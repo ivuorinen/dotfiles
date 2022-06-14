@@ -1,0 +1,38 @@
+[user]
+	name = Ismo Vuorinen
+	email = ismo.vuorinen@geniem.com
+	signingkey = 027A74A88B2CC570
+[core]
+	excludesfile = ~/.gitignore_global
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	template = ~/.stCommitMsg
+[alias]
+    reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
+    reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
+    nah = !git reset --hard && git clean -df
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = master
+[pull]
+	rebase = false
+
+[color]
+	ui = true
+
+[color "status"]
+    added = green bold
+    changed = yellow
+    deleted = red bold strike
+    untracked = cyan
+    branch = yellow black bold ul

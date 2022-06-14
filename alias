@@ -1,0 +1,42 @@
+# shellcheck shell=bash
+# macOS specific
+if [[ $(uname) == 'Darwin' ]]; then
+  alias file_hide="chflags hidden"
+  alias file_show="chflags nohidden"
+  alias brewUp='brew update && brew outdated && brew upgrade && brew cleanup'
+
+  alias php74='$(brew --prefix php@7.4)/bin/php'
+  alias php80='$(brew --prefix php@8.0)/bin/php -d error_reporting=22527'
+  alias phpc='$(brew --prefix php)/bin/php -d error_reporting=22527'
+  alias php80raw='$(brew --prefix php@8.0)/bin/php'
+
+  alias php-server='php -S localhost:9000'
+
+  alias p74c='$(brew --prefix php@7.4)/bin/php -d error_reporting=22527 $(which composer)'
+  alias p80c='$(brew --prefix php@8.0)/bin/php -d error_reporting=22527 $(which composer)'
+  alias p8c='$(brew --prefix php)/bin/php -d error_reporting=22527 $(which composer)'
+  alias p7a='$(brew --prefix php@7.4)/bin/php artisan'
+  alias p8a='$(brew --prefix php)/bin/php artisan'
+
+  alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+
+  # work related
+  alias geniemvpn='sudo openfortivpn -c ~/.local/openfortivpn.conf'
+fi
+
+alias watchx='watch -dpbc'
+alias zapds='find . -name ".DS_Store" -print -delete'
+alias t='tail -f'
+alias dn='du -chd1'
+
+alias codescanner='docker run --env SOURCE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock registry.gitlab.com/gitlab-org/ci-cd/codequality:${VERSION:-latest} /code'
+
+alias composerUp='composer global update'
+alias npmUp='npm -g up'
+
+alias zedit='code ~/.zshrc ~/.alias'
+
+if [[ -f "$HOME/.aliases.local" ]]; then
+  # shellcheck disable=SC1091
+  source "$HOME/.aliases.local"
+fi

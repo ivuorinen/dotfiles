@@ -1,0 +1,23 @@
+{
+  "useTaobaoRegistry": false,
+  "presets": {
+    "v2-router-vuex-scss-prettier": {
+      "useConfigFiles": false,
+      "plugins": {
+        "@vue/cli-plugin-babel": {},
+        "@vue/cli-plugin-router": {
+          "historyMode": false
+        },
+        "@vue/cli-plugin-vuex": {},
+        "@vue/cli-plugin-eslint": {
+          "config": "prettier",
+          "lintOn": [
+            "save"
+          ]
+        }
+      },
+      "vueVersion": "2",
+      "cssPreprocessor": "dart-sass"
+    }
+  }
+}
