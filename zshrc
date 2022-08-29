@@ -1,3 +1,5 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && . "$HOME/.fig/shell/zshrc.pre.zsh"
 # shellcheck shell=bash
 
 LOCAL_BIN="$HOME/.local/bin"
@@ -64,3 +66,6 @@ GCLOUD_INSTALL_LOCATION=$(gcloud info --format="value(installation.sdk_root)" --
 source "$GCLOUD_INSTALL_LOCATION/path.zsh.inc"
 source "$GCLOUD_INSTALL_LOCATION/completion.zsh.inc"
 source "$(brew --prefix z)/etc/profile.d/z.sh"
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"
