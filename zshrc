@@ -12,7 +12,7 @@ GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
 BREW_RUBY=$(brew --prefix ruby)/bin
 USR_SBIN=/usr/local/sbin
 
-export PATH="$LOCAL_BIN:$PHP_74:$PHP_80:$PHP_CUR:$PYTHON_38:$COMPOSER_DIR:$BREW_PYTHON:$GNUBIN_DIR:$BREW_RUBY:$USR_SBIN:$PATH"
+export PATH="$LOCAL_BIN:$PYTHON_38:$COMPOSER_DIR:$BREW_PYTHON:$GNUBIN_DIR:$BREW_RUBY:$USR_SBIN:$PATH"
 source "$HOME/.config/antigen.zsh"
 
 export NVM_DIR="$HOME/.nvm"
