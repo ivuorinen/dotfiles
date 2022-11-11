@@ -2,6 +2,8 @@
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 # shellcheck shell=bash
 
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
 LOCAL_BIN="$HOME/.local/bin"
 OPT_FOLDER="/usr/local/opt"
 PHP_74=$(brew --prefix php@7.4)/bin
