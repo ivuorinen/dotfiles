@@ -73,5 +73,6 @@ handle_file_ln "/Users/ivuorinen/.dotfiles/gitconfig" "/Users/ivuorinen/.gitconf
 handle_file_ln "/Users/ivuorinen/.dotfiles/gitignore_global" "/Users/ivuorinen/.gitignore_global"
 handle_file_ln "/Users/ivuorinen/.dotfiles/huskyrc" "/Users/ivuorinen/.huskyrc"
 handle_file_ln "/Users/ivuorinen/.dotfiles/install.sh" "/Users/ivuorinen/.install.sh"
+handle_file_ln "/Users/ivuorinen/.dotfiles/local/bin/x-open-ports" "/Users/ivuorinen/.local/bin/x-open-ports"
 handle_file_ln "/Users/ivuorinen/.dotfiles/vuerc" "/Users/ivuorinen/.vuerc"
 handle_file_ln "/Users/ivuorinen/.dotfiles/zshrc" "/Users/ivuorinen/.zshrc"

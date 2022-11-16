@@ -1,15 +1,8 @@
 [user]
 	name = Ismo Vuorinen
-	email = ismo.vuorinen@geniem.com
-	signingkey = 027A74A88B2CC570
+	email = ismo.vuorinen@vincit.fi
 [core]
 	excludesfile = ~/.gitignore_global
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
 [commit]
 	template = ~/.stCommitMsg
 [alias]
@@ -36,6 +29,9 @@
 
 [color]
 	ui = true
+	diff = auto
+	branch = auto
+	status = auto
 
 [color "status"]
     added = green bold
