@@ -2,8 +2,13 @@
 
 ## Setup
 
-
 ## Other stuff
+
+Update `Brewfile``
+
+```bash
+brew bundle dump --force --file=~/.dotfiles/Brewfile
+```
 
 Enable automatic brew updates and upgrades.
 
