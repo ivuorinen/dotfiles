@@ -14,9 +14,10 @@ COMPOSER_DIR="$HOME/.composer/vendor/bin"
 BREW_PYTHON=$(brew --prefix python@3.8)/bin
 GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
 BREW_RUBY=$(brew --prefix ruby)/bin
+BREW_GEMS=$(gem environment gemdir)/bin
 USR_SBIN=/usr/local/sbin
 
-export PATH="$LOCAL_BIN:$PYTHON_38:$COMPOSER_DIR:$BREW_PYTHON:$GNUBIN_DIR:$BREW_RUBY:$USR_SBIN:$PATH"
+export PATH="$LOCAL_BIN:$PYTHON_38:$COMPOSER_DIR:$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$USR_SBIN:$PATH"
 source "$HOME/.config/antigen.zsh"
 
 export NVM_DIR="$HOME/.nvm"
