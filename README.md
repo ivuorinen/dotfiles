@@ -4,7 +4,7 @@
 
 ## Other stuff
 
-Update `Brewfile``
+Update `Brewfile`
 
 ```bash
 brew bundle dump --force --file=~/.dotfiles/Brewfile

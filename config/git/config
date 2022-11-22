@@ -2,9 +2,7 @@
 	name = Ismo Vuorinen
 	email = ismo.vuorinen@vincit.fi
 [core]
-	excludesfile = ~/.gitignore_global
-[commit]
-	template = ~/.stCommitMsg
+	excludesfile = ~/.config/git/gitignore
 [alias]
     reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
     reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
