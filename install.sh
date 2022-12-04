@@ -63,7 +63,6 @@ handle_file_ln() {
   $MKDIR -p "$($DIRNAME "$2")"
   $LN -sf "$1" "$2"
 }
-handle_file_ln "/Users/ivuorinen/.dotfiles/Brewfile" "/Users/ivuorinen/.Brewfile"
 handle_file_ln "/Users/ivuorinen/.dotfiles/alias" "/Users/ivuorinen/.alias"
 handle_file_ln "/Users/ivuorinen/.dotfiles/bash_profile" "/Users/ivuorinen/.bash_profile"
 handle_file_ln "/Users/ivuorinen/.dotfiles/bashrc" "/Users/ivuorinen/.bashrc"
@@ -73,7 +72,6 @@ handle_file_ln "/Users/ivuorinen/.dotfiles/config/git/config" "/Users/ivuorinen/
 handle_file_ln "/Users/ivuorinen/.dotfiles/config/git/gitignore" "/Users/ivuorinen/.config/git/gitignore"
 handle_file_ln "/Users/ivuorinen/.dotfiles/git_profiles" "/Users/ivuorinen/.git_profiles"
 handle_file_ln "/Users/ivuorinen/.dotfiles/huskyrc" "/Users/ivuorinen/.huskyrc"
-handle_file_ln "/Users/ivuorinen/.dotfiles/install.sh" "/Users/ivuorinen/.install.sh"
 handle_file_ln "/Users/ivuorinen/.dotfiles/local/bin/x-open-ports" "/Users/ivuorinen/.local/bin/x-open-ports"
 handle_file_ln "/Users/ivuorinen/.dotfiles/vuerc" "/Users/ivuorinen/.vuerc"
 handle_file_ln "/Users/ivuorinen/.dotfiles/zshrc" "/Users/ivuorinen/.zshrc"
