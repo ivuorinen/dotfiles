@@ -176,8 +176,6 @@ cask "fork"
 cask "google-cloud-sdk"
 # HTTP and GraphQL Client
 cask "insomnia"
-# End-to-end encryption software
-cask "keybase"
 # Kubernetes IDE
 cask "lens"
 # Reverse proxy, secure introspectable tunnels to localhost
