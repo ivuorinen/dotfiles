@@ -7,7 +7,7 @@
 Update `Brewfile`
 
 ```bash
-brew bundle dump --force --file=~/.dotfiles/Brewfile
+brew bundle dump --force --file=~/.dotfiles/Brewfile --describe
 ```
 
 Enable automatic brew updates and upgrades.

@@ -66,6 +66,9 @@ antigen apply
 
 export HIST_STAMPS="yyyy-mm-dd"
 
+# Only load 1Password cli completions if op exists
+hash op 2>/dev/null && eval "$(op completion zsh)"; compdef _op op
+
 source "$HOME/.alias"
 
 GCLOUD_INSTALL_LOCATION=$(gcloud info --format="value(installation.sdk_root)" --quiet)

@@ -1,3 +1,4 @@
+tap "1password/tap"
 tap "anchore/grype"
 tap "ddosify/tap"
 tap "dm3ch/tap"
@@ -30,10 +31,22 @@ brew "brew-php-switcher"
 brew "glib"
 # Manage compile and link flags for libraries
 brew "pkg-config"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
 # Open source suite of directory software
 brew "openldap"
+# Libraries to talk to Microsoft SQL Server and Sybase databases
+brew "freetds"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
+# Postgres C API library
+brew "libpq"
+# General-purpose scripting language
+brew "php"
+# Dependency Manager for PHP
+brew "composer"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Diff that understands syntax
+brew "difftastic"
 # Tool for exploring each layer in a docker image
 brew "dive"
 # Command-line DNS client
@@ -42,8 +55,6 @@ brew "dog"
 brew "eg-examples"
 # CLI for templating and/or deploying FaaS functions
 brew "faas-cli"
-# Libraries to talk to Microsoft SQL Server and Sybase databases
-brew "freetds"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
 # GitHub command-line tool
@@ -66,8 +77,6 @@ brew "gnutls"
 brew "gnupg"
 # Image manipulation
 brew "netpbm"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Library to render SVG files using Cairo
@@ -90,8 +99,6 @@ brew "imagemagick"
 brew "jq"
 # Lazier way to manage everything docker
 brew "lazydocker"
-# Postgres C API library
-brew "libpq"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
 # Swiss Army Knife for macOS
@@ -121,13 +128,13 @@ brew "shfmt"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier", link: false
 # Tool to build, change, and version infrastructure
-brew "terraform"
+brew "terraform", link: false
 # Thin wrapper for Terraform e.g. for locking state
 brew "terragrunt"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
 # Terraform version manager inspired by rbenv
-brew "tfenv", link: false
+brew "tfenv"
 # Programmatically correct mistyped console commands
 brew "thefuck"
 # Simplified and community-driven man pages
@@ -142,6 +149,8 @@ brew "viddy"
 brew "watch"
 # Internet file retriever
 brew "wget"
+# Personal information dashboard for your terminal
+brew "wtfutil"
 # Tracks most-used directories to make cd smarter
 brew "z"
 # A vulnerability scanner for container images and filesystems
@@ -162,6 +171,8 @@ brew "shivammathur/php/php"
 brew "shivammathur/php/php@7.4"
 # General-purpose scripting language
 brew "shivammathur/php/php@8.0"
+# Command-line helper for the 1Password password manager
+cask "1password-cli"
 # App to build and share containerized applications and microservices
 cask "docker"
 # Reimagine your terminal
