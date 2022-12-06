@@ -19,9 +19,6 @@ if [[ $(uname) == 'Darwin' ]]; then
   alias p8a='$(brew --prefix php)/bin/php artisan'
 
   alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-
-  # work related
-  alias geniemvpn='sudo openfortivpn -c ~/.local/openfortivpn.conf'
 fi
 
 alias watchx='watch -dpbc'

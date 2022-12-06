@@ -103,6 +103,8 @@ brew "lazydocker"
 brew "libvoikko"
 # Swiss Army Knife for macOS
 brew "m-cli"
+# Mac App Store command-line interface
+brew "mas"
 # Terminal-based visual file manager
 brew "midnight-commander"
 # Port scanning utility for large networks
@@ -203,6 +205,8 @@ cask "quicklook-json"
 cask "quicklookase"
 # MySQL/MariaDB database management
 cask "sequel-ace"
+# Collection of apps available by subscription
+cask "setapp"
 # Application for inspecting installer packages
 cask "suspicious-package"
 # Quicklook extension for source files
@@ -213,3 +217,10 @@ cask "visual-studio-code"
 cask "vlc"
 # Rust-based terminal
 cask "warp"
+mas "1Password for Safari", id: 1569813296
+mas "GarageBand", id: 682658836
+mas "iMovie", id: 408981434
+mas "Keynote", id: 409183694
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Tailscale", id: 1475387142

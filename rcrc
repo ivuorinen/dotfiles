@@ -1,0 +1,2 @@
+EXCLUDES="README.md install.sh Brewfile.lock.json Brewfile"
+HOSTNAME=$(hostname -s)

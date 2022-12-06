@@ -10,15 +10,18 @@ insert_final_newline = true
 # tab_width = 4
 trim_trailing_whitespace = true
 
-[*.sass]
-# indent_size = 2
+[{*.yaml,*.yml}]
+indent_size = 2
 
-[{*.bash,*.sh,*.zsh}]
+[*.sh]
+indent_style = space
 indent_size = 2
 tab_width = 2
 
-[{*.ctp,*.hphp,*.inc,*.module,*.php,*.php4,*.php5,*.phtml}]
-# max_line_length = 110
-
-[{*.yaml,*.yml}]
-indent_size = 2
+shell_variant      = posix # like -ln=posix
+binary_next_line   = true  # like -bn
+switch_case_indent = true  # like -ci
+space_redirects    = true  # like -sr
+keep_padding       = false  # like -kp
+function_next_line = false  # like -fn
+never_split        = true  # like -ns
