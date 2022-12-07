@@ -1,2 +1,2 @@
-EXCLUDES="README.md install.sh Brewfile.lock.json Brewfile set-defaults.sh gh-extensions.sh"
+EXCLUDES="*.md *.sh *.lock.json Brewfile scripts"
 HOSTNAME=$(hostname -s)
