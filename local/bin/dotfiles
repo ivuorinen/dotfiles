@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# Dotfiles and install helper
+# (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022
+# Licensed under MIT, see LICENSE
+#
+
+# Helper variables, override with ENVs like `VERBOSE=1 helpers.sh help`
+: "${VERBOSE:=0}"
+: "${DOTFILES:=$HOME/.dotfiles}"
+: "${INSTALL_SCRIPT:=$DOTFILES/install.sh}"
+: "${BREWFILE:=$DOTFILES/Brewfile}"
+
+function usage() {
+  echo $"Usage: $0 [install | brew | dotfiles | other]"
+  echo $" All commands have their own subcommands."
+  echo $" When in doubt run the subcommand to show list."
+}
+
+function section_install() {
+  USAGE_PREFIX="Usage: $0 install"
+
+  case "$1" in
+    *)
+      echo "$USAGE_PREFIX [link | update]"
+      echo " * link:         Use rcrc to update dotfile links"
+      echo " * update:       Updates and upgrades brew packages"
+      echo " * updatebundle: Updates Brewfile with descriptions"
+      ;;
+  esac
+}
+
+function section_brew() {
+  USAGE_PREFIX="Usage: $0 brew"
+
+  if ! command -v brew &> /dev/null; then
+    echo "brew could not be found, please install it first"
+    exit
+  fi
+
+  case "$1" in
+    install)
+      brew bundle install --file="$BREWFILE"; echo "🎉 Done!"
+      ;;
+    update)
+      brew update && brew upgrade; echo "🎉 Done!"
+      ;;
+    updatebundle)
+      # Updates .dotfiles/Brewfile with descriptions
+      brew bundle dump --force --file="$BREWFILE" --describe
+      echo "🎉 Done!"
+      ;;
+    autoupdate)
+      brew autoupdate start 43200 --upgrade --cleanup --immediate
+      ;;
+    *)
+      echo "$USAGE_PREFIX [install | update | updatebundle]"
+      echo " * install:      Installs items defined in Brewfile"
+      echo " * update:       Updates and upgrades brew packages"
+      echo " * updatebundle: Updates Brewfile with descriptions"
+      echo " * autoupdate:   Setups brew auto-update and runs it immediately"
+      ;;
+  esac
+}
+
+function section_dotfiles() {
+  USAGE_PREFIX="Usage: $0 dotfiles"
+
+  case "$1" in
+    link)
+      rcup -B "$HOSTNAME" -v && echo "🎉 Done!"
+      ;;
+    update)
+      # Updates .dotfiles/install.sh and formats it
+      rcup -B 0 -g | \
+        tee "$INSTALL_SCRIPT" 1> /dev/null && \
+        shfmt -w -l "$INSTALL_SCRIPT" && \
+        echo "🎉 Done!"
+      ;;
+    *)
+      echo "$USAGE_PREFIX [link | update]"
+      echo " * link:         Use rcrc to update dotfile links"
+      echo " * update:       Updates dotfile links, installs host specific overrides automatically"
+      ;;
+  esac
+}
+
+function section_other() {
+  case "$1" in
+    *)
+      echo "section_other"
+      echo "$1"
+      ;;
+  esac
+}
+
+# The main loop. first keyword after $0 triggers section, or help.
+case "$1" in
+  install) section_install "$2" ;;
+  brew) section_brew "$2" ;;
+  dotfiles) section_dotfiles "$2" ;;
+  other) section_other "$2" ;;
+  *) usage; exit 1 ;;
+esac

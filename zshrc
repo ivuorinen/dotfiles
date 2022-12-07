@@ -36,6 +36,7 @@ export NVM_AUTO_USE=true
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
 [[ -f "$HOME/.dotfiles/alias" ]] && source "$HOME/.dotfiles/alias"
+[[ -f "$HOME/.dotfiles/alias-$HOSTNAME" ]] && source "$HOME/.dotfiles/alias-$HOSTNAME"
 
 # Try to load antigen, if present
 [[ -f "$HOME/.config/antigen.zsh" ]] && source "$HOME/.config/antigen.zsh"

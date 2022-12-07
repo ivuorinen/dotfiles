@@ -73,6 +73,7 @@ handle_file_ln "/Users/ivuorinen/.dotfiles/config/git/gitignore" "/Users/ivuorin
 handle_file_ln "/Users/ivuorinen/.dotfiles/config/wtf/config.yml" "/Users/ivuorinen/.config/wtf/config.yml"
 handle_file_ln "/Users/ivuorinen/.dotfiles/git_profiles" "/Users/ivuorinen/.git_profiles"
 handle_file_ln "/Users/ivuorinen/.dotfiles/huskyrc" "/Users/ivuorinen/.huskyrc"
+handle_file_ln "/Users/ivuorinen/.dotfiles/local/bin/dotfiles" "/Users/ivuorinen/.local/bin/dotfiles"
 handle_file_ln "/Users/ivuorinen/.dotfiles/local/bin/x-open-ports" "/Users/ivuorinen/.local/bin/x-open-ports"
 handle_file_ln "/Users/ivuorinen/.dotfiles/rcrc" "/Users/ivuorinen/.rcrc"
 handle_file_ln "/Users/ivuorinen/.dotfiles/ssh/allowed_signers" "/Users/ivuorinen/.ssh/allowed_signers"
