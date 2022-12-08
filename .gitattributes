@@ -205,7 +205,12 @@ Procfile          text
 
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
+
+*.gitignore       text
 *.gitkeep         text
+.gitattributes export-ignore
+**/.gitignore     export-ignore
+**/.gitkeep       export-ignore
 
 # Repo specials
 local/bin/*        text eol=lf

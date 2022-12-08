@@ -189,6 +189,8 @@ cask "fork"
 cask "google-cloud-sdk"
 # HTTP and GraphQL Client
 cask "insomnia"
+# JetBrains tools manager
+cask "jetbrains-toolbox"
 # Kubernetes IDE
 cask "lens"
 # Reverse proxy, secure introspectable tunnels to localhost
@@ -207,6 +209,8 @@ cask "quicklookase"
 cask "sequel-ace"
 # Collection of apps available by subscription
 cask "setapp"
+# Sound and audio controller
+cask "soundsource"
 # Application for inspecting installer packages
 cask "suspicious-package"
 # Quicklook extension for source files
