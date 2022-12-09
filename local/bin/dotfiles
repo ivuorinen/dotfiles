@@ -4,33 +4,38 @@
 # (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022
 # Licensed under MIT, see LICENSE
 #
-
+# shellcheck source-path=SCRIPTDIR
+#
 # Helper variables, override with ENVs like `VERBOSE=1 helpers.sh help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${INSTALL_SCRIPT:=$DOTFILES/install.sh}"
 : "${BREWFILE:=$DOTFILES/Brewfile}"
 
-function usage() {
-  echo $"Usage: $0 [install | brew | dotfiles | other]"
+function usage
+{
+  echo $"Usage: $0 [install | brew | dotfiles]"
   echo $" All commands have their own subcommands."
   echo $" When in doubt run the subcommand to show list."
 }
 
-function section_install() {
+function section_install
+{
   USAGE_PREFIX="Usage: $0 install"
 
   case "$1" in
+    gh-extensions)
+      bash "$DOTFILES/scripts/gh-extensions.sh" && echo "🎉 Done!"
+      ;;
     *)
-      echo "$USAGE_PREFIX [link | update]"
-      echo " * link:         Use rcrc to update dotfile links"
-      echo " * update:       Updates and upgrades brew packages"
-      echo " * updatebundle: Updates Brewfile with descriptions"
+      echo "$USAGE_PREFIX [gh-extensions]"
+      echo " * gh-extensions: Install GitHub CLI Extensions"
       ;;
   esac
 }
 
-function section_brew() {
+function section_brew
+{
   USAGE_PREFIX="Usage: $0 brew"
 
   if ! command -v brew &> /dev/null; then
@@ -40,15 +45,16 @@ function section_brew() {
 
   case "$1" in
     install)
-      brew bundle install --file="$BREWFILE"; echo "🎉 Done!"
+      brew bundle install --file="$BREWFILE"
+      echo "🎉 Done!"
       ;;
     update)
-      brew update && brew upgrade; echo "🎉 Done!"
+      brew update && brew outdated && brew upgrade && brew cleanup
+      echo "🎉 Done!"
       ;;
     updatebundle)
       # Updates .dotfiles/Brewfile with descriptions
-      brew bundle dump --force --file="$BREWFILE" --describe
-      echo "🎉 Done!"
+      brew bundle dump --force --file="$BREWFILE" --describe && echo "🎉 Done!"
       ;;
     autoupdate)
       brew autoupdate start 43200 --upgrade --cleanup --immediate
@@ -63,7 +69,8 @@ function section_brew() {
   esac
 }
 
-function section_dotfiles() {
+function section_dotfiles
+{
   USAGE_PREFIX="Usage: $0 dotfiles"
 
   case "$1" in
@@ -72,24 +79,37 @@ function section_dotfiles() {
       ;;
     update)
       # Updates .dotfiles/install.sh and formats it
-      rcup -B 0 -g | \
-        tee "$INSTALL_SCRIPT" 1> /dev/null && \
-        shfmt -w -l "$INSTALL_SCRIPT" && \
-        echo "🎉 Done!"
+      rcup -B 0 -g \
+        | tee "$INSTALL_SCRIPT" 1> /dev/null \
+        && shfmt -w -l "$INSTALL_SCRIPT" \
+        && echo "🎉 Done!"
+      ;;
+    shfmt)
+      # Format shell scripts according to following rules.
+      shfmt \
+        --list \
+        --write \
+        --diff \
+        --simplify \
+        --language-dialect bash \
+        --indent 2 \
+        --binary-next-line \
+        --case-indent \
+        --space-redirects \
+        --func-next-line \
+        "$DOTFILES" \
+        "$DOTFILES/local/bin/dotfiles" \
+        "$DOTFILES/local/bin/x-check-git-attributes" \
+        "$DOTFILES/local/bin/x-open-ports" \
+        "$DOTFILES/config/alias" \
+        "$DOTFILES/config/exports" \
+        "$DOTFILES/config/functions"
       ;;
     *)
-      echo "$USAGE_PREFIX [link | update]"
+      echo "$USAGE_PREFIX [link | update | shfmt]"
       echo " * link:         Use rcrc to update dotfile links"
       echo " * update:       Updates dotfile links, installs host specific overrides automatically"
-      ;;
-  esac
-}
-
-function section_other() {
-  case "$1" in
-    *)
-      echo "section_other"
-      echo "$1"
+      echo " * shfmt:        Run shfmt to all dotfiles"
       ;;
   esac
 }
@@ -99,6 +119,5 @@ case "$1" in
   install) section_install "$2" ;;
   brew) section_brew "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
-  other) section_other "$2" ;;
-  *) usage; exit 1 ;;
+  *) usage && exit 1 ;;
 esac

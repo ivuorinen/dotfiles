@@ -1,32 +1,69 @@
 # shellcheck shell=bash
 # macOS specific
+
+# Get installed php versions from brew and setup aliases
+function x-set-php-aliases
+{
+  local php_versions=()
+  while IFS="" read -r line; do php_versions+=("$line"); done < <(brew list | grep '^php')
+
+  php_error_reporting='-d error_reporting=22527'
+
+  for version in "${php_versions[@]}"; do
+    # drop the dot from version (8.0 -> 80)
+    local php_abbr="${version//\./}"
+    # replace "php@" with "p" so "php@80" becomes "p80"
+    local php_alias="${php_abbr//php@/p}"
+
+    # Skip php = php aliasing
+    # if [[ "$php_abbr" == "$php_alias" ]]; then continue; fi;
+
+    # Fetch the exec path once
+    php_exec="$(brew --prefix "$version")/bin/php"
+
+    # Raw PHP without error_reporting flag.
+    # shellcheck disable=SC2139
+    alias ${php_alias}r="$php_exec"
+    # PHP with error_reporting flag.
+    # shellcheck disable=SC2139
+    alias $php_alias="$php_exec $php_error_reporting"
+    # Local PHP Server.
+    # shellcheck disable=SC2139
+    alias ${php_alias}s="$php_exec -S localhost:9000"
+    # Use composer with specific PHP and error_reporting flag on.
+    # shellcheck disable=SC2139
+    alias ${php_alias}c="$php_exec $php_error_reporting $(which composer)"
+  done
+}
+
 if [[ $(uname) == 'Darwin' ]]; then
-  alias file_hide="chflags hidden"
-  alias file_show="chflags nohidden"
-  alias brewUp='brew update && brew outdated && brew upgrade && brew cleanup'
 
-  alias php74='$(brew --prefix php@7.4)/bin/php'
-  alias php80='$(brew --prefix php@8.0)/bin/php -d error_reporting=22527'
-  alias phpc='$(brew --prefix php)/bin/php -d error_reporting=22527'
-  alias php80raw='$(brew --prefix php@8.0)/bin/php'
-
-  alias php-server='php -S localhost:9000'
-
-  alias p74c='$(brew --prefix php@7.4)/bin/php -d error_reporting=22527 $(which composer)'
-  alias p80c='$(brew --prefix php@8.0)/bin/php -d error_reporting=22527 $(which composer)'
-  alias p8c='$(brew --prefix php)/bin/php -d error_reporting=22527 $(which composer)'
-  alias p7a='$(brew --prefix php@7.4)/bin/php artisan'
-  alias p8a='$(brew --prefix php)/bin/php artisan'
+  x-set-php-aliases
 
   alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+
+  # Flush Directory Service cache
+  alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+
+  # Lock the screen
+  alias afk="osascript -e 'tell application \"System Events\" to keystroke \"q\" using {command down,control down}'"
+
+  # Empty the Trash on all mounted volumes and the main HDD
+  # Also, clear Apple’s System Logs to improve shell startup speed
+  alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
 fi
 
-alias watchx='watch -dpbc'
+alias watchx='watch -dpbc' # watch with: differences, precise, beep and color
 alias zapds='find . -name ".DS_Store" -print -delete'
-alias t='tail -f'
-alias dn='du -chd1'
+alias t='tail -f'   # tail with follow flag on
+alias dn='du -chd1' # directory usage, return only the total
 
-alias codescanner='docker run --env SOURCE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock registry.gitlab.com/gitlab-org/ci-cd/codequality:${VERSION:-latest} /code'
+alias code_scanner='docker run \
+  --env SOURCE_CODE="$PWD" \
+  --volume "$PWD":/code \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  registry.gitlab.com/gitlab-org/ci-cd/codequality:${CODEQUALITY_VERSION:-latest} \
+  /code'
 
 alias composerUp='composer global update'
 alias npmUp='npm -g up'

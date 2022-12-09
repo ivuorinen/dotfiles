@@ -22,12 +22,14 @@
 : ${MKDIR:=/bin/mkdir}
 : ${RM:=/bin/rm}
 : ${DIRNAME:=/usr/bin/dirname}
-verbose() {
+verbose()
+{
   if [ "$VERBOSE" -gt 0 ]; then
     echo "$@"
   fi
 }
-handle_file_cp() {
+handle_file_cp()
+{
   if [ -e "$2" ]; then
     printf "%s " "overwrite $2? [yN]"
     read overwrite
@@ -45,7 +47,8 @@ handle_file_cp() {
   $MKDIR -p "$($DIRNAME "$2")"
   $CP -R "$1" "$2"
 }
-handle_file_ln() {
+handle_file_ln()
+{
   if [ -e "$2" ]; then
     printf "%s " "overwrite $2? [yN]"
     read overwrite

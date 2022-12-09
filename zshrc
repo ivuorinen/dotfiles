@@ -2,21 +2,12 @@
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 # shellcheck shell=bash
 
-LOCAL_BIN="$HOME/.local/bin"
-
-PYTHON_38="$HOME/Library/Python/3.8/bin"
-COMPOSER_DIR="$HOME/.composer/vendor/bin"
-USR_SBIN=/usr/local/sbin
-
-export PATH="/opt/homebrew/bin:$USR_SBIN:$PATH"
+export PATH="/opt/homebrew/bin:/usr/local/sbin:$PATH"
 
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
     BREW_SBIN=$(brew --prefix)/sbin
 
-    # PHP_74=$(brew --prefix php@7.4)/bin
-    # PHP_80=$(brew --prefix php@8.0)/bin
-    # PHP_CUR=$(brew --prefix php)/bin
     BREW_PYTHON=$(brew --prefix python@3.8)/bin
     GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
     BREW_RUBY=$(brew --prefix ruby)/bin
@@ -25,8 +16,9 @@ if [ command -v brew &> /dev/null ]; then
     export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
 fi
 
-export PATH="$LOCAL_BIN:$PYTHON_38:$COMPOSER_DIR:$PATH"
-export HIST_STAMPS="yyyy-mm-dd"
+LOCAL_BIN="$HOME/.local/bin"
+COMPOSER_DIR="$HOME/.composer/vendor/bin"
+export PATH="$LOCAL_BIN:$COMPOSER_DIR:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 export NVM_LAZY_LOAD=true
@@ -35,8 +27,19 @@ export NVM_AUTO_USE=true
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
-[[ -f "$HOME/.dotfiles/alias" ]] && source "$HOME/.dotfiles/alias"
-[[ -f "$HOME/.dotfiles/alias-$HOSTNAME" ]] && source "$HOME/.dotfiles/alias-$HOSTNAME"
+# Run x-load-configs in your terminal to reload the files.
+function x-load-configs()
+{
+    # Load the shell dotfiles, and then some:
+    for file in ~/.dotfiles/config/{exports,alias,functions}; do
+        [ -r "$file" ] && [ -f "$file" ] && source "$file"
+        [ -r "$file-$HOSTNAME" ] && [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
+    done
+}
+x-load-configs
+
+# Import ssh keys in keychain
+ssh-add -A 2>/dev/null;
 
 # Try to load antigen, if present
 [[ -f "$HOME/.config/antigen.zsh" ]] && source "$HOME/.config/antigen.zsh"

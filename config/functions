@@ -1,0 +1,67 @@
+# shellcheck shell=bash
+#
+# shell functions
+#
+
+# Weather in Tampere, or other city
+function weather
+{
+  # https://github.com/chubin/wttr.in#usage
+  local city="${1:-Tampere}"
+  curl "http://wttr.in/${city// /+}?2nFQM&lang=fi"
+}
+
+# Docker
+function ssh-docker
+{
+  docker exec -it "$@" bash
+}
+
+# Create a new directory and enter it
+function mkd
+{
+  mkdir -p "$@" && cd "$@" || exit
+}
+
+# All the dig info
+function digga
+{
+  dig +nocmd "$1" any +multiline +noall +answer
+}
+
+# Rector project to php version 8.0 by default.
+function rector
+{
+  local php="${1:-80}"
+  docker run -v "$(pwd)":/project rector/rector:latest process \
+    "/project/$1" \
+    --set "php${php}" \
+    --autoload-file /project/vendor/autoload.php
+}
+
+# Commit everything
+function commit
+{
+  commitMessage="$*"
+
+  if [ "$commitMessage" = "" ]; then
+    commitMessage="Automated commit"
+  fi
+
+  git add .
+  eval "git commit -a -m '${commitMessage}'"
+}
+
+function scheduler
+{
+  while :; do
+    php artisan schedule:run
+    echo "Sleeping 60 seconds..."
+    sleep 60
+  done
+}
+
+function silent
+{
+  "$@" >&/dev/null
+}
