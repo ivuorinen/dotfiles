@@ -24,11 +24,19 @@ function section_install
   USAGE_PREFIX="Usage: $0 install"
 
   case "$1" in
+    antigen)
+      curl -L git.io/antigen > "$DOTFILES/config/antigen.zsh" && echo "🎉 Done!"
+      ;;
+    defaults)
+      bash "$DOTFILES/scripts/set-defaults.sh" && echo "🎉 Done!"
+      ;;
     gh-extensions)
       bash "$DOTFILES/scripts/gh-extensions.sh" && echo "🎉 Done!"
       ;;
     *)
-      echo "$USAGE_PREFIX [gh-extensions]"
+      echo "$USAGE_PREFIX [antigen | defaults | gh-extensions]"
+      echo " * antigen:       Updates the antigen.zsh file"
+      echo " * defaults:      Setup nice macOS defaults"
       echo " * gh-extensions: Install GitHub CLI Extensions"
       ;;
   esac
