@@ -11,6 +11,7 @@ tap "homebrew/core"
 tap "homebrew/services"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
+tap "teamookla/speedtest"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.10"
 # Automate deployment, configuration, and upgrading
@@ -173,8 +174,12 @@ brew "shivammathur/php/php"
 brew "shivammathur/php/php@7.4"
 # General-purpose scripting language
 brew "shivammathur/php/php@8.0"
+# Ookla Speedtest
+brew "teamookla/speedtest/speedtest"
 # Command-line helper for the 1Password password manager
 cask "1password-cli"
+# Text editor
+cask "coda"
 # App to build and share containerized applications and microservices
 cask "docker"
 # Reimagine your terminal
@@ -205,6 +210,8 @@ cask "qlstephen"
 cask "quicklook-json"
 # QuickLook generator for Adobe Swatch Exchange files
 cask "quicklookase"
+# Move and resize windows using keyboard shortcuts or snap areas
+cask "rectangle"
 # MySQL/MariaDB database management
 cask "sequel-ace"
 # Collection of apps available by subscription
