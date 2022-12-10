@@ -4,7 +4,8 @@ echo 'start osx/set-defaults.sh'
 # Ask for the administrator password upfront
 sudo -v
 
-# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+# Keep-alive: update existing `sudo` time stamp
+# until this script has finished
 while true; do
   sudo -n true
   sleep 60
