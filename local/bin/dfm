@@ -6,7 +6,7 @@
 #
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 #
-# Helper variables, override with ENVs like `VERBOSE=1 dotfiles help`
+# Helper variables, override with ENVs like `VERBOSE=1 dfm help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${INSTALL_SCRIPT:=$DOTFILES/scripts/install.sh}"

@@ -43,8 +43,8 @@ else
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-bash ../local/bin/dotfiles brew install && "Installed Brewfile contents"
-bash ../local/bin/dotfiles dotfiles link && "Linked all dotfiles"
+bash ../local/bin/dfm brew install && "Installed Brewfile contents"
+bash ../local/bin/dfm dotfiles link && "Linked all dotfiles"
 
 read -r -p "Do you want to set macOS defaults? (y/N) " yn
 
