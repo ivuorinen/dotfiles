@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
+#
+# Check git repo's files .gitattributes and are all of them mapped.
+# Ismo Vuorinen <https://github.com/ivuorinen> 2022
+#
+
+if ! command -v git &> /dev/null; then
+  echo "git could not be found, please install it first"
+  exit
+fi
 
 missing_attributes=$(git ls-files | git check-attr -a --stdin | grep "text: auto")
+
 if [[ "$missing_attributes" ]]; then
   echo ".gitattributes rule missing for the following files:"
   echo "$missing_attributes"

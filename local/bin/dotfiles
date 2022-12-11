@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
 #
-# Dotfiles and install helper
+# Dotfiles manager and install helper
 # (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022
 # Licensed under MIT, see LICENSE
 #
-# shellcheck source-path=SCRIPTDIR
+# shellcheck source-path=$HOME/.dotfiles/local/bin
 #
-# Helper variables, override with ENVs like `VERBOSE=1 helpers.sh help`
+# Helper variables, override with ENVs like `VERBOSE=1 dotfiles help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
-: "${INSTALL_SCRIPT:=$DOTFILES/install.sh}"
+: "${INSTALL_SCRIPT:=$DOTFILES/scripts/install.sh}"
 : "${BREWFILE:=$DOTFILES/Brewfile}"
 
-function usage
-{
-  echo $"Usage: $0 [install | brew | dotfiles]"
-  echo $" All commands have their own subcommands."
-  echo $" When in doubt run the subcommand to show list."
-}
+SCRIPT=$(basename "$0")
 
 function section_install
 {
-  USAGE_PREFIX="Usage: $0 install"
+  USAGE_PREFIX="-> $SCRIPT install"
 
   case "$1" in
+    all)
+      bash "$DOTFILES/scripts/settler.sh" && echo "🎉 Done!"
+      ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/config/antigen.zsh" && echo "🎉 Done!"
       ;;
@@ -44,7 +42,7 @@ function section_install
 
 function section_brew
 {
-  USAGE_PREFIX="Usage: $0 brew"
+  USAGE_PREFIX="-> $SCRIPT brew"
 
   if ! command -v brew &> /dev/null; then
     echo "brew could not be found, please install it first"
@@ -79,18 +77,18 @@ function section_brew
 
 function section_dotfiles
 {
-  USAGE_PREFIX="Usage: $0 dotfiles"
+  USAGE_PREFIX="-> $SCRIPT dotfiles"
 
   case "$1" in
     link)
       rcup -B "$HOSTNAME" -v && echo "🎉 Done!"
       ;;
     update)
-      # Updates .dotfiles/install.sh and formats it
+      # Updates .dotfiles/scripts/install.sh and formats it
       rcup -B 0 -g \
         | tee "$INSTALL_SCRIPT" 1> /dev/null \
         && shfmt -w -l "$INSTALL_SCRIPT" \
-        && sed -i '' "s|$HOME|\~|g" "$INSTALL_SCRIPT" \
+        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
         && echo "🎉 Done!"
       ;;
     shfmt)
@@ -121,6 +119,18 @@ function section_dotfiles
       echo " * shfmt:        Run shfmt to all dotfiles"
       ;;
   esac
+}
+
+function usage
+{
+  echo $"Usage: $SCRIPT [install | brew | dotfiles]"
+  echo $" All commands have their own subcommands."
+  echo ""
+  section_install
+  echo ""
+  section_brew
+  echo ""
+  section_dotfiles
 }
 
 # The main loop. first keyword after $0 triggers section, or help.

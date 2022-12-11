@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Install GitHub CLI extensions
 
+if ! command -v gh &> /dev/null; then
+  echo "gh (GitHub Client) could not be found, please install it first"
+  exit 1
+fi
+
 extensions=(
   # GitHub CLI extension for reviewing Dependabot PRs.
   einride/gh-dependabot

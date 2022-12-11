@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # Settler - my macOS setup automator
+# Ismo Vuorinen <https://github.com/ivuorinen> 2018
 
 # Ask for the administrator password upfront
 sudo -v
