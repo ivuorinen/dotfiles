@@ -13,15 +13,6 @@ _theme
 *.sql.gz
 *.WordPress.*.xml
 cachegrind.out.*
-client-*.json
 composer.phar
-devops/.infra_ip_cache
 wp_*.sh
-
-redirectRules.csv
-results_redirectRules.csv
-testRedirect.sh
-
-uploads-webpc
-webpc-passthru.php
 auth.json
