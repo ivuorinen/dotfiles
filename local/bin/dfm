@@ -23,7 +23,7 @@ function section_install
       bash "$DOTFILES/scripts/settler.sh" && echo "🎉 Done!"
       ;;
     antigen)
-      curl -L git.io/antigen > "$DOTFILES/config/antigen.zsh" && echo "🎉 Done!"
+      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && echo "🎉 Done!"
       ;;
     defaults)
       bash "$DOTFILES/scripts/set-defaults.sh" && echo "🎉 Done!"
@@ -105,7 +105,7 @@ function section_dotfiles
         --space-redirects \
         --func-next-line \
         "$DOTFILES" \
-        "$DOTFILES/local/bin/dotfiles" \
+        "$DOTFILES/local/bin/dfm" \
         "$DOTFILES/local/bin/x-check-git-attributes" \
         "$DOTFILES/local/bin/x-open-ports" \
         "$DOTFILES/config/alias" \

@@ -42,7 +42,7 @@ x-load-configs
 ssh-add -A 2>/dev/null;
 
 # Try to load antigen, if present
-[[ -f "$HOME/.config/antigen.zsh" ]] && source "$HOME/.config/antigen.zsh"
+[[ -f "$HOME/.local/bin/antigen.zsh" ]] && source "$HOME/.local/bin/antigen.zsh"
 
 # antigen is present
 if command -v antigen &> /dev/null; then
