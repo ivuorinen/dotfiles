@@ -64,6 +64,7 @@ if command -v antigen &> /dev/null; then
     hash docker 2>/dev/null && antigen bundle docker
 
     hash nvm 2>/dev/null && antigen bundle Sparragus/zsh-auto-nvm-use
+    hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
     hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
     hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin
     # antigen bundle voronkovich/phpcs.plugin.zsh
