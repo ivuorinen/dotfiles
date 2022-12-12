@@ -94,6 +94,7 @@ function section_dotfiles
     shfmt)
       # Format shell scripts according to following rules.
       shfmt \
+        --find \
         --list \
         --write \
         --diff \
@@ -104,13 +105,7 @@ function section_dotfiles
         --case-indent \
         --space-redirects \
         --func-next-line \
-        "$DOTFILES" \
-        "$DOTFILES/local/bin/dfm" \
-        "$DOTFILES/local/bin/x-check-git-attributes" \
-        "$DOTFILES/local/bin/x-open-ports" \
-        "$DOTFILES/config/alias" \
-        "$DOTFILES/config/exports" \
-        "$DOTFILES/config/functions"
+        "$DOTFILES"
       ;;
     *)
       echo "$USAGE_PREFIX [link | update | shfmt]"
