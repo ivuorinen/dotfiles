@@ -216,6 +216,8 @@ cask "rectangle"
 cask "sequel-ace"
 # Collection of apps available by subscription
 cask "setapp"
+# Team communication and collaboration software
+cask "slack"
 # Sound and audio controller
 cask "soundsource"
 # Application for inspecting installer packages
