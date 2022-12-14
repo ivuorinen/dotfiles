@@ -2,6 +2,7 @@
 #
 # Settler - my macOS setup automator
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
+#
 
 # Ask for the administrator password upfront
 sudo -v
@@ -43,8 +44,8 @@ else
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-bash ../local/bin/dfm brew install && "Installed Brewfile contents"
-bash ../local/bin/dfm dotfiles link && "Linked all dotfiles"
+bash "$HOME/.dotfiles/local/bin/dfm" brew install && "Installed Brewfile contents"
+bash "$HOME/.dotfiles/local/bin/dfm" dotfiles link && "Linked all dotfiles"
 
 read -r -p "Do you want to set macOS defaults? (y/N) " yn
 

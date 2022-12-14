@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-echo 'start osx/set-defaults.sh'
+#
+# set-defaults.sh - Sets macOS Defaults that I like
+#
+# This script contains large portions from following scripts:
+# - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
+#
 
 # Ask for the administrator password upfront
 sudo -v
@@ -226,8 +231,11 @@ defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 
 # Enable the Develop menu and the Web Inspector in Safari
 defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+defaults write com.apple.Safari \
+  WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write com.apple.Safari \
+  com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled \
+  -bool true
 
 # Don’t display the annoying prompt when quitting iTerm
 #defaults write com.googlecode.iterm2 PromptOnQuit -bool false
@@ -268,10 +276,16 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 ###############################################################################
 
 # Disable smart quotes as it’s annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+defaults write com.apple.messageshelper.MessageController \
+  SOInputLineSettings \
+  -dict-add "automaticQuoteSubstitutionEnabled" \
+  -bool false
 
 # Disable continuous spell checking
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
+defaults write com.apple.messageshelper.MessageController \
+  SOInputLineSettings \
+  -dict-add "continuousSpellCheckingEnabled" \
+  -bool false
 
 ###############################################################################
 # Kill affected applications                                                  #
