@@ -7,6 +7,7 @@ tap "github/gh"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
 tap "homebrew/cask"
+tap "homebrew/cask-fonts"
 tap "homebrew/core"
 tap "homebrew/services"
 tap "shivammathur/extensions"
@@ -128,6 +129,8 @@ brew "ruby"
 brew "shellcheck"
 # Autoformat shell script source code
 brew "shfmt"
+# Version control system designed to be a better CVS
+brew "subversion"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier", link: false
 # Tool to build, change, and version infrastructure
@@ -186,6 +189,18 @@ cask "docker"
 cask "fig"
 # Unofficial overcast.fm podcast app
 cask "fog"
+# Typeface made for developers
+cask "font-jetbrains-mono"
+# Developer targeted fonts with a high number of glyphs
+cask "font-jetbrains-mono-nerd-font"
+cask "font-lato"
+cask "font-open-sans"
+# Font with a mechanical skeleton and the forms are largely geometric
+cask "font-roboto"
+cask "font-source-code-pro"
+cask "font-source-code-pro-for-powerline"
+cask "font-source-sans-pro"
+cask "font-source-serif-pro"
 # Open Source Webfont Converter
 cask "fontplop"
 # GIT client
@@ -200,6 +215,8 @@ cask "jetbrains-toolbox"
 cask "lens"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Collaboration platform for API development
+cask "postman"
 # Display image info and preview unsupported formats in QuickLook
 cask "qlimagesize"
 # QuickLook generator for Markdown files
