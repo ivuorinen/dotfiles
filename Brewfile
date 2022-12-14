@@ -69,6 +69,8 @@ brew "git-extras"
 brew "git-flow-avh"
 # See your latest local git branches, formatted real fancy
 brew "git-recent"
+# Open-source GitLab command-line tool
+brew "glab"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
 # Validating, recursive, caching DNS resolver
