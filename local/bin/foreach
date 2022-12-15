@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# foreach <folder> <commands that should be run to each file>
+#
+# Source: https://github.com/mvdan/dotfiles/blob/master/.bin/foreach
+
+cmd=$1
+shift
+
+for dir in $($cmd); do
+  (
+    echo "$dir"
+    cd "$dir" || exit 1
+    eval "$@" # allow multiple commands like "foo && bar"
+  )
+done
