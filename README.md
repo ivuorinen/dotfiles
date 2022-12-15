@@ -1,6 +1,11 @@
 # .dotfiles
 
-The folder structure follows [XDG Base Directory Specification][xdg] where possible.
+Welcome to [ivuorinen](https://github.com/ivuorinen)'s .dotfiles repository. It's a hodgepodge of scripts
+and configurations, tests and mistakes I'm not aware of yet. As I find more interesting tools, configs and
+other stuff, this repository will live accordingly.
+
+Please for the love of everything good do not use these 1:1 as your own dotfiles,
+fork or download the repo as a zip and go from there with your own configs.
 
 ## Setup
 
@@ -11,13 +16,41 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 3. ???
 4. Profit
 
-Note: there's a bit chicken/egg situation, because settler assumes you don't have git, and you need git to clone the repo.
+Note: there's a bit chicken/egg situation, because settler assumes you don't have git,
+and you need git to clone the repo. This will change soon&trade;.
+
+## Interesting files and locations
+
+### Special folders
+
+| Path               | Description                                                                         |
+|--------------------|-------------------------------------------------------------------------------------|
+| `.github`          | GitHub Repository configuration files. Not part of the dotfiles per se.             |
+| `host-{hostname}/` | Host specific dotfiles. Configurations that should apply to that host only.         |
+| `local/bin`        | Helper scripts that I've collected or wrote to make life easier.                    |
+| `scripts`          | Setup scripts. Some can be run many times, some are meant only for the first round. |
+
+### dotfile folders
+
+| Repo      | Destination | Description                                                      |
+|-----------|-------------|------------------------------------------------------------------|
+| `config/` | `.config/`  | Configurations for applications.                                 |
+| `local/`  | `.local/`   | XDG Base folder, contains `bin`, `share` and `state` for example |
+| `ssh/`    | `.ssh/`     | SSH Configurations.                                              |
 
 ### dfm - the dotfiles manager
 
-`dfm` is a shellscript that has some tools that help with dotfiles management.
+`.local/bin/dfm` is a shell script that has some tools that help with dotfiles management.
+
+### `scripts/install.sh` - dotfiles linker
+
+The `scripts/install.sh` is a `rcm` generated shell script that does all the necessary linking.
+
+To refresh the file, you can run `dfm dotfiles update`
 
 ## Configuration
+
+The folder structure follows [XDG Base Directory Specification][xdg] where possible.
 
 ### XDG Variables
 

@@ -81,15 +81,15 @@ function section_dotfiles
 
   case "$1" in
     link)
-      rcup -B "$HOSTNAME" -v && echo "🎉 Done!"
+      rcup -B "$HOSTNAME" -f -v && echo "🎉 Done!"
       ;;
     update)
       # Updates .dotfiles/scripts/install.sh and formats it
       rcup -B 0 -g \
         | tee "$INSTALL_SCRIPT" 1> /dev/null \
-        && shfmt -w -l "$INSTALL_SCRIPT" \
-        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
-        && echo "🎉 Done!"
+        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT"
+      $0 dotfiles shfmt
+      echo "🎉 Done!"
       ;;
     shfmt)
       # Format shell scripts according to following rules.
