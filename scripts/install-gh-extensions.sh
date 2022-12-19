@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Install GitHub CLI extensions
 
+source "$HOME/.dotfiles/scripts/shared.sh"
+
 if ! command -v gh &> /dev/null; then
-  echo "gh (GitHub Client) could not be found, please install it first"
+  msg_run "gh (GitHub Client) could not be found, please install it first"
   exit 1
 fi
 
@@ -35,10 +37,17 @@ extensions=(
   stoe/gh-report
 )
 
+msg "Starting to install GitHub CLI extensions..."
+
 for ext in "${extensions[@]}"; do
+  # Trim spaces
+  ext=${ext// /}
   # Skip comments
   if [[ ${ext:0:1} == "#" ]]; then continue; fi
 
-  echo "-> Installing $ext"
+  msg_run "Installing $ext"
   gh extensions install "$ext"
+  echo ""
 done
+
+msg_ok "Done"

@@ -79,6 +79,8 @@ brew "unbound"
 brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
 # Image manipulation
 brew "netpbm"
 # OpenType text shaping engine

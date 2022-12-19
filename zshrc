@@ -2,6 +2,9 @@
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 # shellcheck shell=bash
 
+autoload -U colors zsh/terminfo
+colors
+
 export PATH="/opt/homebrew/bin:/usr/local/sbin:$PATH"
 
 if [ command -v brew &> /dev/null ]; then
@@ -14,6 +17,14 @@ if [ command -v brew &> /dev/null ]; then
     BREW_GEMS=$(gem environment gemdir)/bin
 
     export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
+fi
+
+# If we have go packages, include them to the PATH
+if command -v go &> /dev/null; then
+    export GOPATH=$(go env GOPATH);
+    if [ -d "$GOPATH/bin" ]; then
+        export PATH="$GOPATH/bin:$PATH"
+    fi
 fi
 
 LOCAL_BIN="$HOME/.local/bin"

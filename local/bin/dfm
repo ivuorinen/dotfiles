@@ -14,35 +14,42 @@
 
 SCRIPT=$(basename "$0")
 
+source "$HOME/.dotfiles/scripts/shared.sh"
+
 function section_install
 {
-  USAGE_PREFIX="-> $SCRIPT install"
+  USAGE_PREFIX="$SCRIPT install"
 
   case "$1" in
     all)
-      bash "$DOTFILES/scripts/settler.sh" && echo "🎉 Done!"
+      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Done!"
       ;;
     antigen)
-      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && echo "🎉 Done!"
+      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 Done!"
       ;;
     defaults)
-      bash "$DOTFILES/scripts/set-defaults.sh" && echo "🎉 Done!"
+      bash "$DOTFILES/scripts/set-defaults.sh" && msg_done "🎉 Done!"
       ;;
-    gh-extensions)
-      bash "$DOTFILES/scripts/gh-extensions.sh" && echo "🎉 Done!"
+    ext_go)
+      bash "$DOTFILES/scripts/install-go-packages" && msg_done "🎉 Done!"
+      ;;
+    ext_gh)
+      bash "$DOTFILES/scripts/install-gh-extensions" && msg_done "🎉 Done!"
       ;;
     *)
-      echo "$USAGE_PREFIX [antigen | defaults | gh-extensions]"
-      echo " * antigen:       Updates the antigen.zsh file"
-      echo " * defaults:      Setup nice macOS defaults"
-      echo " * gh-extensions: Install GitHub CLI Extensions"
+      menu_section "$USAGE_PREFIX" "all | antigen | defaults | ext_go | ext_gh"
+      menu_item "all"      "Runs the WIP settler.sh"
+      menu_item "antigen"  "Updates the antigen.zsh file"
+      menu_item "defaults" "Setup nice macOS defaults"
+      menu_item "ext_go"   "Install Go Packages"
+      menu_item "ext_gh"   "Install GitHub CLI Extensions"
       ;;
   esac
 }
 
 function section_brew
 {
-  USAGE_PREFIX="-> $SCRIPT brew"
+  USAGE_PREFIX="$SCRIPT brew"
 
   if ! command -v brew &> /dev/null; then
     echo "brew could not be found, please install it first"
@@ -60,24 +67,27 @@ function section_brew
       ;;
     updatebundle)
       # Updates .dotfiles/Brewfile with descriptions
-      brew bundle dump --force --file="$BREWFILE" --describe && echo "🎉 Done!"
+      brew bundle dump \
+        --force \
+        --file="$BREWFILE" \
+        --describe && msg_ok "🎉 Done!"
       ;;
     autoupdate)
       brew autoupdate start 43200 --upgrade --cleanup --immediate
       ;;
     *)
-      echo "$USAGE_PREFIX [install | update | updatebundle]"
-      echo " * install:      Installs items defined in Brewfile"
-      echo " * update:       Updates and upgrades brew packages"
-      echo " * updatebundle: Updates Brewfile with descriptions"
-      echo " * autoupdate:   Setups brew auto-update and runs it immediately"
+      menu_section "$USAGE_PREFIX" "install | update | updatebundle | autoupdate"
+      menu_item "install" "Installs items defined in Brewfile"
+      menu_item "update" "Updates and upgrades brew packages"
+      menu_item "updatebundle" "Updates Brewfile with descriptions"
+      menu_item "autoupdate" "Setups brew auto-update and runs it immediately"
       ;;
   esac
 }
 
 function section_dotfiles
 {
-  USAGE_PREFIX="-> $SCRIPT dotfiles"
+  USAGE_PREFIX="$SCRIPT dotfiles"
 
   case "$1" in
     link)
@@ -108,18 +118,44 @@ function section_dotfiles
         "$DOTFILES"
       ;;
     *)
-      echo "$USAGE_PREFIX [link | update | shfmt]"
-      echo " * link:         Use rcrc to update dotfile links"
-      echo " * update:       Updates dotfile links, installs host specific overrides automatically"
-      echo " * shfmt:        Run shfmt to all dotfiles"
+      menu_section "$USAGE_PREFIX" "link | update | shfmt"
+      menu_item "link" "Use rcrc to update dotfile links"
+      menu_item "update" "Updates dotfile links, installs host specific overrides automatically"
+      menu_item "shfmt" "Run shfmt to all dotfiles"
+      ;;
+  esac
+}
+
+# Secret menu for visual tests
+function section_tests
+{
+  USAGE_PREFIX="$SCRIPT tests"
+
+  case "$1" in
+    msg)
+      msg "msg"
+      msg_done "msg_done"
+      msg_prompt "msg_prompt"
+      msg_prompt_done "msg_prompt_done"
+      msg_nested "msg_nested"
+      msg_nested_done "msg_nested_done"
+      msg_run "msg_run" "second_param"
+      msg_ok "msg_ok"
+      msg_warn "msg_warn"
+      msg_err "msg_err"
+      ;;
+    *)
+      menu_section "$USAGE_PREFIX" "msg"
+      menu_item "msg" "List all log functions from shared.sh"
       ;;
   esac
 }
 
 function usage
 {
-  echo $"Usage: $SCRIPT [install | brew | dotfiles]"
-  echo $" All commands have their own subcommands."
+  echo ""
+  menu_section "Usage: $SCRIPT" "install | brew | dotfiles"
+  echo $"   All commands have their own subcommands."
   echo ""
   section_install
   echo ""
@@ -133,5 +169,6 @@ case "$1" in
   install) section_install "$2" ;;
   brew) section_brew "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
+  tests) section_tests "$2" ;;
   *) usage && exit 1 ;;
 esac

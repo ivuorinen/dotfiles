@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# set-defaults.sh - Sets macOS Defaults that I like
+# set-macos-defaults.sh - Sets macOS Defaults that I like
 #
 # This script contains large portions from following scripts:
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
