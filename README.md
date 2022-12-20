@@ -42,9 +42,9 @@ and you need git to clone the repo. This will change soon&trade;.
 
 `.local/bin/dfm` is a shell script that has some tools that help with dotfiles management.
 
-### `scripts/install.sh` - dotfiles linker
+### `scripts/install-dotfiles.sh` - dotfiles linker
 
-The `scripts/install.sh` is a `rcm` generated shell script that does all the necessary linking.
+The `scripts/install-dotfiles.sh` is a `rcm` generated shell script that does all the necessary linking.
 
 To refresh the file, you can run `dfm dotfiles update`
 

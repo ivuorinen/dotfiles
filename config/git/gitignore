@@ -16,3 +16,4 @@ cachegrind.out.*
 composer.phar
 wp_*.sh
 auth.json
+dfm.sh

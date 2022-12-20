@@ -9,7 +9,7 @@
 # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
-: "${INSTALL_SCRIPT:=$DOTFILES/scripts/install.sh}"
+: "${INSTALL_SCRIPT:=$DOTFILES/scripts/install-dotfiles.sh}"
 : "${BREWFILE:=$DOTFILES/Brewfile}"
 
 SCRIPT=$(basename "$0")
@@ -22,27 +22,39 @@ function section_install
 
   case "$1" in
     all)
-      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Done!"
+      $0 install antigen && msg_done "New antigen installed"
+      $0 install macos && msg_done "macOS Defaults set"
+      $0 install brew && msg_done "Brewfile defined apps has been installed"
+      $0 install ext_gh && msg_done "Extensions for GitHub CLI have been installed"
+      $0 install ext_go && msg_done "Go packages have been installed"
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 Done!"
       ;;
-    defaults)
-      bash "$DOTFILES/scripts/set-defaults.sh" && msg_done "🎉 Done!"
+    brew)
+      brew bundle install --file="$BREWFILE" && echo "🎉 Done!"
+      ;;
+    macos)
+      bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Done!"
       ;;
     ext_go)
-      bash "$DOTFILES/scripts/install-go-packages" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/install-go-packages.sh" && msg_done "🎉 Done!"
       ;;
     ext_gh)
-      bash "$DOTFILES/scripts/install-gh-extensions" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/install-gh-extensions.sh" && msg_done "🎉 Done!"
+      ;;
+    settler)
+      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Done!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | defaults | ext_go | ext_gh"
-      menu_item "all"      "Runs the WIP settler.sh"
+      menu_section "$USAGE_PREFIX" "all | antigen | brew | macos | ext_go | ext_gh | settler"
+      menu_item "all"      "Installs antigen, macos, brew, ext_gh and ext_go"
       menu_item "antigen"  "Updates the antigen.zsh file"
-      menu_item "defaults" "Setup nice macOS defaults"
-      menu_item "ext_go"   "Install Go Packages"
+      menu_item "brew"     "Install Brewfile contents"
       menu_item "ext_gh"   "Install GitHub CLI Extensions"
+      menu_item "ext_go"   "Install Go Packages"
+      menu_item "macos"    "Setup nice macOS defaults"
+      menu_item "settler"  "Runs the WIP settler.sh"
       ;;
   esac
 }
@@ -58,8 +70,7 @@ function section_brew
 
   case "$1" in
     install)
-      brew bundle install --file="$BREWFILE"
-      echo "🎉 Done!"
+      brew bundle install --file="$BREWFILE" && echo "🎉 Done!"
       ;;
     update)
       brew update && brew outdated && brew upgrade && brew cleanup
@@ -97,7 +108,8 @@ function section_dotfiles
       # Updates .dotfiles/scripts/install.sh and formats it
       rcup -B 0 -g \
         | tee "$INSTALL_SCRIPT" 1> /dev/null \
-        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT"
+        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
+        && sed -i '' "s|install.sh|$(basename $INSTALL_SCRIPT)|g" "$INSTALL_SCRIPT"
       $0 dotfiles shfmt
       echo "🎉 Done!"
       ;;
@@ -119,9 +131,9 @@ function section_dotfiles
       ;;
     *)
       menu_section "$USAGE_PREFIX" "link | update | shfmt"
-      menu_item "link" "Use rcrc to update dotfile links"
-      menu_item "update" "Updates dotfile links, installs host specific overrides automatically"
-      menu_item "shfmt" "Run shfmt to all dotfiles"
+      menu_item "link"    "Use rcrc to update dotfile links"
+      menu_item "update"  "Updates dotfile links, installs host specific overrides automatically"
+      menu_item "shfmt"   "Run shfmt to all dotfiles"
       ;;
   esac
 }
