@@ -10,6 +10,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "mongodb/brew"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
@@ -161,6 +162,8 @@ brew "watch"
 brew "wget"
 # Personal information dashboard for your terminal
 brew "wtfutil"
+# JavaScript package manager
+brew "yarn"
 # Tracks most-used directories to make cd smarter
 brew "z"
 # A vulnerability scanner for container images and filesystems
@@ -169,6 +172,8 @@ brew "anchore/grype/grype"
 brew "ddosify/tap/ddosify"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
+# High-performance, schema-free, document-oriented database
+brew "mongodb/brew/mongodb-community"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@7.4"
 # Xdebug PHP extension
