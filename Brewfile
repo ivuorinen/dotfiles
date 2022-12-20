@@ -114,6 +114,8 @@ brew "m-cli"
 brew "mas"
 # Terminal-based visual file manager
 brew "midnight-commander"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
 # Port scanning utility for large networks
 brew "nmap"
 # Manage multiple Node.js versions
