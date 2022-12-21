@@ -58,6 +58,8 @@ brew "dog"
 brew "eg-examples"
 # CLI for templating and/or deploying FaaS functions
 brew "faas-cli"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
 # GitHub command-line tool
