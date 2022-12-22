@@ -1,2 +1,15 @@
 Host *
-	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+ IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+Host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/id_rsa
+
+Host bitbucket.com
+ Hostname bitbucket.com
+ IdentityFile ~/.ssh/id_rsa
+
+Host gitlab.com
+ Hostname gitlab.com
+ IdentityFile ~/.ssh/id_rsa
+
