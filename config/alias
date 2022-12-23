@@ -68,9 +68,10 @@ alias code_scanner='docker run \
 alias composerUp='composer global update'
 alias npmUp='npm -g up'
 
-alias zedit='code ~/.zshrc ~/.alias'
+alias zedit='$EDITOR ~/.zshrc ~/.alias'
 
 if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091
   source "$HOME/.aliases.local"
 fi
+

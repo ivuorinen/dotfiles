@@ -27,6 +27,10 @@ if command -v go &> /dev/null; then
     fi
 fi
 
+if command -v nvim &> /dev/null; then
+    export EDITOR="nvim"
+fi
+
 LOCAL_BIN="$HOME/.local/bin"
 COMPOSER_DIR="$HOME/.composer/vendor/bin"
 export PATH="$LOCAL_BIN:$COMPOSER_DIR:$PATH"
