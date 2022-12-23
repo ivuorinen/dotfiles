@@ -69,6 +69,7 @@ alias composerUp='composer global update'
 alias npmUp='npm -g up'
 
 alias zedit='$EDITOR ~/.zshrc ~/.alias'
+alias zdots='$EDITOR ~/.dotfiles'
 
 if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091
