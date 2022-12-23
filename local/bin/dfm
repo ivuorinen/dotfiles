@@ -32,7 +32,7 @@ function section_install
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 Done!"
       ;;
     brew)
-      brew bundle install --file="$BREWFILE" && echo "🎉 Done!"
+      brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
       ;;
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Done!"
@@ -70,7 +70,7 @@ function section_brew
 
   case "$1" in
     install)
-      brew bundle install --file="$BREWFILE" && echo "🎉 Done!"
+      brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
       ;;
     update)
       brew update && brew outdated && brew upgrade && brew cleanup
@@ -81,7 +81,7 @@ function section_brew
       brew bundle dump \
         --force \
         --file="$BREWFILE" \
-        --describe && msg_ok "🎉 Done!"
+        --describe && msg_done "🎉 Done!"
       ;;
     autoupdate)
       brew autoupdate start 43200 --upgrade --cleanup --immediate
@@ -102,7 +102,7 @@ function section_dotfiles
 
   case "$1" in
     link)
-      rcup -B "$HOSTNAME" -f -v && echo "🎉 Done!"
+      rcup -B "$HOSTNAME" -f -v && msg_done "🎉 Done!"
       ;;
     update)
       # Updates .dotfiles/scripts/install.sh and formats it
@@ -111,7 +111,7 @@ function section_dotfiles
         && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
         && sed -i '' "s|install.sh|$(basename $INSTALL_SCRIPT)|g" "$INSTALL_SCRIPT"
       $0 dotfiles shfmt
-      echo "🎉 Done!"
+      msg_done "🎉 Done!"
       ;;
     shfmt)
       # Format shell scripts according to following rules.
@@ -121,7 +121,6 @@ function section_dotfiles
         --write \
         --diff \
         --simplify \
-        --language-dialect bash \
         --indent 2 \
         --binary-next-line \
         --case-indent \
