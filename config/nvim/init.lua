@@ -57,13 +57,16 @@ require('packer').startup(function(use)
   -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make', cond = vim.fn.executable 'make' == 1 }
 
+  -- catppuccin theme
+  use { "catppuccin/nvim", as = "catppuccin" }
+
   use {
     "folke/which-key.nvim",
     config = function()
       require("which-key").setup {
         -- your configuration comes here
         -- or leave it empty to use the default settings
-        -- refer to the configuration section below
+        -- refer to the configuration section in the docs
       }
     end
   }
@@ -128,7 +131,8 @@ vim.wo.signcolumn = 'yes'
 
 -- Set colorscheme
 vim.o.termguicolors = true
-vim.cmd.colorscheme('palenight')
+--vim.cmd.colorscheme('palenight')
+vim.cmd.colorscheme('catppuccin-macchiato')
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -162,7 +166,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'onedark',
+    theme = 'catppuccin-macchiato',
     component_separators = '|',
     section_separators = '',
   },
@@ -350,7 +354,14 @@ require('mason').setup()
 
 -- Enable the following language servers
 -- Feel free to add/remove any LSPs that you want here. They will automatically be installed
-local servers = { 'clangd', 'rust_analyzer', 'pyright', 'tsserver', 'sumneko_lua', 'gopls' }
+local servers = {
+  'clangd',
+  'rust_analyzer',
+  'pyright',
+  'tsserver',
+  'sumneko_lua',
+  'gopls'
+}
 
 -- Ensure the servers above are installed
 require('mason-lspconfig').setup {

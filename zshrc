@@ -5,7 +5,7 @@
 autoload -U colors zsh/terminfo
 colors
 
-export PATH="/opt/homebrew/bin:/usr/local/sbin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:/usr/local/sbin:$PATH"
 
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
@@ -77,6 +77,7 @@ if command -v antigen &> /dev/null; then
     hash php 2>/dev/null && antigen bundle php
     hash nvm 2>/dev/null && antigen bundle nvm
     hash docker 2>/dev/null && antigen bundle docker
+    hash ruby 2>/dev/null && antigen bundle ruby
 
     hash nvm 2>/dev/null && antigen bundle Sparragus/zsh-auto-nvm-use
     hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
