@@ -72,14 +72,13 @@ if command -v antigen &> /dev/null; then
     antigen bundle zsh-users/zsh-completions
     antigen bundle MichaelAquilina/zsh-you-should-use
     antigen bundle unixorn/autoupdate-antigen.zshplugin
+    antigen bundle Sparragus/zsh-auto-nvm-use
     # antigen bundle git-auto-fetch
 
     hash php 2>/dev/null && antigen bundle php
     hash nvm 2>/dev/null && antigen bundle nvm
     hash docker 2>/dev/null && antigen bundle docker
     hash ruby 2>/dev/null && antigen bundle ruby
-
-    hash nvm 2>/dev/null && antigen bundle Sparragus/zsh-auto-nvm-use
     hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
     hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
     hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin
