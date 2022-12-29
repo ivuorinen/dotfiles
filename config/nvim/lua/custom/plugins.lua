@@ -47,6 +47,11 @@ return function(use)
         callback = function() require("lint").try_lint() end,
     })
 
+    -- nvim orgmode, to get me use nvim even more.
+    use ({ "nvim-orgmode/orgmode",
+        config = function() require("orgmode").setup({}) end,
+    })
+
 
     -- Remaps for the refactoring operations currently offered by the plugin
     local map = vim.api.nvim_set_keymap
