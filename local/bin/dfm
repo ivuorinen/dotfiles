@@ -14,7 +14,7 @@
 
 SCRIPT=$(basename "$0")
 
-source "$HOME/.dotfiles/scripts/shared.sh"
+source "$DOTFILES/scripts/shared.sh"
 
 function section_install
 {
@@ -74,7 +74,7 @@ function section_brew
       ;;
     update)
       brew update && brew outdated && brew upgrade && brew cleanup
-      echo "🎉 Done!"
+      msg_done "🎉 Done!"
       ;;
     updatebundle)
       # Updates .dotfiles/Brewfile with descriptions
