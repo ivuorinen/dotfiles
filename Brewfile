@@ -14,8 +14,6 @@ tap "mongodb/brew"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.10"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Zstandard is a real-time compression algorithm
@@ -36,6 +34,8 @@ brew "glib"
 brew "pkg-config"
 # Open source suite of directory software
 brew "openldap"
+# Get a file from an HTTP, HTTPS or FTP server
+brew "curl"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
 # C/C++ and Java libraries for Unicode and globalization
@@ -48,6 +48,8 @@ brew "php"
 brew "composer"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
+# Get, unpack, build, and install modules from CPAN
+brew "cpanminus"
 # Diff that understands syntax
 brew "difftastic"
 # Tool for exploring each layer in a docker image
@@ -126,6 +128,10 @@ brew "nvm"
 brew "openjdk"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
+# Highly capable, feature-rich programming language
+brew "perl"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.10"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.8"
 # RC file (dotfile) management
@@ -226,6 +232,8 @@ cask "insomnia"
 cask "jetbrains-toolbox"
 # Kubernetes IDE
 cask "lens"
+# Neovim Client
+cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Collaboration platform for API development
