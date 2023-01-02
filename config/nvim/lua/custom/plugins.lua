@@ -7,8 +7,8 @@ return function(use)
 
     -- 🍨 Soothing pastel theme for (Neo)vim
     -- https://github.com/catppuccin/nvim
-    use { "catppuccin/nvim", as = "catppuccin" }
-    vim.cmd.colorscheme('catppuccin-latte')
+    -- use { "catppuccin/nvim", as = "catppuccin" }
+    -- vim.cmd.colorscheme('catppuccin-latte')
 
     -- markdown preview plugin for (neo)vim
     -- https://github.com/iamcco/markdown-preview.nvim
@@ -51,7 +51,6 @@ return function(use)
     use ({ "nvim-orgmode/orgmode",
         config = function() require("orgmode").setup({}) end,
     })
-
 
     -- Remaps for the refactoring operations currently offered by the plugin
     local map = vim.api.nvim_set_keymap
