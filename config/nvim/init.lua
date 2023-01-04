@@ -108,6 +108,12 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   group = packer_group,
   pattern = { vim.fn.expand '$MYVIMRC', '~/.dotfiles/config/nvim/**/*.lua' },
 })
+-- Automatically run PackerSync for plugins.lua files.
+vim.api.nvim_create_autocmd('BufWritePost', {
+  command = 'source <afile> | PackerSync',
+  group = packer_group,
+  pattern = { '~/.dotfiles/config/nvim/**/plugins.lua' },
+})
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -154,7 +160,7 @@ vim.o.winbar = '%=%m %f'
 -- [[ Basic Keymaps ]]
 -- Set <space> as the leader key
 -- See `:help mapleader`
---  NOTE: Must happen before plugins are required 
+--  NOTE: Must happen before plugins are required
 --  (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
@@ -240,9 +246,9 @@ vim.keymap.set('n', '<leader>/', function()
   -- change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(
     require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
+      winblend = 10,
+      previewer = false,
+    })
 end, { desc = '[/] Fuzzily search in current buffer]' })
 
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files,
@@ -287,7 +293,7 @@ require('nvim-treesitter.configs').setup {
     enable = true,
     -- Required for spellcheck, some LaTex highlights and
     -- code block highlights that do not have ts grammar
-    additional_vim_regex_highlighting = {'org'},
+    additional_vim_regex_highlighting = { 'org' },
   },
 
   indent = { enable = true, disable = { 'python' } },
@@ -490,7 +496,7 @@ require("mason-lspconfig").setup_handlers {
   -- The first entry (without a key) will be the default handler
   -- and will be called for each installed server that doesn't have
   -- a dedicated handler.
-  function (server_name) -- default handler (optional)
+  function(server_name) -- default handler (optional)
     require("lspconfig")[server_name].setup {}
   end,
 }
@@ -596,16 +602,16 @@ map('n', '<C-.>', '<Cmd>BufferNext<CR>', opts)
 map('n', '<C-<>', '<Cmd>BufferMovePrevious<CR>', opts)
 map('n', '<C->>', '<Cmd>BufferMoveNext<CR>', opts)
 -- Goto buffer in position...
-map('n', '<A-1>', '<Cmd>BufferGoto 1<CR>', opts)
-map('n', '<A-2>', '<Cmd>BufferGoto 2<CR>', opts)
-map('n', '<A-3>', '<Cmd>BufferGoto 3<CR>', opts)
-map('n', '<A-4>', '<Cmd>BufferGoto 4<CR>', opts)
-map('n', '<A-5>', '<Cmd>BufferGoto 5<CR>', opts)
-map('n', '<A-6>', '<Cmd>BufferGoto 6<CR>', opts)
-map('n', '<A-7>', '<Cmd>BufferGoto 7<CR>', opts)
-map('n', '<A-8>', '<Cmd>BufferGoto 8<CR>', opts)
-map('n', '<A-9>', '<Cmd>BufferGoto 9<CR>', opts)
-map('n', '<A-0>', '<Cmd>BufferLast<CR>', opts)
+map('n', '<leader>b1', '<Cmd>BufferGoto 1<CR>', opts)
+map('n', '<leader>b2', '<Cmd>BufferGoto 2<CR>', opts)
+map('n', '<leader>b3', '<Cmd>BufferGoto 3<CR>', opts)
+map('n', '<leader>b4', '<Cmd>BufferGoto 4<CR>', opts)
+map('n', '<leader>b5', '<Cmd>BufferGoto 5<CR>', opts)
+map('n', '<leader>b6', '<Cmd>BufferGoto 6<CR>', opts)
+map('n', '<leader>b7', '<Cmd>BufferGoto 7<CR>', opts)
+map('n', '<leader>b8', '<Cmd>BufferGoto 8<CR>', opts)
+map('n', '<leader>b9', '<Cmd>BufferGoto 9<CR>', opts)
+map('n', '<leader>b0', '<Cmd>BufferLast<CR>', opts)
 -- Pin/unpin buffer
 map('n', '<A-p>', '<Cmd>BufferPin<CR>', opts)
 -- Close buffer
@@ -639,7 +645,7 @@ vim.api.nvim_create_autocmd("BufNewFile",
 -- Enable spell checking for certain file types
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" },
   { pattern = { "*.txt", "*.md", "*.tex" },
-  command = "setlocal spell" })
+    command = "setlocal spell" })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
