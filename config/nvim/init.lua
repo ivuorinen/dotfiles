@@ -549,9 +549,6 @@ end
 -- Setup mason so it can manage external tooling
 require('mason').setup()
 require("null-ls").setup()
-require("mason-null-ls").setup({
-  automatic_setup = true,
-})
 
 -- Enable the following language servers.
 -- Feel free to add/remove any LSPs that you want here.

@@ -132,15 +132,69 @@ return function(use)
 
   -- Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua.
   -- https://github.com/jose-elias-alvarez/null-ls.nvim
-  use { "jose-elias-alvarez/null-ls.nvim" }
+  use {
+    "jose-elias-alvarez/null-ls.nvim",
+    config = function()
+      local n = require("null-ls")
+      local b = n.builtins
+      require("null-ls").setup({
+        b.code_actions.eslint,
+        b.code_actions.shellcheck,
+        b.code_actions.xo,
+        b.completion.luasnip,
+        b.completion.spell,
+        b.diagnostics.actionlint,
+        b.diagnostics.alex,
+        b.diagnostics.ansiblelint,
+        b.diagnostics.codespell,
+        b.diagnostics.dotenv_linter,
+        b.diagnostics.editorconfig_checker,
+        b.diagnostics.eslint,
+        b.diagnostics.hadolint,
+        b.diagnostics.jsonlint,
+        b.diagnostics.luacheck,
+        b.diagnostics.markdownlint,
+        b.diagnostics.php,
+        b.diagnostics.phpcs,
+        b.diagnostics.phpstan,
+        b.diagnostics.psalm,
+        b.diagnostics.shellcheck,
+        b.diagnostics.spectral,
+        b.diagnostics.stylelint,
+        b.diagnostics.todo_comments,
+        b.diagnostics.trail_space,
+        b.diagnostics.xo,
+        b.diagnostics.yamllint,
+        b.formatting.blade_formatter,
+        b.formatting.eslint,
+        b.formatting.fixjson,
+        b.formatting.lua_format,
+        b.formatting.markdownlint,
+        b.formatting.prettier,
+        b.formatting.shfmt,
+        b.formatting.stylelint,
+        -- b.formatting.stylua,
+        b.formatting.terraform_fmt,
+        b.formatting.trim_whitespace,
+        b.formatting.yamlfmt,
+      })
+    end,
+    requires = { "nvim-lua/plenary.nvim" }
+  }
 
   -- mason-null-ls bridges mason.nvim with the null-ls plugin
   -- - making it easier to use both plugins together.
   -- https://github.com/jay-babu/mason-null-ls.nvim
   use {
     "jayp0521/mason-null-ls.nvim",
+    config = function()
+      require("mason-null-ls").setup({
+        ensure_installed = nil,
+        automatic_installation = true,
+        automatic_setup = false,
+      })
+    end,
     requires = { "jose-elias-alvarez/null-ls.nvim" }
   }
 
 end
-
