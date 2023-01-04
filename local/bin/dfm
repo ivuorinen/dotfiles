@@ -109,7 +109,7 @@ function section_dotfiles
       rcup -B 0 -g \
         | tee "$INSTALL_SCRIPT" 1> /dev/null \
         && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
-        && sed -i '' "s|install.sh|$(basename $INSTALL_SCRIPT)|g" "$INSTALL_SCRIPT"
+        && sed -i '' "s|install.sh|$(basename "$INSTALL_SCRIPT")|g" "$INSTALL_SCRIPT"
       $0 dotfiles shfmt
       msg_done "🎉 Done!"
       ;;

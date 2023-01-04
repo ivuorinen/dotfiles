@@ -66,14 +66,12 @@ require('packer').startup(function(use)
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
-    requires = { 'nvim-lua/plenary.nvim' }
-  }
+        branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
   -- Only load if `make` is available
   use { 'nvim-telescope/telescope-fzf-native.nvim',
-    run = 'make', cond = vim.fn.executable 'make' == 1 }
+        run = 'make', cond = vim.fn.executable 'make' == 1 }
 
   -- Add custom plugins to packer from
   -- ~/.config/nvim/lua/custom/plugins.lua
@@ -106,11 +104,11 @@ local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
 vim.api.nvim_create_autocmd('BufWritePost', {
   command = 'source <afile> | PackerCompile',
   group = packer_group,
-  pattern = { vim.fn.expand '$MYVIMRC', '~/.dotfiles/config/nvim/**/*.lua' },
+  pattern = { vim.fn.expand '$MYVIMRC' },
 })
 -- Automatically run PackerSync for plugins.lua files.
 vim.api.nvim_create_autocmd('BufWritePost', {
-  command = 'source <afile> | PackerSync',
+  command = 'source <afile> | PackerSync | PackerCompile',
   group = packer_group,
   pattern = { '~/.dotfiles/config/nvim/**/plugins.lua' },
 })
@@ -121,7 +119,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 -- Set highlight on search
 vim.o.hlsearch = false
 
--- Make line numbers default, enabled relative linenumbers
+-- Make line numbers default, enabled relative line numbers
 vim.wo.number = true
 vim.opt.relativenumber = true
 
@@ -169,9 +167,145 @@ vim.g.maplocalleader = ' '
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
--- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+-- Misc options.
+vim.o.incsearch = true
+
+-- Keymap settings, etc.
+-- ~/.config/nvim/lua/custom/keymaps.lua
+local map = vim.api.nvim_set_keymap
+local default_options_table = {
+  expr = true,
+  silent = true,
+  noremap = true,
+}
+
+-- normal mode keymap setter
+---@param keys string Trigger keys
+---@param func string Function or command to run
+---@param opts table Optional table of vim.keymap.set options.
+---@param desc string Optional description
+local nmap = function(keys, func, opts, desc)
+  if desc then
+    desc = 'keymaps.nmap: ' .. desc
+  end
+
+  local options = default_options_table
+
+  -- If we have options, merge them to the local options table
+  if opts then
+    for k, v in pairs(opts) do
+      options[k] = v
+    end
+  end
+
+  vim.keymap.set('n', keys, func, options)
+end
+
+-- visual mode keymap setter
+---@param keys string Trigger keys
+---@param func string Function or command to run
+---@param opts table Optional table of vim.keymap.set options.
+---@param desc string Optional description
+local vmap = function(keys, func, opts, desc)
+  if desc then
+    desc = 'keymaps.vmap: ' .. desc
+  end
+
+  local options = default_options_table
+
+  -- If we have options, merge them to the local options table
+  if opts then
+    for k, v in pairs(opts) do
+      options[k] = v
+    end
+  end
+
+  vim.keymap.set('v', keys, func, options)
+end
+
+-- Format document
+nmap("<leader>D", ":Format")
+
+-- Deal with word wrap
+nmap('k', "v:count == 0 ? 'gk' : 'k'")
+nmap('j', "v:count == 0 ? 'gj' : 'j'")
+
+-- Diagnostic keymaps
+nmap('dz', vim.diagnostic.goto_prev)
+nmap('dx', vim.diagnostic.goto_next)
+nmap('<leader>e', vim.diagnostic.open_float)
+nmap('<leader>q', vim.diagnostic.setloclist)
+
+--
+-- ThePrimeagen/refactoring.nvim
+-- https://github.com/ThePrimeagen/refactoring.nvim
+--
+
+-- Remaps for the refactoring operations currently offered by the plugin
+local rf = { noremap = true, silent = true, expr = false }
+vmap("<leader>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], rf)
+vmap("<leader>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], rf)
+vmap("<leader>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], rf)
+vmap("<leader>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], rf)
+
+-- Extract block doesn't need visual mode
+nmap("<leader>rb", [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]], rf)
+nmap("<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], rf)
+
+-- Inline variable can also pick up the identifier currently under the cursor without visual mode
+nmap("<leader>ri", [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], rf)
+
+-- prompt for a refactor to apply when the remap is triggered
+vmap("<leader>rr", ":lua require('refactoring').select_refactor()<CR>", rf)
+
+--
+--
+--
+
+-- barbar keymaps
+local barbar_opts = { noremap = true, silent = true }
+
+-- Move to previous/next
+map('n', '<C-,>', '<Cmd>BufferPrevious<CR>', barbar_opts)
+map('n', '<C-.>', '<Cmd>BufferNext<CR>', barbar_opts)
+-- Re-order to previous/next
+map('n', '<C-<>', '<Cmd>BufferMovePrevious<CR>', barbar_opts)
+map('n', '<C->>', '<Cmd>BufferMoveNext<CR>', barbar_opts)
+-- Goto buffer in position...
+map('n', '<leader>b1', '<Cmd>BufferGoto 1<CR>', barbar_opts)
+map('n', '<leader>b2', '<Cmd>BufferGoto 2<CR>', barbar_opts)
+map('n', '<leader>b3', '<Cmd>BufferGoto 3<CR>', barbar_opts)
+map('n', '<leader>b4', '<Cmd>BufferGoto 4<CR>', barbar_opts)
+map('n', '<leader>b5', '<Cmd>BufferGoto 5<CR>', barbar_opts)
+map('n', '<leader>b6', '<Cmd>BufferGoto 6<CR>', barbar_opts)
+map('n', '<leader>b7', '<Cmd>BufferGoto 7<CR>', barbar_opts)
+map('n', '<leader>b8', '<Cmd>BufferGoto 8<CR>', barbar_opts)
+map('n', '<leader>b9', '<Cmd>BufferGoto 9<CR>', barbar_opts)
+map('n', '<leader>b0', '<Cmd>BufferLast<CR>', barbar_opts)
+-- Pin/unpin buffer
+map('n', '<A-p>', '<Cmd>BufferPin<CR>', barbar_opts)
+-- Close buffer
+map('n', '<A-c>', '<Cmd>BufferClose<CR>', barbar_opts)
+-- Wipeout buffer
+--                 :BufferWipeout
+-- Close commands
+--                 :BufferCloseAllButCurrent
+--                 :BufferCloseAllButPinned
+--                 :BufferCloseAllButCurrentOrPinned
+--                 :BufferCloseBuffersLeft
+--                 :BufferCloseBuffersRight
+-- Magic buffer-picking mode
+map('n', '<C-p>', '<Cmd>BufferPick<CR>', barbar_opts)
+-- Sort automatically by...
+map('n', '<Space>bb', '<Cmd>BufferOrderByBufferNumber<CR>', barbar_opts)
+map('n', '<Space>bd', '<Cmd>BufferOrderByDirectory<CR>', barbar_opts)
+map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', barbar_opts)
+map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', barbar_opts)
+
+-- Other:
+-- :BarbarEnable - enables barbar (enabled by default)
+-- :BarbarDisable - very bad command, should never be used
+
 
 local highlight_group = vim.api.nvim_create_augroup(
   'YankHighlight', { clear = true }
@@ -236,34 +370,27 @@ require('telescope').setup {
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
 
+local ks = vim.keymap.set
+local tl = require('telescope.builtin')
+
 -- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles,
-  { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers,
-  { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>/', function()
+ks('n', '<leader>?', tl.oldfiles, { desc = '[?] Find recently opened files' })
+ks('n', '<leader><space>', tl.buffers, { desc = '[ ] Find existing buffers' })
+ks('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to
   -- change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(
+  tl.current_buffer_fuzzy_find(
     require('telescope.themes').get_dropdown {
       winblend = 10,
       previewer = false,
     })
 end, { desc = '[/] Fuzzily search in current buffer]' })
 
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files,
-  { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags,
-  { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string,
-  { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep,
-  { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics,
-  { desc = '[S]earch [D]iagnostics' })
-
--- Load custom treesitter grammar for org filetype
-require('orgmode').setup_ts_grammar()
+ks('n', '<leader>sf', tl.find_files, { desc = '[S]earch [F]iles' })
+ks('n', '<leader>sh', tl.help_tags, { desc = '[S]earch [H]elp' })
+ks('n', '<leader>sw', tl.grep_string, { desc = '[S]earch current [W]ord' })
+ks('n', '<leader>sg', tl.live_grep, { desc = '[S]earch by [G]rep' })
+ks('n', '<leader>sd', tl.diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -355,19 +482,15 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
+-- Load custom treesitter grammar for org filetype
+require('orgmode').setup_ts_grammar()
 require('orgmode').setup({
   org_agenda_files = {
-    '~/Library/Mobile Documents/iCloud~md~obsidian/Documents/_nvalt/**/*',
-    '~/.dotfiles/local/org/**/*'
+    vim.fn.expand '~/.local/share/_nvalt/**/*',
+    vim.fn.expand '~/.dotfiles/local/org/**/*'
   },
-  org_default_notes_file = '~/Library/Mobile Documents/iCloud~md~obsidian/Documents/_nvalt/refile.org',
+  org_default_notes_file = vim.fn.expand '~/.local/share/_nvalt/refile.org',
 })
-
--- Diagnostic keymaps
-vim.keymap.set('n', 'dz', vim.diagnostic.goto_prev)
-vim.keymap.set('n', 'dx', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
 -- LSP settings.
 --  This function gets run when an LSP connects to a particular buffer.
@@ -380,7 +503,7 @@ local on_attach = function(_, bufnr)
   -- In this case, we create a function that lets us more
   -- easily define mappings specific for LSP related items.
   -- It sets the mode, buffer and description for us each time.
-  local nmap = function(keys, func, desc)
+  local nm = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
     end
@@ -388,31 +511,29 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  local t = require('telescope.builtin')
+  local vbuf = vim.lsp.buf
 
-  nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references,
-    '[G]oto [R]eferences')
-  nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-  nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols,
-    '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols,
-    '[W]orkspace [S]ymbols')
+  nm('<leader>rn', vbuf.rename, '[R]e[n]ame')
+  nm('<leader>ca', vbuf.code_action, '[C]ode [A]ction')
+
+  nm('gd', vbuf.definition, '[G]oto [D]efinition')
+  nm('gr', t.lsp_references, '[G]oto [R]eferences')
+  nm('gI', vbuf.implementation, '[G]oto [I]mplementation')
+  nm('<leader>D', vbuf.type_definition, 'Type [D]efinition')
+  nm('<leader>ds', t.lsp_document_symbols, '[D]ocument [S]ymbols')
+  nm('<leader>ws', t.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nm('K', vbuf.hover, 'Hover Documentation')
+  nm('<C-k>', vbuf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder,
-    '[W]orkspace [A]dd Folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder,
-    '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  nm('gD', vbuf.declaration, '[G]oto [D]eclaration')
+  nm('<leader>wa', vbuf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+  nm('<leader>wr', vbuf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+  nm('<leader>wl', function()
+    print(vim.inspect(vbuf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 
   -- Create a command `:Format` local to the LSP buffer
@@ -427,6 +548,10 @@ end
 
 -- Setup mason so it can manage external tooling
 require('mason').setup()
+require("null-ls").setup()
+require("mason-null-ls").setup({
+  automatic_setup = true,
+})
 
 -- Enable the following language servers.
 -- Feel free to add/remove any LSPs that you want here.
@@ -463,7 +588,6 @@ local servers = {
   'marksman', -- markdown
   -- n
   -- o
-  'spectral', --openapi
   -- p
   'intelephense', 'phpactor', 'psalm',
   'pyright',
@@ -496,7 +620,8 @@ require("mason-lspconfig").setup_handlers {
   -- The first entry (without a key) will be the default handler
   -- and will be called for each installed server that doesn't have
   -- a dedicated handler.
-  function(server_name) -- default handler (optional)
+  function(server_name)
+    -- default handler (optional)
     require("lspconfig")[server_name].setup {}
   end,
 }
@@ -515,8 +640,7 @@ end
 -- Turn on lsp status information
 require('fidget').setup()
 
--- Example custom configuration for lua
---
+-- Example custom configuration for lua.
 -- Make runtime files discoverable to the server
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, 'lua/?.lua')
@@ -591,50 +715,7 @@ cmp.setup {
   },
 }
 
--- barbar keymaps
-local map = vim.api.nvim_set_keymap
-local opts = { noremap = true, silent = true }
 
--- Move to previous/next
-map('n', '<C-,>', '<Cmd>BufferPrevious<CR>', opts)
-map('n', '<C-.>', '<Cmd>BufferNext<CR>', opts)
--- Re-order to previous/next
-map('n', '<C-<>', '<Cmd>BufferMovePrevious<CR>', opts)
-map('n', '<C->>', '<Cmd>BufferMoveNext<CR>', opts)
--- Goto buffer in position...
-map('n', '<leader>b1', '<Cmd>BufferGoto 1<CR>', opts)
-map('n', '<leader>b2', '<Cmd>BufferGoto 2<CR>', opts)
-map('n', '<leader>b3', '<Cmd>BufferGoto 3<CR>', opts)
-map('n', '<leader>b4', '<Cmd>BufferGoto 4<CR>', opts)
-map('n', '<leader>b5', '<Cmd>BufferGoto 5<CR>', opts)
-map('n', '<leader>b6', '<Cmd>BufferGoto 6<CR>', opts)
-map('n', '<leader>b7', '<Cmd>BufferGoto 7<CR>', opts)
-map('n', '<leader>b8', '<Cmd>BufferGoto 8<CR>', opts)
-map('n', '<leader>b9', '<Cmd>BufferGoto 9<CR>', opts)
-map('n', '<leader>b0', '<Cmd>BufferLast<CR>', opts)
--- Pin/unpin buffer
-map('n', '<A-p>', '<Cmd>BufferPin<CR>', opts)
--- Close buffer
-map('n', '<A-c>', '<Cmd>BufferClose<CR>', opts)
--- Wipeout buffer
---                 :BufferWipeout
--- Close commands
---                 :BufferCloseAllButCurrent
---                 :BufferCloseAllButPinned
---                 :BufferCloseAllButCurrentOrPinned
---                 :BufferCloseBuffersLeft
---                 :BufferCloseBuffersRight
--- Magic buffer-picking mode
-map('n', '<C-p>', '<Cmd>BufferPick<CR>', opts)
--- Sort automatically by...
-map('n', '<Space>bb', '<Cmd>BufferOrderByBufferNumber<CR>', opts)
-map('n', '<Space>bd', '<Cmd>BufferOrderByDirectory<CR>', opts)
-map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', opts)
-map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
-
--- Other:
--- :BarbarEnable - enables barbar (enabled by default)
--- :BarbarDisable - very bad command, should never be used
 
 vim.api.nvim_create_autocmd("BufWritePost",
   { pattern = "plugins.lua", command = "source <afile> | PackerSync" })
