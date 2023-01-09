@@ -66,12 +66,12 @@ require('packer').startup(function(use)
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim',
-        branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
+    branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
   -- Only load if `make` is available
   use { 'nvim-telescope/telescope-fzf-native.nvim',
-        run = 'make', cond = vim.fn.executable 'make' == 1 }
+    run = 'make', cond = vim.fn.executable 'make' == 1 }
 
   -- Add custom plugins to packer from
   -- ~/.config/nvim/lua/custom/plugins.lua
@@ -391,6 +391,9 @@ ks('n', '<leader>sh', tl.help_tags, { desc = '[S]earch [H]elp' })
 ks('n', '<leader>sw', tl.grep_string, { desc = '[S]earch current [W]ord' })
 ks('n', '<leader>sg', tl.live_grep, { desc = '[S]earch by [G]rep' })
 ks('n', '<leader>sd', tl.diagnostics, { desc = '[S]earch [D]iagnostics' })
+
+-- Add harpoon to telescope
+require("telescope").load_extension('harpoon')
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`

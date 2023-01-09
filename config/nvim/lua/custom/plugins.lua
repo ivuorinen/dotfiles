@@ -59,6 +59,13 @@ return function(use)
     }
   }
 
+  -- harpoon, by ThePrimeagen
+  -- https://github.com/ThePrimeagen/harpoon
+  use {
+    "ThePrimeagen/harpoon",
+    requires = { { "nvim-lua/plenary.nvim" } }
+  }
+
   -- An asynchronous linter plugin for Neovim complementary to
   -- the built-in Language Server Protocol support.
   -- https://github.com/mfussenegger/nvim-lint

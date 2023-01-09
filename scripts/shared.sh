@@ -86,3 +86,4 @@ function menu_item() {
   LINE=$(printf '%-15s %-30s\n' "$1" "$2")
   echo -e "$(__log_indent)$(__log_marker) $LINE"
 }
+
