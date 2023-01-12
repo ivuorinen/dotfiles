@@ -26,5 +26,5 @@
 #  If the status code was not zero then repeat.
 #
 while [ $? -ne 0 ]; do
-    "$@"
+  "$@"
 done

@@ -12,78 +12,95 @@ CLR_BLUE='\033[1;34m'
 CLR_RESET="\033[0m"
 
 # -- Helpers -- #
-function __log_marker() {
+function __log_marker()
+{
   echo -e "${CLR_BLUE}➜${CLR_RESET}"
 }
 
-function __log_marker_ok() {
+function __log_marker_ok()
+{
   echo -e "${CLR_GREEN}✔${CLR_RESET}"
 }
 
-function __log_marker_ok_blue() {
+function __log_marker_ok_blue()
+{
   echo -e "${CLR_BLUE}✔${CLR_RESET}"
 }
 
-function __log_marker_warn() {
+function __log_marker_warn()
+{
   echo -e "${CLR_YELLOW}⁕${CLR_RESET}"
 }
 
-function __log_marker_err() {
+function __log_marker_err()
+{
   echo -e "${CLR_RED}⛌${CLR_RESET}"
 }
 
-function __log_indent() {
+function __log_indent()
+{
   echo "    "
 }
 
 # -- Log -- #
-function msg() {
+function msg()
+{
   echo -e "$(__log_marker) $1"
 }
 
-function msg_done() {
+function msg_done()
+{
   echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
-function msg_prompt() {
+function msg_prompt()
+{
   echo -e "$(__log_marker) $1"
 }
 
-function msg_prompt_done() {
+function msg_prompt_done()
+{
   echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
-function msg_nested() {
+function msg_nested()
+{
   echo -e "$(__log_indent)$(__log_marker) $1"
 }
 
-function msg_nested_done() {
+function msg_nested_done()
+{
   echo -e "$(__log_indent)$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
-function msg_run() {
+function msg_run()
+{
   echo -e "${CLR_GREEN}➜ $1${CLR_RESET} $2"
 }
 
-function msg_ok() {
+function msg_ok()
+{
   echo -e "$(__log_marker_ok) $1"
 }
 
-function msg_warn() {
+function msg_warn()
+{
   echo -e "$(__log_marker_warn) $1"
 }
 
-function msg_err() {
+function msg_err()
+{
   echo -e "$(__log_marker_err) $1"
 }
 
 # -- Menu builder -- #
-function menu_section() {
+function menu_section()
+{
   LINE=$(printf '%-18s [ %-15s ]\n' "$1" "$2")
   echo -e " $(__log_marker) $LINE"
 }
-function menu_item() {
+function menu_item()
+{
   LINE=$(printf '%-15s %-30s\n' "$1" "$2")
   echo -e "$(__log_indent)$(__log_marker) $LINE"
 }
-

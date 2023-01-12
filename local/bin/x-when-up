@@ -18,8 +18,8 @@
 #  Ensure we received the correct number of arguments.
 #
 if [ $# -lt 2 ]; then
-    echo "Usage: $0 HOST COMMAND..."
-    exit 1
+  echo "Usage: $0 HOST COMMAND..."
+  exit 1
 fi
 
 if [ $1 = "ssh" ]; then
@@ -32,8 +32,8 @@ echo "Waiting for $HOST to come online..."
 
 ping -c 1 -W 1 $HOST > /dev/null
 while [ $? -ne 0 ]; do
-    sleep 1
-    ping -c 1 -W 1 $HOST > /dev/null
+  sleep 1
+  ping -c 1 -W 1 $HOST > /dev/null
 done
 
 # By the time we reach here the ping-command has completed successfully

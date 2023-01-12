@@ -48,13 +48,13 @@ function section_install
       ;;
     *)
       menu_section "$USAGE_PREFIX" "all | antigen | brew | macos | ext_go | ext_gh | settler"
-      menu_item "all"      "Installs antigen, macos, brew, ext_gh and ext_go"
-      menu_item "antigen"  "Updates the antigen.zsh file"
-      menu_item "brew"     "Install Brewfile contents"
-      menu_item "ext_gh"   "Install GitHub CLI Extensions"
-      menu_item "ext_go"   "Install Go Packages"
-      menu_item "macos"    "Setup nice macOS defaults"
-      menu_item "settler"  "Runs the WIP settler.sh"
+      menu_item "all" "Installs antigen, macos, brew, ext_gh and ext_go"
+      menu_item "antigen" "Updates the antigen.zsh file"
+      menu_item "brew" "Install Brewfile contents"
+      menu_item "ext_gh" "Install GitHub CLI Extensions"
+      menu_item "ext_go" "Install Go Packages"
+      menu_item "macos" "Setup nice macOS defaults"
+      menu_item "settler" "Runs the WIP settler.sh"
       ;;
   esac
 }
@@ -115,24 +115,13 @@ function section_dotfiles
       ;;
     shfmt)
       # Format shell scripts according to following rules.
-      shfmt \
-        --find \
-        --list \
-        --write \
-        --diff \
-        --simplify \
-        --indent 2 \
-        --binary-next-line \
-        --case-indent \
-        --space-redirects \
-        --func-next-line \
-        "$DOTFILES"
+      shfmt -fn -l -w -i 2 -ci -sr -bn "$DOTFILES"
       ;;
     *)
       menu_section "$USAGE_PREFIX" "link | update | shfmt"
-      menu_item "link"    "Use rcrc to update dotfile links"
-      menu_item "update"  "Updates dotfile links, installs host specific overrides automatically"
-      menu_item "shfmt"   "Run shfmt to all dotfiles"
+      menu_item "link" "Use rcrc to update dotfile links"
+      menu_item "update" "Updates dotfile links, installs host specific overrides automatically"
+      menu_item "shfmt" "Run shfmt to all dotfiles"
       ;;
   esac
 }

@@ -14,8 +14,8 @@
 #  Ensure we received the correct number of arguments.
 #
 if [ $# -lt 2 ]; then
-    echo "Usage: $0 HOST COMMAND..."
-    exit 1
+  echo "Usage: $0 HOST COMMAND..."
+  exit 1
 fi
 
 HOST=$1
@@ -24,7 +24,7 @@ echo "Waiting for $HOST to get down..."
 
 true
 while [ $? -ne 1 ]; do
-    ping -c 1 -W 1 $HOST > /dev/null
+  ping -c 1 -W 1 $HOST > /dev/null
 done
 
 shift
