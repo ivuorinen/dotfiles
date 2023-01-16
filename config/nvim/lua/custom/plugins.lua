@@ -204,4 +204,7 @@ return function(use)
     requires = { "jose-elias-alvarez/null-ls.nvim" }
   }
 
+  -- WakaTime Support
+  use { "wakatime/vim-wakatime" }
+
 end
