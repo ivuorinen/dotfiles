@@ -48,7 +48,9 @@ function x-load-configs()
     # Load the shell dotfiles, and then some:
     for file in ~/.dotfiles/config/{exports,alias,functions}; do
         [ -r "$file" ] && [ -f "$file" ] && source "$file"
+        [ -r "$file-secret" ] && [ -f "$file-secret" ] && source "$file-secret"
         [ -r "$file-$HOSTNAME" ] && [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
+        [ -r "$file-$HOSTNAME-secret" ] && [ -f "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
     done
 }
 x-load-configs

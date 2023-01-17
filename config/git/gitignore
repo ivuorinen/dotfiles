@@ -4,6 +4,7 @@
 *.cache
 *~
 
+*-secret
 __secret
 __ignored
 __test_*.php
