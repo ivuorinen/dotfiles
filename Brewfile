@@ -120,6 +120,8 @@ brew "mas"
 brew "midnight-commander"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# No Nonsense Neovim Client in Rust
+brew "neovide"
 # Port scanning utility for large networks
 brew "nmap"
 # Manage multiple Node.js versions
@@ -128,6 +130,8 @@ brew "nvm"
 brew "openjdk"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
+# Swiss-army knife of markup format conversion
+brew "pandoc"
 # Highly capable, feature-rich programming language
 brew "perl"
 # Interpreted, interactive, object-oriented programming language
@@ -232,8 +236,6 @@ cask "insomnia"
 cask "jetbrains-toolbox"
 # Kubernetes IDE
 cask "lens"
-# Neovim Client
-cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Collaboration platform for API development
@@ -266,8 +268,12 @@ cask "syntax-highlight"
 cask "visual-studio-code"
 # Multimedia player
 cask "vlc"
+# Spell-checking service for Finnish
+cask "voikkospellservice"
 # Rust-based terminal
 cask "warp"
+# View output from scripts in the menu bar
+cask "xbar"
 mas "1Password for Safari", id: 1569813296
 mas "Flow", id: 1423210932
 mas "GarageBand", id: 682658836
@@ -275,4 +281,5 @@ mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
+mas "pullBar", id: 1601913905
 mas "Tailscale", id: 1475387142
