@@ -84,6 +84,7 @@ function section_brew
         --describe && msg_done "🎉 Done!"
       ;;
     autoupdate)
+      brew autoupdate delete
       brew autoupdate start 43200 --upgrade --cleanup --immediate
       ;;
     *)
