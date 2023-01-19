@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Get git repository status for all subdirectories
+# recursively in specified dir.
+#
+# Check the default dir:
+#   `git-dirty.sh`
+# Check specific dir:
+#   `git-dirty.sh ~/Projects`
+# Override default dir with env:
+#   `GIT_DIRTY_DIR=$HOME/Projects git-dirty.sh`
+#
+# If you want to skip directory from checks, just add `.ignore` file next
+# to the `.git` folder. ProTip: Add `.ignore` to your global `.gitignore`.
+#
+# The script automatically skips folders:
+#   node_modules, vendor
+#
+# SET Defaults:
+# Default dir to check, can be overridden in env (.bashrc, .zshrc, ...)
+: "${GIT_DIRTY_DIR:=$HOME/Code}"
+
+# If user has provided folder as a first argument, use it.
+if [ "$1" != "" ]; then
+    GIT_DIRTY_DIR="$1"
+fi
+
+# UTF-8 ftw
+GITDIRTY="❌ "
+GITCLEAN="✅ "
+
+catch() {
+  echo "Error $1 occurred on $2"
+}
+
+gitdirty() {
+  local d="$1"
+  trap 'catch $? $LINENO' ERR
+
+  if [[ -d "$d" ]]; then
+    if [[ -e "$d/.ignore" ]]; then
+      echo -e ""
+    else
+      # Check that $d is not '--', 'vendor', or 'node_modules'
+      if [[ "${d:0:2}" == "--" ]] || [[ "$d" == "vendor" ]] || [[ "$d" == "node_modules" ]]; then
+        echo ""
+      else
+        cd "$d" > /dev/null
+
+        # If we have `.git` folder, check it.
+        if [[ -d ".git" ]]; then
+          ISDIRTY=$(git diff --shortstat 2> /dev/null | tail -n1)
+          ICON="$GITCLEAN"
+
+          [[ $ISDIRTY != "" ]] && ICON="$GITDIRTY"
+
+          printf " %s %s\n" "$ICON" "$(pwd)"
+        else
+          # If it wasn't git repository, check subdirectories.
+          gitdirtyrepos -- *
+        fi
+      fi
+      cd .. > /dev/null
+    fi
+  fi
+}
+
+gitdirtyrepos() {
+  for x in "$@"; do
+    gitdirty "$x"
+  done
+}
+
+set -e
+trap 'case $? in
+        139) echo "segfault occurred";;
+        11) echo "ssegfault occurred";;
+      esac' EXIT
+
+gitdirtyrepos "$GIT_DIRTY_DIR"
