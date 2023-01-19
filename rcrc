@@ -1,2 +1,2 @@
-EXCLUDES="*.md *.sh *.lock.json Brewfile scripts"
+EXCLUDES="*.md *.sh *.lock.json Brewfile scripts *-secret"
 HOSTNAME=$(hostname -s)
