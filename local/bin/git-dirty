@@ -21,18 +21,20 @@
 
 # If user has provided folder as a first argument, use it.
 if [ "$1" != "" ]; then
-    GIT_DIRTY_DIR="$1"
+  GIT_DIRTY_DIR="$1"
 fi
 
 # UTF-8 ftw
 GITDIRTY="❌ "
 GITCLEAN="✅ "
 
-catch() {
+catch()
+{
   echo "Error $1 occurred on $2"
 }
 
-gitdirty() {
+gitdirty()
+{
   local d="$1"
   trap 'catch $? $LINENO' ERR
 
@@ -64,7 +66,8 @@ gitdirty() {
   fi
 }
 
-gitdirtyrepos() {
+gitdirtyrepos()
+{
   for x in "$@"; do
     gitdirty "$x"
   done

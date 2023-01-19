@@ -173,4 +173,3 @@ case "$1" in
   tests) section_tests "$2" ;;
   *) usage && exit 1 ;;
 esac
-
