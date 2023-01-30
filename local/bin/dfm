@@ -22,32 +22,32 @@ function section_install
 
   case "$1" in
     all)
-      $0 install antigen && msg_done "New antigen installed"
-      $0 install macos && msg_done "macOS Defaults set"
-      $0 install brew && msg_done "Brewfile defined apps has been installed"
-      $0 install ext_gh && msg_done "Extensions for GitHub CLI have been installed"
-      $0 install ext_go && msg_done "Go packages have been installed"
+      $0 install antigen
+      $0 install macos
+      $0 install brew
+      $0 install ext_gh
+      $0 install ext_go
       ;;
     antigen)
-      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 Done!"
+      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 New antigen installed!"
       ;;
     brew)
-      brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
+      brew bundle install --file="$BREWFILE" && msg_done "🎉 macOS Defaults set!"
       ;;
     macos)
-      bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
       ;;
     ext_go)
-      bash "$DOTFILES/scripts/install-go-packages.sh" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/install-go-packages.sh" && msg_done "🎉 Go packages have been installed!"
       ;;
     ext_gh)
-      bash "$DOTFILES/scripts/install-gh-extensions.sh" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/install-gh-extensions.sh" && msg_done "🎉 Extensions for GitHub CLI have been installed!"
       ;;
     settler)
-      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Done!"
+      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | brew | macos | ext_go | ext_gh | settler"
+      menu_section "$USAGE_PREFIX" "all | antigen | brew | ext_gh | ext_go | macos | settler"
       menu_item "all" "Installs antigen, macos, brew, ext_gh and ext_go"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "brew" "Install Brewfile contents"
@@ -103,7 +103,7 @@ function section_dotfiles
 
   case "$1" in
     link)
-      rcup -B "$HOSTNAME" -f -v && msg_done "🎉 Done!"
+      rcup -B "$HOSTNAME" -f -v && msg_done "🎉 dotfiles have been linked!"
       ;;
     update)
       # Updates .dotfiles/scripts/install.sh and formats it
@@ -112,16 +112,20 @@ function section_dotfiles
         && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
         && sed -i '' "s|install.sh|$(basename "$INSTALL_SCRIPT")|g" "$INSTALL_SCRIPT"
       $0 dotfiles shfmt
-      msg_done "🎉 Done!"
+      $0 dotfiles link
+      msg_done "🎉 dotfiles updated and linked!"
       ;;
     shfmt)
       # Format shell scripts according to following rules.
-      shfmt -fn -l -w -i 2 -ci -sr -bn "$DOTFILES"
+      find "$DOTFILES" \
+        \( -name '*.sh' -or -name '*.zsh' -or -name 'x-*' -or -not '*.pl' \) \
+        -exec shfmt -fn -l -w -i 2 -ci -sr -bn {} \;
+      msg_done "🎉 dotfiles have been formatted!"
       ;;
     *)
       menu_section "$USAGE_PREFIX" "link | update | shfmt"
       menu_item "link" "Use rcrc to update dotfile links"
-      menu_item "update" "Updates dotfile links, installs host specific overrides automatically"
+      menu_item "update" "Updates dotfile links (scripts/install.sh), formats it and runs it."
       menu_item "shfmt" "Run shfmt to all dotfiles"
       ;;
   esac

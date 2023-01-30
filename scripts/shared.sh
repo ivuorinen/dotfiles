@@ -104,3 +104,10 @@ function menu_item()
   LINE=$(printf '%-15s %-30s\n' "$1" "$2")
   echo -e "$(__log_indent)$(__log_marker) $LINE"
 }
+
+# https://stackoverflow.com/a/85932
+function fn_exists()
+{
+  declare -f -F "$1" > /dev/null
+  return $?
+}
