@@ -250,6 +250,8 @@ cask "qlstephen"
 cask "quicklook-json"
 # QuickLook generator for Adobe Swatch Exchange files
 cask "quicklookase"
+# Automatically hides or quits apps after periods of inactivity
+cask "quitter"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
 # MySQL/MariaDB database management
