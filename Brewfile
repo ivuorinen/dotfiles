@@ -148,6 +148,8 @@ brew "ruby"
 brew "shellcheck"
 # Autoformat shell script source code
 brew "shfmt"
+# Cross-shell prompt for astronauts
+brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
 # Send macOS User Notifications from the command-line

@@ -65,7 +65,7 @@ ssh-add -A 2>/dev/null;
 if command -v antigen &> /dev/null; then
     antigen use oh-my-zsh
 
-    antigen theme oskarkrawczyk/honukai-iterm-zsh honukai
+    # antigen theme oskarkrawczyk/honukai-iterm-zsh honukai
 
     antigen bundle ssh-agent
     antigen bundle colored-man-pages
@@ -113,6 +113,8 @@ if hash gcloud 2>/dev/null; then
     [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
     [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
 fi
+
+eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
