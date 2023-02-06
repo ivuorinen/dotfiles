@@ -76,35 +76,9 @@ return function(use)
     end,
   })
 
-  -- nvim orgmode, to get me use nvim even more.
-  use({
-    "nvim-orgmode/orgmode",
-    config = function()
-      require('orgmode').setup_ts_grammar()
-    end,
-  })
-
   -- Markdown support
   use 'preservim/vim-markdown'
   use 'godlygeek/tabular'
-
-  -- obsidian plugin for nvim
-  -- https://github.com/epwalsh/obsidian.nvim
-  use({
-    "epwalsh/obsidian.nvim",
-    config = function()
-      require("obsidian").setup({
-        dir = '~/.local/share/_nvalt',
-        notes_subdir = "notes",
-        daily_notes = {
-          folder = "_daily"
-        },
-        completion = {
-          nvim_cmp = true, -- if using nvim-cmp, otherwise set to false
-        }
-      })
-    end
-  })
 
   -- Creates missing folders on save
   -- https://github.com/jghauser/mkdir.nvim

@@ -48,11 +48,6 @@ require('packer').startup(function(use)
     after = 'nvim-treesitter',
   }
 
-  -- Git related plugins
-  use 'tpope/vim-fugitive'
-  use 'tpope/vim-rhubarb'
-  use 'lewis6991/gitsigns.nvim'
-
   -- Theme based off the Material Pale Night
   use 'drewtempelmeyer/palenight.vim'
   -- Fancier statusline
@@ -342,18 +337,6 @@ require('indent_blankline').setup {
   show_current_context_start = true,
 }
 
--- Gitsigns
--- See `:help gitsigns.txt`
-require('gitsigns').setup {
-  signs = {
-    add = { text = '+' },
-    change = { text = '~' },
-    delete = { text = '_' },
-    topdelete = { text = '‾' },
-    changedelete = { text = '~' },
-  },
-}
-
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
@@ -484,16 +467,6 @@ require('nvim-treesitter.configs').setup {
     },
   },
 }
-
--- Load custom treesitter grammar for org filetype
-require('orgmode').setup_ts_grammar()
-require('orgmode').setup({
-  org_agenda_files = {
-    vim.fn.expand '~/.local/share/_nvalt/**/*',
-    vim.fn.expand '~/.dotfiles/local/org/**/*'
-  },
-  org_default_notes_file = vim.fn.expand '~/.local/share/_nvalt/refile.org',
-})
 
 -- LSP settings.
 --  This function gets run when an LSP connects to a particular buffer.
