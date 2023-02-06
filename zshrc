@@ -5,7 +5,7 @@
 autoload -U colors zsh/terminfo
 colors
 
-export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:/usr/local/sbin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:$PATH"
 
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
