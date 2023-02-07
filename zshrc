@@ -80,8 +80,8 @@ if command -v antigen &> /dev/null; then
     hash php 2>/dev/null && antigen bundle php
     hash nvm 2>/dev/null && antigen bundle nvm
     hash docker 2>/dev/null && antigen bundle docker
-    hash ruby 2>/dev/null && antigen bundle ruby
-    hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+    # hash ruby 2>/dev/null && antigen bundle ruby
+    # hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
     hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
     hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin
     # antigen bundle voronkovich/phpcs.plugin.zsh
@@ -108,11 +108,11 @@ if hash op 2>/dev/null; then
 fi
 
 # gcloud is present
-if hash gcloud 2>/dev/null; then
-    GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
-    [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
-    [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
-fi
+#if hash gcloud 2>/dev/null; then
+#    GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
+#    [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
+#    [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
+#fi
 
 eval "$(starship init zsh)"
 
