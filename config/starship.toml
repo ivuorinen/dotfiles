@@ -7,3 +7,33 @@ add_newline = true
 # Replace the '❯' symbol in the prompt with '➜'
 [character] # The name of the module we are configuring is 'character'
 success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+
+[cmd_duration]
+disabled = true
+
+[directory]
+truncation_length = 2
+truncation_symbol = '…/'
+
+[git_branch]
+symbol = '🌱 '
+truncation_length = 4
+truncation_symbol = ''
+ignore_branches = ['master', 'main']
+
+[git_status]
+up_to_date = '✓'
+staged = '[++\($count\)](green)'
+
+[package]
+format = '[$symbol($version )]($style)'
+version_format = '${major}.${minor}'
+
+[php]
+format = '[$symbol($version )]($style)'
+version_format = '${major}.${minor}'
+
+[nodejs]
+format = '[$symbol($version )]($style)'
+version_format = '${major}.${minor}'
+
