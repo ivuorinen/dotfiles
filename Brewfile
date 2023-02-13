@@ -288,10 +288,5 @@ cask "warp"
 cask "xbar"
 mas "1Password for Safari", id: 1569813296
 mas "Flow", id: 1423210932
-mas "GarageBand", id: 682658836
-mas "iMovie", id: 408981434
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
 mas "pullBar", id: 1601913905
 mas "Tailscale", id: 1475387142
