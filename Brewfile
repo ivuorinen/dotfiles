@@ -32,6 +32,8 @@ brew "brew-php-switcher"
 brew "glib"
 # Manage compile and link flags for libraries
 brew "pkg-config"
+# Cross-platform make
+brew "cmake"
 # Open source suite of directory software
 brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
@@ -56,6 +58,8 @@ brew "difftastic"
 brew "dive"
 # Command-line DNS client
 brew "dog"
+# Tool to verify that your files are in harmony with your .editorconfig
+brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
 # CLI for templating and/or deploying FaaS functions
@@ -112,6 +116,8 @@ brew "jq"
 brew "lazydocker"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
+# Package manager for the Lua programming language
+brew "luarocks"
 # Swiss Army Knife for macOS
 brew "m-cli"
 # Mac App Store command-line interface
@@ -172,6 +178,8 @@ brew "tmux"
 brew "tree"
 # Modern watch command
 brew "viddy"
+# Command-line interface to the WakaTime api
+brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
 # Internet file retriever

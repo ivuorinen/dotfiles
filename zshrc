@@ -5,7 +5,16 @@
 autoload -U colors zsh/terminfo
 colors
 
-export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:$PATH"
+export HOMEBREW="/opt/homebrew"
+export DOTFILES="$HOME/.dotfiles"
+export PATH="$HOMEBREW/opt/ruby/bin:$HOMEBREW/bin:$HOMEBREW/sbin:/usr/local/sbin:$PATH"
+export HOMEBREW_NO_ENV_HINTS=1
+
+# Explicitely set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_STATE_HOME="$HOME/.local/state"
 
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
