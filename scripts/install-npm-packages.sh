@@ -18,6 +18,9 @@ packages=(
   "prettier"
   "@bchatard/alfred-jetbrains"
   "@johnnymorganz/stylua-bin"
+  "js-debug"
+  "stylelint-lsp"
+  "blade-formatter"
 )
 
 for pkg in "${packages[@]}"; do
@@ -27,7 +30,7 @@ for pkg in "${packages[@]}"; do
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
   msg_run "Installing npm package:" "$pkg"
-  npm install -g --no-fund --no-progress --no-timing "$pkg"
+  npm install -g --force --no-fund --no-progress --no-timing "$pkg"
   echo ""
 done
 

@@ -2,7 +2,11 @@
 	path = config/nvim
 	url = git@github.com:AstroNvim/AstroNvim.git
 	ignore = dirty
+	branch = v3
+	update = checkout
 [submodule "config/astronvim/lua/user"]
 	path = config/astronvim/lua/user
 	url = git@github.com:ivuorinen/astronvim_config.git
-	ignore = dirty
+	update = rebase
+	branch = main
+
