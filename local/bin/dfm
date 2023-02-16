@@ -43,16 +43,20 @@ function section_install
     ext_gh)
       bash "$DOTFILES/scripts/install-gh-extensions.sh" && msg_done "🎉 Extensions for GitHub CLI have been installed!"
       ;;
+    ext_npm)
+      bash "$DOTFILES/scripts/install-npm-packages.sh" && msg_done "NPM Packages have been installed!"
+      ;;
     settler)
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | brew | ext_gh | ext_go | macos | settler"
+      menu_section "$USAGE_PREFIX" "all | antigen | brew | ext_gh | ext_go | ext_npm | macos | settler"
       menu_item "all" "Installs antigen, macos, brew, ext_gh and ext_go"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "brew" "Install Brewfile contents"
       menu_item "ext_gh" "Install GitHub CLI Extensions"
       menu_item "ext_go" "Install Go Packages"
+      menu_item "ext_npm" "Install NPM Packages"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "settler" "Runs the WIP settler.sh"
       ;;

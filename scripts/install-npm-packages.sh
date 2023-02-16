@@ -11,6 +11,13 @@ fi
 packages=(
   # This is a tool to check if your files consider your .editorconfig rules.
   "editorconfig-checker"
+  # Node module to create a release or a changelog from
+  # a tag and uses issues or commits to creating the release notes.
+  "github-release-notes"
+  "neovim"
+  "prettier"
+  "@bchatard/alfred-jetbrains"
+  "@johnnymorganz/stylua-bin"
 )
 
 for pkg in "${packages[@]}"; do
@@ -20,7 +27,7 @@ for pkg in "${packages[@]}"; do
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
   msg_run "Installing npm package:" "$pkg"
-  npm install -g --force "$pkg"
+  npm install -g --no-fund --no-progress --no-timing "$pkg"
   echo ""
 done
 
