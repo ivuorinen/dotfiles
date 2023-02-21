@@ -1,66 +1,74 @@
 [user]
-    name = Ismo Vuorinen
-    email = ismo.vuorinen@vincit.fi
+  name = Ismo Vuorinen
+  email = ismo.vuorinen@vincit.fi
 	signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLyOvkr1nRqMVv3UAizmk6C+q40H4khvw7qIXXXyOyFmzjwYx/Cuxoi4uZVjX+q4qFYJ+c312uu6YXiEtfyoCao3wub8r1cLBQ3eIvuyWp2K8Ixcd9JmFmLmoeiENpJxqyr0WPZLDkrCWUZCsQQh8zzGFnfciUdUdTiZ7s21AEhhmFRSdFlVfQSlGMFxU321psg1YilcP80bDwFd1FsL4TssSkwlbgP/twqnpZ4436TTo7kp0UnH/RZkfRdDWScKHaWgncBG0CZeQxGWnRp8fvZn/7gDnthcZhvnDALVBE7QFuZ90GxqVw3IGpHryV0mFO6EGQ9Ke9YX7pKVZPUXZjeCN4SVKsqFdVJ6AjaSJ9K7nL98rYK7qNzndT3cKqPNgPteyXWRulH68A51ecQqHrjTttZcdN9hKt9uBHpzuXsby2QObT+VB4MNjZapa+YYF/WgwJCml4lzn2xMFg1vYZD78pfoJ9e5f2cL1MMlUSDb0TNxmEXfDQ77H/pRpKDz0=
 
 [core]
-    excludesfile = ~/.config/git/gitignore
+  excludesfile = ~/.config/git/gitignore
 
 [alias]
-    reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
-    reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
-    nah = !git reset --hard && git clean -df
-    undo-commit = reset HEAD~ --soft
-    llog = log --pretty=fuller
-    logs = log --graph --pretty=format:'%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
-    rl = reflog --format='%C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)'
-    tagdate = log --date-order --graph --tags --simplify-by-decoration --pretty=format:\"%ai %h %d\"
-    branchbydate = for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)'
-    branchcolor = "!for ref in $(git for-each-ref --sort=-committerdate --format=\"%(refname)\" refs/heads/ refs/remotes ); do git log -n1 $ref --pretty=format:\"%Cgreen%cr%Creset %C(yellow)%d%Creset %C(bold blue)<%an>%Creset%n\" | cat ; done | awk '! a[$0]++'"
+  reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
+  reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
+  nah = !git reset --hard && git clean -df
+  undo-commit = reset HEAD~ --soft
+  llog = log --pretty=fuller
+  logs = log --graph --pretty=format:'%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
+  rl = reflog --format='%C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)'
+  tagdate = log --date-order --graph --tags --simplify-by-decoration --pretty=format:\"%ai %h %d\"
+  branchbydate = for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+  branchcolor = "!for ref in $(git for-each-ref --sort=-committerdate --format=\"%(refname)\" refs/heads/ refs/remotes ); do git log -n1 $ref --pretty=format:\"%Cgreen%cr%Creset %C(yellow)%d%Creset %C(bold blue)<%an>%Creset%n\" | cat ; done | awk '! a[$0]++'"
 
 [diff]
-    tool = difftastic
+  tool = difftastic
 
 [difftool]
-    prompt = false
+  prompt = false
 
 [difftool "difftastic"]
-    cmd = difft "$LOCAL" "$REMOTE"
+  cmd = difft "$LOCAL" "$REMOTE"
 
 [filter "lfs"]
-    clean = git-lfs clean -- %f
-    smudge = git-lfs smudge -- %f
-    process = git-lfs filter-process
-    required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
 
 [init]
-    defaultBranch = master
+  defaultBranch = main
 
 [pull]
-    rebase = false
+  rebase = true
 
 [color]
-    ui = true
-    diff = auto
-    branch = auto
-    status = auto
+  ui = true
+  diff = auto
+  branch = auto
+  status = auto
 
 [color "status"]
-    added = green bold
-    changed = yellow
-    deleted = red bold strike
-    untracked = cyan
-    branch = yellow black bold ul
+  added = green bold
+  changed = yellow
+  deleted = red bold strike
+  untracked = cyan
+  branch = yellow black bold ul
+
 [gpg]
 	format = ssh
+
 [gpg "ssh"]
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
 	allowedSignersFile = ~/.ssh/allowed_signers
+
 [commit]
 	gpgsign = true
+
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
+
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[submodule]
+	recurse = true
