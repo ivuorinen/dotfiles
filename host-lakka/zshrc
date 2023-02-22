@@ -1,0 +1,33 @@
+PATH=$HOME/.local/bin:$HOME/bin:$HOME/.gem/bin:$HOME/.rvm/bin:/usr/local/bin:/usr/sbin:/usr/bin:$PATH
+
+export LC_ALL=fi_FI.utf8
+
+source $HOME/.local/bin/antigen
+
+antigen use oh-my-zsh
+
+antigen bundle git
+antigen bundle php
+# antigen bundle rvm
+antigen bundle autojump
+antigen bundle command-not-found
+antigen bundle jreese/zsh-titles
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-completions
+antigen bundle unixorn/rvm-plugin
+antigen bundle unixorn/autoupdate-antigen.zshplugin
+
+antigen theme oskarkrawczyk/honukai-iterm-zsh honukai
+
+antigen apply
+
+alias t='tail -f'
+alias logrotate='/usr/sbin/logrotate -s $HOME/logs/state'
+alias dn='du -chd1'
+alias nano='nano -wS -$'
+alias cat=bat
+alias gpg=gpg2
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" ]] # Load RVM into a shell session *as a function*
+. "/home/users/viir/.acme.sh/acme.sh.env"
