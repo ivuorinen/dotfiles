@@ -16,6 +16,35 @@ SCRIPT=$(basename "$0")
 
 source "$DOTFILES/scripts/shared.sh"
 
+function section_reset
+{
+  USAGE_PREFIX="$SCRIPT reset"
+  case "$1" in
+    all)
+      msg_ok "Running all reset commands"
+      $0 reset nvim
+      ;;
+    nvim)
+      rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim ~/.config/astronvim ~/.config/nvim
+      msg_done "Deleted old nvim files"
+      ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
+      ln -s ~/.dotfiles/config/nvim ~/.config/nvim
+      msg_done "Linked nvim and astronvim"
+      $0 install brew
+      $0 install ext_go
+      $0 install ext_npm
+      msg_done "Installed brew, and packages for go and npm"
+      nvim  --headless -c 'autocmd User PackerComplete quitall'
+      msg_done "Installed nvim packages and we are now ready"
+      ;;
+    *)
+      menu_section "$USAGE_PREFIX" "all | nvim"
+      menu_item "all" "Reset everything, runs all configured reset actions"
+      menu_item "nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
+      ;;
+  esac
+}
+
 function section_install
 {
   USAGE_PREFIX="$SCRIPT install"
@@ -163,10 +192,12 @@ function section_tests
 function usage
 {
   echo ""
-  menu_section "Usage: $SCRIPT" "install | brew | dotfiles"
+  menu_section "Usage: $SCRIPT" "install | reset | brew | dotfiles"
   echo $"   All commands have their own subcommands."
   echo ""
   section_install
+  echo ""
+  section_reset
   echo ""
   section_brew
   echo ""
@@ -176,6 +207,7 @@ function usage
 # The main loop. first keyword after $0 triggers section, or help.
 case "$1" in
   install) section_install "$2" ;;
+  reset) section_reset "$2" ;;
   brew) section_brew "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
   tests) section_tests "$2" ;;
