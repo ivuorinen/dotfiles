@@ -3,4 +3,5 @@
 # Set whether or not to follow arbitrary file
 # paths in source statements (since 0.8.0).
 external-sources=true
+includeAllWorkspaceSymbols=true
 
