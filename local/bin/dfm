@@ -26,16 +26,15 @@ function section_reset
       ;;
     nvim)
       rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim ~/.config/astronvim ~/.config/nvim
-      msg_done "Deleted old nvim files"
+      msg_ok "Deleted old nvim files"
       ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
       ln -s ~/.dotfiles/config/nvim ~/.config/nvim
-      msg_done "Linked nvim and astronvim"
+      msg_ok "Linked nvim and astronvim"
       $0 install brew
       $0 install ext_go
       $0 install ext_npm
-      msg_done "Installed brew, and packages for go and npm"
-      nvim  --headless -c 'autocmd User PackerComplete quitall'
-      msg_done "Installed nvim packages and we are now ready"
+      msg_ok "Installed brew, and packages for go and npm"
+      msg_done "...and we are done!"
       ;;
     *)
       menu_section "$USAGE_PREFIX" "all | nvim"
