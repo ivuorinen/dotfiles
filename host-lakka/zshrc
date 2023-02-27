@@ -1,19 +1,47 @@
 # Lakka zsh configuration.
 #
 # shellcheck shell=bash
+export PATH="/usr/local/bin:/usr/bin:/usr/sbin:$PATH"
 
-# Explicitely set XDG Folders
+# Defaults
+export DOTFILES="$HOME/.dotfiles"
+
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
 
-export PATH="$XDG_BIN_HOME:$HOME/bin:$HOME/.gem/bin:$HOME/.rvm/bin:/usr/local/bin:/usr/sbin:/usr/bin:$PATH"
+# z, https://github.com/rupa/z
+export _Z_DATA="$XDG_STATE_HOME/z"
+
+# composer, https://getcomposer.org/
+if command -v composer &> /dev/null; then
+    export COMPOSER_HOME="$XDG_STATE_HOME/composer"
+    export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
+    export PATH="$COMPOSER_BIN:$PATH"
+fi
+
+# gem, rubygems
+if command -v gem &>/dev/null; then
+    export GEM_HOME="$XDG_STATE_HOME/gem"
+    export PATH="$GEM_HOME/bin:$PATH"
+fi
+
+export PATH="$XDG_BIN_HOME:$HOME/bin:$HOME/.rvm/bin:$PATH"
 export LC_ALL=fi_FI.utf8
 
+# Antigen configuration
+# https://github.com/zsh-users/antigen/wiki/Configuration
+export ADOTDIR="$XDG_DATA_HOME/antigen"
+export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
+export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
+
+# Try to load antigen, if present
 [[ -f "$XDG_BIN_HOME/antigen.zsh" ]] && source "$XDG_BIN_HOME/antigen.zsh"
 
-# If antigen was loadeded
+# If antigen was loaded
 if command -v antigen &> /dev/null; then
   antigen use oh-my-zsh
 

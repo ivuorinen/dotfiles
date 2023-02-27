@@ -1,22 +1,28 @@
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 # shellcheck shell=bash
 
 autoload -U colors zsh/terminfo
 colors
 
-export HOMEBREW="/opt/homebrew"
+# Defaults
 export DOTFILES="$HOME/.dotfiles"
-export PATH="$HOMEBREW/opt/ruby/bin:$HOMEBREW/bin:$HOMEBREW/sbin:/usr/local/sbin:$PATH"
-export HOMEBREW_NO_ENV_HINTS=1
 
-# Explicitely set XDG folders
+# Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
 
+# Homebrew configuration
+export HOMEBREW="/opt/homebrew"
+export HOMEBREW_BIN="$HOMEBREW/bin"
+export HOMEBREW_SBIN="$HOMEBREW/sbin"
+export HOMEBREW_PKG="$HOMEBREW/opt"
+export HOMEBREW_NO_ENV_HINTS=1
+
+export PATH="$XDG_BIN_HOME:$HOMEBREW_BIN:$HOMEBREW_SBIN:/usr/local/sbin:$PATH"
+
+# brew, https://brew.sh
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
     BREW_SBIN=$(brew --prefix)/sbin
@@ -41,21 +47,34 @@ if command -v nvim &> /dev/null; then
     export EDITOR="nvim"
 fi
 
-COMPOSER_DIR="$HOME/.composer/vendor/bin"
-export PATH="$XDG_BIN_HOME:$COMPOSER_DIR:$PATH"
+# z, https://github.com/rupa/z
+export _Z_DATA="$XDG_STATE_HOME/z"
 
-export NVM_DIR="$HOME/.nvm"
+# composer, https://getcomposer.org/
+if command -v composer &> /dev/null; then
+    export COMPOSER_HOME="$XDG_STATE_HOME/composer"
+    export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
+    export PATH="$COMPOSER_BIN:$PATH"
+fi
+
+# gem, rubygems
+if command -v gem &>/dev/null; then
+    export GEM_HOME="$XDG_STATE_HOME/gem"
+fi
+
+# nvm, the node version manager
+export NVM_DIR="$XDG_STATE_HOME/nvm"
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 export NVM_AUTO_USE=true
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+[ -s "$HOMEBREW_PKG/nvm/nvm.sh" ] && \. "$HOMEBREW_PKG/nvm/nvm.sh"
+[ -s "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm"
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
 {
     # Load the shell dotfiles, and then some:
-    for file in ~/.dotfiles/config/{exports,alias,functions}; do
+    for file in $DOTFILES/config/{exports,alias,functions}; do
         [ -r "$file" ] && [ -f "$file" ] && source "$file"
         [ -r "$file-secret" ] && [ -f "$file-secret" ] && source "$file-secret"
         [ -r "$file-$HOSTNAME" ] && [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
@@ -66,6 +85,12 @@ x-load-configs
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
+
+# Antigen configuration
+# https://github.com/zsh-users/antigen/wiki/Configuration
+export ADOTDIR="$XDG_DATA_HOME/antigen"
+export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
+export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
 
 # Try to load antigen, if present
 [[ -f "$XDG_BIN_HOME/antigen.zsh" ]] && source "$XDG_BIN_HOME/antigen.zsh"
@@ -120,6 +145,3 @@ fi
 #fi
 
 eval "$(starship init zsh)"
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
