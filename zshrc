@@ -15,6 +15,7 @@ export HOMEBREW_NO_ENV_HINTS=1
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
 
 if [ command -v brew &> /dev/null ]; then
     BREW_BIN=$(brew --prefix)/bin
@@ -40,9 +41,8 @@ if command -v nvim &> /dev/null; then
     export EDITOR="nvim"
 fi
 
-LOCAL_BIN="$HOME/.local/bin"
 COMPOSER_DIR="$HOME/.composer/vendor/bin"
-export PATH="$LOCAL_BIN:$COMPOSER_DIR:$PATH"
+export PATH="$XDG_BIN_HOME:$COMPOSER_DIR:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 export NVM_LAZY_LOAD=true
@@ -68,13 +68,11 @@ x-load-configs
 ssh-add -A 2>/dev/null;
 
 # Try to load antigen, if present
-[[ -f "$HOME/.local/bin/antigen.zsh" ]] && source "$HOME/.local/bin/antigen.zsh"
+[[ -f "$XDG_BIN_HOME/antigen.zsh" ]] && source "$XDG_BIN_HOME/antigen.zsh"
 
 # antigen is present
 if command -v antigen &> /dev/null; then
     antigen use oh-my-zsh
-
-    # antigen theme oskarkrawczyk/honukai-iterm-zsh honukai
 
     antigen bundle ssh-agent
     antigen bundle colored-man-pages
@@ -84,16 +82,14 @@ if command -v antigen &> /dev/null; then
     antigen bundle MichaelAquilina/zsh-you-should-use
     antigen bundle unixorn/autoupdate-antigen.zshplugin
     antigen bundle Sparragus/zsh-auto-nvm-use
-    # antigen bundle git-auto-fetch
 
     hash php 2>/dev/null && antigen bundle php
     hash nvm 2>/dev/null && antigen bundle nvm
     hash docker 2>/dev/null && antigen bundle docker
     # hash ruby 2>/dev/null && antigen bundle ruby
-    # hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+    hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
     hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
     hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin
-    # antigen bundle voronkovich/phpcs.plugin.zsh
 
     # Platform dependant bundles
     if [[ $(uname) == 'Linux' ]]; then
