@@ -60,6 +60,7 @@ fi
 # gem, rubygems
 if command -v gem &>/dev/null; then
     export GEM_HOME="$XDG_STATE_HOME/gem"
+    export GEM_PATH="$XDG_STATE_HOME/gem"
 fi
 
 # nvm, the node version manager
@@ -69,6 +70,9 @@ export NVM_COMPLETION=true
 export NVM_AUTO_USE=true
 [ -s "$HOMEBREW_PKG/nvm/nvm.sh" ] && \. "$HOMEBREW_PKG/nvm/nvm.sh"
 [ -s "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm"
+
+# wakatime, https://github.com/wakatime/wakatime-cli
+export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
