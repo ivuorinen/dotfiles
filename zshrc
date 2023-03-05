@@ -148,4 +148,8 @@ fi
 #    [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
 #fi
 
+# Load iterm2 shell integration
+# https://iterm2.com/documentation-shell-integration.html
+[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+
 eval "$(starship init zsh)"
