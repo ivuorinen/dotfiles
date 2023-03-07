@@ -138,7 +138,16 @@ fi
 
 # op (1Password cli) is present
 if hash op 2>/dev/null; then
+    export OP_CACHE="$XDG_STATE_HOME/1password"
+    mkdir -p $OP_CACHE;
     eval "$(op completion zsh)"; compdef _op op
+fi
+
+# Ansible configuration
+# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
+if hash ansible 2>/dev/null; then
+    export ANSIBLE_HOME="$XDG_STATE_HOME/ansible"
+    mkdir -p "$ANSIBLE_HOME"
 fi
 
 # gcloud is present
