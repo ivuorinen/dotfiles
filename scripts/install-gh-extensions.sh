@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Install GitHub CLI extensions
 
+# shellcheck source="shared.sh"
 source "$HOME/.dotfiles/scripts/shared.sh"
 
 if ! command -v gh &> /dev/null; then
