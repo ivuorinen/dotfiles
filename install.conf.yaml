@@ -1,0 +1,98 @@
+---
+- defaults:
+    brew:
+      stderr: false
+      stdout: true
+    brewfile:
+      stdout: true
+    link:
+      create: true
+      relative: true
+      relink: true
+
+- clean:
+    ~/:
+    ~/.config:
+      recursive: true
+    ~/.local:
+      recursive: true
+
+- create:
+    ~/.config:
+    ~/.local:
+    ~/.local/share:
+    ~/.local/state:
+    ~/.ssh:
+      mode: 700
+    ~/Code:
+
+- link:
+    ~/.bashrc:
+    ~/.ecrc:
+    ~/.git_profiles:
+    ~/.huskyrc:
+    ~/.plan:
+    ~/.shellcheckrc:
+    ~/.vuerc:
+    ~/.config/:
+      path: config/
+    ~/.local/bin/:
+      path: local/bin/
+    ~/.ssh/:
+      force: true
+      glob: true
+      mode: 600
+      path: ssh/**
+    ~/.zshrc:
+      force: true
+      path: zshrc
+
+- if:
+  - cond: "[ $(uname) = Darwin ]"
+    met:
+      - brewfile:
+        - Brewfile
+  - cond: "[[ $(hostname) = v ]]"
+    met:
+      - link:
+        ~/.config/*:
+          force: true
+          glob: true
+          path: host-v/config/**
+      - go:
+        - github.com/delicb/cliware
+        - github.com/skx/sysbox@latest
+  - cond: "[[ $(hostname) = lakka ]]"
+    met:
+      - link:
+        ~/.irssi/*:
+          force: true
+          glob: true
+          path: host-lakka/irssi/**
+        ~/.zshrc*:
+          force: true
+          path: host-lakka/zshrc
+  - cond: "command -v npm"
+    met:
+      - shell:
+        - bash "$HOME/.dotfiles/scripts/install-npm-packages.sh"
+
+# GitHub CLI Extensions
+- ghe:
+  - andyfeller/gh-dependency-report
+  - andyfeller/gh-montage
+  - chelnak/gh-changelog
+  - davidraviv/gh-clean-branches
+  - dlvhdr/gh-dash
+  - einride/gh-dependabot
+  - heaths/gh-label
+  - hectcastro/gh-metrics
+  - matt-bartel/gh-clone-org
+  - rsese/gh-actions-status
+  - samcoe/gh-triage
+  - stoe/gh-report
+  - VildMedPap/gh-orgstats
+  - vilmibm/gh-screensaver
+  - vilmibm/gh-user-status
+
+- shell: [git submodule update --init --recursive]

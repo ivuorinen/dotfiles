@@ -17,34 +17,6 @@ SCRIPT=$(basename "$0")
 # shellcheck source=./../../scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
-function section_reset
-{
-  USAGE_PREFIX="$SCRIPT reset"
-  case "$1" in
-    all)
-      msg_ok "Running all reset commands"
-      $0 reset nvim
-      ;;
-    nvim)
-      rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim ~/.config/astronvim ~/.config/nvim
-      msg_ok "Deleted old nvim files"
-      ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
-      ln -s ~/.dotfiles/config/nvim ~/.config/nvim
-      msg_ok "Linked nvim and astronvim"
-      hash brew 2>/dev/null && $0 install brew
-      hash go 2>/dev/null && $0 install ext_go
-      hash npm 2>/dev/null && $0 install ext_npm
-      msg_ok "Installed packages"
-      msg_done "...and we are done!"
-      ;;
-    *)
-      menu_section "$USAGE_PREFIX" "all | nvim"
-      menu_item "all" "Reset everything, runs all configured reset actions"
-      menu_item "nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
-      ;;
-  esac
-}
-
 function section_install
 {
   USAGE_PREFIX="$SCRIPT install"
@@ -52,21 +24,18 @@ function section_install
   case "$1" in
     all)
       $0 install antigen
+      $0 install starship
       $0 install macos
-      $0 install ext_gh
-      $0 install ext_go
+      $0 install ext_npm
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 New antigen installed!"
       ;;
+    starship)
+      curl -sS https://starship.rs/install.sh | sh && msg_done "🎉 starship installed!"
+      ;;
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
-      ;;
-    ext_go)
-      bash "$DOTFILES/scripts/install-go-packages.sh" && msg_done "🎉 Go packages have been installed!"
-      ;;
-    ext_gh)
-      bash "$DOTFILES/scripts/install-gh-extensions.sh" && msg_done "🎉 Extensions for GitHub CLI have been installed!"
       ;;
     ext_npm)
       bash "$DOTFILES/scripts/install-npm-packages.sh" && msg_done "NPM Packages have been installed!"
@@ -75,11 +44,10 @@ function section_install
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | ext_gh | ext_go | ext_npm | macos | settler"
-      menu_item "all" "Installs antigen, macos, brew, ext_gh and ext_go"
+      menu_section "$USAGE_PREFIX" "all | antigen | starship | ext_npm | macos | settler"
+      menu_item "all" "Installs antigen, macos, brew and ext_gh"
       menu_item "antigen" "Updates the antigen.zsh file"
-      menu_item "ext_gh" "Install GitHub CLI Extensions"
-      menu_item "ext_go" "Install Go Packages"
+      menu_item "starship" "Install starship.rs"
       menu_item "ext_npm" "Install NPM Packages"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "settler" "Runs the WIP settler.sh"
@@ -129,18 +97,24 @@ function section_dotfiles
   USAGE_PREFIX="$SCRIPT dotfiles"
 
   case "$1" in
-    link)
-      rcup -B "$HOSTNAME" -f -v && msg_done "🎉 dotfiles have been linked!"
+    reset_all)
+      msg_ok "Running all reset commands"
+      $0 dotfiles reset_nvim
       ;;
-    update)
-      # Updates .dotfiles/scripts/install.sh and formats it
-      rcup -B 0 -g \
-        | tee "$INSTALL_SCRIPT" 1> /dev/null \
-        && sed -i '' "s|$HOME|\$HOME|g" "$INSTALL_SCRIPT" \
-        && sed -i '' "s|install.sh|$(basename "$INSTALL_SCRIPT")|g" "$INSTALL_SCRIPT"
-      $0 dotfiles shfmt
-      $0 dotfiles link
-      msg_done "🎉 dotfiles updated and linked!"
+    reset_nvim)
+      rm -rf \
+        ~/.local/share/nvim \
+        ~/.local/state/nvim \
+        ~/.cache/nvim \
+        ~/.config/astronvim \
+        ~/.config/nvim
+      msg_ok "Deleted old nvim files"
+      ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
+      ln -s ~/.dotfiles/config/nvim ~/.config/nvim
+      msg_ok "Linked nvim and astronvim"
+      hash npm 2>/dev/null && $0 install ext_npm
+      msg_ok "Installed packages"
+      msg_done "...and we are done!"
       ;;
     shfmt)
       # Format shell scripts according to following rules.
@@ -150,9 +124,9 @@ function section_dotfiles
       msg_done "🎉 dotfiles have been formatted!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "link | update | shfmt"
-      menu_item "link" "Use rcrc to update dotfile links"
-      menu_item "update" "Updates dotfile links (scripts/install.sh), formats it and runs it."
+      menu_section "$USAGE_PREFIX" "reset_all | reset_nvim | shfmt"
+      menu_item "reset_all" "Reset everything, runs all configured reset actions"
+      menu_item "reset_nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
       menu_item "shfmt" "Run shfmt to all dotfiles"
       ;;
   esac
@@ -191,8 +165,6 @@ function usage
   echo ""
   section_install
   echo ""
-  section_reset
-  echo ""
   section_brew
   echo ""
   section_dotfiles
@@ -201,7 +173,6 @@ function usage
 # The main loop. first keyword after $0 triggers section, or help.
 case "$1" in
   install) section_install "$2" ;;
-  reset) section_reset "$2" ;;
   brew) section_brew "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
   tests) section_tests "$2" ;;

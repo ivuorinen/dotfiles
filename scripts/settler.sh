@@ -36,26 +36,3 @@ until [ "$(which git)" ]; do
   echo -n "."
   sleep 1
 done
-
-# Install brew
-if [ "$(which brew)" ]; then
-  echo 'Brew already installed'
-else
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
-bash "$HOME/.dotfiles/local/bin/dfm" brew install && "Installed Brewfile contents"
-bash "$HOME/.dotfiles/local/bin/dfm" dotfiles link && "Linked all dotfiles"
-
-read -r -p "Do you want to set macOS defaults? (y/N) " yn
-
-case $yn in
-  [yY])
-    bash "set-defaults.sh"
-    ;;
-  *)
-    echo "Skipping..."
-    ;;
-esac
-
-echo "Done. Note that some of these changes require a logout/restart to take effect."

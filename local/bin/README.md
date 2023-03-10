@@ -25,9 +25,9 @@ Some problematic code has been fixed per `shellcheck` suggestions.
 | `x-when-up`             | skx/sysadmin-util |
 
 - Sources:
-    - [skx/sysadmin-utils](https://github.com/skx/sysadmin-util/)
-        - Tools for Linux/Unix sysadmins.
-        - [Licence](https://github.com/skx/sysadmin-util/blob/master/LICENSE)
-    - onnimonni
-        - https://gist.github.com/onnimonni/b49779ebc96216771a6be3de46449fa1
-    - [mvdan/dotfiles](https://github.com/mvdan/dotfiles)
+  - [skx/sysadmin-utils](https://github.com/skx/sysadmin-util/)
+    - Tools for Linux/Unix sysadmins.
+    - [Licence](https://github.com/skx/sysadmin-util/blob/master/LICENSE)
+  - [onnimonni](https://github.com/onnimonni)
+    - [validate_sha256sum](https://gist.github.com/onnimonni/b49779ebc96216771a6be3de46449fa1)
+  - [mvdan/dotfiles](https://github.com/mvdan/dotfiles)

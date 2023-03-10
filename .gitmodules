@@ -1,12 +1,37 @@
+[submodule "dotbot"]
+	path = dotbot
+	url = git@github.com:anishathalye/dotbot.git
+	ignore = dirty
+
+[submodule "dotbot-plugins/dotbot-brew"]
+	path = dotbot-plugins/dotbot-brew
+	url = git@github.com:wren/dotbot-brew.git
+	ignore = dirty
+
+[submodule "dotbot-plugins/dotbot-if"]
+	path = dotbot-plugins/dotbot-if
+	url = git@github.com:wonderbeyond/dotbot-if.git
+	ignore = dirty
+
+[submodule "dotbot-plugins/dotbot-gh-extension"]
+	path = dotbot-plugins/dotbot-gh-extension
+	url = git@github.com:fundor333/dotbot-gh-extension.git
+	ignore = dirty
+
+[submodule "dotbot-plugins/dotbot-golang"]
+	path = dotbot-plugins/dotbot-golang
+	url = git@github.com:delicb/dotbot-golang.git
+	ignore = dirty
+
 [submodule "config/nvim"]
 	path = config/nvim
 	url = git@github.com:AstroNvim/AstroNvim.git
 	ignore = dirty
-	branch = v3
+	branch = nightly
 	update = checkout
+
 [submodule "config/astronvim/lua/user"]
 	path = config/astronvim/lua/user
 	url = git@github.com:ivuorinen/astronvim_config.git
 	update = rebase
 	branch = main
-
