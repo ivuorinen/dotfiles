@@ -14,6 +14,7 @@
 
 SCRIPT=$(basename "$0")
 
+# shellcheck source=./../../scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
 function section_reset
@@ -30,10 +31,10 @@ function section_reset
       ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
       ln -s ~/.dotfiles/config/nvim ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
-      $0 install brew
-      $0 install ext_go
-      $0 install ext_npm
-      msg_ok "Installed brew, and packages for go and npm"
+      hash brew 2>/dev/null && $0 install brew
+      hash go 2>/dev/null && $0 install ext_go
+      hash npm 2>/dev/null && $0 install ext_npm
+      msg_ok "Installed packages"
       msg_done "...and we are done!"
       ;;
     *)
@@ -52,15 +53,11 @@ function section_install
     all)
       $0 install antigen
       $0 install macos
-      $0 install brew
       $0 install ext_gh
       $0 install ext_go
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 New antigen installed!"
-      ;;
-    brew)
-      brew bundle install --file="$BREWFILE" && msg_done "🎉 macOS Defaults set!"
       ;;
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
@@ -78,10 +75,9 @@ function section_install
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | brew | ext_gh | ext_go | ext_npm | macos | settler"
+      menu_section "$USAGE_PREFIX" "all | antigen | ext_gh | ext_go | ext_npm | macos | settler"
       menu_item "all" "Installs antigen, macos, brew, ext_gh and ext_go"
       menu_item "antigen" "Updates the antigen.zsh file"
-      menu_item "brew" "Install Brewfile contents"
       menu_item "ext_gh" "Install GitHub CLI Extensions"
       menu_item "ext_go" "Install Go Packages"
       menu_item "ext_npm" "Install NPM Packages"
@@ -96,37 +92,36 @@ function section_brew
   USAGE_PREFIX="$SCRIPT brew"
 
   if ! command -v brew &> /dev/null; then
-    echo "brew could not be found, please install it first"
-    exit
+    menu_section "$USAGE_PREFIX" "brew not available on this system"
+  else
+    case "$1" in
+      install)
+        brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
+        ;;
+      update)
+        brew update && brew outdated && brew upgrade && brew cleanup
+        msg_done "🎉 Done!"
+        ;;
+      updatebundle)
+        # Updates .dotfiles/Brewfile with descriptions
+        brew bundle dump \
+          --force \
+          --file="$BREWFILE" \
+          --describe && msg_done "🎉 Done!"
+        ;;
+      autoupdate)
+        brew autoupdate delete
+        brew autoupdate start 43200 --upgrade --cleanup --immediate
+        ;;
+      *)
+        menu_section "$USAGE_PREFIX" "install | update | updatebundle | autoupdate"
+        menu_item "install" "Installs items defined in Brewfile"
+        menu_item "update" "Updates and upgrades brew packages"
+        menu_item "updatebundle" "Updates Brewfile with descriptions"
+        menu_item "autoupdate" "Setups brew auto-update and runs it immediately"
+        ;;
+    esac
   fi
-
-  case "$1" in
-    install)
-      brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
-      ;;
-    update)
-      brew update && brew outdated && brew upgrade && brew cleanup
-      msg_done "🎉 Done!"
-      ;;
-    updatebundle)
-      # Updates .dotfiles/Brewfile with descriptions
-      brew bundle dump \
-        --force \
-        --file="$BREWFILE" \
-        --describe && msg_done "🎉 Done!"
-      ;;
-    autoupdate)
-      brew autoupdate delete
-      brew autoupdate start 43200 --upgrade --cleanup --immediate
-      ;;
-    *)
-      menu_section "$USAGE_PREFIX" "install | update | updatebundle | autoupdate"
-      menu_item "install" "Installs items defined in Brewfile"
-      menu_item "update" "Updates and upgrades brew packages"
-      menu_item "updatebundle" "Updates Brewfile with descriptions"
-      menu_item "autoupdate" "Setups brew auto-update and runs it immediately"
-      ;;
-  esac
 }
 
 function section_dotfiles
@@ -210,5 +205,5 @@ case "$1" in
   brew) section_brew "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
   tests) section_tests "$2" ;;
-  *) usage && exit 1 ;;
+  *) usage && exit 0 ;;
 esac

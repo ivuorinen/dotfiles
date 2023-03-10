@@ -35,6 +35,13 @@ if [ command -v brew &> /dev/null ]; then
     export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
 fi
 
+# nvm, the node version manager
+export NVM_LAZY_LOAD=true
+export NVM_COMPLETION=true
+export NVM_AUTO_USE=true
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
 # If we have go packages, include them to the PATH
 if command -v go &> /dev/null; then
     export GOPATH=$(go env GOPATH);
@@ -63,13 +70,6 @@ if command -v gem &>/dev/null; then
     export GEM_PATH="$XDG_STATE_HOME/gem"
 fi
 
-# nvm, the node version manager
-export NVM_DIR="$XDG_STATE_HOME/nvm"
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-export NVM_AUTO_USE=true
-[ -s "$HOMEBREW_PKG/nvm/nvm.sh" ] && \. "$HOMEBREW_PKG/nvm/nvm.sh"
-[ -s "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PKG/nvm/etc/bash_completion.d/nvm"
 
 # wakatime, https://github.com/wakatime/wakatime-cli
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
@@ -115,7 +115,6 @@ if command -v antigen &> /dev/null; then
     hash php 2>/dev/null && antigen bundle php
     hash nvm 2>/dev/null && antigen bundle nvm
     hash docker 2>/dev/null && antigen bundle docker
-    # hash ruby 2>/dev/null && antigen bundle ruby
     hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
     hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
     hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin

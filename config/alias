@@ -4,36 +4,38 @@
 # Get installed php versions from brew and setup aliases
 function x-set-php-aliases
 {
-  local php_versions=()
-  while IFS="" read -r line; do php_versions+=("$line"); done < <(brew list | grep '^php')
+  if command -v brew &> /dev/null; then
+    local php_versions=()
+    while IFS="" read -r line; do php_versions+=("$line"); done < <(brew list | grep '^php')
 
-  php_error_reporting='-d error_reporting=22527'
+    php_error_reporting='-d error_reporting=22527'
 
-  for version in "${php_versions[@]}"; do
-    # drop the dot from version (8.0 -> 80)
-    local php_abbr="${version//\./}"
-    # replace "php@" with "p" so "php@80" becomes "p80"
-    local php_alias="${php_abbr//php@/p}"
+    for version in "${php_versions[@]}"; do
+      # drop the dot from version (8.0 -> 80)
+      local php_abbr="${version//\./}"
+      # replace "php@" with "p" so "php@80" becomes "p80"
+      local php_alias="${php_abbr//php@/p}"
 
-    # Skip php = php aliasing
-    # if [[ "$php_abbr" == "$php_alias" ]]; then continue; fi;
+      # Skip php = php aliasing
+      # if [[ "$php_abbr" == "$php_alias" ]]; then continue; fi;
 
-    # Fetch the exec path once
-    php_exec="$(brew --prefix "$version")/bin/php"
+      # Fetch the exec path once
+      php_exec="$(brew --prefix "$version")/bin/php"
 
-    # Raw PHP without error_reporting flag.
-    # shellcheck disable=SC2139
-    alias ${php_alias}r="$php_exec"
-    # PHP with error_reporting flag.
-    # shellcheck disable=SC2139
-    alias $php_alias="$php_exec $php_error_reporting"
-    # Local PHP Server.
-    # shellcheck disable=SC2139
-    alias ${php_alias}s="$php_exec -S localhost:9000"
-    # Use composer with specific PHP and error_reporting flag on.
-    # shellcheck disable=SC2139
-    alias ${php_alias}c="$php_exec $php_error_reporting $(which composer)"
-  done
+      # Raw PHP without error_reporting flag.
+      # shellcheck disable=SC2139
+      alias "${php_alias}"r="$php_exec"
+      # PHP with error_reporting flag.
+      # shellcheck disable=SC2139
+      alias "$php_alias"="$php_exec $php_error_reporting"
+      # Local PHP Server.
+      # shellcheck disable=SC2139
+      alias "${php_alias}"s="$php_exec -S localhost:9000"
+      # Use composer with specific PHP and error_reporting flag on.
+      # shellcheck disable=SC2139
+      alias "${php_alias}"c="$php_exec $php_error_reporting $(which composer)"
+    done
+  fi
 }
 
 if [[ $(uname) == 'Darwin' ]]; then

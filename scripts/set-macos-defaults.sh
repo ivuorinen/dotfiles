@@ -6,6 +6,8 @@
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
 #
 
+[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0;
+
 # Ask for the administrator password upfront
 sudo -v
 
