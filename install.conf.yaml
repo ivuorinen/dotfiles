@@ -1,13 +1,12 @@
 ---
 - defaults:
     brew:
-      stderr: false
+      stderr: true
       stdout: true
     brewfile:
       stdout: true
     link:
       create: true
-      relative: true
       relink: true
 
 - clean:
@@ -35,9 +34,11 @@
     ~/.shellcheckrc:
     ~/.vuerc:
     ~/.config/:
-      path: config/
+      glob: true
+      path: config/**
     ~/.local/bin/:
-      path: local/bin/
+      glob: true
+      path: local/bin/**
     ~/.ssh/:
       force: true
       glob: true
@@ -47,13 +48,18 @@
       force: true
       path: zshrc
 
+- shell: [git submodule update --init --recursive, Installing submodules]
+
 - if:
   - cond: "[ $(uname) = Darwin ]"
     met:
-      - brewfile:
-        - Brewfile
+      - shell:
+        - echo "Darwin system"
+        - [brew bundle install --file="Brewfile", Installing Brewfile contents]
   - cond: "[[ $(hostname) = v ]]"
     met:
+      - shell:
+        - echo "host is v"
       - link:
         ~/.config/*:
           force: true
@@ -64,6 +70,8 @@
         - github.com/skx/sysbox@latest
   - cond: "[[ $(hostname) = lakka ]]"
     met:
+      - shell:
+        - echo "host is lakka"
       - link:
         ~/.irssi/*:
           force: true
@@ -75,7 +83,8 @@
   - cond: "command -v npm"
     met:
       - shell:
-        - bash "$HOME/.dotfiles/scripts/install-npm-packages.sh"
+        - echo "we have npm"
+        - ["$HOME/.dotfiles/scripts/install-npm-packages.sh", Installing npm packages]
 
 # GitHub CLI Extensions
 - ghe:
@@ -85,7 +94,6 @@
   - davidraviv/gh-clean-branches
   - dlvhdr/gh-dash
   - einride/gh-dependabot
-  - heaths/gh-label
   - hectcastro/gh-metrics
   - matt-bartel/gh-clone-org
   - rsese/gh-actions-status
@@ -94,5 +102,3 @@
   - VildMedPap/gh-orgstats
   - vilmibm/gh-screensaver
   - vilmibm/gh-user-status
-
-- shell: [git submodule update --init --recursive]

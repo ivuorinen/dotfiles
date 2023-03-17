@@ -1,14 +1,18 @@
 Host github.com
  User git
  HostName github.com
+ IdentityAgent none
+ IdentitiesOnly yes
  IdentityFile ~/.ssh/id_rsa
 
 Host bitbucket.com
  Hostname bitbucket.com
+ IdentitiesOnly yes
  IdentityFile ~/.ssh/id_rsa
 
 Host gitlab.com
  Hostname gitlab.com
+ IdentitiesOnly yes
  IdentityFile ~/.ssh/id_rsa
 
 Host *
