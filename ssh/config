@@ -1,20 +1,7 @@
 Host github.com
- User git
- HostName github.com
- IdentityAgent none
- IdentitiesOnly yes
- IdentityFile ~/.ssh/id_rsa
-
-Host bitbucket.com
- Hostname bitbucket.com
- IdentitiesOnly yes
- IdentityFile ~/.ssh/id_rsa
-
-Host gitlab.com
- Hostname gitlab.com
- IdentitiesOnly yes
- IdentityFile ~/.ssh/id_rsa
+  User git
 
 Host *
- IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+#  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  IdentityFile ~/.ssh/id_rsa
 

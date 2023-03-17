@@ -21,12 +21,12 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ### Interesting folders
 
-| Path               | Description                                         |
-| ------------------ | --------------------------------------------------- |
-| `.github`          | GitHub Repository configuration files.              |
-| `host-{hostname}/` | Configurations that should apply to that host only. |
-| `local/bin`        | Helper scripts that I've collected or wrote.        |
-| `scripts`          | Setup scripts.                                      |
+| Path                | Description                                  |
+| ------------------- | -------------------------------------------- |
+| `.github`           | GitHub Repository configuration files.       |
+| `hosts/{hostname}/` | Configs that should apply to that host only. |
+| `local/bin`         | Helper scripts that I've collected or wrote. |
+| `scripts`           | Setup scripts.                               |
 
 ### dotfile folders
 
@@ -49,11 +49,12 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 
 | Var                | Default              |
 | ------------------ | -------------------- |
-| Executables        | `$HOME/.local/bin`   |
 | `$XDG_DATA_HOME`   | `$HOME/.local/share` |
 | `$XDG_STATE_HOME`  | `$HOME/.local/state` |
 | `$XDG_CONFIG_HOME` | `$HOME/.config`      |
+| `$XDG_BIN_HOME`    | `$HOME/.local/bin`   |
 
+- `$XDG_BIN_HOME` is a custom `env` for `.local/bin` folder.
 - `$XDG_DATA_HOME` defines the base directory relative to which user-specific data
   files should be stored. If `$XDG_DATA_HOME` is either not set or empty,
   a default equal to `$HOME/.local/share` should be used.
