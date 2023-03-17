@@ -11,6 +11,7 @@
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${INSTALL_SCRIPT:=$DOTFILES/scripts/install-dotfiles.sh}"
 : "${BREWFILE:=$DOTFILES/Brewfile}"
+: "${HOSTFILES:=$DOTFILES/hosts}"
 
 SCRIPT=$(basename "$0")
 
@@ -26,7 +27,7 @@ function section_install
       $0 install antigen
       $0 install starship
       $0 install macos
-      $0 install ext_npm
+      $0 install npm
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 New antigen installed!"
@@ -37,18 +38,18 @@ function section_install
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
       ;;
-    ext_npm)
+    npm)
       bash "$DOTFILES/scripts/install-npm-packages.sh" && msg_done "NPM Packages have been installed!"
       ;;
     settler)
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | starship | ext_npm | macos | settler"
+      menu_section "$USAGE_PREFIX" "all | antigen | starship | npm | macos | settler"
       menu_item "all" "Installs antigen, macos, brew and ext_gh"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "starship" "Install starship.rs"
-      menu_item "ext_npm" "Install NPM Packages"
+      menu_item "npm" "Install NPM Packages"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "settler" "Runs the WIP settler.sh"
       ;;
@@ -112,7 +113,7 @@ function section_dotfiles
       ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
       ln -s ~/.dotfiles/config/nvim ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
-      hash npm 2>/dev/null && $0 install ext_npm
+      hash npm 2>/dev/null && $0 install npm
       msg_ok "Installed packages"
       msg_done "...and we are done!"
       ;;
@@ -128,6 +129,29 @@ function section_dotfiles
       menu_item "reset_all" "Reset everything, runs all configured reset actions"
       menu_item "reset_nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
       menu_item "shfmt" "Run shfmt to all dotfiles"
+      ;;
+  esac
+}
+
+function section_check
+{
+  USAGE_PREFIX="$SCRIPT check"
+  X_HOSTNAME=$(hostname)
+  X_ARCH=$(uname)
+
+  case "$1" in
+    a|arch)
+      [[ "$2" = "" ]] && echo "$X_ARCH" && exit 0
+      [[ $X_ARCH = "$2" ]] && exit 0 || exit 1
+      ;;
+    h|host|hostname)
+      [[ "$2" = "" ]] && echo "$X_HOSTNAME" && exit 0
+      [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
+      ;;
+    *)
+      menu_section "$USAGE_PREFIX" "arch | host"
+      menu_item "arch <arch>" "Empty returns current. Exit code 0 when match, 1 when not."
+      menu_item "host <host>" "Empty returns current. Exit code 0 when match, 1 when not."
       ;;
   esac
 }
@@ -160,12 +184,14 @@ function section_tests
 function usage
 {
   echo ""
-  menu_section "Usage: $SCRIPT" "install | reset | brew | dotfiles"
+  menu_section "Usage: $SCRIPT" "install | reset | brew | check | dotfiles"
   echo $"   All commands have their own subcommands."
   echo ""
   section_install
   echo ""
   section_brew
+  echo ""
+  section_check
   echo ""
   section_dotfiles
 }
@@ -174,6 +200,7 @@ function usage
 case "$1" in
   install) section_install "$2" ;;
   brew) section_brew "$2" ;;
+  check) section_check "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
   tests) section_tests "$2" ;;
   *) usage && exit 0 ;;

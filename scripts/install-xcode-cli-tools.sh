@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Settler - my macOS setup automator
+# Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 
