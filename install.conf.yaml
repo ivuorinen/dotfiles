@@ -4,6 +4,7 @@
       stderr: true
       stdout: true
     brewfile:
+      stderr: true
       stdout: true
     link:
       create: true
@@ -26,13 +27,6 @@
     ~/Code:
 
 - link:
-    ~/.bashrc:
-    ~/.ecrc:
-    ~/.git_profiles:
-    ~/.huskyrc:
-    ~/.plan:
-    ~/.shellcheckrc:
-    ~/.vuerc:
     ~/.config/:
       glob: true
       path: config/**
@@ -44,11 +38,13 @@
       glob: true
       mode: 600
       path: ssh/**
-    ~/.zshrc:
+    ~/:
       force: true
-      path: zshrc
+      glob: true
+      path: base/**
+      prefix: '.'
 
-- shell: [git submodule update --init --recursive, Installing submodules]
+- shell: [git submodule update --init --recursive --force, Installing submodules]
 
 - if:
   - cond: "[ $(uname) = Darwin ]"

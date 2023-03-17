@@ -18,5 +18,6 @@ git submodule update --init --recursive
   --plugin-dir=dotbot-plugins/dotbot-gh-extension \
   --plugin-dir=dotbot-plugins/dotbot-golang \
   --plugin-dir=dotbot-plugins/dotbot-if \
+  -p dotbot-plugins/dotbot-if/if.py \
   -c "${CONFIG}" \
   "${@}"

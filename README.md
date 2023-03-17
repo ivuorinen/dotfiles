@@ -13,13 +13,9 @@ fork or download the repo as a zip and go from there with your own configs.
 ### First time setup
 
 1. Clone this repository to `$HOME/.dotfiles`
-2. `bash $HOME/.dotfiles/scripts/settler.sh`
+2. `./install`
 3. ???
 4. Profit
-
-Note: there's a bit chicken/egg situation,
-because settler assumes you don't have git,
-and you need git to clone the repo. This will change soon&trade;.
 
 ## Interesting files and locations
 
@@ -36,6 +32,7 @@ and you need git to clone the repo. This will change soon&trade;.
 
 | Repo      | Destination | Description                                 |
 | --------- | ----------- | ------------------------------------------- |
+| `base/`   | `.*`        | `$HOME` level files.                        |
 | `config/` | `.config/`  | Configurations for applications.            |
 | `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `state` |
 | `ssh/`    | `.ssh/`     | SSH Configurations.                         |
@@ -43,13 +40,6 @@ and you need git to clone the repo. This will change soon&trade;.
 ### dfm - the dotfiles manager
 
 `.local/bin/dfm` is a shell script that has some tools that help with dotfiles management.
-
-### `scripts/install-dotfiles.sh` - dotfiles linker
-
-The `scripts/install-dotfiles.sh` is a `rcm` generated shell script
-that does all the necessary linking.
-
-To refresh the file, you can run `dfm dotfiles update`
 
 ## Configuration
 
@@ -95,9 +85,9 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 
 ### Interesting dotfiles repos
 
-- [https://dotfiles.github.io/inspiration/](dotfiles.github.io/inspiration)
-- [https://github.com/frdmn/dotfiles](github.com/frdmn/dotfiles) - Ansible-based
+- [dotfiles.github.io/inspiration/](https://dotfiles.github.io/inspiration)
+- [frdmn/dotfiles](https://github.com/github.com/frdmn/dotfiles) - Ansible-based
   dotfile setup for macOS
-- [https://github.com/mvdan/dotfiles](mvdan/dotfiles) - Here be dragons
-- [https://github.com/vsouza/dotfiles](vsouza/dotfiles) - 🏡 My dotfiles
-- [https://github.com/freekmurze/dotfiles](freekmurze/dotfiles) - My personal dotfiles
+- [mvdan/dotfiles](https://github.com/mvdan/dotfiles) - Here be dragons
+- [vsouza/dotfiles](https://github.com/vsouza/dotfiles) - 🏡 My dotfiles
+- [freekmurze/dotfiles](https://github.com/freekmurze/dotfiles) - My personal dotfiles
