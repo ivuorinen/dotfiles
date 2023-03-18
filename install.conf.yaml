@@ -1,8 +1,5 @@
 ---
 - defaults:
-    brew:
-      stderr: true
-      stdout: true
     brewfile:
       stderr: true
       stdout: true
