@@ -35,3 +35,6 @@
 	url = https://github.com/ivuorinen/astronvim_config.git
 	update = rebase
 	branch = main
+[submodule "dotbot-plugins/dotbot-ifplatform"]
+	path = dotbot-plugins/dotbot-ifplatform
+	url = https://github.com/ssbanerje/dotbot-ifplatform.git
