@@ -26,6 +26,7 @@
       mode: 700
     ~/Code:
 
+
 - link:
     ~/.config/:
       glob: true
@@ -45,17 +46,14 @@
       prefix: "."
 
 - shell:
-    - [git submodule update --init --recursive --force]
-    - [bash scripts/install-npm-packages.sh]
+    - [ git submodule update --init --recursive --force ]
+    - [ bash scripts/install-npm-packages.sh ]
 
 - ifmacos:
     - shell:
-        - [bash scripts/set-macos-defaults.sh]
+        - [ bash scripts/set-macos-defaults.sh ]
     - brewfile:
         - Brewfile
-
-- go:
-    - github.com/skx/sysbox@latest
 
 # hosts: air
 - if:
@@ -81,13 +79,13 @@
     - cond: "[[ $(hostname) = lakka ]]"
       met:
         - link:
-          ~/.irssi/*:
-            force: true
-            glob: true
-            path: hosts/lakka/irssi/**
-          ~/.zshrc*:
-            force: true
-            path: hosts/lakka/zshrc
+            ~/.irssi/*:
+              force: true
+              glob: true
+              path: hosts/lakka/irssi/**
+            ~/.zshrc:
+              force: true
+              path: hosts/lakka/zshrc
 
 # GitHub CLI Extensions
 - ghe:
@@ -120,4 +118,5 @@
     - VildMedPap/gh-orgstats
     - vilmibm/gh-screensaver
     - vilmibm/gh-user-status
+
 #
