@@ -42,77 +42,82 @@
       force: true
       glob: true
       path: base/**
-      prefix: '.'
+      prefix: "."
 
 - shell:
-  - [git submodule update --init --recursive --force]
-  - [bash scripts/set-macos-defaults.sh]
-  - [bash scripts/install-npm-packages.sh]
+    - [git submodule update --init --recursive --force]
+    - [bash scripts/install-npm-packages.sh]
 
-- brewfile:
-  - Brewfile
+- ifmacos:
+    - shell:
+        - [bash scripts/set-macos-defaults.sh]
+    - brewfile:
+        - Brewfile
 
 - go:
-  - github.com/skx/sysbox@latest
+    - github.com/skx/sysbox@latest
 
 # hosts: air
 - if:
-  - cond: '[[ $(hostname) = air ]]'
-    met:
-      - go:
-        - github.com/skx/sysbox@latest
+    - cond: "[[ $(hostname) = air ]]"
+      met:
+        - go:
+            - github.com/skx/sysbox@latest
 
 # hosts: v
 - if:
-  - cond: '[[ $(hostname) = v ]]'
-    met:
-    - link:
-        ~/.config/:
-          glob: true
-          force: true
-          path: hosts/v/config/**
-    - go:
-      - github.com/skx/sysbox@latest
+    - cond: "[[ $(hostname) = v ]]"
+      met:
+        - link:
+            ~/.config/:
+              glob: true
+              force: true
+              path: hosts/v/config/**
+        - go:
+            - github.com/skx/sysbox@latest
 
 # hosts: lakka
 - if:
-  - cond: '[[ $(hostname) = lakka ]]'
-    met:
-      - link:
-        ~/.irssi/*:
-          force: true
-          glob: true
-          path: hosts/lakka/irssi/**
-        ~/.zshrc*:
-          force: true
-          path: hosts/lakka/zshrc
+    - cond: "[[ $(hostname) = lakka ]]"
+      met:
+        - link:
+          ~/.irssi/*:
+            force: true
+            glob: true
+            path: hosts/lakka/irssi/**
+          ~/.zshrc*:
+            force: true
+            path: hosts/lakka/zshrc
 
 # GitHub CLI Extensions
 - ghe:
-  # GitHub CLI extension for generating a report on repository dependencies.
-  - andyfeller/gh-dependency-report
-  # GitHub CLI extension to generate montage from GitHub user avatars
-  - andyfeller/gh-montage
-  # An opinionated GitHub Cli extension for creating
-  # changelogs that adhere to the keep a changelog specification.
-  - chelnak/gh-changelog
-  # Safely deletes local branches with no upstream and no un-pushed commits
-  - davidraviv/gh-clean-branches
-  # A beautiful CLI dashboard for GitHub 🚀
-  - dlvhdr/gh-dash
-  # GitHub CLI extension for reviewing Dependabot PRs.
-  - einride/gh-dependabot
+    # GitHub CLI extension for generating a report on repository dependencies.
+    - andyfeller/gh-dependency-report
+    # GitHub CLI extension to generate montage from GitHub user avatars
+    - andyfeller/gh-montage
+    # An opinionated GitHub Cli extension for creating
+    # changelogs that adhere to the keep a changelog specification.
+    - chelnak/gh-changelog
+    # Safely deletes local branches with no upstream and no un-pushed commits
+    - davidraviv/gh-clean-branches
+    # A beautiful CLI dashboard for GitHub 🚀
+    - dlvhdr/gh-dash
+    # GitHub CLI extension for reviewing Dependabot PRs.
+    - einride/gh-dependabot
     # A GitHub CLI extension that provides summary pull request metrics.
-  - hectcastro/gh-metrics
-  # A github-cli extension script to clone all repositories
-  # in an organization, optionally filtering by topic.
-  - matt-bartel/gh-clone-org
-  # being an extension to view the overall health of an organization's use of actions
-  - rsese/gh-actions-status
-  - samcoe/gh-triage
-  # Generate account/organization/enterprise reports
-  - stoe/gh-report
-  # Organisation specific extension for gh cli to retrieve different statistics
-  - VildMedPap/gh-orgstats
-  - vilmibm/gh-screensaver
-  - vilmibm/gh-user-status
+    - hectcastro/gh-metrics
+    # A github-cli extension script to clone all repositories
+    # in an organization, optionally filtering by topic.
+    - matt-bartel/gh-clone-org
+    # being an extension to view the overall health of
+    # an organization's use of actions
+    - rsese/gh-actions-status
+    - samcoe/gh-triage
+    # Generate account/organization/enterprise reports
+    - stoe/gh-report
+    # Organisation specific extension for gh cli
+    # to retrieve different statistics
+    - VildMedPap/gh-orgstats
+    - vilmibm/gh-screensaver
+    - vilmibm/gh-user-status
+#
