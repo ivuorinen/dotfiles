@@ -26,6 +26,7 @@ function section_install
     all)
       $0 install antigen
       $0 install starship
+      $0 install nvm
       $0 install macos
       $0 install npm
       ;;
@@ -34,6 +35,9 @@ function section_install
       ;;
     starship)
       curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin && msg_done "🎉 starship installed!"
+      ;;
+    nvm)
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && msg_done "   ^=^n^i nvm installed!"
       ;;
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
