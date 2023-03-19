@@ -3,6 +3,8 @@
     brewfile:
       stderr: true
       stdout: true
+    create:
+      mode: 755
     link:
       create: true
       relink: true
@@ -42,12 +44,12 @@
       prefix: "."
 
 - shell:
-    - [ git submodule update --init --recursive --force ]
-    - [ bash scripts/install-npm-packages.sh ]
+    - [git submodule update --init --recursive --force]
+    - [bash scripts/install-npm-packages.sh]
 
 - ifmacos:
     - shell:
-        - [ bash scripts/set-macos-defaults.sh ]
+        - [bash scripts/set-macos-defaults.sh]
     - brewfile:
         - Brewfile
 
@@ -114,5 +116,4 @@
     - VildMedPap/gh-orgstats
     - vilmibm/gh-screensaver
     - vilmibm/gh-user-status
-
 #

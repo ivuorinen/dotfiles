@@ -14,11 +14,10 @@ git submodule update --init --recursive
 
 "${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" \
   -d "${BASEDIR}" \
-  --plugin-dir=dotbot-plugins/dotbot-brew \
-  --plugin-dir=dotbot-plugins/dotbot-gh-extension \
-  --plugin-dir=dotbot-plugins/dotbot-golang \
-  --plugin-dir=dotbot-plugins/dotbot-if \
-  --plugin-dir=dotbot-plugins/dotbot-ifplatform \
-  -p dotbot-plugins/dotbot-if/if.py \
+  --plugin-dir=dotbot-brew \
+  --plugin-dir=dotbot-gh-extension \
+  --plugin-dir=dotbot-golang \
+  --plugin-dir=dotbot-if \
+  --plugin-dir=dotbot-ifplatform \
   -c "${CONFIG}" \
   "${@}"

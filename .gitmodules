@@ -3,23 +3,28 @@
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
 
-[submodule "dotbot-plugins/dotbot-brew"]
-	path = dotbot-plugins/dotbot-brew
+[submodule "dotbot-brew"]
+	path = dotbot-brew
 	url = https://github.com/wren/dotbot-brew.git
 	ignore = dirty
 
-[submodule "dotbot-plugins/dotbot-if"]
-	path = dotbot-plugins/dotbot-if
+[submodule "dotbot-if"]
+	path = dotbot-if
 	url = https://github.com/wonderbeyond/dotbot-if.git
 	ignore = dirty
 
-[submodule "dotbot-plugins/dotbot-gh-extension"]
-	path = dotbot-plugins/dotbot-gh-extension
+[submodule "dotbot-ifplatform"]
+	path = dotbot-ifplatform
+	url = https://github.com/ssbanerje/dotbot-ifplatform.git
+	ignore = dirty
+
+[submodule "dotbot-gh-extension"]
+	path = dotbot-gh-extension
 	url = https://github.com/fundor333/dotbot-gh-extension.git
 	ignore = dirty
 
-[submodule "dotbot-plugins/dotbot-golang"]
-	path = dotbot-plugins/dotbot-golang
+[submodule "dotbot-golang"]
+	path = dotbot-golang
 	url = https://github.com/delicb/dotbot-golang.git
 	ignore = dirty
 
@@ -35,6 +40,4 @@
 	url = https://github.com/ivuorinen/astronvim_config.git
 	update = rebase
 	branch = main
-[submodule "dotbot-plugins/dotbot-ifplatform"]
-	path = dotbot-plugins/dotbot-ifplatform
-	url = https://github.com/ssbanerje/dotbot-ifplatform.git
+	ignore = dirty
