@@ -23,23 +23,22 @@
       mode: 700
     ~/Code:
 
-
 - link:
     ~/.config/:
       glob: true
-      path: config/**
+      path: config/*
     ~/.local/bin/:
       glob: true
-      path: local/bin/**
+      path: local/bin/*
     ~/.ssh/:
       force: true
       glob: true
       mode: 600
-      path: ssh/**
+      path: ssh/*
     ~/:
       force: true
       glob: true
-      path: base/**
+      path: base/*
       prefix: "."
 
 - shell:
