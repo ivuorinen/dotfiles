@@ -98,22 +98,10 @@
     - davidraviv/gh-clean-branches
     # A beautiful CLI dashboard for GitHub 🚀
     - dlvhdr/gh-dash
-    # GitHub CLI extension for reviewing Dependabot PRs.
-    - einride/gh-dependabot
-    # A GitHub CLI extension that provides summary pull request metrics.
-    - hectcastro/gh-metrics
     # A github-cli extension script to clone all repositories
     # in an organization, optionally filtering by topic.
     - matt-bartel/gh-clone-org
     # being an extension to view the overall health of
     # an organization's use of actions
     - rsese/gh-actions-status
-    - samcoe/gh-triage
-    # Generate account/organization/enterprise reports
-    - stoe/gh-report
-    # Organisation specific extension for gh cli
-    # to retrieve different statistics
-    - VildMedPap/gh-orgstats
-    - vilmibm/gh-screensaver
-    - vilmibm/gh-user-status
 #
