@@ -45,7 +45,8 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 
 # If we have go packages, include them to the PATH
 if command -v go &> /dev/null; then
-    export GOPATH=$(go env GOPATH);
+    export GOPATH="$XDG_DATA_HOME/go";
+    mkdir -p "$GOPATH"
     if [ -d "$GOPATH/bin" ]; then
         export PATH="$GOPATH/bin:$PATH"
     fi

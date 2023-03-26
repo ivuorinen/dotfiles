@@ -59,6 +59,7 @@
       met:
         - go:
             - github.com/skx/sysbox@latest
+            - github.com/dotzero/git-profile
 
 # hosts: v
 - if:
@@ -71,6 +72,15 @@
               path: hosts/v/config/**
         - go:
             - github.com/skx/sysbox@latest
+            - github.com/dotzero/git-profile
+
+# hosts tunkki
+- if:
+    - cond: "[[ $(hostname) = tunkki ]]"
+      met:
+        - go:
+            - github.com/skx/sysbox@latest
+            - github.com/dotzero/git-profile
 
 # hosts: lakka
 - if:
