@@ -35,9 +35,10 @@ TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
 FILENAME_TIMESTAMP="${DATABASE}_${FILENAME}_${TIMESTAMP}.sql"
 
 mysqldump \
-  ${DATABASE} \
+  "${DATABASE}" \
   "$(
     echo "show tables like '${PREFIX}%';" \
-      | mysql ${DATABASE} \
+      | mysql "${DATABASE}" \
       | sed '/Tables_in/d'
   )" > "${FILENAME_TIMESTAMP}"
+

@@ -24,9 +24,10 @@ echo "Waiting for $HOST to get down..."
 
 true
 while [ $? -ne 1 ]; do
-  ping -c 1 -W 1 $HOST > /dev/null
+  ping -c 1 -W 1 "$HOST" > /dev/null
 done
 
 shift
 
 "$@"
+

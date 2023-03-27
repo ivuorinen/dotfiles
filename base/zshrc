@@ -1,3 +1,4 @@
+# this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
 autoload -U colors zsh/terminfo
@@ -24,15 +25,15 @@ export PATH="$XDG_BIN_HOME:$HOMEBREW_BIN:$HOMEBREW_SBIN:/usr/local/sbin:$PATH"
 
 # brew, https://brew.sh
 if [ command -v brew &> /dev/null ]; then
-    BREW_BIN=$(brew --prefix)/bin
-    BREW_SBIN=$(brew --prefix)/sbin
+  BREW_BIN=$(brew --prefix)/bin
+  BREW_SBIN=$(brew --prefix)/sbin
 
-    BREW_PYTHON=$(brew --prefix python@3.8)/bin
-    GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
-    BREW_RUBY=$(brew --prefix ruby)/bin
-    BREW_GEMS=$(gem environment gemdir)/bin
+  BREW_PYTHON=$(brew --prefix python@3.8)/bin
+  GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
+  BREW_RUBY=$(brew --prefix ruby)/bin
+  BREW_GEMS=$(gem environment gemdir)/bin
 
-    export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
+  export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
 fi
 
 # nvm, the node version manager
@@ -163,3 +164,4 @@ fi
 [[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
 
 eval "$(starship init zsh)"
+

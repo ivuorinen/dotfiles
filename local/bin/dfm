@@ -124,7 +124,7 @@ function section_dotfiles
     shfmt)
       # Format shell scripts according to following rules.
       find "$DOTFILES" \
-        \( -name '*.sh' -or -name '*.zsh' -or -name 'x-*' -or -not '*.pl' \) \
+        \( -name '*.sh' -or -name '*.zsh' -or -name 'x-*' \) \
         -exec shfmt -fn -l -w -i 2 -ci -sr -bn {} \;
       msg_done "🎉 dotfiles have been formatted!"
       ;;
@@ -209,3 +209,4 @@ case "$1" in
   tests) section_tests "$2" ;;
   *) usage && exit 0 ;;
 esac
+

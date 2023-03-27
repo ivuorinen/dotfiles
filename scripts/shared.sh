@@ -6,9 +6,9 @@
 
 # -- Colors -- #
 CLR_RED="\033[1;31m"
-CLR_YELLOW='\033[1;33m'
+CLR_YELLOW="\033[1;33m"
 CLR_GREEN="\033[1;32m"
-CLR_BLUE='\033[1;34m'
+CLR_BLUE="\033[1;34m"
 CLR_RESET="\033[0m"
 
 # -- Helpers -- #
@@ -111,3 +111,4 @@ function fn_exists()
   declare -f -F "$1" > /dev/null
   return $?
 }
+

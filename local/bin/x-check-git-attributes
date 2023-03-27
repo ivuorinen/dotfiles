@@ -6,7 +6,7 @@
 
 if ! command -v git &> /dev/null; then
   echo "git could not be found, please install it first"
-  exit
+  exit 1
 fi
 
 missing_attributes=$(git ls-files | git check-attr -a --stdin | grep "text: auto")
@@ -17,3 +17,4 @@ if [[ "$missing_attributes" ]]; then
 else
   echo "All files have a corresponding rule in .gitattributes"
 fi
+

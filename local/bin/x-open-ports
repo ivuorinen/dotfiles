@@ -3,6 +3,7 @@
 # List open (listened) ports, without the crud that
 # usually comes with `lsof -i`
 #
+# Modified by:     Ismo Vuorinen <https://github.com/ivuorinen> 2020
 # Originally from: https://www.commandlinefu.com/commands/view/8951
 # Original author: https://www.commandlinefu.com/commands/by/wickedcpj
 #
@@ -18,3 +19,4 @@ lsof -i 4 -P -n +c 0 \
   | uniq
 
 echo ""
+
