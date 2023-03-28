@@ -10,12 +10,17 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "jesseduffield/lazygit"
 tap "mongodb/brew"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
+# Checks ansible playbooks for practices and behaviour
+brew "ansible-lint"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
 # Spell checker with better logic than ispell
@@ -26,6 +31,8 @@ brew "autoconf"
 brew "awscli"
 # Terminal bandwidth utilization tool
 brew "bandwhich"
+# Yet another cross-platform graphical process/system monitor
+brew "bottom"
 # Switch Apache / Valet / CLI configs between PHP versions
 brew "brew-php-switcher"
 # Core application library for C
@@ -34,30 +41,22 @@ brew "glib"
 brew "pkg-config"
 # Cross-platform make
 brew "cmake"
-# Open source suite of directory software
-brew "openldap"
-# Get a file from an HTTP, HTTPS or FTP server
-brew "curl"
-# Libraries to talk to Microsoft SQL Server and Sybase databases
-brew "freetds"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
-# Postgres C API library
-brew "libpq"
-# General-purpose scripting language
-brew "php"
-# Dependency Manager for PHP
-brew "composer"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
 # Get, unpack, build, and install modules from CPAN
 brew "cpanminus"
+# Open source suite of directory software
+brew "openldap"
+# Get a file from an HTTP, HTTPS or FTP server
+brew "curl"
 # Diff that understands syntax
 brew "difftastic"
 # Tool for exploring each layer in a docker image
 brew "dive"
 # Command-line DNS client
 brew "dog"
+# Lightning-fast linter for .env files written in Rust
+brew "dotenv-linter"
 # Tool to verify that your files are in harmony with your .editorconfig
 brew "editorconfig-checker"
 # Useful examples at the command-line
@@ -66,8 +65,12 @@ brew "eg-examples"
 brew "faas-cli"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
+# Libraries to talk to Microsoft SQL Server and Sybase databases
+brew "freetds"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
+# Disk usage analyzer with console interface written in Go
+brew "gdu", link: false
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -92,6 +95,8 @@ brew "gnupg"
 brew "go"
 # Image manipulation
 brew "netpbm"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Library to render SVG files using Cairo
@@ -114,6 +119,8 @@ brew "imagemagick"
 brew "jq"
 # Lazier way to manage everything docker
 brew "lazydocker"
+# Postgres C API library
+brew "libpq"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
 # Package manager for the Lua programming language
@@ -140,6 +147,14 @@ brew "openapi-generator"
 brew "pandoc"
 # Highly capable, feature-rich programming language
 brew "perl"
+# General-purpose scripting language
+brew "php@8.1"
+# Python version management
+brew "pyenv"
+# Migrate pip packages from one Python version to another
+brew "pyenv-pip-migrate"
+# Pyenv plugin to manage virtualenv
+brew "pyenv-virtualenv"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.10"
 # Interpreted, interactive, object-oriented programming language
@@ -168,6 +183,8 @@ brew "terragrunt"
 brew "testssl"
 # Terraform version manager inspired by rbenv
 brew "tfenv"
+# Static analysis security scanner for your terraform code
+brew "tfsec"
 # Programmatically correct mistyped console commands
 brew "thefuck"
 # Simplified and community-driven man pages
@@ -178,6 +195,8 @@ brew "tmux"
 brew "tree"
 # Modern watch command
 brew "viddy"
+# Tool for creating isolated virtual python environments
+brew "virtualenv"
 # Command-line interface to the WakaTime api
 brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
@@ -196,6 +215,8 @@ brew "anchore/grype/grype"
 brew "ddosify/tap/ddosify"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
+# A simple terminal UI for git commands, written in Go
+brew "jesseduffield/lazygit/lazygit"
 # High-performance, schema-free, document-oriented database
 brew "mongodb/brew/mongodb-community"
 # Xdebug PHP extension

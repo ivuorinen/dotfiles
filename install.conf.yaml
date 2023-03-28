@@ -1,30 +1,27 @@
----
 - defaults:
     brewfile:
       stderr: true
       stdout: true
     create:
-      mode: 755
+      mode: 0755
     link:
       create: true
       relink: true
-
+      exclude: ["*.md"]
 - clean:
     ~/:
     ~/.config:
       recursive: true
     ~/.local:
       recursive: true
-
 - create:
     ~/.config:
     ~/.local:
     ~/.local/share:
     ~/.local/state:
     ~/.ssh:
-      mode: 700
+      mode: 0700
     ~/Code:
-
 - link:
     ~/.config/:
       glob: true
@@ -35,33 +32,37 @@
     ~/.ssh/:
       force: true
       glob: true
-      mode: 600
+      mode: 0600
       path: ssh/*
     ~/:
       force: true
       glob: true
       path: base/*
       prefix: "."
-
 - shell:
     - [git submodule update --init --recursive --force]
-    - [bash scripts/install-npm-packages.sh]
-
+    - [chsh -s $(which zsh), Making zsh the default shell]
 - ifmacos:
     - shell:
         - [bash scripts/set-macos-defaults.sh]
     - brewfile:
         - Brewfile
-
-# hosts: air
+# Go packages what should be included in every system
+- go:
+    - github.com/skx/sysbox@latest
+    - github.com/dotzero/git-profile
+    - github.com/google/yamlfmt/cmd/yamlfmt@latest
+# hosts!
+## hosts: air
 - if:
     - cond: "[[ $(hostname) = air ]]"
       met:
-        - go:
-            - github.com/skx/sysbox@latest
-            - github.com/dotzero/git-profile
-
-# hosts: v
+        - link:
+            ~/.config/:
+              glob: true
+              force: true
+              path: hosts/air/config/**
+## hosts: v
 - if:
     - cond: "[[ $(hostname) = v ]]"
       met:
@@ -70,19 +71,16 @@
               glob: true
               force: true
               path: hosts/v/config/**
-        - go:
-            - github.com/skx/sysbox@latest
-            - github.com/dotzero/git-profile
-
-# hosts tunkki
+## hosts: tunkki
 - if:
     - cond: "[[ $(hostname) = tunkki ]]"
       met:
-        - go:
-            - github.com/skx/sysbox@latest
-            - github.com/dotzero/git-profile
-
-# hosts: lakka
+        - link:
+            ~/.config/:
+              glob: true
+              force: true
+              path: hosts/tunkki/config/**
+## hosts: lakka
 - if:
     - cond: "[[ $(hostname) = lakka ]]"
       met:
@@ -94,7 +92,6 @@
             ~/.zshrc:
               force: true
               path: hosts/lakka/zshrc
-
 # GitHub CLI Extensions
 - ghe:
     # GitHub CLI extension for generating a report on repository dependencies.
@@ -114,4 +111,5 @@
     # being an extension to view the overall health of
     # an organization's use of actions
     - rsese/gh-actions-status
+
 #

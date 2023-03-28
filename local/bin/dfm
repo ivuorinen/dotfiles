@@ -49,10 +49,11 @@ function section_install
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | starship | npm | macos | settler"
+      menu_section "$USAGE_PREFIX" "all | antigen | starship | nvm | npm | macos | settler"
       menu_item "all" "Installs antigen, macos, brew and ext_gh"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "starship" "Install starship.rs"
+      menu_item "nvm" "Install Node Version Manager (nvm)"
       menu_item "npm" "Install NPM Packages"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "settler" "Runs the WIP settler.sh"
@@ -117,21 +118,34 @@ function section_dotfiles
       ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
       ln -s ~/.dotfiles/config/nvim ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
-      hash npm 2>/dev/null && $0 install npm
+      hash npm 2> /dev/null && $0 install npm
       msg_ok "Installed packages"
       msg_done "...and we are done!"
+      ;;
+    yamlfmt)
+      # format yaml files
+      yamlfmt -conf "$DOTFILES/.yamlfmt"
       ;;
     shfmt)
       # Format shell scripts according to following rules.
       find "$DOTFILES" \
-        \( -name '*.sh' -or -name '*.zsh' -or -name 'x-*' \) \
-        -exec shfmt -fn -l -w -i 2 -ci -sr -bn {} \;
+        -type f -perm +111 \
+        -not -path '*/.git/*' \
+        -not -path '*dotbot*' \
+        -not -name '*.pl' \
+        -not -name '*.py' \
+        -exec shfmt \
+        --language-dialect bash \
+        --func-next-line --list --write \
+        --indent 2 --case-indent --space-redirects \
+        --binary-next-line {} \;
       msg_done "🎉 dotfiles have been formatted!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "reset_all | reset_nvim | shfmt"
+      menu_section "$USAGE_PREFIX" "reset_all | reset_nvim | yamlfmt | shfmt"
       menu_item "reset_all" "Reset everything, runs all configured reset actions"
       menu_item "reset_nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
+      menu_item "yamlfmt" "Run yamlfmt to all dotfiles, which are in our control"
       menu_item "shfmt" "Run shfmt to all dotfiles"
       ;;
   esac
@@ -144,11 +158,11 @@ function section_check
   X_ARCH=$(uname)
 
   case "$1" in
-    a|arch)
+    a | arch)
       [[ "$2" = "" ]] && echo "$X_ARCH" && exit 0
       [[ $X_ARCH = "$2" ]] && exit 0 || exit 1
       ;;
-    h|host|hostname)
+    h | host | hostname)
       [[ "$2" = "" ]] && echo "$X_HOSTNAME" && exit 0
       [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
       ;;
@@ -209,4 +223,3 @@ case "$1" in
   tests) section_tests "$2" ;;
   *) usage && exit 0 ;;
 esac
-

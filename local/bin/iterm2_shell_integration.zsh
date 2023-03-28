@@ -2,12 +2,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -17,7 +17,8 @@ if [[ -o interactive ]]; then
     ITERM_SHELL_INTEGRATION_INSTALLED=Yes
     ITERM2_SHOULD_DECORATE_PROMPT="1"
     # Indicates start of command output. Runs just before command executes.
-    iterm2_before_cmd_executes() {
+    iterm2_before_cmd_executes()
+    {
       if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
         printf "\033]133;C;\r\007"
       else
@@ -25,7 +26,8 @@ if [[ -o interactive ]]; then
       fi
     }
 
-    iterm2_set_user_var() {
+    iterm2_set_user_var()
+    {
       printf "\033]1337;SetUserVar=%s=%s\007" "$1" $(printf "%s" "$2" | base64 | tr -d '\n')
     }
 
@@ -36,15 +38,17 @@ if [[ -o interactive ]]; then
     # \(user.currentDirectory).
     whence -v iterm2_print_user_vars > /dev/null 2>&1
     if [ $? -ne 0 ]; then
-      iterm2_print_user_vars() {
-          true
+      iterm2_print_user_vars()
+      {
+        true
       }
     fi
 
-    iterm2_print_state_data() {
+    iterm2_print_state_data()
+    {
       local _iterm2_hostname="${iterm2_hostname-}"
       if [ -z "${iterm2_hostname:-}" ]; then
-        _iterm2_hostname=$(hostname -f 2>/dev/null)
+        _iterm2_hostname=$(hostname -f 2> /dev/null)
       fi
       printf "\033]1337;RemoteHost=%s@%s\007" "$USER" "${_iterm2_hostname-}"
       printf "\033]1337;CurrentDir=%s\007" "$PWD"
@@ -52,18 +56,21 @@ if [[ -o interactive ]]; then
     }
 
     # Report return code of command; runs after command finishes but before prompt
-    iterm2_after_cmd_executes() {
+    iterm2_after_cmd_executes()
+    {
       printf "\033]133;D;%s\007" "$STATUS"
       iterm2_print_state_data
     }
 
     # Mark start of prompt
-    iterm2_prompt_mark() {
+    iterm2_prompt_mark()
+    {
       printf "\033]133;A\007"
     }
 
     # Mark end of prompt
-    iterm2_prompt_end() {
+    iterm2_prompt_end()
+    {
       printf "\033]133;B\007"
     }
 
@@ -105,7 +112,8 @@ if [[ -o interactive ]]; then
     # * PS1 does not have our escape sequences during command execution
     # * After the command executes but before a new one begins, PS1 has escape sequences and
     #   ITERM2_PRECMD_PS1 has PS1's original value.
-    iterm2_decorate_prompt() {
+    iterm2_decorate_prompt()
+    {
       # This should be a raw PS1 without iTerm2's stuff. It could be changed during command
       # execution.
       ITERM2_PRECMD_PS1="$PS1"
@@ -126,7 +134,8 @@ if [[ -o interactive ]]; then
       ITERM2_DECORATED_PS1="$PS1"
     }
 
-    iterm2_precmd() {
+    iterm2_precmd()
+    {
       local STATUS="$?"
       if [ -z "${ITERM2_SHOULD_DECORATE_PROMPT-}" ]; then
         # You pressed ^C while entering a command (iterm2_preexec did not run)
@@ -145,7 +154,8 @@ if [[ -o interactive ]]; then
     }
 
     # This is not run if you press ^C while entering a command.
-    iterm2_preexec() {
+    iterm2_preexec()
+    {
       # Set PS1 back to its raw value prior to executing the command.
       PS1="$ITERM2_PRECMD_PS1"
       ITERM2_SHOULD_DECORATE_PROMPT="1"
@@ -158,10 +168,10 @@ if [[ -o interactive ]]; then
     # to a VPN.
     if [ -z "${iterm2_hostname-}" ]; then
       if [ "$(uname)" != "Darwin" ]; then
-        iterm2_hostname=`hostname -f 2>/dev/null`
+        iterm2_hostname=$(hostname -f 2> /dev/null)
         # Some flavors of BSD (i.e. NetBSD and OpenBSD) don't have the -f option.
         if [ $? -ne 0 ]; then
-          iterm2_hostname=`hostname`
+          iterm2_hostname=$(hostname)
         fi
       fi
     fi

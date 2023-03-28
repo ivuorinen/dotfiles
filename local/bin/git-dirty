@@ -80,4 +80,3 @@ trap 'case $? in
       esac' EXIT
 
 gitdirtyrepos "$GIT_DIRTY_DIR"
-

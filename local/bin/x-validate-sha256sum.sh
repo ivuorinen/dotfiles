@@ -50,4 +50,3 @@ elif [ "$(get_sha256sum "$filename")" = "$file_hash" ]; then
 else
   error "$filename doesn't match provided sha256sum"
 fi
-

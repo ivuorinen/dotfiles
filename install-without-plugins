@@ -23,4 +23,3 @@ git submodule update --init --recursive
 #  --plugin-dir=dotbot-plugins/dotbot-if \
 #  --plugin-dir=dotbot-plugins/dotbot-ifplatform \
 #  -p dotbot-plugins/dotbot-if/if.py \
-

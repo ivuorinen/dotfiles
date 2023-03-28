@@ -17,4 +17,3 @@ if [[ "$missing_attributes" ]]; then
 else
   echo "All files have a corresponding rule in .gitattributes"
 fi
-

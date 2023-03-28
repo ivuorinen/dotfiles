@@ -2,6 +2,10 @@
   name = Ismo Vuorinen
   email = ismo@ivuorinen.net
 
+[credential]
+  helper = store --file ~/.cache/git/git-credentials
+  helper = cache --timeout 30000
+
 [core]
   excludesfile = ~/.config/git/gitignore
 

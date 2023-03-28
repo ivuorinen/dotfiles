@@ -26,6 +26,5 @@ export GREP_OPTIONS="--color=auto"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
+hash shopt 2>/dev/null && shopt -s checkwinsize
 

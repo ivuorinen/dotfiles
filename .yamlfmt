@@ -1,0 +1,25 @@
+formatter:
+  type: basic
+  indent: 2
+  retain_line_breaks: false
+  disallow_anchors: false
+  max_line_length: 0
+  scan_folded_as_literal: false
+  indentless_arrays: false
+
+doublestar: true
+
+extensions:
+  - yaml
+  - yml
+
+include:
+  - ./*.{yml,yaml}
+  - ./**/*.{yml,yaml}
+
+exclude:
+  - ./dotbot/**
+  - ./dotbot-*/**
+  - ./config/astronvim/**
+  - ./config/nvim/**
+

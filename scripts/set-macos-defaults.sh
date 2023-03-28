@@ -6,7 +6,7 @@
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
 #
 
-[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0;
+[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
 
 # Ask for the administrator password upfront
 sudo -v
@@ -299,4 +299,3 @@ for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
   killall "${app}" > /dev/null 2>&1
 done
 echo "Done. Note that some of these changes require a logout/restart to take effect."
-

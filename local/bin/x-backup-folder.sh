@@ -10,14 +10,14 @@ if [ -z "${DIRECTORY}" ]; then
 fi
 
 if [ -z "${FILENAME}" ]; then
-    FILENAME=$DIRECTORY
+  FILENAME=$DIRECTORY
 fi
 
-FILENAME=${FILENAME} | \
-  tr '/' _ | \
-  iconv -t ascii//TRANSLIT | \
-  sed -r s/[^a-zA-Z0-9]+/_/g | \
-  sed -r s/^_+\|-+$//g
+FILENAME=${FILENAME} \
+  | tr '/' _ \
+  | iconv -t ascii//TRANSLIT \
+  | sed -r s/[^a-zA-Z0-9]+/_/g \
+  | sed -r s/^_+\|-+$//g
 
 TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
 FILENAME_TIMESTAMP="${FILENAME}_${TIMESTAMP}"

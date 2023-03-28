@@ -41,4 +41,3 @@ mysqldump \
       | mysql "${DATABASE}" \
       | sed '/Tables_in/d'
   )" > "${FILENAME_TIMESTAMP}"
-

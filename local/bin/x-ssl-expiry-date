@@ -104,4 +104,3 @@ for name in "$@"; do
     echo "    Days: ${diff}"
   fi
 done
-

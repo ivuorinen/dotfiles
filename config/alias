@@ -1,4 +1,4 @@
-# shellcheck shell=bash
+#!/usr/bin/env bash
 # macOS specific
 
 # Get installed php versions from brew and setup aliases
