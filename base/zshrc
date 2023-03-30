@@ -25,15 +25,12 @@ export PATH="$XDG_BIN_HOME:$HOMEBREW_BIN:$HOMEBREW_SBIN:/usr/local/sbin:$PATH"
 
 # brew, https://brew.sh
 if [ command -v brew &> /dev/null ]; then
-  BREW_BIN=$(brew --prefix)/bin
-  BREW_SBIN=$(brew --prefix)/sbin
-
   BREW_PYTHON=$(brew --prefix python)/bin
   GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
   BREW_RUBY=$(brew --prefix ruby)/bin
   BREW_GEMS=$(gem environment gemdir)/bin
 
-  export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
+  export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$PATH"
 fi
 
 # nvm, the node version manager
@@ -69,6 +66,7 @@ fi
 if command -v gem &>/dev/null; then
     export GEM_HOME="$XDG_STATE_HOME/gem"
     export GEM_PATH="$XDG_STATE_HOME/gem"
+    export PATH="$GEM_HOME/bin:$PATH"
 fi
 
 
