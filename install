@@ -15,9 +15,7 @@ git submodule update --init --recursive
 "${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" \
   -d "${BASEDIR}" \
   --plugin-dir=dotbot-brew \
-  --plugin-dir=dotbot-gh-extension \
-  --plugin-dir=dotbot-golang \
   --plugin-dir=dotbot-if \
-  -p dotbot-if/if.py \
+  --plugin-dir=dotbot-gh-extension \
   -c "${CONFIG}" \
   "${@}"

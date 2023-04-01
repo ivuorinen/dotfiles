@@ -41,17 +41,7 @@
       prefix: "."
 - shell:
     - [git submodule update --init --recursive --force]
-    - [chsh -s $(which zsh), Making zsh the default shell]
-- ifmacos:
-    - shell:
-        - [bash scripts/set-macos-defaults.sh]
-    - brewfile:
-        - Brewfile
-# Go packages what should be included in every system
-- go:
-    - github.com/skx/sysbox@latest
-    - github.com/dotzero/git-profile
-    - github.com/google/yamlfmt/cmd/yamlfmt@latest
+    - bash scripts/install-go-packages.sh
 # hosts!
 ## hosts: air
 - if:

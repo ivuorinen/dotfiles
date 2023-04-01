@@ -13,19 +13,9 @@
 	url = https://github.com/wonderbeyond/dotbot-if.git
 	ignore = dirty
 
-[submodule "dotbot-ifplatform"]
-	path = dotbot-ifplatform
-	url = https://github.com/ssbanerje/dotbot-ifplatform.git
-	ignore = dirty
-
 [submodule "dotbot-gh-extension"]
 	path = dotbot-gh-extension
 	url = https://github.com/fundor333/dotbot-gh-extension.git
-	ignore = dirty
-
-[submodule "dotbot-golang"]
-	path = dotbot-golang
-	url = https://github.com/delicb/dotbot-golang.git
 	ignore = dirty
 
 [submodule "config/nvim"]
