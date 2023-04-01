@@ -52,6 +52,12 @@ if command -v nvim &> /dev/null; then
     export EDITOR="nvim"
 fi
 
+# docker, https://docs.docker.com/engine/reference/commandline/cli/
+if command -v docker &> /dev/null; then
+    export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+    mkdir -p "$DOCKER_CONFIG"
+fi
+
 # z, https://github.com/rupa/z
 export _Z_DATA="$XDG_STATE_HOME/z"
 
