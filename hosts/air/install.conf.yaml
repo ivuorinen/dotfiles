@@ -1,0 +1,15 @@
+- include: 'hosts/defaults.yaml'
+- shell:
+    - echo "Configuring air"
+- brewfile:
+    - Brewfile
+- link:
+    ~/:
+      force: true
+      glob: true
+      path: hosts/air/base/**
+      prefix: "."
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/air/config/**

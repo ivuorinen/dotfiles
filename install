@@ -8,6 +8,7 @@ DOTBOT_DIR="dotbot"
 DOTBOT_BIN="bin/dotbot"
 BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTBOT_BIN_PATH="${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}"
+DOTBOT_HOST="$(hostname -s)" || ''
 
 cd "$BASEDIR"
 git submodule sync --quiet --recursive
@@ -17,6 +18,20 @@ git submodule update --init --recursive
   -d "${BASEDIR}" \
   --plugin-dir=dotbot-brew \
   --plugin-dir=dotbot-gh-extension \
-  --plugin-dir=dotbot-if \
+  --plugin-dir=dotbot-include \
   -c "${CONFIG}" \
   "${@}"
+
+if [ "${DOTBOT_HOST}" != "" ]; then
+  DOTBOT_HOST_CONFIG="${BASEDIR}/hosts/${DOTBOT_HOST}/${CONFIG}"
+  echo "-> Trying if host config can be found: ${DOTBOT_HOST_CONFIG}"
+  [ -r "$DOTBOT_HOST_CONFIG" ] && [ -f "$DOTBOT_HOST_CONFIG" ] \
+    && echo "(!) Found $DOTBOT_HOST_CONFIG" \
+    && "$DOTBOT_BIN_PATH" \
+      -d "$BASEDIR" \
+      --plugin-dir=dotbot-brew \
+      --plugin-dir=dotbot-gh-extension \
+      --plugin-dir=dotbot-include \
+      -c "$DOTBOT_HOST_CONFIG" \
+      "${@}"
+fi

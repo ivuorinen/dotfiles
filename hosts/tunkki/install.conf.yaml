@@ -1,0 +1,13 @@
+- include: 'hosts/defaults.yaml'
+- shell:
+    - echo "Configuring tunkki"
+- link:
+    ~/:
+      force: true
+      glob: true
+      path: hosts/tunkki/base/**
+      prefix: "."
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/tunkki/config/**

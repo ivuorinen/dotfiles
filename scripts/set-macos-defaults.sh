@@ -19,6 +19,11 @@ while true; do
   kill -0 "$$" || exit
 done 2> /dev/null &
 
+# Change user shell to zsh if not that already.
+if hash zsh 2> /dev/null; then
+  [[ "$SHELL" != $(which zsh) ]] && chsh -s "$(which zsh)"
+fi
+
 ###############################################################################
 # General UI/UX                                                               #
 ###############################################################################

@@ -1,0 +1,17 @@
+- include: 'hosts/defaults.yaml'
+- shell:
+    - echo "Configuring lakka"
+- link:
+    ~/:
+      force: true
+      glob: true
+      path: hosts/lakka/base/**
+      prefix: "."
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/lakka/config/**
+    ~/.irssi/:
+      glob: true
+      force: true
+      path: hosts/lakka/irssi/**

@@ -1,0 +1,15 @@
+- include: 'hosts/defaults.yaml'
+- shell:
+    - echo "Configuring v"
+- brewfile:
+    - Brewfile
+- link:
+    ~/:
+      force: true
+      glob: true
+      path: hosts/v/base/**
+      prefix: "."
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/v/config/**

@@ -27,13 +27,19 @@ function section_install
       $0 install macos
       $0 install antigen
       $0 install starship
+      $0 brew install
+      $0 install composer
       $0 install nvm
       $0 install npm
+      $0 install ntfy
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" \
         && msg_done "🎉 New antigen installed!"
       ;;
+    composer)
+      bash "$DOTFILES/scripts/install-composer.sh" \
+        && msg_done "🎉 composer installed!"
       ;;
     starship)
       curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin \
@@ -52,17 +58,20 @@ function section_install
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
         && msg_done "NPM Packages have been installed!"
       ;;
-    settler)
-      bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
+    ntfy)
+      bash "$DOTFILES/scripts/install-ntfy.sh" \
+        && msg_done "ntfy installed!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | starship | nvm | npm | macos | settler"
-      menu_item "all" "Installs antigen, macos, brew and ext_gh"
+      menu_section "$USAGE_PREFIX" "all | antigen | composer | starship | macos | nvm | npm"
+      menu_item "all" "Installs macos defaults, antigen, starship, brew, nvm and npm packages"
       menu_item "antigen" "Updates the antigen.zsh file"
+      menu_item "composer" "Install composer"
       menu_item "starship" "Install starship.rs"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "nvm" "Install Node Version Manager (nvm)"
       menu_item "npm" "Install NPM Packages"
+      menu_item "ntfy" "Install ntfy"
       ;;
   esac
 }
@@ -126,7 +135,7 @@ function section_dotfiles
       msg_ok "Linked nvim and astronvim"
       hash npm 2> /dev/null && $0 install npm
       msg_ok "Installed packages"
-      msg_done "...and we are done!"
+      msg_done "nvim reset!"
       ;;
     yamlfmt)
       # format yaml files

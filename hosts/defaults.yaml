@@ -1,0 +1,9 @@
+- defaults:
+    create:
+      mode: 0755
+    link:
+      create: true
+      relink: true
+      exclude: ["*.md", "*renovate*"]
+    shell:
+      stdout: true
