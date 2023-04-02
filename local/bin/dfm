@@ -24,26 +24,33 @@ function section_install
 
   case "$1" in
     all)
+      $0 install macos
       $0 install antigen
       $0 install starship
       $0 install nvm
-      $0 install macos
       $0 install npm
       ;;
     antigen)
-      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" && msg_done "🎉 New antigen installed!"
+      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" \
+        && msg_done "🎉 New antigen installed!"
+      ;;
       ;;
     starship)
-      curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin && msg_done "🎉 starship installed!"
-      ;;
-    nvm)
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && msg_done "   ^=^n^i nvm installed!"
+      curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin \
+        && msg_done "🎉 starship installed!"
       ;;
     macos)
-      bash "$DOTFILES/scripts/set-macos-defaults.sh" && msg_done "🎉 Brewfile defined apps has been installed!"
+      bash "$DOTFILES/scripts/set-macos-defaults.sh" \
+        && msg_done "🎉 Brewfile defined apps has been installed!"
+      ;;
+    nvm)
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
+        && nvm install --lts --latest-npm --default \
+        && msg_done "🎉 nvm installed!"
       ;;
     npm)
-      bash "$DOTFILES/scripts/install-npm-packages.sh" && msg_done "NPM Packages have been installed!"
+      bash "$DOTFILES/scripts/install-npm-packages.sh" \
+        && msg_done "NPM Packages have been installed!"
       ;;
     settler)
       bash "$DOTFILES/scripts/settler.sh" && msg_done "🎉 Settler has been run!"
@@ -53,10 +60,9 @@ function section_install
       menu_item "all" "Installs antigen, macos, brew and ext_gh"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "starship" "Install starship.rs"
+      menu_item "macos" "Setup nice macOS defaults"
       menu_item "nvm" "Install Node Version Manager (nvm)"
       menu_item "npm" "Install NPM Packages"
-      menu_item "macos" "Setup nice macOS defaults"
-      menu_item "settler" "Runs the WIP settler.sh"
       ;;
   esac
 }
@@ -134,12 +140,14 @@ function section_dotfiles
         -not -path '*dotbot*' \
         -not -name '*.pl' \
         -not -name '*.py' \
+        -not -name '*.php' \
+        -not -name '*.zsh' \
         -exec shfmt \
         --language-dialect bash \
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
         --binary-next-line {} \;
-      msg_done "🎉 dotfiles have been formatted!"
+      msg_done "🎉 dotfiles have been shfmt formatted!"
       ;;
     *)
       menu_section "$USAGE_PREFIX" "reset_all | reset_nvim | yamlfmt | shfmt"

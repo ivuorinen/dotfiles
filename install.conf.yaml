@@ -1,12 +1,8 @@
 - defaults:
-    brewfile:
-      stderr: true
-      stdout: true
     create:
       mode: 0755
     link:
       create: true
-      relink: true
       exclude: ["*.md", "*renovate*"]
 - clean:
     ~/:

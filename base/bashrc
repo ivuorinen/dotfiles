@@ -1,75 +1,8 @@
+# this is my bashrc config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
-
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_STATE_HOME="$HOME/.local/state"
-export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
-
-# Homebrew configuration
-export HOMEBREW="/opt/homebrew"
-export HOMEBREW_BIN="$HOMEBREW/bin"
-export HOMEBREW_SBIN="$HOMEBREW/sbin"
-export HOMEBREW_PKG="$HOMEBREW/opt"
-export HOMEBREW_NO_ENV_HINTS=1
-
-export PATH="$XDG_BIN_HOME:$HOMEBREW_BIN:$HOMEBREW_SBIN:/usr/local/sbin:$PATH"
-
-# brew, https://brew.sh
-if command -v brew &> /dev/null; then
-  BREW_BIN=$(brew --prefix)/bin
-  BREW_SBIN=$(brew --prefix)/sbin
-
-  BREW_PYTHON=$(brew --prefix python@3.8)/bin
-  GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
-  BREW_RUBY=$(brew --prefix ruby)/bin
-  BREW_GEMS=$(gem environment gemdir)/bin
-
-  export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$BREW_BIN:$BREW_SBIN:$PATH"
-fi
-
-# nvm, the node version manager
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-export NVM_AUTO_USE=true
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# If we have go packages, include them to the PATH
-if command -v go &> /dev/null; then
-    export GOPATH=$(go env GOPATH);
-    if [ -d "$GOPATH/bin" ]; then
-        export PATH="$GOPATH/bin:$PATH"
-    fi
-fi
-
-if command -v nvim &> /dev/null; then
-    export EDITOR="nvim"
-fi
-
-# z, https://github.com/rupa/z
-export _Z_DATA="$XDG_STATE_HOME/z"
-
-# composer, https://getcomposer.org/
-if command -v composer &> /dev/null; then
-    export COMPOSER_HOME="$XDG_STATE_HOME/composer"
-    export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
-    export PATH="$COMPOSER_BIN:$PATH"
-fi
-
-# gem, rubygems
-if command -v gem &>/dev/null; then
-    export GEM_HOME="$XDG_STATE_HOME/gem"
-    export GEM_PATH="$XDG_STATE_HOME/gem"
-fi
-
-
-# wakatime, https://github.com/wakatime/wakatime-cli
-export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
@@ -86,28 +19,3 @@ x-load-configs
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
-
-# op (1Password cli) is present
-if hash op 2>/dev/null; then
-    export OP_CACHE="$XDG_STATE_HOME/1password"
-    mkdir -p "$OP_CACHE";
-    eval "$(op completion zsh)"; compdef _op op
-fi
-
-# Ansible configuration
-# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
-if hash ansible 2>/dev/null; then
-    export ANSIBLE_HOME="$XDG_STATE_HOME/ansible"
-    mkdir -p "$ANSIBLE_HOME"
-fi
-
-# gcloud is present
-#if hash gcloud 2>/dev/null; then
-#    GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
-#    [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
-#    [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
-#fi
-
-# Load iterm2 shell integration
-# https://iterm2.com/documentation-shell-integration.html
-[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"

@@ -26,14 +26,14 @@ function x-set-php-aliases
       # shellcheck disable=SC2139
       alias "${php_alias}"r="$php_exec"
       # PHP with error_reporting flag.
-      # shellcheck disable=SC2139
+      # shellcheck disable=SC2139,SC2140
       alias "$php_alias"="$php_exec $php_error_reporting"
       # Local PHP Server.
-      # shellcheck disable=SC2139
-      alias "${php_alias}"s="$php_exec -S localhost:9000"
+      # shellcheck disable=SC2139,SC2140
+      alias "${php_alias}s"="$php_exec -S localhost:9000"
       # Use composer with specific PHP and error_reporting flag on.
-      # shellcheck disable=SC2139
-      alias "${php_alias}"c="$php_exec $php_error_reporting $(which composer)"
+      # shellcheck disable=SC2139,SC2140
+      alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
     done
   fi
 }
@@ -76,4 +76,3 @@ if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091
   source "$HOME/.aliases.local"
 fi
-
