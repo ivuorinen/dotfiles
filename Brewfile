@@ -23,6 +23,8 @@ brew "ansible"
 brew "ansible-lint"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
+# Open Source Kubernetes Marketplace
+brew "arkade"
 # Spell checker with better logic than ispell
 brew "aspell"
 # Automatic configure script builder
@@ -31,6 +33,8 @@ brew "autoconf"
 brew "awscli"
 # Terminal bandwidth utilization tool
 brew "bandwhich"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
 # Yet another cross-platform graphical process/system monitor
 brew "bottom"
 # Switch Apache / Valet / CLI configs between PHP versions
@@ -99,6 +103,8 @@ brew "netpbm"
 brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
+# Framework for layout and rendering of i18n text
+brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -193,6 +199,8 @@ brew "tldr"
 brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Vulnerability scanner for container images, file systems, and Git repos
+brew "trivy"
 # Modern watch command
 brew "viddy"
 # Tool for creating isolated virtual python environments
@@ -207,8 +215,6 @@ brew "wget"
 brew "wtfutil"
 # JavaScript package manager
 brew "yarn"
-# Tracks most-used directories to make cd smarter
-brew "z"
 # A vulnerability scanner for container images and filesystems
 brew "anchore/grype/grype"
 # High-performance load testing tool, written in Golang.
@@ -267,6 +273,8 @@ cask "insomnia"
 cask "jetbrains-toolbox"
 # Kubernetes IDE
 cask "lens"
+# Neovim Client
+cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Collaboration platform for API development
