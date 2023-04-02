@@ -29,6 +29,3 @@ switch_case_indent = true  # --case-indent
 space_redirects    = false
 keep_padding       = false
 function_next_line = true  # --func-next-line
-
-[local/bin/antigen.zsh]
-ignore = true

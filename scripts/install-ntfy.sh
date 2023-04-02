@@ -1,13 +1,33 @@
 #!/bin/bash
 
-NTFY_VERSION=2.2.0
-NTFY_URL="https://github.com/binwiederhier/ntfy"
-NTFY_DEST="ntfy_${NTFY_VERSION}_macOS_all"
+set -e
 
-curl -L "$NTFY_URL/releases/download/v${NTFY_VERSION}/${NTFY_DEST}.tar.gz" > "${NTFY_DEST}.tar.gz"
-tar zxvf "${NTFY_DEST}.tar.gz"
-cp -a "${NTFY_DEST}/ntfy" ~/.local/bin/ntfy
-mkdir -p ~/.config/ntfy
-cp "${NTFY_DEST}/client/client.yml" ~/.config/ntfy/client.yml
-ntfy --help
-rm -rf "${NTFY_DEST}" "${NTFY_DEST}.tar.gz"
+if ! command -v ntfy &> /dev/null; then
+  case $(dfm check arch) in
+    Linux)
+      NTFY_ARCH="linux_$(arch)"
+      ;;
+    Darwin)
+      NTFY_ARCH="macOS_all"
+      ;;
+  esac
+
+  NTFY_VERSION=2.2.0
+  NTFY_URL="https://github.com/binwiederhier/ntfy"
+  NTFY_DEST="ntfy_${NTFY_VERSION}_${NTFY_ARCH}"
+
+  curl -L "$NTFY_URL/releases/download/v${NTFY_VERSION}/${NTFY_DEST}.tar.gz" \
+    > "${NTFY_DEST}.tar.gz"
+  tar zxvf "${NTFY_DEST}.tar.gz"
+  cp -a "${NTFY_DEST}/ntfy" ~/.local/bin/ntfy
+  mkdir -p ~/.config/ntfy
+
+  # copy config only if it does not exist
+  if [ ! -f "$HOME/.config/ntfy/client.yml" ]; then
+    cp "${NTFY_DEST}/client/client.yml" ~/.config/ntfy/client.yml
+  fi
+
+  rm -rf "${NTFY_DEST}" "${NTFY_DEST}.tar.gz"
+else
+  echo "ntfy already installed"
+fi

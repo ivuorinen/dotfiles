@@ -10,13 +10,13 @@ export DOTFILES="$HOME/.dotfiles"
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
 {
-    # Load the shell dotfiles, and then some:
-    for file in $DOTFILES/config/{exports,alias,functions}; do
-        [ -r "$file" ] && [ -f "$file" ] && source "$file"
-        [ -r "$file-secret" ] && [ -f "$file-secret" ] && source "$file-secret"
-        [ -r "$file-$HOSTNAME" ] && [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
-        [ -r "$file-$HOSTNAME-secret" ] && [ -f "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
-    done
+  # Load the shell dotfiles, and then some:
+  for file in $DOTFILES/config/{exports,alias,functions}; do
+    [ -f "$file" ] && source "$file"
+    [ -f "$file-secret" ] && source "$file-secret"
+    [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
+    [ -f "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
+  done
 }
 x-load-configs
 
@@ -24,42 +24,17 @@ x-load-configs
 ssh-add -A 2>/dev/null;
 
 # Try to load antigen, if present
-[[ -f "$XDG_BIN_HOME/antigen.zsh" ]] && source "$XDG_BIN_HOME/antigen.zsh"
+ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
+[[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
 
 # antigen is present
 if command -v antigen &> /dev/null; then
-    antigen use oh-my-zsh
+  antigen use oh-my-zsh
 
-    antigen bundle ssh-agent
-    antigen bundle colored-man-pages
-    antigen bundle jreese/zsh-titles
-    antigen bundle zsh-users/zsh-syntax-highlighting
-    antigen bundle zsh-users/zsh-completions
-    antigen bundle MichaelAquilina/zsh-you-should-use
-    antigen bundle unixorn/autoupdate-antigen.zshplugin
-    antigen bundle Sparragus/zsh-auto-nvm-use
+  # config/functions
+  x-default-antigen-bundles
 
-    hash php 2>/dev/null && antigen bundle php
-    hash nvm 2>/dev/null && antigen bundle nvm
-    hash docker 2>/dev/null && antigen bundle docker
-    hash python 2>/dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-    hash jq 2>/dev/null && antigen bundle reegnz/jq-zsh-plugin
-    hash docker-compose 2>/dev/null && antigen bundle sroze/docker-compose-zsh-plugin
-
-    # Platform dependant bundles
-    if [[ $(uname) == 'Linux' ]]; then
-        antigen bundle command-not-found
-    elif [[ $(uname) == 'Darwin' ]]; then
-        # If we have brew installed
-        if command -v brew &> /dev/null; then
-            # Only enable brew plugin if brew exists
-            antigen bundle brew
-            # load Z
-            [[ -f "$(brew --prefix z)/etc/profile.d/z.sh" ]] && source "$(brew --prefix z)/etc/profile.d/z.sh"
-        fi
-    fi
-
-    antigen apply
+  antigen apply
 fi
 
 eval "$(starship init zsh)"

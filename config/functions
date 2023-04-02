@@ -65,3 +65,29 @@ function silent
 {
   "$@" >&/dev/null
 }
+
+# Defines default antigen bundles
+function x-default-antigen-bundles
+{
+  # these should be always available
+  antigen bundle colored-man-pages
+  antigen bundle command-not-found
+  antigen bundle ssh-agent
+  antigen bundle MichaelAquilina/zsh-you-should-use
+  antigen bundle Sparragus/zsh-auto-nvm-use
+  antigen bundle jreese/zsh-titles
+  antigen bundle unixorn/autoupdate-antigen.zshplugin
+  antigen bundle zsh-users/zsh-completions
+  antigen bundle zsh-users/zsh-syntax-highlighting
+
+  # these should be available if there's need
+  hash git 2> /dev/null && antigen bundle git
+  hash brew 2> /dev/null && antigen bundle brew
+  hash docker 2> /dev/null && antigen bundle docker
+  hash docker-compose 2> /dev/null && antigen bundle sroze/docker-compose-zsh-plugin
+  hash jq 2> /dev/null && antigen bundle reegnz/jq-zsh-plugin
+  hash nvm 2> /dev/null && antigen bundle nvm
+  hash php 2> /dev/null && antigen bundle php
+  hash python 2> /dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+  hash rvm 2> /dev/null && antigen bundle unixorn/rvm-plugin
+}

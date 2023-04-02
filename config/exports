@@ -1,17 +1,22 @@
 # shellcheck shell=bash
 
-export HIST_STAMPS="yyyy-mm-dd"
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
 
+# History env variables
+export HIST_STAMPS="yyyy-mm-dd"
 # Larger bash history (allow 32³ entries; default is 500)
 export HISTSIZE=32768
 export HISTFILESIZE=$HISTSIZE
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth
-
 # Make some commands not show up in history
 export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
-
 # And include the parameter for ZSH
 export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
 
@@ -28,12 +33,7 @@ export GREP_OPTIONS="--color=auto"
 # update the values of LINES and COLUMNS.
 hash shopt 2> /dev/null && shopt -s checkwinsize
 
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_STATE_HOME="$HOME/.local/state"
-export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
+export LC_ALL=fi_FI.utf8
 
 # Antigen configuration
 # https://github.com/zsh-users/antigen/wiki/Configuration
@@ -87,6 +87,7 @@ fi
 
 # z, https://github.com/rupa/z
 export _Z_DATA="$XDG_STATE_HOME/z"
+[[ -f "$XDG_BIN_HOME/z/z.sh" ]] && source "$XDG_BIN_HOME/z/z.sh"
 
 # composer, https://getcomposer.org/
 if command -v composer &> /dev/null; then
@@ -138,4 +139,5 @@ fi
 
 # Load iterm2 shell integration
 # https://iterm2.com/documentation-shell-integration.html
-[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
+  && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"

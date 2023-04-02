@@ -6,6 +6,8 @@
     ~/.local:
       recursive: true
 - create:
+    ~/.cache:
+    ~/.cache/git:
     ~/.config:
     ~/.local:
     ~/.local/share:

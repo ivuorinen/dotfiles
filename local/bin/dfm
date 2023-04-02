@@ -32,6 +32,7 @@ function section_install
       $0 install nvm
       $0 install npm
       $0 install ntfy
+      $0 install z
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" \
@@ -51,16 +52,21 @@ function section_install
       ;;
     nvm)
       curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
+        && git checkout "$HOME/.zshrc" \
         && nvm install --lts --latest-npm --default \
         && msg_done "🎉 nvm installed!"
       ;;
     npm)
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
-        && msg_done "NPM Packages have been installed!"
+        && msg_done "🎉 NPM Packages have been installed!"
       ;;
     ntfy)
       bash "$DOTFILES/scripts/install-ntfy.sh" \
-        && msg_done "ntfy installed!"
+        && msg_done "🎉 ntfy installed!"
+      ;;
+    z)
+      bash "$DOTFILES/scripts/install-z.sh" \
+        && msg_done "🎉 Z has been installed!"
       ;;
     *)
       menu_section "$USAGE_PREFIX" "all | antigen | composer | starship | macos | nvm | npm"
@@ -72,6 +78,7 @@ function section_install
       menu_item "nvm" "Install Node Version Manager (nvm)"
       menu_item "npm" "Install NPM Packages"
       menu_item "ntfy" "Install ntfy"
+      menu_item "z" "Install z"
       ;;
   esac
 }

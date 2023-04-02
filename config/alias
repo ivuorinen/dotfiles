@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# macOS specific
 
 # Get installed php versions from brew and setup aliases
 function x-set-php-aliases
@@ -42,6 +41,7 @@ if [[ $(uname) == 'Darwin' ]]; then
 
   x-set-php-aliases
 
+  # Laravel Sail shortcut
   alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
   # Flush Directory Service cache
@@ -60,15 +60,12 @@ alias zapds='find . -name ".DS_Store" -print -delete'
 alias t='tail -f'   # tail with follow flag on
 alias dn='du -chd1' # directory usage, return only the total
 
-alias code_scanner="docker run \
-  --env SOURCE_CODE='${PWD}' \
-  --volume '${PWD}':/code \
-  --volume /var/run/docker.sock:/var/run/docker.sock \
-  registry.gitlab.com/gitlab-org/ci-cd/codequality:${CODEQUALITY_VERSION:-latest} \
-  /code"
-
-alias composerUp='composer global update'
-alias npmUp='npm -g up'
+alias code_scanner='docker run
+  --env SOURCE_CODE="$PWD"
+  --volume "${PWD}":/code
+  --volume /var/run/docker.sock:/var/run/docker.sock
+  registry.gitlab.com/gitlab-org/ci-cd/codequality:"${CODEQUALITY_VERSION:-latest}"
+  /code'
 
 alias zedit='$EDITOR ~/.dotfiles'
 
