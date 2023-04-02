@@ -16,6 +16,7 @@
 [submodule "dotbot-include"]
 	path = dotbot-include
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
+	ignore = dirty
 
 [submodule "config/nvim"]
 	path = config/nvim
