@@ -29,6 +29,7 @@ function section_install
       $0 install starship
       $0 brew install
       $0 install composer
+      $0 install dotenv-linter
       $0 install nvm
       $0 install npm
       $0 install ntfy
@@ -41,6 +42,12 @@ function section_install
     composer)
       bash "$DOTFILES/scripts/install-composer.sh" \
         && msg_done "🎉 composer installed!"
+      ;;
+    dotenv-linter)
+      curl -sSfL \
+        https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
+        | sh -s -- -b "$XDG_BIN_HOME" \
+        && msg_done "🎉 dotenv-linter installed!"
       ;;
     starship)
       curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin \
@@ -69,10 +76,11 @@ function section_install
         && msg_done "🎉 Z has been installed!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | composer | starship | macos | nvm | npm"
-      menu_item "all" "Installs macos defaults, antigen, starship, brew, nvm and npm packages"
+      menu_section "$USAGE_PREFIX" "all | antigen | composer | dotenv-linter | starship | macos | nvm | npm"
+      menu_item "all" "Installs macos defaults, antigen, starship, brew, nvm, npm packages and others"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "composer" "Install composer"
+      menu_item "dotenv-linter" "Install dotenv-linter"
       menu_item "starship" "Install starship.rs"
       menu_item "macos" "Setup nice macOS defaults"
       menu_item "nvm" "Install Node Version Manager (nvm)"
