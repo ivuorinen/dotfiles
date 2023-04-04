@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # shellcheck shell=bash
 
 # Explicitly set XDG folders
@@ -34,6 +35,13 @@ export GREP_OPTIONS="--color=auto"
 hash shopt 2> /dev/null && shopt -s checkwinsize
 
 export LC_ALL=fi_FI.utf8
+
+# If we are using zsh, color our dir lists and such
+if [ $SHELL = $(which zsh) ]; then
+  LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:'
+  export LS_COLORS
+  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+fi
 
 # Antigen configuration
 # https://github.com/zsh-users/antigen/wiki/Configuration
@@ -131,13 +139,14 @@ if hash ansible 2> /dev/null; then
 fi
 
 # gcloud is present
-#if hash gcloud 2>/dev/null; then
-#    GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
-#    [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
-#    [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
-#fi
+if hash gcloud 2>/dev/null; then
+  GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
+  [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
+  [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
+fi
 
 # Load iterm2 shell integration
 # https://iterm2.com/documentation-shell-integration.html
 [[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
   && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+

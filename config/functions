@@ -91,3 +91,4 @@ function x-default-antigen-bundles
   hash python 2> /dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
   hash rvm 2> /dev/null && antigen bundle unixorn/rvm-plugin
 }
+
