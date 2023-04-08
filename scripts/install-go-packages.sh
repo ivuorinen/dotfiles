@@ -12,6 +12,8 @@ else
     github.com/skx/sysbox@latest
     github.com/dotzero/git-profile@latest
     github.com/google/yamlfmt/cmd/yamlfmt@latest
+    github.com/ericchiang/pup@latest
+    github.com/suntong/html2md@latest
   )
 
   for pkg in "${packages[@]}"; do

@@ -133,6 +133,12 @@ function section_dotfiles
   USAGE_PREFIX="$SCRIPT dotfiles"
 
   case "$1" in
+    fmt)
+      msg_ok "Running all formatters"
+      $0 dotfiles yamlfmt
+      $0 dotfiles shfmt
+      msg_done "...done!"
+      ;;
     reset_all)
       msg_ok "Running all reset commands"
       $0 dotfiles reset_nvim
@@ -174,7 +180,8 @@ function section_dotfiles
       msg_done "🎉 dotfiles have been shfmt formatted!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "reset_all | reset_nvim | yamlfmt | shfmt"
+      menu_section "$USAGE_PREFIX" "fmt | reset_all | reset_nvim | yamlfmt | shfmt"
+      menu_item "fmt" "Run all formatters"
       menu_item "reset_all" "Reset everything, runs all configured reset actions"
       menu_item "reset_nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
       menu_item "yamlfmt" "Run yamlfmt to all dotfiles, which are in our control"
