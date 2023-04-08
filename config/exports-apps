@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# shellcheck shell=zsh
+# vim: filetype=zsh
+
+# Antigen configuration
+# https://github.com/zsh-users/antigen/wiki/Configuration
+export ADOTDIR="$XDG_DATA_HOME/antigen"
+export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
+export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
+
+# Ansible configuration
+# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
+if hash ansible 2> /dev/null; then
+  export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
+  export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
+  export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
+  x-dc "$ANSIBLE_HOME"
+  x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
+fi
+
+# composer, https://getcomposer.org/
+if command -v composer &> /dev/null; then
+  export COMPOSER_HOME="$XDG_STATE_HOME/composer"
+  export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
+  export PATH="$COMPOSER_BIN:$PATH"
+fi
+
+# docker, https://docs.docker.com/engine/reference/commandline/cli/
+if command -v docker &> /dev/null; then
+  export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+  x-dc "$DOCKER_CONFIG"
+fi
+
+# ffmpeg
+if hash ffmpeg 2> /dev/null; then
+  export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
+  x-dc "$FFMPEG_DATADIR"
+fi
+
+# gcloud
+if hash gcloud 2>/dev/null; then
+  GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
+  [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
+  [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
+fi
+
+# gem, rubygems
+if command -v gem &> /dev/null; then
+  export GEM_HOME="$XDG_STATE_HOME/gem"
+  export GEM_PATH="$XDG_STATE_HOME/gem"
+  export PATH="$GEM_HOME/bin:$PATH"
+fi
+
+# If we have go packages, include them to the PATH
+if command -v go &> /dev/null; then
+  export GOPATH="$XDG_DATA_HOME/go"
+  export GOBIN="$XDG_BIN_HOME"
+  x-dc "$GOPATH"
+fi
+
+# irssi
+if hash irssi 2> /dev/null; then
+  # These variables are used in ./alias with --config and --home
+  export IRSSI_CONFIG_HOME="$XDG_CONFIG_HOME/irssi"
+  export IRSSI_CONFIG_FILE="$IRSSI_CONFIG_HOME/config"
+  x-dc "$IRSSI_CONFIG_HOME"
+fi
+
+# nvm, the node version manager
+export NVM_LAZY_LOAD=true
+export NVM_COMPLETION=true
+export NVM_AUTO_USE=true
+export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# op (1Password cli) is present
+if hash op 2> /dev/null; then
+  export OP_CACHE="$XDG_STATE_HOME/1password"
+  x-dc "$OP_CACHE"
+  eval "$(op completion zsh)"
+  compdef _op op
+fi
+
+# pyenv, python environments
+if command -v pyenv &> /dev/null; then
+  export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
+  x-dc "$PYENV_ROOT"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+
+  eval "$(pyenv init -)"
+fi
+
+# wakatime, https://github.com/wakatime/wakatime-cli
+export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
+x-dc "$WAKATIME_HOME"
+
+# z, https://github.com/rupa/z
+export _Z_DATA="$XDG_STATE_HOME/z"
+[[ -f "$XDG_BIN_HOME/z/z.sh" ]] && source "$XDG_BIN_HOME/z/z.sh"
+
+# Misc
+export ANDROID_HOME="$XDG_DATA_HOME/android"
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"

@@ -1,53 +1,19 @@
 #!/usr/bin/env bash
-# shellcheck shell=bash
+# shellcheck shell=zsh
+# vim: filetype=zsh
+
+export DOTFILES="$HOME/.dotfiles"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
-export XDG_BIN_HOME="$HOME/.local/bin" # this one is custom
 
-# History env variables
-export HIST_STAMPS="yyyy-mm-dd"
-# Larger bash history (allow 32³ entries; default is 500)
-export HISTSIZE=32768
-export HISTFILESIZE=$HISTSIZE
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-export HISTCONTROL=ignoreboth
-# Make some commands not show up in history
-export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
-# And include the parameter for ZSH
-export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
-
-# Highlight section titles in manual pages
-export LESS_TERMCAP_md="$ORANGE"
-
-# Don’t clear the screen after quitting a manual page
-export MANPAGER="less -X"
-
-# Always enable colored `grep` output
-export GREP_OPTIONS="--color=auto"
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-hash shopt 2> /dev/null && shopt -s checkwinsize
-
-export LC_ALL=fi_FI.utf8
-
-# If we are using zsh, color our dir lists and such
-if [ $SHELL = $(which zsh) ]; then
-  LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:'
-  export LS_COLORS
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-fi
-
-# Antigen configuration
-# https://github.com/zsh-users/antigen/wiki/Configuration
-export ADOTDIR="$XDG_DATA_HOME/antigen"
-export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
-export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
+# custom variables
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 # Homebrew configuration
 export HOMEBREW="/opt/homebrew"
@@ -68,85 +34,9 @@ if command -v brew &> /dev/null; then
   export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$PATH"
 fi
 
-# nvm, the node version manager
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-export NVM_AUTO_USE=true
-export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-# If we have go packages, include them to the PATH
-if command -v go &> /dev/null; then
-  export GOPATH="$XDG_DATA_HOME/go"
-  export GOBIN="$XDG_BIN_HOME"
-  mkdir -p "$GOPATH"
-fi
+source "$DOTFILES/config/exports-shell"
+source "$DOTFILES/config/exports-apps"
 
 if command -v nvim &> /dev/null; then
   export EDITOR="nvim"
 fi
-
-# docker, https://docs.docker.com/engine/reference/commandline/cli/
-if command -v docker &> /dev/null; then
-  export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
-  mkdir -p "$DOCKER_CONFIG"
-fi
-
-# z, https://github.com/rupa/z
-export _Z_DATA="$XDG_STATE_HOME/z"
-[[ -f "$XDG_BIN_HOME/z/z.sh" ]] && source "$XDG_BIN_HOME/z/z.sh"
-
-# composer, https://getcomposer.org/
-if command -v composer &> /dev/null; then
-  export COMPOSER_HOME="$XDG_STATE_HOME/composer"
-  export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
-  export PATH="$COMPOSER_BIN:$PATH"
-fi
-
-# gem, rubygems
-if command -v gem &> /dev/null; then
-  export GEM_HOME="$XDG_STATE_HOME/gem"
-  export GEM_PATH="$XDG_STATE_HOME/gem"
-  export PATH="$GEM_HOME/bin:$PATH"
-fi
-
-# pyenv, python environments
-export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
-mkdir -p "$PYENV_ROOT"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
-if command -v pyenv &> /dev/null; then
-  eval "$(pyenv init -)"
-fi
-
-# wakatime, https://github.com/wakatime/wakatime-cli
-export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
-
-# op (1Password cli) is present
-if hash op 2> /dev/null; then
-  export OP_CACHE="$XDG_STATE_HOME/1password"
-  mkdir -p "$OP_CACHE"
-  eval "$(op completion zsh)"
-  compdef _op op
-fi
-
-# Ansible configuration
-# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
-if hash ansible 2> /dev/null; then
-  export ANSIBLE_HOME="$XDG_STATE_HOME/ansible"
-  mkdir -p "$ANSIBLE_HOME"
-fi
-
-# gcloud is present
-if hash gcloud 2>/dev/null; then
-  GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
-  [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
-  [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
-fi
-
-# Load iterm2 shell integration
-# https://iterm2.com/documentation-shell-integration.html
-[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
-  && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
-

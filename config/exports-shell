@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# shellcheck shell=zsh
+# vim: filetype=zsh
+
+export LC_ALL=fi_FI.utf8
+
+# Bash completion file location
+export BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME}/bash-completion/bash_completion"
+
+# History env variables
+export HIST_STAMPS="yyyy-mm-dd"
+# Larger bash history (allow 32³ entries; default is 500)
+export HISTSIZE=32768
+export HISTFILESIZE=$HISTSIZE
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+export HISTCONTROL=ignoreboth
+# Make some commands not show up in history
+export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
+# And include the parameter for ZSH
+export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
+
+# Highlight section titles in manual pages
+export LESS_TERMCAP_md="$ORANGE"
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Always enable colored `grep` output
+export GREP_OPTIONS="--color=auto"
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+hash shopt 2> /dev/null && shopt -s checkwinsize
+
+# Load iterm2 shell integration
+# https://iterm2.com/documentation-shell-integration.html
+[[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
+  && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+
+# Set dircolors based on the file, if it exists
+if command -v dircolors &> /dev/null; then
+  eval $(dircolors "$XDG_CONFIG_HOME/dircolors")
+fi
+
+# If we are using zsh, color our dir lists and such
+if [ "$SHELL" = "$(which zsh)" ]; then
+  x-dc "$XDG_CACHE_HOME/zsh"
+  x-dc "$XDG_STATE_HOME/zsh"
+  export HISTFILE="$XDG_STATE_HOME/zsh/history"
+  zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
+  zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+fi

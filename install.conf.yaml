@@ -10,6 +10,7 @@
     ~/.cache/git:
     ~/.config:
     ~/.local:
+    ~/.local/run:
     ~/.local/share:
     ~/.local/state:
     ~/.ssh:

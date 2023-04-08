@@ -15,9 +15,6 @@ function x-set-php-aliases
       # replace "php@" with "p" so "php@80" becomes "p80"
       local php_alias="${php_abbr//php@/p}"
 
-      # Skip php = php aliasing
-      # if [[ "$php_abbr" == "$php_alias" ]]; then continue; fi;
-
       # Fetch the exec path once
       php_exec="$(brew --prefix "$version")/bin/php"
 
@@ -68,6 +65,11 @@ alias code_scanner='docker run
   /code'
 
 alias zedit='$EDITOR ~/.dotfiles'
+
+if hash irssi 2> /dev/null; then
+  # shellcheck disable=2139
+  alias irssi="irssi --config='$IRSSI_CONFIG_FILE' --home='$IRSSI_CONFIG_HOME'"
+fi
 
 if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091
