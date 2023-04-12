@@ -38,3 +38,4 @@ if command -v antigen &> /dev/null; then
 fi
 
 eval "$(starship init zsh)"
+

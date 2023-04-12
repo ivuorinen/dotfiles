@@ -3,6 +3,7 @@
 # vim: filetype=zsh
 
 export DOTFILES="$HOME/.dotfiles"
+export PATH="$DOTFILES/local/bin:$PATH"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -40,3 +41,4 @@ source "$DOTFILES/config/exports-apps"
 if command -v nvim &> /dev/null; then
   export EDITOR="nvim"
 fi
+

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# shellcheck shell=zsh
+# shellcheck shell=bash
+# shellcheck enable=external-sources
 # vim: filetype=zsh
 
 # Antigen configuration
@@ -70,7 +71,7 @@ fi
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 export NVM_AUTO_USE=true
-export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
+export NVM_DIR="$XDG_CONFIG_HOME/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 

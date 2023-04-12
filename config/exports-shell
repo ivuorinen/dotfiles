@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck shell=zsh
+# shellcheck shell=bash
 # vim: filetype=zsh
 
 export LC_ALL=fi_FI.utf8
@@ -40,6 +40,7 @@ hash shopt 2> /dev/null && shopt -s checkwinsize
 
 # Set dircolors based on the file, if it exists
 if command -v dircolors &> /dev/null; then
+  # shellcheck disable=SC2046
   eval $(dircolors "$XDG_CONFIG_HOME/dircolors")
 fi
 
@@ -49,5 +50,6 @@ if [ "$SHELL" = "$(which zsh)" ]; then
   x-dc "$XDG_STATE_HOME/zsh"
   export HISTFILE="$XDG_STATE_HOME/zsh/history"
   zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
-  zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+  zstyle ':completion:*' list-colors "$LS_COLORS"
 fi
+
