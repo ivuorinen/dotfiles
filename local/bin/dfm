@@ -24,6 +24,22 @@ function section_install
 {
   USAGE_PREFIX="$SCRIPT install"
 
+  MENU=(
+    "all:Installs macos defaults, antigen, starship, brew, nvm, npm packages and others"
+    "antigen:Updates the antigen.zsh file"
+    "composer:Install composer"
+    "dotenv:Install dotenv-linter"
+    "gh:Install GitHub CLI Extensions"
+    "go:Install Go Packages"
+    "imagick:Install ImageMagick CLI"
+    "starship:Install starship.rs"
+    "macos:Setup nice macOS defaults"
+    "nvm:Install Node Version Manager (nvm)"
+    "npm:Install NPM Packages"
+    "ntfy:Install ntfy"
+    "z:Install z"
+  )
+
   case "$1" in
     all)
       $0 install macos
@@ -42,71 +58,58 @@ function section_install
       ;;
     antigen)
       curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" \
-        && msg_done "🎉 New antigen installed!"
+        && msg_yay "New antigen installed!"
       ;;
     composer)
       bash "$DOTFILES/scripts/install-composer.sh" \
-        && msg_done "🎉 composer installed!"
+        && msg_yay "composer installed!"
       ;;
     dotenv)
       curl -sSfL \
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
-        && msg_done "🎉 dotenv-linter installed!"
+        && msg_yay "dotenv-linter installed!"
       ;;
     gh)
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \
-        && msg_done "🎉 github cli extensions installed!"
+        && msg_yay "github cli extensions installed!"
       ;;
     go)
       bash "$DOTFILES/scripts/install-go-packages.sh" \
-        && msg_done "🎉 go packages installed!"
+        && msg_yay "go packages installed!"
       ;;
     imagick)
       wget https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
-        && msg_done "🎉 imagick installed!"
+        && msg_yay "imagick installed!"
       ;;
     starship)
       curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin \
-        && msg_done "🎉 starship installed!"
+        && msg_yay "starship installed!"
       ;;
     macos)
       bash "$DOTFILES/scripts/set-macos-defaults.sh" \
-        && msg_done "🎉 Brewfile defined apps has been installed!"
+        && msg_yay "Brewfile defined apps has been installed!"
       ;;
     nvm)
       curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash \
         && nvm install --lts --latest-npm --default \
         && git checkout "$HOME/.zshrc" \
-        && msg_done "🎉 nvm installed!"
+        && msg_yay "nvm installed!"
       ;;
     npm)
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
-        && msg_done "🎉 NPM Packages have been installed!"
+        && msg_yay "NPM Packages have been installed!"
       ;;
     ntfy)
       bash "$DOTFILES/scripts/install-ntfy.sh" \
-        && msg_done "🎉 ntfy installed!"
+        && msg_yay "ntfy installed!"
       ;;
     z)
       bash "$DOTFILES/scripts/install-z.sh" \
-        && msg_done "🎉 z has been installed!"
+        && msg_yay "z has been installed!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | composer | dotenv | gh | go | imagick | starship | macos | nvm | npm"
-      menu_item "all" "Installs macos defaults, antigen, starship, brew, nvm, npm packages and others"
-      menu_item "antigen" "Updates the antigen.zsh file"
-      menu_item "composer" "Install composer"
-      menu_item "dotenv" "Install dotenv-linter"
-      menu_item "gh" "Install GitHub CLI Extensions"
-      menu_item "go" "Install Go Packages"
-      menu_item "imagick" "Install ImageMagick CLI"
-      menu_item "starship" "Install starship.rs"
-      menu_item "macos" "Setup nice macOS defaults"
-      menu_item "nvm" "Install Node Version Manager (nvm)"
-      menu_item "npm" "Install NPM Packages"
-      menu_item "ntfy" "Install ntfy"
-      menu_item "z" "Install z"
+      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
       ;;
   esac
 }
@@ -115,34 +118,37 @@ function section_brew
 {
   USAGE_PREFIX="$SCRIPT brew"
 
+  MENU=(
+    "install:Installs items defined in Brewfile"
+    "update:Updates and upgrades brew packages"
+    "updatebundle:Updates Brewfile with descriptions"
+    "autoupdate:Setups brew auto-update and runs it immediately"
+  )
+
   if ! command -v brew &> /dev/null; then
     menu_section "$USAGE_PREFIX" "brew not available on this system"
   else
     case "$1" in
       install)
-        brew bundle install --file="$BREWFILE" && msg_done "🎉 Done!"
+        brew bundle install --file="$BREWFILE" && msg_yay "Done!"
         ;;
       update)
         brew update && brew outdated && brew upgrade && brew cleanup
-        msg_done "🎉 Done!"
+        msg_yay "Done!"
         ;;
       updatebundle)
         # Updates .dotfiles/Brewfile with descriptions
         brew bundle dump \
           --force \
           --file="$BREWFILE" \
-          --describe && msg_done "🎉 Done!"
+          --describe && msg_yay "Done!"
         ;;
       autoupdate)
         brew autoupdate delete
         brew autoupdate start 43200 --upgrade --cleanup --immediate
         ;;
       *)
-        menu_section "$USAGE_PREFIX" "install | update | updatebundle | autoupdate"
-        menu_item "install" "Installs items defined in Brewfile"
-        menu_item "update" "Updates and upgrades brew packages"
-        menu_item "updatebundle" "Updates Brewfile with descriptions"
-        menu_item "autoupdate" "Setups brew auto-update and runs it immediately"
+        menu_usage "$USAGE_PREFIX" "${MENU[@]}"
         ;;
     esac
   fi
@@ -151,6 +157,14 @@ function section_brew
 function section_dotfiles
 {
   USAGE_PREFIX="$SCRIPT dotfiles"
+
+  MENU=(
+    "fmt:Run all formatters"
+    "yamlfmt:Run yamlfmt to all dotfiles, which are in our control"
+    "shfmt:Run shfmt to all dotfiles"
+    "reset_all:Reset everything, runs all configured reset actions"
+    "reset_nvim:Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
+  )
 
   case "$1" in
     fmt)
@@ -171,8 +185,8 @@ function section_dotfiles
         ~/.config/astronvim \
         ~/.config/nvim
       msg_ok "Deleted old nvim files"
-      ln -s ~/.dotfiles/config/astronvim ~/.config/astronvim
-      ln -s ~/.dotfiles/config/nvim ~/.config/nvim
+      ln -s $DOTFILES/config/astronvim ~/.config/astronvim
+      ln -s $DOTFILES/config/nvim ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
       hash npm 2> /dev/null && $0 install npm
       msg_ok "Installed packages"
@@ -197,15 +211,10 @@ function section_dotfiles
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
         --binary-next-line {} \;
-      msg_done "🎉 dotfiles have been shfmt formatted!"
+      msg_yay "dotfiles have been shfmt formatted!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "fmt | reset_all | reset_nvim | yamlfmt | shfmt"
-      menu_item "fmt" "Run all formatters"
-      menu_item "reset_all" "Reset everything, runs all configured reset actions"
-      menu_item "reset_nvim" "Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
-      menu_item "yamlfmt" "Run yamlfmt to all dotfiles, which are in our control"
-      menu_item "shfmt" "Run shfmt to all dotfiles"
+      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
       ;;
   esac
 }
@@ -215,6 +224,11 @@ function section_check
   USAGE_PREFIX="$SCRIPT check"
   X_HOSTNAME=$(hostname)
   X_ARCH=$(uname)
+
+  MENU=(
+    "arch <arch>:Empty returns current. Exit code 0 when match, 1 when not."
+    "host <host>:Empty returns current. Exit code 0 when match, 1 when not."
+  )
 
   case "$1" in
     a | arch)
@@ -226,9 +240,7 @@ function section_check
       [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "arch | host"
-      menu_item "arch <arch>" "Empty returns current. Exit code 0 when match, 1 when not."
-      menu_item "host <host>" "Empty returns current. Exit code 0 when match, 1 when not."
+      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
       ;;
   esac
 }
@@ -238,30 +250,44 @@ function section_tests
 {
   USAGE_PREFIX="$SCRIPT tests"
 
+  MENU=(
+    "msg:List all log functions from shared.sh"
+  )
+
   case "$1" in
     msg)
       msg "msg"
       msg_done "msg_done"
-      msg_prompt "msg_prompt"
-      msg_prompt_done "msg_prompt_done"
+      msg_done_suffix "msg_done_suffix"
+      msg_err "msg_err"
       msg_nested "msg_nested"
       msg_nested_done "msg_nested_done"
-      msg_run "msg_run" "second_param"
       msg_ok "msg_ok"
+      msg_prompt "msg_prompt"
+      msg_prompt_done "msg_prompt_done"
+      msg_run "msg_run" "second_param"
+      msg_run_done "msg_run_done" "second_param"
       msg_warn "msg_warn"
-      msg_err "msg_err"
+      msg_yay "msg_yay"
+      msg_yay_done "msg_yay_done"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "msg"
-      menu_item "msg" "List all log functions from shared.sh"
+      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
       ;;
   esac
 }
 
 function usage
 {
+  SECTIONS=(
+    "install"
+    "reset"
+    "brew"
+    "check"
+    "dotfiles"
+  )
   echo ""
-  menu_section "Usage: $SCRIPT" "install | reset | brew | check | dotfiles"
+  menu_usage_header "Usage: $SCRIPT" "${SECTIONS[@]}"
   echo $"   All commands have their own subcommands."
   echo ""
   section_install

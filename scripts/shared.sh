@@ -32,6 +32,11 @@ function __log_marker_warn()
   echo -e "${CLR_YELLOW}⁕${CLR_RESET}"
 }
 
+function __log_marker_question()
+{
+  echo -e "${CLR_YELLOW}?${CLR_RESET}"
+}
+
 function __log_marker_err()
 {
   echo -e "${CLR_RED}⛌${CLR_RESET}"
@@ -48,19 +53,33 @@ function msg()
   echo -e "$(__log_marker) $1"
 }
 
+function msg_yay()
+{
+  echo -e "🎉 $1"
+}
+
+function msg_yay_done()
+{
+  echo -e "🎉 $1 ...$(__log_marker_ok)"
+}
+
 function msg_done()
 {
   echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
+function msg_done_suffix() {
+  echo -e "$(__log_marker) ...$(__log_marker_ok)"
+}
+
 function msg_prompt()
 {
-  echo -e "$(__log_marker) $1"
+  echo -e "$(__log_marker_question) $1"
 }
 
 function msg_prompt_done()
 {
-  echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
+  echo -e "$(__log_marker_question) $1 ...$(__log_marker_ok)"
 }
 
 function msg_nested()
@@ -76,6 +95,11 @@ function msg_nested_done()
 function msg_run()
 {
   echo -e "${CLR_GREEN}➜ $1${CLR_RESET} $2"
+}
+
+function msg_run_done()
+{
+  echo -e "${CLR_GREEN}➜ $1${CLR_RESET} $2 ...$(__log_marker_ok)"
 }
 
 function msg_ok()
@@ -110,4 +134,40 @@ function fn_exists()
 {
   declare -f -F "$1" > /dev/null
   return $?
+}
+
+# Takes a bash array ("cow:moo", "dinosaur:roar") and loops
+# through the keys to build menu section listing.
+function menu_usage_header()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  KEYS=""
+  for item in "${MENU_ARRAY[@]}"; do
+    CMD=$(echo "${item}"|awk -F ":" '{print $1}')
+    KEYS+="${CMD} | "
+  done
+
+  # "???" removes 3 last characters, being " | " from the end
+  menu_section "$MENU_CMD" "${KEYS%???}"
+}
+
+# Takes the usage command "$0 dotfiles" and a
+# bash array ("cow:moo" "dinosaur:roar") and loops
+# through in building a menu for dfm command usage listing.
+function menu_usage()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  menu_usage_header "$MENU_CMD" "${MENU_ARRAY[@]}"
+
+  for item in "${MENU_ARRAY[@]}" ; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    DESC=$(echo "${item}" | awk -F ":" '{print $2}')
+    menu_item "$CMD" "$DESC"
+  done
 }

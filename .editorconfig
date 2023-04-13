@@ -7,25 +7,3 @@ indent_size = 2
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-[*.lua]
-insert_final_newline = true
-
-[*.yaml]
-indent_size = 2
-insert_final_newline = true
-
-[*.yml]
-indent_size = 2
-insert_final_newline = true
-
-[*.sh]
-indent_size = 2
-indent_style = space
-insert_final_newline = true
-shell_variant      = bash # --language-variant
-binary_next_line   = true
-switch_case_indent = true  # --case-indent
-space_redirects    = false
-keep_padding       = false
-function_next_line = true  # --func-next-line
