@@ -103,3 +103,5 @@ export _Z_DATA="$XDG_STATE_HOME/z"
 # Misc
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
+

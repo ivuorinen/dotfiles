@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Source: https://github.com/thirtythreeforty/dotfiles/blob/master/bin/extip
+
+curl icanhazip.com "${@}"
+

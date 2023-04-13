@@ -56,6 +56,9 @@ alias watchx='watch -dpbc' # watch with: differences, precise, beep and color
 alias zapds='find . -name ".DS_Store" -print -delete'
 alias t='tail -f'   # tail with follow flag on
 alias dn='du -chd1' # directory usage, return only the total
+alias mirrorsite='wget -m -k -K -E -e robots=off' # Mirror site
+# Mirror stdout to stderr, useful for seeing data going through a pipe
+alias peek='tee >(cat 1>&2)'
 
 alias code_scanner='docker run
   --env SOURCE_CODE="$PWD"
