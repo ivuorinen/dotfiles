@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Generate thumbnails using magick
+# https://imagemagick.org/script/download.php
+#
+# Defaults to current directory creating thumbs with 1000x1000
+# images with 200px white borders around the original image.
+#
+# Defaults can be overridden with ENV variables like this:
+# $ THMB_BACKGROUND=black x-thumbgen ~/images/
+#
+# Created by: Ismo Vuorinen <https://github.com/ivuorinen> 2015
+
+: "${THMB_SOURCE:=$1}"
+: "${THMB_BACKGROUND:=white}"
+: "${THMB_RESIZE:=800x800}"
+: "${THMB_EXTENT:=1000x1000}"
+
+[ $# -eq 0 ] && {
+  echo "Usage: $0 /full/path/to/image/folder"
+  exit 1
+}
+
+if [ "$THMB_SOURCE" == "" ] || [ ! -d "$THMB_SOURCE" ]; then
+  THMB_SOURCE=$(pwd)
+fi
+
+if command -v magick &> /dev/null; then
+
+  magick \
+    "$THMB_SOURCE/*" \
+    -resize "$THMB_RESIZE" \
+    -background "$THMB_BACKGROUND" \
+    -gravity center \
+    -extent "$THMB_EXTENT" \
+    -set filename:fname '%t_thumb.%e' +adjoin '%[filename:fname]'
+
+else
+  echo "magick not found in PATH, https://imagemagick.org/script/download.php"
+fi

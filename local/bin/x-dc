@@ -2,10 +2,13 @@
 # Verify folder exists, and if it does not, create it.
 
 dir="$1"
- 
-[ $# -eq 0 ] && { echo "Usage: $0 full/path/to/dir/to/create"; exit 1; }
- 
+
+[ $# -eq 0 ] && {
+  echo "Usage: $0 full/path/to/dir/to/create"
+  exit 1
+}
+
 if [ ! -d "$dir" ]; then
-  mkdir -p "$dir" && exit 0;
+  mkdir -p "$dir" && exit 0
 fi
 

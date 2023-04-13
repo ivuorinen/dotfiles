@@ -39,7 +39,7 @@ if hash ffmpeg 2> /dev/null; then
 fi
 
 # gcloud
-if hash gcloud 2>/dev/null; then
+if hash gcloud 2> /dev/null; then
   GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
   [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
   [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
