@@ -15,6 +15,8 @@
 
 SCRIPT=$(basename "$0")
 
+VERSION_NVM="v0.39.3"
+
 # shellcheck source=./../../scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
@@ -29,8 +31,9 @@ function section_install
       $0 install starship
       $0 brew install
       $0 install composer
-      $0 install dotenv-linter
+      $0 install dotenv
       $0 install gh
+      $0 install go
       $0 install imagick
       $0 install nvm
       $0 install npm
@@ -45,7 +48,7 @@ function section_install
       bash "$DOTFILES/scripts/install-composer.sh" \
         && msg_done "🎉 composer installed!"
       ;;
-    dotenv-linter)
+    dotenv)
       curl -sSfL \
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
@@ -54,6 +57,10 @@ function section_install
     gh)
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \
         && msg_done "🎉 github cli extensions installed!"
+      ;;
+    go)
+      bash "$DOTFILES/scripts/install-go-packages.sh" \
+        && msg_done "🎉 go packages installed!"
       ;;
     imagick)
       wget https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
@@ -68,9 +75,9 @@ function section_install
         && msg_done "🎉 Brewfile defined apps has been installed!"
       ;;
     nvm)
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
-        && git checkout "$HOME/.zshrc" \
+      curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash \
         && nvm install --lts --latest-npm --default \
+        && git checkout "$HOME/.zshrc" \
         && msg_done "🎉 nvm installed!"
       ;;
     npm)
@@ -83,15 +90,16 @@ function section_install
       ;;
     z)
       bash "$DOTFILES/scripts/install-z.sh" \
-        && msg_done "🎉 Z has been installed!"
+        && msg_done "🎉 z has been installed!"
       ;;
     *)
-      menu_section "$USAGE_PREFIX" "all | antigen | composer | dotenv-linter | imagick | starship | macos | nvm | npm"
+      menu_section "$USAGE_PREFIX" "all | antigen | composer | dotenv | gh | go | imagick | starship | macos | nvm | npm"
       menu_item "all" "Installs macos defaults, antigen, starship, brew, nvm, npm packages and others"
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "composer" "Install composer"
-      menu_item "dotenv-linter" "Install dotenv-linter"
+      menu_item "dotenv" "Install dotenv-linter"
       menu_item "gh" "Install GitHub CLI Extensions"
+      menu_item "go" "Install Go Packages"
       menu_item "imagick" "Install ImageMagick CLI"
       menu_item "starship" "Install starship.rs"
       menu_item "macos" "Setup nice macOS defaults"

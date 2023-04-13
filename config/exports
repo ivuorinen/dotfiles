@@ -41,4 +41,3 @@ source "$DOTFILES/config/exports-apps"
 if command -v nvim &> /dev/null; then
   export EDITOR="nvim"
 fi
-
