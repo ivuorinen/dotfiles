@@ -30,6 +30,7 @@ function section_install
       $0 brew install
       $0 install composer
       $0 install dotenv-linter
+      $0 install gh
       $0 install imagick
       $0 install nvm
       $0 install npm
@@ -49,6 +50,10 @@ function section_install
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
         && msg_done "🎉 dotenv-linter installed!"
+      ;;
+    gh)
+      bash "$DOTFILES/scripts/install-gh-extensions.sh" \
+        && msg_done "🎉 github cli extensions installed!"
       ;;
     imagick)
       wget https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
@@ -86,6 +91,7 @@ function section_install
       menu_item "antigen" "Updates the antigen.zsh file"
       menu_item "composer" "Install composer"
       menu_item "dotenv-linter" "Install dotenv-linter"
+      menu_item "gh" "Install GitHub CLI Extensions"
       menu_item "imagick" "Install ImageMagick CLI"
       menu_item "starship" "Install starship.rs"
       menu_item "macos" "Setup nice macOS defaults"

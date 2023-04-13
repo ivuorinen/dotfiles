@@ -8,11 +8,6 @@
 	url = https://github.com/wren/dotbot-brew.git
 	ignore = dirty
 
-[submodule "dotbot-gh-extension"]
-	path = dotbot-gh-extension
-	url = https://github.com/fundor333/dotbot-gh-extension.git
-	ignore = dirty
-
 [submodule "dotbot-include"]
 	path = dotbot-include
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
