@@ -1,6 +1,6 @@
 Brewfile.lock.json
 *.log
 *-secret
+*cache
 .idea
 .vscode
-

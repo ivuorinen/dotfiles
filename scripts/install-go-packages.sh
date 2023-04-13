@@ -4,9 +4,7 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-if ! command -v go &> /dev/null; then
-  msg "go hasn't been installed yet."
-else
+have go && {
   packages=(
     # sysadmin/scripting utilities, distributed as a single binary
     github.com/skx/sysbox@latest
@@ -28,5 +26,4 @@ else
   done
 
   msg_ok "Done"
-
-fi
+} || msg "go hasn't been installed yet."

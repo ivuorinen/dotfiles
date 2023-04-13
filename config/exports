@@ -3,7 +3,8 @@
 # vim: filetype=zsh
 
 export DOTFILES="$HOME/.dotfiles"
-export PATH="$DOTFILES/local/bin:$PATH"
+source "$DOTFILES/scripts/shared.sh"
+path_append "$DOTFILES/local/bin"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -23,21 +24,20 @@ export HOMEBREW_SBIN="$HOMEBREW/sbin"
 export HOMEBREW_PKG="$HOMEBREW/opt"
 export HOMEBREW_NO_ENV_HINTS=1
 
-export PATH="$XDG_BIN_HOME:$HOMEBREW_BIN:$HOMEBREW_SBIN:/usr/local/sbin:$PATH"
+path_append "/usr/local/bin"
+path_append "$HOMEBREW_SBIN"
+path_append "$HOMEBREW_BIN"
+path_append "$XDG_BIN_HOME"
 
 # brew, https://brew.sh
-if command -v brew &> /dev/null; then
-  BREW_PYTHON=$(brew --prefix python)/bin
-  GNUBIN_DIR=$(brew --prefix coreutils)/libexec/gnubin
-  BREW_RUBY=$(brew --prefix ruby)/bin
-  BREW_GEMS=$(gem environment gemdir)/bin
-
-  export PATH="$BREW_PYTHON:$GNUBIN_DIR:$BREW_GEMS:$BREW_RUBY:$PATH"
-fi
+have brew && {
+  path_append "$(brew --prefix python)/bin"
+  path_append "$(brew --prefix coreutils)/libexec/gnubin"
+  path_append "$(brew --prefix ruby)/bin"
+  path_append "$(gem environment gemdir)/bin"
+}
 
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"
 
-if command -v nvim &> /dev/null; then
-  export EDITOR="nvim"
-fi
+have nvim && export EDITOR="nvim"

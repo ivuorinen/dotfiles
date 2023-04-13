@@ -125,9 +125,7 @@ function section_brew
     "autoupdate:Setups brew auto-update and runs it immediately"
   )
 
-  if ! command -v brew &> /dev/null; then
-    menu_section "$USAGE_PREFIX" "brew not available on this system"
-  else
+  have brew && {
     case "$1" in
       install)
         brew bundle install --file="$BREWFILE" && msg_yay "Done!"
@@ -151,7 +149,7 @@ function section_brew
         menu_usage "$USAGE_PREFIX" "${MENU[@]}"
         ;;
     esac
-  fi
+  } || menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
 function section_dotfiles
@@ -188,13 +186,13 @@ function section_dotfiles
       ln -s $DOTFILES/config/astronvim ~/.config/astronvim
       ln -s $DOTFILES/config/nvim ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
-      hash npm 2> /dev/null && $0 install npm
+      have npm && $0 install npm
       msg_ok "Installed packages"
       msg_done "nvim reset!"
       ;;
     yamlfmt)
       # format yaml files
-      yamlfmt -conf "$DOTFILES/.yamlfmt"
+      have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt" || msg_err "yamlfmt not found"
       ;;
     shfmt)
       # Format shell scripts according to following rules.

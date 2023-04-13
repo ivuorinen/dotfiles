@@ -1,6 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Install PHP Package Manager Composer
+#
+# shellcheck source="shared.sh"
+source "$HOME/.dotfiles/scripts/shared.sh"
 
-if command -v php &> /dev/null; then
+have php && {
   EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')"
   php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
   ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
@@ -16,4 +20,4 @@ if command -v php &> /dev/null; then
   rm composer-setup.php
   mv composer.phar ~/.local/bin/composer
   exit $RESULT
-fi
+} || msg_err "PHP Not Available, cannot install composer"

@@ -6,6 +6,8 @@ colors
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
+# shellcheck source=shared.sh
+source "$DOTFILES/scripts/shared.sh"
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
@@ -28,14 +30,14 @@ ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
 [[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
 
 # antigen is present
-if command -v antigen &> /dev/null; then
+have antigen && {
   antigen use oh-my-zsh
 
   # config/functions
   x-default-antigen-bundles
 
   antigen apply
-fi
+}
 
-eval "$(starship init zsh)"
-
+# starship is present
+have starship && eval "$(starship init zsh)"

@@ -171,3 +171,33 @@ function menu_usage()
     menu_item "$CMD" "$DESC"
   done
 }
+
+# shorthand for checking if the system has the bin in path.
+# usage: have php && php -v
+function have
+{
+  command -v "$1" >&/dev/null;
+}
+
+# Remove directory from the PATH variable
+# usage: path_remove ~/.local/bin
+function path_remove
+{
+  PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
+}
+
+# Append directory to the PATH
+# usage: path_append ~/.local/bin
+function path_append
+{
+  path_remove "$1"
+  PATH="${PATH:+"$PATH:"}$1"
+}
+
+# Prepend directory to the PATH
+# usage: path_prepend ~/.local/bin
+function path_prepend
+{
+  path_remove "$1"
+  PATH="$1${PATH:+":$PATH"}"
+}

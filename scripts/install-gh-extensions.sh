@@ -4,9 +4,7 @@
 # shellcheck source="shared.sh"
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-if ! command -v gh &> /dev/null; then
-  msg_run "gh (GitHub Client) could not be found, please install it first"
-else
+have gh && {
   extensions=(
     # GitHub CLI extension for generating a report on repository dependencies.
     andyfeller/gh-dependency-report
@@ -41,4 +39,4 @@ else
   done
 
   msg_ok "Done"
-fi
+} || msg_err "gh (GitHub Client) could not be found, please install it first"

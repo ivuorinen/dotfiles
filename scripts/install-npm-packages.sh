@@ -4,9 +4,7 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-if ! command -v npm &> /dev/null; then
-  msg_err "npm could not be found."
-else
+have npm && {
   packages=(
     # This is a tool to check if your files consider your .editorconfig rules.
     "editorconfig-checker"
@@ -35,4 +33,4 @@ else
     npm install -g --no-fund --no-progress --no-timing "$pkg"
     echo ""
   done
-fi
+} || msg_err "npm could not be found."

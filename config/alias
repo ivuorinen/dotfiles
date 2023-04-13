@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# shellcheck source="../scripts/shared.sh"
+source "$DOTFILES/scripts/shared.sh"
 
 # Get installed php versions from brew and setup aliases
 function x-set-php-aliases
 {
-  if command -v brew &> /dev/null; then
+  have brew && {
     local php_versions=()
     while IFS="" read -r line; do php_versions+=("$line"); done < <(brew list | grep '^php')
 
@@ -31,7 +33,7 @@ function x-set-php-aliases
       # shellcheck disable=SC2139,SC2140
       alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
     done
-  fi
+  }
 }
 
 if [[ $(uname) == 'Darwin' ]]; then
@@ -74,10 +76,8 @@ alias code_scanner='docker run
 
 alias zedit='$EDITOR ~/.dotfiles'
 
-if hash irssi 2> /dev/null; then
-  # shellcheck disable=2139
+have irssi && \
   alias irssi="irssi --config='$IRSSI_CONFIG_FILE' --home='$IRSSI_CONFIG_HOME'"
-fi
 
 if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091

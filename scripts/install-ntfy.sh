@@ -1,8 +1,14 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+#
+# Install ntfy
+#
+# shellcheck source=shared.sh
+source "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
-if ! command -v ntfy &> /dev/null; then
+have ntfy && {
+  msg "ntfy already installed"
+} || {
   case $(dfm check arch) in
     Linux)
       NTFY_ARCH="linux_$(arch)"
@@ -28,6 +34,4 @@ if ! command -v ntfy &> /dev/null; then
   fi
 
   rm -rf "${NTFY_DEST}" "${NTFY_DEST}.tar.gz"
-else
-  echo "ntfy already installed"
-fi
+}

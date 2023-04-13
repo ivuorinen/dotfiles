@@ -2,6 +2,8 @@
 #
 # shell functions
 #
+# shellcheck source="../scripts/shared.sh"
+source "$DOTFILES/scripts/shared.sh"
 
 # Weather in Tampere, or other city
 function weather
@@ -66,29 +68,6 @@ function silent
   "$@" >&/dev/null
 }
 
-# Remove directory from the PATH variable
-# usage: path_remove ~/.local/bin
-function path_remove
-{
-  PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
-}
-
-# Append directory to the PATH
-# usage: path_append ~/.local/bin
-function path_append
-{
-  path_remove "$1"
-  PATH="${PATH:+"$PATH:"}$1"
-}
-
-# Prepend directory to the PATH
-# usage: path_prepend ~/.local/bin
-function path_prepend
-{
-  path_remove "$1"
-  PATH="$1${PATH:+":$PATH"}"
-}
-
 # Defines default antigen bundles
 function x-default-antigen-bundles
 {
@@ -104,13 +83,13 @@ function x-default-antigen-bundles
   antigen bundle zsh-users/zsh-syntax-highlighting
 
   # these should be available if there's need
-  hash git 2> /dev/null && antigen bundle git
-  hash brew 2> /dev/null && antigen bundle brew
-  hash docker 2> /dev/null && antigen bundle docker
-  hash docker-compose 2> /dev/null && antigen bundle sroze/docker-compose-zsh-plugin
-  hash jq 2> /dev/null && antigen bundle reegnz/jq-zsh-plugin
-  hash nvm 2> /dev/null && antigen bundle nvm
-  hash php 2> /dev/null && antigen bundle php
-  hash python 2> /dev/null && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-  hash rvm 2> /dev/null && antigen bundle unixorn/rvm-plugin
+  have git && antigen bundle git
+  have brew && antigen bundle brew
+  have docker && antigen bundle docker
+  have docker-compose && antigen bundle sroze/docker-compose-zsh-plugin
+  have jq && antigen bundle reegnz/jq-zsh-plugin
+  have nvm && antigen bundle nvm
+  have php && antigen bundle php
+  have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+  have rvm && antigen bundle unixorn/rvm-plugin
 }
