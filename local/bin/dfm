@@ -79,7 +79,7 @@ function section_install
         && msg_yay "go packages installed!"
       ;;
     imagick)
-      wget https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
+      curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
         && msg_yay "imagick installed!"
       ;;
     starship)
