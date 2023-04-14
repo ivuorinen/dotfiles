@@ -11,6 +11,28 @@ CLR_GREEN="\033[1;32m"
 CLR_BLUE="\033[1;34m"
 CLR_RESET="\033[0m"
 
+# -- Color functions -- #
+function __color_red()
+{
+  local MSG="$1"
+  echo -e "${CLR_RED}${MSG}${CLR_RESET}"
+}
+function __color_yellow()
+{
+  local MSG="$1"
+  echo -e "${CLR_YELLOW}${MSG}${CLR_RESET}"
+}
+function __color_green()
+{
+  local MSG="$1"
+  echo -e "${CLR_GREEN}${MSG}${CLR_RESET}"
+}
+function __color_blue()
+{
+  local MSG="$1"
+  echo -e "${CLR_BLUE}${MSG}${CLR_RESET}"
+}
+
 # -- Helpers -- #
 function __log_marker()
 {
@@ -68,7 +90,8 @@ function msg_done()
   echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
-function msg_done_suffix() {
+function msg_done_suffix()
+{
   echo -e "$(__log_marker) ...$(__log_marker_ok)"
 }
 
@@ -146,7 +169,7 @@ function menu_usage_header()
 
   KEYS=""
   for item in "${MENU_ARRAY[@]}"; do
-    CMD=$(echo "${item}"|awk -F ":" '{print $1}')
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
     KEYS+="${CMD} | "
   done
 
@@ -163,9 +186,9 @@ function menu_usage()
   shift
   MENU_ARRAY=("$@")
 
-  menu_usage_header "$MENU_CMD" "${MENU_ARRAY[@]}"
+  msg "$MENU_CMD"
 
-  for item in "${MENU_ARRAY[@]}" ; do
+  for item in "${MENU_ARRAY[@]}"; do
     CMD=$(echo "${item}" | awk -F ":" '{print $1}')
     DESC=$(echo "${item}" | awk -F ":" '{print $2}')
     menu_item "$CMD" "$DESC"
@@ -176,7 +199,7 @@ function menu_usage()
 # usage: have php && php -v
 function have
 {
-  command -v "$1" >&/dev/null;
+  command -v "$1" >&/dev/null
 }
 
 # Remove directory from the PATH variable

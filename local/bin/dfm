@@ -9,6 +9,7 @@
 # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
+: "${SHARED_SCRIPT:=$DOTFILES/scripts/shared.sh}"
 : "${INSTALL_SCRIPT:=$DOTFILES/scripts/install-dotfiles.sh}"
 : "${BREWFILE:=$DOTFILES/Brewfile}"
 : "${HOSTFILES:=$DOTFILES/hosts}"
@@ -18,14 +19,14 @@ SCRIPT=$(basename "$0")
 VERSION_NVM="v0.39.3"
 
 # shellcheck source=./../../scripts/shared.sh
-source "$DOTFILES/scripts/shared.sh"
+source "$SHARED_SCRIPT"
 
 function section_install
 {
-  USAGE_PREFIX="$SCRIPT install"
+  USAGE_PREFIX="$SCRIPT install <command>"
 
   MENU=(
-    "all:Installs macos defaults, antigen, starship, brew, nvm, npm packages and others"
+    "all:Installs everything in the correct order"
     "antigen:Updates the antigen.zsh file"
     "composer:Install composer"
     "dotenv:Install dotenv-linter"
@@ -116,7 +117,7 @@ function section_install
 
 function section_brew
 {
-  USAGE_PREFIX="$SCRIPT brew"
+  USAGE_PREFIX="$SCRIPT brew <command>"
 
   MENU=(
     "install:Installs items defined in Brewfile"
@@ -154,7 +155,7 @@ function section_brew
 
 function section_dotfiles
 {
-  USAGE_PREFIX="$SCRIPT dotfiles"
+  USAGE_PREFIX="$SCRIPT dotfiles <command>"
 
   MENU=(
     "fmt:Run all formatters"
@@ -219,13 +220,13 @@ function section_dotfiles
 
 function section_check
 {
-  USAGE_PREFIX="$SCRIPT check"
+  USAGE_PREFIX="$SCRIPT check <command>"
   X_HOSTNAME=$(hostname)
   X_ARCH=$(uname)
 
   MENU=(
-    "arch <arch>:Empty returns current. Exit code 0 when match, 1 when not."
-    "host <host>:Empty returns current. Exit code 0 when match, 1 when not."
+    "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
+    "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
   )
 
   case "$1" in
@@ -246,7 +247,7 @@ function section_check
 # Secret menu for visual tests
 function section_tests
 {
-  USAGE_PREFIX="$SCRIPT tests"
+  USAGE_PREFIX="$SCRIPT tests <command>"
 
   MENU=(
     "msg:List all log functions from shared.sh"
@@ -277,16 +278,9 @@ function section_tests
 
 function usage
 {
-  SECTIONS=(
-    "install"
-    "reset"
-    "brew"
-    "check"
-    "dotfiles"
-  )
   echo ""
-  menu_usage_header "Usage: $SCRIPT" "${SECTIONS[@]}"
-  echo $"   All commands have their own subcommands."
+  msg_prompt "Usage: $SCRIPT <section> <command>"
+  echo $"  Empty <command> prints <section> help."
   echo ""
   section_install
   echo ""

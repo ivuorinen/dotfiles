@@ -11,4 +11,3 @@ dir="$1"
 if [ ! -d "$dir" ]; then
   mkdir -p "$dir" && exit 0
 fi
-
