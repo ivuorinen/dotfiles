@@ -15,7 +15,6 @@ have npm && {
     "prettier"
     "@bchatard/alfred-jetbrains"
     "@johnnymorganz/stylua-bin"
-    "js-debug"
     "stylelint-lsp"
     "blade-formatter"
     "@loopback/cli"
@@ -29,8 +28,17 @@ have npm && {
     # Skip comments
     if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-    msg_run "Installing npm package:" "$pkg"
-    npm install -g --no-fund --no-progress --no-timing "$pkg"
+    if [[ $(npm ls -g -p "$pkg") != "" ]]; then
+      msg_run_done "$pkg" "already installed"
+    else
+      msg_run "Installing npm package:" "$pkg"
+      npm install -g --no-fund --no-progress --no-timing "$pkg"
+    fi
+
     echo ""
   done
+
+  msg_run "Upgrading all global packages"
+  npm -g --no-progress --no-timing --no-fund outdated
+  npm -g --no-timing --no-fund upgrade
 } || msg_err "npm could not be found."
