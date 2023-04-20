@@ -12,6 +12,7 @@ have go && {
     github.com/google/yamlfmt/cmd/yamlfmt@latest
     github.com/ericchiang/pup@latest
     github.com/suntong/html2md@latest
+    github.com/cheat/cheat/cmd/cheat@latest
   )
 
   for pkg in "${packages[@]}"; do
