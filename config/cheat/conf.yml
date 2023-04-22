@@ -1,6 +1,6 @@
 ---
 # The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
-editor: EDITOR_PATH
+editor: $EDITOR
 
 # Should 'cheat' always colorize output?
 colorize: true
@@ -12,12 +12,12 @@ style: monokai
 
 # Which 'chroma' "formatter" should be applied?
 # One of: "terminal", "terminal256", "terminal16m"
-formatter: terminal16m
+formatter: terminal256
 
 # Through which pager should output be piped?
 # 'less -FRX' is recommended on Unix systems
 # 'more' is recommended on Windows
-pager: PAGER_PATH
+pager: less -FRX
 
 # Cheatpaths are paths at which cheatsheets are available on your local
 # filesystem.

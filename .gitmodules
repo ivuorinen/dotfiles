@@ -1,3 +1,4 @@
+# vim: set expandtab:
 [submodule "dotbot"]
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot.git
@@ -26,3 +27,9 @@
 	update = rebase
 	branch = main
 	ignore = dirty
+
+[submodule "cheat-community"]
+	path = config/cheat/cheatsheets/community
+	url = https://github.com/cheat/cheatsheets.git
+	ignore = dirty
+
