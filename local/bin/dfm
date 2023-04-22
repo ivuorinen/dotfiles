@@ -94,8 +94,8 @@ function section_install
     nvm)
       curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash \
         && nvm install --lts --latest-npm --default
-        git checkout "$DOTFILES/base/zshrc"
-        msg_yay "nvm installed!"
+      git checkout "$DOTFILES/base/zshrc"
+      msg_yay "nvm installed!"
       ;;
     npm)
       bash "$DOTFILES/scripts/install-npm-packages.sh" \

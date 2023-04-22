@@ -69,6 +69,8 @@ brew "eg-examples"
 brew "faas-cli"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
+# Banner-like program prints strings as ASCII art
+brew "figlet"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
 # Monitor a directory for changes and run a shell command
@@ -131,6 +133,8 @@ brew "lazydocker"
 brew "libpq"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
+# Rainbows and unicorns in your console!
+brew "lolcat"
 # Package manager for the Lua programming language
 brew "luarocks"
 # Swiss Army Knife for macOS
@@ -157,6 +161,8 @@ brew "pandoc"
 brew "perl"
 # General-purpose scripting language
 brew "php@8.1"
+# Simple Python style checker in one Python file
+brew "pycodestyle"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
@@ -215,6 +221,8 @@ brew "watch"
 brew "wget"
 # Personal information dashboard for your terminal
 brew "wtfutil"
+# Check your $HOME for unwanted files and directories
+brew "xdg-ninja"
 # JavaScript package manager
 brew "yarn"
 # A vulnerability scanner for container images and filesystems
@@ -293,6 +301,8 @@ cask "quicklook-json"
 cask "quicklookase"
 # Automatically hides or quits apps after periods of inactivity
 cask "quitter"
+# Control your tools with a few keystrokes
+cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
 # MySQL/MariaDB database management

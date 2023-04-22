@@ -6,7 +6,7 @@
 source "$DOTFILES/scripts/shared.sh"
 
 # Weather in Tampere, or other city
-function weather
+weather()
 {
   # https://github.com/chubin/wttr.in#usage
   local city="${1:-Tampere}"
@@ -14,25 +14,25 @@ function weather
 }
 
 # Docker
-function ssh-docker
+ssh-docker()
 {
   docker exec -it "$@" bash
 }
 
 # Create a new directory and enter it
-function mkd
+mkd()
 {
   mkdir -p "$@" && cd "$@" || exit
 }
 
 # All the dig info
-function digga
+digga()
 {
   dig +nocmd "$1" any +multiline +noall +answer
 }
 
 # Rector project to php version 8.0 by default.
-function rector
+rector()
 {
   local php="${1:-80}"
   docker run -v "$(pwd)":/project rector/rector:latest process \
@@ -42,7 +42,7 @@ function rector
 }
 
 # Commit everything
-function commit
+commit()
 {
   commitMessage="$*"
 
@@ -54,7 +54,7 @@ function commit
   eval "git commit -a -m '${commitMessage}'"
 }
 
-function scheduler
+scheduler()
 {
   while :; do
     php artisan schedule:run
@@ -63,13 +63,26 @@ function scheduler
   done
 }
 
-function silent
+silent()
 {
   "$@" >&/dev/null
 }
 
+ask()
+{
+  while true; do
+    read -p "$1 ([y]/n) " -r
+    REPLY=${REPLY:-"y"}
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      return 1
+    elif [[ $REPLY =~ ^[Nn]$ ]]; then
+      return 0
+    fi
+  done
+}
+
 # Defines default antigen bundles
-function x-default-antigen-bundles
+x-default-antigen-bundles()
 {
   # these should be always available
   antigen bundle colored-man-pages
@@ -83,7 +96,6 @@ function x-default-antigen-bundles
   antigen bundle zsh-users/zsh-syntax-highlighting
 
   # these should be available if there's need
-  have git && antigen bundle git
   have brew && antigen bundle brew
   have docker && antigen bundle docker
   have docker-compose && antigen bundle sroze/docker-compose-zsh-plugin
