@@ -49,4 +49,14 @@ if [ "$SHELL" = "$(which zsh)" ]; then
   export HISTFILE="$XDG_STATE_HOME/zsh/history"
   zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
   zstyle ':completion:*' list-colors "$LS_COLORS"
+
+  # fzf
+  [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
+    && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+fi
+
+# If we are using bash
+if [ "$SHELL" = "$(which bash)" ]; then
+  [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] \
+    && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash
 fi

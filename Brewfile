@@ -73,6 +73,8 @@ brew "fd"
 brew "freetds"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
+# Command-line fuzzy finder written in Go
+brew "fzf"
 # Disk usage analyzer with console interface written in Go
 brew "gdu", link: false
 # GitHub command-line tool
