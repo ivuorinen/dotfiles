@@ -32,6 +32,8 @@ have composer && {
 have docker && {
   export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
   x-dc "$DOCKER_CONFIG"
+  # Docker: Disable snyk ad
+  export DOCKER_SCAN_SUGGEST=false
 }
 
 # ffmpeg
