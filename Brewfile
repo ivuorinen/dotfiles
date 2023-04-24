@@ -107,8 +107,6 @@ brew "netpbm"
 brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
-# Framework for layout and rendering of i18n text
-brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -145,8 +143,6 @@ brew "mas"
 brew "midnight-commander"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# No Nonsense Neovim Client in Rust
-brew "neovide"
 # Port scanning utility for large networks
 brew "nmap"
 # Manage multiple Node.js versions
@@ -283,10 +279,14 @@ cask "insomnia"
 cask "jetbrains-toolbox"
 # Kubernetes IDE
 cask "lens"
+# Keep all tasks from your todo apps on your menu bar
+cask "monofocus"
 # Neovim Client
 cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Scheduling application focusing on organization
+cask "omnifocus"
 # Collaboration platform for API development
 cask "postman"
 # Display image info and preview unsupported formats in QuickLook
@@ -325,9 +325,10 @@ cask "vlc"
 cask "voikkospellservice"
 # Rust-based terminal
 cask "warp"
+# Mastodon, Pleroma, and Misskey client
+cask "whalebird"
 # View output from scripts in the menu bar
 cask "xbar"
 mas "1Password for Safari", id: 1569813296
 mas "Flow", id: 1423210932
-mas "pullBar", id: 1601913905
 mas "Tailscale", id: 1475387142
