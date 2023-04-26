@@ -2,8 +2,9 @@ blade-formatter
 corepack
 editorconfig-checker
 github-release-notes
-js-debug
 neovim
 prettier
 standardjs
 stylelint-lsp
+tldr
+
