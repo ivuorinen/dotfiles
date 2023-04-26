@@ -17,7 +17,6 @@ git submodule update --init --recursive
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
   --plugin-dir=dotbot-brew \
-  --plugin-dir=dotbot-gh-extension \
   --plugin-dir=dotbot-include \
   -c "${CONFIG}" \
   "${@}"
@@ -30,8 +29,8 @@ if [ "${DOTBOT_HOST}" != "" ]; then
     && "$DOTBOT_BIN_PATH" \
       -d "$BASEDIR" \
       --plugin-dir=dotbot-brew \
-      --plugin-dir=dotbot-gh-extension \
       --plugin-dir=dotbot-include \
       -c "$DOTBOT_HOST_CONFIG" \
       "${@}"
 fi
+
