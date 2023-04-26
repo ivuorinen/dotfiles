@@ -21,13 +21,6 @@
 	branch = main
 	update = checkout
 
-[submodule "config/astronvim/lua/user"]
-	path = config/astronvim/lua/user
-	url = https://github.com/ivuorinen/astronvim_config.git
-	update = rebase
-	branch = main
-	ignore = dirty
-
 [submodule "cheat-community"]
 	path = config/cheat/cheatsheets/community
 	url = https://github.com/cheat/cheatsheets.git
