@@ -19,3 +19,5 @@ x-load-configs
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
+
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash

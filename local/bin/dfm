@@ -50,6 +50,7 @@ function section_install
       $0 brew install
       $0 install composer
       $0 install dotenv
+      $0 install fzf
       $0 install gh
       $0 install go
       $0 install imagick
@@ -72,6 +73,10 @@ function section_install
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
         && msg_yay "dotenv-linter installed!"
+      ;;
+    fzf)
+      bash "$DOTFILES/scripts/install-fzf.sh" \
+        && msg_yay "fzf installed!"
       ;;
     gh)
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \

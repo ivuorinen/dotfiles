@@ -4,3 +4,4 @@ Brewfile.lock.json
 *cache
 .idea
 .vscode
+config/fzf
