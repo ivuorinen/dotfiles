@@ -5,7 +5,13 @@ return {                      -- Add the community repository of plugin specific
   {
     import = "astrocommunity.colorscheme.catppuccin",
     opts = {
-      flavour = "mocha"
+      flavour = "mocha",
+      transparent_background = false,
+      dim_inactive = {
+        enabled = true,
+        shade = "dark",
+        percentage = 0.15,
+      },
     }
   },
   -- { import = "astrocommunity.completion.copilot-lua-cmp" },
