@@ -25,10 +25,14 @@ brew "ansible-lint"
 brew "zstd"
 # Open Source Kubernetes Marketplace
 brew "arkade"
-# Spell checker with better logic than ispell
-brew "aspell"
 # Automatic configure script builder
 brew "autoconf"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Extendable version manager with support for Ruby, Node.js, Erlang & more
+brew "asdf"
+# Spell checker with better logic than ispell
+brew "aspell"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Terminal bandwidth utilization tool
@@ -43,10 +47,10 @@ brew "brew-php-switcher"
 brew "glib"
 # Manage compile and link flags for libraries
 brew "pkg-config"
+# Human-friendly and fast alternative to cut and (sometimes) awk
+brew "choose-rust"
 # Cross-platform make
 brew "cmake"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
 # Get, unpack, build, and install modules from CPAN
 brew "cpanminus"
 # Open source suite of directory software
@@ -91,6 +95,8 @@ brew "git-flow-avh"
 brew "git-recent"
 # Open-source GitLab command-line tool
 brew "glab"
+# Render markdown on the CLI
+brew "glow"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
 # Validating, recursive, caching DNS resolver
@@ -249,6 +255,8 @@ brew "teamookla/speedtest/speedtest"
 cask "1password-cli"
 # Text editor
 cask "coda"
+# Universal database tool and SQL client
+cask "dbeaver-community"
 # App to build and share containerized applications and microservices
 cask "docker"
 # Reimagine your terminal

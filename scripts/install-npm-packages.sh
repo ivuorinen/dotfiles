@@ -13,11 +13,6 @@ have npm && {
     "github-release-notes"
     "neovim"
     "prettier"
-    "@bchatard/alfred-jetbrains"
-    "@johnnymorganz/stylua-bin"
-    "stylelint-lsp"
-    "blade-formatter"
-    "@loopback/cli"
     "corepack"
     "standardjs"
   )
