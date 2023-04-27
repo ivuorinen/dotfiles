@@ -36,6 +36,27 @@ return {
       luasnip.filetype_extend("javascript", { "javascriptreact" })
     end,
   },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = function(_, opts)
+      require "plugins.neo-tree"
+      opts.filesystem.filtered_items = {
+        visible = false,
+        show_hidden_count = true,
+        hide_dotfiles = false,
+        hide_gitignored = true,
+        hide_by_name = {
+        },
+        never_show = {
+          '.git',
+          '.DS_Store',
+          'thumbs.db'
+        },
+      }
+
+      return opts
+    end,
+  },
   -- {
   --   "windwp/nvim-autopairs",
   --   config = function(plugin, opts)
