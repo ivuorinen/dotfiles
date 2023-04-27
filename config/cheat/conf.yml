@@ -63,14 +63,13 @@ cheatpaths:
   #   'readonly': shall user-created ('cheat -e') cheatsheets be saved here?
   - name: community
     path: ~/.config/cheat/cheatsheets/community
-    tags: [ community ]
+    tags: [community]
     readonly: true
-
   # If you have personalized cheatsheets, list them last. They will take
   # precedence over the more global cheatsheets.
   - name: personal
     path: ~/.config/cheat/cheatsheets/personal
-    tags: [ personal ]
+    tags: [personal]
     readonly: false
 
 # While it requires no configuration here, it's also worth noting that

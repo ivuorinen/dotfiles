@@ -83,6 +83,7 @@ function section_install
       ;;
     imagick)
       curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
+        && chmod +x "$XDG_BIN_HOME/magick" \
         && msg_yay "imagick installed!"
       ;;
     starship)
