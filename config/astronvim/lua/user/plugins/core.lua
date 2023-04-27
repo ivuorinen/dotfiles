@@ -23,12 +23,15 @@ return {
   -- You can disable default plugins as follows:
   -- { "max397574/better-escape.nvim", enabled = false },
   --
-  -- You can also easily customize additional setup of plugins that is outside of the plugin's setup call
+  -- You can also easily customize additional setup of plugins
+  -- that is outside of the plugin's setup call
   {
     "L3MON4D3/LuaSnip",
     config = function(plugin, opts)
-      require "plugins.configs.luasnip"(plugin, opts) -- include the default astronvim config that calls the setup call
-      -- add more custom luasnip configuration such as filetype extend or custom snippets
+      -- include the default astronvim config that calls the setup call
+      require "plugins.configs.luasnip" (plugin, opts)
+      -- add more custom luasnip configuration such
+      -- as filetype extend or custom snippets
       local luasnip = require "luasnip"
       luasnip.filetype_extend("javascript", { "javascriptreact" })
     end,
@@ -63,12 +66,13 @@ return {
   --     )
   --   end,
   -- },
-  -- By adding to the which-key config and using our helper function you can add more which-key registered bindings
+  -- By adding to the which-key config and using our helper
+  -- function you can add more which-key registered bindings
   {
     "folke/which-key.nvim",
     config = function(plugin, opts)
       -- include the default astronvim config that calls the setup call
-      require "plugins.configs.which-key"(plugin, opts)
+      require "plugins.configs.which-key" (plugin, opts)
       -- Add bindings which show up as group name
       local wk = require "which-key"
       wk.register({
