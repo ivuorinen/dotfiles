@@ -3,6 +3,7 @@
 
 autoload -U colors zsh/terminfo
 colors
+setopt correct
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"

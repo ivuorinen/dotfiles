@@ -61,7 +61,7 @@ function section_install
       $0 install z
       ;;
     antigen)
-      curl -L git.io/antigen > "$DOTFILES/local/bin/antigen.zsh" \
+      curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
         && msg_yay "New antigen installed!"
       ;;
     composer)
@@ -92,7 +92,9 @@ function section_install
         && msg_yay "imagick installed!"
       ;;
     starship)
-      curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir ~/.local/bin \
+      curl -sS https://starship.rs/install.sh | sh -s -- \
+        --bin-dir ~/.local/bin \
+        --yes \
         && msg_yay "starship installed!"
       ;;
     macos)
