@@ -19,7 +19,7 @@
 	url = https://github.com/AstroNvim/AstroNvim.git
 	ignore = dirty
 	branch = main
-	update = checkout
+	shallow = true
 
 [submodule "cheat-community"]
 	path = config/cheat/cheatsheets/community
@@ -29,3 +29,4 @@
 [submodule "tmux/tpm"]
 	path = config/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm.git
+	ignore = dirty
