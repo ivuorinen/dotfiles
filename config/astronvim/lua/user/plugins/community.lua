@@ -6,7 +6,7 @@ return {                      -- Add the community repository of plugin specific
     import = "astrocommunity.colorscheme.catppuccin",
     opts = {
       flavour = "mocha",
-      transparent_background = false,
+      transparent_background = true,
       dim_inactive = {
         enabled = true,
         shade = "dark",
@@ -23,8 +23,7 @@ return {                      -- Add the community repository of plugin specific
       disabled_filetypes = { "help", "text", "markdown" },
     },
   },
-  { import = "astrocommunity.code-runner.overseer-nvim" },
-  --- { import = "astrocommunity.diagnostics.lsp_lines-nvim" },
+  { import = "astrocommunity.diagnostics.lsp_lines-nvim" },
   { import = "astrocommunity.diagnostics.trouble-nvim" },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
   { import = "astrocommunity.editing-support.neogen" },
