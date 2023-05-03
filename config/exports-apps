@@ -109,3 +109,5 @@ export _Z_DATA="$XDG_STATE_HOME/z"
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
+export TMUX_CONF="$DOTFILES/config/tmux/tmux.conf"
+
