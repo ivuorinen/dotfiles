@@ -36,4 +36,6 @@ have npm && {
   msg_run "Upgrading all global packages"
   npm -g --no-progress --no-timing --no-fund outdated
   npm -g --no-timing --no-fund upgrade
-} || msg_err "npm could not be found."
+}
+
+! have npm && msg_err "npm could not be found."

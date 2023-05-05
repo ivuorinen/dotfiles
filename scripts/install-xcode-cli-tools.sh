@@ -4,6 +4,12 @@
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 
+[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
+
+! have xcode-select \
+  && msg_err "xcode-select could not be found, skipping" \
+  && exit 0
+
 # Ask for the administrator password upfront
 sudo -v
 

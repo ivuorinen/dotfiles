@@ -39,4 +39,7 @@ have gh && {
   done
 
   msg_ok "Done"
-} || msg_err "gh (GitHub Client) could not be found, please install it first"
+}
+
+! have gh \
+  && msg_err "gh (GitHub Client) could not be found, please install it first"

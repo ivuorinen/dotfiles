@@ -6,9 +6,9 @@
 source "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
-have ntfy && {
-  msg "ntfy already installed"
-} || {
+have ntfy && msg "ntfy already installed"
+
+! have ntfy && {
   case $(dfm check arch) in
     Linux)
       NTFY_ARCH="linux_$(arch)"

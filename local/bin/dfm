@@ -164,7 +164,9 @@ function section_brew
         menu_usage "$USAGE_PREFIX" "${MENU[@]}"
         ;;
     esac
-  } || menu_section "$USAGE_PREFIX" "brew not available on this system"
+  }
+
+  ! have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
 function section_dotfiles
@@ -207,7 +209,8 @@ function section_dotfiles
       ;;
     yamlfmt)
       # format yaml files
-      have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt" || msg_err "yamlfmt not found"
+      have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt"
+      ! have yamlfmt && msg_err "yamlfmt not found"
       ;;
     shfmt)
       # Format shell scripts according to following rules.

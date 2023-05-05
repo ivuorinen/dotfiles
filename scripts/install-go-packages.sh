@@ -34,4 +34,6 @@ have go && {
   done
 
   msg_ok "Done"
-} || msg "go hasn't been installed yet."
+}
+
+! have go && msg "go hasn't been installed yet."
