@@ -5,3 +5,5 @@ Brewfile.lock.json
 .idea
 .vscode
 config/fzf
+config/cheat/cheatsheets/pure-bash-bible/*
+config/cheat/cheatsheets/tldr/*

@@ -224,3 +224,9 @@ function path_prepend
   path_remove "$1"
   PATH="$1${PATH:+":$PATH"}"
 }
+
+# Creates a random string
+rnd()
+{
+  echo $RANDOM | md5sum | head -c 20
+}

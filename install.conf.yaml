@@ -10,6 +10,8 @@
     ~/.cache/git:
     ~/.config:
     ~/.config/cheat/cheatsheets/personal:
+    ~/.config/cheat/cheatsheets/pure-bash-bible:
+    ~/.config/cheat/cheatsheets/tldr:
     ~/.local:
     ~/.local/run:
     ~/.local/share:
