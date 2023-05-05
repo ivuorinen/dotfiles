@@ -191,7 +191,8 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 ###############################################################################
 
 # Set default screenshot location
-#defaults write com.apple.screencapture "location" -string "~/Documents/Screenshots"
+mkdir -p "$HOME/Documents/Screenshots"
+defaults write com.apple.screencapture "location" -string "$HOME/Documents/Screenshots"
 
 # Exclude date and time in screenshot filenames
 defaults write com.apple.screencapture "include-date" -bool true
@@ -245,7 +246,10 @@ defaults write com.apple.Safari \
   -bool true
 
 # Don’t display the annoying prompt when quitting iTerm
-#defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+# Use iTerm2 preferences from the .dotfiles folder.
+defaults write com.googlecode.iterm2 PrefsCustomFolder \
+  -string "$HOME/.dotfiles/config/iterm2"
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true

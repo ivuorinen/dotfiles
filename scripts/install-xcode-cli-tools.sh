@@ -20,10 +20,12 @@ while true; do
   kill -0 "$$" || exit
 done 2> /dev/null &
 
-# https://unix.stackexchange.com/a/408305
-# check if user has git installed and propose to install if not installed
-if [ "$(which git)" ]; then
-  echo "You already have git. Continuing..."
+XCODE_TOOLS_PATH=$(xcode-select -p)
+XCODE_SWIFT_PATH="$XCODE_TOOLS_PATH/usr/bin/swift"
+
+# Modified from https://unix.stackexchange.com/a/408305
+if [ -a "$XCODE_SWIFT_PATH" ]; then
+  echo "You have swift from xcode-select. Continuing..."
 else
   XCODE_MESSAGE="$(
     osascript -e \
@@ -38,7 +40,7 @@ else
   fi
 fi
 
-until [ "$(which git)" ]; do
+until [ -f "$XCODE_SWIFT_PATH" ]; do
   echo -n "."
   sleep 1
 done

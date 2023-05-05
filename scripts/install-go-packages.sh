@@ -20,6 +20,8 @@ have go && {
     github.com/cheat/cheat/cmd/cheat@latest
     # Render markdown on the CLI, with pizzazz! 💅
     github.com/charmbracelet/glow@latest
+    # Static checker for GitHub Actions workflow files
+    github.com/rhysd/actionlint/cmd/actionlint@latest
   )
 
   for pkg in "${packages[@]}"; do

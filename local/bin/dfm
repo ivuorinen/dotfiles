@@ -200,8 +200,8 @@ function section_dotfiles
         ~/.config/astronvim \
         ~/.config/nvim
       msg_ok "Deleted old nvim files"
-      ln -s $DOTFILES/config/astronvim ~/.config/astronvim
-      ln -s $DOTFILES/config/nvim ~/.config/nvim
+      ln -s "$DOTFILES/config/astronvim" ~/.config/astronvim
+      ln -s "$DOTFILES/config/nvim" ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
       have npm && $0 install npm
       msg_ok "Installed packages"
@@ -218,6 +218,7 @@ function section_dotfiles
         -type f -perm +111 \
         -not -path '*/.git/*' \
         -not -path '*dotbot*' \
+        -not -path '*tmux*' \
         -not -name '*.pl' \
         -not -name '*.py' \
         -not -name '*.php' \
