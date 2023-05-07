@@ -11,20 +11,21 @@ done
 TLDR_GIT="https://github.com/tldr-pages/tldr.git"
 TLDR_SOURCE="source: $TLDR_GIT"
 TLDR_SYNTAX="syntax: markdown"
-TLDR_TAGS="tags: [bash]"
 
 TLDR_TEMP_PREFIX=$(basename "$0")
 TLDR_TEMP_DIR="/tmp/cheat-tldr-$(rnd)"
 
 # If there's no .git, clone the folder
 if [ ! -d "$TLDR_TEMP_DIR/.git" ]; then
-  git clone "$TLDR_GIT" "$TLDR_TEMP_DIR"
+  git clone --depth 1 "$TLDR_GIT" "$TLDR_TEMP_DIR"
 fi
 
 # Fetch the destination directory from cheat defined directories.
 TLDR_CHEAT_DEST="$(cheat -d | grep tldr | head -1 | awk '{print $2}')"
 
-[ "$TLDR_CHEAT_DEST" = "" ] && msg_err "cheat doesn't know about the destination" && exit 1
+[ "$TLDR_CHEAT_DEST" = "" ] \
+  && msg_err "cheat doesn't know about the destination" \
+  && exit 1
 
 if [ ! -d "$TLDR_CHEAT_DEST" ]; then
   mkdir -p "$TLDR_CHEAT_DEST"
@@ -34,16 +35,8 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
   DIRNAME=$(basename "$d")
   # echo "-> $DIRNAME ($d)"
 
-  case "$DIRNAME" in
-    *common)
-      SECTION_DIR="${TLDR_CHEAT_DEST}"
-      TLDR_TAGS="tags: [common]"
-      ;;
-    *)
-      SECTION_DIR="${TLDR_CHEAT_DEST}/$DIRNAME"
-      TLDR_TAGS="tags: [$DIRNAME]"
-      ;;
-  esac
+  SECTION_DIR="${TLDR_CHEAT_DEST}/$DIRNAME"
+  TLDR_TAGS="tags: [$DIRNAME]"
 
   if [ ! -d "$SECTION_DIR" ]; then
     mkdir -p "$SECTION_DIR"
