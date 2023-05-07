@@ -31,9 +31,14 @@ return {                      -- Add the community repository of plugin specific
   { import = "astrocommunity.editing-support.todo-comments-nvim" },
   { import = "astrocommunity.indent.mini-indentscope" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
+  { import = "astrocommunity.motion.harpoon" },
   { import = "astrocommunity.pack.php" },
   { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.project.neoconf-nvim" },
+  { import = "astrocommunity.project.nvim-spectre" },
+  { import = "astrocommunity.project.project-nvim" },
   { import = "astrocommunity.test.neotest" },
   { import = "astrocommunity.utility.neodim" },
+  { import = "astrocommunity.utility.transparent-nvim" },
 }
+
