@@ -18,7 +18,9 @@ PBB_TEMP_DIR="/tmp/pbb-$(rnd)"
 
 # If there's no .git, clone the folder
 if [ ! -d "$PBB_TEMP_DIR/.git" ]; then
-  git clone "$PBB_GIT" "$PBB_TEMP_DIR"
+  msg_run "Starting to clone $PBB_GIT"
+  git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR" \
+    && msg_yay "Cloned $PBB_GIT"
 fi
 
 PBB_CHAPTERS=$(ls -1v "$PBB_TEMP_DIR"/manuscript/chapter*)
@@ -32,10 +34,9 @@ for f in ${PBB_CHAPTERS[@]}; do
   # get all headers, take the first one, strip the # and return the first word in lowercase
   HEADER=$(grep -e '^[#] ' "$f" | head -1 | awk '{print tolower($2)}')
   CHEAT_FILE="$CHEAT_DEST/${HEADER}"
-  echo "(*) $CHEAT_FILE"
 
   if [ ! -f "$CHEAT_FILE" ]; then
-    cp "$f" "$CHEAT_FILE"
+    cp "$f" "$CHEAT_FILE" && msg_run "$CHEAT_FILE"
   fi
 
   LC_ALL=C perl -pi.bak -e 's/\<\!-- CHAPTER END --\>//' "$CHEAT_FILE"

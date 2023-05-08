@@ -17,7 +17,9 @@ TLDR_TEMP_DIR="/tmp/cheat-tldr-$(rnd)"
 
 # If there's no .git, clone the folder
 if [ ! -d "$TLDR_TEMP_DIR/.git" ]; then
-  git clone --depth 1 "$TLDR_GIT" "$TLDR_TEMP_DIR"
+  msg_run "Starting to clone $TLDR_GIT"
+  git clone --depth 1 --single-branch -q "$TLDR_GIT" "$TLDR_TEMP_DIR" \
+    && msg_done "Cloned $TLDR_GIT"
 fi
 
 # Fetch the destination directory from cheat defined directories.
@@ -50,7 +52,7 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
     # echo "-> dest: $TLDR_FILE"
 
     if [ ! -f "$TLDR_FILE" ]; then
-      cp "$FILE" "$TLDR_FILE"
+      cp "$FILE" "$TLDR_FILE" && msg_run "$TLDR_FILE"
     fi
 
     if [ -f "$TLDR_FILE" ] && [ '---' != "$(head -1 < "$TLDR_FILE")" ]; then
