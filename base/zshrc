@@ -5,6 +5,10 @@ autoload -U colors zsh/terminfo
 colors
 setopt correct
 
+# Add completion scripts to zsh path
+fpath=(~/.config/zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
+
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=shared.sh

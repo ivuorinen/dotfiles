@@ -72,6 +72,12 @@ have irssi && {
   x-dc "$IRSSI_CONFIG_HOME"
 }
 
+# nb, https://xwmx.github.io/nb/
+have nb && {
+  export NB_DIR="$XDG_STATE_HOME/nb"
+  x-dc "$NB_DIR"
+}
+
 # nvm, the node version manager
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
@@ -79,6 +85,12 @@ export NVM_AUTO_USE=true
 export NVM_DIR="$XDG_CONFIG_HOME/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# Add npm packages to path
+have node && {
+  NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
+  path_append "$NVM_NODE_BIN_DIR"
+}
 
 # op (1Password cli) is present
 have op && {
