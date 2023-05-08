@@ -12,21 +12,7 @@
   "no-duplicate-heading": {
     "siblings_only": true
   },
-  "ol-prefix": {
-    "style": "ordered"
-  },
-  "proper-names": {
-    "code_blocks": false,
-    "names": [
-      "Cake.Markdownlint",
-      "CommonMark",
-      "JavaScript",
-      "Markdown",
-      "markdown-it",
-      "markdownlint",
-      "Node.js"
-    ]
-  },
+  "required-headings": false,
   "ul-style": {
     "style": "dash"
   }
