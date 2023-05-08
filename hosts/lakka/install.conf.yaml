@@ -1,4 +1,4 @@
-- include: 'hosts/defaults.yaml'
+- include: "tools/dotbot-defaults.yaml"
 - shell:
     - echo "Configuring lakka"
 - link:

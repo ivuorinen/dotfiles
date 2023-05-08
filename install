@@ -3,12 +3,12 @@
 set -e
 
 CONFIG="install.conf.yaml"
-DOTBOT_DIR="dotbot"
+DOTBOT_DIR="tools/dotbot"
 
 DOTBOT_BIN="bin/dotbot"
 BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTBOT_BIN_PATH="${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}"
-DOTBOT_HOST="$(hostname -s)" || ''
+DOTBOT_HOST="$(hostname -s)"
 
 cd "$BASEDIR"
 git submodule sync --quiet --recursive
@@ -16,8 +16,8 @@ git submodule update --init --recursive
 
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
-  --plugin-dir=dotbot-brew \
-  --plugin-dir=dotbot-include \
+  --plugin-dir=tools/dotbot-brew \
+  --plugin-dir=tools/dotbot-include \
   -c "${CONFIG}" \
   "${@}"
 
@@ -28,8 +28,8 @@ if [ "${DOTBOT_HOST}" != "" ]; then
     && echo "(!) Found $DOTBOT_HOST_CONFIG" \
     && "$DOTBOT_BIN_PATH" \
       -d "$BASEDIR" \
-      --plugin-dir=dotbot-brew \
-      --plugin-dir=dotbot-include \
+      --plugin-dir=tools/dotbot-brew \
+      --plugin-dir=tools/dotbot-include \
       -c "$DOTBOT_HOST_CONFIG" \
       "${@}"
 fi

@@ -1,16 +1,16 @@
 # vim: set expandtab:
 [submodule "dotbot"]
-	path = dotbot
+	path = tools/dotbot
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
 
 [submodule "dotbot-brew"]
-	path = dotbot-brew
+	path = tools/dotbot-brew
 	url = https://github.com/wren/dotbot-brew.git
 	ignore = dirty
 
 [submodule "dotbot-include"]
-	path = dotbot-include
+	path = tools/dotbot-include
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
 	ignore = dirty
 

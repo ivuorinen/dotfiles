@@ -4,6 +4,6 @@
     link:
       create: true
       relink: true
-      exclude: ["*.md", "*renovate*"]
+      exclude: [ "*.md", "*renovate*", "LICENSE" ]
     shell:
       stdout: true
