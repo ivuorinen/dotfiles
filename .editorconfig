@@ -8,6 +8,9 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.php]
+indent_size = 4
+
 [.git{ignore,modules}]
 indent_style = tab
 indent_size = 1
