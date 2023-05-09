@@ -10,6 +10,14 @@ $fsCharLenght = 0;
 
 $quota = shell_exec("quota -w");
 
+/**
+ * Pad string
+ *
+ * @param string $i Input string
+ * @param int    $n Length
+ * @param string $p Padding string
+ * @return string
+ */
 function pad($i, $n = 3, $p = ' ')
 {
     return str_pad($i, $n, $p, STR_PAD_LEFT);

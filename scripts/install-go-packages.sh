@@ -4,38 +4,37 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-have go && {
-  packages=(
-    # sysadmin/scripting utilities, distributed as a single binary
-    github.com/skx/sysbox@latest
-    # Git Profile allows you to switch between user profiles in git repos
-    github.com/dotzero/git-profile@latest
-    # An extensible command line tool or library to format yaml files.
-    github.com/google/yamlfmt/cmd/yamlfmt@latest
-    # Parsing HTML at the command line
-    github.com/ericchiang/pup@latest
-    # HTML to Markdown converter
-    github.com/suntong/html2md@latest
-    # cheat allows you to create and view interactive cheatsheets on the cli.
-    github.com/cheat/cheat/cmd/cheat@latest
-    # Render markdown on the CLI, with pizzazz! 💅
-    github.com/charmbracelet/glow@latest
-    # Static checker for GitHub Actions workflow files
-    github.com/rhysd/actionlint/cmd/actionlint@latest
-  )
+! have go && msg "go hasn't been installed yet." && exit 0;
 
-  for pkg in "${packages[@]}"; do
-    # Trim spaces
-    pkg=${pkg// /}
-    # Skip comments
-    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+packages=(
+  # sysadmin/scripting utilities, distributed as a single binary
+  github.com/skx/sysbox@latest
+  # Git Profile allows you to switch between user profiles in git repos
+  github.com/dotzero/git-profile@latest
+  # An extensible command line tool or library to format yaml files.
+  github.com/google/yamlfmt/cmd/yamlfmt@latest
+  # Parsing HTML at the command line
+  github.com/ericchiang/pup@latest
+  # HTML to Markdown converter
+  github.com/suntong/html2md@latest
+  # cheat allows you to create and view interactive cheatsheets on the cli.
+  github.com/cheat/cheat/cmd/cheat@latest
+  # Render markdown on the CLI, with pizzazz! 💅
+  github.com/charmbracelet/glow@latest
+  # Static checker for GitHub Actions workflow files
+  github.com/rhysd/actionlint/cmd/actionlint@latest
+)
 
-    msg_run "Installing go package:" "$pkg"
-    go install "$pkg"
-    echo ""
-  done
+for pkg in "${packages[@]}"; do
+  # Trim spaces
+  pkg=${pkg// /}
+  # Skip comments
+  if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  msg_ok "Done"
-}
+  msg_run "Installing go package:" "$pkg"
+  go install "$pkg"
+  echo ""
+done
 
-! have go && msg "go hasn't been installed yet."
+msg_ok "Done"
+
