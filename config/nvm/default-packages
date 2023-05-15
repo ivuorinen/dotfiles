@@ -4,7 +4,6 @@ editorconfig-checker
 github-release-notes
 neovim
 prettier
-standardjs
 stylelint-lsp
 tldr
 

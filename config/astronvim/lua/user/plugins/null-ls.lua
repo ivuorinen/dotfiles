@@ -26,7 +26,6 @@ return {
       null_ls.builtins.diagnostics.psalm,
       null_ls.builtins.diagnostics.semgrep,
       null_ls.builtins.diagnostics.shellcheck,
-      null_ls.builtins.diagnostics.standardjs,
       null_ls.builtins.diagnostics.stylelint,
       null_ls.builtins.diagnostics.tfsec,
       null_ls.builtins.diagnostics.trail_space,
