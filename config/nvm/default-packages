@@ -3,7 +3,6 @@ corepack
 editorconfig-checker
 github-release-notes
 neovim
-prettier
 stylelint-lsp
 tldr
 

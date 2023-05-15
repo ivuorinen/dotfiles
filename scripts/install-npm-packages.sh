@@ -4,7 +4,7 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-! have npm && msg_err "npm could not be found." && exit 0;
+! have npm && msg_err "npm could not be found." && exit 0
 
 packages=(
   # This is a tool to check if your files consider your .editorconfig rules.
@@ -13,7 +13,6 @@ packages=(
   # a tag and uses issues or commits to creating the release notes.
   "github-release-notes"
   "neovim"
-  "prettier"
   "corepack"
   # CLI and local web plain text note‑taking, bookmarking, and archiving
   # with linking, tagging, filtering, search, Git versioning & syncing,
@@ -40,4 +39,3 @@ done
 msg_run "Upgrading all global packages"
 npm -g --no-progress --no-timing --no-fund outdated
 npm -g --no-timing --no-fund upgrade
-
