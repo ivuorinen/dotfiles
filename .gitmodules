@@ -3,25 +3,21 @@
 	path = tools/dotbot
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
-	branch = v1.19.1
 
 [submodule "dotbot-brew"]
 	path = tools/dotbot-brew
 	url = https://github.com/wren/dotbot-brew.git
 	ignore = dirty
-	branch = main
 
 [submodule "dotbot-include"]
 	path = tools/dotbot-include
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
 	ignore = dirty
-	branch = main
 
 [submodule "config/nvim"]
 	path = config/nvim
 	url = https://github.com/AstroNvim/AstroNvim.git
 	ignore = dirty
-	branch = v3.15.6
 	shallow = true
 
 [submodule "cheat-community"]
@@ -33,4 +29,3 @@
 	path = config/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm.git
 	ignore = dirty
-	branch = v3.1.0

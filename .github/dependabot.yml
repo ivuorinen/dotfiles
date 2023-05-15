@@ -6,9 +6,3 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-
-  # Update Git Submodules daily
-  - package-ecosystem: gitsubmodule
-    schedule:
-      interval: "daily"
-    directory: /
