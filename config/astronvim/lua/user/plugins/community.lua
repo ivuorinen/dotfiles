@@ -20,11 +20,17 @@ return {                      -- Add the community repository of plugin specific
     "m4xshen/smartcolumn.nvim",
     opts = {
       colorcolumn = { "80", "100", "120" },
-      disabled_filetypes = { "help", "text", "markdown" },
+      disabled_filetypes = { "help", "text", "markdown", "json" },
     },
   },
-  { import = "astrocommunity.diagnostics.lsp_lines-nvim" },
   { import = "astrocommunity.diagnostics.trouble-nvim" },
+  {
+    "folke/trouble.nvim",
+    opts = {
+      auto_open = false,
+      position = "right"
+    }
+  },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
   { import = "astrocommunity.editing-support.neogen" },
   { import = "astrocommunity.editing-support.nvim-regexplainer" },
@@ -33,7 +39,6 @@ return {                      -- Add the community repository of plugin specific
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
   { import = "astrocommunity.motion.harpoon" },
   { import = "astrocommunity.pack.php" },
-  { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.project.neoconf-nvim" },
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.project.project-nvim" },

@@ -11,8 +11,6 @@ return { -- use mason-lspconfig to configure LSP installations
         "codeqlls",
         "cssls",
         "diagnosticls",
-        "docker_compose_language_service",
-        "dockerls",
         "eslint",
         "graphql",
         "html",
