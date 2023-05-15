@@ -26,7 +26,7 @@ jobs:
 
       - name: Update submodules
         run: |
-          if git commit -S -am"Update submodules (automated)
+          if git commit -am"Update submodules (automated)
 
           $(git submodule --quiet foreach \
             'tag="$(git describe --tags --abbrev=0 origin/HEAD)"
