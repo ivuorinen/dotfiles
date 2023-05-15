@@ -1,0 +1,51 @@
+---
+name: Release Daily State # Workflow name displayed on GitHub
+
+on:
+  workflow_dispatch: # Trigger manually
+  schedule:
+    - cron: "59 23 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  new-daily-release:
+    runs-on: ubuntu-latest
+    outputs:
+      created: ${{ steps.daily-version.outputs.created }}
+      version: ${{ steps.daily-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3 # Checkout our working repository
+
+      - uses: fregante/daily-version-action@v2
+        name: Create tag if necessary
+        id: daily-version
+
+      - name: Conventional Changelog Action
+        if: steps.daily-version.outputs.created
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-git-pull: "true"
+          output-file: "false"
+          fallback-version: "${{ steps.daily-version.outputs.version }}"
+          skip-version-file: "true"
+          git-message: "chore(release): {version}"
+          git-user-name: "${{ github.actor }}"
+          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Create release
+        if: env.DAILY_VERSION_CREATED
+        uses: actions/github-script@v5.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.request(
+              `POST /repos/${{ github.repository }}/releases`,
+              {
+                tag_name: "${{ steps.daily-version.outputs.version }}",
+                body: "${{ steps.daily-version.outputs.clean_changelog }}"
+              }
+            );
