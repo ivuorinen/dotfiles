@@ -1,59 +1,7 @@
+[include]
+  path = ~/.dotfiles/config/git/shared
+
 [user]
   name = Ismo Vuorinen
   email = ismo@ivuorinen.net
 
-[credential]
-  helper = store --file ~/.cache/git/git-credentials
-  helper = cache --timeout 30000
-
-[core]
-  excludesfile = ~/.config/git/gitignore
-
-[alias]
-  reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
-  reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
-  nah = !git reset --hard && git clean -df
-  undo-commit = reset HEAD~ --soft
-  llog = log --pretty=fuller
-  logs = log --graph --pretty=format:'%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
-  rl = reflog --format='%C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)'
-  tagdate = log --date-order --graph --tags --simplify-by-decoration --pretty=format:\"%ai %h %d\"
-  branchbydate = for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)'
-  branchcolor = "!for ref in $(git for-each-ref --sort=-committerdate --format=\"%(refname)\" refs/heads/ refs/remotes ); do git log -n1 $ref --pretty=format:\"%Cgreen%cr%Creset %C(yellow)%d%Creset %C(bold blue)<%an>%Creset%n\" | cat ; done | awk '! a[$0]++'"
-
-[diff]
-  tool = difftastic
-
-[difftool]
-  prompt = false
-
-[difftool "difftastic"]
-  cmd = difft "$LOCAL" "$REMOTE"
-
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
-
-[init]
-  defaultBranch = main
-
-[pull]
-  rebase = true
-
-[color]
-  ui = true
-  diff = auto
-  branch = auto
-  status = auto
-
-[color "status"]
-  added = green bold
-  changed = yellow
-  deleted = red bold strike
-  untracked = cyan
-  branch = yellow black bold ul
-
-[submodule]
-  recurse = true
