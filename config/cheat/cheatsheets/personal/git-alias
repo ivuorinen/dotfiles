@@ -1,0 +1,43 @@
+---
+tags: [ vcs, alias ]
+---
+
+# git branchbydate
+
+List repository branches by date when last updated and extra information.
+
+# git branchcolor
+
+List repository branches sorted by when they were last updated.
+
+# git llog
+
+Show log with fuller information.
+
+# git logs
+
+Git logs with detailed information and git tree.
+
+# git nah
+
+Reset all changes.
+
+# git reset-origin
+
+Reset to origin.
+
+# git reset-upstream
+
+Hard reset to upstream master.
+
+# git rl
+
+Colored reflog.
+
+# git tagdate
+
+List tags in date order and with graph.
+
+# git undo-commit
+
+Undoes last commit.
