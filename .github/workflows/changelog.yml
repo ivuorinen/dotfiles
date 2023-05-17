@@ -5,27 +5,19 @@ on:
   workflow_dispatch: # Trigger manually
 
 jobs:
-  changelog:
+  debug-changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Conventional Changelog Action
-        id: generate-changelog
-        uses: TriPSs/conventional-changelog-action@v3
+      - name: Create changelog text
+        id: changelog
+        uses: loopwerk/tag-changelog@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          skip-git-pull: "true"
-          skip-on-empty: "false"
-          skip-commit: "true"
-          skip-tag: "true"
-          skip-version-file: "true"
-          create-summary: "true"
-          output-file: "false"
-          tag-prefix: ""
-          git-push: "false"
-          release-count: "0"
-          fallback-version: "22.11.14" # The oldest tag
-          git-message: "chore(release): {version}"
-          git-user-name: "${{ github.actor }}"
-          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Echo results"
+        id: output-changelog
+        run: |
+          echo "${{ steps.changelog.outputs.changes }}"
+
