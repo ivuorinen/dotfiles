@@ -5,18 +5,13 @@ on:
   workflow_dispatch: # Trigger manually
 
 jobs:
-  create-debug-changelog:
+  changelog:
     runs-on: ubuntu-latest
-    outputs:
-      date: ${{ steps.day.outputs.now }}
     steps:
       - uses: actions/checkout@v3
 
-      - id: day
-        run: echo "now=$(date +'%Y.%-m.%-d')" >> "$GITHUB_OUTPUT"
-
       - name: Conventional Changelog Action
-        id: changelog
+        id: generate-changelog
         uses: TriPSs/conventional-changelog-action@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -30,7 +25,7 @@ jobs:
           tag-prefix: ""
           git-push: "false"
           release-count: "0"
-          fallback-version: "${{ steps.day.outputs.date }}"
+          fallback-version: "22.11.14" # The oldest tag
           git-message: "chore(release): {version}"
           git-user-name: "${{ github.actor }}"
           git-user-email: "${{ github.actor }}@users.noreply.github.com"
