@@ -42,7 +42,6 @@ return {
       null_ls.builtins.formatting.isort,
       null_ls.builtins.formatting.jq,
       null_ls.builtins.formatting.phpcsfixer,
-      null_ls.builtins.formatting.prettierd,
       null_ls.builtins.formatting.shfmt.with {
         args = { "-i", "1", "-bn", "-ci", "-sr", "-kb", "-fn" },
       },

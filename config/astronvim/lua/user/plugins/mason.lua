@@ -5,23 +5,7 @@ return { -- use mason-lspconfig to configure LSP installations
     -- overrides `require("mason-lspconfig").setup(...)`
     opts = {
       ensure_installed = {
-        "ansiblels",
-        "bashls",
-        "clangd",
-        "codeqlls",
-        "cssls",
         "diagnosticls",
-        "eslint",
-        "graphql",
-        "html",
-        "intelephense",
-        "jsonls",
-        "psalm",
-        "stylelint_lsp",
-        "tailwindcss",
-        "tsserver",
-        "vuels",
-        "yamlls",
       },
     },
   }, -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
