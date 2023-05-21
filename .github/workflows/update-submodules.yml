@@ -1,6 +1,6 @@
 name: Update submodules
 on:
-  schedule: [cron: 0 6 * * 0]
+  schedule: [cron: 0 3 * * *]
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Update submodules
         run: |
-          if git commit -am"Update submodules (automated)
+          if git commit -am"chore(git): Update submodules (automated)
 
           $(git submodule --quiet foreach \
             'tag="$(git describe --tags --abbrev=0 origin/HEAD)"
