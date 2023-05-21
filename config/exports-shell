@@ -4,7 +4,7 @@
 # vim: filetype=zsh
 source "$DOTFILES/scripts/shared.sh"
 
-export LC_ALL=fi_FI.utf8
+export LC_ALL=fi_FI.UTF-8
 
 # Bash completion file location
 export BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME}/bash-completion/bash_completion"
