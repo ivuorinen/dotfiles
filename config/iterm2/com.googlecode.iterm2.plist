@@ -1089,7 +1089,7 @@
 			<key>Send Code When Idle</key>
 			<false/>
 			<key>Set Local Environment Vars</key>
-			<false/>
+			<true/>
 			<key>Shortcut</key>
 			<string>T</string>
 			<key>Show Status Bar</key>
