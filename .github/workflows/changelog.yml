@@ -15,7 +15,7 @@ jobs:
         uses: loopwerk/tag-changelog@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          config_file: .github/tag-changelog-config.js
+          config_file: ./../.github/tag-changelog-config.js
 
       - name: "Echo results"
         id: output-changelog

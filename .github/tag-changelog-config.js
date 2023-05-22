@@ -13,13 +13,14 @@ module.exports = {
     { types: ['other', 'Other'], label: 'Other Changes' },
   ],
 
-  excludeTypes: ['other'],
+  excludeTypes: [],
 
   renderTypeSection: function (label, commits) {
-    let text = `\n## ${ label }\n`
+    let text = `\n## ${ label }\n\n`
 
     commits.forEach((commit) => {
-      text += `- ${ commit.subject }\n`
+      const scope = commit.scope ? `**${ commit.scope }:** ` : ''
+      text += `- ${ scope }${ commit.subject }\n`
     })
 
     return text
@@ -27,6 +28,8 @@ module.exports = {
 
   renderChangelog: function (release, changes) {
     const now = new Date()
-    return `# ${ release } - ${ now.toISOString().substring(0, 10) }\n` + changes + '\n\n'
+    const d = now.toISOString().substring(0, 10);
+    const header = `# ${ release } - ${ d }\n`;
+    return header + changes + '\n\n'
   },
 }
