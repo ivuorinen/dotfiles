@@ -175,6 +175,20 @@ function section_brew
   ! have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
+function section_docs
+{
+  USAGE_PREFIX="$SCRIPT docs <command>"
+
+  MENU=(
+    "tmux:Update tmux keybindings documentation"
+  )
+
+  case "$1" in
+    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
 function section_dotfiles
 {
   USAGE_PREFIX="$SCRIPT dotfiles <command>"
@@ -307,6 +321,8 @@ function usage
   section_check
   echo ""
   section_dotfiles
+  echo ""
+  section_docs
 }
 
 # The main loop. first keyword after $0 triggers section, or help.
@@ -315,6 +331,7 @@ case "$1" in
   brew) section_brew "$2" ;;
   check) section_check "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
+  docs) section_docs "$2" ;;
   tests) section_tests "$2" ;;
   *) usage && exit 0 ;;
 esac

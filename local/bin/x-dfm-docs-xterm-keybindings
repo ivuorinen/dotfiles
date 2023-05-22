@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# x-xterm-update-keybindings
+# Updates $HOME/.dotfiles/docs/tmux.md with my keybindings.
+
+# shellcheck source=./../../scripts/shared.sh
+source "$HOME/.dotfiles/scripts/shared.sh"
+
+have tmux || {
+  msg_err "tmux not found" && exit 0
+}
+
+TMUX_KEYBINDINGS_DOCS="$DOTFILES/docs/tmux-keybindings.md"
+
+CB="\n\`\`\`\n"
+KB=$(tmux list-keys)
+H="# tmux keybindings\n"
+L="\n\nLeader: \`<ctrl><space>\`\n\n"
+
+msg "Outputting tmux keybindings to $TMUX_KEYBINDINGS_DOCS"
+echo -e "${H}${L}${CB}${KB}${CB}" > "$TMUX_KEYBINDINGS_DOCS"
+msg_done "Done!"
