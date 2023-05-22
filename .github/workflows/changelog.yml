@@ -20,4 +20,3 @@ jobs:
         id: output-changelog
         run: |
           echo "${{ steps.changelog.outputs.changes }}"
-

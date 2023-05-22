@@ -124,4 +124,3 @@ export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 export TMUX_CONF="$DOTFILES/config/tmux/tmux.conf"
 export BAT_THEME="ansi"
 export CHEAT_USE_FZF=true
-

@@ -4,7 +4,7 @@
 # shellcheck source="shared.sh"
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-! have php && msg_err "PHP Not Available, cannot install composer" && exit 0;
+! have php && msg_err "PHP Not Available, cannot install composer" && exit 0
 
 EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')"
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -21,4 +21,3 @@ RESULT=$?
 rm composer-setup.php
 mv composer.phar ~/.local/bin/composer
 exit $RESULT
-

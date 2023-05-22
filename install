@@ -33,4 +33,3 @@ if [ "${DOTBOT_HOST}" != "" ]; then
       -c "$DOTBOT_HOST_CONFIG" \
       "${@}"
 fi
-

@@ -4,7 +4,7 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-! have go && msg "go hasn't been installed yet." && exit 0;
+! have go && msg "go hasn't been installed yet." && exit 0
 
 packages=(
   # sysadmin/scripting utilities, distributed as a single binary
@@ -37,4 +37,3 @@ for pkg in "${packages[@]}"; do
 done
 
 msg_ok "Done"
-

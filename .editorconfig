@@ -15,6 +15,10 @@ indent_size = 4
 indent_style = tab
 indent_size = 1
 
+[*.plist]
+indent_size = 1
+indent_style = tab
+
 [local/bin/*]
 shell_variant      = bash # --language-variant
 binary_next_line   = true

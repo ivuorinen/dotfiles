@@ -14,4 +14,3 @@ if [ ! -d "$FZF_PATH" ]; then
 else
   msg_done "fzf ($FZF_PATH/) already installed"
 fi
-

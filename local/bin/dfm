@@ -131,9 +131,7 @@ function section_install
       bash "$DOTFILES/scripts/install-z.sh" \
         && msg_yay "z has been installed!"
       ;;
-    *)
-      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-      ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -238,9 +236,7 @@ function section_dotfiles
         --binary-next-line {} \;
       msg_yay "dotfiles have been shfmt formatted!"
       ;;
-    *)
-      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-      ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -264,9 +260,7 @@ function section_check
       [[ "$2" = "" ]] && echo "$X_HOSTNAME" && exit 0
       [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
       ;;
-    *)
-      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-      ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -296,9 +290,7 @@ function section_tests
       msg_yay "msg_yay"
       msg_yay_done "msg_yay_done"
       ;;
-    *)
-      menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-      ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 

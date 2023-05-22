@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 ! have gh \
   && msg_err "gh (GitHub Client) could not be found, please install it first" \
-  && exit 0;
+  && exit 0
 
 extensions=(
   # GitHub CLI extension for generating a report on repository dependencies.
@@ -42,4 +42,3 @@ for ext in "${extensions[@]}"; do
 done
 
 msg_ok "Done"
-

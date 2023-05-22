@@ -6,7 +6,7 @@
 source "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
-have ntfy && msg "ntfy already installed" && exit 0;
+have ntfy && msg "ntfy already installed" && exit 0
 
 case $(dfm check arch) in
   Linux)
@@ -33,4 +33,3 @@ if [ ! -f "$HOME/.config/ntfy/client.yml" ]; then
 fi
 
 rm -rf "${NTFY_DEST}" "${NTFY_DEST}.tar.gz"
-
