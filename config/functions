@@ -89,7 +89,6 @@ x-default-antigen-bundles()
   antigen bundle command-not-found
   antigen bundle ssh-agent
   antigen bundle MichaelAquilina/zsh-you-should-use
-  antigen bundle Sparragus/zsh-auto-nvm-use
   antigen bundle jreese/zsh-titles
   antigen bundle unixorn/autoupdate-antigen.zshplugin
   antigen bundle zsh-users/zsh-completions
@@ -101,6 +100,7 @@ x-default-antigen-bundles()
   have docker-compose && antigen bundle sroze/docker-compose-zsh-plugin
   have jq && antigen bundle reegnz/jq-zsh-plugin
   have nvm && antigen bundle nvm
+  have nvm && antigen bundle $DOTFILES/config/zsh/plugins/nvm-auto-use
   have php && antigen bundle php
   have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
   have rvm && antigen bundle unixorn/rvm-plugin
