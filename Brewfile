@@ -15,6 +15,9 @@ tap "mongodb/brew"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
+tap "xwmx/taps"
+# Run your GitHub Actions locally 🚀
+brew "act"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
 # Automate deployment, configuration, and upgrading
@@ -153,10 +156,10 @@ brew "neovim"
 brew "nmap"
 # Manage multiple Node.js versions
 brew "nvm"
-# Development kit for the Java programming language
-brew "openjdk"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
+# Development kit for the Java programming language
+brew "openjdk"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Highly capable, feature-rich programming language
@@ -189,6 +192,10 @@ brew "shfmt"
 brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
+# Feature-rich console based todo list manager
+brew "task"
+# Terminal user interface for taskwarrior
+brew "taskwarrior-tui"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier", link: false
 # Tool to build, change, and version infrastructure
@@ -293,6 +300,8 @@ cask "monofocus"
 cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
 # Scheduling application focusing on organization
 cask "omnifocus"
 # Collaboration platform for API development
@@ -313,6 +322,10 @@ cask "quitter"
 cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
+# GUI for rsync
+cask "rsyncosx"
+# GUI for rsync
+cask "rsyncui"
 # MySQL/MariaDB database management
 cask "sequel-ace"
 # Collection of apps available by subscription
