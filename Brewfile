@@ -72,6 +72,8 @@ brew "dotenv-linter"
 brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
+# Run arbitrary commands when files change
+brew "entr"
 # CLI for templating and/or deploying FaaS functions
 brew "faas-cli"
 # Simple, fast and user-friendly alternative to find
