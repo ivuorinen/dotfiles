@@ -64,6 +64,8 @@ brew "curl"
 brew "difftastic"
 # Tool for exploring each layer in a docker image
 brew "dive"
+# Lightweight DNS forwarder and DHCP server
+brew "dnsmasq"
 # Command-line DNS client
 brew "dog"
 # Lightning-fast linter for .env files written in Rust
@@ -86,6 +88,8 @@ brew "freetds"
 brew "fswatch"
 # Command-line fuzzy finder written in Go
 brew "fzf"
+# Graphics library to dynamically manipulate images
+brew "gd"
 # Disk usage analyzer with console interface written in Go
 brew "gdu", link: false
 # GitHub command-line tool
@@ -118,6 +122,8 @@ brew "netpbm"
 brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
+# Framework for layout and rendering of i18n text
+brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -132,6 +138,10 @@ brew "hadolint"
 brew "htop"
 # Website copier/offline browser
 brew "httrack"
+# Configurable static site generator
+brew "hugo"
+# ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
+brew "libheif"
 # Tools and libraries to manipulate images in many formats
 brew "imagemagick"
 # Lightweight and flexible command-line JSON processor
@@ -154,6 +164,10 @@ brew "mas"
 brew "midnight-commander"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# No Nonsense Neovim Client in Rust
+brew "neovide", link: false
+# HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
+brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
 # Manage multiple Node.js versions
@@ -246,6 +260,8 @@ brew "gesquive/tap/git-user"
 brew "jesseduffield/lazygit/lazygit"
 # High-performance, schema-free, document-oriented database
 brew "mongodb/brew/mongodb-community"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.2"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@7.4"
 # Xdebug PHP extension
@@ -262,10 +278,14 @@ brew "shivammathur/php/php@8.0"
 brew "teamookla/speedtest/speedtest"
 # Command-line helper for the 1Password password manager
 cask "1password-cli"
+# Turn audio CDs and files into audiobooks
+cask "audiobook-builder"
 # Text editor
 cask "coda"
 # Universal database tool and SQL client
 cask "dbeaver-community"
+# Database version management tool
+cask "dbngin"
 # App to build and share containerized applications and microservices
 cask "docker"
 # Reimagine your terminal
@@ -353,5 +373,9 @@ cask "whalebird"
 # View output from scripts in the menu bar
 cask "xbar"
 mas "1Password for Safari", id: 1569813296
+mas "Audiobook Builder", id: 1437681957
 mas "Flow", id: 1423210932
+mas "Keynote", id: 409183694
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
 mas "Tailscale", id: 1475387142
