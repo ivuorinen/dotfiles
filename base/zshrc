@@ -6,7 +6,7 @@ colors
 setopt correct
 
 # Add completion scripts to zsh path
-fpath=(~/.config/zsh/completion $fpath)
+FPATH="~/.config/zsh/completion:$FPATH"
 autoload -Uz compinit && compinit -i
 
 # Defaults
@@ -50,3 +50,10 @@ have starship && eval "$(starship init zsh)"
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
   && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
 
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
+  autoload -Uz compinit
+  compinit
+fi
