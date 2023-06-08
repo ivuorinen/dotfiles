@@ -21,6 +21,14 @@ have ansible && {
   x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 }
 
+# brew configuration
+have brew && {
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
+  autoload -Uz compinit
+  compinit
+}
+
 # composer, https://getcomposer.org/
 have composer && {
   export COMPOSER_HOME="$XDG_STATE_HOME/composer"

@@ -49,11 +49,3 @@ have starship && eval "$(starship init zsh)"
 
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
   && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
-
-if type brew &>/dev/null
-then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
-  autoload -Uz compinit
-  compinit
-fi
