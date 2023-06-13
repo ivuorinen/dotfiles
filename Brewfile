@@ -38,8 +38,6 @@ brew "asdf"
 brew "aspell"
 # Official Amazon AWS command-line interface
 brew "awscli"
-# Terminal bandwidth utilization tool
-brew "bandwhich"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Yet another cross-platform graphical process/system monitor
@@ -76,8 +74,6 @@ brew "editorconfig-checker"
 brew "eg-examples"
 # Run arbitrary commands when files change
 brew "entr"
-# CLI for templating and/or deploying FaaS functions
-brew "faas-cli"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Banner-like program prints strings as ASCII art
@@ -98,8 +94,6 @@ brew "gh"
 brew "git"
 # Small git utilities
 brew "git-extras"
-# AVH edition of git-flow
-brew "git-flow-avh"
 # See your latest local git branches, formatted real fancy
 brew "git-recent"
 # Open-source GitLab command-line tool
@@ -160,12 +154,8 @@ brew "luarocks"
 brew "m-cli"
 # Mac App Store command-line interface
 brew "mas"
-# Terminal-based visual file manager
-brew "midnight-commander"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# No Nonsense Neovim Client in Rust
-brew "neovide", link: false
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -208,10 +198,6 @@ brew "shfmt"
 brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
-# Feature-rich console based todo list manager
-brew "task"
-# Terminal user interface for taskwarrior
-brew "taskwarrior-tui"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier", link: false
 # Tool to build, change, and version infrastructure
@@ -318,8 +304,6 @@ cask "jetbrains-toolbox"
 cask "lens"
 # Keep all tasks from your todo apps on your menu bar
 cask "monofocus"
-# Neovim Client
-cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -370,8 +354,6 @@ cask "voikkospellservice"
 cask "warp"
 # Mastodon, Pleroma, and Misskey client
 cask "whalebird"
-# View output from scripts in the menu bar
-cask "xbar"
 mas "1Password for Safari", id: 1569813296
 mas "Audiobook Builder", id: 1437681957
 mas "Flow", id: 1423210932
