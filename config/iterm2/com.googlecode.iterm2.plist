@@ -2,13 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AboutToPasteTabsWithCancel</key>
-	<true/>
-	<key>AboutToPasteTabsWithCancel_selection</key>
-	<integer>0</integer>
 	<key>AllowClipboardAccess</key>
-	<true/>
-	<key>AlternateMouseScroll</key>
 	<true/>
 	<key>AutoHideTmuxClientSession</key>
 	<true/>
@@ -344,7 +338,7 @@
 		</dict>
 	</dict>
 	<key>Default Bookmark Guid</key>
-	<string>82636119-EA17-4A26-9AA7-408172F4A9C8</string>
+	<string>B563F48B-314D-48CC-908E-ACA971D430BE</string>
 	<key>DimBackgroundWindows</key>
 	<false/>
 	<key>DimOnlyText</key>
@@ -353,16 +347,14 @@
 	<true/>
 	<key>HapticFeedbackForEsc</key>
 	<false/>
+	<key>HideScrollbar</key>
+	<true/>
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>IRMemory</key>
 	<integer>4</integer>
 	<key>MaxVertically</key>
 	<true/>
-	<key>NeverWarnAboutShortLivedSessions_82636119-EA17-4A26-9AA7-408172F4A9C8</key>
-	<true/>
-	<key>NeverWarnAboutShortLivedSessions_82636119-EA17-4A26-9AA7-408172F4A9C8_selection</key>
-	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -370,6 +362,8 @@
 			<true/>
 			<key>ASCII Ligatures</key>
 			<false/>
+			<key>Allow Title Reporting</key>
+			<true/>
 			<key>Ambiguous Double Width</key>
 			<false/>
 			<key>Ansi 0 Color</key>
@@ -610,26 +604,12 @@
 				<key>Red Component</key>
 				<real>1</real>
 			</dict>
-			<key>Badge Font</key>
-			<string>JetBrainsMonoNerdFontCompleteM-Bold</string>
-			<key>Badge Max Height</key>
-			<real>0.10000000000000001</real>
-			<key>Badge Max Width</key>
-			<real>0.45000000000000001</real>
-			<key>Badge Right Margin</key>
-			<real>10</real>
-			<key>Badge Text</key>
-			<string></string>
-			<key>Badge Top Margin</key>
-			<real>10</real>
-			<key>Blend</key>
-			<real>0.24709154211956524</real>
 			<key>Blinking Cursor</key>
 			<false/>
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>9.5927277260638313</real>
+			<real>10</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -648,11 +628,9 @@
 			<key>Close Sessions On End</key>
 			<true/>
 			<key>Columns</key>
-			<integer>120</integer>
+			<integer>130</integer>
 			<key>Command</key>
 			<string></string>
-			<key>Cursor Boost</key>
-			<real>0.0</real>
 			<key>Cursor Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -720,11 +698,9 @@
 				<real>0.80392156862745101</real>
 			</dict>
 			<key>Guid</key>
-			<string>82636119-EA17-4A26-9AA7-408172F4A9C8</string>
+			<string>B563F48B-314D-48CC-908E-ACA971D430BE</string>
 			<key>Horizontal Spacing</key>
 			<real>1</real>
-			<key>Icon</key>
-			<integer>1</integer>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Jobs to Ignore</key>
@@ -1030,8 +1006,6 @@
 				<key>Red Component</key>
 				<real>0.53725490196078429</real>
 			</dict>
-			<key>Minimum Contrast</key>
-			<real>0.14973958333333334</real>
 			<key>Mouse Reporting</key>
 			<true/>
 			<key>Name</key>
@@ -1057,7 +1031,7 @@
 			<key>Rows</key>
 			<integer>25</integer>
 			<key>Screen</key>
-			<integer>-2</integer>
+			<integer>-1</integer>
 			<key>Scrollback Lines</key>
 			<integer>0</integer>
 			<key>Selected Text Color</key>
@@ -1088,17 +1062,13 @@
 			</dict>
 			<key>Send Code When Idle</key>
 			<false/>
-			<key>Set Local Environment Vars</key>
-			<true/>
 			<key>Shortcut</key>
-			<string>T</string>
+			<string></string>
 			<key>Show Status Bar</key>
 			<true/>
 			<key>Show Timestamps</key>
 			<integer>2</integer>
 			<key>Silence Bell</key>
-			<false/>
-			<key>Smart Cursor Color</key>
 			<true/>
 			<key>Status Bar Layout</key>
 			<dict>
@@ -1107,17 +1077,17 @@
 					<key>algorithm</key>
 					<integer>0</integer>
 					<key>auto-rainbow style</key>
-					<integer>3</integer>
+					<integer>0</integer>
 					<key>font</key>
 					<string>.AppleSystemUIFont 12</string>
 					<key>remove empty components</key>
-					<false/>
+					<true/>
 				</dict>
 				<key>components</key>
 				<array>
 					<dict>
 						<key>class</key>
-						<string>iTermStatusBarJobComponent</string>
+						<string>iTermStatusBarClockComponent</string>
 						<key>configuration</key>
 						<dict>
 							<key>knobs</key>
@@ -1126,22 +1096,55 @@
 								<integer>1</integer>
 								<key>base: priority</key>
 								<real>5</real>
+								<key>format</key>
+								<string>YYYY-MM-dd HH:mm</string>
+								<key>localize</key>
+								<integer>0</integer>
+								<key>maxwidth</key>
+								<real>150</real>
+								<key>minwidth</key>
+								<real>150</real>
+							</dict>
+							<key>layout advanced configuration dictionary value</key>
+							<dict>
+								<key>algorithm</key>
+								<integer>0</integer>
+								<key>auto-rainbow style</key>
+								<integer>0</integer>
+								<key>remove empty components</key>
+								<false/>
+							</dict>
+						</dict>
+					</dict>
+					<dict>
+						<key>class</key>
+						<string>iTermStatusBarHostnameComponent</string>
+						<key>configuration</key>
+						<dict>
+							<key>knobs</key>
+							<dict>
+								<key>abbreviate-localhost</key>
+								<string></string>
+								<key>base: compression resistance</key>
+								<real>1</real>
+								<key>base: priority</key>
+								<real>5</real>
 								<key>maxwidth</key>
 								<real>+infinity</real>
 								<key>minwidth</key>
-								<integer>0</integer>
+								<string>0</string>
 								<key>shared text color</key>
 								<dict>
 									<key>Alpha Component</key>
 									<real>1</real>
 									<key>Blue Component</key>
-									<real>0.63</real>
+									<real>0.43218994140625</real>
 									<key>Color Space</key>
 									<string>sRGB</string>
 									<key>Green Component</key>
-									<real>0.63</real>
+									<real>0.34513998031616211</real>
 									<key>Red Component</key>
-									<real>0.90000000000000002</real>
+									<real>0.0</real>
 								</dict>
 							</dict>
 							<key>layout advanced configuration dictionary value</key>
@@ -1149,9 +1152,65 @@
 								<key>algorithm</key>
 								<integer>0</integer>
 								<key>auto-rainbow style</key>
-								<integer>3</integer>
+								<integer>0</integer>
 								<key>font</key>
 								<string>.AppleSystemUIFont 12</string>
+								<key>remove empty components</key>
+								<true/>
+							</dict>
+						</dict>
+					</dict>
+					<dict>
+						<key>class</key>
+						<string>iTermStatusBarSpringComponent</string>
+						<key>configuration</key>
+						<dict>
+							<key>knobs</key>
+							<dict>
+								<key>base: compression resistance</key>
+								<integer>1</integer>
+								<key>base: priority</key>
+								<real>5</real>
+								<key>iTermStatusBarSpringComponentSizeMultipleKey</key>
+								<integer>1</integer>
+								<key>iTermStatusBarSpringComponentSpringConstantKey</key>
+								<real>0.01</real>
+							</dict>
+							<key>layout advanced configuration dictionary value</key>
+							<dict>
+								<key>algorithm</key>
+								<integer>0</integer>
+								<key>auto-rainbow style</key>
+								<integer>0</integer>
+								<key>font</key>
+								<string>.AppleSystemUIFont 12</string>
+								<key>remove empty components</key>
+								<true/>
+							</dict>
+						</dict>
+					</dict>
+					<dict>
+						<key>class</key>
+						<string>iTermStatusBarSpringComponent</string>
+						<key>configuration</key>
+						<dict>
+							<key>knobs</key>
+							<dict>
+								<key>base: compression resistance</key>
+								<integer>1</integer>
+								<key>base: priority</key>
+								<real>5</real>
+								<key>iTermStatusBarSpringComponentSizeMultipleKey</key>
+								<integer>1</integer>
+								<key>iTermStatusBarSpringComponentSpringConstantKey</key>
+								<real>0.01</real>
+							</dict>
+							<key>layout advanced configuration dictionary value</key>
+							<dict>
+								<key>algorithm</key>
+								<integer>0</integer>
+								<key>auto-rainbow style</key>
+								<integer>0</integer>
 								<key>remove empty components</key>
 								<false/>
 							</dict>
@@ -1165,18 +1224,14 @@
 			<array/>
 			<key>Terminal Type</key>
 			<string>xterm-256color</string>
-			<key>Title Components</key>
-			<integer>512</integer>
 			<key>Transparency</key>
-			<real>0.10293218085106381</real>
+			<real>0.20000000000000004</real>
 			<key>Unlimited Scrollback</key>
 			<true/>
 			<key>Use Bold Font</key>
 			<true/>
 			<key>Use Bright Bold</key>
 			<true/>
-			<key>Use Cursor Guide</key>
-			<false/>
 			<key>Use Italic Font</key>
 			<true/>
 			<key>Use Non-ASCII Font</key>
@@ -1191,12 +1246,6 @@
 			<string>/Users/ivuorinen/Code</string>
 		</dict>
 	</array>
-	<key>OpenArrangementAtStartup</key>
-	<false/>
-	<key>OpenNoWindowsAtStartup</key>
-	<false/>
-	<key>OpenTmuxWindowsIn</key>
-	<integer>1</integer>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -1230,16 +1279,24 @@
 			<string>kNextWindowPointerAction</string>
 		</dict>
 	</dict>
+	<key>PreserveWindowSizeWhenTabBarVisibilityChanges</key>
+	<true/>
+	<key>Print In Black And White</key>
+	<true/>
 	<key>PromptOnQuit</key>
+	<false/>
+	<key>SeparateStatusBarsPerPane</key>
 	<false/>
 	<key>SmartPlacement</key>
 	<true/>
 	<key>SoundForEsc</key>
 	<false/>
-	<key>SplitPaneDimmingAmount</key>
-	<real>0.59999999999999998</real>
+	<key>StatusBarPosition</key>
+	<integer>0</integer>
 	<key>TabStyleWithAutomaticOption</key>
 	<integer>5</integer>
+	<key>ThreeFingerEmulates</key>
+	<true/>
 	<key>TmuxUnpauseAutomatically</key>
 	<true/>
 	<key>VisualIndicatorForEsc</key>
