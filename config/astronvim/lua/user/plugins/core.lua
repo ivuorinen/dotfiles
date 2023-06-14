@@ -47,9 +47,13 @@ return {
         hide_dotfiles = false,
         hide_gitignored = false,
         hide_by_name = {
+          '.idea',
+          '.DS_Store'
         },
         never_show = {
           '.git',
+          '.idea',
+          '.mypy_cache',
           '.DS_Store',
           'thumbs.db'
         },
