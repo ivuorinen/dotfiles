@@ -6,9 +6,7 @@ tap "gesquive/tap"
 tap "github/gh"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-fonts"
-tap "homebrew/core"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "mongodb/brew"
@@ -16,7 +14,7 @@ tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
-# Run your GitHub Actions locally 🚀
+# Run your GitHub Actions locally
 brew "act"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
@@ -86,8 +84,6 @@ brew "fswatch"
 brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
-# Disk usage analyzer with console interface written in Go
-brew "gdu", link: false
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -156,6 +152,8 @@ brew "m-cli"
 brew "mas"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# No Nonsense Neovim Client in Rust
+brew "neovide"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -199,9 +197,7 @@ brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
 # Send macOS User Notifications from the command-line
-brew "terminal-notifier", link: false
-# Tool to build, change, and version infrastructure
-brew "terraform", link: false
+brew "terminal-notifier"
 # Thin wrapper for Terraform e.g. for locking state
 brew "terragrunt"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
@@ -304,6 +300,8 @@ cask "jetbrains-toolbox"
 cask "lens"
 # Keep all tasks from your todo apps on your menu bar
 cask "monofocus"
+# Neovim Client
+cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -352,11 +350,9 @@ cask "vlc"
 cask "voikkospellservice"
 # Rust-based terminal
 cask "warp"
-# Mastodon, Pleroma, and Misskey client
-cask "whalebird"
 mas "1Password for Safari", id: 1569813296
+mas "Actions", id: 1586435171
 mas "Audiobook Builder", id: 1437681957
-mas "Flow", id: 1423210932
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
