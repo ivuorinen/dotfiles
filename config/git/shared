@@ -12,7 +12,7 @@
   rebase = true
 
 [gpg]
-	format = ssh
+  format = ssh
 
 [alias]
   branchbydate = for-each-ref --count=30 --sort=-committerdate refs/heads/ --format='%(refname:short)'
@@ -22,6 +22,7 @@
   nah = !git reset --hard && git clean -df
   reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
   reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
+  recent = "!r() { count=$1; git for-each-ref --sort=-committerdate refs/heads --format='%(HEAD)%(color:yellow)%(refname:short)|%(color:bold green)%(committerdate:relative)|%(color:blue)%(subject)|%(color:magenta)%(authorname)%(color:reset)' --color=always --count=${count:=10} | column -ts'|';}; r"
   rl = reflog --format='%C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)'
   tagdate = log --date-order --graph --tags --simplify-by-decoration --pretty=format:\"%ai %h %d\"
   undo-commit = reset HEAD~ --soft
@@ -59,4 +60,5 @@
 
 # dotfiles special config
 [includeIf "hasconfig:remote.*.url:https://github.com/ivuorinen/dotfiles.git"]
-	path = ~/.dotfiles/config/git/special/dotfiles ;
+  path = ~/.dotfiles/config/git/special/dotfiles ;
+
