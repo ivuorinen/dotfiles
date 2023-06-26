@@ -29,7 +29,7 @@ brew "arkade"
 # Automatic configure script builder
 brew "autoconf"
 # GNU File, Shell, and Text utilities
-brew "coreutils"
+brew "coreutils", link: false
 # Extendable version manager with support for Ruby, Node.js, Erlang & more
 brew "asdf"
 # Spell checker with better logic than ispell
@@ -70,6 +70,12 @@ brew "dotenv-linter"
 brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Development kit for the Java programming language
+brew "openjdk"
 # Run arbitrary commands when files change
 brew "entr"
 # Simple, fast and user-friendly alternative to find
@@ -84,6 +90,8 @@ brew "fswatch"
 brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
+# Disk usage analyzer with console interface written in Go
+brew "gdu"
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -108,10 +116,6 @@ brew "gnupg"
 brew "go"
 # Image manipulation
 brew "netpbm"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -152,8 +156,6 @@ brew "m-cli"
 brew "mas"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# No Nonsense Neovim Client in Rust
-brew "neovide"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -188,6 +190,8 @@ brew "rcm"
 brew "ripgrep"
 # Powerful, clean, object-oriented scripting language
 brew "ruby"
+# Safe, concurrent, practical language
+brew "rust"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Autoformat shell script source code
@@ -353,10 +357,12 @@ cask "warp"
 mas "1Password for Safari", id: 1569813296
 mas "Actions", id: 1586435171
 mas "Audiobook Builder", id: 1437681957
+mas "Ivory", id: 6444602274
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Tailscale", id: 1475387142
+mas "Xcode", id: 497799835
 vscode "akamud.vscode-theme-onelight"
 vscode "amiralizadeh9480.laravel-extra-intellisense"
 vscode "andrewleedham.vscode-css-modules"
