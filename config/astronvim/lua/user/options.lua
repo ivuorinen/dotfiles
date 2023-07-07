@@ -25,6 +25,8 @@ return {
     icons_enabled = true,
     -- disable notifications when toggling UI elements
     ui_notifications_enabled = true,
+    -- enable experimental resession.nvim session management (will be default in AstroNvim v4)
+    resession_enabled = false,
   },
 }
 -- If you need more control, you can use the function()...end notation

@@ -1,7 +1,7 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  opts = {
-    ensure_installed = {
+  opts = function(_, opts)
+    opts.ensure_installed = require("astronvim.utils").list_insert_unique(opts.ensure_installed, {
       "bash",
       "c",
       "cmake",
@@ -28,6 +28,6 @@ return {
       "vim",
       "vue",
       "yaml",
-    },
-  },
+    })
+  end,
 }

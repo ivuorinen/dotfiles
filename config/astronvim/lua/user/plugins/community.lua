@@ -30,7 +30,7 @@ return {
     "folke/trouble.nvim",
     opts = {
       auto_open = true,
-      position = "right"
+      position = "bottom"
     }
   },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
@@ -40,8 +40,15 @@ return {
   { import = "astrocommunity.indent.mini-indentscope" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
   { import = "astrocommunity.motion.harpoon" },
+  { import = "astrocommunity.pack.ansible" },
+  { import = "astrocommunity.pack.bash" },
+  { import = "astrocommunity.pack.docker" },
+  { import = "astrocommunity.pack.go" },
+  { import = "astrocommunity.pack.html-css" },
+  { import = "astrocommunity.pack.markdown" },
   { import = "astrocommunity.pack.php" },
-  { import = "astrocommunity.project.neoconf-nvim" },
+  { import = "astrocommunity.pack.typescript" },
+  { import = "astrocommunity.pack.vue" },
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.project.project-nvim" },
   { import = "astrocommunity.test.neotest" },

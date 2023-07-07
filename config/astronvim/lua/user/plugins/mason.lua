@@ -4,29 +4,41 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     -- overrides `require("mason-lspconfig").setup(...)`
-    opts = {
-      ensure_installed = {
-        "diagnosticls",
-      },
-    },
+    opts = function(_, opts)
+      -- add more things to the ensure_installed table protecting against community packs modifying it
+      opts.ensure_installed = require("astronvim.utils").list_insert_unique(opts.ensure_installed, {
+        -- "lua_ls",
+      })
+    end,
   },
   -- use mason-null-ls to configure Formatters/Linter
   -- installation for null-ls sources
   {
     "jay-babu/mason-null-ls.nvim",
     -- overrides `require("mason-null-ls").setup(...)`
-    opts = {
-      automatic_setup = true,
-      automatic_installation = true,
-    },
+    opts = function(_, opts)
+      -- add more things to the ensure_installed table protecting against community packs modifying it
+      opts.ensure_installed = require("astronvim.utils").list_insert_unique(opts.ensure_installed, {
+        -- "prettier",
+        -- "stylua",
+      })
+      opts.automatic_setup = true
+      opts.automatic_installation = true
+    end,
   },
   {
     "jay-babu/mason-nvim-dap.nvim",
     -- overrides `require("mason-nvim-dap").setup(...)`
-    opts = {
-      automatic_installation = true,
-      automatic_setup = true,
-      ensure_installed = { "python", "php", "js", "bash" },
-    },
+    opts = function(_, opts)
+      -- add more things to the ensure_installed table protecting against community packs modifying it
+      opts.ensure_installed = require("astronvim.utils").list_insert_unique(opts.ensure_installed, {
+        "python",
+        "php",
+        "js",
+        "bash"
+      })
+      opts.automatic_installation = true
+      opts.automatic_setup = true
+    end,
   },
 }

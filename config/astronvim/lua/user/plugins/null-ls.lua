@@ -30,14 +30,8 @@ return {
       null_ls.builtins.diagnostics.tfsec,
       null_ls.builtins.diagnostics.trail_space,
       null_ls.builtins.diagnostics.tsc,
-      null_ls.builtins.diagnostics.vacuum,
-      null_ls.builtins.diagnostics.vint,
-      null_ls.builtins.diagnostics.vulture,
-      null_ls.builtins.diagnostics.yamllint,
       null_ls.builtins.diagnostics.zsh,
-      null_ls.builtins.formatting.blade_formatter,
       null_ls.builtins.formatting.clang_format,
-      null_ls.builtins.formatting.eslint,
       null_ls.builtins.formatting.fixjson,
       null_ls.builtins.formatting.isort,
       null_ls.builtins.formatting.jq,
@@ -45,7 +39,6 @@ return {
       null_ls.builtins.formatting.shfmt.with {
         args = { "-i", "1", "-bn", "-ci", "-sr", "-kb", "-fn" },
       },
-      null_ls.builtins.formatting.stylelint,
     }
     return config -- return final config table
   end,
