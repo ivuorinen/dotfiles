@@ -50,6 +50,8 @@ brew "pkg-config"
 brew "choose-rust"
 # Cross-platform make
 brew "cmake"
+# Dependency manager for Cocoa projects
+brew "cocoapods"
 # Get, unpack, build, and install modules from CPAN
 brew "cpanminus"
 # Open source suite of directory software
@@ -276,6 +278,8 @@ cask "dbngin"
 cask "docker"
 # Reimagine your terminal
 cask "fig"
+# UI toolkit for building applications for mobile, web and desktop
+cask "flutter"
 # Unofficial overcast.fm podcast app
 cask "fog"
 # Typeface made for developers

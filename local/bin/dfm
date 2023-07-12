@@ -149,7 +149,7 @@ function section_brew
   have brew && {
     case "$1" in
       install)
-        brew bundle install --file="$BREWFILE" && msg_yay "Done!"
+        brew bundle install --file="$BREWFILE" --force --quiet && msg_yay "Done!"
         ;;
       update)
         brew update && brew outdated && brew upgrade && brew cleanup
