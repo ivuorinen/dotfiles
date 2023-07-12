@@ -51,8 +51,10 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
     TLDR_FILE="$SECTION_DIR/${FILENAME}"
     # echo "-> dest: $TLDR_FILE"
 
-    if [ ! -f "$TLDR_FILE" ]; then
-      cp "$FILE" "$TLDR_FILE" && msg_run "$TLDR_FILE"
+    replacable "$FILE" "$TLDR_FILE"
+    override=$?
+    if [ "$override" -ne 1 ]; then
+      cp "$FILE" "$TLDR_FILE" && msg_run "Updated: $TLDR_FILE"
     fi
 
     if [ -f "$TLDR_FILE" ] && [ '---' != "$(head -1 < "$TLDR_FILE")" ]; then

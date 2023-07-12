@@ -35,8 +35,10 @@ for f in ${PBB_CHAPTERS[@]}; do
   HEADER=$(grep -e '^[#] ' "$f" | head -1 | awk '{print tolower($2)}')
   CHEAT_FILE="$CHEAT_DEST/${HEADER}"
 
-  if [ ! -f "$CHEAT_FILE" ]; then
-    cp "$f" "$CHEAT_FILE" && msg_run "$CHEAT_FILE"
+  replacable "$f" "$CHEAT_FILE"
+  override=$?
+  if [ "$override" -ne 1 ]; then
+    cp "$f" "$CHEAT_FILE" && msg_run "Updated: $CHEAT_FILE"
   fi
 
   LC_ALL=C perl -pi.bak -e 's/\<\!-- CHAPTER END --\>//' "$CHEAT_FILE"

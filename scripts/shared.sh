@@ -230,3 +230,42 @@ rnd()
 {
   echo $RANDOM | md5sum | head -c 20
 }
+
+# return sha256sum for file
+# $1 - filename (string)
+function get_sha256sum()
+{
+  sha256sum "$1" | head -c 64
+}
+
+# Replacable file
+#
+# $1 - filename (string)
+# $2 - filename (string)
+#
+# Returns 1 when replacable, 0 when not replacable.
+function replacable()
+{
+  FILE1="$1"
+  FILE2="$2"
+
+  [[ ! -r "$FILE1" ]] && { msg_err "File 1 ($FILE1) does not exist" && return 1; }
+  [[ ! -r "$FILE2" ]] && { msg_err "File 2 ($FILE2) does not exist" && return 1; }
+
+  FILE1_HASH=$(get_sha256sum "$FILE1")
+  FILE2_HASH=$(get_sha256sum "$FILE2")
+
+  [[ $FILE1_HASH = "" ]] && {
+    msg_err "Could not get hash for file 1 ($FILE1)" && return 1;
+  }
+  [[ $FILE2_HASH = "" ]] && {
+    msg_err "Could not get hash for file 2 ($FILE2)" && return 1;
+  }
+
+  [[ "$FILE1_HASH" == "$FILE2_HASH" ]] && {
+    msg_ok "Files match, not replacable" && return 0;
+  }
+
+  return 1;
+}
+
