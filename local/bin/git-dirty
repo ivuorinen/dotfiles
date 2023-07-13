@@ -46,7 +46,7 @@ gitdirty()
       if [[ "${d:0:2}" == "--" ]] || [[ "$d" == "vendor" ]] || [[ "$d" == "node_modules" ]]; then
         echo ""
       else
-        cd "$d" > /dev/null
+        cd "$d"
 
         # If we have `.git` folder, check it.
         if [[ -d ".git" ]]; then
@@ -58,7 +58,7 @@ gitdirty()
           printf " %s %s\n" "$ICON" "$(pwd)"
         else
           # If it wasn't git repository, check subdirectories.
-          gitdirtyrepos -- *
+          gitdirtyrepos ./*
         fi
       fi
       cd .. > /dev/null
