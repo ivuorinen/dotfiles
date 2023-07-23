@@ -1,0 +1,5 @@
+Host lakka
+  User viir
+  HostName lakka.kapsi.fi
+  IdentityFile ~/.ssh/id_rsa
+
