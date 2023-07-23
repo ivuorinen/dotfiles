@@ -51,14 +51,15 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
     TLDR_FILE="$SECTION_DIR/${FILENAME}"
     # echo "-> dest: $TLDR_FILE"
 
-    replacable "$FILE" "$TLDR_FILE"
-    override=$?
-    if [ "$override" -ne 1 ]; then
-      cp "$FILE" "$TLDR_FILE" && msg_run "Updated: $TLDR_FILE"
+    # Update the original file for making the replacable value comparable
+    if [ -f "$FILE" ] && [ '---' != "$(head -1 < "$FILE")" ]; then
+      echo -e "---\n$TLDR_SYNTAX\n$TLDR_TAGS\n$TLDR_SOURCE\n---\n$(cat "$FILE")" > "$FILE"
     fi
 
-    if [ -f "$TLDR_FILE" ] && [ '---' != "$(head -1 < "$TLDR_FILE")" ]; then
-      echo -e "---\n$TLDR_SYNTAX\n$TLDR_TAGS\n$TLDR_SOURCE\n---\n$(cat "$TLDR_FILE")" > "$TLDR_FILE"
+    replacable "$FILE" "$TLDR_FILE"
+    override=$?
+    if [ "$override" -ne 0 ]; then
+      cp "$FILE" "$TLDR_FILE" && msg_run "Updated: $TLDR_FILE"
     fi
 
   done

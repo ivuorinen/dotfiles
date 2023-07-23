@@ -2,7 +2,10 @@
 #
 # Shared bash functions and helpers
 # that can be sourced to other scripts.
-#
+
+# Helper env variables. Use like this: VERBOSE=1 ./script.sh
+: "${VERBOSE:=0}"
+
 
 # -- Colors -- #
 CLR_RED="\033[1;31m"
@@ -249,22 +252,33 @@ function replacable()
   FILE1="$1"
   FILE2="$2"
 
-  [[ ! -r "$FILE1" ]] && { msg_err "File 1 ($FILE1) does not exist" && return 1; }
-  [[ ! -r "$FILE2" ]] && { msg_err "File 2 ($FILE2) does not exist, replacable" && return 1; }
+  [[ ! -r "$FILE1" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "File 1 ($FILE1) does not exist"
+    return 0;
+  }
+  [[ ! -r "$FILE2" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "File 2 ($FILE2) does not exist, replacable"
+    return 1;
+  }
 
   FILE1_HASH=$(get_sha256sum "$FILE1")
   FILE2_HASH=$(get_sha256sum "$FILE2")
 
   [[ $FILE1_HASH = "" ]] && {
-    msg_err "Could not get hash for file 1 ($FILE1)" && return 1;
+    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 1 ($FILE1)"
+    return 0;
   }
   [[ $FILE2_HASH = "" ]] && {
-    msg_err "Could not get hash for file 2 ($FILE2), replacable" && return 1;
+    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 2 ($FILE2), replacable"
+    return 1;
   }
 
   [[ "$FILE1_HASH" == "$FILE2_HASH" ]] && {
-    msg_ok "Files match, not replacable" && return 0;
+    [[ $VERBOSE -eq 1 ]] && msg_ok "Files match, not replacable: $FILE1"
+    return 0;
   }
+
+  [[ $VERBOSE -eq 1 ]] && msg_warn "Files do not match ($FILE1_HASH != $FILE2_HASH), replacable"
 
   return 1;
 }
