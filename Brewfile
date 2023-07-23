@@ -202,6 +202,10 @@ brew "shfmt"
 brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
+# Feature-rich console based todo list manager
+brew "task"
+# Terminal user interface for taskwarrior
+brew "taskwarrior-tui"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Thin wrapper for Terraform e.g. for locking state
