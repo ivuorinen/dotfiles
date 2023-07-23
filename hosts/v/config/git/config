@@ -1,6 +1,9 @@
 [include]
   path = ~/.dotfiles/config/git/shared
 
+[gpg]
+  format = ssh
+
 [user]
   name = Ismo Vuorinen
   email = ismo.vuorinen@vincit.fi
