@@ -43,6 +43,10 @@ weekstart=monday
 
 news.version=2.6.0
 
+default.project=Inbox
+calendar.details=full
+calendar.holidays=sparse
+
 uda.taskwarrior-tui.keyconfig.quit=q
 uda.taskwarrior-tui.keyconfig.refresh=r
 uda.taskwarrior-tui.keyconfig.go-to-bottom=G
