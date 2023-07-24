@@ -226,7 +226,7 @@ bind-key    -T prefix       D                    choose-client -Z
 bind-key    -T prefix       E                    select-layout -E
 bind-key    -T prefix       I                    run-shell /Users/ivuorinen/.config/tmux/plugins/tpm/bindings/install_plugins
 bind-key    -T prefix       L                    switch-client -l
-bind-key    -T prefix       M                    select-pane -M
+bind-key    -T prefix       M                    run-shell -b /Users/ivuorinen/.tmux/plugins/tmux-notify/scripts/cancel.sh
 bind-key    -T prefix       N                    new-window
 bind-key    -T prefix       R                    run-shell " 			tmux source-file /Users/ivuorinen/.config/tmux/tmux.conf > /dev/null; 			tmux display-message 'Sourced /Users/ivuorinen/.config/tmux/tmux.conf!'"
 bind-key    -T prefix       S                    switch-client -l
@@ -248,11 +248,11 @@ bind-key    -T prefix       n                    next-window
 bind-key    -T prefix       o                    select-pane -t :.+
 bind-key    -T prefix       p                    paste-buffer
 bind-key    -T prefix       q                    display-panes
-bind-key    -T prefix       r                    source-file /Users/ivuorinen/.dotfiles/config/tmux/tmux.conf \; display-message "tmux cfg reloaded!"
+bind-key    -T prefix       r                    source-file /Users/ivuorinen/.config/tmux/tmux.conf \; display-message "tmux cfg reloaded!"
 bind-key    -T prefix       s                    choose-tree -Zs
 bind-key    -T prefix       t                    run-shell "/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/join_pane.sh 'join-pane' '-b'"
 bind-key    -T prefix       w                    choose-tree -Zw
-bind-key    -T prefix       x                    confirm-before -p "kill-pane #P? (y/n)" kill-pane
+bind-key    -T prefix       x                    run-shell "tmux split-window -l 10 \"/Users/ivuorinen/.tmux/plugins/tmux-1password/scripts/main.sh '#{pane_id}'\""
 bind-key    -T prefix       y                    run-shell -b /Users/ivuorinen/.config/tmux/plugins/tmux-yank/scripts/copy_line.sh
 bind-key    -T prefix       z                    resize-pane -Z
 bind-key    -T prefix       \{                   swap-pane -U
@@ -269,6 +269,7 @@ bind-key    -T prefix       M-2                  select-layout even-vertical
 bind-key    -T prefix       M-3                  select-layout main-horizontal
 bind-key    -T prefix       M-4                  select-layout main-vertical
 bind-key    -T prefix       M-5                  select-layout tiled
+bind-key    -T prefix       M-m                  run-shell -b "/Users/ivuorinen/.tmux/plugins/tmux-notify/scripts/notify.sh refocus"
 bind-key    -T prefix       M-n                  next-window -a
 bind-key    -T prefix       M-o                  rotate-window -D
 bind-key    -T prefix       M-p                  previous-window -a
