@@ -1,22 +1,17 @@
----
 name: Debug Changelog # Workflow name displayed on GitHub
-
 on:
   workflow_dispatch: # Trigger manually
-
 jobs:
   debug-changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Create changelog text
         id: changelog
         uses: loopwerk/tag-changelog@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
-
       - name: "Echo results"
         id: output-changelog
         run: |

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck source="../scripts/shared.sh"
+# shellcheck disable=1091,2139
 source "$DOTFILES/scripts/shared.sh"
 
 # Get installed php versions from brew and setup aliases

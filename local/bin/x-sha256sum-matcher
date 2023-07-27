@@ -14,7 +14,8 @@ file_2="$2"
 
 # return sha256sum for file
 # $1 - filename (string)
-get_sha256sum() {
+get_sha256sum()
+{
   sha256sum "$1" | head -c 64
 }
 
@@ -22,11 +23,13 @@ get_sha256sum() {
   echo "Usage: $0 file1.sh file2.sh" && exit 1
 }
 
-msg() {
+msg()
+{
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
 }
 
-error() {
+error()
+{
   msg "(!) ERROR: $1" && exit 1
 }
 
@@ -45,6 +48,5 @@ if [ "$file_1_hash" != "$file_2_hash" ]; then
   error "Files do not match"
 else
   msg "(*) Success: Files do match"
-  exit 0;
+  exit 0
 fi
-

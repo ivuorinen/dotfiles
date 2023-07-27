@@ -5,7 +5,8 @@
 #
 # Modified by Ismo Vuorinen <https://github.com/ivuorinen> 2023
 
-__pushover_usage() {
+__pushover_usage()
+{
   printf "pushover <options> <message>\n"
   printf " -c <callback>\n"
   printf " -d <device>\n"
@@ -22,7 +23,8 @@ __pushover_usage() {
   return 1
 }
 
-__pushover_opt_field() {
+__pushover_opt_field()
+{
   field=$1
   shift
   value="${*}"
@@ -31,7 +33,8 @@ __pushover_opt_field() {
   fi
 }
 
-__pushover_send_message() {
+__pushover_send_message()
+{
   device="${1:-}"
 
   curl_cmd="\"${CURL}\" -s -S \
@@ -71,8 +74,7 @@ devices="${devices} ${device}"
 optstring="c:d:D:e:f:p:r:t:T:s:u:U:a:h"
 
 OPTIND=1
-while getopts ${optstring} c
-do
+while getopts ${optstring} c; do
   case ${c} in
     c)
       callback="${OPTARG}"
@@ -117,7 +119,7 @@ do
       ;;
   esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 if [ "$#" -lt 1 ]; then
   __pushover_usage
@@ -141,9 +143,8 @@ else
     __pushover_send_message "${device}"
     r=${?}
     if [ "${r}" -ne 0 ]; then
-      break;
+      break
     fi
   done
 fi
 exit "${r}"
-

@@ -1,24 +1,19 @@
----
 # The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
 # editor: $EDITOR
 
 # Should 'cheat' always colorize output?
 colorize: true
-
 # Which 'chroma' colorscheme should be applied to the output?
 # Options are available here:
 #   https://github.com/alecthomas/chroma/tree/master/styles
 style: "catppuccin"
-
 # Which 'chroma' "formatter" should be applied?
 # One of: "terminal", "terminal256", "terminal16m"
 formatter: terminal256
-
 # Through which pager should output be piped?
 # 'less -FRX' is recommended on Unix systems
 # 'more' is recommended on Windows
 pager: less -FRX
-
 # Cheatpaths are paths at which cheatsheets are available on your local
 # filesystem.
 #
@@ -63,21 +58,21 @@ cheatpaths:
   #   'readonly': shall user-created ('cheat -e') cheatsheets be saved here?
   - name: community
     path: ~/.config/cheat/cheatsheets/community
-    tags: [ community ]
+    tags: [community]
     readonly: true
   # If you have personalized cheatsheets, list them last. They will take
   # precedence over the more global cheatsheets.
   - name: personal
     path: ~/.dotfiles/config/cheat/cheatsheets/personal
-    tags: [ personal ]
+    tags: [personal]
     readonly: false
   - name: pure-bash-bible
     path: ~/.dotfiles/config/cheat/cheatsheets/pure-bash-bible
-    tags: [ pure-bash-bible ]
+    tags: [pure-bash-bible]
     readonly: true
   - name: tldr
     path: ~/.dotfiles/config/cheat/cheatsheets/tldr
-    tags: [ tldr ]
+    tags: [tldr]
     readonly: true
 
 # While it requires no configuration here, it's also worth noting that

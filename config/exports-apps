@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # shellcheck enable=external-sources
-# shellcheck disable=1091
+# shellcheck disable=1091,2139
 # vim: filetype=zsh
 source "$DOTFILES/scripts/shared.sh"
 
