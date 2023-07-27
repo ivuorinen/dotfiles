@@ -13,6 +13,15 @@ return {
     enabled = true,
   },
   {
+    "nvim-treesitter/nvim-treesitter-context",
+    lazy = false,
+    enabled = true,
+    opts = {
+      enable = true,
+      mode = "cursor", -- cursor, or topline
+    },
+  },
+  {
     "folke/edgy.nvim",
     event = "VeryLazy",
     init = function()
@@ -78,11 +87,11 @@ return {
           pinned = true,
           open = "Neotree position=top buffers",
         },
-        {
-          ft = "Outline",
-          pinned = true,
-          open = "SymbolsOutlineOpen",
-        },
+        -- {
+          -- ft = "Outline",
+          -- pinned = true,
+          -- open = "SymbolsOutlineOpen",
+        -- },
         -- any other neo-tree windows
         "neo-tree",
       },
