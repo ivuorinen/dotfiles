@@ -7,6 +7,7 @@ Brewfile.lock.json
 config/fzf
 config/cheat/cheatsheets/pure-bash-bible/*
 config/cheat/cheatsheets/tldr/*
+config/git/credentials
 ssh/local.d/*
 !ssh/local.d/.gitkeep
 !.gitkeep
