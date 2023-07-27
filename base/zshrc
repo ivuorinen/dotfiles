@@ -3,6 +3,9 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
+export ZDOTDIR="$HOME/.local/state/zsh"
+mkdir -p "$ZDOTDIR"
+
 autoload -U colors zsh/terminfo
 colors
 setopt correct
@@ -10,6 +13,7 @@ setopt correct
 # Add completion scripts to zsh path
 FPATH="~/.config/zsh/completion:$FPATH"
 autoload -Uz compinit && compinit -i
+compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
@@ -51,6 +55,8 @@ have starship && eval "$(starship init zsh)"
 
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
   && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+
+export LESSHISTFILE="$XDG_CACHE_HOME"/less_history
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"

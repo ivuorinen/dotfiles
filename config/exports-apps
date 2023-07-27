@@ -13,42 +13,34 @@ export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
 
 # Ansible configuration
 # https://docs.ansible.com/ansible/latest/reference_appendices/config.html
+export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
+export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
+export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
 have ansible && {
-  export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
-  export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
-  export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
   x-dc "$ANSIBLE_HOME"
   x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 }
 
-# brew configuration
-have brew && {
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
-  autoload -Uz compinit
-  compinit
-}
+export ANDROID_HOME="$XDG_DATA_HOME/android"
 
 # composer, https://getcomposer.org/
+export COMPOSER_HOME="$XDG_STATE_HOME/composer"
+export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 have composer && {
-  export COMPOSER_HOME="$XDG_STATE_HOME/composer"
-  export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
   export PATH="$COMPOSER_BIN:$PATH"
 }
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
+export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 have docker && {
-  export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
   x-dc "$DOCKER_CONFIG"
   # Docker: Disable snyk ad
   export DOCKER_SCAN_SUGGEST=false
 }
 
 # ffmpeg
-have ffmpeg && {
-  export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
-  x-dc "$FFMPEG_DATADIR"
-}
+export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
+have ffmpeg && x-dc "$FFMPEG_DATADIR"
 
 # gcloud
 have gcloud && {
@@ -57,20 +49,12 @@ have gcloud && {
   [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
 }
 
-# gem, rubygems
-have gem && {
-  export GEM_HOME="$XDG_STATE_HOME/gem"
-  export GEM_PATH="$XDG_STATE_HOME/gem"
-  export PATH="$GEM_HOME/bin:$PATH"
-  path_append "$GEM_PATH/bin"
-}
+# GnuPG
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 
-# If we have go packages, include them to the PATH
-have go && {
-  export GOPATH="$XDG_DATA_HOME/go"
-  export GOBIN="$XDG_BIN_HOME"
-  x-dc "$GOPATH"
-}
+# Go
+export GOPATH="$XDG_DATA_HOME/go"
+export GOBIN="$XDG_BIN_HOME"
 
 # irssi
 have irssi && {
@@ -81,10 +65,8 @@ have irssi && {
 }
 
 # nb, https://xwmx.github.io/nb/
-have nb && {
-  export NB_DIR="$XDG_STATE_HOME/nb"
-  x-dc "$NB_DIR"
-}
+export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
+export NB_DIR="$XDG_STATE_HOME/nb"
 
 # nvm, the node version manager
 export NVM_LAZY_LOAD=true
@@ -101,25 +83,40 @@ have node && {
 }
 
 # op (1Password cli) is present
+export OP_CACHE="$XDG_STATE_HOME/1password"
 have op && {
-  export OP_CACHE="$XDG_STATE_HOME/1password"
-  x-dc "$OP_CACHE"
   eval "$(op completion zsh)"
   compdef _op op
 }
 
+# Python
+#
 # pyenv, python environments
+export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
+export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 have pyenv && {
-  export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
-  x-dc "$PYENV_ROOT"
   path_append "$PYENV_ROOT/bin"
-
   eval "$(pyenv init -)"
 }
 
-have rbenv && {
-  eval "$(rbenv init - zsh)"
-}
+# Ruby
+#
+# including: bundler, rbenv
+export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME"/bundle
+export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
+export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
+export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
+x-dc "$RBENV_ROOT"
+have gem && path_append "$(gem environment gemdir)/bin"
+have rbenv && eval "$(rbenv init - zsh)"
+
+# screen
+export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
+
+# tmux
+export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 
 # wakatime, https://github.com/wakatime/wakatime-cli
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
@@ -130,9 +127,6 @@ export _Z_DATA="$XDG_STATE_HOME/z"
 [[ -f "$XDG_BIN_HOME/z/z.sh" ]] && source "$XDG_BIN_HOME/z/z.sh"
 
 # Misc
-export ANDROID_HOME="$XDG_DATA_HOME/android"
-export GNUPGHOME="$XDG_DATA_HOME/gnupg"
-export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
-export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 export BAT_THEME="ansi"
 export CHEAT_USE_FZF=true
+export SQLITE_HISTORY="$XDG_CACHE_HOME"/sqlite_history

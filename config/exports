@@ -31,10 +31,7 @@ path_prepend "$XDG_BIN_HOME"
 
 # brew, https://brew.sh
 have brew && {
-  path_append "$(brew --prefix python)/bin"
-  path_append "$(brew --prefix coreutils)/libexec/gnubin"
-  path_append "$(brew --prefix ruby)/bin"
-  path_append "$(gem environment gemdir)/bin"
+  have_brew python && path_append "$(brew --prefix python)/bin"
 }
 
 source "$DOTFILES/config/exports-shell"

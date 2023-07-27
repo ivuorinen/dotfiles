@@ -204,6 +204,19 @@ function have
   command -v "$1" >&/dev/null
 }
 
+# shorthand for checking if brew package is installed
+# usage: have_brew php && php -v
+function have_brew
+{
+  ! have brew && return 125
+
+  if brew list "$1" &> /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Remove directory from the PATH variable
 # usage: path_remove ~/.local/bin
 function path_remove
