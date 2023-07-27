@@ -175,6 +175,22 @@ function section_brew
   ! have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
+function section_helpers
+{
+  USAGE_PREFIX="$SCRIPT helpers <command>"
+  MENU=(
+    "path:Show \$PATH dir by dir"
+  )
+
+  case "$1" in
+    path)
+      # shellcheck disable=2001
+      for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done;
+    ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
 function section_docs
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
@@ -323,6 +339,8 @@ function usage
   section_dotfiles
   echo ""
   section_docs
+  echo ""
+  section_helpers
 }
 
 # The main loop. first keyword after $0 triggers section, or help.
@@ -331,6 +349,7 @@ case "$1" in
   brew) section_brew "$2" ;;
   check) section_check "$2" ;;
   dotfiles) section_dotfiles "$2" ;;
+  helpers) section_helpers "$2" ;;
   docs) section_docs "$2" ;;
   tests) section_tests "$2" ;;
   *) usage && exit 0 ;;
