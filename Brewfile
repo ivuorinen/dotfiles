@@ -16,20 +16,46 @@ tap "teamookla/speedtest"
 tap "xwmx/taps"
 # Run your GitHub Actions locally
 brew "act"
+# Mozilla CA certificate store
+brew "ca-certificates"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
+# YAML Parser
+brew "libyaml"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Checks ansible playbooks for practices and behaviour
 brew "ansible-lint"
+# Generic-purpose lossless compression algorithm by Google
+brew "brotli"
+# Library and utilities for processing GIFs
+brew "giflib"
+# Performance-portable, length-agnostic SIMD with runtime dispatch
+brew "highway"
+# Library of 2D and 3D vector, matrix, and math operations
+brew "imath"
+# JPEG image codec that aids compression and decompression
+brew "jpeg-turbo"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
+# New file format for still image compression
+brew "jpeg-xl"
+# Codec library for encoding and decoding AV1 video streams
+brew "aom"
+# Apache Portable Runtime library
+brew "apr"
+# Companion library to apr, the Apache Portable Runtime library
+brew "apr-util"
+# Password hashing library and CLI utility
+brew "argon2"
 # Open Source Kubernetes Marketplace
 brew "arkade"
 # Automatic configure script builder
 brew "autoconf"
+# GNU multiple precision arithmetic library
+brew "gmp"
 # GNU File, Shell, and Text utilities
-brew "coreutils", link: false
+brew "coreutils"
 # Extendable version manager with support for Ruby, Node.js, Erlang & more
 brew "asdf"
 # Spell checker with better logic than ispell
@@ -42,6 +68,12 @@ brew "bat"
 brew "bottom"
 # Switch Apache / Valet / CLI configs between PHP versions
 brew "brew-php-switcher"
+# Software library to render fonts
+brew "freetype"
+# XML-based font configuration API for X Windows
+brew "fontconfig"
+# GNU internationalization (i18n) and localization (l10n) library
+brew "gettext"
 # Core application library for C
 brew "glib"
 # Manage compile and link flags for libraries
@@ -50,8 +82,6 @@ brew "pkg-config"
 brew "choose-rust"
 # Cross-platform make
 brew "cmake"
-# Dependency manager for Cocoa projects
-brew "cocoapods"
 # Get, unpack, build, and install modules from CPAN
 brew "cpanminus"
 # Open source suite of directory software
@@ -72,12 +102,6 @@ brew "dotenv-linter"
 brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
-# OpenType text shaping engine
-brew "harfbuzz"
-# Development kit for the Java programming language
-brew "openjdk"
 # Run arbitrary commands when files change
 brew "entr"
 # Simple, fast and user-friendly alternative to find
@@ -116,8 +140,14 @@ brew "gnutls"
 brew "gnupg"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
+# Library access to GnuPG
+brew "gpgme"
 # Image manipulation
 brew "netpbm"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
+# OpenType text shaping engine
+brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -142,10 +172,10 @@ brew "libheif"
 brew "imagemagick"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
+# Network authentication protocol
+brew "krb5"
 # Lazier way to manage everything docker
 brew "lazydocker"
-# Postgres C API library
-brew "libpq"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
 # Rainbows and unicorns in your console!
@@ -156,14 +186,20 @@ brew "luarocks"
 brew "m-cli"
 # Mac App Store command-line interface
 brew "mas"
+# NCurses Disk Usage
+brew "ncdu"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# No Nonsense Neovim Client in Rust
+brew "neovide"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
 # Manage multiple Node.js versions
 brew "nvm"
+# Development kit for the Java programming language
+brew "openjdk@11"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
 # Development kit for the Java programming language
@@ -186,12 +222,12 @@ brew "pyenv-virtualenv"
 brew "python@3.10"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.8"
+# Ruby version manager
+brew "rbenv"
 # RC file (dotfile) management
 brew "rcm"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# Powerful, clean, object-oriented scripting language
-brew "ruby"
 # Safe, concurrent, practical language
 brew "rust"
 # Static analysis and lint tool, for (ba)sh scripts
@@ -417,7 +453,6 @@ vscode "ms-vscode.cpptools"
 vscode "msjsdiag.vscode-react-native"
 vscode "mtxr.sqltools"
 vscode "neilbrayfield.php-docblocker"
-vscode "nemesarial.dust"
 vscode "nhoizey.gremlins"
 vscode "octref.vetur"
 vscode "oderwat.indent-rainbow"
@@ -431,6 +466,7 @@ vscode "tootone.org-mode"
 vscode "valeryanm.vscode-phpsab"
 vscode "Vue.volar"
 vscode "WakaTime.vscode-wakatime"
+vscode "withfig.fig"
 vscode "wix.vscode-import-cost"
 vscode "xdebug.php-debug"
 vscode "xdebug.php-pack"
