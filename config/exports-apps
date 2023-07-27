@@ -117,6 +117,10 @@ have pyenv && {
   eval "$(pyenv init -)"
 }
 
+have rbenv && {
+  eval "$(rbenv init - zsh)"
+}
+
 # wakatime, https://github.com/wakatime/wakatime-cli
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
