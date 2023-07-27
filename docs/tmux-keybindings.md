@@ -31,7 +31,7 @@ bind-key    -T copy-mode    P                    send-keys -X toggle-position
 bind-key    -T copy-mode    R                    send-keys -X rectangle-toggle
 bind-key    -T copy-mode    T                    command-prompt -1 -p "(jump to backward)" { send-keys -X jump-to-backward "%%" }
 bind-key    -T copy-mode    X                    send-keys -X set-mark
-bind-key    -T copy-mode    Y                    send-keys -X copy-pipe-and-cancel "tmux paste-buffer"
+bind-key    -T copy-mode    Y                    send-keys -X copy-pipe-and-cancel "tmux paste-buffer -p"
 bind-key    -T copy-mode    f                    command-prompt -1 -p "(jump forward)" { send-keys -X jump-forward "%%" }
 bind-key    -T copy-mode    g                    command-prompt -p "(goto line)" { send-keys -X goto-line "%%" }
 bind-key    -T copy-mode    n                    send-keys -X search-again
@@ -75,7 +75,7 @@ bind-key    -T copy-mode    M-r                  send-keys -X middle-line
 bind-key    -T copy-mode    M-v                  send-keys -X page-up
 bind-key    -T copy-mode    M-w                  send-keys -X copy-pipe-and-cancel
 bind-key    -T copy-mode    M-x                  send-keys -X jump-to-mark
-bind-key    -T copy-mode    M-y                  send-keys -X copy-pipe-and-cancel "pbcopy; tmux paste-buffer"
+bind-key    -T copy-mode    M-y                  send-keys -X copy-pipe-and-cancel "pbcopy; tmux paste-buffer -p"
 bind-key    -T copy-mode    "M-{"                send-keys -X previous-paragraph
 bind-key    -T copy-mode    "M-}"                send-keys -X next-paragraph
 bind-key    -T copy-mode    M-Up                 send-keys -X halfpage-up
@@ -136,7 +136,7 @@ bind-key    -T copy-mode-vi T                    command-prompt -1 -p "(jump to 
 bind-key    -T copy-mode-vi V                    send-keys -X select-line
 bind-key    -T copy-mode-vi W                    send-keys -X next-space
 bind-key    -T copy-mode-vi X                    send-keys -X set-mark
-bind-key    -T copy-mode-vi Y                    send-keys -X copy-pipe-and-cancel "tmux paste-buffer"
+bind-key    -T copy-mode-vi Y                    send-keys -X copy-pipe-and-cancel "tmux paste-buffer -p"
 bind-key    -T copy-mode-vi ^                    send-keys -X back-to-indentation
 bind-key    -T copy-mode-vi b                    send-keys -X previous-word
 bind-key    -T copy-mode-vi e                    send-keys -X next-word-end
@@ -171,7 +171,7 @@ bind-key    -T copy-mode-vi Down                 send-keys -X cursor-down
 bind-key    -T copy-mode-vi Left                 send-keys -X cursor-left
 bind-key    -T copy-mode-vi Right                send-keys -X cursor-right
 bind-key    -T copy-mode-vi M-x                  send-keys -X jump-to-mark
-bind-key    -T copy-mode-vi M-y                  send-keys -X copy-pipe-and-cancel "pbcopy; tmux paste-buffer"
+bind-key    -T copy-mode-vi M-y                  send-keys -X copy-pipe-and-cancel "pbcopy; tmux paste-buffer -p"
 bind-key    -T copy-mode-vi C-Up                 send-keys -X scroll-up
 bind-key    -T copy-mode-vi C-Down               send-keys -X scroll-down
 bind-key    -T join-pane    \"                   run-shell "'/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/join_pane.sh' 'join-pane' '-b' '-v'"
@@ -183,6 +183,7 @@ bind-key    -T join-pane    h                    run-shell "'/Users/ivuorinen/.c
 bind-key    -T join-pane    v                    run-shell "'/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/join_pane.sh' 'join-pane' '-b' '-v'"
 bind-key    -T join-pane    |                    run-shell "'/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/join_pane.sh' 'join-pane' '-b' '-h'"
 bind-key    -T prefix       C-Space              run-shell "/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/promote_window.sh '#{session_name}' '#{window_id}' '#{window_name}' '#{pane_current_path}'"
+bind-key    -T prefix       Enter                run-shell -b "/Users/ivuorinen/.config/tmux/plugins/tmux-notify/scripts/notify.sh false true"
 bind-key    -T prefix       C-n                  next-window
 bind-key    -T prefix       C-o                  rotate-window
 bind-key    -T prefix       C-p                  previous-window
@@ -191,7 +192,7 @@ bind-key    -T prefix       C-s                  run-shell /Users/ivuorinen/.con
 bind-key    -T prefix       C-z                  suspend-client
 bind-key    -T prefix       Escape               copy-mode
 bind-key    -T prefix       Space                next-layout
-bind-key    -T prefix       !                    break-pane
+bind-key    -T prefix       !                    split-window -h -c "#{pane_current_path}"
 bind-key    -T prefix       \"                   split-window -v -c "#{pane_current_path}"
 bind-key    -T prefix       \#                   list-buffers
 bind-key    -T prefix       \$                   command-prompt -I "#S" { rename-session "%%" }
@@ -226,7 +227,7 @@ bind-key    -T prefix       D                    choose-client -Z
 bind-key    -T prefix       E                    select-layout -E
 bind-key    -T prefix       I                    run-shell /Users/ivuorinen/.config/tmux/plugins/tpm/bindings/install_plugins
 bind-key    -T prefix       L                    switch-client -l
-bind-key    -T prefix       M                    run-shell -b /Users/ivuorinen/.tmux/plugins/tmux-notify/scripts/cancel.sh
+bind-key    -T prefix       M                    run-shell -b /Users/ivuorinen/.config/tmux/plugins/tmux-notify/scripts/cancel.sh
 bind-key    -T prefix       N                    new-window
 bind-key    -T prefix       R                    run-shell " 			tmux source-file /Users/ivuorinen/.config/tmux/tmux.conf > /dev/null; 			tmux display-message 'Sourced /Users/ivuorinen/.config/tmux/tmux.conf!'"
 bind-key    -T prefix       S                    switch-client -l
@@ -248,11 +249,11 @@ bind-key    -T prefix       n                    next-window
 bind-key    -T prefix       o                    select-pane -t :.+
 bind-key    -T prefix       p                    paste-buffer
 bind-key    -T prefix       q                    display-panes
-bind-key    -T prefix       r                    source-file /Users/ivuorinen/.config/tmux/tmux.conf \; display-message "tmux cfg reloaded!"
+bind-key    -T prefix       r                    source-file /Users/ivuorinen/.dotfiles/config/tmux/tmux.conf \; display-message "tmux cfg reloaded!"
 bind-key    -T prefix       s                    choose-tree -Zs
 bind-key    -T prefix       t                    run-shell "/Users/ivuorinen/.config/tmux/plugins/tmux-sessionist/scripts/join_pane.sh 'join-pane' '-b'"
 bind-key    -T prefix       w                    choose-tree -Zw
-bind-key    -T prefix       x                    run-shell "tmux split-window -l 10 \"/Users/ivuorinen/.tmux/plugins/tmux-1password/scripts/main.sh '#{pane_id}'\""
+bind-key    -T prefix       x                    run-shell "tmux split-window -l 10 \"/Users/ivuorinen/.config/tmux/plugins/tmux-1password/scripts/main.sh '#{pane_id}'\""
 bind-key    -T prefix       y                    run-shell -b /Users/ivuorinen/.config/tmux/plugins/tmux-yank/scripts/copy_line.sh
 bind-key    -T prefix       z                    resize-pane -Z
 bind-key    -T prefix       \{                   swap-pane -U
@@ -264,12 +265,13 @@ bind-key -r -T prefix       Up                   select-pane -U
 bind-key -r -T prefix       Down                 select-pane -D
 bind-key -r -T prefix       Left                 select-pane -L
 bind-key -r -T prefix       Right                select-pane -R
+bind-key    -T prefix       M-Enter              run-shell -b "/Users/ivuorinen/.config/tmux/plugins/tmux-notify/scripts/notify.sh true true"
 bind-key    -T prefix       M-1                  select-layout even-horizontal
 bind-key    -T prefix       M-2                  select-layout even-vertical
 bind-key    -T prefix       M-3                  select-layout main-horizontal
 bind-key    -T prefix       M-4                  select-layout main-vertical
 bind-key    -T prefix       M-5                  select-layout tiled
-bind-key    -T prefix       M-m                  run-shell -b "/Users/ivuorinen/.tmux/plugins/tmux-notify/scripts/notify.sh refocus"
+bind-key    -T prefix       M-m                  run-shell -b "/Users/ivuorinen/.config/tmux/plugins/tmux-notify/scripts/notify.sh true"
 bind-key    -T prefix       M-n                  next-window -a
 bind-key    -T prefix       M-o                  rotate-window -D
 bind-key    -T prefix       M-p                  previous-window -a
@@ -304,6 +306,7 @@ bind-key    -T root         WheelUpStatus        previous-window
 bind-key    -T root         WheelDownStatus      next-window
 bind-key    -T root         DoubleClick1Pane     select-pane -t = \; if-shell -F "#{||:#{pane_in_mode},#{mouse_any_flag}}" { send-keys -M } { copy-mode -H ; send-keys -X select-word ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel }
 bind-key    -T root         TripleClick1Pane     select-pane -t = \; if-shell -F "#{||:#{pane_in_mode},#{mouse_any_flag}}" { send-keys -M } { copy-mode -H ; send-keys -X select-line ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel }
+bind-key    -T root         F12                  run-shell "/Users/ivuorinen/.config/tmux/plugins/tmux-suspend/scripts/suspend.sh \"\" \"   @mode_indicator_custom_prompt:: ---- ,   @mode_indicator_custom_mode_style::bg=brightblack\,fg=black, \""
 bind-key    -T root         M-H                  previous-window
 bind-key    -T root         M-L                  next-window
 bind-key    -T root         M-MouseDown3Pane     display-menu -T "#[align=centre]#{pane_index} (#{pane_id})" -t = -x M -y M "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Top,}" < { send-keys -X history-top } "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Bottom,}" > { send-keys -X history-bottom } '' "#{?mouse_word,Search For #[underscore]#{=/9/...:mouse_word},}" C-r { if-shell -F "#{?#{m/r:(copy|view)-mode,#{pane_mode}},0,1}" "copy-mode -t=" ; send-keys -X -t = search-backward "#{q:mouse_word}" } "#{?mouse_word,Type #[underscore]#{=/9/...:mouse_word},}" C-y { copy-mode -q ; send-keys -l "#{q:mouse_word}" } "#{?mouse_word,Copy #[underscore]#{=/9/...:mouse_word},}" c { copy-mode -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode -q ; set-buffer "#{q:mouse_line}" } '' "Horizontal Split" h { split-window -h } "Vertical Split" v { split-window -v } '' "#{?#{>:#{window_panes},1},,-}Swap Up" u { swap-pane -U } "#{?#{>:#{window_panes},1},,-}Swap Down" d { swap-pane -D } "#{?pane_marked_set,,-}Swap Marked" s { swap-pane } '' Kill X { kill-pane } Respawn R { respawn-pane -k } "#{?pane_marked,Unmark,Mark}" m { select-pane -m } "#{?#{>:#{window_panes},1},,-}#{?window_zoomed_flag,Unzoom,Zoom}" z { resize-pane -Z }
@@ -313,5 +316,6 @@ bind-key    -T root         M-Left               select-pane -L
 bind-key    -T root         M-Right              select-pane -R
 bind-key    -T root         S-Left               previous-window
 bind-key    -T root         S-Right              next-window
+bind-key    -T suspended    F12                  run-shell "/Users/ivuorinen/.config/tmux/plugins/tmux-suspend/scripts/resume.sh \"\""
 ```
 
