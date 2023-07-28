@@ -18,7 +18,7 @@ include:
   - ./**/*.{yml,yaml}
 
 exclude:
-  - ./dotbot/**
-  - ./dotbot-*/**
+  - ./tools/dotbot/**
+  - ./tools/dotbot-*/**
   - ./config/astronvim/**
   - ./config/nvim/**

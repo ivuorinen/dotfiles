@@ -31,10 +31,10 @@ digga()
   dig +nocmd "$1" any +multiline +noall +answer
 }
 
-# Rector project to php version 8.0 by default.
+# Rector project to php version 8.2 by default.
 rector()
 {
-  local php="${1:-80}"
+  local php="${1:-82}"
   docker run -v "$(pwd)":/project rector/rector:latest process \
     "/project/$1" \
     --set "php${php}" \
@@ -100,7 +100,7 @@ x-default-antigen-bundles()
   have docker-compose && antigen bundle sroze/docker-compose-zsh-plugin
   have jq && antigen bundle reegnz/jq-zsh-plugin
   have nvm && antigen bundle nvm
-  have nvm && antigen bundle $DOTFILES/config/zsh/plugins/nvm-auto-use
+  have nvm && antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
   have php && antigen bundle php
   have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
   have rvm && antigen bundle unixorn/rvm-plugin
