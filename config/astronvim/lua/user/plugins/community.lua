@@ -34,13 +34,14 @@ return {
       position = "bottom"
     }
   },
+  { import = "astrocommunity.debugging.telescope-dap-nvim" },
   { import = "astrocommunity.editing-support.comment-box-nvim" },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
   { import = "astrocommunity.editing-support.neogen" },
   { import = "astrocommunity.editing-support.nvim-regexplainer" },
   { import = "astrocommunity.editing-support.todo-comments-nvim" },
   { import = "astrocommunity.indent.mini-indentscope" },
-  { import = "astrocommunity.markdown-and-latex.glow-nvim" },
+  { import = "astrocommunity.lsp.lsp-signature-nvim" },
   { import = "astrocommunity.motion.harpoon" },
   { import = "astrocommunity.pack.ansible" },
   { import = "astrocommunity.pack.bash" },

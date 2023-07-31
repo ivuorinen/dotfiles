@@ -24,6 +24,24 @@ return {
   {
     "folke/edgy.nvim",
     event = "VeryLazy",
+    dependencies = {
+      {
+        'nvim-neo-tree/neo-tree.nvim',
+        config = function()
+          require('neo-tree').setup({
+            open_files_do_not_replace_types = {
+              'terminal', 'Trouble', 'qf', 'edgy'
+            },
+          })
+        end,
+      },
+      {
+        'simrat39/symbols-outline.nvim',
+        config = function()
+          require('symbols-outline').setup()
+        end,
+      },
+    },
     init = function()
       vim.opt.laststatus = 3
       vim.opt.splitkeep = "screen"
@@ -70,15 +88,6 @@ return {
           size = { height = 0.5 },
         },
         {
-          title = "Neo-Tree Git",
-          ft = "neo-tree",
-          filter = function(buf)
-            return vim.b[buf].neo_tree_source == "git_status"
-          end,
-          pinned = true,
-          open = "Neotree position=right git_status",
-        },
-        {
           title = "Neo-Tree Buffers",
           ft = "neo-tree",
           filter = function(buf)
@@ -87,11 +96,11 @@ return {
           pinned = true,
           open = "Neotree position=top buffers",
         },
-        -- {
-          -- ft = "Outline",
-          -- pinned = true,
-          -- open = "SymbolsOutlineOpen",
-        -- },
+        {
+          ft = "Outline",
+          pinned = true,
+          open = "SymbolsOutlineOpen",
+        },
         -- any other neo-tree windows
         "neo-tree",
       },
