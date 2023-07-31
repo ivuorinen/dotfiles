@@ -104,6 +104,8 @@ brew "editorconfig-checker"
 brew "eg-examples"
 # Run arbitrary commands when files change
 brew "entr"
+# Perl lib for reading and writing EXIF metadata
+brew "exiftool"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Banner-like program prints strings as ASCII art
