@@ -122,6 +122,8 @@ brew "gdu"
 brew "gh"
 # Distributed revision control system
 brew "git"
+# Enable transparent encryption/decryption of files in a git repo
+brew "git-crypt"
 # Small git utilities
 brew "git-extras"
 # See your latest local git branches, formatted real fancy
@@ -142,6 +144,8 @@ brew "gnupg"
 brew "go"
 # Library access to GnuPG
 brew "gpgme"
+# Manage your GnuPG keys with ease!
+brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
 # C/C++ and Java libraries for Unicode and globalization
@@ -276,6 +280,8 @@ brew "wget"
 brew "wtfutil"
 # Check your $HOME for unwanted files and directories
 brew "xdg-ninja"
+# Hackable, minimal, fast TUI file explorer
+brew "xplr"
 # JavaScript package manager
 brew "yarn"
 # A vulnerability scanner for container images and filesystems

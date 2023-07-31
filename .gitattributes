@@ -219,3 +219,9 @@ git/*              text
 **/git/*           text
 **/alias           text
 ssh/*              text
+
+# Git Crypt special files
+*-secret   filter=git-crypt diff=git-crypt
+*.key      filter=git-crypt diff=git-crypt
+secrets/** filter=git-crypt diff=git-crypt
+
