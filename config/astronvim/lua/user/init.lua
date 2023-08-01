@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 return {
   -- Configure AstroNvim updates
   updater = {

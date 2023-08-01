@@ -17,12 +17,15 @@ return {
       end,
       desc = "Pick to close",
     },
-    -- tables with the `name` key will be registered with which-key if it's installed
-    -- this is useful for naming menus
+    -- tables with the `name` key will be registered with which-key
+    -- if it's installed this is useful for naming menus
     ["<leader>b"] = { name = "Buffers" },
-    -- quick save
-    -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
-    ["<leader>P"] = { ":Telescope projects<cr>", desc = "Update Projects listing" },
+    -- quick save (change description)
+    ["<C-s>"] = { ":w!<cr>", desc = "Save File" },
+    ["<leader>P"] = {
+      ":Telescope projects<cr>",
+      desc = "Update Projects listing"
+    },
   },
   t = {
     -- setting a mapping to false will disable it

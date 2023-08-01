@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 return {
   -- You can also add new plugins here as well:
   -- Add plugins, the lazy syntax
@@ -48,12 +49,13 @@ return {
     end,
     opts = {
       bottom = {
-        -- toggleterm / lazyterm at the bottom with a height of 40% of the screen
+        -- toggleterm / lazyterm at the bottom with
+        -- a height of 40% of the screen
         {
           ft = "toggleterm",
           size = { height = 0.4 },
           -- exclude floating windows
-          filter = function(buf, win)
+          filter = function(_, win)
             return vim.api.nvim_win_get_config(win).relative == ""
           end,
         },
