@@ -22,6 +22,7 @@ return {
       mode = "cursor", -- cursor, or topline
     },
   },
+  { "kazhala/close-buffers.nvim" },
   {
     "folke/edgy.nvim",
     event = "VeryLazy",
@@ -97,11 +98,6 @@ return {
           end,
           pinned = true,
           open = "Neotree position=top buffers",
-        },
-        {
-          ft = "Outline",
-          pinned = true,
-          open = "SymbolsOutlineOpen",
         },
         -- any other neo-tree windows
         "neo-tree",

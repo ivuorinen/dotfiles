@@ -26,6 +26,24 @@ return {
       ":Telescope projects<cr>",
       desc = "Update Projects listing"
     },
+    -- close_buffers
+    ['<leader>bch'] = {
+      "<CMD>lua require('close_buffers').delete({type = 'hidden'})<CR>",
+      desc = "Delete hidden buffers"
+    },
+    -- comment-box
+    ["<leader>bb"] = {
+      "<cmd>lua require('comment-box').lbox()<cr>",
+      desc = "Left aligned fixed size box with left aligned text"
+    },
+    ["<leader>bc"] = {
+      "<cmd>lua require('comment-box').ccbox()<cr>",
+      desc = "Centered adapted box with centered text"
+    },
+    ["<leader>bl"] = {
+      "<cmd>lua require('comment-box').cline()<cr>",
+      desc = "Centered line"
+    },
   },
   t = {
     -- setting a mapping to false will disable it
