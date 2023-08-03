@@ -18,7 +18,7 @@ RESET='\033[0m'
 # Print time-based personalized message, using figlet & lolcat if availible
 function welcome_greeting () {
   h=$(date +%H)
-  if [ "$h" -lt 04 ] || [[ $h -gt 22 ]];
+  if [ "$h" -lt 04 ] || [ "$h" -gt 22 ];
     then greeting="Good Night"
   elif [ "$h" -lt 12 ];
     then greeting="Good morning"
@@ -41,7 +41,7 @@ function welcome_greeting () {
 function welcome_sysinfo () {
   if hash neofetch 2>/dev/null; then
     neofetch --shell_version off \
-      --disable kernel distro shell resolution de wm wm_theme theme icons terminal \
+      --disable kernel distro shell resolution cpu gpu de wm wm_theme theme icons terminal \
       --backend off \
       --colors 4 8 4 4 8 6 \
       --color_blocks off \
