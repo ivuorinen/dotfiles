@@ -55,6 +55,11 @@ if [[ $(uname) == 'Darwin' ]]; then
   alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
 fi
 
+# tmux: automatically attach or create session with name 'main'
+alias tmux='tmux new-session -A -s main'
+# tmux: attach or create new session
+alias ta='tmux attach || tmux'
+
 # watch with: differences, precise, beep and color
 alias watchx='watch -dpbc'
 # delete .DS_Store files
