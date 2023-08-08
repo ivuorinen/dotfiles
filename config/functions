@@ -84,6 +84,9 @@ ask()
 # Defines default antigen bundles
 x-default-antigen-bundles()
 {
+  # the theme to use
+  antigen theme romkatv/powerlevel10k
+
   # these should be always available
   antigen bundle colored-man-pages
   antigen bundle command-not-found

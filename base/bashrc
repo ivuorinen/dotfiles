@@ -1,7 +1,9 @@
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/bashrc.pre.bash" ]] && builtin source "$HOME/.fig/shell/bashrc.pre.bash"
 # this is my bashrc config. there are many like it, but this one is mine.
 # shellcheck shell=bash
+
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/bashrc.pre.bash" ]] \
+  && builtin source "$HOME/.fig/shell/bashrc.pre.bash"
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
@@ -11,10 +13,10 @@ function x-load-configs()
 {
     # Load the shell dotfiles, and then some:
     for file in $DOTFILES/config/{exports,alias,functions}; do
-        [ -r "$file" ] && [ -f "$file" ] && source "$file"
-        [ -r "$file-secret" ] && [ -f "$file-secret" ] && source "$file-secret"
-        [ -r "$file-$HOSTNAME" ] && [ -f "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
-        [ -r "$file-$HOSTNAME-secret" ] && [ -f "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
+        [ -r "$file" ] && source "$file"
+        [ -r "$file-secret" ] && source "$file-secret"
+        [ -r "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
+        [ -r "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
     done
 }
 x-load-configs
@@ -22,7 +24,9 @@ x-load-configs
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
 
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash
+[ -f "${DOTFILES}/config/fzf/fzf.bash" ] \
+  && source "${DOTFILES}/config/fzf/fzf.bash"
 
 # Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/bashrc.post.bash" ]] && builtin source "$HOME/.fig/shell/bashrc.post.bash"
+[[ -f "$HOME/.fig/shell/bashrc.post.bash" ]] \
+  && builtin source "$HOME/.fig/shell/bashrc.post.bash"

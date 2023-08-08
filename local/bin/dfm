@@ -47,7 +47,6 @@ function section_install
     all)
       $0 install macos
       $0 install antigen
-      $0 install starship
       $0 brew install
       $0 install composer
       $0 install dotenv

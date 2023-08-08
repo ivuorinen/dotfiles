@@ -240,8 +240,6 @@ brew "rust"
 brew "shellcheck"
 # Autoformat shell script source code
 brew "shfmt"
-# Cross-shell prompt for astronauts
-brew "starship"
 # Version control system designed to be a better CVS
 brew "subversion"
 # Feature-rich console based todo list manager

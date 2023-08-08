@@ -23,13 +23,13 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ## The looks
 
-## tmux with starship, the default view
+## tmux with powerlevel10k, the default view
 
-![screenshot of tmux with starship](./.github/screenshots/tmux-starship.png)
+![screenshot of tmux with powerlevel10k](./.github/screenshots/tmux-powerlevel10k-130x20.png)
 
 ## tmux + nvim (astronvim) editing this repository
 
-![screenshot of tmux showing nvim](.github/screenshots/tmux-nvim-astronvim.png)
+![screenshot of tmux showing nvim](.github/screenshots/tmux-astronvim-130x40.png)
 
 ## Interesting files and locations
 
@@ -61,12 +61,12 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 
 ### XDG Variables
 
-| Env                | Default              |
-|--------------------|----------------------|
-| `$XDG_BIN_HOME`    | `$HOME/.local/bin`   |
-| `$XDG_CONFIG_HOME` | `$HOME/.config`      |
-| `$XDG_DATA_HOME`   | `$HOME/.local/share` |
-| `$XDG_STATE_HOME`  | `$HOME/.local/state` |
+| Env                | Default              | Short description                              |
+|--------------------|----------------------|------------------------------------------------|
+| `$XDG_BIN_HOME`    | `$HOME/.local/bin`   | Local binaries                                 |
+| `$XDG_CONFIG_HOME` | `$HOME/.config`      | User-specific configs                          |
+| `$XDG_DATA_HOME`   | `$HOME/.local/share` | User-specific data files                       |
+| `$XDG_STATE_HOME`  | `$HOME/.local/state` | App state that should persist between restarts |
 
 - `$XDG_BIN_HOME` defines directory that contains local binaries.
 - `$XDG_DATA_HOME` defines the base directory relative to which user-specific data
