@@ -46,6 +46,7 @@ news.version=2.6.0
 default.project=Inbox
 calendar.details=full
 calendar.holidays=sparse
+recurrence=on
 
 uda.taskwarrior-tui.keyconfig.quit=q
 uda.taskwarrior-tui.keyconfig.refresh=r
