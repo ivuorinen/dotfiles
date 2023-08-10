@@ -21,10 +21,19 @@ autoload -U colors zsh/terminfo
 colors
 setopt correct
 
+export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
+x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
+
 # Add completion scripts to zsh path
-FPATH="~/.config/zsh/completion:$FPATH"
-autoload -Uz compinit && compinit -i
+FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
+autoload -Uz compinit
 compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
+
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  compinit
+fi
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()

@@ -36,4 +36,11 @@ for pkg in "${packages[@]}"; do
   echo ""
 done
 
+msg "Installing completions for selected packages"
+
+have git-profile && {
+  git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/git-profile" \
+    && msg_yay "Installed completions for git-profile"
+}
+
 msg_ok "Done"
