@@ -102,6 +102,12 @@ brew "dotenv-linter"
 brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Development kit for the Java programming language
+brew "openjdk"
 # Run arbitrary commands when files change
 brew "entr"
 # Perl lib for reading and writing EXIF metadata
@@ -150,10 +156,6 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -196,8 +198,6 @@ brew "mas"
 brew "ncdu"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
-# No Nonsense Neovim Client in Rust
-brew "neovide"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -208,8 +208,6 @@ brew "nvm"
 brew "openjdk@11"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
-# Development kit for the Java programming language
-brew "openjdk"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Highly capable, feature-rich programming language
@@ -240,6 +238,8 @@ brew "rust"
 brew "shellcheck"
 # Autoformat shell script source code
 brew "shfmt"
+# Support CI generation of SBOMs via golang tooling
+brew "spdx-sbom-generator"
 # Version control system designed to be a better CVS
 brew "subversion"
 # Feature-rich console based todo list manager
@@ -354,10 +354,10 @@ cask "jetbrains-toolbox"
 cask "lens"
 # Keep all tasks from your todo apps on your menu bar
 cask "monofocus"
-# Neovim Client
-cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Simple application that will prevent iTunes or Apple Music from launching
+cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
 # Scheduling application focusing on organization
@@ -422,6 +422,7 @@ vscode "bmewburn.vscode-intelephense-client"
 vscode "Box-Of-Hats.bemhelper"
 vscode "bradlc.vscode-tailwindcss"
 vscode "christian-kohler.npm-intellisense"
+vscode "christian-kohler.path-intellisense"
 vscode "DavidAnson.vscode-markdownlint"
 vscode "dbaeumer.vscode-eslint"
 vscode "DotJoshJohnson.xml"
@@ -429,6 +430,7 @@ vscode "eamodio.gitlens"
 vscode "EditorConfig.EditorConfig"
 vscode "esbenp.prettier-vscode"
 vscode "formulahendry.auto-close-tag"
+vscode "formulahendry.auto-rename-tag"
 vscode "formulahendry.code-runner"
 vscode "gencer.html-slim-scss-css-class-completion"
 vscode "github.vscode-github-actions"
@@ -444,6 +446,7 @@ vscode "liamhammett.inline-parameters"
 vscode "macieklad.tailwind-sass-syntax"
 vscode "MehediDracula.php-namespace-resolver"
 vscode "mikestead.dotenv"
+vscode "MisterJ.vue-volar-extention-pack"
 vscode "MrChetan.phpstorm-parameter-hints-in-vscode"
 vscode "mrorz.language-gettext"
 vscode "ms-azuretools.vscode-docker"
@@ -460,10 +463,10 @@ vscode "msjsdiag.vscode-react-native"
 vscode "mtxr.sqltools"
 vscode "neilbrayfield.php-docblocker"
 vscode "nhoizey.gremlins"
-vscode "octref.vetur"
 vscode "oderwat.indent-rainbow"
 vscode "pflannery.vscode-versionlens"
 vscode "phiter.phpstorm-snippets"
+vscode "sibiraj-s.vscode-scss-formatter"
 vscode "SonarSource.sonarlint-vscode"
 vscode "stylelint.vscode-stylelint"
 vscode "syler.sass-indented"
@@ -471,6 +474,7 @@ vscode "timonwong.shellcheck"
 vscode "tootone.org-mode"
 vscode "valeryanm.vscode-phpsab"
 vscode "Vue.volar"
+vscode "Vue.vscode-typescript-vue-plugin"
 vscode "WakaTime.vscode-wakatime"
 vscode "withfig.fig"
 vscode "wix.vscode-import-cost"
