@@ -1,0 +1,34 @@
+{
+  "profiles": {
+    "github": [
+      {
+        "key": "user.name",
+        "value": "Ismo Vuorinen"
+      },
+      {
+        "key": "user.email",
+        "value": "ivuorinen@users.noreply.github.com"
+      }
+    ],
+    "home": [
+      {
+        "key": "user.email",
+        "value": "ismo@ivuorinen.net"
+      },
+      {
+        "key": "user.name",
+        "value": "Ismo Vuorinen"
+      }
+    ],
+    "work": [
+      {
+        "key": "user.email",
+        "value": "ismo.vuorinen@vincit.fi"
+      },
+      {
+        "key": "user.name",
+        "value": "Ismo Vuorinen"
+      }
+    ]
+  }
+}
