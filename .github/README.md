@@ -25,11 +25,11 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ## tmux with powerlevel10k, the default view
 
-![screenshot of tmux with powerlevel10k](./.github/screenshots/tmux-powerlevel10k-130x20.png)
+![screenshot of tmux with powerlevel10k](./screenshots/tmux-powerlevel10k-130x20.png)
 
 ## tmux + nvim (astronvim) editing this repository
 
-![screenshot of tmux showing nvim](.github/screenshots/tmux-astronvim-130x40.png)
+![screenshot of tmux showing nvim](./screenshots/tmux-astronvim-130x40.png)
 
 ## Interesting files and locations
 
