@@ -119,6 +119,9 @@ path_append "$CARGO_HOME/bin"
 # screen
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 
+# sonarlint
+export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
+
 # tmux
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 
