@@ -112,6 +112,10 @@ x-dc "$RBENV_ROOT"
 have gem && path_append "$(gem environment gemdir)/bin"
 have rbenv && eval "$(rbenv init - zsh)"
 
+# Rust / cargo
+export CARGO_HOME="$XDG_STATE_HOME/cargo"
+path_append "$CARGO_HOME/bin"
+
 # screen
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 
