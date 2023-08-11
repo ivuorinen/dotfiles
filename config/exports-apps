@@ -95,6 +95,7 @@ have op && {
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 have pyenv && {
+  path_append "$(pyenv root)/shims"
   path_append "$PYENV_ROOT/bin"
   eval "$(pyenv init -)"
 }
