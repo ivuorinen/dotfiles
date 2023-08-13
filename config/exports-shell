@@ -2,6 +2,7 @@
 # shellcheck shell=bash
 # shellcheck disable=1091,2046
 # vim: filetype=zsh
+export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
 export LC_ALL=fi_FI.UTF-8

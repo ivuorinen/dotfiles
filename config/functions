@@ -3,6 +3,7 @@
 # shell functions
 #
 # shellcheck source="../scripts/shared.sh"
+export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
 # Weather in Tampere, or other city

@@ -17,6 +17,8 @@ export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
+export HISTFILE="$XDG_STATE_HOME"/zsh/history
+
 autoload -U colors zsh/terminfo
 colors
 setopt correct
@@ -32,7 +34,7 @@ compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 if type brew &>/dev/null
 then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  compinit
+  compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 fi
 
 # Run x-load-configs in your terminal to reload the files.

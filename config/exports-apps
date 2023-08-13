@@ -3,6 +3,7 @@
 # shellcheck enable=external-sources
 # shellcheck disable=1091,2139
 # vim: filetype=zsh
+export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
 # Antigen configuration
