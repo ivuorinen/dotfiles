@@ -57,6 +57,9 @@ return {
           '.DS_Store',
           'thumbs.db'
         },
+        never_show_by_pattern = { -- uses glob style patterns
+          ".null-ls_*",
+        },
       }
 
       return opts
