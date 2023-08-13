@@ -124,6 +124,9 @@ export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 # sonarlint
 export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
 
+# tldr / tealdeer
+export TEALDEER_CONFIG_DIR="$XDG_CONFIG_HOME/tealdeer/"
+
 # tmux
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 
