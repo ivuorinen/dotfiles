@@ -125,7 +125,7 @@ brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
 # Disk usage analyzer with console interface written in Go
-brew "gdu"
+brew "gdu", link: false
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -184,6 +184,8 @@ brew "jq"
 brew "krb5"
 # Lazier way to manage everything docker
 brew "lazydocker"
+# Postgres C API library
+brew "libpq"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
 # Rainbows and unicorns in your console!
@@ -279,7 +281,7 @@ brew "wget"
 # Personal information dashboard for your terminal
 brew "wtfutil"
 # Check your $HOME for unwanted files and directories
-brew "xdg-ninja"
+brew "xdg-ninja", args: ["HEAD"]
 # Hackable, minimal, fast TUI file explorer
 brew "xplr"
 # JavaScript package manager
@@ -463,6 +465,7 @@ vscode "msjsdiag.vscode-react-native"
 vscode "mtxr.sqltools"
 vscode "neilbrayfield.php-docblocker"
 vscode "nhoizey.gremlins"
+vscode "octref.vetur"
 vscode "oderwat.indent-rainbow"
 vscode "pflannery.vscode-versionlens"
 vscode "phiter.phpstorm-snippets"
@@ -476,7 +479,6 @@ vscode "valeryanm.vscode-phpsab"
 vscode "Vue.volar"
 vscode "Vue.vscode-typescript-vue-plugin"
 vscode "WakaTime.vscode-wakatime"
-vscode "withfig.fig"
 vscode "wix.vscode-import-cost"
 vscode "xdebug.php-debug"
 vscode "xdebug.php-pack"
