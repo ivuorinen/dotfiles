@@ -324,8 +324,6 @@ cask "dbeaver-community"
 cask "dbngin"
 # App to build and share containerized applications and microservices
 cask "docker"
-# Reimagine your terminal
-cask "fig"
 # UI toolkit for building applications for mobile, web and desktop
 cask "flutter"
 # Unofficial overcast.fm podcast app
