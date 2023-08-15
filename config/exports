@@ -17,16 +17,11 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
-eval "$(brew shellenv)"
-
-export HOMEBREW_PREFIX="$XDG_STATE_HOME/homebrew"
-
-export HOMEBREW_BIN="$HOMEBREW_PREFIX/bin"
-export HOMEBREW_PKG="$HOMEBREW_PREFIX/opt"
-export HOMEBREW_SBIN="$HOMEBREW_PREFIX/sbin"
+path_append "/opt/homebrew/bin"
+have brew && eval "$(brew shellenv)"
 
 path_append "/usr/local/bin"
-path_prepend "$XDG_BIN_HOME"
+path_append "$XDG_BIN_HOME"
 
 # brew, https://brew.sh
 have brew && {

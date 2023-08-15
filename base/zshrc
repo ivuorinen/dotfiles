@@ -1,13 +1,6 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=shared.sh
@@ -38,14 +31,13 @@ x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
 # Add completion scripts to zsh path
 FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
 autoload -Uz compinit
-compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
 if type brew &>/dev/null
 then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 fi
 
+compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
@@ -66,8 +58,6 @@ have antigen && {
 
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
   && source "${DOTFILES}/config/fzf/fzf.zsh"
-
-export LESSHISTFILE="$XDG_CACHE_HOME"/less_history
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 export P10K_LOCATION="$XDG_CONFIG_HOME/zsh/p10k.zsh"
