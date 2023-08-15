@@ -9,7 +9,7 @@ git submodule add --name cheat-community -f https://github.com/cheat/cheatsheets
 git submodule add --name tmux/tpm \
   -f https://github.com/tmux-plugins/tpm.git config/tmux/plugins/tpm
 git submodule add --name tmux/catppuccin \
-  -f https://github.com/catppuccin/tmux.git config/tmux/plugins/catppuccin
+  -f https://github.com/catppuccin/tmux.git config/tmux/plugins/tmux
 git submodule add --name tmux/tmux-1password \
   -f https://github.com/yardnsm/tmux-1password.git config/tmux/plugins/tmux-1password
 git submodule add --name tmux/tmux-autoreload \
