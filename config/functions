@@ -20,12 +20,6 @@ ssh-docker()
   docker exec -it "$@" bash
 }
 
-# Create a new directory and enter it
-mkd()
-{
-  mkdir -p "$@" && cd "$@" || exit
-}
-
 # All the dig info
 digga()
 {
@@ -61,24 +55,6 @@ scheduler()
     php artisan schedule:run
     echo "Sleeping 60 seconds..."
     sleep 60
-  done
-}
-
-silent()
-{
-  "$@" >&/dev/null
-}
-
-ask()
-{
-  while true; do
-    read -p "$1 ([y]/n) " -r
-    REPLY=${REPLY:-"y"}
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-      return 1
-    elif [[ $REPLY =~ ^[Nn]$ ]]; then
-      return 0
-    fi
   done
 }
 

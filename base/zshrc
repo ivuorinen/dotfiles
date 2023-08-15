@@ -13,6 +13,19 @@ export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
+# Run x-load-configs in your terminal to reload the files.
+function x-load-configs()
+{
+  # Load the shell dotfiles, and then some:
+  for file in $DOTFILES/config/{exports,alias,functions}; do
+    [ -r "$file" ] && source "$file"
+    [ -r "$file-secret" ] && source "$file-secret"
+    [ -r "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
+    [ -r "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
+  done
+}
+x-load-configs
+
 export HISTFILE="$XDG_STATE_HOME"/zsh/history
 
 autoload -U colors zsh/terminfo
@@ -33,18 +46,6 @@ then
   compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 fi
 
-# Run x-load-configs in your terminal to reload the files.
-function x-load-configs()
-{
-  # Load the shell dotfiles, and then some:
-  for file in $DOTFILES/config/{exports,alias,functions}; do
-    [ -r "$file" ] && source "$file"
-    [ -r "$file-secret" ] && source "$file-secret"
-    [ -r "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
-    [ -r "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
-  done
-}
-x-load-configs
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;

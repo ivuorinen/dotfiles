@@ -294,3 +294,46 @@ function replacable()
 
   return 1
 }
+
+# Create directory if it doesn't exist already
+x-dc()
+{
+  dir="$1"
+
+  [ $# -eq 0 ] && {
+    echo "Usage: $0 full/path/to/dir/to/create"
+    exit 1
+  }
+
+  if [ ! -d "$dir" ]; then
+    mkdir -p "$dir" && exit 0
+  fi
+}
+
+# Create a new directory and enter it
+mkd()
+{
+  mkdir -p "$@" && cd "$@" || exit
+}
+
+# Run command silently
+# Usage: silent uptime
+silent()
+{
+  "$@" >&/dev/null
+}
+
+# Create a prompt which you have to answer y/n to continue
+ask()
+{
+  while true; do
+    read -p "$1 ([y]/n) " -r
+    REPLY=${REPLY:-"y"}
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      return 1
+    elif [[ $REPLY =~ ^[Nn]$ ]]; then
+      return 0
+    fi
+  done
+}
+
