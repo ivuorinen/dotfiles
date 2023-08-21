@@ -76,9 +76,6 @@ x-default-antigen-bundles()
 
   # these should be available if there's need
   have brew && antigen bundle brew
-  have docker && antigen bundle docker
-  have docker-compose && antigen bundle sroze/docker-compose-zsh-plugin
-  have jq && antigen bundle reegnz/jq-zsh-plugin
   have nvm && antigen bundle nvm
   have nvm && antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
   have php && antigen bundle php
