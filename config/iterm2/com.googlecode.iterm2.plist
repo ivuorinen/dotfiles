@@ -637,6 +637,8 @@
 			<integer>130</integer>
 			<key>Command</key>
 			<string></string>
+			<key>Cursor Boost</key>
+			<real>0.19958333333333333</real>
 			<key>Cursor Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -709,6 +711,8 @@
 			<string>B563F48B-314D-48CC-908E-ACA971D430BE</string>
 			<key>Horizontal Spacing</key>
 			<real>1</real>
+			<key>Icon</key>
+			<integer>1</integer>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Jobs to Ignore</key>
@@ -1014,6 +1018,8 @@
 				<key>Red Component</key>
 				<real>0.19802422821521759</real>
 			</dict>
+			<key>Minimum Contrast</key>
+			<real>0.49644531250000001</real>
 			<key>Mouse Reporting</key>
 			<true/>
 			<key>Name</key>
@@ -1244,6 +1250,8 @@
 			<true/>
 			<key>Use Bright Bold</key>
 			<true/>
+			<key>Use Cursor Guide</key>
+			<false/>
 			<key>Use Italic Font</key>
 			<true/>
 			<key>Use Non-ASCII Font</key>
@@ -1317,8 +1325,6 @@
 	<true/>
 	<key>VisualIndicatorForEsc</key>
 	<false/>
-	<key>WindowNumber</key>
-	<true/>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
