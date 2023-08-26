@@ -1,5 +1,6 @@
+.git/**
 config/cheat/cheatsheets/community/**
-config/tmux/**
-config/nvim/**
-tools/**
+tools/dotbot/**
+tools/dotbot-brew/**
+tools/dotbot-include/**
 
