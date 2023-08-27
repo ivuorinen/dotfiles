@@ -14,10 +14,6 @@ packages=(
   "github-release-notes"
   "neovim"
   "corepack"
-  # CLI and local web plain text note‑taking, bookmarking, and archiving
-  # with linking, tagging, filtering, search, Git versioning & syncing,
-  # Pandoc conversion, + more, in a single portable script.
-  "nb.sh"
 )
 
 for pkg in "${packages[@]}"; do
