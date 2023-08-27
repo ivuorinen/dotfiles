@@ -14,12 +14,6 @@
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
 	ignore = dirty
 
-[submodule "config/nvim"]
-	path = config/nvim
-	url = https://github.com/AstroNvim/AstroNvim.git
-	ignore = dirty
-	shallow = true
-
 [submodule "cheat-community"]
 	path = config/cheat/cheatsheets/community
 	url = https://github.com/cheat/cheatsheets.git
