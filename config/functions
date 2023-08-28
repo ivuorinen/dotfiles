@@ -61,14 +61,17 @@ scheduler()
 # Defines default antigen bundles
 x-default-antigen-bundles()
 {
-  # the theme to use
-  antigen theme romkatv/powerlevel10k
+  export ZSH_TMUX_AUTOSTART=true
+  export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
+  export ZSH_TMUX_UNICODE=true
 
   # these should be always available
+  antigen bundle autoenv
+  antigen bundle tmux
   antigen bundle colored-man-pages
   antigen bundle command-not-found
   antigen bundle ssh-agent
-  antigen bundle MichaelAquilina/zsh-you-should-use
+  # antigen bundle MichaelAquilina/zsh-you-should-use
   antigen bundle jreese/zsh-titles
   antigen bundle unixorn/autoupdate-antigen.zshplugin
   antigen bundle zsh-users/zsh-completions
@@ -81,4 +84,7 @@ x-default-antigen-bundles()
   have php && antigen bundle php
   have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
   have rvm && antigen bundle unixorn/rvm-plugin
+
+  # the theme to use
+  antigen theme romkatv/powerlevel10k
 }
