@@ -82,6 +82,9 @@ return {
       },
     },
   },
+
+  "rcarriga/nvim-notify",
+
   -- Status information for LSP.
   "j-hui/fidget.nvim",
 
