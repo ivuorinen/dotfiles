@@ -28,9 +28,9 @@
     ~/.config/:
       glob: true
       path: config/**
-    ~/.local/bin/:
+    ~/.local/:
       glob: true
-      path: local/bin/**
+      path: local/**
     ~/.ssh/:
       glob: true
       mode: 0600
