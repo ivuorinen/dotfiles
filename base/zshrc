@@ -58,6 +58,7 @@ have antigen && {
   antigen apply
 }
 
+# shellcheck source=../config/fzf/fzf.zsh
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
   && source "${DOTFILES}/config/fzf/fzf.zsh"
 

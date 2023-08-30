@@ -1,13 +1,12 @@
 # Setup fzf
 # ---------
-if [[ ! "$PATH" == *$HOME/.config/fzf/bin* ]]; then
-  PATH="${PATH:+${PATH}:}$HOME/.config/fzf/bin"
-fi
 
 # Auto-completion
 # ---------------
-[[ $- == *i* ]] && source "$HOME/.config/fzf/shell/completion.zsh" 2> /dev/null
+# shellcheck source=completion.zsh
+[[ $- == *i* ]] && source "$HOME/.dotfiles/config/fzf/completion.zsh" 2> /dev/null
 
 # Key bindings
 # ------------
-source "$HOME/.config/fzf/shell/key-bindings.zsh"
+# shellcheck source=key-bindings.zsh
+source "$HOME/.dotfiles/config/fzf/key-bindings.zsh"

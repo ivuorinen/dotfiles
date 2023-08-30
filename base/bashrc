@@ -20,6 +20,6 @@ x-load-configs
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null;
 
+# shellcheck source=../config/fzf/fzf.bash
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] \
   && source "${DOTFILES}/config/fzf/fzf.bash"
-

@@ -1,13 +1,12 @@
 # Setup fzf
 # ---------
-if [[ ! "$PATH" == */Users/ivuorinen/.config/fzf/bin* ]]; then
-  PATH="${PATH:+${PATH}:}/Users/ivuorinen/.config/fzf/bin"
-fi
 
 # Auto-completion
 # ---------------
-[[ $- == *i* ]] && source "/Users/ivuorinen/.config/fzf/shell/completion.bash" 2> /dev/null
+# shellcheck source=completion.bash
+[[ $- == *i* ]] && source "$HOME/.dotfiles/config/fzf/completion.bash" 2> /dev/null
 
 # Key bindings
 # ------------
-source "/Users/ivuorinen/.config/fzf/shell/key-bindings.bash"
+# shellcheck source=key-bindings.bash
+source "$HOME/.dotfiles/config/fzf/key-bindings.bash"
