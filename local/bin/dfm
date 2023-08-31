@@ -250,10 +250,12 @@ function section_dotfiles
     shfmt)
       # Format shell scripts according to following rules.
       find "$DOTFILES" \
-        -type f -perm +111 \
+        -type f -executable \
         -not -path '*/.git/*' \
         -not -path '*dotbot*' \
-        -not -path '*tmux*' \
+        -not -path '*config/fzf*' \
+        -not -path '*bin/fzf*' \
+        -not -path '*tmux/plugins*' \
         -not -name '*.pl' \
         -not -name '*.py' \
         -not -name '*.php' \
