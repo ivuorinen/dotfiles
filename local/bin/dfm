@@ -184,8 +184,8 @@ function section_helpers
   case "$1" in
     path)
       # shellcheck disable=2001
-      for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done;
-    ;;
+      for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done
+      ;;
     *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }

@@ -31,26 +31,28 @@
 # 2. Functions to minise code.
 #{
 
-  # I.
-  notify () {
+# I.
+notify()
+{
 
-    notify-call \
-      --replace-file "$replace_id" \
-      "$@"
+  notify-call \
+    --replace-file "$replace_id" \
+    "$@"
 
-  }
+}
 
-  # II.
-  stop () {
+# II.
+stop()
+{
 
-    # A.
-    #pkill -INT -f 'ffmpeg -f alsa -ac 1 -i pulse -f x11grab -r 30 -s '
-    giph --stop
+  # A.
+  #pkill -INT -f 'ffmpeg -f alsa -ac 1 -i pulse -f x11grab -r 30 -s '
+  giph --stop
 
-    # C.
-    eww update record_menu=false
+  # C.
+  eww update record_menu=false
 
-  }
+}
 #}
 
 # #. Kill previous giph process.
@@ -76,7 +78,7 @@ fi
   case "$1" in
 
     # A. Supported.
-    'mkv' | 'gif' | 'webm' | 'mp4' ) ;;
+    'mkv' | 'gif' | 'webm' | 'mp4') ;;
 
     # B. Not supported.
     *)
@@ -93,7 +95,7 @@ fi
       # II. Execute itself.
       exec $0 $format $2
 
-    ;;
+      ;;
 
   esac
 
@@ -170,7 +172,7 @@ fi
       gtk-launch \
       "$(xdg-mime query default inode/directory)" \
       "$path_recordings/" \
-      >/dev/null 2>&1 &
+      > /dev/null 2>&1 &
 
   fi
 

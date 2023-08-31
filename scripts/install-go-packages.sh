@@ -7,6 +7,8 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 ! have go && msg "go hasn't been installed yet." && exit 0
 
 packages=(
+  # A shell parser, formatter, and interpreter with bash support; includes shfmt
+  mvdan.cc/sh/v3/cmd/shfmt@latest
   # sysadmin/scripting utilities, distributed as a single binary
   github.com/skx/sysbox@latest
   # Git Profile allows you to switch between user profiles in git repos

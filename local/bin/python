@@ -4,4 +4,3 @@
 # and anyone else who expects to see a 'python' executable
 
 exec python3 "$@"
-

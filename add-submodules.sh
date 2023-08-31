@@ -34,4 +34,3 @@ git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
 git submodule add --name tmux/vim-tmux-navigator \
   -f https://github.com/christoomey/vim-tmux-navigator.git config/tmux/plugins/vim-tmux-navigator
-
