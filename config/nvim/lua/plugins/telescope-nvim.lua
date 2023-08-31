@@ -77,6 +77,15 @@ return {
         -- Developer configurations: Not meant for general override
         buffer_previewer_maker = previewers.buffer_previewer_maker,
       },
+      pickers = {
+        buffers = {
+          mappings = {
+            i = {
+              ["<c-d>"] = actions.delete_buffer + actions.move_to_top,
+            }
+          }
+        }
+      },
 
       extensions_list = { "themes", "terms" },
     })

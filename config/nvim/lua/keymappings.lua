@@ -45,6 +45,18 @@ wk.register({
         "Delete hidden buffers",
       },
     },
+    g = {
+      name = "Goto buffer",
+      ["1"] = { "<cmd>buffer! 1<cr>", "Buffer 1" },
+      ["2"] = { "<cmd>buffer! 2<cr>", "Buffer 2" },
+      ["3"] = { "<cmd>buffer! 3<cr>", "Buffer 3" },
+      ["4"] = { "<cmd>buffer! 4<cr>", "Buffer 4" },
+      ["5"] = { "<cmd>buffer! 5<cr>", "Buffer 5" },
+      ["6"] = { "<cmd>buffer! 6<cr>", "Buffer 6" },
+      ["7"] = { "<cmd>buffer! 7<cr>", "Buffer 7" },
+      ["8"] = { "<cmd>buffer! 8<cr>", "Buffer 8" },
+      ["9"] = { "<cmd>buffer! 9<cr>", "Buffer 9" },
+    },
   },
   D = {
     name = "[D]iagnostics (Trouble)",
@@ -53,6 +65,12 @@ wk.register({
     f = { ":lua vim.diagnostic.open_float()<CR>", "[D]iagnostics: Open [f]loat" },
     n = { ":lua vim.diagnostic.goto_next()<CR>", "[D]iagnostics: [n]ext" },
     p = { ":lua vim.diagnostic.goto_prev()<CR>", "[D]iagnostics: [p]rev" },
+  },
+  e = {
+    function()
+      vim.cmd("Neotree focus source=filesystem position=left")
+    end,
+    "Toggle the sidebar tree of the root folder.",
   },
   f = {
     name = "[f]ind",
@@ -108,28 +126,41 @@ wk.register({
   x = { ":Bdelete<CR>", "[x]: Close current buffer" },
 }, { prefix = "<leader>" })
 
--- Normal mode, prefix <leader>
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Normal mode, prefix <leader>                             │
+--  ╰──────────────────────────────────────────────────────────╯
 wk.register({
   b = { name = "Buffer" },
 }, { mode = "n", prefix = "<leader>" })
 
--- Insert mode, prefix <leader>
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Insert mode, prefix <leader>                             │
+--  ╰──────────────────────────────────────────────────────────╯
 wk.register({
   b = { name = "Buffer" },
 }, { mode = "i", prefix = "<leader>" })
+
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Insert mode, no prefix                                   │
+--  ╰──────────────────────────────────────────────────────────╯
+wk.register({
+  ["<C-s>"] = { "<cmd>w<cr>", "Save file" },
+  ["<C-Home>"] = { "<Home>", "Do just Home on CTRL + Home" },
+}, { mode = "i", prefix = "" })
+
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ All modes, no prefix                                     │
+--  ╰──────────────────────────────────────────────────────────╯
+wk.register({
+  ["<C-s>"] = { "<cmd>w<cr>", "Save file" },
+  ["<C-End>"] = { "<End>", "Do just End on CTRL + End" },
+}, { prefix = "" })
 
 -- Go to the next block.
 --key('n', '<C-Down>', 'g%', remap )
 
 -- Loop through brackets blocks.
 --key('n', '<C-Up>', 'z%', remap )
-
--- Do just End on CTRL + End.
-key("i", "<C-End>", "<End>", remap)
-key("n", "<C-End>", "<End>", remap)
-
--- Do just Home on CTRL + Home.
-key("i", "<C-Home>", "<End>", remap)
 
 -- Highlight the word after pressing enter.
 key(
@@ -149,14 +180,6 @@ key(
 
 -- Toggle highlight of search
 key("n", "<C-c>", ":set hlsearch!<CR>", remap)
-
--- Toggle the sidebar tree of the root folder.
-key("n", "<leader>e", "", {
-  noremap = true,
-  silent = true,
-  desc = "Open NeoTree without warnings",
-  callback = function() vim.cmd("Neotree toggle source=filesystem position=left") end,
-})
 
 -- Try to correct the current word.
 key("i", "<C-b>", "ea<C-x><C-s>", remap)
@@ -180,9 +203,6 @@ key("v", "<C-x>", "mad`ai<Right>", { silent = true })
 -- Set 'CTRL + c' as 'copier'
 key("v", "<C-c>", "may`ai", remap)
 key("i", "<C-v>", "<Esc>:Registers<CR>", remap)
-
--- Set 'CTRL + s as save'
-key("n", "<C-s>", "<cmd>w<cr>", remap)
 
 -- Create mark.
 key("n", "'", "`", remap)
@@ -227,53 +247,3 @@ key("v", ">", ">gv", remap)
 
 -- Set 'Backspace' as 'delete selection' for the visual selection.
 key("v", "<BS>", '"_di', remap)
-
----
-
--- Barbar keymappings
-
-local map = vim.api.nvim_set_keymap
-local opts = { noremap = true, silent = true }
-
--- Move to previous/next
-map("n", "<C-,>", "<Cmd>BufferPrevious<CR>", opts)
-map("n", "<C-.>", "<Cmd>BufferNext<CR>", opts)
--- Re-order to previous/next
-map("n", "<C-<>", "<Cmd>BufferMovePrevious<CR>", opts)
-map("n", "<C->>", "<Cmd>BufferMoveNext<CR>", opts)
--- Goto buffer in position...
-map("n", "<C-1>", "<Cmd>BufferGoto 1<CR>", opts)
-map("n", "<C-2>", "<Cmd>BufferGoto 2<CR>", opts)
-map("n", "<C-3>", "<Cmd>BufferGoto 3<CR>", opts)
-map("n", "<C-4>", "<Cmd>BufferGoto 4<CR>", opts)
-map("n", "<C-5>", "<Cmd>BufferGoto 5<CR>", opts)
-map("n", "<C-6>", "<Cmd>BufferGoto 6<CR>", opts)
-map("n", "<C-7>", "<Cmd>BufferGoto 7<CR>", opts)
-map("n", "<C-8>", "<Cmd>BufferGoto 8<CR>", opts)
-map("n", "<C-9>", "<Cmd>BufferGoto 9<CR>", opts)
-map("n", "<C-0>", "<Cmd>BufferLast<CR>", opts)
--- Pin/unpin buffer
-map("n", "<C-p>", "<Cmd>BufferPin<CR>", opts)
-
--- Close buffer
--- map('n', '<C-c>', '<Cmd>BufferClose<CR>', opts)
-
--- Wipeout buffer
---                 :BufferWipeout
--- Close commands
---                 :BufferCloseAllButCurrent
---                 :BufferCloseAllButPinned
---                 :BufferCloseAllButCurrentOrPinned
---                 :BufferCloseBuffersLeft
---                 :BufferCloseBuffersRight
--- Magic buffer-picking mode
-map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
--- Sort automatically by...
-map("n", "<Space>bb", "<Cmd>BufferOrderByBufferNumber<CR>", opts)
-map("n", "<Space>bd", "<Cmd>BufferOrderByDirectory<CR>", opts)
-map("n", "<Space>bl", "<Cmd>BufferOrderByLanguage<CR>", opts)
-map("n", "<Space>bw", "<Cmd>BufferOrderByWindowNumber<CR>", opts)
-
--- Other:
--- :BarbarEnable - enables barbar (enabled by default)
--- :BarbarDisable - very bad command, should never be used
