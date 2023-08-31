@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Setting aliases for tunkki
+
+alias nvim="/snap/nvim/current/usr/bin/nvim"
