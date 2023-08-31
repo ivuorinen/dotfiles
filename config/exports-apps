@@ -24,6 +24,8 @@ have ansible && {
 
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 
+export HOMEBREW_NO_ENV_HINTS=true
+
 # composer, https://getcomposer.org/
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"

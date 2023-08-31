@@ -18,6 +18,8 @@ tap "xwmx/taps"
 brew "act"
 # Mozilla CA certificate store
 brew "ca-certificates"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
 # YAML Parser
@@ -100,8 +102,6 @@ brew "dnsmasq"
 brew "dog"
 # Lightning-fast linter for .env files written in Rust
 brew "dotenv-linter"
-# Tool to verify that your files are in harmony with your .editorconfig
-brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
 # Run arbitrary commands when files change
@@ -411,6 +411,7 @@ mas "Actions", id: 1586435171
 mas "Audiobook Builder", id: 1437681957
 mas "Ivory", id: 6444602274
 mas "Keynote", id: 409183694
+mas "LastPass", id: 926036361
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Tailscale", id: 1475387142
