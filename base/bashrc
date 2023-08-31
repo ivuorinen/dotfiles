@@ -7,12 +7,13 @@ export DOTFILES="$HOME/.dotfiles"
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
 {
+    HOST="$(hostname -s)"
     # Load the shell dotfiles, and then some:
     for file in $DOTFILES/config/{exports,alias,functions}; do
         [ -r "$file" ] && source "$file"
         [ -r "$file-secret" ] && source "$file-secret"
-        [ -r "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
-        [ -r "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
+        [ -r "$file-$HOST" ] && source "$file-$HOST"
+        [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
     done
 }
 x-load-configs
