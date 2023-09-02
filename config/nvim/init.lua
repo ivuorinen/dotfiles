@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 local key = vim.api.nvim_set_keymap
 local remap = { noremap = true, silent = true }
 

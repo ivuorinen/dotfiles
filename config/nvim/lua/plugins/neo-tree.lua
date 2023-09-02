@@ -1,4 +1,6 @@
 -- File-tree manager.
+-- https://github.com/nvim-neo-tree/neo-tree.nvim
+-- luacheck: globals vim
 
 -- Unless you are still migrating, remove the deprecated commands from v1.x
 vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
@@ -7,7 +9,7 @@ return {
   "nvim-neo-tree/neo-tree.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "kyazdani42/nvim-web-devicons", -- not strictly required, but recommended
+    "kyazdani42/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
     {
       -- only needed if you want to use the commands with "_with_window_picker" suffix
@@ -39,13 +41,17 @@ return {
     vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵", texthl = "DiagnosticSignHint" })
 
     require("neo-tree").setup({
-      close_if_last_window = true,    -- Close Neo-tree if it is the last window left in the tab
-      popup_border_style = "rounded", -- "double", "none", "rounded", "shadow", "single" or "solid"
+      -- Close Neo-tree if it is the last window left in the tab
+      close_if_last_window = true,
+      -- "double", "none", "rounded", "shadow", "single" or "solid"
+      popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
-      enable_normal_mode_for_inputs = false,                             -- Enable normal mode for input dialogs.
+      -- Enable normal mode for input dialogs.
+      enable_normal_mode_for_inputs = false,
 
-      open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
+      -- when opening files, do not use windows containing these filetypes or buftypes
+      open_files_do_not_replace_types = { "terminal", "trouble", "qf" },
 
       -- popup_border_style is for input and confirmation dialogs.
       -- Configurtaion of floating window is done in the individual source sections.
@@ -53,13 +59,20 @@ return {
       close_floats_on_escape_key = true,
       default_source = "filesystem",
       git_status_async = true,
-      log_level = "info",               -- "trace", "debug", "info", "warn", "error", "fatal"
-      log_to_file = false,              -- true, false, "/path/to/file.log", use :NeoTreeLogs to show the file
-      open_files_in_last_window = true, -- false                                                                = open files in top left window
-      resize_timer_interval = 100,      -- in ms, needed for containers to redraw right aligned and faded content
-      sort_case_insensitive = true,     -- used when sorting files and directories in the tree
-      use_popups_for_input = false,     -- If false, inputs will use vim.ui.input() instead of custom floats.
-      sort_function = nil,              -- use a custom function for sorting files and directories in the tree
+      -- "trace", "debug", "info", "warn", "error", "fatal"
+      log_level = "info",
+      -- true, false, "/path/to/file.log", use :NeoTreeLogs to show the file
+      log_to_file = false,
+      -- false = open files in top left window
+      open_files_in_last_window = true,
+      -- in ms, needed for containers to redraw right aligned and faded content
+      resize_timer_interval = 100,
+      -- used when sorting files and directories in the tree
+      sort_case_insensitive = true,
+      -- If false, inputs will use vim.ui.input() instead of custom floats.
+      use_popups_for_input = false,
+      -- use a custom function for sorting files and directories in the tree
+      sort_function = nil,
 
       event_handlers = {
         --  {
@@ -121,14 +134,16 @@ return {
         },
         indent = {
           indent_size = 2,
-          padding = 1, -- extra padding on left hand side
+          -- extra padding on left hand side
+          padding = 1,
           -- indent guides
           with_markers = true,
           indent_marker = "│",
           last_indent_marker = "└",
           highlight = "NeoTreeIndentMarker",
           -- expander config, needed for nesting files
-          with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+          -- if nil and file nesting is enabled, will enable expanders
+          with_expanders = true,
           expander_collapsed = "",
           expander_expanded = "",
           expander_highlight = "NeoTreeExpander",
@@ -155,10 +170,10 @@ return {
         git_status = {
           symbols = {
             -- Change type
-            added = "˖", -- or "✚", but this is redundant info if you use git_status_colors on the name
-            modified = "±", -- or "", but this is redundant info if you use git_status_colors on the name
-            deleted = "✕", -- this can only be used in the git_status source
-            renamed = "↪", -- this can only be used in the git_status source
+            added = "˖",
+            modified = "±",
+            deleted = "✕",
+            renamed = "↪",
             -- Status type
             untracked = "?",
             ignored = "⍨",
@@ -223,15 +238,20 @@ return {
       -- that will be available in all sources (if not overridden in `opts[source_name].commands`)
       -- see `:h neo-tree-custom-commands-global`
       commands = {},
-      window = {           -- see https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup for
+      window = {
+        -- see https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup for
         -- possible options. These can also be functions that return these options.
-        position = "left", -- left, right, float, current
-        width = 40,        -- applies to left and right positions
+
+        -- left, right, float, current
+        position = "left",
+        -- applies to left and right positions
+        width = 40,
         mapping_options = {
           noremap = true,
           nowait = true,
         },
-        popup = { -- settings that apply to float position only
+        -- settings that apply to float position only
+        popup = {
           size = {
             height = "80%",
             width = "50%",
@@ -245,11 +265,14 @@ return {
         mappings = {
           ["<space>"] = {
             "toggle_node",
-            nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
+            -- disable `nowait` if you have existing combos
+            -- starting with this char that you want to use
+            nowait = false,
           },
           ["<2-LeftMouse>"] = "open",
           ["<cr>"] = "open",
-          ["<esc>"] = "cancel", -- close preview or floating neo-tree window
+          -- close preview or floating neo-tree window
+          ["<esc>"] = "cancel",
           ["P"] = { "toggle_preview", config = { use_float = true } },
           ["l"] = "focus_preview",
           ["S"] = "open_split",
@@ -260,33 +283,41 @@ return {
           -- ["<cr>"] = "open_drop",
           -- ["t"] = "open_tab_drop",
           ["w"] = "open_with_window_picker",
-          --["P"] = "toggle_preview", -- enter preview mode, which shows the current node without focusing
+          -- -- enter preview mode, which shows the current node without focusing
+          --["P"] = "toggle_preview",
           ["C"] = "close_node",
           -- ['C'] = 'close_all_subnodes',
           ["z"] = "close_all_nodes",
           --["Z"] = "expand_all_nodes",
           ["a"] = {
             "add",
-            -- this command supports BASH style brace expansion ("x{a,b,c}" -> xa,xb,xc). see `:h neo-tree-file-actions` for details
-            -- some commands may take optional config options, see `:h neo-tree-mappings` for details
+            -- this command supports BASH style brace expansion ("x{a,b,c}" -> xa,xb,xc).
+            -- see `:h neo-tree-file-actions` for details
+            -- some commands may take optional config options,
+            -- see `:h neo-tree-mappings` for details
             config = {
-              show_path = "none", -- "none", "relative", "absolute"
+              -- "none", "relative", "absolute"
+              show_path = "relative",
             },
           },
-          ["A"] = "add_directory", -- also accepts the optional config.show_path option like "add". this also supports BASH style brace expansion.
+          -- also accepts the optional config.show_path option like "add".
+          -- this also supports BASH style brace expansion.
+          ["A"] = "add_directory",
           ["d"] = "delete",
           ["r"] = "rename",
           ["y"] = "copy_to_clipboard",
           ["x"] = "cut_to_clipboard",
           ["p"] = "paste_from_clipboard",
-          ["c"] = "copy", -- takes text input for destination, also accepts the optional config.show_path option like "add":
+          -- takes text input for destination, also accepts the optional config.show_path option like "add":
           -- ["c"] = {
           --  "copy",
           --  config = {
           --    show_path = "none" -- "none", "relative", "absolute"
           --  }
           --}
-          ["m"] = "move", -- takes text input for destination, also accepts the optional config.show_path option like "add".
+          ["c"] = "copy",
+          -- takes text input for destination, also accepts the optional config.show_path option like "add".
+          ["m"] = "move",
           ["q"] = "close_window",
           ["R"] = "refresh",
           ["?"] = "show_help",
@@ -296,9 +327,10 @@ return {
       },
       nesting_rules = {},
       filesystem = {
-        commands = {}, -- Add a custom command or override a global one using the same function name
+        -- Add a custom command or override a global one using the same function name
+        commands = {},
         components = {
-          harpoon_index = function(config, node, state)
+          harpoon_index = function(config, node, _)
             local Marked = require("harpoon.mark")
             local path = node:get_id()
             local succuss, index = pcall(Marked.get_index_of, path)
@@ -313,10 +345,12 @@ return {
           end,
         },
         filtered_items = {
-          visible = false, -- when true, they will just be displayed differently than normal items
+          -- when true, they will just be displayed differently than normal items
+          visible = false,
           hide_dotfiles = false,
           hide_gitignored = false,
-          hide_hidden = true, -- only works on Windows for hidden files/directories
+          -- only works on Windows for hidden files/directories
+          hide_hidden = true,
           hide_by_name = {
             ".git",
             ".DS_Store",
@@ -325,7 +359,8 @@ return {
             ".mypy_cache",
             "node_modules",
           },
-          hide_by_pattern = { -- uses glob style patterns
+          -- uses glob style patterns
+          hide_by_pattern = {
             --"*.meta",
             --"*/src/*/tsconfig.json",
             "*-cache",
@@ -342,26 +377,34 @@ return {
           },
         },
         find_by_full_path_words = true,
-        group_empty_dirs = false,               -- when true, empty folders will be grouped together
-        bind_to_cwd = false,                    -- true creates a 2-way binding between vim's cwd and neo-tree's root
-        search_limit = 50,                      -- max number of search results when using filters
+        -- when true, empty folders will be grouped together
+        group_empty_dirs = false,
+        -- true creates a 2-way binding between vim's cwd and neo-tree's root
+        bind_to_cwd = false,
+        -- max number of search results when using filters
+        search_limit = 50,
         follow_current_file = {
-          enabled = false,                      -- This will find and focus the file in the active buffer every time
-          --               -- the current file is changed while the tree is open.
-          leave_dirs_open = false,              -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          -- This will find and focus the file in the active buffer every time
+          -- the current file is changed while the tree is open.
+          enabled = false,
+          -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          leave_dirs_open = false,
         },
-        hijack_netrw_behavior = "open_default", -- netrw disabled, opening a directory opens neo-tree
+        -- netrw disabled, opening a directory opens neo-tree
         -- in whatever position is specified in window.position
         -- "open_current",  -- netrw disabled, opening a directory opens within the
         -- window like netrw would, regardless of window.position
         -- "disabled",    -- netrw left alone, neo-tree does not handle opening dirs
-        use_libuv_file_watcher = false, -- This will use the OS level file watchers to detect changes
+        hijack_netrw_behavior = "open_default",
+        -- This will use the OS level file watchers to detect changes
         -- instead of relying on nvim autocmd events.
+        use_libuv_file_watcher = true,
         window = {
           mappings = {
             ["."] = "set_root",
             ["/"] = "fuzzy_finder",
-            ["#"] = "fuzzy_sorter", -- fuzzy sorting using the fzy algorithm
+            -- fuzzy sorting using the fzy algorithm
+            ["#"] = "fuzzy_sorter",
             ["<bs>"] = "navigate_up",
             ["<c-up>"] = "navigate_up",
             ["<c-x>"] = "clear_filter",
@@ -371,7 +414,8 @@ return {
             ["gp"] = "prev_git_modified",
             ["H"] = "toggle_hidden",
           },
-          fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
+          -- define keymaps for filter popup window in fuzzy_finder_mode
+          fuzzy_finder_mappings = {
             ["<down>"] = "move_cursor_down",
             ["<C-n>"] = "move_cursor_down",
             ["<up>"] = "move_cursor_up",
@@ -381,11 +425,14 @@ return {
       },
       buffers = {
         follow_current_file = {
-          enabled = true,         -- This will find and focus the file in the active buffer every time
-          --              -- the current file is changed while the tree is open.
-          leave_dirs_open = true, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          -- This will find and focus the file in the active buffer every time
+          -- the current file is changed while the tree is open.
+          enabled = true,
+          -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          leave_dirs_open = true,
         },
-        group_empty_dirs = true,  -- when true, empty folders will be grouped together
+        -- when true, empty folders will be grouped together
+        group_empty_dirs = true,
         show_unloaded = true,
         window = {
           mappings = {

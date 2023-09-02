@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 -- Completion menu.
 
 -- Icons to display.
@@ -140,6 +141,7 @@ return {
 
       -- Formatting the menu display.
       formatting = {
+        expandable_indicator = true,
         fields = { "kind", "abbr", "menu" },
         format = function(_, vim_item)
           vim_item.menu = vim_item.kind
@@ -202,7 +204,7 @@ return {
         {
           name = "nvim_lsp",
           priority = 11,
-          --max_item_count = 10,
+          max_item_count = 10,
         },
 
         -- Snippets in general to facilitate life.

@@ -1,4 +1,5 @@
 -- Completion for snippets.
+-- luacheck: globals vim CAPABILITIES
 CAPABILITIES = vim.lsp.protocol.make_client_capabilities()
 CAPABILITIES = require("cmp_nvim_lsp").default_capabilities(CAPABILITIES)
 CAPABILITIES.textDocument.completion.completionItem.snippetSupport = true

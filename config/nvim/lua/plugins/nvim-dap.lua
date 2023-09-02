@@ -1,10 +1,8 @@
 --
 -- Shows how to use the DAP plugin to debug your code.
 --
--- Primarily focused on configuring the debugger for Go, but can
--- be extended to other languages as well. That's why it's called
--- kickstart.nvim and not kitchen-sink.nvim ;)
-
+-- https://github.com/mfussenegger/nvim-dap
+-- luacheck: globals vim
 return {
   "mfussenegger/nvim-dap",
   dependencies = {
@@ -30,7 +28,7 @@ return {
 
       -- You can provide additional configuration to the handlers,
       -- see mason-nvim-dap README for more information
-      handlers = {},
+      -- handlers = {},
 
       -- You'll need to check that you have the required things installed
       -- online, please don't ask me how to install them :)
@@ -39,6 +37,7 @@ return {
         "bash",
         "delve",
         "js",
+        "lua",
         "php",
         "python",
       },

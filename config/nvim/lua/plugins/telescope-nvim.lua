@@ -1,9 +1,11 @@
 -- Telescope, a see-all-through file manager.
+-- vim: ts=2 sw=2 si et
+-- luacheck: globals vim
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
-    { "nvim-lua/popup.nvim" },
     { "nvim-lua/plenary.nvim" },
+    { "nvim-lua/popup.nvim" },
     -- Fuzzy Finder Algorithm which requires local dependencies to be built.
     -- Only load if `make` is available. Make sure you have the system
     -- requirements installed.
@@ -92,50 +94,62 @@ return {
 
     pcall(require("telescope").load_extension, "fzf")
     pcall(require("telescope").load_extension, "file_browser")
+    pcall(require("telescope").load_extension, "harpoon")
 
     -- See `:help telescope.builtin`
-    vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-    vim.keymap.set("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
-    vim.keymap.set("n", "<leader>/", function()
-      -- You can pass additional configuration to telescope to change theme, layout, etc.
-      require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-        winblend = 10,
-        previewer = false,
-      }))
-    end, { desc = "[/] Fuzzily search in current buffer" })
+    local tbi = require("telescope.builtin")
+    local wk = require("which-key")
+    wk.register({
+      ["?"] = {
+        function() tbi.oldfiles() end,
+        "[?] Find recently opened files",
+      },
+      ["<space>"] = {
+        function() tbi.buffers() end,
+        "[ ] Find existing buffers",
+      },
+      ["/"] = {
+        function()
+          -- You can pass additional configuration to telescope to change theme, layout, etc.
+          tbi.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+            winblend = 10,
+            previewer = false,
+          }))
+        end,
+        "[/] Fuzzily search in current buffer",
+      },
 
-    vim.keymap.set(
-      "n",
-      "<leader>tg",
-      require("telescope.builtin").git_files,
-      { desc = "[T]elescope: Search [G]it files" }
-    )
-    vim.keymap.set("n", "<leader>tf", require("telescope.builtin").find_files, { desc = "[T]elescope: Search [F]iles" })
-    vim.keymap.set("n", "<leader>th", require("telescope.builtin").help_tags, { desc = "[T]elescope: Search [H]elp" })
-    vim.keymap.set(
-      "n",
-      "<leader>tw",
-      require("telescope.builtin").grep_string,
-      { desc = "[T]elescope: Search current [W]ord" }
-    )
-    vim.keymap.set(
-      "n",
-      "<leader>tr",
-      require("telescope.builtin").live_grep,
-      { desc = "[T]elescope: Search by G[r]ep" }
-    )
-    vim.keymap.set(
-      "n",
-      "<leader>td",
-      require("telescope.builtin").diagnostics,
-      { desc = "[T]elescope: Search [D]iagnostics" }
-    )
+      t = {
+        b = {
+          "<cmd>Telescope file_browser<CR>",
+          "[T]elescope: File [B]rowser",
+        },
+        d = {
+          function() tbi.diagnostics() end,
+          "[T]elescope: Search [D]iagnostics",
+        },
 
-    vim.keymap.set(
-      "n",
-      "<leader>tb",
-      ":Telescope file_browser<CR>",
-      { desc = "[T]elescope: File [B]rowser", noremap = true }
-    )
+        f = {
+          function() tbi.find_files() end,
+          "[T]elescope: Search [F]iles",
+        },
+        g = {
+          function() tbi.git_files() end,
+          "[T]elescope: Search [G]it files",
+        },
+        h = {
+          function() tbi.help_tags() end,
+          "[T]elescope: Search [H]elp",
+        },
+        r = {
+          function() tbi.live_grep() end,
+          "[T]elescope: Search by G[r]ep",
+        },
+        w = {
+          function() tbi.grep_string() end,
+          "[T]elescope: Search current [W]ord",
+        },
+      },
+    }, { prefix = "<leader>" })
   end,
 }

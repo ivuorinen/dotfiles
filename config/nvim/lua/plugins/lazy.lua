@@ -1,12 +1,109 @@
+-- luacheck: globals vim
+
 return {
-  -- Plenary is used by many other plugins
-  { "nvim-lua/plenary.nvim", lazy = true },
+  -- plenary: full; complete; entire; absolute; unqualified.
+  -- All the lua functions I don't want to write twice.
+  -- https://github.com/nvim-lua/plenary.nvim
+  { "nvim-lua/plenary.nvim",       lazy = true },
 
-  -- Icons on menu
-  "onsails/lspkind-nvim",
+  -- lua `fork` of vim-web-devicons for neovim
+  -- https://github.com/nvim-tree/nvim-web-devicons
+  { "kyazdani42/nvim-web-devicons" },
 
-  -- Restore folds and cursor position
-  "senderle/restoreview",
+  -- The theme of choise, catppuccin
+  -- https://github.com/catppuccin/nvim
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 10000,
+    enabled = true,
+    lazy = false,
+    config = function() vim.cmd.colorscheme("catppuccin") end,
+    opts = {
+      flavour = "mocha",
+      transparent_background = true,
+      dim_inactive = {
+        enabled = true,
+        shade = "dark",
+        percentage = 0.15,
+      },
+      integrations = {
+        aerial = true,
+        barbecue = {
+          -- directory name is dimmed by default
+          dim_dirname = true,
+          bold_basename = true,
+          dim_context = false,
+          alt_background = false,
+        },
+        cmp = true,
+        dap = { enabled = true, enable_ui = true },
+        gitsigns = true,
+        harpoon = true,
+        indent_blankline = {
+          enabled = true,
+          colored_indent_levels = false,
+        },
+        mason = true,
+        neotree = true,
+        notify = true,
+        native_lsp = {
+          enabled = true,
+          virtual_text = {
+            errors = { "italic" },
+            hints = { "italic" },
+            warnings = { "italic" },
+            information = { "italic" },
+          },
+          underlines = {
+            errors = { "underline" },
+            hints = { "underline" },
+            warnings = { "underline" },
+            information = { "underline" },
+          },
+          inlay_hints = {
+            background = true,
+          },
+        },
+        semantic_tokens = true,
+        symbols_outline = true,
+        telescope = {
+          enabled = true,
+          style = "catppuccin",
+        },
+        treesitter = true,
+        lsp_trouble = true,
+        which_key = true,
+      },
+    },
+  },
+
+  -- Notifications as a popup
+  -- https://github.com/rcarriga/nvim-notify
+  {
+    "rcarriga/nvim-notify",
+    keys = {
+      {
+        "<leader>un",
+        function() require("notify").dismiss({ silent = true, pending = true }) end,
+        desc = "Dismiss all Notifications",
+      },
+    },
+    opts = {
+      timeout = 3000,
+      max_height = function() return math.floor(vim.o.lines * 0.75) end,
+      max_width = function() return math.floor(vim.o.columns * 0.75) end,
+    },
+    init = function() vim.notify = require("notify") end,
+  },
+
+  -- vscode-like pictograms for neovim lsp completion items
+  -- https://github.com/onsails/lspkind.nvim
+  { "onsails/lspkind-nvim" },
+
+  -- Save and restore Vim views automatically
+  -- https://github.com/senderle/restoreview
+  { "senderle/restoreview" },
 
   -- Create key bindings that stick. WhichKey is a lua plugin for Neovim that
   -- displays a popup with possible keybindings of the command you started typing.
@@ -43,100 +140,41 @@ return {
     end,
   },
 
-  -- The theme of choise, catppuccin
-  ---- https://github.com/catppuccin/nvim
+  -- Add/change/delete surrounding delimiter pairs with ease.
+  -- https://github.com/kylechui/nvim-surround
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    priority = 10000,
-    enabled = true,
-    lazy = false,
-    config = function() vim.cmd.colorscheme("catppuccin") end,
+    --[[
+      Old text                    Command         New text
+      ------------------------------------------------------------------
+      surround_words              ysiw)           (surround_words)
+      make strings               ys$"            "make strings"
+      [delete ar*ound me!]        ds]             delete around me!
+      "change quot*es"            cs'"            "change quotes"
+      <b>or tag* types</b>        csth1<CR>       <h1>or tag types</h1>
+      delete(functi*on calls)     dsf             function calls
+    ]]
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup()
+    end,
+  },
+
+  -- A tree like view for symbols in Neovim using the LSP.
+  -- https://github.com/simrat39/symbols-outline.nvim
+  {
+    "simrat39/symbols-outline.nvim",
+    cmd = "SymbolsOutline",
+    keys = { { "<leader>bs", "<cmd>SymbolsOutline<cr>", desc = "Symbols Outline" } },
     opts = {
-      flavour = "mocha",
-      transparent_background = true,
-      dim_inactive = {
-        enabled = true,
-        shade = "dark",
-        percentage = 0.15,
-      },
-      integrations = {
-        aerial = true,
-        barbecue = {
-          dim_dirname = true, -- directory name is dimmed by default
-          bold_basename = true,
-          dim_context = false,
-          alt_background = false,
-        },
-        cmp = true,
-        dap = { enabled = true, enable_ui = true },
-        gitsigns = true,
-        harpoon = true,
-        indent_blankline = {
-          enabled = true,
-          colored_indent_levels = false,
-        },
-        mason = true,
-        neotree = true,
-        notify = true,
-        nvimtree = false,
-        native_lsp = {
-          enabled = true,
-          virtual_text = {
-            errors = { "italic" },
-            hints = { "italic" },
-            warnings = { "italic" },
-            information = { "italic" },
-          },
-          underlines = {
-            errors = { "underline" },
-            hints = { "underline" },
-            warnings = { "underline" },
-            information = { "underline" },
-          },
-          inlay_hints = {
-            background = true,
-          },
-        },
-        semantic_tokens = true,
-        symbols_outline = true,
-        telescope = {
-          enabled = true,
-          style = "catppuccin",
-        },
-        ts_rainbow = true,
-        treesitter = true,
-        lsp_trouble = true,
-        which_key = true,
-      },
+      -- add your options that should be passed to the setup() function here
+      position = "right",
     },
   },
 
-  -- Notifications as a popup
-  -- https://github.com/rcarriga/nvim-notify
-  {
-    "rcarriga/nvim-notify",
-    keys = {
-      {
-        "<leader>un",
-        function() require("notify").dismiss({ silent = true, pending = true }) end,
-        desc = "Dismiss all Notifications",
-      },
-    },
-    opts = {
-      timeout = 3000,
-      max_height = function() return math.floor(vim.o.lines * 0.75) end,
-      max_width = function() return math.floor(vim.o.columns * 0.75) end,
-    },
-    init = function() vim.notify = require("notify") end,
-  },
-
-  {
-    "dstein64/vim-startuptime",
-    cmd = "StartupTime",
-    config = function() vim.g.startuptime_tries = 10 end,
-  },
-
+  -- Getting you where you want with the fewest keystrokes.
+  -- https://github.com/ThePrimeagen/harpoon
   { "ThePrimeagen/harpoon" },
 
   -- A Neovim plugin hiding your colorcolumn when unneeded.
@@ -150,27 +188,28 @@ return {
   },
 
   -- Status information for LSP.
-  "j-hui/fidget.nvim",
+  -- https://github.com/j-hui/fidget.nvim
+  { "j-hui/fidget.nvim" },
 
   -- Close buffer without messing up with the window.
-  "famiu/bufdelete.nvim",
+  -- https://github.com/famiu/bufdelete.nvim
+  { "famiu/bufdelete.nvim" },
 
   -- Delete multiple vim buffers based on different conditions
   -- https://github.com/kazhala/close-buffers.nvim
-  "kazhala/close-buffers.nvim",
-
-  "nyoom-engineering/oxocarbon.nvim",
+  { "kazhala/close-buffers.nvim" },
 
   -- JSONLS
-  "b0o/schemastore.nvim",
+  -- https://github.com/b0o/schemastore.nvim
+  { "b0o/schemastore.nvim" },
 
   -- sleuth.vim: Heuristically set buffer options
   -- https://github.com/tpope/vim-sleuth
-  "tpope/vim-sleuth",
+  { "tpope/vim-sleuth" },
 
   -- Neovim plugin for locking a buffer to a window
   -- https://github.com/stevearc/stickybuf.nvim
-  { "stevearc/stickybuf.nvim",      opts = {} },
+  { "stevearc/stickybuf.nvim",   opts = {} },
 
   -- Describe the regexp under the cursor
   -- https://github.com/bennypowers/nvim-regexplainer
@@ -190,6 +229,8 @@ return {
   -- https://github.com/LudoPinelli/comment-box.nvim
   { "LudoPinelli/comment-box.nvim", opts = {} },
 
+  -- Tabnine Client for Neovim
+  -- https://github.com/codota/tabnine-nvim
   {
     "codota/tabnine-nvim",
     name = "tabnine",

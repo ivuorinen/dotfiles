@@ -1,4 +1,6 @@
--- Dim
+-- Twilight dims inactive portions of the
+-- code you're editing using TreeSitter
+-- https://github.com/folke/twilight.nvim
 return {
   "folke/twilight.nvim",
   config = {

@@ -1,5 +1,4 @@
-local option = vim.api.nvim_set_option
-local set = vim.api.nvim_set_var
+-- luacheck: globals vim
 
 -- Fix moving through lines 'gk' and 'gj'
 vim.wo.linebreak = true
@@ -123,28 +122,37 @@ vim.o.shortmess = vim.o.shortmess .. "c"
 -- Menu Transparency.
 vim.go.pumblend = 10
 
---------------------Variables-----------------
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Variables                                                │
+--  ╰──────────────────────────────────────────────────────────╯
 
-set("one_allow_itali:set cursorlinec:set cursorlines", 1)
-set("do_filetype_lua", 1)
-set("MRU_File", "~/.cache/vim_mru_files")
+vim.api.nvim_set_var("one_allow_itali:set cursorlinec:set cursorlines", 1)
+vim.api.nvim_set_var("do_filetype_lua", 1)
+vim.api.nvim_set_var("MRU_File", "~/.cache/vim_mru_files")
 
---------------------API------------------------
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ API                                                      │
+--  ╰──────────────────────────────────────────────────────────╯
 
 -- Change title accordingly.
-option("title", true)
+vim.api.nvim_set_option("title", true)
 
 -- Set clipboard to be global across the system
-option("clipboard", "unnamedplus")
+vim.api.nvim_set_option("clipboard", "unnamedplus")
 
 -- Basic fold column
-option("foldcolumn", "1")
+vim.api.nvim_set_option("foldcolumn", "1")
 
 -- Set dictionary to language spell
-option("dictionary", "/usr/share/dict/words")
+vim.api.nvim_set_option("dictionary", "/usr/share/dict/words")
 
 -- Wildignore for when opening files :0
-option("wildignore", "*/tmp*/,*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,~$,*/.log")
+vim.api.nvim_set_option(
+  "wildignore",
+  "*/tmp*/,*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,~$,*/.log"
+)
 
 -- Folding
-option("foldmethod", "indent")
+vim.api.nvim_set_option("foldmethod", "syntax")
+vim.api.nvim_set_option('foldenable', false)
+vim.api.nvim_set_option('foldminlines', 5)
