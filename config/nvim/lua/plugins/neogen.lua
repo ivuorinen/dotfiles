@@ -1,6 +1,9 @@
-local prefix = "<leader>a"
+-- A better annotation generator. Supports multiple languages and annotation conventions.
+-- https://github.com/danymat/neogen
 return {
   "danymat/neogen",
+  dependencies = "nvim-treesitter/nvim-treesitter",
+  version = "*",
   cmd = "Neogen",
   opts = {
     snippet_engine = "luasnip",
@@ -11,10 +14,10 @@ return {
     },
   },
   keys = {
-    { prefix .. "<cr>", function() require("neogen").generate({ type = "current" }) end, desc = "Current" },
-    { prefix .. "c", function() require("neogen").generate({ type = "class" }) end, desc = "Class" },
-    { prefix .. "f", function() require("neogen").generate({ type = "func" }) end, desc = "Function" },
-    { prefix .. "t", function() require("neogen").generate({ type = "type" }) end, desc = "Type" },
-    { prefix .. "F", function() require("neogen").generate({ type = "file" }) end, desc = "File" },
+    { "<leader>aa", function() require("neogen").generate({ type = "current" }) end, desc = "Current" },
+    { "<leader>ac", function() require("neogen").generate({ type = "class" }) end, desc = "Class" },
+    { "<leader>af", function() require("neogen").generate({ type = "func" }) end, desc = "Function" },
+    { "<leader>at", function() require("neogen").generate({ type = "type" }) end, desc = "Type" },
+    { "<leader>aF", function() require("neogen").generate({ type = "file" }) end, desc = "File" },
   },
 }

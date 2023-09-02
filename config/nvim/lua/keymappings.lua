@@ -46,7 +46,7 @@ wk.register({
       },
     },
     g = {
-      name = "Goto buffer",
+      name = "[g]oto buffer",
       ["1"] = { "<cmd>buffer! 1<cr>", "Buffer 1" },
       ["2"] = { "<cmd>buffer! 2<cr>", "Buffer 2" },
       ["3"] = { "<cmd>buffer! 3<cr>", "Buffer 3" },
@@ -67,9 +67,7 @@ wk.register({
     p = { ":lua vim.diagnostic.goto_prev()<CR>", "[D]iagnostics: [p]rev" },
   },
   e = {
-    function()
-      vim.cmd("Neotree focus source=filesystem position=left")
-    end,
+    function() vim.cmd("Neotree focus source=filesystem position=left") end,
     "Toggle the sidebar tree of the root folder.",
   },
   f = {
@@ -78,6 +76,13 @@ wk.register({
     f = { ':lua require("telescope.builtin").find_files()<cr>', "[f]ind [f]iles" },
     -- Find recursively a text across the root folder subfiles.
     g = { ':lua require("telescope.builtin").live_grep()<cr>', "[f]ind text with [g]rep" },
+  },
+  G = {
+    -- defined in plugins/gitsigns.lua
+    name = "Git",
+    b = {
+      name = "blame",
+    },
   },
   h = {
     name = "[h]arpoon",
@@ -92,7 +97,7 @@ wk.register({
   },
   --- Remap debugging to "H" from LV default of "h"
   H = {
-    name = "[H]elp/Conceal/Telescope",
+    name = "[H]elp/Conceal/Treesitter",
     c = {
       name = "[c]onceal",
       h = { ":set conceallevel=1<cr>", "hide/conceal" },
@@ -117,6 +122,10 @@ wk.register({
     name = "[q]uit",
     q = { ":qa<cr>", "[q]uit: [q]uit all" },
     f = { ":qa!<cr>", "[q]uit: all with [f]orce" },
+  },
+  r = {
+    -- defined in plugins/refactoring-nvim.lua
+    name = "[r]efactor",
   },
   t = {
     name = "[t]elescope",

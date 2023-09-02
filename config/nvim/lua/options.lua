@@ -103,7 +103,7 @@ vim.o.spelllang = "en_gb"
 vim.bo.spelllang = "en_gb"
 
 -- Global statusline.
-vim.opt.laststatus = 3
+vim.opt.laststatus = 2
 
 -- When "on" the commands listed below move the cursor to the first non-blank
 --  of the line.  When off the cursor is kept in the same column (if possible).
@@ -132,7 +132,7 @@ set("MRU_File", "~/.cache/vim_mru_files")
 --------------------API------------------------
 
 -- Change title accordingly.
--- option('title', true)
+option("title", true)
 
 -- Set clipboard to be global across the system
 option("clipboard", "unnamedplus")
@@ -147,7 +147,4 @@ option("dictionary", "/usr/share/dict/words")
 option("wildignore", "*/tmp*/,*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,~$,*/.log")
 
 -- Folding
-option("foldmethod", "syntax")
-
--- File format for neovim reading
-option("fileformat", "unix")
+option("foldmethod", "indent")

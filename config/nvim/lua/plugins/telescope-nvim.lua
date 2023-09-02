@@ -2,8 +2,8 @@
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
-    "nvim-lua/popup.nvim",
-    "nvim-lua/plenary.nvim",
+    { "nvim-lua/popup.nvim" },
+    { "nvim-lua/plenary.nvim" },
     -- Fuzzy Finder Algorithm which requires local dependencies to be built.
     -- Only load if `make` is available. Make sure you have the system
     -- requirements installed.
@@ -14,7 +14,7 @@ return {
       build = "make",
       cond = function() return vim.fn.executable("make") == 1 end,
     },
-    "nvim-telescope/telescope-file-browser.nvim",
+    { "nvim-telescope/telescope-file-browser.nvim" },
   },
   config = function()
     local actions = require("telescope.actions")
@@ -82,9 +82,9 @@ return {
           mappings = {
             i = {
               ["<c-d>"] = actions.delete_buffer + actions.move_to_top,
-            }
-          }
-        }
+            },
+          },
+        },
       },
 
       extensions_list = { "themes", "terms" },
