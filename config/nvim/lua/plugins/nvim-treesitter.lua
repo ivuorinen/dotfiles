@@ -20,38 +20,7 @@ return {
         modules = {},
 
         -- Add languages to be installed here that you want installed for treesitter
-        ensure_installed = {
-          "bash",
-          "c",
-          "cmake",
-          "comment",
-          "diff",
-          "dockerfile",
-          "gitignore",
-          "go",
-          "graphql",
-          "html",
-          "javascript",
-          "json",
-          "json5",
-          "latex",
-          "lua",
-          "markdown",
-          "php",
-          "phpdoc",
-          "python",
-          "regex",
-          "scss",
-          "terraform",
-          "todotxt",
-          "toml",
-          "tsx",
-          "typescript",
-          "vim",
-          "vimdoc",
-          "vue",
-          "yaml",
-        },
+        ensure_installed = "all",
 
         highlight = {
           enable = true,
@@ -129,5 +98,5 @@ return {
       enable = true,
       mode = "cursor", -- cursor, or topline
     },
-  }
+  },
 }

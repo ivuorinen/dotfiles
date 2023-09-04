@@ -73,7 +73,6 @@ return {
       use_popups_for_input = false,
       -- use a custom function for sorting files and directories in the tree
       sort_function = nil,
-
       event_handlers = {
         --  {
         --    event = "before_render",
@@ -127,7 +126,6 @@ return {
           end,
         },
       },
-
       default_component_configs = {
         container = {
           enable_character_fade = true,
@@ -183,57 +181,6 @@ return {
           },
         },
       },
-      renderers = {
-        directory = {
-          { "indent" },
-          { "icon" },
-          { "current_filter" },
-          {
-            "container",
-            width = "100%",
-            right_padding = 0,
-            --max_width   = 60,
-            content = {
-              { "name",        zindex = 10 },
-              -- {
-              --   "symlink_target",
-              --   zindex = 10,
-              --   highlight = "NeoTreeSymbolicLinkTarget",
-              -- },
-              { "clipboard",   zindex = 10 },
-              { "diagnostics", errors_only = true, zindex = 20, align = "right" },
-            },
-          },
-        },
-        file = {
-          { "indent" },
-          { "icon" },
-          {
-            "container",
-            width = "100%",
-            right_padding = 0,
-            --max_width   = 60,
-            content = {
-              {
-                "name",
-                use_git_status_colors = false,
-                zindex = 10,
-              },
-              -- {
-              --   "symlink_target",
-              --   zindex = 10,
-              --   highlight = "NeoTreeSymbolicLinkTarget",
-              -- },
-              { "clipboard",   zindex = 10 },
-              { "bufnr",       zindex = 10 },
-              -- { "harpoon_index" }, --> This is what actually adds the component in where you want it
-              { "modified",    zindex = 20, align = "right" },
-              { "diagnostics", zindex = 20, align = "right" },
-              { "git_status",  zindex = 20, align = "right" },
-            },
-          },
-        },
-      },
       -- A list of functions, each representing a global custom command
       -- that will be available in all sources (if not overridden in `opts[source_name].commands`)
       -- see `:h neo-tree-custom-commands-global`
@@ -275,10 +222,10 @@ return {
           ["<esc>"] = "cancel",
           ["P"] = { "toggle_preview", config = { use_float = true } },
           ["l"] = "focus_preview",
-          ["S"] = "open_split",
-          ["s"] = "open_vsplit",
-          -- ["S"] = "split_with_window_picker",
-          -- ["s"] = "vsplit_with_window_picker",
+          -- ["S"] = "open_split",
+          -- ["s"] = "open_vsplit",
+          ["S"] = "split_with_window_picker",
+          ["s"] = "vsplit_with_window_picker",
           ["t"] = "open_tabnew",
           -- ["<cr>"] = "open_drop",
           -- ["t"] = "open_tab_drop",
@@ -343,6 +290,52 @@ return {
               return {}
             end
           end,
+        },
+        renderers = {
+          directory = {
+            { "indent" },
+            { "icon" },
+            { "current_filter" },
+            {
+              "container",
+              width = "100%",
+              right_padding = 0,
+              --max_width   = 60,
+              content = {
+                { "name",        zindex = 10 },
+                { "clipboard",   zindex = 10 },
+                { "diagnostics", errors_only = true, zindex = 20, align = "right" },
+              },
+            },
+          },
+          file = {
+            { "indent" },
+            { "icon" },
+            {
+              "container",
+              width = "100%",
+              right_padding = 0,
+              --max_width   = 60,
+              content = {
+                {
+                  "name",
+                  use_git_status_colors = false,
+                  zindex = 10,
+                },
+                -- {
+                --   "symlink_target",
+                --   zindex = 10,
+                --   highlight = "NeoTreeSymbolicLinkTarget",
+                -- },
+                { "clipboard",     zindex = 10 },
+                { "bufnr",         zindex = 10 },
+                { "harpoon_index", zindex = 20, align = "right" },
+                { "modified",      zindex = 20, align = "right" },
+                { "diagnostics",   zindex = 20, align = "right" },
+                { "git_status",    zindex = 20, align = "right" },
+              },
+            },
+          },
         },
         filtered_items = {
           -- when true, they will just be displayed differently than normal items

@@ -1,11 +1,13 @@
--- Winbar with context.
+-- A VS Code like winbar for Neovim
+-- https://github.com/utilyre/barbecue.nvim
 return {
   "utilyre/barbecue.nvim",
   dependencies = {
     "neovim/nvim-lspconfig",
     "SmiteshP/nvim-navic",
-    "kyazdani42/nvim-web-devicons", -- Optional
+    "kyazdani42/nvim-web-devicons",
   },
+  version = "*",
   config = {
     theme = "catppuccin",
 

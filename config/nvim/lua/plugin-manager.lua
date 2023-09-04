@@ -1,5 +1,6 @@
 -- Package manager https://github.com/folke/lazy.nvim
 -- :help lazy.nvim.txt
+-- luacheck: globals vim
 
 -- To install lazy.nvim automatically.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -17,5 +18,26 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- Plugins start here:
-require("lazy").setup("plugins")
+local options = {
+  defaults = { lazy = false },
+  install = { colorscheme = { "catppuccin" } },
+  performance = {
+    cache = {
+      enabled = true,
+    },
+    rtp = {
+      disabled_plugins = {
+        "gzip",
+        "matchit",
+        "matchparen",
+        "netrwPlugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
+}
+
+require("lazy").setup("plugins", options)

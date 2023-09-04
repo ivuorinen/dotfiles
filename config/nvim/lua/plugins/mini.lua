@@ -50,7 +50,7 @@ return {
 
     -- Animate common Neovim actions
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-animate.md
-    require("mini.animate").setup()
+    -- require("mini.animate").setup()
 
     -- Go forward/backward with square brackets
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-bracketed.md
@@ -119,6 +119,10 @@ return {
     -- Minimal and fast statusline module with opinionated default look
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-statusline.md
     require("mini.statusline").setup()
+
+    -- Fast and feature-rich surround actions
+    -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-surround.md
+    require("mini.surround").setup()
 
     -- Minimal and fast tabline showing listed buffers
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-tabline.md

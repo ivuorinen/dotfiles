@@ -1,4 +1,6 @@
--- Show signs of GIT written in lua
+-- Git integration for buffers
+-- https://github.com/lewis6991/gitsigns.nvim
+-- luacheck: globals vim
 return {
   "lewis6991/gitsigns.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },

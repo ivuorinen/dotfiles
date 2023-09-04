@@ -1,15 +1,18 @@
+-- Quickstart configs for Nvim LSP
+-- https://github.com/neovim/nvim-lspconfig
+-- luacheck: globals vim
 return {
   -- LSP auto-complete.
   "neovim/nvim-lspconfig",
   dependencies = {
     -- Automatically install LSPs to stdpath for neovim
-    { "williamboman/mason.nvim", config = true },
+    { "williamboman/mason.nvim",          config = true },
     { "williamboman/mason-lspconfig.nvim" },
 
     -- Useful status updates for LSP
     -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
     -- NOTE: using tag legacy, fidget is being re-written completely
-    { "j-hui/fidget.nvim", event = "LspAttach", tag = "legacy", opts = {} },
+    { "j-hui/fidget.nvim",                event = "LspAttach", tag = "legacy", opts = {} },
 
     -- Additional lua configuration, makes nvim stuff amazing!
     { "folke/neodev.nvim" },
@@ -17,9 +20,11 @@ return {
   init = function()
     -- disable lsp watcher. Too slow on linux
     local ok, wf = pcall(require, "vim.lsp._watchfiles")
-    if ok then wf._watchfunc = function()
-      return function() end
-    end end
+    if ok then
+      wf._watchfunc = function()
+        return function() end
+      end
+    end
   end,
   config = function()
     -- Switch for controlling whether you want autoformatting.

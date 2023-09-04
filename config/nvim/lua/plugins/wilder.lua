@@ -20,8 +20,9 @@ return {
 
     wilder.set_option('renderer', wilder.popupmenu_renderer({
       highlights = {
-        gradient = gradient, -- must be set
+        -- must be set
         -- selected_gradient key can be set to apply gradient highlighting for the selected candidate.
+        gradient = gradient,
       },
       highlighter = wilder.highlighter_with_gradient({
         wilder.basic_highlighter(), -- or wilder.lua_fzy_highlighter(),

@@ -1,7 +1,7 @@
 -- Completion for snippets.
 -- luacheck: globals vim CAPABILITIES
+local vim = vim
 CAPABILITIES = vim.lsp.protocol.make_client_capabilities()
-CAPABILITIES = require("cmp_nvim_lsp").default_capabilities(CAPABILITIES)
 CAPABILITIES.textDocument.completion.completionItem.snippetSupport = true
 
 --CAPABILITIES.offsetEncoding = 'utf-8'
@@ -82,6 +82,7 @@ local servers = {
   jsonls = {},
   lua_ls = {
     Lua = {
+      diagnostics = { globals = { "vim" } },
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
     },
@@ -101,7 +102,6 @@ require("neodev").setup()
 -- nvim-cmp supports additional completion capabilities,
 -- so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require("mason-lspconfig")

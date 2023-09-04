@@ -5,9 +5,7 @@
   and WhichKey register. Slowly migrating to the WhichKey system,
   and tweaking the groupings as I go.
 --]]
-
-local key = vim.api.nvim_set_keymap
-local remap = { noremap = true, silent = true }
+-- luacheck: globals vim CAPABILITIES
 
 local wk = require("which-key")
 
@@ -18,13 +16,17 @@ local wk = require("which-key")
 -- Register in all modes, prefix <leader>
 wk.register({
   b = {
-    name = "Buffer",
+    name = "[b]uffer",
     n = {
       "<cmd>tabnew<cr>",
-      "New tab",
+      "[n]ew tab",
+    },
+    a = {
+      name = "[a]nnotate"
+      -- defined in plugins/neogen.lua
     },
     c = {
-      name = "Comments",
+      name = "[c]omments",
       b = {
         "<cmd>lua require('comment-box').lbox()<cr>",
         "Left aligned fixed size box with left aligned text",
@@ -39,7 +41,7 @@ wk.register({
       },
     },
     d = {
-      name = "Delete buffers",
+      name = "[d]elete buffers",
       h = {
         "<CMD>lua require('close_buffers').delete({type = 'hidden'})<CR>",
         "Delete hidden buffers",
@@ -165,36 +167,14 @@ wk.register({
   ["<C-End>"] = { "<End>", "Do just End on CTRL + End" },
 }, { prefix = "" })
 
+local key = vim.api.nvim_set_keymap
+local remap = { noremap = true, silent = true }
+
 -- Go to the next block.
 --key('n', '<C-Down>', 'g%', remap )
 
 -- Loop through brackets blocks.
 --key('n', '<C-Up>', 'z%', remap )
-
--- Highlight the word after pressing enter.
-key(
-  "n",
-  "<CR>",
-  [[:let searchTerm = '\v<'.expand("<cword>").'>' <bar> let @/ = searchTerm <bar> echo '/'.@/ <bar> call histadd("search", searchTerm) <bar> set hls<cr>]],
-  remap
-)
-
--- Highlight the visual selection after pressing enter.
-key(
-  "v",
-  "<CR>",
-  [["*y:silent! let searchTerm = '\V'.substitute(escape(@*, '\/'), "\n", '\\n', "g") <bar> let @/ = searchTerm <bar> echo '/'.@/ <bar> call histadd("search", searchTerm) <bar> set hls<cr>]],
-  remap
-)
-
--- Toggle highlight of search
-key("n", "<C-c>", ":set hlsearch!<CR>", remap)
-
--- Try to correct the current word.
-key("i", "<C-b>", "ea<C-x><C-s>", remap)
-
--- Toggle built-in nvim spell checking.
-key("n", "<F5>", ":setlocal spell!<CR>", remap)
 
 -- Move lines normally like an IDE when line wraps
 key("i", "<Down>", [[v:count ? 'j' : '<c-o>gj']], { expr = true, noremap = true, silent = true })
@@ -203,7 +183,6 @@ key("n", "<Down>", [[v:count ? 'j' : 'gj']], { expr = true, noremap = true, sile
 key("n", "<Up>", [[v:count ? 'k' : 'gk']], { expr = true, noremap = true, silent = true })
 
 -- Set 'CTRL + v' as 'paster'
--- key('', '<C-v>', 'map"_d<Esc>i', remap )
 key("v", "<C-v>", "p", remap)
 
 -- Set 'CTRL + x' as 'cut'
