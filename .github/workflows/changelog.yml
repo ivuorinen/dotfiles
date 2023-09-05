@@ -5,7 +5,7 @@ jobs:
   debug-changelog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create changelog text
         id: changelog
         uses: loopwerk/tag-changelog@v1
