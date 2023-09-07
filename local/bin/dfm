@@ -16,7 +16,7 @@
 
 SCRIPT=$(basename "$0")
 
-VERSION_NVM="v0.39.3"
+VERSION_NVM="v0.39.5"
 
 # shellcheck source=./../../scripts/shared.sh
 source "$SHARED_SCRIPT"

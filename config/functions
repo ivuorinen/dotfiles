@@ -83,12 +83,9 @@ x-default-antigen-bundles()
 
   # these should be available if there's need
   have brew && antigen bundle brew
-  have nvm && antigen bundle nvm
+  # have nvm && antigen bundle nvm
   have nvm && antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
   have php && antigen bundle php
   have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
   have rvm && antigen bundle unixorn/rvm-plugin
-
-  # the theme to use
-  antigen theme romkatv/powerlevel10k
 }
