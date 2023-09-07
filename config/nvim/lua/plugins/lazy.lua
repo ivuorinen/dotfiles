@@ -182,6 +182,26 @@ return {
   -- https://github.com/j-hui/fidget.nvim
   { "j-hui/fidget.nvim" },
 
+  -- A neovim lua plugin to help easily manage multiple terminal windows
+  -- https://github.com/akinsho/toggleterm.nvim
+  {
+    'akinsho/toggleterm.nvim',
+    version = "*",
+    opts = {
+      open_mapping = [[<c-t>]],
+      insert_mappings = true,
+      -- direction = "float",
+      float_opts = {
+        width = function()
+          return math.floor(vim.o.columns * 0.9)
+        end,
+        height = function()
+          return math.floor(vim.o.lines * 0.9)
+        end,
+      },
+    }
+  },
+
   -- Close buffer without messing up with the window.
   -- https://github.com/famiu/bufdelete.nvim
   { "famiu/bufdelete.nvim" },
