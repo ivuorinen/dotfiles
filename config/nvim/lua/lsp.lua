@@ -4,8 +4,6 @@ local vim = vim
 CAPABILITIES = vim.lsp.protocol.make_client_capabilities()
 CAPABILITIES.textDocument.completion.completionItem.snippetSupport = true
 
---CAPABILITIES.offsetEncoding = 'utf-8'
-
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)

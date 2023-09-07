@@ -9,11 +9,11 @@ vim.g.maplocalleader = " "
 -- Set 'Space' as <NOP> key to leadermap key
 key("n", "<Space>", "<NOP>", remap)
 
--- Filetype specialties.
-require("filetype")
-
 -- Global, windows options of neovim:
 require("options")
+
+-- Filetype specialties.
+require("filetype")
 
 -- To adminstrate packages:
 require("plugin-manager")

@@ -62,11 +62,11 @@ return {
 
     -- Autocompletion and signature help plugin
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-completion.md
-    require("mini.completion").setup()
+    -- require("mini.completion").setup()
 
     -- Automatic highlighting of word under cursor
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-cursorword.md
-    require("mini.cursorword").setup()
+    -- require("mini.cursorword").setup()
 
     -- Highlight patterns in text
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-hipatterns.md
@@ -86,7 +86,12 @@ return {
 
     -- Visualize and work with indent scope
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-indentscope.md
-    require("mini.indentscope").setup()
+    require("mini.indentscope").setup({
+      draw = {
+        delay = 0,
+        -- animation = require("mini.indentscope").gen_animation("none"),
+      },
+    })
 
     -- Jump to next/previous single character
     -- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-jump.md

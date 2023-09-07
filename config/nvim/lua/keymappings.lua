@@ -13,20 +13,19 @@ local wk = require("which-key")
 --  │ Register keybindings                                     │
 --  ╰──────────────────────────────────────────────────────────╯
 
--- Register in all modes, prefix <leader>
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Register in all modes, prefix <leader>                   │
+--  ╰──────────────────────────────────────────────────────────╯
 wk.register({
   b = {
-    name = "[b]uffer",
-    n = {
-      "<cmd>tabnew<cr>",
-      "[n]ew tab",
-    },
+    name = "+buffer",
+    n = { "<cmd>tabnew<cr>", "[n]ew tab" },
     a = {
-      name = "[a]nnotate"
+      name = "+annotate"
       -- defined in plugins/neogen.lua
     },
     c = {
-      name = "[c]omments",
+      name = "+comments",
       b = {
         "<cmd>lua require('comment-box').lbox()<cr>",
         "Left aligned fixed size box with left aligned text",
@@ -41,53 +40,42 @@ wk.register({
       },
     },
     d = {
-      name = "[d]elete buffers",
+      name = "+delete buffers",
       h = {
         "<CMD>lua require('close_buffers').delete({type = 'hidden'})<CR>",
         "Delete hidden buffers",
       },
     },
-    g = {
-      name = "[g]oto buffer",
-      ["1"] = { "<cmd>buffer! 1<cr>", "Buffer 1" },
-      ["2"] = { "<cmd>buffer! 2<cr>", "Buffer 2" },
-      ["3"] = { "<cmd>buffer! 3<cr>", "Buffer 3" },
-      ["4"] = { "<cmd>buffer! 4<cr>", "Buffer 4" },
-      ["5"] = { "<cmd>buffer! 5<cr>", "Buffer 5" },
-      ["6"] = { "<cmd>buffer! 6<cr>", "Buffer 6" },
-      ["7"] = { "<cmd>buffer! 7<cr>", "Buffer 7" },
-      ["8"] = { "<cmd>buffer! 8<cr>", "Buffer 8" },
-      ["9"] = { "<cmd>buffer! 9<cr>", "Buffer 9" },
-    },
+    t = { ":TabnineToggle<cr>", "Toggle TabNine" },
   },
   D = {
-    name = "[D]iagnostics (Trouble)",
+    name = "+Diagnostics (Trouble)",
     t = { ":TroubleToggle<CR>", "[D]iagnostics [t]oggle" },
     -- Quick navigation between diagonostics.
     f = { ":lua vim.diagnostic.open_float()<CR>", "[D]iagnostics: Open [f]loat" },
     n = { ":lua vim.diagnostic.goto_next()<CR>", "[D]iagnostics: [n]ext" },
     p = { ":lua vim.diagnostic.goto_prev()<CR>", "[D]iagnostics: [p]rev" },
+    ---
+    x = { function() require("trouble").open() end, "Open Trouble" },
+    w = { function() require("trouble").open("workspace_diagnostics") end, "Workspace diagnostics" },
+    d = { function() require("trouble").open("document_diagnostics") end, "Document diagnostics" },
+    q = { function() require("trouble").open("quickfix") end, "Quickfix" },
+    l = { function() require("trouble").open("loclist") end, "Loclist" },
+    r = { function() require("trouble").open("lsp_references") end, "LSP References" },
   },
   e = {
     function() vim.cmd("Neotree focus source=filesystem position=left") end,
-    "Toggle the sidebar tree of the root folder.",
+    "Toggle the sidebar tree",
   },
   f = {
-    name = "[f]ind",
+    name = "+find",
     -- Find recursively files across the root folder subfiles.
     f = { ':lua require("telescope.builtin").find_files()<cr>', "[f]ind [f]iles" },
     -- Find recursively a text across the root folder subfiles.
     g = { ':lua require("telescope.builtin").live_grep()<cr>', "[f]ind text with [g]rep" },
   },
-  G = {
-    -- defined in plugins/gitsigns.lua
-    name = "Git",
-    b = {
-      name = "blame",
-    },
-  },
   h = {
-    name = "[h]arpoon",
+    name = "+harpoon",
     a = { "<cmd>lua require('harpoon.mark').add_file()<cr>", "[h]arpoon: [A]dd file" },
     r = { "<cmd>lua require('harpoon.mark').rm_file()<cr>", "[h]arpoon: [r]emove file" },
     m = { "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", "[h]arpoon: harpoon [m]enu" },
@@ -99,44 +87,54 @@ wk.register({
   },
   --- Remap debugging to "H" from LV default of "h"
   H = {
-    name = "[H]elp/Conceal/Treesitter",
+    name = "+help/Conceal/Treesitter",
     c = {
-      name = "[c]onceal",
+      name = "+conceal",
       h = { ":set conceallevel=1<cr>", "hide/conceal" },
       s = { ":set conceallevel=0<cr>", "show/unconceal" },
     },
     t = {
-      name = "Treesitter",
+      name = "+treesitter",
       t = { vim.treesitter.inspect_tree, "show tree" },
       c = { ":=vim.treesitter.get_captures_at_cursor()<cr>", "show capture" },
       n = { ":=vim.treesitter.get_node():type()<cr>", "show node" },
     },
   },
+  o = {
+    g = {
+      -- defined in plugins/gitsigns.lua
+      name = "+git",
+      b = {
+        name = "+blame",
+      },
+    },
+  },
   p = {
-    name = "[p]lugins",
-    i = { function() require("lazy").install() end, "[p]lugins [i]nstall" },
-    s = { function() require("lazy").home() end, "[p]lugins [s]tatus" },
-    S = { function() require("lazy").sync() end, "[p]lugins [S]ync" },
-    u = { function() require("lazy").check() end, "[p]lugins Check [u]pdates" },
-    U = { function() require("lazy").update() end, "[p]lugins [U]pdate" },
+    name = "+plugins",
+    i = { function() require("lazy").install() end, "plugins [i]nstall" },
+    s = { function() require("lazy").home() end, "plugins [s]tatus" },
+    S = { function() require("lazy").sync() end, "plugins [S]ync" },
+    u = { function() require("lazy").check() end, "plugins Check [u]pdates" },
+    U = { function() require("lazy").update() end, "plugins [U]pdate" },
   },
   q = {
-    name = "[q]uit",
-    q = { ":qa<cr>", "[q]uit: [q]uit all" },
-    f = { ":qa!<cr>", "[q]uit: all with [f]orce" },
+    name = "+quit",
+    q = { ":qa<cr>", "quit: [q]uit all" },
+    f = { ":qa!<cr>", "quit: all with [f]orce" },
   },
   r = {
     -- defined in plugins/refactoring-nvim.lua
-    name = "[r]efactor",
+    name = "+refactor",
   },
   t = {
-    name = "[t]elescope",
+    name = "+telescope",
     -- Find recursively TODOs, NOTEs, FIXITs, ... across the root folder subfiles.
     t = { ":TodoTelescope<cr>", "[t]elescope: [t]odo" },
   },
-  x = { ":Bdelete<CR>", "[x]: Close current buffer" },
+  x = { ":Bdelete<CR>", "Close current buffer" },
 }, { prefix = "<leader>" })
 
+--
 --  ╭──────────────────────────────────────────────────────────╮
 --  │ Normal mode, prefix <leader>                             │
 --  ╰──────────────────────────────────────────────────────────╯
@@ -144,6 +142,7 @@ wk.register({
   b = { name = "Buffer" },
 }, { mode = "n", prefix = "<leader>" })
 
+--
 --  ╭──────────────────────────────────────────────────────────╮
 --  │ Insert mode, prefix <leader>                             │
 --  ╰──────────────────────────────────────────────────────────╯
@@ -151,6 +150,7 @@ wk.register({
   b = { name = "Buffer" },
 }, { mode = "i", prefix = "<leader>" })
 
+--
 --  ╭──────────────────────────────────────────────────────────╮
 --  │ Insert mode, no prefix                                   │
 --  ╰──────────────────────────────────────────────────────────╯
@@ -159,6 +159,7 @@ wk.register({
   ["<C-Home>"] = { "<Home>", "Do just Home on CTRL + Home" },
 }, { mode = "i", prefix = "" })
 
+--
 --  ╭──────────────────────────────────────────────────────────╮
 --  │ All modes, no prefix                                     │
 --  ╰──────────────────────────────────────────────────────────╯
@@ -166,6 +167,11 @@ wk.register({
   ["<C-s>"] = { "<cmd>w<cr>", "Save file" },
   ["<C-End>"] = { "<End>", "Do just End on CTRL + End" },
 }, { prefix = "" })
+
+--
+--  ╭──────────────────────────────────────────────────────────╮
+--  │ Other keymappings, still to move                         │
+--  ╰──────────────────────────────────────────────────────────╯
 
 local key = vim.api.nvim_set_keymap
 local remap = { noremap = true, silent = true }
@@ -181,19 +187,6 @@ key("i", "<Down>", [[v:count ? 'j' : '<c-o>gj']], { expr = true, noremap = true,
 key("i", "<Up>", [[v:count ? 'k' : '<c-o>gk']], { expr = true, noremap = true, silent = true })
 key("n", "<Down>", [[v:count ? 'j' : 'gj']], { expr = true, noremap = true, silent = true })
 key("n", "<Up>", [[v:count ? 'k' : 'gk']], { expr = true, noremap = true, silent = true })
-
--- Set 'CTRL + v' as 'paster'
-key("v", "<C-v>", "p", remap)
-
--- Set 'CTRL + x' as 'cut'
-key("v", "<C-x>", "mad`ai<Right>", { silent = true })
-
--- Set 'CTRL + c' as 'copier'
-key("v", "<C-c>", "may`ai", remap)
-key("i", "<C-v>", "<Esc>:Registers<CR>", remap)
-
--- Create mark.
-key("n", "'", "`", remap)
 
 -- Move normaly bottom and up with C+Up and C+Down.
 key("i", "<C-Up>", "<C-o>gk", remap)
@@ -220,14 +213,6 @@ key("i", "<S-Up>", "<Esc>v<Up>", remap)
 key("i", "<S-Down>", "<C-o>v<Down>", remap)
 key("i", "<S-Left>", "<Esc>v<Left>", remap)
 key("i", "<S-Right>", "<C-o>v<Right>", remap)
-
--- Set 'SHIFT + special-keys' as 'select' like a modern text editor.
-key("i", "<S-Home>", "<Esc>v<Home>", remap)
-key("i", "<S-End>", "<C-o>v<End><Left>", remap)
-key("n", "<S-Home>", "v<Home>", remap)
-key("n", "<S-End>", "v<End><Left>", remap)
-key("n", "<S-PageUp>", "", remap)
-key("n", "<S-PageDown>", "<Esc>:call Visual_Scroll_Down()<CR>i<Right><Left>", remap)
 
 -- Indent the current visual selection.
 key("v", "<", "<gv", remap)

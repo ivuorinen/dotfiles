@@ -1,57 +1,29 @@
 -- luacheck: globals vim
 
--- Fix moving through lines 'gk' and 'gj'
-vim.wo.linebreak = true
-
--- Enable break indent
-vim.o.breakindent = true
-
 -- Use the new FileType system of Neovim.
 -- let g:do_filetype_lua = 1
 
--- Save undo history
-vim.o.undofile = true
-
--- Show lines number (hybrid)
-vim.wo.number = true
-vim.wo.relativenumber = true
-
--- Keep signcolumn on by default
-vim.wo.signcolumn = "yes"
+vim.wo.linebreak = true -- Fix moving through lines 'gk' and 'gj'
+vim.o.breakindent = true -- Enable break indent
+vim.o.undofile = true -- Save undo history
+vim.wo.number = true -- Show lines number (hybrid)
+vim.wo.relativenumber = true -- Show lines number (hybrid)
+vim.wo.signcolumn = "yes" -- Keep signcolumn on by default
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
--- To have a extra line :)
-vim.o.cmdheight = 0
-
--- Set wrap for words
-vim.wo.wrap = true
-
--- Always show tabs
-vim.o.showtabline = 2
-
--- Show xtra spaces
-vim.opt.list = true
-
--- Set wildmenu for later use
-vim.o.wildmenu = true
-
--- Highlighting search
-vim.o.hlsearch = true
-
--- Set ruler for better look
-vim.o.ruler = true
-
--- No nice message
-vim.o.hidden = true
-
--- Partial commands only in the screen
-vim.o.showcmd = true
-
--- Match braces when inserting new ones :)
-vim.o.showmatch = true
+vim.o.cmdheight = 0 -- To have a extra line :)
+vim.wo.wrap = true -- Set wrap for words
+vim.o.showtabline = 2 -- Always show tabs
+vim.opt.list = true -- Show xtra spaces
+vim.o.wildmenu = true -- Set wildmenu for later use
+vim.o.hlsearch = true -- Highlighting search
+vim.o.ruler = true -- Set ruler for better look
+vim.o.hidden = true -- No nice message
+vim.o.showcmd = true -- Partial commands only in the screen
+vim.o.showmatch = true -- Match braces when inserting new ones
 
 -- Cursor line
 ---- Cursor column
@@ -60,39 +32,19 @@ vim.wo.cursorline = true
 vim.o.cursorcolumn = true
 vim.wo.cursorcolumn = true
 
--- Off scroll when moving through the buffer
-vim.o.scrolloff = 40
+vim.o.scrolloff = 40 -- Off scroll when moving through the buffer
+vim.go.termguicolors = true -- For terminal RGB colours
+vim.go.t_Co = "256" -- Colours, I believe
+vim.go.t_ut = "" -- Colours, I believe
+vim.o.laststatus = 3 -- Space for tabs
+vim.o.softtabstop = 2 -- Space for tabs
+vim.o.expandtab = true -- Expand tab to use spaces instead
+vim.o.tabstop = 2 -- Space for tabs
+vim.bo.shiftwidth = 2 -- Space for tabs
+vim.o.shiftwidth = 2 -- Space for tabs
 
--- For terminal RGB colours
-vim.go.termguicolors = true
-
--- Colours, I believe
-vim.go.t_Co = "256"
-vim.go.t_ut = ""
-
--- Space for tabs
-vim.o.laststatus = 3
-
--- Space for tabs
-vim.o.softtabstop = 2
-
--- Expand tab to use spaces instead
-vim.o.expandtab = true
-
---  Space for tabs
-vim.o.tabstop = 2
-
--- Space for tabs
-vim.bo.shiftwidth = 2
-
--- Space for tabs
-vim.o.shiftwidth = 2
-
--- Format options to not create new lines with comments
-vim.o.formatoptions = "tqj"
-
--- Mouse working with neovim
-vim.o.mouse = "a"
+vim.o.formatoptions = "tqj" -- Format options to not create new lines with comments
+vim.o.mouse = "a" -- Mouse working with neovim
 
 -- viminfo file
 -- vim.o.viminfo = vim.o.viminfo .. '~/.config/nvim/viminfo'
@@ -101,16 +53,12 @@ vim.o.mouse = "a"
 vim.o.spelllang = "en_gb"
 vim.bo.spelllang = "en_gb"
 
--- Global statusline.
-vim.opt.laststatus = 2
+vim.opt.laststatus = 2 -- Global statusline.
 
 -- When "on" the commands listed below move the cursor to the first non-blank
 --  of the line.  When off the cursor is kept in the same column (if possible).
 -- https://neovim.io/doc/user/options.html#'startofline'
 vim.opt.startofline = true
-
--- Columns line "limit"
--- vim.o.cc = '85'
 
 -- Set path for better searching across the system
 -- vim.o.path = vim.o.path .. '**'
@@ -119,8 +67,7 @@ vim.opt.startofline = true
 vim.o.completeopt = "menuone,longest,noselect"
 vim.o.shortmess = vim.o.shortmess .. "c"
 
--- Menu Transparency.
-vim.go.pumblend = 10
+vim.go.pumblend = 10 -- Menu Transparency.
 
 --  ╭──────────────────────────────────────────────────────────╮
 --  │ Variables                                                │

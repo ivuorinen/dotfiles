@@ -162,7 +162,19 @@ return {
     "m4xshen/smartcolumn.nvim",
     opts = {
       colorcolumn = { "80", "100", "120" },
-      disabled_filetypes = { "help", "text", "markdown", "json", "lazy", "starter", "neo-tree" },
+      disabled_filetypes = {
+        "dashboard",
+        "help",
+        "json",
+        "lazy",
+        "lazyterm",
+        "mason",
+        "neo-tree",
+        "notify",
+        "starter",
+        "toggleterm",
+        "Trouble",
+      },
     },
   },
 
@@ -216,7 +228,10 @@ return {
     build = vim.loop.os_uname().sysname == "Windows_NT" and "pwsh.exe -file .\\dl_binaries.ps1" or "./dl_binaries.sh",
     cmd = { "TabnineStatus", "TabnineDisable", "TabnineEnable", "TabnineToggle" },
     event = "User",
-    opts = { accept_keymap = "<C-e>" },
+    opts = {
+      accept_keymap = "<C-CR>",
+      dismiss_keymap = "<C-Esc>",
+    },
   },
 
   -- Vim plugin for automatic time tracking and metrics generated from your programming activity.

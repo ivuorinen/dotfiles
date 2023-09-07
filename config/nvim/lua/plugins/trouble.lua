@@ -9,7 +9,7 @@ return {
     -- position of the list can be: bottom, top, left, right
     position = "bottom",
     -- height of the trouble list when position is top or bottom
-    height = 10,
+    height = 6,
     -- width of the list when position is left or right
     width = 50,
     -- use devicons for filenames
@@ -68,7 +68,7 @@ return {
     -- add an indent guide below the fold icons
     indent_lines = true,
     -- automatically open the list when you have diagnostics
-    auto_open = true,
+    auto_open = false,
     -- automatically close the list when you have no diagnostics
     auto_close = true,
     -- automatically preview the location of the diagnostic.
