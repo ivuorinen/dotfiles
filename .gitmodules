@@ -26,24 +26,12 @@
 [submodule "tmux/catppuccin"]
 	path = config/tmux/plugins/tmux
 	url = https://github.com/catppuccin/tmux.git
-[submodule "tmux/tmux-1password"]
-	path = config/tmux/plugins/tmux-1password
-	url = https://github.com/yardnsm/tmux-1password.git
-[submodule "tmux/tmux-autoreload"]
-	path = config/tmux/plugins/tmux-autoreload
-	url = https://github.com/b0o/tmux-autoreload.git
 [submodule "tmux/tmux-continuum"]
 	path = config/tmux/plugins/tmux-continuum
 	url = https://github.com/tmux-plugins/tmux-continuum
-[submodule "tmux/tmux-fzf"]
-	path = config/tmux/plugins/tmux-fzf
-	url = https://github.com/sainnhe/tmux-fzf.git
 [submodule "tmux/tmux-menus"]
 	path = config/tmux/plugins/tmux-menus
 	url = https://github.com/jaclu/tmux-menus.git
-[submodule "tmux/tmux-notify"]
-	path = config/tmux/plugins/tmux-notify
-	url = https://github.com/ChanderG/tmux-notify.git
 [submodule "tmux/tmux-resurrect"]
 	path = config/tmux/plugins/tmux-resurrect
 	url = https://github.com/tmux-plugins/tmux-resurrect
@@ -53,12 +41,6 @@
 [submodule "tmux/tmux-sessionist"]
 	path = config/tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist.git
-[submodule "tmux/tmux-suspend"]
-	path = config/tmux/plugins/tmux-suspend
-	url = https://github.com/MunifTanjim/tmux-suspend.git
 [submodule "tmux/tmux-yank"]
 	path = config/tmux/plugins/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank.git
-[submodule "tmux/vim-tmux-navigator"]
-	path = config/tmux/plugins/vim-tmux-navigator
-	url = https://github.com/christoomey/vim-tmux-navigator.git

@@ -61,9 +61,11 @@ scheduler()
 # Defines default antigen bundles
 x-default-antigen-bundles()
 {
-  export ZSH_TMUX_AUTOSTART=true
+  export ZSH_TMUX_AUTOSTART=false
   export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
   export ZSH_TMUX_UNICODE=true
+  export ZSH_TMUX_AUTOQUIT=false
+  export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
   # these should be always available
   antigen bundle tmux
