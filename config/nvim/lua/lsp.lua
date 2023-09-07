@@ -120,26 +120,80 @@ mason_lspconfig.setup_handlers({
   end,
 })
 
--- Bash Language Server
-require("lsp.bash")
 
--- eslint_d + prettierd
--- require 'lsp.eslint_d_prettierd'
+-- Configure language servers for specific languages
+local lspconfig = require("lspconfig")
+
+-- Bash Language Server
+lspconfig.bashls.setup({
+  cmd = {
+    "bash-language-server",
+    "start",
+  },
+  filetypes = { "sh", "zsh" },
+  capabilities = CAPABILITIES,
+})
 
 -- HTML
-require("lsp.html")
+lspconfig.html.setup({ capabilities = CAPABILITIES })
 
 -- JSON
-require("lsp.json")
+lspconfig.jsonls.setup({
+  settings = {
+    json = {
+      schemas = require("schemastore").json.schemas(),
+      validate = { enable = true },
+    },
+  },
+  capabilities = CAPABILITIES,
+})
 
 -- Python
-require("lsp.python")
+lspconfig.pylsp.setup({})
 
 -- CSS + Less + SCSS
-require("lsp.scss")
+lspconfig.cssls.setup({
+  cmd = { "vscode-css-language-server", "--stdio" },
+  filetypes = { "css", "scss", "less" },
+  -- root_dir  = root_pattern("package.json", ".git") or bufdir,
+  settings = {
+    css = {
+      validate = true,
+    },
+    less = {
+      validate = true,
+    },
+    scss = {
+      validate = true,
+    },
+  },
+  single_file_support = true,
+  capabilities = CAPABILITIES,
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
+  end,
+})
+
 
 -- rome
-require("lsp.rome")
+local util = require("lspconfig.util")
+lspconfig.rome.setup({
+  root_dir = util.root_pattern("rome.json"),
+  single_file_support = true,
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
+  end,
+  capabilities = CAPABILITIES,
+})
+
 
 -- Typescript + Javascript
-require("lsp.typescript")
+lspconfig.tsserver.setup({
+  capabilities = CAPABILITIES,
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
+  end,
+})
+
+lspconfig.lua_ls.setup({})
+lspconfig.yamlls.setup({})
