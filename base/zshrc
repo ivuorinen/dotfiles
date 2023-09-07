@@ -1,10 +1,3 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
@@ -20,10 +13,19 @@ function x-load-configs()
 {
   # Load the shell dotfiles, and then some:
   for file in $DOTFILES/config/{exports,alias,functions}; do
+    HOST="$(hostname -s)"
+    # global (exports|alias|functions) file for all hosts
+    # shellcheck source=../config/exports
     [ -r "$file" ] && source "$file"
+    # global secret file, git ignored
+    # shellcheck source=../config/exports-secret
     [ -r "$file-secret" ] && source "$file-secret"
-    [ -r "$file-$HOSTNAME" ] && source "$file-$HOSTNAME"
-    [ -r "$file-$HOSTNAME-secret" ] && source "$file-$HOSTNAME-secret"
+    # host specific (exports|alias|functions) file
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST" ] && source "$file-$HOST"
+    # host specific (exports|alias|functions) file, git ignored
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
   done
 }
 x-load-configs
@@ -32,7 +34,6 @@ export HISTFILE="$XDG_STATE_HOME"/zsh/history
 
 autoload -U colors zsh/terminfo
 colors
-setopt correct
 
 export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
 x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
@@ -48,11 +49,9 @@ fi
 
 compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
-# Import ssh keys in keychain
-ssh-add -A 2>/dev/null;
-
 # Try to load antigen, if present
 ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
+# shellcheck source=../../.local/bin/antigen.zsh
 [[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
 
 # antigen is present

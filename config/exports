@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck shell=zsh
+# shellcheck shell=bash
 # vim: filetype=zsh
 
 export DOTFILES="$HOME/.dotfiles"

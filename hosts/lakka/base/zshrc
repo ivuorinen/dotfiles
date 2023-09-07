@@ -12,10 +12,15 @@ function x-load-configs()
   HOST="$(hostname -s)"
   # Load the shell dotfiles, and then some:
   for file in $DOTFILES/config/{exports,alias,functions}; do
-      [ -r "$file" ] && source "$file"
-      [ -r "$file-secret" ] && source "$file-secret"
-      [ -r "$file-$HOST" ] && source "$file-$HOST"
-      [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
+    # global (exports|alias|functions) file for all hosts
+    # shellcheck source=../../../config/exports
+    [ -r "$file" ] && source "$file"
+    # shellcheck source=../../../config/exports
+    [ -r "$file-secret" ] && source "$file-secret"
+    # shellcheck source=../../../config/exports
+    [ -r "$file-$HOST" ] && source "$file-$HOST"
+    # shellcheck source=../../../config/exports
+    [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
   done
 }
 x-load-configs
@@ -25,14 +30,16 @@ export LC_ALL=fi_FI.utf8
 
 export RVM_PATH="$HOME/.rvm"
 export PATH="$RVM_PATH/bin:$PATH"
+# shellcheck source=$HOME/.rvm/scripts/rvm
 [[ -s "$RVM_PATH/scripts/rvm" ]] && source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # Try to load antigen, if present
 ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
+# shellcheck source=$HOME/.local/bin/antigen.zsh
 [[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
 
 # If antigen was loaded
-if command -v antigen &> /dev/null; then
+if command -v antigen &>/dev/null; then
   antigen use oh-my-zsh
 
   # config/functions
@@ -48,4 +55,5 @@ alias nano='nano -wS -$'
 alias gpg=gpg2
 
 ACME_PATH="$HOME/.acme.sh"
+# shellcheck source=$HOME/.acme.sh/acme.sh.env
 [[ -s "$ACME_PATH/acme.sh.env" ]] && . "$ACME_PATH/acme.sh.env"

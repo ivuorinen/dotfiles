@@ -67,6 +67,9 @@ x-default-antigen-bundles()
   export ZSH_TMUX_AUTOQUIT=false
   export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
+  # Add keychain to ssh-agent args when on macOS
+  have brew && zstyle :omz:plugins:ssh-agent ssh-add-args --apple-load-keychain
+
   # these should be always available
   antigen bundle tmux
   antigen bundle colored-man-pages
