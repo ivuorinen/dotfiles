@@ -4,8 +4,8 @@
 -- https://github.com/folke/trouble.nvim
 return {
   "folke/trouble.nvim",
-  dependencies = "kyazdani42/nvim-web-devicons",
-  config = {
+  dependencies = "nvim-tree/nvim-web-devicons",
+  opts = {
     -- position of the list can be: bottom, top, left, right
     position = "bottom",
     -- height of the trouble list when position is top or bottom

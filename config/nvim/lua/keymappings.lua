@@ -21,7 +21,7 @@ wk.register({
     name = "+buffer",
     n = { "<cmd>tabnew<cr>", "[n]ew tab" },
     a = {
-      name = "+annotate"
+      name = "+annotate",
       -- defined in plugins/neogen.lua
     },
     c = {

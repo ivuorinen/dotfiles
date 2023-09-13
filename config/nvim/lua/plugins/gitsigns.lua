@@ -4,7 +4,7 @@
 return {
   "lewis6991/gitsigns.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
-  config = {
+  opts = {
     signs = {
       add = { hl = "GitSignsAdd", text = "┃", numhl = "GitSignsAddNr", linehl = "GitSignsAddLn" },
       change = { hl = "GitSignsChange", text = "┃", numhl = "GitSignsChangeNr", linehl = "GitSignsChangeLn" },

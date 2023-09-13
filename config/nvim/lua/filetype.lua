@@ -1,12 +1,7 @@
--- To be used anywhere.
-local function job(command) vim.api.nvim_command("call jobstart('" .. command .. "')") end
+-- luacheck: globals vim
 
-local function format()
-  vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = "<buffer>",
-    callback = function() vim.lsp.buf.format() end,
-  })
-end
+-- To be used anywhere.
+-- local function job(command) vim.api.nvim_command("call jobstart('" .. command .. "')") end
 
 local function yaml_ft(path, bufnr)
   -- get content of buffer as string
@@ -45,7 +40,7 @@ vim.filetype.add({
     csv = "csv",
     cl = "opencl",
     env = "env",
-    sh = "zsh",
+    sh = "bash",
     --
   },
   pattern = {
@@ -54,10 +49,10 @@ vim.filetype.add({
     -- [".*config/nvim/.*"] = function() vim.api.nvim_command "cd ~/.config/nvim/" end,
 
     ---- Typescript Projects
-    [".*/src/.*ts"] = function() format() end,
-    [".*/src/.*json"] = function() format() end,
-    [".*/src/.*scss"] = function() format() end,
-    [".*/src/.*html"] = function() format() end,
+    -- [".*/src/.*ts"] = function() format() end,
+    -- [".*/src/.*json"] = function() format() end,
+    -- [".*/src/.*scss"] = function() format() end,
+    -- [".*/src/.*html"] = function() format() end,
 
     --[".*Code/ivuorinen/[project]/src/.*ts"] = function()
     --  vim.api.nvim_command('cd ~/Code/ivuorinen/[project]/')
@@ -73,5 +68,6 @@ vim.filetype.add({
     ["tsconfig.json"] = "json5",
 
     [".ignore"] = "gitignore",
+    ["docker-compose.yml"] = "yaml.docker-compose",
   },
 })

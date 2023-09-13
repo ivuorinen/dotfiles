@@ -6,18 +6,20 @@ CAPABILITIES.textDocument.completion.completionItem.snippetSupport = true
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   local nmap = function(keys, func, desc)
     if desc then desc = "LSP: " .. desc end
 
     vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
   end
 
+  if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
+
   local wk = require("which-key")
 
   wk.register({
     l = {
-      name = "LSP",
+      name = "+lsp",
       n = { vim.lsp.buf.rename, "Rename" },
       c = { vim.lsp.buf.code_action, "Code Action" },
       f = { "<cmd>Format", "Format current buffer with LSP" },
@@ -33,7 +35,7 @@ local on_attach = function(_, bufnr)
       },
     },
     g = {
-      name = "Goto",
+      name = "+goto",
       d = { vim.lsp.buf.definition, "[G]oto [D]efinition" },
       r = { require("telescope.builtin").lsp_references, "[G]oto [R]eferences" },
       I = { vim.lsp.buf.implementation, "[G]oto [I]mplementation" },
@@ -48,12 +50,12 @@ local on_attach = function(_, bufnr)
   nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 
   -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(
-    bufnr,
-    "Format",
-    function(_) vim.lsp.buf.format() end,
-    { desc = "Format current buffer with LSP" }
-  )
+  -- vim.api.nvim_buf_create_user_command(
+  --  bufnr,
+  --  "Format",
+  --  function(_) vim.lsp.buf.format() end,
+  --  { desc = "Format current buffer with LSP" }
+  -- )
 end
 
 -- Enable the following language servers
@@ -71,13 +73,38 @@ local servers = {
   ansiblels = {},
   bashls = {},
   clangd = {},
+  cssls = {
+    cmd = { "vscode-css-language-server", "--stdio" },
+    filetypes = { "css", "scss", "less" },
+    -- root_dir  = root_pattern("package.json", ".git") or bufdir,
+    settings = {
+      css = {
+        validate = true,
+      },
+      less = {
+        validate = true,
+      },
+      scss = {
+        validate = true,
+      },
+    },
+    single_file_support = true,
+    capabilities = CAPABILITIES,
+  },
+  diagnosticls = {},
   docker_compose_language_service = {},
   dockerls = {},
-  eslint = {},
-  gopls = {},
+  eslint = {}, -- JS
+  gopls = {},  -- Go
+  graphql = {},
   html = { filetypes = { "html", "twig", "hbs" } },
-  intelephense = {},
-  jsonls = {},
+  intelephense = {}, -- PHP
+  jsonls = {
+    json = {
+      schemas = require("schemastore").json.schemas(),
+      validate = { enable = true },
+    },
+  },
   lua_ls = {
     Lua = {
       diagnostics = { globals = { "vim" } },
@@ -85,115 +112,33 @@ local servers = {
       telemetry = { enable = false },
     },
   },
-  marksman = {},
-  pyright = {},
-  rust_analyzer = {},
-  terraformls = {},
-  tsserver = {},
-  vuels = {},
-  yamlls = {},
+  marksman = {},      -- Markdown
+  psalm = {},         -- PHP
+  pylsp = {},         -- Python
+  pyright = {},       -- Python
+  rust_analyzer = {}, -- Rust
+  terraformls = {},   -- Terraform
+  tsserver = {},      -- TypeScript
+  vuels = {},         -- Vue
+  yamlls = {          -- YAML
+    yaml = {
+      schemaStore = {
+        -- You must disable built-in schemaStore support if you want to use
+        -- this plugin and its advanced options like `ignore`.
+        enable = false,
+        -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+        url = "",
+      },
+      schemas = require("schemastore").yaml.schemas(),
+    },
+  },
 }
 
 -- Setup neovim lua configuration
 require("neodev").setup()
 
--- nvim-cmp supports additional completion capabilities,
--- so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-
--- Ensure the servers above are installed
-local mason_lspconfig = require("mason-lspconfig")
-
-mason_lspconfig.setup({
+require("mason").setup()
+require("mason-lspconfig").setup({
   ensure_installed = vim.tbl_keys(servers),
-  automatic_installation = true,
+  automatic_installtion = true,
 })
-
-mason_lspconfig.setup_handlers({
-  function(server_name)
-    require("lspconfig")[server_name].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    })
-  end,
-})
-
-
--- Configure language servers for specific languages
-local lspconfig = require("lspconfig")
-
--- Bash Language Server
-lspconfig.bashls.setup({
-  cmd = {
-    "bash-language-server",
-    "start",
-  },
-  filetypes = { "sh", "zsh" },
-  capabilities = CAPABILITIES,
-})
-
--- HTML
-lspconfig.html.setup({ capabilities = CAPABILITIES })
-
--- JSON
-lspconfig.jsonls.setup({
-  settings = {
-    json = {
-      schemas = require("schemastore").json.schemas(),
-      validate = { enable = true },
-    },
-  },
-  capabilities = CAPABILITIES,
-})
-
--- Python
-lspconfig.pylsp.setup({})
-
--- CSS + Less + SCSS
-lspconfig.cssls.setup({
-  cmd = { "vscode-css-language-server", "--stdio" },
-  filetypes = { "css", "scss", "less" },
-  -- root_dir  = root_pattern("package.json", ".git") or bufdir,
-  settings = {
-    css = {
-      validate = true,
-    },
-    less = {
-      validate = true,
-    },
-    scss = {
-      validate = true,
-    },
-  },
-  single_file_support = true,
-  capabilities = CAPABILITIES,
-  on_attach = function(client, bufnr)
-    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
-  end,
-})
-
-
--- rome
-local util = require("lspconfig.util")
-lspconfig.rome.setup({
-  root_dir = util.root_pattern("rome.json"),
-  single_file_support = true,
-  on_attach = function(client, bufnr)
-    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
-  end,
-  capabilities = CAPABILITIES,
-})
-
-
--- Typescript + Javascript
-lspconfig.tsserver.setup({
-  capabilities = CAPABILITIES,
-  on_attach = function(client, bufnr)
-    if client.server_capabilities.documentSymbolProvider then require("nvim-navic").attach(client, bufnr) end
-  end,
-})
-
-lspconfig.lua_ls.setup({})
-lspconfig.yamlls.setup({})

@@ -1,14 +1,15 @@
 -- luacheck: globals vim
+local vim = vim
 
 return {
   -- plenary: full; complete; entire; absolute; unqualified.
   -- All the lua functions I don't want to write twice.
   -- https://github.com/nvim-lua/plenary.nvim
-  { "nvim-lua/plenary.nvim",       lazy = true },
+  { "nvim-lua/plenary.nvim",      lazy = true },
 
   -- lua `fork` of vim-web-devicons for neovim
   -- https://github.com/nvim-tree/nvim-web-devicons
-  { "kyazdani42/nvim-web-devicons" },
+  { "nvim-tree/nvim-web-devicons" },
 
   -- The theme of choise, catppuccin
   -- https://github.com/catppuccin/nvim
@@ -38,6 +39,7 @@ return {
         },
         cmp = true,
         dap = { enabled = true, enable_ui = true },
+        fidget = true,
         gitsigns = true,
         harpoon = true,
         indent_blankline = {
@@ -45,6 +47,7 @@ return {
           colored_indent_levels = false,
         },
         mason = true,
+        mini = true,
         neotree = true,
         notify = true,
         native_lsp = {
@@ -185,21 +188,17 @@ return {
   -- A neovim lua plugin to help easily manage multiple terminal windows
   -- https://github.com/akinsho/toggleterm.nvim
   {
-    'akinsho/toggleterm.nvim',
+    "akinsho/toggleterm.nvim",
     version = "*",
     opts = {
       open_mapping = [[<c-t>]],
       insert_mappings = true,
       -- direction = "float",
       float_opts = {
-        width = function()
-          return math.floor(vim.o.columns * 0.9)
-        end,
-        height = function()
-          return math.floor(vim.o.lines * 0.9)
-        end,
+        width = function() return math.floor(vim.o.columns * 0.9) end,
+        height = function() return math.floor(vim.o.lines * 0.9) end,
       },
-    }
+    },
   },
 
   -- Close buffer without messing up with the window.
@@ -210,7 +209,7 @@ return {
   -- https://github.com/kazhala/close-buffers.nvim
   { "kazhala/close-buffers.nvim" },
 
-  -- JSONLS
+  -- JSON schemas for Neovim
   -- https://github.com/b0o/schemastore.nvim
   { "b0o/schemastore.nvim" },
 
@@ -226,7 +225,7 @@ return {
   -- https://github.com/bennypowers/nvim-regexplainer
   {
     "bennypowers/nvim-regexplainer",
-    requires = {
+    dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
     },
@@ -256,9 +255,5 @@ return {
 
   -- Vim plugin for automatic time tracking and metrics generated from your programming activity.
   -- https://github.com/wakatime/vim-wakatime
-  {
-    "wakatime/vim-wakatime",
-    lazy = false,
-    enabled = true,
-  },
+  { "wakatime/vim-wakatime",        lazy = false, enabled = true },
 }

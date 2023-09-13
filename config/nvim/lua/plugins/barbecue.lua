@@ -5,10 +5,10 @@ return {
   dependencies = {
     "neovim/nvim-lspconfig",
     "SmiteshP/nvim-navic",
-    "kyazdani42/nvim-web-devicons",
+    "nvim-tree/nvim-web-devicons",
   },
   version = "*",
-  config = {
+  opts = {
     theme = "catppuccin",
 
     -- If you set this to false, floating windows will look weird

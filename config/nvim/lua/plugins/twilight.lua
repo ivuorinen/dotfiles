@@ -3,7 +3,7 @@
 -- https://github.com/folke/twilight.nvim
 return {
   "folke/twilight.nvim",
-  config = {
+  opts = {
     dimming = {
       -- amount of dimming
       alpha = 0.2,
