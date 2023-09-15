@@ -10,9 +10,9 @@ BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTBOT_BIN_PATH="${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}"
 DOTBOT_HOST="$(hostname -s)"
 
-cd "$BASEDIR"
-git submodule sync --quiet --recursive
-git submodule update --init --recursive
+cd "${BASEDIR}"
+git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
+git submodule update --init --recursive "${DOTBOT_DIR}"
 
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
