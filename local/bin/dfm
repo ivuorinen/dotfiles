@@ -28,6 +28,7 @@ function section_install
   MENU=(
     "all:Installs everything in the correct order"
     "antigen:Updates the antigen.zsh file"
+    "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
     "dotenv:Install dotenv-linter"
@@ -48,6 +49,7 @@ function section_install
       $0 install macos
       $0 install antigen
       $0 brew install
+      $0 install cargo
       $0 install composer
       $0 install dotenv
       $0 install fzf
@@ -64,6 +66,10 @@ function section_install
     antigen)
       curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
         && msg_yay "New antigen installed!"
+      ;;
+    cargo)
+      bash "$DOTFILES/scripts/install-cargo-packages.sh" \
+        && msg_yay "cargo packages installed!"
       ;;
     cheat-databases)
       for database in "$DOTFILES"/scripts/install-cheat-*; do
