@@ -197,11 +197,32 @@ function menu_usage()
   done
 }
 
+# Cache commands using bkt if installed
+if command -v bkt >&/dev/null; then
+  bkt()
+  {
+    command bkt "$@"
+  }
+else
+  # If bkt isn't installed skip its arguments and just execute directly.
+  # Optionally write a msg to stderr suggesting users install bkt.
+  bkt()
+  {
+    while [[ "$1" == --* ]]; do shift; done
+    "$@"
+  }
+fi
+
 # shorthand for checking if the system has the bin in path.
 # usage: have php && php -v
 function have
 {
-  command -v "$1" >&/dev/null
+  bkt -- command -v "$1" >&/dev/null
+}
+
+function brew_installed
+{
+  bkt -- brew list
 }
 
 # shorthand for checking if brew package is installed
@@ -210,7 +231,7 @@ function have_brew
 {
   ! have brew && return 125
 
-  if brew list "$1" &> /dev/null; then
+  if bkt -- brew list "$1" &> /dev/null; then
     return 0
   else
     return 1
