@@ -1,0 +1,7 @@
+# lakka exports
+
+## LUA
+have luarocks && $(luarocks path --bin)
+
+path_append "$HOME/.local/go/bin"
+
