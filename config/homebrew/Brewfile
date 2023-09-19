@@ -68,6 +68,8 @@ brew "awscli"
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
 # Yet another cross-platform graphical process/system monitor
 brew "bottom"
 # Switch Apache / Valet / CLI configs between PHP versions
@@ -150,8 +152,6 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Framework for layout and rendering of i18n text
@@ -276,6 +276,8 @@ brew "virtualenv"
 brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
+# Watch files and take action when they change
+brew "watchman"
 # Internet file retriever
 brew "wget"
 # Personal information dashboard for your terminal
@@ -312,8 +314,10 @@ brew "shivammathur/php/php@7.4"
 brew "shivammathur/php/php@8.0"
 # Ookla Speedtest
 brew "teamookla/speedtest/speedtest"
-# Command-line helper for the 1Password password manager
+# Command-line interface for 1Password
 cask "1password-cli"
+# GPU-accelerated terminal emulator
+cask "alacritty"
 # Turn audio CDs and files into audiobooks
 cask "audiobook-builder"
 # Text editor
@@ -433,6 +437,7 @@ vscode "esbenp.prettier-vscode"
 vscode "formulahendry.auto-close-tag"
 vscode "formulahendry.auto-rename-tag"
 vscode "formulahendry.code-runner"
+vscode "foxundermoon.shell-format"
 vscode "gencer.html-slim-scss-css-class-completion"
 vscode "github.vscode-github-actions"
 vscode "GitHub.vscode-pull-request-github"
@@ -471,6 +476,7 @@ vscode "phiter.phpstorm-snippets"
 vscode "sibiraj-s.vscode-scss-formatter"
 vscode "SonarSource.sonarlint-vscode"
 vscode "stylelint.vscode-stylelint"
+vscode "sumneko.lua"
 vscode "syler.sass-indented"
 vscode "timonwong.shellcheck"
 vscode "tootone.org-mode"
