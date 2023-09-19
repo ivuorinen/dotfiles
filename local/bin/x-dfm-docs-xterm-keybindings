@@ -17,6 +17,9 @@ KB=$(tmux list-keys)
 H="# tmux keybindings\n"
 L="\n\nLeader: \`<ctrl><space>\`\n\n"
 
+# Generalize expanded $HOME to "$HOME"
+KB="${KB//$HOME/\$HOME}"
+
 msg "Outputting tmux keybindings to $TMUX_KEYBINDINGS_DOCS"
 echo -e "${H}${L}${CB}${KB}${CB}" > "$TMUX_KEYBINDINGS_DOCS"
 msg_done "Done!"
