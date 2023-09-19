@@ -25,4 +25,3 @@ msg "Installing git-crypt"
   fi
 }
 msg_done "Done installing git-crypt"
-

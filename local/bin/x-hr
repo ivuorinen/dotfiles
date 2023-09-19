@@ -10,9 +10,9 @@
 # Modified by Ismo Vuorinen <https://github.com/ivuorinen> 2023
 
 # Determine width of terminal
-hr_col_count="$( (tput cols - 4) )"
+hr_col_count="$( (tput cols - 4))"
 if [ -z "${hr_col_count+set}" ] || [ "$hr_col_count" -lt 1 ]; then
-    hr_col_count="${COLUMNS:-80}"
+  hr_col_count="${COLUMNS:-80}"
 fi
 
 # Colors
@@ -21,20 +21,21 @@ hr_color="${hr_color:=$CLR_RED}"
 hr_reset="\033[0m"
 
 # Prints the HR line
-hr_draw_char() {
-    local CHAR="$1"
-    local LINE=""
-    LINE=$(printf "%*s" "$((hr_col_count - 3))" " ")
-    LINE="${LINE// /${CHAR}}"
-    echo -e "${hr_color}${LINE:0:${hr_col_count}}${hr_reset}"
+hr_draw_char()
+{
+  local CHAR="$1"
+  local LINE=""
+  LINE=$(printf "%*s" "$((hr_col_count - 3))" " ")
+  LINE="${LINE// /${CHAR}}"
+  echo -e "${hr_color}${LINE:0:${hr_col_count}}${hr_reset}"
 }
 
 # Passes param and calls hr()
-hr() {
-    for WORD in "${@:--}"; do
-        hr_draw_char "$WORD"
-    done
+hr()
+{
+  for WORD in "${@:--}"; do
+    hr_draw_char "$WORD"
+  done
 }
 
 hr "$@"
-

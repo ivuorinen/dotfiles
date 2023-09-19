@@ -2,8 +2,9 @@
 # fzf-tmux: starts fzf in a tmux pane
 # usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
 
-fail() {
-  >&2 echo "$1"
+fail()
+{
+  echo >&2 "$1"
   exit 2
 }
 
@@ -19,8 +20,9 @@ term=""
 [[ -n "$LINES" ]] && lines=$LINES || lines=$(tput lines) || lines=$(tmux display-message -p "#{pane_height}")
 [[ -n "$COLUMNS" ]] && columns=$COLUMNS || columns=$(tput cols) || columns=$(tmux display-message -p "#{pane_width}")
 
-help() {
-  >&2 echo 'usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
+help()
+{
+  echo >&2 'usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
 
   LAYOUT OPTIONS:
     (default layout: -d 50%)
@@ -55,7 +57,7 @@ while [[ $# -gt 0 ]]; do
       echo "fzf-tmux (with fzf $("$fzf" --version))"
       exit
       ;;
-    -p*|-w*|-h*|-x*|-y*|-d*|-u*|-r*|-l*)
+    -p* | -w* | -h* | -x* | -y* | -d* | -u* | -r* | -l*)
       if [[ "$arg" =~ ^-[pwhxy] ]]; then
         [[ "$opt" =~ "-E" ]] || opt="-E"
       elif [[ "$arg" =~ ^.[lr] ]]; then
@@ -93,9 +95,9 @@ while [[ $# -gt 0 ]]; do
       elif [[ "$arg" =~ ^-[whxy] ]]; then
         opt="$opt ${arg:0:2}$size"
       elif [[ "$size" =~ %$ ]]; then
-        size=${size:0:((${#size}-1))}
+        size=${size:0:((${#size} - 1))}
         if [[ -n "$swap" ]]; then
-          opt="$opt -p $(( 100 - size ))"
+          opt="$opt -p $((100 - size))"
         else
           opt="$opt -p $size"
         fi
@@ -106,7 +108,7 @@ while [[ $# -gt 0 ]]; do
           else
             max=$lines
           fi
-          size=$(( max - size ))
+          size=$((max - size))
           [[ $size -lt 0 ]] && size=0
           opt="$opt -l $size"
         else
@@ -152,13 +154,14 @@ fifo1="${TMPDIR:-/tmp}/fzf-fifo1-$id"
 fifo2="${TMPDIR:-/tmp}/fzf-fifo2-$id"
 fifo3="${TMPDIR:-/tmp}/fzf-fifo3-$id"
 if tmux_win_opts=$(tmux show-options -p remain-on-exit \; show-options -p synchronize-panes 2> /dev/null); then
-  tmux_win_opts=( $(sed '/ off/d; s/synchronize-panes/set-option -p synchronize-panes/; s/remain-on-exit/set-option -p remain-on-exit/; s/$/ \\;/' <<< "$tmux_win_opts") )
+  tmux_win_opts=($(sed '/ off/d; s/synchronize-panes/set-option -p synchronize-panes/; s/remain-on-exit/set-option -p remain-on-exit/; s/$/ \\;/' <<< "$tmux_win_opts"))
   tmux_off_opts='; set-option -p synchronize-panes off ; set-option -p remain-on-exit off'
 else
-  tmux_win_opts=( $(tmux show-window-options remain-on-exit \; show-window-options synchronize-panes | sed '/ off/d; s/^/set-window-option /; s/$/ \\;/') )
+  tmux_win_opts=($(tmux show-window-options remain-on-exit \; show-window-options synchronize-panes | sed '/ off/d; s/^/set-window-option /; s/$/ \\;/'))
   tmux_off_opts='; set-window-option synchronize-panes off ; set-window-option remain-on-exit off'
 fi
-cleanup() {
+cleanup()
+{
   \rm -f $argsf $fifo1 $fifo2 $fifo3
 
   # Restore tmux window options
@@ -196,7 +199,7 @@ if [[ "$opt" =~ "-E" ]]; then
     exit 2
   fi
 fi
-[[ -n "$FZF_DEFAULT_OPTS"    ]] && envs="$envs FZF_DEFAULT_OPTS=$(printf %q "$FZF_DEFAULT_OPTS")"
+[[ -n "$FZF_DEFAULT_OPTS" ]] && envs="$envs FZF_DEFAULT_OPTS=$(printf %q "$FZF_DEFAULT_OPTS")"
 [[ -n "$FZF_DEFAULT_COMMAND" ]] && envs="$envs FZF_DEFAULT_COMMAND=$(printf %q "$FZF_DEFAULT_COMMAND")"
 [[ -n "$RUNEWIDTH_EASTASIAN" ]] && envs="$envs RUNEWIDTH_EASTASIAN=$(printf %q "$RUNEWIDTH_EASTASIAN")"
 [[ -n "$BAT_THEME" ]] && envs="$envs BAT_THEME=$(printf %q "$BAT_THEME")"
@@ -236,6 +239,9 @@ fi
 tmux \
   split-window -c "$PWD" $opt "bash -c 'exec -a fzf bash $argsf'" $swap \
   $tmux_off_opts \
-  > /dev/null 2>&1 || { "$fzf" "${args[@]}"; exit $?; }
+  > /dev/null 2>&1 || {
+  "$fzf" "${args[@]}"
+  exit $?
+}
 cat $fifo2
 exit "$(cat $fifo3)"
