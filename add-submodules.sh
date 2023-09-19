@@ -20,5 +20,7 @@ git submodule add --name tmux/tmux-sensible \
   -f https://github.com/tmux-plugins/tmux-sensible.git config/tmux/plugins/tmux-sensible
 git submodule add --name tmux/tmux-sessionist \
   -f https://github.com/tmux-plugins/tmux-sessionist.git config/tmux/plugins/tmux-sessionist
+git submodule add --name tmux/tmux-window-name \
+  -f https://github.com/ofirgall/tmux-window-name.git config/tmux/plugins/tmux-window-name
 git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank

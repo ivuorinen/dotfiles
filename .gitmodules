@@ -44,3 +44,6 @@
 [submodule "tmux/tmux-yank"]
 	path = config/tmux/plugins/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank.git
+[submodule "tmux/tmux-window-name"]
+	path = config/tmux/plugins/tmux-window-name
+	url = https://github.com/ofirgall/tmux-window-name.git
