@@ -14,6 +14,8 @@ packages=(
   "bkt"
   # a structural diff that understands syntax
   "difftastic"
+  # A simple, fast and user-friendly alternative to 'find'
+  "fd-find"
 )
 
 for pkg in "${packages[@]}"; do

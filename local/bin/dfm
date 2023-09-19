@@ -261,18 +261,9 @@ function section_dotfiles
       ;;
     shfmt)
       # Format shell scripts according to following rules.
-      find "$DOTFILES" \
-        -type f -executable \
-        -not -path '*/.git/*' \
-        -not -path '*dotbot*' \
-        -not -path '*config/fzf*' \
-        -not -path '*bin/fzf*' \
-        -not -path '*tmux/plugins*' \
-        -not -name '*.pl' \
-        -not -name '*.py' \
-        -not -name '*.php' \
-        -not -name '*.zsh' \
-        -exec shfmt \
+      fd --full-path "$DOTFILES" -tx \
+        -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
+        -x shfmt \
         --language-dialect bash \
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
