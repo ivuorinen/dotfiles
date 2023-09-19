@@ -7,7 +7,7 @@ $directory\
 $git_branch\
 $git_state\
 $git_status\
-$fill\
+$fill \
 $battery\
 $username\
 $hostname\
@@ -75,6 +75,8 @@ symbol = " "
 
 [hostname]
 ssh_symbol = " "
+ssh_only = false
+format = '[$ssh_symbol](bold blue)[$hostname](bold red) '
 
 [nodejs]
 symbol = " "
