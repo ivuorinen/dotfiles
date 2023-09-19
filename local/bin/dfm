@@ -41,6 +41,7 @@ function section_install
     "nvm:Install Node Version Manager (nvm)"
     "npm:Install NPM Packages"
     "ntfy:Install ntfy"
+    "pip:Install pip/python packages"
     "z:Install z"
   )
 
@@ -49,6 +50,7 @@ function section_install
       $0 install macos
       $0 install antigen
       $0 brew install
+      $0 install pip
       $0 install cargo
       $0 install composer
       $0 install dotenv
@@ -131,6 +133,10 @@ function section_install
     ntfy)
       bash "$DOTFILES/scripts/install-ntfy.sh" \
         && msg_yay "ntfy installed!"
+      ;;
+    pip)
+      bash "$DOTFILES/scripts/install-pip-packages.sh" \
+        && msg_yay "pip/python packages installed!"
       ;;
     z)
       bash "$DOTFILES/scripts/install-z.sh" \
