@@ -41,7 +41,7 @@ done
 msg "Installing completions for selected packages"
 
 have git-profile && {
-  git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/git-profile" \
+  git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
     && msg_yay "Installed completions for git-profile"
 }
 
