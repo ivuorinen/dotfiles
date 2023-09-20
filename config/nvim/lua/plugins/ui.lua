@@ -14,6 +14,30 @@ return {
       flavour = "mocha",
     },
   },
+  -- Remove all background colors to make nvim transparent
+  -- https://github.com/xiyaowong/transparent.nvim
+  {
+    "xiyaowong/transparent.nvim",
+    lazy = false,
+    enabled = true,
+    config = function()
+      vim.g.transparent_groups = vim.list_extend(
+        vim.g.transparent_groups or {},
+        vim.tbl_map(function(v)
+          return v.hl_group
+        end, vim.tbl_values(require("bufferline.config").highlights))
+      )
+    end,
+  },
+  -- A fancy, configurable, notification manager for NeoVim
+  -- https://github.com/rcarriga/nvim-notify
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      -- Set background color to black so transparent doesn't mess stuff up
+      background_colour = "#000000",
+    },
+  },
   -- Getting you where you want with the fewest keystrokes.
   -- https://github.com/ThePrimeagen/harpoon
   { "ThePrimeagen/harpoon" },
