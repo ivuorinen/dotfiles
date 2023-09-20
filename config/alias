@@ -55,6 +55,55 @@ if [[ $(uname) == 'Darwin' ]]; then
   alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
 fi
 
+# Be nice
+alias please="sudo "
+
+# Easier navigation: .., ..., ....
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+# Colors for ls
+alias ll="ls -l"
+alias l="ls"
+
+# Prevent common typos
+alias cd..="cd .."
+alias sl="ls"
+
+# List only directories
+alias lsd="ls -lF | grep '^d'"
+
+# Recursively delete `.pyc` files
+alias rmpyc="find . -type f -name '*.pyc' -ls -delete"
+
+# Recursively delete `.DS_Store` files
+alias rmds="find . -type f -name '*.DS_Store' -ls -delete"
+
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en1"
+alias ips="ifconfig -a | grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' | sed -e 's/inet6* //'"
+
+# Show/hide hidden files in Finder
+alias show="defaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder"
+alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder"
+
+# Pipe public key to clipboard.
+alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
+
+# Flush Directory Service cache
+alias flush="dscacheutil -flushcache"
+
+# Update locatedb
+alias updatedb="sudo /usr/libexec/locate.updatedb"
+
+# Always return full history
+alias history="history 1"
+
+alias pip="pip3 "
+alias python="python3 "
+
 # tmux: automatically attach or create session with name 'main'
 alias tmux='tmux new-session -A -s main'
 # tmux: attach or create new session
