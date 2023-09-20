@@ -38,6 +38,9 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
   # echo "-> $DIRNAME ($d)"
 
   SECTION_DIR="${TLDR_CHEAT_DEST}/$DIRNAME"
+
+  [ "$DIRNAME" = "common" ] && SECTION_DIR="${TLDR_CHEAT_DEST}"
+
   TLDR_TAGS="tags: [$DIRNAME]"
 
   if [ ! -d "$SECTION_DIR" ]; then
@@ -48,7 +51,7 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
     BASENAME=$(basename "$FILE" .md)
     FILENAME="${BASENAME%%.*}"
     # echo "-> $FILE = $FILENAME"
-    TLDR_FILE="$SECTION_DIR/${FILENAME}"
+    TLDR_FILE="$SECTION_DIR/${BASENAME}"
     # echo "-> dest: $TLDR_FILE"
 
     # Update the original file for making the replacable value comparable
