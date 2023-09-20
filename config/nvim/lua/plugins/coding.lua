@@ -80,7 +80,7 @@ return {
     cmd = { "TabnineStatus", "TabnineDisable", "TabnineEnable", "TabnineToggle" },
     event = "User",
     opts = {
-      accept_keymap = "<C-CR>",
+      accept_keymap = "<C-e>",
       dismiss_keymap = "<C-Esc>",
     },
   },
