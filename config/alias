@@ -58,6 +58,11 @@ fi
 # Be nice
 alias please="sudo "
 
+! have eza && alias ls='ls --color=auto'
+have eza && {
+  alias ls='eza -h -s=type --git --icons --group-directories-first'
+}
+
 # Easier navigation: .., ..., ....
 alias ..="cd .."
 alias ...="cd ../.."
