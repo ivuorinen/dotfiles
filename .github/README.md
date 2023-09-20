@@ -23,20 +23,14 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ## The looks
 
-## tmux with powerlevel10k, the default view
-
-![screenshot of tmux with powerlevel10k](./screenshots/tmux-powerlevel10k-130x20.png)
-
-## tmux + nvim (astronvim) editing this repository
-
-![screenshot of tmux showing nvim](./screenshots/tmux-astronvim-130x40.png)
+![screenshot of tmux with nvim editing this repo](./screenshots/tmux-nvim.png)
 
 ## Interesting files and locations
 
 ### Interesting folders
 
 | Path                | Description                                  |
-|---------------------|----------------------------------------------|
+| ------------------- | -------------------------------------------- |
 | `.github`           | GitHub Repository configuration files.       |
 | `hosts/{hostname}/` | Configs that should apply to that host only. |
 | `local/bin`         | Helper scripts that I've collected or wrote. |
@@ -45,7 +39,7 @@ fork or download the repo as a zip and go from there with your own configs.
 ### dotfile folders
 
 | Repo      | Destination | Description                                 |
-|-----------|-------------|---------------------------------------------|
+| --------- | ----------- | ------------------------------------------- |
 | `base/`   | `.*`        | `$HOME` level files.                        |
 | `config/` | `.config/`  | Configurations for applications.            |
 | `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `state` |
@@ -62,7 +56,7 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 ### XDG Variables
 
 | Env                | Default              | Short description                              |
-|--------------------|----------------------|------------------------------------------------|
+| ------------------ | -------------------- | ---------------------------------------------- |
 | `$XDG_BIN_HOME`    | `$HOME/.local/bin`   | Local binaries                                 |
 | `$XDG_CONFIG_HOME` | `$HOME/.config`      | User-specific configs                          |
 | `$XDG_DATA_HOME`   | `$HOME/.local/share` | User-specific data files                       |
@@ -79,7 +73,7 @@ environment variable, at an appropriate place.
 #### XDG_DATA_HOME (`$HOME/.local/share`)
 
 `$XDG_DATA_HOME` defines the base directory relative to which
-user-specific *data files* should be stored.
+user-specific _data files_ should be stored.
 
 If `$XDG_DATA_HOME` is either not set or empty,
 a default equal to `$HOME/.local/share` should be used.
@@ -87,7 +81,7 @@ a default equal to `$HOME/.local/share` should be used.
 #### XDG_CONFIG_HOME (`$HOME/.config`)
 
 `$XDG_CONFIG_HOME` defines the base directory relative to which
-user-specific *configuration files* should be stored.
+user-specific _configuration files_ should be stored.
 
 If `$XDG_CONFIG_HOME` is either not set or empty,
 a default equal to `$HOME/.config` should be used.
@@ -95,13 +89,13 @@ a default equal to `$HOME/.config` should be used.
 #### XDG_STATE_HOME (`$HOME/.local/state`)
 
 `$XDG_STATE_HOME` defines the base directory relative to which
-user-specific *state files* should be stored.
+user-specific _state files_ should be stored.
 
 If `$XDG_STATE_HOME` is either not set or empty,
 a default equal to `$HOME/.local/state` should be used.
 
-The `$XDG_STATE_HOME` contains *state data* that should
-*persist between (application) restarts*, but that is not important or
+The `$XDG_STATE_HOME` contains _state data_ that should
+_persist between (application) restarts_, but that is not important or
 portable enough to the user that it should be stored in `$XDG_DATA_HOME`.
 
 - It may contain:
