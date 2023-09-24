@@ -148,3 +148,6 @@ version_format = '${major}.${minor}'
 symbol = " "
 format = "[$virtualenv]($style) "
 
+[username]
+format = "[$user]($style) "
+
