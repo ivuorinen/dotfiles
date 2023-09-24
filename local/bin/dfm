@@ -32,6 +32,7 @@ function section_install
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
     "dotenv:Install dotenv-linter"
+    "fonts:Install programming fonts"
     "gh:Install GitHub CLI Extensions"
     "go:Install Go Packages"
     "imagick:Install ImageMagick CLI"
@@ -48,6 +49,7 @@ function section_install
   case "$1" in
     all)
       $0 install macos
+      $0 install fonts
       $0 install antigen
       $0 brew install
       $0 install pip
@@ -88,6 +90,10 @@ function section_install
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
         && msg_yay "dotenv-linter installed!"
+      ;;
+    fonts)
+      bash "$DOTFILES/scripts/install-fonts.sh" \
+        && msg_yay "Installed fonts!"
       ;;
     fzf)
       bash "$DOTFILES/scripts/install-fzf.sh" \
