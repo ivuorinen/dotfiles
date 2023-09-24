@@ -18,8 +18,6 @@ tap "xwmx/taps"
 brew "act"
 # Mozilla CA certificate store
 brew "ca-certificates"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
 # YAML Parser
@@ -104,12 +102,20 @@ brew "dnsmasq"
 brew "dog"
 # Lightning-fast linter for .env files written in Rust
 brew "dotenv-linter"
+# Tool to verify that your files are in harmony with your .editorconfig
+brew "editorconfig-checker"
 # Useful examples at the command-line
 brew "eg-examples"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Development kit for the Java programming language
+brew "openjdk"
 # Run arbitrary commands when files change
 brew "entr"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
@@ -152,8 +158,6 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -208,8 +212,6 @@ brew "nvm"
 brew "openjdk@11"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
-# Development kit for the Java programming language
-brew "openjdk"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Highly capable, feature-rich programming language
@@ -416,6 +418,7 @@ mas "Keynote", id: 409183694
 mas "LastPass", id: 926036361
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
+mas "Pixelmator Pro", id: 1289583905
 mas "Tailscale", id: 1475387142
 mas "Xcode", id: 497799835
 vscode "akamud.vscode-theme-onelight"
@@ -485,6 +488,7 @@ vscode "Vue.volar"
 vscode "Vue.vscode-typescript-vue-plugin"
 vscode "WakaTime.vscode-wakatime"
 vscode "wix.vscode-import-cost"
+vscode "XadillaX.viml"
 vscode "xdebug.php-debug"
 vscode "xdebug.php-pack"
 vscode "yinfei.luahelper"
