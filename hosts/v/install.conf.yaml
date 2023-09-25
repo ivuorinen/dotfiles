@@ -1,8 +1,6 @@
 - include: "tools/dotbot-defaults.yaml"
 - shell:
     - echo "Configuring v"
-- brewfile:
-    - Brewfile
 - link:
     ~/:
       force: true

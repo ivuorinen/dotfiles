@@ -31,6 +31,11 @@
       glob: true
       relink: true
       path: config/*
+      exclude: [config/nvm]
+    ~/.config/nvm/default-packages:
+      create: true
+      relink: true
+      path: config/nvm/default-packages
     ~/.local/bin:
       glob: true
       path: local/bin/*
