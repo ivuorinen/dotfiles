@@ -9,6 +9,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 }
 
 packages=(
+  "pipx"
   "libtmux"
 )
 

@@ -7,19 +7,27 @@ export DOTFILES="$HOME/.dotfiles"
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()
 {
+  # Load the shell dotfiles, and then some:
+  for file in $DOTFILES/config/{exports,alias,functions}; do
     HOST="$(hostname -s)"
-    # Load the shell dotfiles, and then some:
-    for file in $DOTFILES/config/{exports,alias,functions}; do
-        [ -r "$file" ] && source "$file"
-        [ -r "$file-secret" ] && source "$file-secret"
-        [ -r "$file-$HOST" ] && source "$file-$HOST"
-        [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
-    done
+    # global (exports|alias|functions) file for all hosts
+    # shellcheck source=../config/exports
+    [ -r "$file" ] && source "$file"
+    # global secret file, git ignored
+    # shellcheck source=../config/exports-secret
+    [ -r "$file-secret" ] && source "$file-secret"
+    # host specific (exports|alias|functions) file
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST" ] && source "$file-$HOST"
+    # host specific (exports|alias|functions) file, git ignored
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
+  done
 }
 x-load-configs
 
 # Import ssh keys in keychain
-ssh-add -A 2>/dev/null;
+ssh-add -A 2> /dev/null
 
 # shellcheck source=../config/fzf/fzf.bash
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] \

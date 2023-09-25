@@ -29,7 +29,7 @@ for pkg in "${packages[@]}"; do
   # Skip comments
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  msg "Installing cargo package $pkg"
+  msg_run "Installing cargo package $pkg"
   cargo install "$pkg"
 
   echo ""

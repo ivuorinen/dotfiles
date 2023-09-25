@@ -250,10 +250,8 @@ function section_dotfiles
         ~/.local/share/nvim \
         ~/.local/state/nvim \
         ~/.cache/nvim \
-        ~/.config/astronvim \
         ~/.config/nvim
-      msg_ok "Deleted old nvim files"
-      ln -s "$DOTFILES/config/astronvim" ~/.config/astronvim
+      msg_ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim
       msg_ok "Linked nvim and astronvim"
       have npm && $0 install npm

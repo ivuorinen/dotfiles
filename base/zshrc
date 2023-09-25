@@ -42,8 +42,7 @@ x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
 FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
 autoload -Uz compinit
 
-if type brew &>/dev/null
-then
+if type brew &> /dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 fi
 
@@ -70,4 +69,3 @@ have antigen && {
 
 # Start starship
 eval "$(starship init zsh)"
-
