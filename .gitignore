@@ -13,4 +13,5 @@ ssh/local.d/*
 !ssh/local.d/.gitkeep
 !.gitkeep
 .env
+local/share/fonts/NerdFonts
 

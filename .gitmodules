@@ -47,3 +47,12 @@
 [submodule "tmux/tmux-window-name"]
 	path = config/tmux/plugins/tmux-window-name
 	url = https://github.com/ofirgall/tmux-window-name.git
+[submodule "dotbot-crontab"]
+	path = tools/dotbot-crontab
+	url = https://github.com/codekansas/dotbot-crontab.git
+[submodule "dotbot-snap"]
+	path = tools/dotbot-snap
+	url = https://github.com/DrDynamic/dotbot-snap.git
+[submodule "dotbot-pip"]
+	path = tools/dotbot-pip
+	url = https://github.com/sobolevn/dotbot-pip.git

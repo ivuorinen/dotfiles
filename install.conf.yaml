@@ -52,3 +52,19 @@
 - shell:
     - git submodule update --init --recursive --force
     - bash local/bin/dfm install all
+- pipx:
+    file: tools/requirements-pipx.txt
+    stdout: false
+    stderr: true
+- crontab:
+    - time: 0 5 * * *
+      command: brew update && brew upgrade
+      platform: darwin # Optional
+    - time: 0 5 * * *
+      command: apt update && apt upgrade
+      platform: linux # Optional
+    - time: 0 5 * * *
+      command: task sync
+- snap:
+    - nvim:
+      classic: true

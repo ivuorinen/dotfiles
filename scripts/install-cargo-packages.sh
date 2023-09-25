@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 ! have cargo && {
   msg "cargo could not be found. installing cargo with rustup.rs"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
 }
 
 packages=(
@@ -18,6 +18,9 @@ packages=(
   "eza"
   # A simple, fast and user-friendly alternative to 'find'
   "fd-find"
+  "cargo-update"
+  "pijul"
+  "ripgrep"
 )
 
 for pkg in "${packages[@]}"; do
@@ -26,7 +29,8 @@ for pkg in "${packages[@]}"; do
   # Skip comments
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  cargo install $pkg
+  msg "Installing cargo package $pkg"
+  cargo install "$pkg"
 
   echo ""
 done

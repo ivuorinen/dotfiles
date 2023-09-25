@@ -18,7 +18,7 @@ for pkg in "${packages[@]}"; do
   # Skip comments
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  python3 -m pip install --user $pkg
+  python3 -m pip install --user "$pkg"
 
   echo ""
 done

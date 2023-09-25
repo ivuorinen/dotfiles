@@ -18,18 +18,24 @@ git submodule update --init --recursive "${DOTBOT_DIR}"
   -d "${BASEDIR}" \
   --plugin-dir=tools/dotbot-brew \
   --plugin-dir=tools/dotbot-include \
+  --plugin-dir=tools/dotbot-crontab \
+  --plugin-dir=tools/dotbot-snap \
+  --plugin-dir=tools/dotbot-pip \
   -c "${CONFIG}" \
   "${@}"
 
 if [ "${DOTBOT_HOST}" != "" ]; then
   DOTBOT_HOST_CONFIG="${BASEDIR}/hosts/${DOTBOT_HOST}/${CONFIG}"
   echo "-> Trying if host config can be found: ${DOTBOT_HOST_CONFIG}"
-  [ -r "$DOTBOT_HOST_CONFIG" ] && [ -f "$DOTBOT_HOST_CONFIG" ] \
-    && echo "(!) Found $DOTBOT_HOST_CONFIG" \
-    && "$DOTBOT_BIN_PATH" \
+  [ -r "$DOTBOT_HOST_CONFIG" ] && [ -f "$DOTBOT_HOST_CONFIG" ] &&
+    echo "(!) Found $DOTBOT_HOST_CONFIG" &&
+    "$DOTBOT_BIN_PATH" \
       -d "$BASEDIR" \
       --plugin-dir=tools/dotbot-brew \
       --plugin-dir=tools/dotbot-include \
+      --plugin-dir=tools/dotbot-crontab \
+      --plugin-dir=tools/dotbot-snap \
+      --plugin-dir=tools/dotbot-pip \
       -c "$DOTBOT_HOST_CONFIG" \
       "${@}"
 fi

@@ -119,6 +119,7 @@ have gem && path_append "$(gem environment gemdir)/bin"
 have rbenv && eval "$(rbenv init - zsh)"
 
 # Rust / cargo
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 path_append "$CARGO_HOME/bin"
 
