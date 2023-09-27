@@ -7,9 +7,10 @@ module.exports = {
     { types: ['build', 'ci'], label: '🏗️ Build System' },
     { types: ['refactor'], label: '🪚 Refactors' },
     { types: ['doc', 'docs'], label: '📚 Documentation Changes' },
+    { types: ['config'], label: '🪛 Configuration Changes' },
     { types: ['test', 'tests'], label: '🔍 Tests' },
-    { types: ['style', 'codestyle'], label: '💅 Code Style Changes' },
-    { types: ['chore', 'Chore'], label: '🧹 Chores' },
+    { types: ['style', 'codestyle', 'lint'], label: '💅 Code Style Changes' },
+    { types: ['chore', 'Chore', 'deps', 'Deps'], label: '🧹 Chores' },
     { types: ['other', 'Other'], label: 'Other Changes' },
   ],
 
