@@ -1,4 +1,4 @@
-- include: "tools/dotbot-defaults.yaml"
+- include: 'tools/dotbot-defaults.yaml'
 - clean:
     ~/:
     ~/.config:
@@ -26,7 +26,7 @@
       force: true
       glob: true
       path: base/*
-      prefix: "."
+      prefix: '.'
     ~/.config/:
       glob: true
       relink: true
@@ -65,6 +65,3 @@
       platform: linux # Optional
     - time: 0 5 * * *
       command: task sync
-- snap:
-    - nvim:
-      classic: true

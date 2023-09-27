@@ -1,6 +1,6 @@
 # nvim keybindings
 
-```md
+```
 n  !           * <Cmd>lua require("which-key").show("!", {mode = "n", auto = true})<CR>
 n  '           * <Cmd>lua require("which-key").show("'", {mode = "n", auto = true})<CR>
 n  "           * <Cmd>lua require("which-key").show("\"", {mode = "n", auto = true})<CR>

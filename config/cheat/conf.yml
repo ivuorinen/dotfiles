@@ -6,7 +6,7 @@ colorize: true
 # Which 'chroma' colorscheme should be applied to the output?
 # Options are available here:
 #   https://github.com/alecthomas/chroma/tree/master/styles
-style: "catppuccin"
+style: 'catppuccin'
 # Which 'chroma' "formatter" should be applied?
 # One of: "terminal", "terminal256", "terminal16m"
 formatter: terminal256
@@ -74,7 +74,6 @@ cheatpaths:
     path: ~/.dotfiles/config/cheat/cheatsheets/tldr
     tags: [tldr]
     readonly: true
-
 # While it requires no configuration here, it's also worth noting that
 # cheat will automatically append directories named '.cheat' within the
 # current working directory to the 'cheatpath'. This can be very useful if

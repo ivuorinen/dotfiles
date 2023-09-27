@@ -1,5 +1,5 @@
 {
-  "extends": "markdownlint/style/prettier",
+  "extends": "@ivuorinen/markdownlint-config",
   "code-block-style": {
     "style": "fenced"
   },

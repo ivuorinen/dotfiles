@@ -1,0 +1,8 @@
+.mypy_cache/*
+tools/dotbot*
+local/bin/antigen.zsh
+config/cheat/cheatsheets/community
+config/tmux/plugins/*
+lazy-lock.json
+Brewfile.lock.json
+

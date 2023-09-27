@@ -3,4 +3,4 @@ config/cheat/cheatsheets/community/**
 tools/dotbot/**
 tools/dotbot-brew/**
 tools/dotbot-include/**
-
+node_modules

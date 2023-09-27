@@ -1,4 +1,4 @@
-- include: "tools/dotbot-defaults.yaml"
+- include: 'tools/dotbot-defaults.yaml'
 - shell:
     - echo "Configuring air"
 - brewfile:
@@ -8,7 +8,7 @@
       force: true
       glob: true
       path: hosts/air/base/**
-      prefix: "."
+      prefix: '.'
     ~/.config/:
       glob: true
       force: true

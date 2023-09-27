@@ -4,6 +4,7 @@
 # Updates $HOME/.dotfiles/docs/tmux.md with my keybindings.
 
 # shellcheck source=./../../scripts/shared.sh
+DOTFILES_SHARED_LOADED=""
 source "$HOME/.dotfiles/scripts/shared.sh"
 
 have tmux || {
@@ -15,7 +16,7 @@ TMUX_KEYBINDINGS_DOCS="$DOTFILES/docs/tmux-keybindings.md"
 CB="\n\`\`\`\n"
 KB=$(tmux list-keys)
 H="# tmux keybindings\n"
-L="\n\nLeader: \`<ctrl><space>\`\n\n"
+L="\nLeader: \`<ctrl><space>\`\n"
 
 # Generalize expanded $HOME to "$HOME"
 KB="${KB//$HOME/\$HOME}"

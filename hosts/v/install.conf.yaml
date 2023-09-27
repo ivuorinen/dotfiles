@@ -1,4 +1,4 @@
-- include: "tools/dotbot-defaults.yaml"
+- include: 'tools/dotbot-defaults.yaml'
 - shell:
     - echo "Configuring v"
 - link:
@@ -6,7 +6,7 @@
       force: true
       glob: true
       path: hosts/v/base/**
-      prefix: "."
+      prefix: '.'
     ~/.config/:
       glob: true
       force: true

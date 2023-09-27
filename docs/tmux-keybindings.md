@@ -1,8 +1,6 @@
 # tmux keybindings
 
-
 Leader: `<ctrl><space>`
-
 
 ```
 bind-key    -T copy-mode    C-Space              send-keys -X begin-selection
@@ -298,4 +296,3 @@ bind-key    -T root         M-Right              select-pane -R
 bind-key    -T root         C-Tab                previous-window
 bind-key    -T root         C-S-Tab              next-window
 ```
-

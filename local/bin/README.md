@@ -13,7 +13,7 @@ Some problematic code has been fixed per `shellcheck` suggestions.
 ## Sourced
 
 | Script                  | Source            |
-|-------------------------|-------------------|
+| ----------------------- | ----------------- |
 | `x-dupes`               | skx/sysadmin-util |
 | `x-foreach`             | mvdan/dotfiles    |
 | `x-multi-ping`          | skx/sysadmin-util |

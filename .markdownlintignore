@@ -1,0 +1,6 @@
+# only care about files that are under our control
+config/cheat/cheatsheets/community/*
+config/tmux/plugins/*
+tools/*
+node_modules/*
+

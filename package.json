@@ -1,0 +1,36 @@
+{
+  "name": "ivuorinen-dotfiles",
+  "version": "1.0.0",
+  "description": "ivuorinen's dotfiles, this is for linting and formatters",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "lint:markdown": "npx markdownlint -d .",
+    "fix:markdown": "npx markdownlint -df .",
+    "lint:prettier": "npx prettier . --check",
+    "fix:prettier": "npx prettier . --write",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivuorinen/dotfiles.git"
+  },
+  "keywords": [
+    "dotfiles",
+    "ivuorinen"
+  ],
+  "author": "Ismo Vuorinen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ivuorinen/dotfiles/issues"
+  },
+  "homepage": "https://github.com/ivuorinen/dotfiles#readme",
+  "devDependencies": {
+    "@ivuorinen/commitlint-config": "^0.1.10",
+    "@ivuorinen/eslint-config": "^0.2.13",
+    "@ivuorinen/markdownlint-config": "^0.1.6",
+    "@ivuorinen/prettier-config": "^0.1.1"
+  }
+}

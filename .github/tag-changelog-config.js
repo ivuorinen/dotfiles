@@ -16,11 +16,11 @@ module.exports = {
   excludeTypes: [],
 
   renderTypeSection: function (label, commits) {
-    let text = `\n## ${ label }\n\n`
+    let text = `\n## ${label}\n\n`
 
-    commits.forEach((commit) => {
-      const scope = commit.scope ? `**${ commit.scope }:** ` : ''
-      text += `- ${ scope }${ commit.subject }\n`
+    commits.forEach(commit => {
+      const scope = commit.scope ? `**${commit.scope}:** ` : ''
+      text += `- ${scope}${commit.subject}\n`
     })
 
     return text
@@ -28,8 +28,8 @@ module.exports = {
 
   renderChangelog: function (release, changes) {
     const now = new Date()
-    const d = now.toISOString().substring(0, 10);
-    const header = `# ${ release } - ${ d }\n`;
+    const d = now.toISOString().substring(0, 10)
+    const header = `# ${release} - ${d}\n`
     return header + changes + '\n\n'
   },
 }
