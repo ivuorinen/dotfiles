@@ -12,6 +12,14 @@ preexec()
   print -Pn "\e]0;$1%~\a"
 }
 
+# Update dotfiles
+dfu()
+{
+  (
+    cd "$DOTFILES" && git pull --ff-only && ./install -q
+  )
+}
+
 # Weather in Tampere, or other city
 weather()
 {
