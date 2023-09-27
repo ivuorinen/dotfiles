@@ -19,9 +19,14 @@ packages=(
   "eza"
   # A simple, fast and user-friendly alternative to 'find'
   "fd-find"
+  # A cargo subcommand for checking and applying
+  # updates to installed executables
   "cargo-update"
-  "pijul"
+  # recursively searches directories for a
+  # regex pattern while respecting your gitignore
   "ripgrep"
+  # A version manager for neovim
+  "bob-nvim"
 )
 
 for pkg in "${packages[@]}"; do
@@ -35,3 +40,14 @@ for pkg in "${packages[@]}"; do
 
   echo ""
 done
+
+msg_done "Installed cargo packages!"
+
+msg_run "Now doing the next steps for cargo packages"
+
+# use bob to install nvim
+have bob && {
+  bob use stable && path_append "$XDG_DATA_HOME/bob/nvim-bin"
+}
+
+msg_done "All next steps done!"
