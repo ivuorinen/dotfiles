@@ -23,11 +23,6 @@ have brew && eval "$(brew shellenv)"
 path_append "/usr/local/bin"
 path_append "$XDG_BIN_HOME"
 
-# brew, https://brew.sh
-have brew && {
-  have_brew python && path_append "$(brew --prefix python)/bin"
-}
-
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"
 

@@ -4,6 +4,8 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
+msg_run "Installing go packages"
+
 ! have go && msg "go hasn't been installed yet." && exit 0
 
 packages=(
@@ -33,16 +35,17 @@ for pkg in "${packages[@]}"; do
   # Skip comments
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  msg_run "Installing go package:" "$pkg"
+  msg_nested "Installing go package: $pkg"
   go install "$pkg"
   echo ""
 done
 
-msg "Installing completions for selected packages"
+msg_run "Installing completions for selected packages"
 
 have git-profile && {
   git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
-    && msg_yay "Installed completions for git-profile"
+    && msg_ok "Installed completions for git-profile"
 }
 
+echo ""
 msg_ok "Done"

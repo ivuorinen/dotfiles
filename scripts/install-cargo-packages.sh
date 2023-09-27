@@ -2,6 +2,7 @@
 # Install cargo/rust packages.
 #
 # shellcheck source=shared.sh
+DOTFILES_SHARED_LOADED=""
 source "$HOME/.dotfiles/scripts/shared.sh"
 
 ! have cargo && {

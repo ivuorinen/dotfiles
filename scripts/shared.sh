@@ -6,6 +6,10 @@
 # Helper env variables. Use like this: VERBOSE=1 ./script.sh
 : "${VERBOSE:=0}"
 
+# If this file has already been loaded, no need to reload it.
+[ "$DOTFILES_SHARED_LOADED" = "yes" ] && return
+export DOTFILES_SHARED_LOADED="yes"
+
 # -- Colors -- #
 CLR_RED="\033[1;31m"
 CLR_YELLOW="\033[1;33m"
@@ -201,7 +205,7 @@ function menu_usage()
 if command -v bkt >&/dev/null; then
   bkt()
   {
-    command bkt "$@"
+    command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
   }
 else
   # If bkt isn't installed skip its arguments and just execute directly.
@@ -213,7 +217,16 @@ else
   }
 fi
 
-# shorthand for checking if the system has the bin in path.
+# shorthand for checking if the system has the bin in path,
+# this version does not use caching
+# usage: have_command php && php -v
+function have_command
+{
+  command -v "$1" >&/dev/null
+}
+
+# shorthand for checking if the system has the bin in path,
+# this version uses caching
 # usage: have php && php -v
 function have
 {
@@ -356,4 +369,10 @@ ask()
       return 0
     fi
   done
+}
+
+# Check if a file contains non-ascii characters
+nonascii()
+{
+  LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
 }

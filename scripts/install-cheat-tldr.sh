@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2231,SC2034,SC2181,SC2068
 # shellcheck source=shared.sh
+DOTFILES_SHARED_LOADED=""
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-TLDR_REQUIRED_TOOLS=(basename git mkdir cheat ls grep head awk cp echo rm)
+TLDR_REQUIRED_TOOLS=(git cheat)
 for t in ${TLDR_REQUIRED_TOOLS[@]}; do
   ! have "$t" && echo "(!) $t is missing, can't continue..." && exit 1
 done

@@ -6,7 +6,7 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-msg "Installing git-crypt"
+msg_run "Installing git-crypt"
 
 ! have git-crypt && {
 

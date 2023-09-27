@@ -8,7 +8,7 @@ function x-set-php-aliases
 {
   have brew && {
     local php_versions=()
-    while IFS="" read -r line; do php_versions+=("$line"); done < <(brew list | grep '^php')
+    while IFS="" read -r line; do php_versions+=("$line"); done < <(brew_installed | grep '^php')
 
     php_error_reporting='-d error_reporting=22527'
 
@@ -58,6 +58,9 @@ fi
 # Be nice
 alias please="sudo "
 
+# Color the grep output
+alias grep='grep --color'
+
 ! have eza && alias ls='ls --color=auto'
 have eza && {
   alias ls='eza -h -s=type --git --icons --group-directories-first'
@@ -68,9 +71,12 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 
-# Colors for ls
-alias ll="ls -l"
-alias l="ls"
+# cd to git root directory
+alias cdgr='cd "$(git root)"'
+
+# Shortcuts for listing
+alias ll="ls -la"
+alias l="ls -a"
 
 # Prevent common typos
 alias cd..="cd .."
@@ -78,12 +84,6 @@ alias sl="ls"
 
 # List only directories
 alias lsd="ls -lF | grep '^d'"
-
-# Recursively delete `.pyc` files
-alias rmpyc="find . -type f -name '*.pyc' -ls -delete"
-
-# Recursively delete `.DS_Store` files
-alias rmds="find . -type f -name '*.DS_Store' -ls -delete"
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -118,6 +118,10 @@ alias ta='tmux attach || tmux'
 alias watchx='watch -dpbc'
 # delete .DS_Store files
 alias zapds='find . -name ".DS_Store" -print -delete'
+# Recursively delete `.pyc` files
+alias zappyc="find . -type f -name '*.pyc' -ls -delete"
+# Run all zaps
+alias zapall="zapds && zappyc"
 # tail with follow flag on
 alias t='tail -f'
 # directory usage, return only the total

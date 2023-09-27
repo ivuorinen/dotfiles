@@ -4,6 +4,8 @@
 # shellcheck source="shared.sh"
 source "$HOME/.dotfiles/scripts/shared.sh"
 
+msg_run "Installing gh (GitHub Client) extensions"
+
 ! have gh \
   && msg_err "gh (GitHub Client) could not be found, please install it first" \
   && exit 0
@@ -28,15 +30,13 @@ extensions=(
   rsese/gh-actions-status
 )
 
-msg "Starting to install GitHub CLI extensions..."
-
 for ext in "${extensions[@]}"; do
   # Trim spaces
   ext=${ext// /}
   # Skip comments
   if [[ ${ext:0:1} == "#" ]]; then continue; fi
 
-  msg_run "Installing $ext"
+  msg_nested "Installing $ext"
   gh extensions install "$ext"
   echo ""
 done

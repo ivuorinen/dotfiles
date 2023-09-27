@@ -3,6 +3,9 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
+export DOTFILES_SHARED_LOADED=""
+# shellcheck source=scripts/shared.sh
+source "$DOTFILES/scripts/shared.sh"
 
 # Run x-load-configs in your terminal to reload the files.
 function x-load-configs()

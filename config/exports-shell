@@ -2,6 +2,7 @@
 # shellcheck shell=bash
 # shellcheck disable=1091,2046
 # vim: filetype=zsh
+
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
@@ -23,8 +24,15 @@ export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
 # And include the parameter for ZSH
 export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
 
+# Less history location
+export LESSHISTFILE="$XDG_STATE_HOME"/less/history
+
 # Highlight section titles in manual pages
 export LESS_TERMCAP_md="$ORANGE"
+
+# zsh autoloaded terminfo
+export TERMINFO="$XDG_DATA_HOME"/terminfo
+export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
 
 # Don’t clear the screen after quitting a manual page
 export MANPAGER="less -X"
@@ -46,6 +54,10 @@ have dircolors && eval $(dircolors "$XDG_CONFIG_HOME/dircolors")
 
 # If we are using zsh, color our dir lists and such
 if [ "$SHELL" = "$(which zsh)" ]; then
+  autoload -U colors zsh/terminfo compinit
+  colors
+  compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
+
   x-dc "$XDG_CACHE_HOME/zsh"
   x-dc "$XDG_STATE_HOME/zsh"
   export HISTFILE="$XDG_STATE_HOME/zsh/history"

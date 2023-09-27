@@ -3,6 +3,7 @@
 # shellcheck enable=external-sources
 # shellcheck disable=1091,2139
 # vim: filetype=zsh
+
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
@@ -17,10 +18,8 @@ export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
 export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
 export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
-have ansible && {
-  x-dc "$ANSIBLE_HOME"
-  x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
-}
+x-dc "$ANSIBLE_HOME"
+x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 
@@ -29,28 +28,17 @@ export HOMEBREW_NO_ENV_HINTS=true
 # composer, https://getcomposer.org/
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
-have composer && {
-  export PATH="$COMPOSER_BIN:$PATH"
-}
+path_append "$COMPOSER_BIN"
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
-have docker && {
-  x-dc "$DOCKER_CONFIG"
-  # Docker: Disable snyk ad
-  export DOCKER_SCAN_SUGGEST=false
-}
+x-dc "$DOCKER_CONFIG"
+# Docker: Disable snyk ad
+export DOCKER_SCAN_SUGGEST=false
 
 # ffmpeg
 export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
 have ffmpeg && x-dc "$FFMPEG_DATADIR"
-
-# gcloud
-have gcloud && {
-  GCLOUD_LOC=$(gcloud info --format="value(installation.sdk_root)" --quiet)
-  [[ -f "$GCLOUD_LOC/path.zsh.inc" ]] && builtin source "$GCLOUD_LOC/path.zsh.inc"
-  [[ -f "$GCLOUD_LOC/completion.zsh.inc" ]] && builtin source "$GCLOUD_LOC/completion.zsh.inc"
-}
 
 # GnuPG
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
@@ -71,17 +59,7 @@ have irssi && {
 export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
 export NB_DIR="$XDG_STATE_HOME/nb"
 
-# nvm, the node version manager
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-export NVM_AUTO_USE=true
-export NVM_DIR="$XDG_CONFIG_HOME/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
-
-# Add npm packages to path
+# NPM: Add npm packages to path
 have node && {
   NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
   path_append "$NVM_NODE_BIN_DIR"
@@ -100,8 +78,7 @@ have op && {
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 have pyenv && {
-  path_append "$(pyenv root)/shims"
-  path_append "$PYENV_ROOT/bin"
+  path_append "$PYENV_ROOT/shims"
   eval "$(pyenv init -)"
 }
 
@@ -115,7 +92,7 @@ export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
 export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
 x-dc "$RBENV_ROOT"
-have gem && path_append "$(gem environment gemdir)/bin"
+have gem && path_append "${GEM_HOME}/bin"
 have rbenv && eval "$(rbenv init - zsh)"
 
 # Rust / cargo
@@ -138,10 +115,6 @@ export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 # wakatime, https://github.com/wakatime/wakatime-cli
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
-
-# z, https://github.com/rupa/z
-export _Z_DATA="$XDG_STATE_HOME/z"
-[[ -f "$XDG_BIN_HOME/z/z.sh" ]] && source "$XDG_BIN_HOME/z/z.sh"
 
 # Misc
 export BAT_THEME="ansi"

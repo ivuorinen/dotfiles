@@ -3,6 +3,7 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
+export DOTFILES_SHARED_LOADED=""
 # shellcheck source=scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 
@@ -30,23 +31,15 @@ function x-load-configs()
 }
 x-load-configs
 
-export HISTFILE="$XDG_STATE_HOME"/zsh/history
-
-autoload -U colors zsh/terminfo
-colors
-
 export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
 x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
 
 # Add completion scripts to zsh path
 FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
-autoload -Uz compinit
 
 if type brew &> /dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:${FPATH}"
 fi
-
-compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
 # Try to load antigen, if present
 ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
@@ -54,14 +47,53 @@ ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
 [[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
 
 # antigen is present
-have antigen && {
-  antigen use oh-my-zsh
+antigen use oh-my-zsh
 
-  # config/functions
-  x-default-antigen-bundles
+export ZSH_TMUX_AUTOSTART=false
+export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
+export ZSH_TMUX_UNICODE=true
+export ZSH_TMUX_AUTOQUIT=false
+export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
-  antigen apply
-}
+export NVM_DIR="$XDG_CONFIG_HOME/nvm"
+export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
+
+# z, the zsh version
+export ZSHZ_DATA="$XDG_STATE_HOME/z"
+antigen bundle z
+
+# these should be always available
+antigen bundle tmux
+antigen bundle colored-man-pages
+antigen bundle command-not-found
+antigen bundle ssh-agent
+antigen bundle jreese/zsh-titles
+antigen bundle unixorn/autoupdate-antigen.zshplugin
+antigen bundle zsh-users/zsh-completions
+
+# prettier history search
+antigen bundle zsh-history-substring-search
+bindkey "${terminfo[kcuu1]}" history-substring-search-up
+bindkey "${terminfo[kcud1]}" history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+# these should be available if there's need
+have brew && antigen bundle brew
+have php && antigen bundle php
+have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+
+# nvm is a strange beast
+zstyle ':omz:plugins:nvm' autoload yes
+antigen bundle nvm
+# antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
+
+# nice to have stuff
+antigen bundle gcloud
+
+# this needs to be the last item
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen apply
 
 # shellcheck source=../config/fzf/fzf.zsh
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
