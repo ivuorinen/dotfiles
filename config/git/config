@@ -5,6 +5,9 @@
   name = Ismo Vuorinen
   email = ismo@ivuorinen.net
 
+[github]
+  user = ivuorinen
+
 [include]
   path = ~/.config/git/overrides/config
 

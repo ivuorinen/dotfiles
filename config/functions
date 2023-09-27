@@ -6,6 +6,12 @@
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
 
+# Alacritty preexec hook to update dynamic title
+preexec()
+{
+  print -Pn "\e]0;$1%~\a"
+}
+
 # Weather in Tampere, or other city
 weather()
 {

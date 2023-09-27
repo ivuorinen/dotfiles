@@ -40,6 +40,8 @@ disabled = true
 [directory]
 read_only = " 󰌾"
 style = "blue"
+before_repo_root_style = "white"
+truncation_symbol = "…/"
 
 [docker_context]
 symbol = " "
