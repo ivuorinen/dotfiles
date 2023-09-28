@@ -10,7 +10,6 @@
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${SHARED_SCRIPT:=$DOTFILES/scripts/shared.sh}"
-: "${INSTALL_SCRIPT:=$DOTFILES/scripts/install-dotfiles.sh}"
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
 : "${HOSTFILES:=$DOTFILES/hosts}"
 
@@ -141,10 +140,7 @@ function section_install
       bash "$DOTFILES/scripts/install-ntfy.sh" \
         && msg_yay "ntfy installed!"
       ;;
-    pip)
-      bash "$DOTFILES/scripts/install-pip-packages.sh" \
-        && msg_yay "pip/python packages installed!"
-      ;;
+    pip) bash "$DOTFILES/scripts/install-pip-packages.sh" ;;
     z)
       bash "$DOTFILES/scripts/install-z.sh" \
         && msg_yay "z has been installed!"
