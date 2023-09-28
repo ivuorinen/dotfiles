@@ -1,41 +1,13 @@
 -- luacheck: globals vim
 return {
-  -- The theme of choise, catppuccin
-  -- https://github.com/catppuccin/nvim
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    priority = 1000,
-    enabled = true,
-    config = function()
-      vim.cmd.colorscheme("catppuccin")
-    end,
+    "folke/tokyonight.nvim",
     opts = {
-      flavour = "mocha",
-    },
-  },
-  -- Remove all background colors to make nvim transparent
-  -- https://github.com/xiyaowong/transparent.nvim
-  {
-    "xiyaowong/transparent.nvim",
-    lazy = false,
-    enabled = true,
-    config = function()
-      vim.g.transparent_groups = vim.list_extend(
-        vim.g.transparent_groups or {},
-        vim.tbl_map(function(v)
-          return v.hl_group
-        end, vim.tbl_values(require("bufferline.config").highlights))
-      )
-    end,
-  },
-  -- A fancy, configurable, notification manager for NeoVim
-  -- https://github.com/rcarriga/nvim-notify
-  {
-    "rcarriga/nvim-notify",
-    opts = {
-      -- Set background color to black so transparent doesn't mess stuff up
-      background_colour = "#000000",
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
     },
   },
   -- Not UFO in the sky, but an ultra fold in Neovim.
@@ -71,7 +43,7 @@ return {
           jumpBot = "]",
         },
       },
-      provider_selector = function(bufnr, filetype, buftype)
+      provider_selector = function(_, _, _) -- bufnr, filetype, buftype
         return { "treesitter", "indent" }
       end,
       fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
@@ -103,15 +75,18 @@ return {
       end,
     },
   },
+  {
+    "simrat39/symbols-outline.nvim",
+    cmd = "SymbolsOutline",
+    keys = { { "<leader>cs", "<cmd>SymbolsOutline<cr>", desc = "Symbols Outline" } },
+    config = true,
+  },
   -- Indent guides for Neovim
   -- https://github.com/lukas-reineke/indent-blankline.nvim
   { "lukas-reineke/indent-blankline.nvim" },
   -- Git integration for buffers
   -- https://github.com/lewis6991/gitsigns.nvim
   { "lewis6991/gitsigns.nvim" },
-  -- Getting you where you want with the fewest keystrokes.
-  -- https://github.com/ThePrimeagen/harpoon
-  { "ThePrimeagen/harpoon" },
   -- Close buffer without messing up with the window.
   -- https://github.com/famiu/bufdelete.nvim
   { "famiu/bufdelete.nvim" },

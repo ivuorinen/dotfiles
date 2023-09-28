@@ -65,17 +65,26 @@ return {
       auto = true,
     },
   },
-
   -- Clarify and beautify your comments using boxes and lines.
   -- https://github.com/LudoPinelli/comment-box.nvim
   { "LudoPinelli/comment-box.nvim", opts = {} },
-
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "stylua",
+        "shellcheck",
+        "shfmt",
+        "flake8",
+      },
+    },
+  },
   -- Tabnine Client for Neovim
   -- https://github.com/codota/tabnine-nvim
   {
     "codota/tabnine-nvim",
     name = "tabnine",
-    enabled = false,
+    -- enabled = false,
     build = vim.loop.os_uname().sysname == "Windows_NT" and "pwsh.exe -file .\\dl_binaries.ps1" or "./dl_binaries.sh",
     cmd = { "TabnineStatus", "TabnineDisable", "TabnineEnable", "TabnineToggle" },
     event = "User",
@@ -84,7 +93,6 @@ return {
       dismiss_keymap = "<C-Esc>",
     },
   },
-
   -- Vim plugin for automatic time tracking and metrics generated from your programming activity.
   -- https://github.com/wakatime/vim-wakatime
   { "wakatime/vim-wakatime", lazy = false, enabled = true },
