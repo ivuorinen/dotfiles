@@ -6,13 +6,14 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install pip packages"
 
-! have pip && {
-  msg_err "Could not find pip, something really terrible is going on." && exit 1
+! have python3 && {
+  msg_err "Could not find python3, something really terrible is going on." && exit 1
 }
 
 packages=(
   "pipx"
   "libtmux"
+  "ensurepath"
 )
 
 for pkg in "${packages[@]}"; do
@@ -27,4 +28,4 @@ for pkg in "${packages[@]}"; do
   echo ""
 done
 
-msg_yay "Run pip package installation"
+msg_yay "Run pip package installations"

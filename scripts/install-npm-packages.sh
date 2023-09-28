@@ -4,6 +4,8 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
+msg "Starting to install npm packages"
+
 ! have npm && msg_err "npm could not be found." && exit 0
 
 packages=(

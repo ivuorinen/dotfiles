@@ -4,6 +4,8 @@
 # shellcheck source=shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
 
+msg "Starting to install rust/cargo packages"
+
 ! have cargo && {
   msg "cargo could not be found. installing cargo with rustup.rs"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
@@ -12,6 +14,8 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 source "$CARGO_HOME/env"
 
 packages=(
+  # An incremental parsing system for programming tools
+  "tree-sitter-cli"
   # a subprocess caching utility
   "bkt"
   # a structural diff that understands syntax
