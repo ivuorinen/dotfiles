@@ -4,7 +4,7 @@
 
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
-path_append "$DOTFILES/local/bin"
+path_prepend "$DOTFILES/local/bin"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -21,7 +21,7 @@ path_append "/opt/homebrew/bin"
 have brew && eval "$(brew shellenv)"
 
 path_append "/usr/local/bin"
-path_append "$XDG_BIN_HOME"
+path_prepend "$XDG_BIN_HOME"
 
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"

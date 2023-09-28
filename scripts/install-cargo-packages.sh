@@ -2,13 +2,14 @@
 # Install cargo/rust packages.
 #
 # shellcheck source=shared.sh
-DOTFILES_SHARED_LOADED=""
 source "$HOME/.dotfiles/scripts/shared.sh"
 
 ! have cargo && {
   msg "cargo could not be found. installing cargo with rustup.rs"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
 }
+
+source "$CARGO_HOME/env"
 
 packages=(
   # a subprocess caching utility

@@ -8,6 +8,27 @@
 
 source "$DOTFILES/local/bin/msgr"
 
+# Run x-load-configs in your terminal to reload the files.
+function x-load-configs()
+{
+  # Load the shell dotfiles, and then some:
+  for file in $DOTFILES/config/{exports,alias,functions}; do
+    HOST="$(hostname -s)"
+    # global (exports|alias|functions) file for all hosts
+    # shellcheck source=../config/exports
+    [ -r "$file" ] && source "$file"
+    # global secret file, git ignored
+    # shellcheck source=../config/exports-secret
+    [ -r "$file-secret" ] && source "$file-secret"
+    # host specific (exports|alias|functions) file
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST" ] && source "$file-$HOST"
+    # host specific (exports|alias|functions) file, git ignored
+    # shellcheck source=../config/exports
+    [ -r "$file-$HOST-secret" ] && source "$file-$HOST-secret"
+  done
+}
+
 # -- Menu builder -- #
 function menu_section()
 {

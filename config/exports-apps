@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 # shellcheck enable=external-sources
 # shellcheck disable=1091,2139
-# vim: filetype=zsh
+# vim: filetype=bash
 
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
@@ -74,8 +74,10 @@ have node && {
 # op (1Password cli) is present
 export OP_CACHE="$XDG_STATE_HOME/1password"
 have op && {
-  eval "$(op completion zsh)"
-  compdef _op op
+  [ "$DOTFILES_CURRENT_SHELL" = "zsh" ] && {
+    eval "$(op completion zsh)"
+    compdef _op op
+  }
 }
 
 # Python
@@ -99,7 +101,10 @@ export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
 x-dc "$RBENV_ROOT"
 have gem && path_append "${GEM_HOME}/bin"
-have rbenv && eval "$(rbenv init - zsh)"
+have rbenv && {
+  [ "$DOTFILES_CURRENT_SHELL" = "zsh" ] && eval "$(rbenv init - zsh)"
+  [ "$DOTFILES_CURRENT_SHELL" = "bash" ] && eval "$(rbenv init - bash)"
+}
 
 # Rust / cargo
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"

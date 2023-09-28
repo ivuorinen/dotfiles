@@ -21,6 +21,9 @@ export DOTFILES_SHARED_LOADED=""
 # shellcheck source=./../../scripts/shared.sh
 source "$SHARED_SCRIPT"
 
+# Loads configs for better installation experience
+x-load-configs
+
 function section_install
 {
   USAGE_PREFIX="$SCRIPT install <command>"
