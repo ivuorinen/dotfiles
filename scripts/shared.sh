@@ -113,7 +113,7 @@ function have_command
 # usage: have php && php -v
 function have
 {
-  bkt -- command -v "$1" >&/dev/null
+  bkt -- which -s "$1" >&/dev/null
 }
 
 function brew_installed
