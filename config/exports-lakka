@@ -5,3 +5,16 @@ have luarocks && $(luarocks path --bin)
 
 path_append "$HOME/.local/go/bin"
 
+alias logrotate='/usr/sbin/logrotate -s $HOME/logs/state'
+alias nano='nano -wS -$'
+alias gpg=gpg2
+
+ACME_PATH="$HOME/.acme.sh"
+# shellcheck source=$HOME/.acme.sh/acme.sh.env
+[[ -s "$ACME_PATH/acme.sh.env" ]] && . "$ACME_PATH/acme.sh.env"
+
+export RVM_PATH="$HOME/.rvm"
+export PATH="$RVM_PATH/bin:$PATH"
+# shellcheck source=$HOME/.rvm/scripts/rvm
+[[ -s "$RVM_PATH/scripts/rvm" ]] && source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
+
