@@ -5,8 +5,8 @@
 
 # Modified from https://stackoverflow.com/a/28776166
 (
-  [[ -n $ZSH_VERSION && $ZSH_EVAL_CONTEXT =~ :file$ ]] || \
-  [[ -n $BASH_VERSION ]] && (return 0 2>/dev/null)
+  [[ -n $ZSH_VERSION && $ZSH_EVAL_CONTEXT =~ :file$ ]] \
+    || [[ -n $BASH_VERSION ]] && (return 0 2> /dev/null)
 ) && sourced=1 || sourced=0
 
 #  ╭──────────────────────────────────────────────────────────╮
@@ -177,19 +177,19 @@ ask()
 function __tests()
 {
   msg "[ msg ]"
-  msg_done "[ msg_done ]"
-  msg_done_suffix "[ msg_done_suffix ]" && echo "   ^-- (msg_done_suffix)"
-  msg_err "[ msg_err ]"
-  msg_nested "[ msg_nested ]"
-  msg_nested_done "[ msg_nested_done ]"
-  msg_ok "[ msg_ok ]"
-  msg_prompt "[ msg_prompt ]"
-  msg_prompt_done "[ msg_prompt_done ]"
-  msg_run "[ msg_run ]" "[ second_param ]"
-  msg_run_done "[ msg_run_done ]" "[ second_param ]"
-  msg_warn "[ msg_warn ]"
-  msg_yay "[ msg_yay ]"
-  msg_yay_done "[ msg_yay_done ]"
+  msg_done "[ done ]"
+  msg_done_suffix "[ done_suffix ]" && echo "   ^-- (done_suffix)"
+  msg_err "[ err ]"
+  msg_nested "[ nested ]"
+  msg_nested_done "[ nested_done ]"
+  msg_ok "[ ok ]"
+  msg_prompt "[ prompt ]"
+  msg_prompt_done "[ prompt_done ]"
+  msg_run "[ run ]" "[ second_param ]"
+  msg_run_done "[ run_done ]" "[ second_param ]"
+  msg_warn "[ warn ]"
+  msg_yay "[ yay ]"
+  msg_yay_done "[ yay_done ]"
 }
 
 function usage()

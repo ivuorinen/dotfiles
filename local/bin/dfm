@@ -51,6 +51,8 @@ function section_install
 
   case "$1" in
     all)
+      msgr msg "Starting to install all and reloading configurations..."
+      x-load-configs
       $0 install macos
       $0 install fonts
       $0 install antigen
@@ -69,6 +71,9 @@ function section_install
       $0 install npm
       $0 install ntfy
       $0 install z
+      msgr msg "Reloading configurations again..."
+      x-load-configs
+      msgr yay "All done!"
       ;;
     antigen)
       curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
