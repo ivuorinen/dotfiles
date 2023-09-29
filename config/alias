@@ -140,8 +140,7 @@ alias code_scanner='docker run
 
 alias zedit='$EDITOR ~/.dotfiles'
 
-have irssi \
-  && alias irssi="irssi --config='$IRSSI_CONFIG_FILE' --home='$IRSSI_CONFIG_HOME'"
+alias irssi="irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi"
 
 if [[ -f "$HOME/.aliases.local" ]]; then
   # shellcheck disable=SC1091

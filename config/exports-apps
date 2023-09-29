@@ -53,14 +53,6 @@ export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export GOPATH="$XDG_DATA_HOME/go"
 export GOBIN="$XDG_BIN_HOME"
 
-# irssi
-have irssi && {
-  # These variables are used in ./alias with --config and --home
-  export IRSSI_CONFIG_HOME="$XDG_CONFIG_HOME/irssi"
-  export IRSSI_CONFIG_FILE="$IRSSI_CONFIG_HOME/config"
-  x-dc "$IRSSI_CONFIG_HOME"
-}
-
 # nb, https://xwmx.github.io/nb/
 export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
 export NB_DIR="$XDG_STATE_HOME/nb"
