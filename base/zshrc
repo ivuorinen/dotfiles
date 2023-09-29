@@ -9,7 +9,7 @@ path_prepend "$DOTFILES/local/bin"
 
 export COMPLETION_WAITING_DOTS=true
 
-x-load-configs
+$DOTFILES/local/bin/x-load-configs
 
 export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
 x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
@@ -50,13 +50,6 @@ antigen bundle ssh-agent
 antigen bundle jreese/zsh-titles
 antigen bundle unixorn/autoupdate-antigen.zshplugin
 antigen bundle zsh-users/zsh-completions
-
-# prettier history search
-antigen bundle zsh-history-substring-search
-bindkey "${terminfo[kcuu1]}" history-substring-search-up
-bindkey "${terminfo[kcud1]}" history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
 
 # these should be available if there's need
 have brew && antigen bundle brew

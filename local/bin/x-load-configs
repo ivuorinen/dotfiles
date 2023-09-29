@@ -5,19 +5,27 @@
 : "${DOTFILES:=$HOME/.dotfiles}"
 source "$DOTFILES/scripts/shared.sh"
 
+CONFIG_PATH="$DOTFILES/config"
+
 # Load the shell dotfiles, and then some:
-for FILENAME in $DOTFILES/config/{exports,alias,functions}; do
-  HOST="$(hostname -s)"
-  # global (exports|alias|functions) FILENAME for all hosts
-  # shellcheck source=../config/exports
-  [ -r "$FILENAME" ] && source "$FILENAME"
-  # global secret FILENAME, git ignored
-  # shellcheck source=../config/exports-secret
-  [ -r "$FILENAME-secret" ] && source "$FILENAME-secret"
-  # host specific (exports|alias|functions) FILENAME
-  # shellcheck source=../config/exports
-  [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST"
-  # host specific (exports|alias|functions) FILENAME, git ignored
-  # shellcheck source=../config/exports
-  [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret"
-done
+function load()
+{
+  for FILE in $CONFIG_PATH/{exports,alias,functions}; do
+    FILENAME="$FILE"
+    HOST="$(hostname -s)"
+    # global (exports|alias|functions) FILENAME for all hosts
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME" ] && source "$FILENAME"
+    # global secret FILENAME, git ignored
+    # shellcheck source=../config/exports-secret
+    [ -r "$FILENAME-secret" ] && source "$FILENAME-secret"
+    # host specific (exports|alias|functions) FILENAME
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST"
+    # host specific (exports|alias|functions) FILENAME, git ignored
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret"
+  done
+}
+
+load

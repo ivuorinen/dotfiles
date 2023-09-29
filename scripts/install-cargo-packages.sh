@@ -14,6 +14,8 @@ msg "Starting to install rust/cargo packages"
 source "$CARGO_HOME/env"
 
 packages=(
+  # starship.rs
+  "starship"
   # An incremental parsing system for programming tools
   "tree-sitter-cli"
   # a subprocess caching utility

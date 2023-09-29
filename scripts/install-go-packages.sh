@@ -27,6 +27,8 @@ packages=(
   github.com/charmbracelet/glow@latest
   # Static checker for GitHub Actions workflow files
   github.com/rhysd/actionlint/cmd/actionlint@latest
+  # simple terminal UI for git commands
+  github.com/jesseduffield/lazygit@latest
 )
 
 for pkg in "${packages[@]}"; do

@@ -3,12 +3,11 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
-export DOTFILES_SHARED_LOADED=""
 # shellcheck source=scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 path_prepend "$DOTFILES/local/bin"
 
-x-load-configs
+$DOTFILES/local/bin/x-load-configs
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
