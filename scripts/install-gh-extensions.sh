@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg_run "Installing gh (GitHub Client) extensions"
 
-! have gh \
+[[ $(x-have "gh") == "1" ]] \
   && msg_err "gh (GitHub Client) could not be found, please install it first" \
   && exit 0
 

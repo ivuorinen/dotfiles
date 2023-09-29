@@ -6,7 +6,7 @@
 source "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
-have ntfy && msg "ntfy already installed" && exit 0
+[[ $(x-have "ntfy") == "0" ]] && msg "ntfy already installed" && exit 0
 
 case $(dfm check arch) in
   Linux)

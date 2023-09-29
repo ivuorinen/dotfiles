@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg_run "Installing go packages"
 
-! have go && msg "go hasn't been installed yet." && exit 0
+[[ $(x-have "go") == "1" ]] && msg "go hasn't been installed yet." && exit 0
 
 packages=(
   # A shell parser, formatter, and interpreter with bash support; includes shfmt

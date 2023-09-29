@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install npm packages"
 
-! have npm && msg_err "npm could not be found." && exit 0
+[[ $(x-have "npm") == "1" ]] && msg_err "npm could not be found." && exit 0
 
 packages=(
   # This is a tool to check if your files consider your .editorconfig rules.

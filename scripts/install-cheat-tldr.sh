@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 TLDR_REQUIRED_TOOLS=(git cheat)
 for t in ${TLDR_REQUIRED_TOOLS[@]}; do
-  ! have "$t" && echo "(!) $t is missing, can't continue..." && exit 1
+  [[ $(x-have "$t") == "1" ]] && echo "(!) $t is missing, can't continue..." && exit 1
 done
 
 TLDR_GIT="https://github.com/tldr-pages/tldr.git"
