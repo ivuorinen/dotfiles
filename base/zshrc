@@ -3,7 +3,6 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
-export DOTFILES_CURRENT_SHELL="zsh"
 # shellcheck source=scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
 path_prepend "$DOTFILES/local/bin"

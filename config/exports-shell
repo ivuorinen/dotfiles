@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # shellcheck disable=1091,2046
-# vim: filetype=zsh
+# vim: filetype=bash
 
 export DOTFILES="$HOME/.dotfiles"
 source "$DOTFILES/scripts/shared.sh"
@@ -48,25 +48,27 @@ hash shopt 2> /dev/null && shopt -s checkwinsize
 have dircolors && eval $(dircolors "$XDG_CONFIG_HOME/dircolors")
 
 # If we are using zsh, color our dir lists and such
-if [ "$DOTFILES_CURRENT_SHELL" = "zsh" ]; then
-  autoload -U colors zsh/terminfo compinit
-  colors
-  compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
+if [ "$DOTFILES_CURRENT_SHELL" = "-zsh" ]; then
+  [[ $ZSH_VERSION != "" ]] && {
+    autoload -U colors zsh/terminfo compinit
+    colors
+    compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
-  x-dc "$XDG_CACHE_HOME/zsh"
-  x-dc "$XDG_STATE_HOME/zsh"
-  export HISTFILE="$XDG_STATE_HOME/zsh/history"
-  zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
-  zstyle ':completion:*' list-colors "$LS_COLORS"
+    x-dc "$XDG_CACHE_HOME/zsh"
+    x-dc "$XDG_STATE_HOME/zsh"
+    export HISTFILE="$XDG_STATE_HOME/zsh/history"
+    zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
+    zstyle ':completion:*' list-colors "$LS_COLORS"
 
-  # fzf
-  [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
-    && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+    # fzf
+    [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
+      && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
 
-  # Load iterm2 shell integration
-  # https://iterm2.com/documentation-shell-integration.html
-  [[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
-    && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+    # Load iterm2 shell integration
+    # https://iterm2.com/documentation-shell-integration.html
+    [[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
+      && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
+  }
 fi
 
 # If we are using bash

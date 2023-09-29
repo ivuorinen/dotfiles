@@ -4,7 +4,7 @@
 # shellcheck disable=1091,2139
 # vim: filetype=bash
 
-export DOTFILES="$HOME/.dotfiles"
+: "${DOTFILES:=$HOME/.dotfiles}"
 source "$DOTFILES/scripts/shared.sh"
 
 # Antigen configuration

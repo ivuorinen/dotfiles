@@ -5,6 +5,10 @@
 
 # Helper env variables. Use like this: VERBOSE=1 ./script.sh
 : "${VERBOSE:=0}"
+: "${DOTFILES:=$HOME/.dotfiles}"
+
+DOTFILES_CURRENT_SHELL=$(ps -p $$ -oargs=)
+export DOTFILES_CURRENT_SHELL
 
 source "$DOTFILES/local/bin/msgr"
 
