@@ -19,37 +19,33 @@
 	url = https://github.com/cheat/cheatsheets.git
 	ignore = dirty
 
-[submodule "tmux/tpm"]
-	path = config/tmux/plugins/tpm
-	url = https://github.com/tmux-plugins/tpm.git
-	ignore = dirty
-[submodule "tmux/catppuccin"]
-	path = config/tmux/plugins/tmux
-	url = https://github.com/catppuccin/tmux.git
 [submodule "tmux/tmux-continuum"]
 	path = config/tmux/plugins/tmux-continuum
 	url = https://github.com/tmux-plugins/tmux-continuum
-[submodule "tmux/tmux-menus"]
-	path = config/tmux/plugins/tmux-menus
-	url = https://github.com/jaclu/tmux-menus.git
+	ignore = dirty
 [submodule "tmux/tmux-resurrect"]
 	path = config/tmux/plugins/tmux-resurrect
 	url = https://github.com/tmux-plugins/tmux-resurrect
+	ignore = dirty
 [submodule "tmux/tmux-sensible"]
 	path = config/tmux/plugins/tmux-sensible
 	url = https://github.com/tmux-plugins/tmux-sensible.git
+	ignore = dirty
 [submodule "tmux/tmux-sessionist"]
 	path = config/tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist.git
+	ignore = dirty
 [submodule "tmux/tmux-yank"]
 	path = config/tmux/plugins/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank.git
+	ignore = dirty
 [submodule "tmux/tmux-window-name"]
 	path = config/tmux/plugins/tmux-window-name
 	url = https://github.com/ofirgall/tmux-window-name.git
 [submodule "dotbot-snap"]
 	path = tools/dotbot-snap
 	url = https://github.com/DrDynamic/dotbot-snap.git
+	ignore = dirty
 [submodule "dotbot-pip"]
 	path = tools/dotbot-pip
 	url = https://github.com/sobolevn/dotbot-pip.git
