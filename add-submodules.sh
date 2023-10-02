@@ -7,10 +7,6 @@ git submodule add --name dotbot-brew \
   -f https://github.com/wren/dotbot-brew.git tools/dotbot-brew
 git submodule add --name dotbot-include \
   -f https://gitlab.com/gnfzdz/dotbot-include.git tools/dotbot-include
-git submodule add --name dotbot-crontab \
-  -f https://github.com/codekansas/dotbot-crontab.git tools/dotbot-crontab
-git submodule add --name dotbot-snap \
-  -f https://github.com/DrDynamic/dotbot-snap.git tools/dotbot-snap
 git submodule add --name dotbot-pip \
   -f https://github.com/sobolevn/dotbot-pip.git tools/dotbot-pip
 
@@ -36,3 +32,5 @@ git submodule add --name tmux/tmux-yank \
 [ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm
 [ -d "config/tmux/plugins/tmux" ] && rm -rf config/tmux/plugins/tmux
 [ -d "config/tmux/plugins/tmux-menus" ] && rm -rf config/tmux/plugins/tmux-menus
+[ -d "tools/dotbot-crontab" ] && rm -rf tools/dotbot-crontab
+[ -d "tools/dotbot-snap" ] && rm -rf tools/dotbot-snap

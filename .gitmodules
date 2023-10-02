@@ -42,9 +42,6 @@
 [submodule "tmux/tmux-window-name"]
 	path = config/tmux/plugins/tmux-window-name
 	url = https://github.com/ofirgall/tmux-window-name.git
-[submodule "dotbot-snap"]
-	path = tools/dotbot-snap
-	url = https://github.com/DrDynamic/dotbot-snap.git
 	ignore = dirty
 [submodule "dotbot-pip"]
 	path = tools/dotbot-pip
