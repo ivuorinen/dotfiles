@@ -13,6 +13,18 @@ require("lazy").setup({
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
     },
+    {
+      "folke/tokyonight.nvim",
+      opts = {
+        style = "night",
+        transparent = true,
+        sidebars = { "qf", "vista_kind", "terminal", "packer" },
+        styles = {
+          sidebars = "transparent",
+          floats = "transparent",
+        },
+      },
+    },
     -- import any extras modules here
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.lang.docker" },

@@ -1,15 +1,5 @@
 -- luacheck: globals vim
 return {
-  {
-    "folke/tokyonight.nvim",
-    opts = {
-      transparent = true,
-      styles = {
-        sidebars = "transparent",
-        floats = "transparent",
-      },
-    },
-  },
   -- Not UFO in the sky, but an ultra fold in Neovim.
   -- https://github.com/kevinhwang91/nvim-ufo/
   {
