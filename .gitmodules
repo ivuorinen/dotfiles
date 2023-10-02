@@ -46,3 +46,9 @@
 [submodule "dotbot-pip"]
 	path = tools/dotbot-pip
 	url = https://github.com/sobolevn/dotbot-pip.git
+[submodule "tmux/tmux-suspend"]
+	path = config/tmux/plugins/tmux-suspend
+	url = https://github.com/MunifTanjim/tmux-suspend.git
+[submodule "tmux/tmux-mode-indicator"]
+	path = config/tmux/plugins/tmux-mode-indicator
+	url = https://github.com/MunifTanjim/tmux-mode-indicator.git

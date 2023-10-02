@@ -17,16 +17,24 @@ git submodule add --name cheat-community \
 # tmux plugin manager and plugins
 git submodule add --name tmux/tmux-continuum \
   -f https://github.com/tmux-plugins/tmux-continuum config/tmux/plugins/tmux-continuum
+git submodule add --name tmux/tmux-mode-indicator \
+  -f https://github.com/MunifTanjim/tmux-mode-indicator.git config/tmux/plugins/tmux-mode-indicator
 git submodule add --name tmux/tmux-resurrect \
   -f https://github.com/tmux-plugins/tmux-resurrect config/tmux/plugins/tmux-resurrect
 git submodule add --name tmux/tmux-sensible \
   -f https://github.com/tmux-plugins/tmux-sensible.git config/tmux/plugins/tmux-sensible
 git submodule add --name tmux/tmux-sessionist \
   -f https://github.com/tmux-plugins/tmux-sessionist.git config/tmux/plugins/tmux-sessionist
+git submodule add --name tmux/tmux-suspend \
+  -f https://github.com/MunifTanjim/tmux-suspend.git config/tmux/plugins/tmux-suspend
 git submodule add --name tmux/tmux-window-name \
   -f https://github.com/ofirgall/tmux-window-name.git config/tmux/plugins/tmux-window-name
 git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
+
+for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
+  git config "submodule.${MODULE}.ignore" all
+done
 
 # remove old submodules
 [ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm
