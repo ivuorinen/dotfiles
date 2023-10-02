@@ -9,7 +9,6 @@
 # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
 : "${VERBOSE:=0}"
 : "${DOTFILES:=$HOME/.dotfiles}"
-: "${SHARED_SCRIPT:=$DOTFILES/scripts/shared.sh}"
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
 : "${HOSTFILES:=$DOTFILES/hosts}"
 
@@ -17,9 +16,9 @@ SCRIPT=$(basename "$0")
 
 VERSION_NVM="v0.39.5"
 
-export DOTFILES_SHARED_LOADED=""
+export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=./../../scripts/shared.sh
-source "$SHARED_SCRIPT"
+source "$HOME/.dotfiles/scripts/shared.sh"
 
 # Loads configs for better installation experience
 x-load-configs

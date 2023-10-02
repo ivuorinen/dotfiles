@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Create directory if it doesn't exist already
+#
+# Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
+# Licensed under MIT License. http://www.opensource.org/licenses/mit-license.
+
+dir="$1"
+
+[ $# -eq 0 ] && {
+  echo "Usage: $0 full/path/to/dir/to/create"
+  exit 1
+}
+
+if [ ! -d "$dir" ]; then
+  mkdir -p "$dir" && exit 0
+fi

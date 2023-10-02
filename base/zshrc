@@ -5,21 +5,43 @@
 export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
-path_prepend "$DOTFILES/local/bin"
+export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$PATH"
+
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# custom variables
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 export COMPLETION_WAITING_DOTS=true
 
-$DOTFILES/local/bin/x-load-configs
+path_append "/opt/homebrew/bin"
+if type brew &> /dev/null; then
+  eval "$(brew shellenv)"
+  FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:${FPATH}"
+fi
+
+path_append "/usr/local/bin"
+path_prepend "$XDG_DATA_HOME/cargo/bin"
+path_prepend "$XDG_BIN_HOME"
+path_prepend "$HOME/.local/go/bin"
+path_prepend "$XDG_DATA_HOME/bob/nvim-bin"
+
+source "$DOTFILES/config/exports-shell"
+source "$DOTFILES/config/exports-apps"
+source "$DOTFILES/config/alias"
+source "$DOTFILES/config/functions"
 
 export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
 x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
 
 # Add completion scripts to zsh path
 FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
-
-if type brew &> /dev/null; then
-  FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:${FPATH}"
-fi
 
 # Try to load antigen, if present
 ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
@@ -29,7 +51,7 @@ ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
 # antigen is present
 antigen use oh-my-zsh
 
-export ZSH_TMUX_AUTOSTART=false
+export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
 export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false

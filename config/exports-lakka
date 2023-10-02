@@ -3,7 +3,7 @@
 ## LUA
 have luarocks && $(luarocks path --bin)
 
-path_append "$HOME/.local/go/bin"
+path_prepend "$HOME/.local/go/bin"
 
 alias logrotate='/usr/sbin/logrotate -s $HOME/logs/state'
 alias nano='nano -wS -$'

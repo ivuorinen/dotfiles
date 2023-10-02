@@ -5,10 +5,159 @@
 
 # Helper env variables. Use like this: VERBOSE=1 ./script.sh
 : "${VERBOSE:=0}"
-: "${DOTFILES:=$HOME/.dotfiles}"
 
+# Modified from https://stackoverflow.com/a/28776166
+(
+  [[ -n $ZSH_VERSION && $ZSH_EVAL_CONTEXT =~ :file$ ]] \
+    || [[ -n $BASH_VERSION ]] && (return 0 2> /dev/null)
+) && sourced=1 || sourced=0
+
+export DOTFILES="$HOME/.dotfiles"
 DOTFILES_CURRENT_SHELL=$(ps -p $$ -oargs=)
 export DOTFILES_CURRENT_SHELL
+
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# custom variables
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_RUNTIME_DIR="$HOME/.local/run"
+
+# Remove directory from the PATH variable
+# usage: path_remove ~/.local/bin
+function path_remove
+{
+  PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
+}
+
+# Append directory to the PATH
+# usage: path_append ~/.local/bin
+function path_append
+{
+  path_remove "$1"
+  PATH="${PATH:+"$PATH:"}$1"
+}
+
+# Prepend directory to the PATH
+# usage: path_prepend ~/.local/bin
+function path_prepend
+{
+  path_remove "$1"
+  PATH="$1${PATH:+":$PATH"}"
+}
+
+# Create directory if it doesn't exist already
+x-dc()
+{
+  dir="$1"
+
+  [ $# -eq 0 ] && {
+    echo "Usage: $0 full/path/to/dir/to/create"
+    exit 1
+  }
+
+  if [ ! -d "$dir" ]; then
+    mkdir -p "$dir" && exit 0
+  fi
+}
+
+# Create a new directory and enter it
+mkd()
+{
+  mkdir -p "$@" && cd "$@" || exit
+}
+
+# Run command silently
+# Usage: silent uptime
+silent()
+{
+  "$@" >&/dev/null
+}
+
+# Check if a file contains non-ascii characters
+nonascii()
+{
+  LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
+}
+
+# Cache commands using bkt if installed
+if command -v bkt >&/dev/null; then
+  bkt()
+  {
+    command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
+  }
+else
+  # If bkt isn't installed skip its arguments and just execute directly.
+  # Optionally write a msg to stderr suggesting users install bkt.
+  bkt()
+  {
+    while [[ "$1" == --* ]]; do shift; done
+    "$@"
+  }
+fi
+
+# shorthand for checking if the system has the bin in path,
+# this version does not use caching
+# usage: have_command php && php -v
+function have_command
+{
+  command -v "$1" >&/dev/null
+}
+
+# shorthand for checking if the system has the bin in path,
+# this version uses caching
+# usage: have php && php -v
+function have
+{
+  bkt -- which "$1" >&/dev/null
+}
+
+function brew_installed
+{
+  bkt -- brew list
+}
+
+# shorthand for checking if brew package is installed
+# usage: have_brew php && php -v
+function have_brew
+{
+  ! have brew && return 125
+
+  if bkt -- brew list "$1" &> /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+CONFIG_PATH="$DOTFILES/config"
+
+# Load the shell dotfiles, and then some:
+function x-load-config-fn()
+{
+  for FILE in $CONFIG_PATH/{exports,alias,functions}; do
+    FILENAME="$FILE"
+    HOST="$(hostname -s)"
+    # global (exports|alias|functions) FILENAME for all hosts
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME" ] && source "$FILENAME"
+    # global secret FILENAME, git ignored
+    # shellcheck source=../config/exports-secret
+    [ -r "$FILENAME-secret" ] && source "$FILENAME-secret"
+    # host specific (exports|alias|functions) FILENAME
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST"
+    # host specific (exports|alias|functions) FILENAME, git ignored
+    # shellcheck source=../config/exports
+    [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret"
+  done
+}
+
+x-load-config-fn
 
 source "$DOTFILES/local/bin/msgr"
 
@@ -67,79 +216,6 @@ function menu_usage()
   done
 }
 
-# Cache commands using bkt if installed
-if command -v bkt >&/dev/null; then
-  bkt()
-  {
-    command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
-  }
-else
-  # If bkt isn't installed skip its arguments and just execute directly.
-  # Optionally write a msg to stderr suggesting users install bkt.
-  bkt()
-  {
-    while [[ "$1" == --* ]]; do shift; done
-    "$@"
-  }
-fi
-
-# shorthand for checking if the system has the bin in path,
-# this version does not use caching
-# usage: have_command php && php -v
-function have_command
-{
-  command -v "$1" >&/dev/null
-}
-
-# shorthand for checking if the system has the bin in path,
-# this version uses caching
-# usage: have php && php -v
-function have
-{
-  bkt -- which "$1" >&/dev/null
-}
-
-function brew_installed
-{
-  bkt -- brew list
-}
-
-# shorthand for checking if brew package is installed
-# usage: have_brew php && php -v
-function have_brew
-{
-  ! have brew && return 125
-
-  if bkt -- brew list "$1" &> /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Remove directory from the PATH variable
-# usage: path_remove ~/.local/bin
-function path_remove
-{
-  PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
-}
-
-# Append directory to the PATH
-# usage: path_append ~/.local/bin
-function path_append
-{
-  path_remove "$1"
-  PATH="${PATH:+"$PATH:"}$1"
-}
-
-# Prepend directory to the PATH
-# usage: path_prepend ~/.local/bin
-function path_prepend
-{
-  path_remove "$1"
-  PATH="$1${PATH:+":$PATH"}"
-}
-
 # Creates a random string
 rnd()
 {
@@ -193,38 +269,4 @@ function replacable()
   [[ $VERBOSE -eq 1 ]] && msg_warn "Files do not match ($FILE1_HASH != $FILE2_HASH), replacable"
 
   return 1
-}
-
-# Create directory if it doesn't exist already
-x-dc()
-{
-  dir="$1"
-
-  [ $# -eq 0 ] && {
-    echo "Usage: $0 full/path/to/dir/to/create"
-    exit 1
-  }
-
-  if [ ! -d "$dir" ]; then
-    mkdir -p "$dir" && exit 0
-  fi
-}
-
-# Create a new directory and enter it
-mkd()
-{
-  mkdir -p "$@" && cd "$@" || exit
-}
-
-# Run command silently
-# Usage: silent uptime
-silent()
-{
-  "$@" >&/dev/null
-}
-
-# Check if a file contains non-ascii characters
-nonascii()
-{
-  LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
 }

@@ -3,11 +3,20 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
+export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$PATH"
 # shellcheck source=scripts/shared.sh
 source "$DOTFILES/scripts/shared.sh"
-path_prepend "$DOTFILES/local/bin"
 
-$DOTFILES/local/bin/x-load-configs
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# custom variables
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null

@@ -2,13 +2,13 @@
 # Load our configuration files
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
-: "${DOTFILES:=$HOME/.dotfiles}"
-source "$DOTFILES/scripts/shared.sh"
+DOTFILES="$HOME/.dotfiles"
+source "$HOME/.dotfiles/scripts/shared.sh"
 
 CONFIG_PATH="$DOTFILES/config"
 
 # Load the shell dotfiles, and then some:
-function load()
+function x-load-config-fn()
 {
   for FILE in $CONFIG_PATH/{exports,alias,functions}; do
     FILENAME="$FILE"
@@ -28,4 +28,4 @@ function load()
   done
 }
 
-load
+x-load-config-fn

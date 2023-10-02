@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck source="../scripts/shared.sh"
 # shellcheck disable=1091,2139
-source "$DOTFILES/scripts/shared.sh"
+DOTFILES="$HOME/.dotfiles"
 
 # Get installed php versions from brew and setup aliases
 function x-set-php-aliases
@@ -106,9 +106,6 @@ alias updatedb="sudo /usr/libexec/locate.updatedb"
 # Always return full history
 alias history="history 1"
 
-alias pip="pip3 "
-alias python="python3 "
-
 # tmux: automatically attach or create session with name 'main'
 alias tmux='tmux new-session -A -s main'
 # tmux: attach or create new session
@@ -149,3 +146,69 @@ fi
 
 alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 alias svn="svn --config-dir $XDG_CONFIG_HOME/subversion"
+
+# Alacritty preexec hook to update dynamic title
+preexec()
+{
+  print -Pn "\e]0;$1%~\a"
+}
+
+# Update dotfiles
+dfu()
+{
+  (
+    cd "$DOTFILES" && git pull --ff-only && ./install -q
+  )
+}
+
+# Weather in Tampere, or other city
+weather()
+{
+  # https://github.com/chubin/wttr.in#usage
+  local city="${1:-Tampere}"
+  curl "http://wttr.in/${city// /+}?2nFQM&lang=fi"
+}
+
+# Docker
+ssh-docker()
+{
+  docker exec -it "$@" bash
+}
+
+# All the dig info
+digga()
+{
+  dig +nocmd "$1" any +multiline +noall +answer
+}
+
+# Rector project to php version 8.2 by default.
+rector()
+{
+  local php="${1:-82}"
+  docker run -v "$(pwd)":/project rector/rector:latest process \
+    "/project/$1" \
+    --set "php${php}" \
+    --autoload-file /project/vendor/autoload.php
+}
+
+# Commit everything
+commit()
+{
+  commitMessage="$*"
+
+  if [ "$commitMessage" = "" ]; then
+    commitMessage="Automated commit"
+  fi
+
+  git add .
+  eval "git commit -a -m '${commitMessage}'"
+}
+
+scheduler()
+{
+  while :; do
+    php artisan schedule:run
+    echo "Sleeping 60 seconds..."
+    sleep 60
+  done
+}

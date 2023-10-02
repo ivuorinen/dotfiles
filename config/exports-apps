@@ -4,9 +4,6 @@
 # shellcheck disable=1091,2139
 # vim: filetype=bash
 
-: "${DOTFILES:=$HOME/.dotfiles}"
-source "$DOTFILES/scripts/shared.sh"
-
 # Antigen configuration
 # https://github.com/zsh-users/antigen/wiki/Configuration
 export ADOTDIR="$XDG_DATA_HOME/antigen"
@@ -24,10 +21,8 @@ x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 
 # bob manages nvim versions
-have bob && {
-  path_prepend "$XDG_DATA_HOME/bob/nvim-bin"
-  have nvim && export EDITOR="nvim"
-}
+path_prepend "$XDG_DATA_HOME/bob/nvim-bin"
+have nvim && export EDITOR="nvim"
 
 export HOMEBREW_NO_ENV_HINTS=true
 
