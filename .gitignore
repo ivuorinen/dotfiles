@@ -15,4 +15,4 @@ ssh/local.d/*
 .env
 local/share/fonts/*
 node_modules
-
+.nfs*

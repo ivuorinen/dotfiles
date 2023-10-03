@@ -99,20 +99,6 @@ return {
       },
     },
   },
-  -- Tabnine Client for Neovim
-  -- https://github.com/codota/tabnine-nvim
-  {
-    "codota/tabnine-nvim",
-    name = "tabnine",
-    -- enabled = false,
-    build = vim.loop.os_uname().sysname == "Windows_NT" and "pwsh.exe -file .\\dl_binaries.ps1" or "./dl_binaries.sh",
-    cmd = { "TabnineStatus", "TabnineDisable", "TabnineEnable", "TabnineToggle" },
-    event = "User",
-    opts = {
-      accept_keymap = "<C-e>",
-      dismiss_keymap = "<C-Esc>",
-    },
-  },
   -- Vim plugin for automatic time tracking and metrics generated from your programming activity.
   -- https://github.com/wakatime/vim-wakatime
   { "wakatime/vim-wakatime", lazy = false, enabled = true },
