@@ -1,4 +1,13 @@
+# vim:noext ft=conf;
 servers = (
+  {
+    address = "irc.cc.tut.fi";
+    chatnet = "IRCNet";
+    port = "6667";
+    own_host = "kapsi.fi";
+    family = "inet";
+    autoconnect = "no";
+  },
   { address = "irc.dal.net"; chatnet = "DALnet"; port = "6667"; },
   {
     address = "ssl.efnet.org";
@@ -315,4 +324,5 @@ settings = {
     nick = "ivuorinen";
   };
   "fe-common/core" = { theme = "lyynx"; };
+  "fe-text" = { actlist_sort = "refnum"; };
 };
