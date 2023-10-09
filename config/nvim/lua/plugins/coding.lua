@@ -1,4 +1,11 @@
 return {
+  -- Copilot from github
+  -- https://github.com/github/copilot.vim
+  {
+    "github/copilot.vim",
+    lazy = false,
+    enabled = true,
+  },
   -- A better annotation generator. Supports multiple languages and annotation conventions.
   -- https://github.com/danymat/neogen
   {

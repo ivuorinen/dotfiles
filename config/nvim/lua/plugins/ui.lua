@@ -83,6 +83,9 @@ return {
   -- Neovim plugin for locking a buffer to a window
   -- https://github.com/stevearc/stickybuf.nvim
   { "stevearc/stickybuf.nvim", opts = {} },
+  -- A pretty window for previewing, navigating and editing your LSP locations
+  -- https://github.com/DNLHC/glance.nvim
+  { "dnlhc/glance.nvim" },
   -- Automatically expand width of the current window.
   -- Maximizes and restore it. And all this with nice animations!
   -- https://github.com/anuvyklack/windows.nvim
