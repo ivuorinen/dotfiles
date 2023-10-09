@@ -16,3 +16,8 @@ ssh/local.d/*
 local/share/fonts/*
 node_modules
 .nfs*
+*.socket
+iTermServer-*
+lock
+config/iterm2/AppSupport
+

@@ -1,11 +1,9 @@
-# this is my bashrc config. there are many like it, but this one is mine.
 # shellcheck shell=bash
+# vim: filetype=zsh
 
-# Defaults
-export DOTFILES="$HOME/.dotfiles"
 export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$HOME/.local/go/bin:$PATH"
-# shellcheck source=scripts/shared.sh
-source "$DOTFILES/scripts/shared.sh"
+
+export DOTFILES="$HOME/.dotfiles"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -18,5 +16,3 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
-# Import ssh keys in keychain
-ssh-add -A 2>/dev/null
