@@ -55,7 +55,6 @@ antigen bundle colored-man-pages
 antigen bundle command-not-found
 antigen bundle ssh-agent
 antigen bundle jreese/zsh-titles
-antigen bundle unixorn/autoupdate-antigen.zshplugin
 antigen bundle zsh-users/zsh-completions
 
 # these should be available if there's need

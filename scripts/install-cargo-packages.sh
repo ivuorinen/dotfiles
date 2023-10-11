@@ -22,7 +22,7 @@ packages=(
   "bkt"
   # a structural diff that understands syntax
   "difftastic"
-  # a modern replacement for ‘ls’.
+  # a modern replacement for ls.
   "eza"
   # A simple, fast and user-friendly alternative to 'find'
   "fd-find"
