@@ -14,13 +14,19 @@ PBB_SYNTAX="syntax: bash"
 PBB_TAGS="tags: [bash]"
 
 PBB_TEMP_PREFIX=$(basename "$0")
-PBB_TEMP_DIR="/tmp/pbb-$(rnd)"
+PBB_TEMP_DIR="$XDG_CACHE_HOME/cheat/pbb"
 
 # If there's no .git, clone the folder
 if [ ! -d "$PBB_TEMP_DIR/.git" ]; then
   msg_run "Starting to clone $PBB_GIT"
   git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR" \
     && msg_yay "Cloned $PBB_GIT"
+else
+  # Update the repo
+  msg_run "Starting to update $PBB_GIT"
+  git -C "$PBB_TEMP_DIR" reset --hard origin/master
+  git -C "$PBB_TEMP_DIR" pull -q \
+    && msg_yay "Updated $PBB_GIT"
 fi
 
 PBB_CHAPTERS=$(ls -1v "$PBB_TEMP_DIR"/manuscript/chapter*)
@@ -50,8 +56,3 @@ for f in ${PBB_CHAPTERS[@]}; do
     echo -e "---\n$T---\n$(cat "$CHEAT_FILE")" > "$CHEAT_FILE"
   fi
 done
-
-# Cleanup
-if [ -d "$PBB_TEMP_DIR" ]; then
-  rm -rf "$PBB_TEMP_DIR"
-fi

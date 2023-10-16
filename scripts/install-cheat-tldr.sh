@@ -13,13 +13,19 @@ TLDR_SOURCE="source: $TLDR_GIT"
 TLDR_SYNTAX="syntax: markdown"
 
 TLDR_TEMP_PREFIX=$(basename "$0")
-TLDR_TEMP_DIR="/tmp/cheat-tldr-$(rnd)"
+TLDR_TEMP_DIR="$XDG_CACHE_HOME/cheat/tldr"
 
 # If there's no .git, clone the folder
 if [ ! -d "$TLDR_TEMP_DIR/.git" ]; then
   msg_run "Starting to clone $TLDR_GIT"
   git clone --depth 1 --single-branch -q "$TLDR_GIT" "$TLDR_TEMP_DIR" \
     && msg_done "Cloned $TLDR_GIT"
+else
+  # Update the repo
+  msg_run "Starting to update $TLDR_GIT"
+  git -C "$TLDR_TEMP_DIR" reset --hard origin/main
+  git -C "$TLDR_TEMP_DIR" pull -q \
+    && msg_done "Updated $TLDR_GIT"
 fi
 
 # Fetch the destination directory from cheat defined directories.
@@ -67,8 +73,3 @@ for d in "$TLDR_TEMP_DIR"/pages/*; do
 
   done
 done
-
-# Cleanup
-if [ -d "$TLDR_TEMP_DIR" ]; then
-  rm -rf "$TLDR_TEMP_DIR"
-fi
