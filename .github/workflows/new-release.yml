@@ -7,7 +7,7 @@ permissions:
   contents: write
 jobs:
   new-daily-release:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       created: ${{ steps.daily-version.outputs.created }}
       version: ${{ steps.daily-version.outputs.version }}

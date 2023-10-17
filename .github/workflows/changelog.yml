@@ -3,7 +3,7 @@ on:
   workflow_dispatch: # Trigger manually
 jobs:
   debug-changelog:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Create changelog text
