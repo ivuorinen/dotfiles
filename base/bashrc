@@ -5,7 +5,7 @@
 export DOTFILES="$HOME/.dotfiles"
 export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$HOME/.local/go/bin:$PATH"
 # shellcheck source=scripts/shared.sh
-source "$DOTFILES/scripts/shared.sh"
+# source "$DOTFILES/scripts/shared.sh"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -20,3 +20,81 @@ export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
+
+# Enable the subsequent settings only in interactive sessions
+case $- in
+*i*) ;;
+*) return ;;
+esac
+
+# Path to your oh-my-bash installation.
+export OSH="$HOME/.local/share/oh-my-bash"
+
+[ -d "$OSH" ] && {
+  export OSH_THEME="powerline-multiline"
+
+  # PowerLine theme config
+  export POWERLINE_LEFT_PROMPT="cwd scm"
+  export POWERLINE_RIGHT_PROMPT="python_venv ruby in_vim battery user_info"
+
+  # Display red dots whilst waiting for completion.
+  export COMPLETION_WAITING_DOTS="true"
+
+  # Uncomment the following line if you want to disable marking untracked files
+  # under VCS as dirty. This makes repository status check for large repositories
+  # much, much faster.
+  export DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+  # To disable the uses of "sudo" by oh-my-bash, please set "false" to
+  # this variable.  The default behavior for the empty value is "true".
+  export OMB_USE_SUDO=true
+
+  # To enable/disable display of Python virtualenv and condaenv
+  export OMB_PROMPT_SHOW_PYTHON_VENV=true # enable
+  # OMB_PROMPT_SHOW_PYTHON_VENV=false # disable
+
+  # Which completions would you like to load? (completions can be found in ~/.oh-my-bash/completions/*)
+  # Custom completions may be added to ~/.oh-my-bash/custom/completions/
+  # Example format: completions=(ssh git bundler gem pip pip3)
+  # Add wisely, as too many completions slow down shell startup.
+  export completions=(
+    git
+    composer
+    ssh
+  )
+
+  # Which aliases would you like to load? (aliases can be found in ~/.oh-my-bash/aliases/*)
+  # Custom aliases may be added to ~/.oh-my-bash/custom/aliases/
+  # Example format: aliases=(vagrant composer git-avh)
+  # Add wisely, as too many aliases slow down shell startup.
+  export aliases=(
+    general
+  )
+
+  # Which plugins would you like to load? (plugins can be found in ~/.oh-my-bash/plugins/*)
+  # Custom plugins may be added to ~/.oh-my-bash/custom/plugins/
+  # Example format: plugins=(rails git textmate ruby lighthouse)
+  # Add wisely, as too many plugins slow down shell startup.
+  export plugins=(
+    git
+    bashmarks
+  )
+
+  # Which plugins would you like to conditionally load? (plugins can be found in ~/.oh-my-bash/plugins/*)
+  # Custom plugins may be added to ~/.oh-my-bash/custom/plugins/
+  # Example format:
+  #  if [ "$DISPLAY" ] || [ "$SSH" ]; then
+  #      plugins+=(tmux-autoattach)
+  #  fi
+
+  source "$OSH/oh-my-bash.sh"
+
+  # Preferred editor for local and remote sessions
+  # if [[ -n $SSH_CONNECTION ]]; then
+  #   export EDITOR='vim'
+  # else
+  #   export EDITOR='mvim'
+  # fi
+}
+
+

@@ -44,6 +44,7 @@ function section_install
     "nvm:Install Node Version Manager (nvm)"
     "npm:Install NPM Packages"
     "ntfy:Install ntfy"
+    "ohmybash:Install oh-my-bash"
     "pip:Install pip/python packages"
     "z:Install z"
   )
@@ -56,6 +57,7 @@ function section_install
       $0 install fonts
       $0 install antigen
       $0 brew install
+      $0 install ohmybash
       $0 install pip
       $0 install cargo
       $0 install composer
@@ -148,6 +150,11 @@ function section_install
         && msg_yay "ntfy installed!"
       ;;
     pip) bash "$DOTFILES/scripts/install-pip-packages.sh" ;;
+    ohmybash)
+      msg "oh-my-bash install started..."
+      bash "$DOTFILES/scripts/install-ohmybash.sh" \
+        && msg_yay "oh-my-bash installed!"
+      ;;
     z)
       bash "$DOTFILES/scripts/install-z.sh" \
         && msg_yay "z has been installed!"
