@@ -18,10 +18,10 @@ tap "xwmx/taps"
 brew "act"
 # Mozilla CA certificate store
 brew "ca-certificates"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
 # YAML Parser
 brew "libyaml"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Checks ansible playbooks for practices and behaviour
@@ -198,6 +198,8 @@ brew "luarocks"
 brew "m-cli"
 # Mac App Store command-line interface
 brew "mas"
+# Mongrel of mail user agents (part elm, pine, mush, mh, etc.)
+brew "mutt"
 # NCurses Disk Usage
 brew "ncdu"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
