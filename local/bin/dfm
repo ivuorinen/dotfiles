@@ -77,85 +77,105 @@ function section_install
       msgr yay "All done!"
       ;;
     antigen)
+      msg "Installing antigen..."
       curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
         && msg_yay "New antigen installed!"
       ;;
     cargo)
+      msg "Installing cargo packages..."
       bash "$DOTFILES/scripts/install-cargo-packages.sh" \
         && msg_yay "cargo packages installed!"
       ;;
     cheat-databases)
+      msg "Installing cheat databases..."
       for database in "$DOTFILES"/scripts/install-cheat-*; do
         bash "$database" \
           && msg_yay "Cheat: $database run"
       done
       ;;
     composer)
+      msg "Installing composer..."
       bash "$DOTFILES/scripts/install-composer.sh" \
         && msg_yay "composer installed!"
       ;;
     dotenv)
+      msg "Installing dotenv-linter..."
       curl -sSfL \
         https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
         | sh -s -- -b "$XDG_BIN_HOME" \
         && msg_yay "dotenv-linter installed!"
       ;;
     fonts)
+      msg "Installing fonts..."
       bash "$DOTFILES/scripts/install-fonts.sh" \
         && msg_yay "Installed fonts!"
       ;;
     fzf)
+      msg "Installing fzf..."
       bash "$DOTFILES/scripts/install-fzf.sh" \
         && msg_yay "fzf installed!"
       ;;
     gh)
+      msg "Installing GitHub CLI Extensions..."
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \
         && msg_yay "github cli extensions installed!"
       ;;
     go)
+      msg "Installing Go Packages..."
       bash "$DOTFILES/scripts/install-go-packages.sh" \
         && msg_yay "go packages installed!"
       ;;
     imagick)
+      msg "Installing ImageMagick CLI..."
       curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
         && chmod +x "$XDG_BIN_HOME/magick" \
         && msg_yay "imagick installed!"
       ;;
     starship)
+      msg "Installing starship.rs..."
       curl -sS https://starship.rs/install.sh | sh -s -- \
         --bin-dir ~/.local/bin \
         --yes \
         && msg_yay "starship installed!"
       ;;
     macos)
+      msg "Setting up macOS defaults..."
       bash "$DOTFILES/scripts/set-macos-defaults.sh" \
         && msg_yay "Brewfile defined apps has been installed!"
       ;;
     neofetch)
+      msg "Installing neofetch..."
       bash "$DOTFILES/scripts/install-neofetch.sh" \
         && msg_yay "neofetch installed!"
       ;;
     nvm)
+      msg "Installing nvm..."
       curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash \
         && nvm install --lts --latest-npm --default
       git checkout "$DOTFILES/base/zshrc"
       msg_yay "nvm installed!"
       ;;
     npm)
+      msg "NPM Packages install started..."
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
         && msg_yay "NPM Packages have been installed!"
       ;;
     ntfy)
+      msg "ntfy install started..."
       bash "$DOTFILES/scripts/install-ntfy.sh" \
         && msg_yay "ntfy installed!"
       ;;
-    pip) bash "$DOTFILES/scripts/install-pip-packages.sh" ;;
     ohmybash)
       msg "oh-my-bash install started..."
       bash "$DOTFILES/scripts/install-ohmybash.sh" \
         && msg_yay "oh-my-bash installed!"
       ;;
+    pip)
+      msg "pip install started..."
+      bash "$DOTFILES/scripts/install-pip-packages.sh"
+      ;;
     z)
+      msg "Installing z..."
       bash "$DOTFILES/scripts/install-z.sh" \
         && msg_yay "z has been installed!"
       ;;
