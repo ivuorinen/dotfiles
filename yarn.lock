@@ -287,11 +287,12 @@
     "@ivuorinen/config-checker" "^1.1.0"
     markdownlint-cli "0.37.0"
 
-"@ivuorinen/prettier-config@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@ivuorinen/prettier-config/-/prettier-config-0.1.1.tgz#e1e043c336f4c9f1c720124ecadcd8c6f67173bc"
-  integrity sha512-XwJWUIen+Fozynb0xNOvvUH5NFFaAnKpIT/U9iCDj9Oo3WoOcr58dNync6Yu3Algu6X3p6VzZrrMwJAo1dWiaQ==
+"@ivuorinen/prettier-config@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@ivuorinen/prettier-config/-/prettier-config-0.2.0.tgz#3dd63dda742c9376bfbb8dbbbcbdc75d2fa8d14f"
+  integrity sha512-iBKIPIhrvM42qDJmaC+96ta+B5ir5xsQJeMbNJmWfo/Ko/pJffeXDIsctGFAynI6Oiob0KPoui5J148vmRWrEQ==
   dependencies:
+    "@ivuorinen/config-checker" "^1.1.0"
     prettier "2.8.8"
 
 "@nodelib/fs.scandir@2.1.5":
