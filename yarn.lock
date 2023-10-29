@@ -279,11 +279,12 @@
     eslint-plugin-promise "6.1.1"
     eslint-plugin-sonarjs "0.21.0"
 
-"@ivuorinen/markdownlint-config@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@ivuorinen/markdownlint-config/-/markdownlint-config-0.1.6.tgz#1bcc7c103f4056338c16109047109815c9dd27e7"
-  integrity sha512-gQd+DSmiSvkOL+O1jfrljLIl6bASd+dumxImjdECHoBD/V/sK/XaiTRXWaDZAPmKnZaYG1/SJzpa5vS3pdRUJQ==
+"@ivuorinen/markdownlint-config@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@ivuorinen/markdownlint-config/-/markdownlint-config-0.2.0.tgz#5288cb038292ae59f9d4a0b5e22dcb8af0aa4645"
+  integrity sha512-ivQcwVawabqjbCqcBG3YyDKRma8geXerz8hjqMgJN0Y8qoe7lBmFczjICA5n5yop35yLXUeSSMHnnHOg+GRdcA==
   dependencies:
+    "@ivuorinen/config-checker" "^1.1.0"
     markdownlint-cli "0.37.0"
 
 "@ivuorinen/prettier-config@^0.1.1":
