@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/commitlint-config": "^0.1.10",
+    "@ivuorinen/commitlint-config": "^0.2.0",
     "@ivuorinen/eslint-config": "^0.3.0",
     "@ivuorinen/markdownlint-config": "^0.1.6",
     "@ivuorinen/prettier-config": "^0.1.1"
