@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Updates subfolders git projects.
+#
+# Actions taken: pull with rebase, autostashes own changes
+# and prunes branches no longer in the remote.
+#
+# Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
+# License: MIT <https://opensource.org/license/mit/>
+
+for f in */; do (cd "$f" && echo "-> $f" && git pull --rebase --autostash --prune); done
+
+echo "Done."
+echo ""
