@@ -1,5 +1,3 @@
 {
-  "extends": [
-    "@ivuorinen/semantic-release-config"
-  ]
+  "extends": ["@ivuorinen/semantic-release-config"]
 }
