@@ -22,15 +22,12 @@
     "ivuorinen"
   ],
   "author": "Ismo Vuorinen",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ivuorinen/dotfiles/issues"
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/commitlint-config": "^0.2.0",
-    "@ivuorinen/eslint-config": "^0.3.0",
-    "@ivuorinen/markdownlint-config": "^0.2.0",
-    "@ivuorinen/prettier-config": "^0.2.0"
+    "@ivuorinen/base-configs": "^1.1.0"
   }
 }
