@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# FSCK subfolders git projects.
+#
+# Actions taken: git fsck --no-dangling --full
+#
+# Copyright 2023 Ismo Vuorinen. All Rights Reserved.
+# License: MIT <https://opensource.org/license/mit/>
+
+STARTING_PATH=${1:-$(pwd)}
+
+DIRS=$(find "$STARTING_PATH" -mindepth 1 -maxdepth 1 -type d)
+
+for DIR in $DIRS; do
+  echo "-> Processing dir: $DIR"
+  cd "$DIR" || exit 1
+  if [ -d "$DIR/.git" ]; then
+    git fsck --no-dangling --full --no-progress
+    echo ""
+  fi
+done
+
+echo ""
+echo "Done."
