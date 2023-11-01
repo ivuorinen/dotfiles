@@ -54,32 +54,3 @@ export GREP_OPTIONS="--color=auto"
 # update the values of LINES and COLUMNS.
 hash shopt 2> /dev/null && shopt -s checkwinsize
 
-# Set dircolors based on the file, if it exists
-have dircolors && eval $(dircolors "$XDG_CONFIG_HOME/dircolors")
-
-# If we are using zsh, color our dir lists and such
-if [ "$DOTFILES_CURRENT_SHELL" = "-zsh" ]; then
-  [[ $ZSH_VERSION != "" ]] && {
-    autoload -U colors zsh/terminfo compinit
-    colors
-    compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
-
-    x-dc "$XDG_CACHE_HOME/zsh"
-    x-dc "$XDG_STATE_HOME/zsh"
-    export HISTFILE="$XDG_STATE_HOME/zsh/history"
-    zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
-    zstyle ':completion:*' list-colors "$LS_COLORS"
-
-    # Load iterm2 shell integration
-    # https://iterm2.com/documentation-shell-integration.html
-    [[ -f "$XDG_BIN_HOME/iterm2_shell_integration.zsh" ]] \
-      && source "$XDG_BIN_HOME/iterm2_shell_integration.zsh"
-  }
-fi
-
-# If we are using bash
-if [ "$DOTFILES_CURRENT_SHELL" = "bash" ]; then
-  # shellcheck source=../config/fzf/fzf.bash
-  [ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
-    source "${DOTFILES}/config/fzf/fzf.bash"
-fi

@@ -2,7 +2,57 @@
 # shellcheck shell=bash
 # vim: filetype=zsh
 
+# Cache commands using bkt if installed
+if command -v bkt >&/dev/null; then
+  bkt()
+  {
+    command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
+  }
+else
+  # If bkt isn't installed skip its arguments and just execute directly.
+  # Optionally write a msg to stderr suggesting users install bkt.
+  bkt()
+  {
+    while [[ "$1" == --* ]]; do shift; done
+    "$@"
+  }
+fi
+
+# shorthand for checking if the system has the bin in path,
+# this version does not use caching
+# usage: have_command php && php -v
+function have_command
+{
+  command -v "$1" >&/dev/null
+}
+
+# shorthand for checking if the system has the bin in path,
+# this version uses caching
+# usage: have php && php -v
+function have
+{
+  bkt -- which "$1" >&/dev/null
+}
+
+function brew_installed
+{
+  bkt -- brew list
+}
+
+# shorthand for checking if brew package is installed
+# usage: have_brew php && php -v
+function have_brew
+{
+  ! have brew && return 125
+
+  if bkt -- brew list "$1" &> /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"
 
-have nvim && export EDITOR="nvim"
+x-have nvim && export EDITOR="nvim"

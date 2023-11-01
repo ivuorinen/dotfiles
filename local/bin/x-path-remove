@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Remove a directory from the PATH
+# Usage: x-path-remove <dir>
+
+export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
+

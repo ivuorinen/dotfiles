@@ -18,6 +18,12 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
+source "$DOTFILES/config/exports"
+
+# shellcheck source=../config/fzf/fzf.bash
+[ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
+  source "${DOTFILES}/config/fzf/fzf.bash"
+
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
 
@@ -96,5 +102,3 @@ export OSH="$HOME/.local/share/oh-my-bash"
   #   export EDITOR='mvim'
   # fi
 }
-
-

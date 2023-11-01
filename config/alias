@@ -6,9 +6,9 @@ DOTFILES="$HOME/.dotfiles"
 # Get installed php versions from brew and setup aliases
 function x-set-php-aliases
 {
-  have brew && {
+  x-have brew && {
     local php_versions=()
-    while IFS="" read -r line; do php_versions+=("$line"); done < <(brew_installed | grep '^php')
+    while IFS="" read -r line; do php_versions+=("$line"); done < <(bkt -- brew list | grep '^php')
 
     php_error_reporting='-d error_reporting=22527'
 
@@ -61,8 +61,8 @@ alias please="sudo "
 # Color the grep output
 alias grep='grep --color'
 
-! have eza && alias ls='ls --color=auto'
-have eza && {
+! x-have eza && alias ls='ls --color=auto'
+x-have eza && {
   alias ls='eza -h -s=type --git --icons --group-directories-first'
 }
 

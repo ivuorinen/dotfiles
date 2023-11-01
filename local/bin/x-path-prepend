@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Add a directory to the front of the PATH if it exists and is not already there
+# Usage: x-path-prepend <dir>
+
+export PATH="$1${PATH:+":$PATH"}"
+

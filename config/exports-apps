@@ -21,15 +21,15 @@ x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 
 # bob manages nvim versions
-path_prepend "$XDG_DATA_HOME/bob/nvim-bin"
-have nvim && export EDITOR="nvim"
+x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
+x-have nvim && export EDITOR="nvim"
 
 export HOMEBREW_NO_ENV_HINTS=true
 
 # composer, https://getcomposer.org/
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
-path_append "$COMPOSER_BIN"
+x-path-append "$COMPOSER_BIN"
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
@@ -39,7 +39,7 @@ export DOCKER_SCAN_SUGGEST=false
 
 # ffmpeg
 export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
-have ffmpeg && x-dc "$FFMPEG_DATADIR"
+x-have ffmpeg && x-dc "$FFMPEG_DATADIR"
 
 # GnuPG
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
@@ -53,14 +53,14 @@ export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
 export NB_DIR="$XDG_STATE_HOME/nb"
 
 # NPM: Add npm packages to path
-have node && {
+x-have node && {
   NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
-  path_append "$NVM_NODE_BIN_DIR"
+  x-path-append "$NVM_NODE_BIN_DIR"
 }
 
 # op (1Password cli) is present
 export OP_CACHE="$XDG_STATE_HOME/1password"
-have op && {
+x-have op && {
   [ "$DOTFILES_CURRENT_SHELL" = "zsh" ] && {
     eval "$(op completion zsh)"
     compdef _op op
@@ -72,8 +72,8 @@ have op && {
 # pyenv, python environments
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
-have pyenv && {
-  path_append "$PYENV_ROOT/shims"
+x-have pyenv && {
+  x-path-append "$PYENV_ROOT/shims"
   eval "$(pyenv init -)"
 }
 
@@ -87,8 +87,8 @@ export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
 export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
 x-dc "$RBENV_ROOT"
-have gem && path_append "${GEM_HOME}/bin"
-have rbenv && {
+x-have gem && x-path-append "${GEM_HOME}/bin"
+x-have rbenv && {
   [ "$DOTFILES_CURRENT_SHELL" = "zsh" ] && eval "$(rbenv init - zsh)"
   [ "$DOTFILES_CURRENT_SHELL" = "bash" ] && eval "$(rbenv init - bash)"
 }
@@ -96,7 +96,7 @@ have rbenv && {
 # Rust / cargo
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
-path_append "$CARGO_HOME/bin"
+x-path-append "$CARGO_HOME/bin"
 
 # screen
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"

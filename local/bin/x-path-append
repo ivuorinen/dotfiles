@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+# Add a directory to the beginning of the PATH if it's not already there.
+# Usage: x-path-append <dir>
+
+x-path-remove "$1"
+export PATH="${PATH:+"$PATH:"}$1"
+

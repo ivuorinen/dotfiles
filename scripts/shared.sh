@@ -31,23 +31,23 @@ export XDG_RUNTIME_DIR="$HOME/.local/run"
 # usage: path_remove ~/.local/bin
 function path_remove
 {
-  PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
+  x-path-remove "$1"
 }
 
 # Append directory to the PATH
 # usage: path_append ~/.local/bin
 function path_append
 {
-  path_remove "$1"
-  PATH="${PATH:+"$PATH:"}$1"
+  x-path-remove "$1"
+  x-path-prepend "$1"
 }
 
 # Prepend directory to the PATH
 # usage: path_prepend ~/.local/bin
 function path_prepend
 {
-  path_remove "$1"
-  PATH="$1${PATH:+":$PATH"}"
+  x-path-remove "$1"
+  x-path-prepend "$1"
 }
 
 # Create directory if it doesn't exist already
@@ -82,56 +82,6 @@ silent()
 nonascii()
 {
   LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
-}
-
-# Cache commands using bkt if installed
-if command -v bkt >&/dev/null; then
-  bkt()
-  {
-    command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
-  }
-else
-  # If bkt isn't installed skip its arguments and just execute directly.
-  # Optionally write a msg to stderr suggesting users install bkt.
-  bkt()
-  {
-    while [[ "$1" == --* ]]; do shift; done
-    "$@"
-  }
-fi
-
-# shorthand for checking if the system has the bin in path,
-# this version does not use caching
-# usage: have_command php && php -v
-function have_command
-{
-  command -v "$1" >&/dev/null
-}
-
-# shorthand for checking if the system has the bin in path,
-# this version uses caching
-# usage: have php && php -v
-function have
-{
-  bkt -- which "$1" >&/dev/null
-}
-
-function brew_installed
-{
-  bkt -- brew list
-}
-
-# shorthand for checking if brew package is installed
-# usage: have_brew php && php -v
-function have_brew
-{
-  ! have brew && return 125
-
-  if bkt -- brew list "$1" &> /dev/null; then
-    return 0
-  else
-    return 1
-  fi
 }
 
 CONFIG_PATH="$DOTFILES/config"
