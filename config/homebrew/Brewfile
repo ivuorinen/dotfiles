@@ -320,6 +320,8 @@ brew "teamookla/speedtest/speedtest"
 cask "1password-cli"
 # GPU-accelerated terminal emulator
 cask "alacritty"
+# Automatic tiling window manager similar to xmonad
+cask "amethyst"
 # Turn audio CDs and files into audiobooks
 cask "audiobook-builder"
 # Text editor
