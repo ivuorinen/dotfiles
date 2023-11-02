@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+#
+# Backup a folder with a timestamp
+# Usage: x-backup-folder folder_to_backup [filename]
+# If filename is not provided, folder_to_backup will be used
+# Example: x-backup-folder ~/Documents/MyFolder
+#
+# Copyright (c) 2022 Ismo Vuorinen. All Rights Reserved.
+# Licensed under the MIT license.
 
 DIRECTORY=$1
 FILENAME=$2

@@ -2,7 +2,7 @@
 #
 # Backup local MySQL Database tables with certain prefix.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
-#
+# License: MIT
 
 SCRIPT=$(basename "$0")
 PREFIX=$1
