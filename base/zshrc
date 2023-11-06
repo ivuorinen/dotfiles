@@ -1,7 +1,20 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$HOME/.local/go/bin:$PATH"
+export DOTFILES="$HOME/.dotfiles"
+
+# Explicitly set XDG folders
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# custom variables
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_RUNTIME_DIR="$HOME/.local/run"
+
+export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
 
 source "$DOTFILES/config/exports"
 source "$DOTFILES/config/alias"

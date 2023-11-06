@@ -3,9 +3,6 @@
 
 # Defaults
 export DOTFILES="$HOME/.dotfiles"
-export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$HOME/.local/go/bin:$PATH"
-# shellcheck source=scripts/shared.sh
-# source "$DOTFILES/scripts/shared.sh"
 
 # Explicitly set XDG folders
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -18,7 +15,14 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
+# Paths
+export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
+
+# shellcheck source=scripts/shared.sh
+# source "$DOTFILES/scripts/shared.sh"
+
 source "$DOTFILES/config/exports"
+source "$DOTFILES/config/alias"
 
 # shellcheck source=../config/fzf/fzf.bash
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
