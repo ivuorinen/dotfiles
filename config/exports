@@ -2,6 +2,11 @@
 # shellcheck shell=bash
 # vim: filetype=zsh
 
+# if cargo directory exists, add it to path
+if [[ -d "$HOME/.local/share/cargo/bin" ]]; then
+  export PATH="$HOME/.local/share/cargo/bin:$PATH"
+fi
+
 # Cache commands using bkt if installed
 if command -v bkt >&/dev/null; then
   bkt()
