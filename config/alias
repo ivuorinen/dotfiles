@@ -144,7 +144,7 @@ if [[ -f "$HOME/.aliases.local" ]]; then
   source "$HOME/.aliases.local"
 fi
 
-alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
+alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 alias svn="svn --config-dir $XDG_CONFIG_HOME/subversion"
 
 # Alacritty preexec hook to update dynamic title
