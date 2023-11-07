@@ -42,6 +42,7 @@ function section_install
     "macos:Setup nice macOS defaults"
     "neofetch:Install neofetch"
     "nvm:Install Node Version Manager (nvm)"
+    "nvm-latest:Install latest lts node using nvm"
     "npm:Install NPM Packages"
     "ntfy:Install ntfy"
     "ohmybash:Install oh-my-bash"
@@ -150,10 +151,18 @@ function section_install
       ;;
     nvm)
       msg "Installing nvm..."
-      curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash \
-        && nvm install --lts --latest-npm --default
-      git checkout "$DOTFILES/base/zshrc"
+      curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash
+      $0 install nvm-latest
       msg_yay "nvm installed!"
+      ;;
+    nvm-latest)
+      msg "Installing latest lts node..."
+      if [ -n "$NVM_DIR" ]; then
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      fi
+      nvm install --lts --latest-npm --default
+      git checkout "$DOTFILES/base/*"
+      msg_yay "latest lts node installed!"
       ;;
     npm)
       msg "NPM Packages install started..."
