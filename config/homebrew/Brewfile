@@ -22,8 +22,6 @@ brew "ca-certificates"
 brew "libyaml"
 # Cryptography and SSL/TLS Toolkit
 brew "openssl@3"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Checks ansible playbooks for practices and behaviour
@@ -62,6 +60,8 @@ brew "coreutils"
 brew "asdf"
 # Spell checker with better logic than ispell
 brew "aspell"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
@@ -270,6 +270,8 @@ brew "terragrunt"
 brew "testssl"
 # Terraform version manager inspired by rbenv
 brew "tfenv"
+# Linter for Terraform files
+brew "tflint"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Programmatically correct mistyped console commands
