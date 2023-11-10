@@ -104,6 +104,13 @@ export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 # sonarlint
 export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
 
+# terraform
+# https://www.terraform.io/docs/cli/config/config-file.html
+# https://www.terraform.io/docs/cli/config/environment-variables.html
+export TF_DATA_DIR="$XDG_STATE_HOME/terraform"
+export TF_CLI_CONFIG_FILE="$XDG_CONFIG_HOME/terraform/terraformrc"
+export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
+
 # tldr / tealdeer
 export TEALDEER_CONFIG_DIR="$XDG_CONFIG_HOME/tealdeer/"
 
@@ -118,3 +125,4 @@ x-dc "$WAKATIME_HOME"
 export BAT_THEME="ansi"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="$XDG_CACHE_HOME"/sqlite_history
+
