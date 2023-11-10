@@ -10,10 +10,12 @@ msg "Starting to install pip packages"
   msg_err "Could not find python3, something really weird is going on." && exit 1
 }
 
+msg_nested "Upgrading pip"
+python3 -m pip install --user --upgrade pip
+
 packages=(
   "pipx"
   "libtmux"
-  "ensurepath"
 )
 
 for pkg in "${packages[@]}"; do
@@ -23,7 +25,7 @@ for pkg in "${packages[@]}"; do
   if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
   msg_nested "Installing pip package: $pkg"
-  python3 -m pip install --user "$pkg"
+  python3 -m pip install --user --upgrade "$pkg"
 
   echo ""
 done
