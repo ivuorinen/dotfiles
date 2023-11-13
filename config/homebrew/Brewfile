@@ -208,8 +208,6 @@ brew "mas"
 brew "mutt"
 # NCurses Disk Usage
 brew "ncdu"
-# Ambitious Vim-fork focused on extensibility and agility
-brew "neovim"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -246,8 +244,6 @@ brew "rbenv"
 brew "rcm"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# Safe, concurrent, practical language
-brew "rust"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Autoformat shell script source code
@@ -370,6 +366,8 @@ cask "google-cloud-sdk"
 cask "insomnia"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
+# End-to-end encryption software
+cask "keybase"
 # Kubernetes IDE
 cask "lens"
 # Keep all tasks from your todo apps on your menu bar
@@ -435,6 +433,7 @@ mas "LastPass", id: 926036361
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pixelmator Pro", id: 1289583905
+mas "Final Cut Pro", id: 424389933
 mas "Tailscale", id: 1475387142
 mas "Xcode", id: 497799835
 vscode "4ops.terraform"
