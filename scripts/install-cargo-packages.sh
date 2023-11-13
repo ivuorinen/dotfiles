@@ -34,6 +34,7 @@ packages=(
   "ripgrep"
   # A version manager for neovim
   "bob-nvim"
+  "bottom"
 )
 
 for pkg in "${packages[@]}"; do
