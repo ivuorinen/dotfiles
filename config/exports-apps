@@ -124,4 +124,3 @@ x-dc "$WAKATIME_HOME"
 export BAT_THEME="ansi"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="$XDG_CACHE_HOME"/sqlite_history
-

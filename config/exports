@@ -59,4 +59,3 @@ function have_brew
 
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"
-

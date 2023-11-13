@@ -4,4 +4,3 @@
 # Usage: x-path-remove <dir>
 
 export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
-
