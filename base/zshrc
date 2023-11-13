@@ -81,5 +81,14 @@ antigen apply
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
   && source "${DOTFILES}/config/fzf/fzf.zsh"
 
+# Autoupdate tmux window name
+TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
+[ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
+  tmux-window-name() {
+	  ($TMUX_WINDOW_NAME_PLUGIN &)
+  }
+  add-zsh-hook chpwd tmux-window-name
+}
+
 # Start starship
 eval "$(starship init zsh)"

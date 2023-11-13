@@ -4,17 +4,16 @@
 # Updates $HOME/.dotfiles/docs/tmux.md with my keybindings.
 
 # shellcheck source=./../../scripts/shared.sh
-DOTFILES_SHARED_LOADED=""
 source "$HOME/.dotfiles/scripts/shared.sh"
 
-have tmux || {
+x-have tmux || {
   msg_err "tmux not found" && exit 0
 }
 
 TMUX_KEYBINDINGS_DOCS="$DOTFILES/docs/tmux-keybindings.md"
 
 CB="\n\`\`\`\n"
-KB=$(tmux list-keys)
+KB=$(tmux lsk -Tprefix -N | sed -e 's/^/    /;')
 H="# tmux keybindings\n"
 L="\nLeader: \`<ctrl><space>\`\n"
 
