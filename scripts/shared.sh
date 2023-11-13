@@ -50,12 +50,6 @@ function path_prepend
   x-path-prepend "$1"
 }
 
-# Create a new directory and enter it
-mkd()
-{
-  mkdir -p "$@" && cd "$@" || exit
-}
-
 # Run command silently
 # Usage: silent uptime
 silent()
