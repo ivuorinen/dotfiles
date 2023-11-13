@@ -6,7 +6,7 @@
 
 [ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
 
-! have xcode-select \
+! x-have xcode-select \
   && msg_err "xcode-select could not be found, skipping" \
   && exit 0
 

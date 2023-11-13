@@ -11,7 +11,7 @@ NEOFETCH_URL="${NEOFETCH_REPO}/archive/refs/tags/${NEOFETCH_VERSION}.tar.gz"
 NEOFETCH_TEMP="/tmp/neofetch"
 NEOFETCH_INSTALL_PREFIX="$HOME/.local"
 
-[[ $(x-have "neofetch") == "1" ]] && {
+x-have "neofetch" || {
   LC_ALL=C
 
   mkdir -p "$NEOFETCH_TEMP" "$NEOFETCH_INSTALL_PREFIX"

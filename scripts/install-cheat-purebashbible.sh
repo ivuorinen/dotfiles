@@ -5,7 +5,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 PBB_REQUIRED_TOOLS=(git cheat)
 for t in ${PBB_REQUIRED_TOOLS[@]}; do
-  [[ $(x-have "$t") == "1" ]] && echo "(!) $t is missing, can't continue..." && exit 1
+  ! x-have "$t" && echo "(!) $t is missing, can't continue..." && exit 1
 done
 
 PBB_GIT="https://github.com/dylanaraps/pure-bash-bible.git"

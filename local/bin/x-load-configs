@@ -2,30 +2,35 @@
 # Load our configuration files
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
+# Set verbosity with VERBOSE=1 x-load-configs
+: "${VERBOSE:0}"
+
 DOTFILES="$HOME/.dotfiles"
-source "$HOME/.dotfiles/scripts/shared.sh"
 
 CONFIG_PATH="$DOTFILES/config"
 
 # Load the shell dotfiles, and then some:
-function x-load-config-fn()
-{
-  for FILE in $CONFIG_PATH/{exports,alias,functions}; do
-    FILENAME="$FILE"
-    HOST="$(hostname -s)"
-    # global (exports|alias|functions) FILENAME for all hosts
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME" ] && source "$FILENAME"
-    # global secret FILENAME, git ignored
-    # shellcheck source=../config/exports-secret
-    [ -r "$FILENAME-secret" ] && source "$FILENAME-secret"
-    # host specific (exports|alias|functions) FILENAME
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST"
-    # host specific (exports|alias|functions) FILENAME, git ignored
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret"
-  done
+HOST="$(hostname -s)"
+[ "$VERBOSE" = "1" ] && {
+  echo "x-load-config-fn: VERBOSE=1"
+  echo "x-load-config-fn: HOST: $HOST"
 }
-
-x-load-config-fn
+for FILE in $CONFIG_PATH/{exports,alias,functions}; do
+  FILENAME="$FILE"
+  # global (exports|alias|functions) FILENAME for all hosts
+  # shellcheck source=../config/exports
+  [ -r "$FILENAME" ] && source "$FILENAME" \
+    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME"
+  # global secret FILENAME, git ignored
+  # shellcheck source=../config/exports-secret
+  [ -r "$FILENAME-secret" ] && source "$FILENAME-secret" \
+    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-secret"
+  # host specific (exports|alias|functions) FILENAME
+  # shellcheck source=../config/exports
+  [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST" \
+    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-$HOST"
+  # host specific (exports|alias|functions) FILENAME, git ignored
+  # shellcheck source=../config/exports
+  [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret" \
+    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-$HOST-secret"
+done

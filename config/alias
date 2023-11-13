@@ -61,7 +61,6 @@ alias please="sudo "
 # Color the grep output
 alias grep='grep --color'
 
-! x-have eza && alias ls='ls --color=auto'
 x-have eza && {
   alias ls='eza -h -s=type --git --icons --group-directories-first'
 }
@@ -148,13 +147,13 @@ alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 alias svn="svn --config-dir $XDG_CONFIG_HOME/subversion"
 
 # Alacritty preexec hook to update dynamic title
-preexec()
+function preexec()
 {
   print -Pn "\e]0;$1%~\a"
 }
 
 # Update dotfiles
-dfu()
+function dfu()
 {
   (
     cd "$DOTFILES" && git pull --ff-only && ./install -q
@@ -162,7 +161,7 @@ dfu()
 }
 
 # Weather in Tampere, or other city
-weather()
+function weather()
 {
   # https://github.com/chubin/wttr.in#usage
   local city="${1:-Tampere}"
@@ -170,19 +169,19 @@ weather()
 }
 
 # Docker
-ssh-docker()
+function ssh-docker()
 {
   docker exec -it "$@" bash
 }
 
 # All the dig info
-digga()
+function digga()
 {
   dig +nocmd "$1" any +multiline +noall +answer
 }
 
 # Rector project to php version 8.2 by default.
-rector()
+function rector()
 {
   local php="${1:-82}"
   docker run -v "$(pwd)":/project rector/rector:latest process \
@@ -192,7 +191,7 @@ rector()
 }
 
 # Commit everything
-commit()
+function commit()
 {
   commitMessage="$*"
 
@@ -204,7 +203,7 @@ commit()
   eval "git commit -a -m '${commitMessage}'"
 }
 
-scheduler()
+function scheduler()
 {
   while :; do
     php artisan schedule:run

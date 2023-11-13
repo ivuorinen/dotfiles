@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg_run "Installing go packages"
 
-[[ $(x-have "go") == "1" ]] && msg "go hasn't been installed yet." && exit 0
+! x-have "go" && msg "go hasn't been installed yet." && exit 0
 
 packages=(
   # A shell parser, formatter, and interpreter with bash support; includes shfmt
@@ -44,7 +44,7 @@ done
 
 msg_run "Installing completions for selected packages"
 
-have git-profile && {
+x-have git-profile && {
   git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
     && msg_ok "Installed completions for git-profile"
 }

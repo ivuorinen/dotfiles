@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install rust/cargo packages"
 
-[[ $(x-have "cargo") == "1" ]] && {
+! x-have cargo && {
   msg "cargo could not be found. installing cargo with rustup.rs"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
 }
@@ -53,8 +53,8 @@ msg_done "Installed cargo packages!"
 msg_run "Now doing the next steps for cargo packages"
 
 # use bob to install nvim
-have bob && {
-  bob use stable && path_append "$XDG_DATA_HOME/bob/nvim-bin"
+x-have bob && {
+  bob use stable && x-path-append "$XDG_DATA_HOME/bob/nvim-bin"
 }
 
 msg_done "All next steps done!"

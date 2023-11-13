@@ -6,7 +6,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install pip packages"
 
-[[ $(x-have "python3") == "1" ]] && {
+x-have "python3" || {
   msg_err "Could not find python3, something really weird is going on." && exit 1
 }
 

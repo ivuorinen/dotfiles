@@ -21,15 +21,14 @@ x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 export ANDROID_HOME="$XDG_DATA_HOME/android"
 
 # bob manages nvim versions
-x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
-x-have nvim && export EDITOR="nvim"
+export PATH="$XDG_DATA_HOME/bob/nvim-bin:$PATH"
 
 export HOMEBREW_NO_ENV_HINTS=true
 
 # composer, https://getcomposer.org/
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
-x-path-append "$COMPOSER_BIN"
+export PATH="$COMPOSER_BIN:$PATH"
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
@@ -55,7 +54,7 @@ export NB_DIR="$XDG_STATE_HOME/nb"
 # NPM: Add npm packages to path
 x-have node && {
   NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
-  x-path-append "$NVM_NODE_BIN_DIR"
+  export PATH="$NVM_NODE_BIN_DIR:$PATH"
 }
 
 # op (1Password cli) is present
@@ -73,7 +72,7 @@ x-have op && {
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 x-have pyenv && {
-  x-path-append "$PYENV_ROOT/shims"
+  export PATH="$PYENV_ROOT/shims:$PATH"
   eval "$(pyenv init -)"
 }
 
@@ -87,7 +86,7 @@ export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
 export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
 x-dc "$RBENV_ROOT"
-x-have gem && x-path-append "${GEM_HOME}/bin"
+x-have gem && export PATH="${GEM_HOME}/bin:$PATH"
 x-have rbenv && {
   [ "$DOTFILES_CURRENT_SHELL" = "zsh" ] && eval "$(rbenv init - zsh)"
   [ "$DOTFILES_CURRENT_SHELL" = "bash" ] && eval "$(rbenv init - bash)"
@@ -96,7 +95,7 @@ x-have rbenv && {
 # Rust / cargo
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
-x-path-append "$CARGO_HOME/bin"
+export PATH="$CARGO_HOME/bin:$PATH"
 
 # screen
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"

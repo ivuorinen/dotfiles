@@ -8,7 +8,7 @@ source "$HOME/.dotfiles/scripts/shared.sh"
 
 msg_run "Installing git-crypt"
 
-[[ $(x-have "git-crypt") == "1" ]] && {
+x-have "git-crypt" || {
 
   REPO_URL="https://github.com/AGWA/git-crypt.git"
   CHECK_PATH="${XDG_BIN_HOME}/git-crypt"

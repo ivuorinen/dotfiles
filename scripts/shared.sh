@@ -50,21 +50,6 @@ function path_prepend
   x-path-prepend "$1"
 }
 
-# Create directory if it doesn't exist already
-x-dc()
-{
-  dir="$1"
-
-  [ $# -eq 0 ] && {
-    echo "Usage: $0 full/path/to/dir/to/create"
-    exit 1
-  }
-
-  if [ ! -d "$dir" ]; then
-    mkdir -p "$dir" && exit 0
-  fi
-}
-
 # Create a new directory and enter it
 mkd()
 {
@@ -83,31 +68,6 @@ nonascii()
 {
   LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
 }
-
-CONFIG_PATH="$DOTFILES/config"
-
-# Load the shell dotfiles, and then some:
-function x-load-config-fn()
-{
-  for FILE in $CONFIG_PATH/{exports,alias,functions}; do
-    FILENAME="$FILE"
-    HOST="$(hostname -s)"
-    # global (exports|alias|functions) FILENAME for all hosts
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME" ] && source "$FILENAME"
-    # global secret FILENAME, git ignored
-    # shellcheck source=../config/exports-secret
-    [ -r "$FILENAME-secret" ] && source "$FILENAME-secret"
-    # host specific (exports|alias|functions) FILENAME
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST"
-    # host specific (exports|alias|functions) FILENAME, git ignored
-    # shellcheck source=../config/exports
-    [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret"
-  done
-}
-
-x-load-config-fn
 
 source "$DOTFILES/local/bin/msgr"
 
