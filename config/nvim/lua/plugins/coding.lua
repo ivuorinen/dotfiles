@@ -16,6 +16,10 @@ return {
     },
     keys = {
       {
+        "<leader>ba",
+        desc = "Annotations / Comments",
+      },
+      {
         "<leader>baa",
         function()
           require("neogen").generate({ type = "current" })
@@ -68,10 +72,12 @@ return {
   -- Clarify and beautify your comments using boxes and lines.
   -- https://github.com/LudoPinelli/comment-box.nvim
   { "LudoPinelli/comment-box.nvim", opts = {} },
+  -- Mason
+  -- https://github.com/williamboman/mason.nvim
   {
     "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
+    opts = function(_, opts)
+      vim.list_extend(opts.ensure_installed, {
         "actionlint",
         "ansible-language-server",
         "ansible-lint",
@@ -86,18 +92,24 @@ return {
         "dockerfile-language-server",
         "editorconfig-checker",
         "fixjson",
+        "flake8",
         "html-lsp",
         "jq",
+        "jsonlint",
+        "luacheck",
         "nginx-language-server",
         "php-cs-fixer",
+        "phpcs",
+        "phpmd",
         "semgrep",
-        "sonarlint-language-server",
-        "stylua",
         "shellcheck",
         "shfmt",
-        "flake8",
-      },
-    },
+        "sonarlint-language-server",
+        "stylelint",
+        "stylua",
+        "yamllint",
+      })
+    end,
   },
   -- Vim plugin for automatic time tracking and metrics generated from your programming activity.
   -- https://github.com/wakatime/vim-wakatime
