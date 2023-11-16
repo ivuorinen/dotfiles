@@ -12,9 +12,14 @@ require("lazy").setup({
     {
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
+      opts = {
+        colorscheme = "tokyonight",
+      },
     },
     {
       "folke/tokyonight.nvim",
+      lazy = false,
+      priority = 1000,
       opts = {
         style = "night",
         transparent = true,
@@ -23,6 +28,8 @@ require("lazy").setup({
           sidebars = "transparent",
           floats = "transparent",
         },
+        dim_inactive = true,
+        lualine_bold = true,
       },
     },
     { import = "plugins" },
