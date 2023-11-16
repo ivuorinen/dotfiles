@@ -2,35 +2,76 @@
 # Load our configuration files
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
-# Set verbosity with VERBOSE=1 x-load-configs
-: "${VERBOSE:0}"
+set -euo pipefail
 
-DOTFILES="$HOME/.dotfiles"
+# Set verbosity with VERBOSE=1 x-load-configs
+VERBOSE="${VERBOSE:=0}"
+
+[ "$VERBOSE" = "1" ] && {
+  set -x
+}
 
 CONFIG_PATH="$DOTFILES/config"
 
 # Load the shell dotfiles, and then some:
 HOST="$(hostname -s)"
 [ "$VERBOSE" = "1" ] && {
-  echo "x-load-config-fn: VERBOSE=1"
-  echo "x-load-config-fn: HOST: $HOST"
+  echo "x-load-configs: VERBOSE=1"
+  echo "x-load-configs: HOST: $HOST"
 }
-for FILE in $CONFIG_PATH/{exports,alias,functions}; do
-  FILENAME="$FILE"
+
+configFile()
+{
+  echo "$CONFIG_PATH/$1"
+}
+
+configMsg()
+{
+  printf 'x-load-configs: %s %s\n' "$1" "$2"
+}
+
+loadConfigFiles()
+{
+  CONFIG_FILE=$1
+  SECRET_FILE=$CONFIG_FILE-secret
+  HOST_FILE=$CONFIG_FILE-$HOST
+  SECRET_HOST=$HOST_FILE-secret
+
+  [ "$VERBOSE" = "1" ] && configMsg "?" "$CONFIG_FILE"
+
   # global (exports|alias|functions) FILENAME for all hosts
   # shellcheck source=../config/exports
-  [ -r "$FILENAME" ] && source "$FILENAME" \
-    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME"
+  [ -r "$CONFIG_FILE" ] && {
+    source "$CONFIG_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$CONFIG_FILE"
+  }
+
   # global secret FILENAME, git ignored
   # shellcheck source=../config/exports-secret
-  [ -r "$FILENAME-secret" ] && source "$FILENAME-secret" \
-    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-secret"
+  [ "$VERBOSE" = "1" ] && configMsg "?" "$SECRET_FILE"
+  [ -r "$SECRET_FILE" ] && {
+    source "$SECRET_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_FILE"
+  }
   # host specific (exports|alias|functions) FILENAME
   # shellcheck source=../config/exports
-  [ -r "$FILENAME-$HOST" ] && source "$FILENAME-$HOST" \
-    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-$HOST"
+  [ "$VERBOSE" = "1" ] && configMsg "?" "$HOST_FILE"
+  [ -r "$HOST_FILE" ] && {
+    source "$HOST_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$HOST_FILE"
+  }
   # host specific (exports|alias|functions) FILENAME, git ignored
   # shellcheck source=../config/exports
-  [ -r "$FILENAME-$HOST-secret" ] && source "$FILENAME-$HOST-secret" \
-    && [ "$VERBOSE" = "1" ] && echo "x-load-config-fn: $FILENAME-$HOST-secret"
-done
+  [ "$VERBOSE" = "1" ] && configMsg "?" "$SECRET_HOST"
+  [ -r "$SECRET_HOST" ] && {
+    source "$SECRET_HOST" \
+      && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_HOST"
+  }
+}
+
+FILE_EXPORTS=$(configFile "exports")
+FILE_FUNCTIONS=$(configFile "functions")
+FILE_ALIAS=$(configFile "alias")
+
+loadConfigFiles "$FILE_EXPORTS"
+loadConfigFiles "$FILE_FUNCTIONS"
+loadConfigFiles "$FILE_ALIAS"
+
+exit 0

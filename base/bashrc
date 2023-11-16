@@ -27,6 +27,10 @@ x-load-configs
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
 
+x-have rbenv && {
+  eval "$(rbenv init - bash)"
+}
+
 # Enable the subsequent settings only in interactive sessions
 case $- in
 *i*) ;;

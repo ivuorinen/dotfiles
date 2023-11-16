@@ -61,9 +61,9 @@ antigen bundle jreese/zsh-titles
 antigen bundle zsh-users/zsh-completions
 
 # these should be available if there's need
-have brew && antigen bundle brew
-have php && antigen bundle php
-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
+x-have brew && antigen bundle brew
+x-have php && antigen bundle php
+x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
 # nvm is a strange beast
 zstyle ':omz:plugins:nvm' autoload yes
@@ -81,14 +81,26 @@ antigen apply
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
   && source "${DOTFILES}/config/fzf/fzf.zsh"
 
+x-have op && {
+  eval "$(op completion zsh)"
+  compdef _op op
+}
+
+x-have rbenv && {
+  eval "$(rbenv init - zsh)"
+}
+
 # Autoupdate tmux window name
 TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
 [ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
-  tmux-window-name() {
-	  ($TMUX_WINDOW_NAME_PLUGIN &)
+  tmux-window-name()
+  {
+    ($TMUX_WINDOW_NAME_PLUGIN &)
   }
   add-zsh-hook chpwd tmux-window-name
 }
 
 # Start starship
 eval "$(starship init zsh)"
+
+source $DOTFILES/config/alias

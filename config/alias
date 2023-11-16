@@ -1,68 +1,15 @@
 #!/usr/bin/env bash
 # shellcheck source="../scripts/shared.sh"
 # shellcheck disable=1091,2139
-DOTFILES="$HOME/.dotfiles"
-
-# Get installed php versions from brew and setup aliases
-function x-set-php-aliases
-{
-  x-have brew && {
-    local php_versions=()
-    while IFS="" read -r line; do php_versions+=("$line"); done < <(bkt -- brew list | grep '^php')
-
-    php_error_reporting='-d error_reporting=22527'
-
-    for version in "${php_versions[@]}"; do
-      # drop the dot from version (8.0 -> 80)
-      local php_abbr="${version//\./}"
-      # replace "php@" with "p" so "php@80" becomes "p80"
-      local php_alias="${php_abbr//php@/p}"
-
-      # Fetch the exec path once
-      php_exec="$(brew --prefix "$version")/bin/php"
-
-      # Raw PHP without error_reporting flag.
-      # shellcheck disable=SC2139
-      alias "${php_alias}"r="$php_exec"
-      # PHP with error_reporting flag.
-      # shellcheck disable=SC2139,SC2140
-      alias "$php_alias"="$php_exec $php_error_reporting"
-      # Local PHP Server.
-      # shellcheck disable=SC2139,SC2140
-      alias "${php_alias}s"="$php_exec -S localhost:9000"
-      # Use composer with specific PHP and error_reporting flag on.
-      # shellcheck disable=SC2139,SC2140
-      alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
-    done
-  }
-}
-
-if [[ $(uname) == 'Darwin' ]]; then
-
-  x-set-php-aliases
-
-  # Laravel Sail shortcut
-  alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-
-  # Flush Directory Service cache
-  alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-
-  # Lock the screen
-  alias afk="osascript -e 'tell application \"System Events\" to keystroke \"q\" using {command down,control down}'"
-
-  # Empty the Trash on all mounted volumes and the main HDD
-  # Also, clear Apple’s System Logs to improve shell startup speed
-  alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
-fi
 
 # Be nice
 alias please="sudo "
 
 # Color the grep output
-alias grep='grep --color'
+alias grep="grep --color"
 
 x-have eza && {
-  alias ls='eza -h -s=type --git --icons --group-directories-first'
+  alias ls="eza -h -s=type --git --icons --group-directories-first"
 }
 
 # Easier navigation: .., ..., ....
@@ -138,22 +85,35 @@ alias zedit='$EDITOR ~/.dotfiles'
 
 alias irssi="irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi"
 
-if [[ -f "$HOME/.aliases.local" ]]; then
-  # shellcheck disable=SC1091
-  source "$HOME/.aliases.local"
-fi
-
 alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 alias svn="svn --config-dir $XDG_CONFIG_HOME/subversion"
 
+if [[ $(uname) == 'Darwin' ]]; then
+
+  # Laravel Sail shortcut
+  alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+
+  # Flush Directory Service cache
+  alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+
+  # Lock the screen
+  alias afk="osascript -e 'tell application \"System Events\" to keystroke \"q\" using {command down,control down}'"
+
+  # Empty the Trash on all mounted volumes and the main HDD
+  # Also, clear Apple's System Logs to improve shell startup speed
+  alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
+
+  x-set-php-aliases
+fi
+
 # Alacritty preexec hook to update dynamic title
-function preexec()
+preexec()
 {
   print -Pn "\e]0;$1%~\a"
 }
 
 # Update dotfiles
-function dfu()
+dfu()
 {
   (
     cd "$DOTFILES" && git pull --ff-only && ./install -q
@@ -161,7 +121,7 @@ function dfu()
 }
 
 # Weather in Tampere, or other city
-function weather()
+weather()
 {
   # https://github.com/chubin/wttr.in#usage
   local city="${1:-Tampere}"
@@ -169,19 +129,19 @@ function weather()
 }
 
 # Docker
-function ssh-docker()
+ssh-docker()
 {
   docker exec -it "$@" bash
 }
 
 # All the dig info
-function digga()
+digga()
 {
   dig +nocmd "$1" any +multiline +noall +answer
 }
 
 # Rector project to php version 8.2 by default.
-function rector()
+rector()
 {
   local php="${1:-82}"
   docker run -v "$(pwd)":/project rector/rector:latest process \
@@ -191,7 +151,7 @@ function rector()
 }
 
 # Commit everything
-function commit()
+commit()
 {
   commitMessage="$*"
 
@@ -203,7 +163,7 @@ function commit()
   eval "git commit -a -m '${commitMessage}'"
 }
 
-function scheduler()
+scheduler()
 {
   while :; do
     php artisan schedule:run

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Check which php versions are installed with brew, and create aliases for each installation.
+# Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
+
+set -euo pipefail
+
+# Set verbosity with VERBOSE=1 x-load-configs
+VERBOSE="${VERBOSE:=0}"
+
+[ "$VERBOSE" = "2" ] && {
+  set -x
+}
+
+! x-have brew && {
+  exit 0
+}
+
+# Get installed php versions from brew and setup aliases
+php_versions=()
+while IFS="" read -r line; do php_versions+=("$line"); done < <(bkt -- brew list | grep '^php')
+
+php_error_reporting='-d error_reporting=22527'
+
+for version in "${php_versions[@]}"; do
+  [ "$VERBOSE" = "1" ] && echo "Setting aliases for $version"
+  # drop the dot from version (8.0 -> 80)
+  php_abbr="${version//\./}"
+  # replace "php@" with "p" so "php@80" becomes "p80"
+  php_alias="${php_abbr//php@/p}"
+
+  # Fetch the exec path once
+  php_exec="$HOMEBREW_PREFIX/opt/$version/bin/php"
+
+  [ -f "$php_exec" ] && {
+    [ "$VERBOSE" = "1" ] && echo "-> php_exec $php_exec"
+
+    # Raw PHP without error_reporting flag.
+    # shellcheck disable=SC2139
+    alias "${php_alias}"r="$php_exec"
+    # PHP with error_reporting flag.
+    # shellcheck disable=SC2139,SC2140
+    alias "$php_alias"="$php_exec $php_error_reporting"
+    # Local PHP Server.
+    # shellcheck disable=SC2139,SC2140
+    alias "${php_alias}s"="$php_exec -S localhost:9000"
+    # Use composer with specific PHP and error_reporting flag on.
+    # shellcheck disable=SC2139,SC2140
+    alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
+  }
+done

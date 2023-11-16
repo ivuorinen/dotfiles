@@ -1,7 +1,7 @@
 # lakka exports
 
 ## LUA
-have luarocks && $(luarocks path --bin)
+x-have luarocks && $(luarocks path --bin)
 
 export PATH="$HOME/.local/go/bin:$PATH"
 
@@ -17,4 +17,3 @@ export RVM_PATH="$HOME/.rvm"
 export PATH="$RVM_PATH/bin:$PATH"
 # shellcheck source=$HOME/.rvm/scripts/rvm
 [[ -s "$RVM_PATH/scripts/rvm" ]] && source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
-

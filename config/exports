@@ -2,11 +2,6 @@
 # shellcheck shell=bash
 # vim: filetype=zsh
 
-# if cargo directory exists, add it to path
-if [[ -d "$HOME/.local/share/cargo/bin" ]]; then
-  export PATH="$HOME/.local/share/cargo/bin:$PATH"
-fi
-
 # Cache commands using bkt if installed
 if command -v bkt >&/dev/null; then
   bkt()
@@ -26,7 +21,7 @@ fi
 # shorthand for checking if the system has the bin in path,
 # this version does not use caching
 # usage: have_command php && php -v
-function have_command
+have_command()
 {
   command -v "$1" >&/dev/null
 }
@@ -34,21 +29,21 @@ function have_command
 # shorthand for checking if the system has the bin in path,
 # this version uses caching
 # usage: have php && php -v
-function have
+have()
 {
   bkt -- which "$1" >&/dev/null
 }
 
-function brew_installed
+brew_installed()
 {
   bkt -- brew list
 }
 
 # shorthand for checking if brew package is installed
 # usage: have_brew php && php -v
-function have_brew
+have_brew()
 {
-  ! have brew && return 125
+  ! x-have brew && return 125
 
   if bkt -- brew list "$1" &> /dev/null; then
     return 0
