@@ -100,7 +100,5 @@ TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/
   add-zsh-hook chpwd tmux-window-name
 }
 
-# Start starship
 eval "$(starship init zsh)"
-
 source $DOTFILES/config/alias
