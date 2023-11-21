@@ -32,4 +32,4 @@ x-have rbenv && {
 }
 
 eval "$(starship init bash)"
-source $DOTFILES/config/alias
+source "$DOTFILES/config/alias"

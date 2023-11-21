@@ -101,4 +101,4 @@ TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/
 }
 
 eval "$(starship init zsh)"
-source $DOTFILES/config/alias
+source "$DOTFILES/config/alias"
