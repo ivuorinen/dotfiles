@@ -18,6 +18,9 @@ export XDG_RUNTIME_DIR="$HOME/.local/run"
 # Paths
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
 
+source "$DOTFILES/config/exports"
+source "$DOTFILES/config/functions"
+source "$DOTFILES/config/alias"
 x-load-configs
 
 # shellcheck source=../config/fzf/fzf.bash
