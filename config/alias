@@ -2,9 +2,6 @@
 # shellcheck source="../scripts/shared.sh"
 # shellcheck disable=1091,2139
 
-# Be nice
-alias please="sudo "
-
 # Color the grep output
 alias grep="grep --color"
 
@@ -32,7 +29,7 @@ alias sl="ls"
 alias lsd="ls -lF | grep '^d'"
 
 # IP addresses
-alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias x-ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' | sed -e 's/inet6* //'"
 
@@ -48,9 +45,6 @@ alias flush="dscacheutil -flushcache"
 
 # Update locatedb
 alias updatedb="sudo /usr/libexec/locate.updatedb"
-
-# Always return full history
-alias history="history 1"
 
 # tmux: automatically attach or create session with name 'main'
 alias tmux='tmux new-session -A -s main'
@@ -132,12 +126,6 @@ weather()
 ssh-docker()
 {
   docker exec -it "$@" bash
-}
-
-# All the dig info
-digga()
-{
-  dig +nocmd "$1" any +multiline +noall +answer
 }
 
 # Rector project to php version 8.2 by default.
