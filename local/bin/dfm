@@ -19,6 +19,9 @@ VERSION_NVM="v0.39.5"
 export DOTFILES="$HOME/.dotfiles"
 # shellcheck source=./../../scripts/shared.sh
 source "$HOME/.dotfiles/scripts/shared.sh"
+source "$DOTFILES/config/exports"
+source "$DOTFILES/config/alias"
+source "$DOTFILES/config/functions"
 
 # Loads configs for better installation experience
 x-load-configs
@@ -152,6 +155,8 @@ function section_install
     nvm)
       msg "Installing nvm..."
       curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash
+      git checkout "$DOTFILES/base/zshrc"
+      git checkout "$DOTFILES/base/bashrc"
       $0 install nvm-latest
       msg_yay "nvm installed!"
       ;;
@@ -161,7 +166,8 @@ function section_install
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       fi
       nvm install --lts --latest-npm --default
-      git checkout "$DOTFILES/base/*"
+      git checkout "$DOTFILES/base/zshrc"
+      git checkout "$DOTFILES/base/bashrc"
       msg_yay "latest lts node installed!"
       ;;
     npm)
