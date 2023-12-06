@@ -37,3 +37,8 @@ done
 msg_run "Upgrading all global packages"
 npm -g --no-progress --no-timing --no-fund outdated
 npm -g --no-timing --no-fund upgrade
+
+msg_run "Cleaning up npm cache"
+npm cache verify
+npm cache clean --force
+npm cache verify

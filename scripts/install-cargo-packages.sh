@@ -24,6 +24,7 @@ source "$CARGO_HOME/env"
 rustup default system
 
 packages=(
+  "cargo-clean"
   # starship.rs
   "starship"
   # An incremental parsing system for programming tools
@@ -68,4 +69,5 @@ x-have bob && {
   bob use stable && x-path-append "$XDG_DATA_HOME/bob/nvim-bin"
 }
 
-msg_done "All next steps done!"
+msg_run "Removing cargo cache"
+cargo cache --autoclean

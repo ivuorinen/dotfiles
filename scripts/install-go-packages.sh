@@ -50,4 +50,8 @@ x-have git-profile && {
 }
 
 echo ""
+
+msg_run "Clearing go cache"
+go clean -cache -modcache
+
 msg_ok "Done"

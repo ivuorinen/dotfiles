@@ -24,9 +24,12 @@ else
   # Update the repo
   msg_run "Starting to update $TLDR_GIT"
   git -C "$TLDR_TEMP_DIR" reset --hard origin/main
-  git -C "$TLDR_TEMP_DIR" pull -q \
+  git -C "$TLDR_TEMP_DIR" pull -q --depth 2 \
     && msg_done "Updated $TLDR_GIT"
 fi
+
+msg_run "Removing non-english translation files"
+rm -rf "$TLDR_TEMP_DIR/pages.*"
 
 # Fetch the destination directory from cheat defined directories.
 TLDR_CHEAT_DEST="$(cheat -d | grep tldr | head -1 | awk '{print $2}')"
