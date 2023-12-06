@@ -24,7 +24,7 @@ source "$CARGO_HOME/env"
 rustup default system
 
 packages=(
-  "cargo-clean"
+  "cargo-cache"
   # starship.rs
   "starship"
   # An incremental parsing system for programming tools
