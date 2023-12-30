@@ -1,19 +1,23 @@
+---
 # Default settings for amethyst
 # Repo: `https://github.com/ianyh/Amethyst`
 #
 # Note due to issue 1419 (https://github.com/ianyh/Amethyst/issues/1419) some
 # config values may conflict and not work if they are the same as the default
-# values for amathyst. You can see these values on github at
+# values for amathyst. You can see these values on GitHub at
 # https://github.com/ianyh/Amethyst/blob/development/Amethyst/default.amethyst
 # If you're experiencing conflicts and the settings are the same as the default,
 # comment out the commands in this file.
 #
 # Move this file to: `~/.amethyst.yml`
 # In order to register changes restart Amethyst.
-# If you experience issues pulling in the changes you can also quit Amethyst and run: `defaults delete com.amethyst.Amethyst.plist`
-# This removes the current preferences and causes Amethyst to restart with default preferences and pull configs from this file.
+# If you experience issues pulling in the changes you can also
+# quit Amethyst and run: `defaults delete com.amethyst.Amethyst.plist`
+# This removes the current preferences and causes Amethyst to restart
+# with default preferences and pull configs from this file.
 
-# layouts - Ordered list of layouts to use by layout key (default tall, wide, fullscreen, and column).
+# layouts - Ordered list of layouts to use by layout key
+# (default tall, wide, fullscreen, and column).
 layouts:
   - bsp
   - tall
@@ -71,39 +75,49 @@ cycle-layout-backward:
   mod: mod2
   key: space
 
-# Shrink the main pane by a percentage of the screen dimension as defined by window-resize-step. Note that not all layouts respond to this command.
+# Shrink the main pane by a percentage of the screen
+# dimension as defined by window-resize-step.
+# Note that not all layouts respond to this command.
 shrink-main:
   mod: mod1
   key: h
 
-# Expand the main pane by a percentage of the screen dimension as defined by window-resize-step. Note that not all layouts respond to this command.
+# Expand the main pane by a percentage of the screen dimension
+# as defined by window-resize-step. Note that not all layouts
+# respond to this command.
 expand-main:
   mod: mod1
   key: l
 
-# Increase the number of windows in the main pane. Note that not all layouts respond to this command.
+# Increase the number of windows in the main pane.
+# Note that not all layouts respond to this command.
 increase-main:
   mod: mod1
   key: ','
 
-# Decrease the number of windows in the main pane. Note that not all layouts respond to this command.
+# Decrease the number of windows in the main pane.
+# Note that not all layouts respond to this command.
 decrease-main:
   mod: mod1
   key: '.'
 
-# General purpose command for custom layouts. Functionality is layout-dependent.
+# General purpose command for custom layouts.
+# Functionality is layout-dependent.
 # command1:
 #   mod: <NONE>
 #   key: <NONE>
-# General purpose command for custom layouts. Functionality is layout-dependent.
+# General purpose command for custom layouts.
+# Functionality is layout-dependent.
 # command2:
 #   mod: <NONE>
 #   key: <NONE>
-# General purpose command for custom layouts. Functionality is layout-dependent.
+# General purpose command for custom layouts.
+# Functionality is layout-dependent.
 # command3:
 #   mod: <NONE>
 #   key: <NONE>
-# General purpose command for custom layouts. Functionality is layout-dependent.
+# General purpose command for custom layouts.
+# Functionality is layout-dependent.
 # command4:
 #   mod: <NONE>
 #   key: <NONE>
@@ -133,42 +147,51 @@ focus-screen-cw:
   mod: mod1
   key: n
 
-# Move the currently focused window onto the next screen in the list going counter-clockwise.
+# Move the currently focused window onto the next
+# screen in the list going counter-clockwise.
 swap-screen-ccw:
   mod: mod2
   key: h
 
-# Move the currently focused window onto the next screen in the list going clockwise.
+# Move the currently focused window onto the next
+# screen in the list going clockwise.
 swap-screen-cw:
   mod: mod2
   key: l
 
-# Swap the position of the currently focused window with the next window in the list going counter-clockwise.
+# Swap the position of the currently focused window with
+# the next window in the list going counter-clockwise.
 swap-ccw:
   mod: mod2
   key: j
 
-# Swap the position of the currently focused window with the next window in the list going clockwise.
+# Swap the position of the currently focused window with
+# the next window in the list going clockwise.
 swap-cw:
   mod: mod2
   key: k
 
-# Swap the position of the currently focused window with the main window in the list.
+# Swap the position of the currently focused window
+# with the main window in the list.
 swap-main:
   mod: mod1
   key: enter
 
-# Move focus to the n-th screen in the list; e.g., focus-screen-3 will move mouse focus to the 3rd screen. Note that the main window in the given screen will be focused.
+# Move focus to the n-th screen in the list; e.g.,
+# focus-screen-3 will move mouse focus to the 3rd screen.
+# Note that the main window in the given screen will be focused.
 #focus-screen-n:
 # focus-screen-<screen-number>:
 #   mod: mod1
 #   key: y
-# Move the currently focused window to the n-th screen; e.g., throw-screen-3 will move the window to the 3rd screen.
+# Move the currently focused window to the n-th screen;
+# e.g., throw-screen-3 will move the window to the 3rd screen.
 # throw-screen-n:
 # throw-screen-<screen-number>:
 #   mod: mod1
 #   key: u
-# Move the currently focused window to the n-th space; e.g., throw-space-3 will move the window to the 3rd space.
+# Move the currently focused window to the n-th space;
+# e.g., throw-space-3 will move the window to the 3rd space.
 # throw-space-<screen-number>:
 #   mod: mod1
 #   key: i
@@ -203,7 +226,9 @@ throw-space-right:
   mod: mod2
   key: right
 
-# Toggle the floating state of the currently focused window; i.e., if it was floating make it tiled and if it was tiled make it floating.
+# Toggle the floating state of the currently focused window;
+# i.e., if it was floating make it tiled and if it was
+# tiled make it floating.
 toggle-float:
   mod: mod1
   key: t
@@ -236,10 +261,13 @@ relaunch-amethyst:
 # disable screen padding on builtin display
 disable-padding-on-builtin-display: false
 
-# Boolean flag for whether or not to add margins betwen windows (default false).
+# Boolean flag for whether to add margins between
+# windows (default false).
 window-margins: false
 
-# Boolean flag for whether or not to set window margins if there is only one window on the screen, assuming window margins are enabled (default false).
+# Boolean flag for whether to set window margins if there is
+# only one window on the screen, assuming window margins
+# are enabled (default false).
 smart-window-margins: true
 
 # # Add 10px margin between windows
@@ -248,39 +276,53 @@ smart-window-margins: true
 # The size of the margins between windows (in px, default 0).
 window-margin-size: 0
 
-# The max number of windows that may be visible on a screen at one time before
-# additional windows are minimized. A value of 0 disables the feature.
+# The max number of windows that may be visible on a screen
+# at one time before additional windows are minimized.
+# A value of 0 disables the feature.
 window-max-count: 0
 
-# The smallest height that a window can be sized to regardless of its layout frame (in px, default 0).
+# The smallest height that a window can be sized to
+# regardless of its layout frame (in px, default 0).
 window-minimum-height: 0
 
-# The smallest width that a window can be sized to regardless of its layout frame (in px, default 0)
+# The smallest width that a window can be sized to
+# regardless of its layout frame (in px, default 0)
 window-minimum-width: 0
 
-# List of bundle identifiers for applications to either be automatically floating or automatically tiled based on floating-is-blacklist (default []).
+# List of bundle identifiers for applications to either be automatically
+# floating or automatically tiled based on floating-is-blacklist (default []).
 floating: []
 
 # Boolean flag determining behavior of the floating list.
-# true if the applications should be floating and all others tiled. false if the applications should be tiled and all others floating (default true).
+# true if the applications should be floating and all others tiled.
+# false if the applications should be tiled and all others floating (default true).
 floating-is-blacklist: false
 
-# true if screen frames should exclude the status bar. false if the screen frames should include the status bar (default false).
+# true if screen frames should exclude the status bar.
+# false if the screen frames should include the status bar (default false).
 ignore-menu-bar: false
 
-# true if windows smaller than a 500px square should be floating by default (default true)
+# true if windows smaller than a 500px square should
+# be floating by default (default true)
 float-small-windows: true
 
-# true if the mouse should move position to the center of a window when it becomes focused (default false). Note that this is largely incompatible with focus-follows-mouse.
+# true if the mouse should move position to the center of a window
+# when it becomes focused (default false).
+# Note that this is largely incompatible with focus-follows-mouse.
 mouse-follows-focus: false
 
-# true if the windows underneath the mouse should become focused as the mouse moves (default false). Note that this is largely incompatible with mouse-follows-focus
+# true if the windows underneath the mouse should become focused as
+# the mouse moves (default false). Note that this is largely
+# incompatible with mouse-follows-focus
 focus-follows-mouse: false
 
-# true if dragging and dropping windows on to each other should swap their positions (default false).
+# true if dragging and dropping windows on to each other
+# should swap their positions (default false).
 mouse-swaps-windows: true
 
-# true if changing the frame of a window with the mouse should update the layout to accommodate the change (default false). Note that not all layouts will be able to respond to the change.
+# true if changing the frame of a window with the mouse should update the
+# layout to accommodate the change (default false).
+# Note that not all layouts will be able to respond to the change.
 mouse-resizes-windows: true
 
 # true to display the name of the layout when a new layout is selected (default true).
@@ -292,13 +334,15 @@ enables-layout-hud-on-space-change: true
 # true to get updates to beta versions of the software (default false).
 use-canary-build: false
 
-# true to insert new windows into the first position and false to insert new windows into the last position (default false).
+# true to insert new windows into the first position and
+# false to insert new windows into the last position (default false).
 new-windows-to-main: false
 
 # true to automatically move to a space when throwing a window to it (default true).
 follow-space-thrown-windows: true
 
-# The integer percentage of the screen dimension to increment and decrement main pane ratios by (default 5).
+# The integer percentage of the screen dimension to increment
+# and decrement main pane ratios by (default 5).
 window-resize-step: 5
 
 # Padding to apply between windows and the left edge of the screen (in px, default 0).

@@ -1,3 +1,4 @@
+---
 check_for_updates: true
 excluded_labels:
   - maintenance

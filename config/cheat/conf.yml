@@ -1,3 +1,4 @@
+---
 # The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
 # editor: $EDITOR
 
@@ -37,7 +38,7 @@ pager: less -FRX
 #
 # This is very useful when you would like to maintain, for example, a
 # "pristine" repository of community cheatsheets on one cheatpath, and an
-# editable personal reponsity of cheatsheets on another cheatpath.
+# editable personal repository of cheatsheets on another cheatpath.
 #
 # Cheatpaths can be also configured to automatically apply tags to cheatsheets
 # on certain paths, which can be useful for querying purposes.

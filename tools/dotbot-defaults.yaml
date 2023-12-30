@@ -1,3 +1,4 @@
+---
 - defaults:
     create:
       mode: 0755
