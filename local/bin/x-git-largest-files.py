@@ -42,26 +42,26 @@ sortByOnDiskSize = False
 class Blob(object):
   sha1 = ''
   size = 0
-  packedSize = 0
+  packed_size = 0
   path = ''
 
   def __init__(self, line):
     cols = line.split()
-    self.sha1, self.size, self.packedSize = cols[0], int(cols[2]), int(cols[3])
+    self.sha1, self.size, self.packed_size = cols[0], int(cols[2]), int(cols[3])
 
   def __repr__(self):
     return '{} - {} - {} - {}'.format(
-      self.sha1, self.size, self.packedSize, self.path)
+      self.sha1, self.size, self.packed_size, self.path)
 
   def __lt__(self, other):
     if (sortByOnDiskSize):
       return self.size < other.size
     else:
-      return self.packedSize < other.packedSize
+      return self.packed_size < other.packed_size
 
   def csv_line(self):
     return "{},{},{},{}".format(
-      self.size/1024, self.packedSize/1024, self.sha1, self.path)
+      self.size/1024, self.packed_size/1024, self.sha1, self.path)
 
 
 def main():
@@ -71,45 +71,45 @@ def main():
 
   args = parse_arguments()
   sortByOnDiskSize = args.sortByOnDiskSize
-  sizeLimit = 1024*args.filesExceeding
+  size_limit = 1024*args.filesExceeding
 
   if args.filesExceeding > 0:
     print("Finding objects larger than {}kB…".format(args.filesExceeding))
   else:
     print("Finding the {} largest objects…".format(args.matchCount))
 
-  blobs = get_top_blobs(args.matchCount, sizeLimit)
+  blobs = get_top_blobs(args.matchCount, size_limit)
 
   populate_blob_paths(blobs)
   print_out_blobs(blobs)
 
 
-def get_top_blobs(count, sizeLimit):
+def get_top_blobs(count, size_limit):
   """Get top blobs from git repository
 
     Args:
         count (int): How many items to return
-        sizeLimit (int): What is the size limit
+        size_limit (int): What is the size limit
 
     Returns:
         dict: Dictionary of Blobs
   """
-  sortColumn = 4
+  sort_column = 4
 
   if sortByOnDiskSize:
-    sortColumn = 3
+    sort_column = 3
 
-  verifyPack = "git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{}nr".format(sortColumn)  # noqa: E501
-  output = check_output(verifyPack, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
+  verify_pack = "git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{}nr".format(sort_column)  # noqa: E501
+  output = check_output(verify_pack, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
 
   blobs = dict()
   # use __lt__ to do the appropriate comparison
-  compareBlob = Blob("a b {} {} c".format(sizeLimit, sizeLimit))
-  for objLine in output:
-    blob = Blob(objLine)
+  compare_blob = Blob("a b {} {} c".format(size_limit, size_limit))
+  for obj_line in output:
+    blob = Blob(obj_line)
 
-    if sizeLimit > 0:
-      if compareBlob < blob:
+    if size_limit > 0:
+      if compare_blob < blob:
         blobs[blob.sha1] = blob
       else:
         break
@@ -132,8 +132,8 @@ def populate_blob_paths(blobs):
     print("Finding object paths…")
 
     # Only include revs which have a path. Other revs aren't blobs.
-    revList = "git rev-list --all --objects | awk '$2 {print}'"
-    all_object_lines = check_output(revList, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
+    rev_list = "git rev-list --all --objects | awk '$2 {print}'"
+    all_object_lines = check_output(rev_list, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
     outstanding_keys = list(blobs.keys())
 
     for line in all_object_lines:
@@ -151,16 +151,16 @@ def populate_blob_paths(blobs):
 
 def print_out_blobs(blobs):
   if len(blobs):
-    csvLines = ["size,pack,hash,path"]
+    csv_lines = ["size,pack,hash,path"]
 
     for blob in sorted(blobs.values(), reverse=True):
-      csvLines.append(blob.csv_line())
+      csv_lines.append(blob.csv_line())
 
     command = ["column", "-t", "-s", ","]
     p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     # Encode the input as bytes
-    input_data = ("\n".join(csvLines) + "\n").encode()
+    input_data = ("\n".join(csv_lines) + "\n").encode()
 
     stdout, _ = p.communicate(input_data)
 
