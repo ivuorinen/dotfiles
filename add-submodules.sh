@@ -31,6 +31,8 @@ git submodule add --name tmux/tmux-window-name \
   -f https://github.com/ofirgall/tmux-window-name.git config/tmux/plugins/tmux-window-name
 git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
+git submodule add --name tmux/tmux-current-pane-hostname \
+  -f https://github.com/soyuka/tmux-current-pane-hostname.git config/tmux/plugins/tmux-current-pane-hostname
 
 # Takes submodules and sets them to ignore all changes
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do

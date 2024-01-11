@@ -52,3 +52,6 @@
 [submodule "tmux/tmux-mode-indicator"]
 	path = config/tmux/plugins/tmux-mode-indicator
 	url = https://github.com/MunifTanjim/tmux-mode-indicator.git
+[submodule "tmux/tmux-current-pane-hostname"]
+	path = config/tmux/plugins/tmux-current-pane-hostname
+	url = https://github.com/soyuka/tmux-current-pane-hostname.git
