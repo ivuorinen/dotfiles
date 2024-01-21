@@ -1,19 +1,22 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
+local wk = require("which-key")
 
-local keymap = vim.keymap.set
-
---         ╭──────────────────────────────────────────────────────────╮
---         │                       Comment box                        │
---         ╰──────────────────────────────────────────────────────────╯
-local cb = require("comment-box")
-
--- left aligned fixed size box with left aligned text
-keymap({ "n", "v" }, "<Leader>bcb", cb.lbox, { desc = "Comment: Left aligned" })
--- centered adapted box with centered text
-keymap({ "n", "v" }, "<Leader>bcc", cb.ccbox, { desc = "Comment: Centered" })
-
--- centered line
-keymap("n", "<Leader>bcl", cb.cline, { desc = "Comment: Centered line" })
-keymap("i", "<M-l>", cb.cline, { desc = "Comment: Centered line" })
+-- ╭──────────────────────────────────────────────────────────╮
+-- │                       Comment box                        │
+-- ╰──────────────────────────────────────────────────────────╯
+wk.register({
+  ["<Leader>"] = {
+    b = {
+      c = {
+        name = "□ Comment boxes",
+        b = { "<Cmd>CBccbox<CR>", "Box Title" },
+        t = { "<Cmd>CBllline<CR>", "Titled Line" },
+        l = { "<Cmd>CBline<CR>", "Simple Line" },
+        m = { "<Cmd>CBllbox14<CR>", "Marked" },
+        d = { "<Cmd>CBd<CR>", "Remove a box" },
+      },
+    },
+  },
+})
