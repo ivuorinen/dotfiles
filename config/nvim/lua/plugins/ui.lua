@@ -1,5 +1,8 @@
 -- luacheck: globals vim
 return {
+  -- Cloak allows you to overlay *'s over defined patterns in defined files.
+  -- https://github.com/laytan/cloak.nvim
+  { "laytan/cloak.nvim" },
   -- Not UFO in the sky, but an ultra fold in Neovim.
   -- https://github.com/kevinhwang91/nvim-ufo/
   {
