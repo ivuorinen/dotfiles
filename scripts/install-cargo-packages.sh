@@ -26,7 +26,7 @@ rustup default system
 packages=(
   "cargo-cache"
   # starship.rs
-  "starship"
+  # "starship"
   # An incremental parsing system for programming tools
   "tree-sitter-cli"
   # a subprocess caching utility

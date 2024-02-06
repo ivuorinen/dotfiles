@@ -61,6 +61,7 @@ function section_install
       $0 install fonts
       $0 install antigen
       $0 brew install
+      $0 install ohmyposh
       $0 install ohmybash
       $0 install pip
       $0 install cargo
@@ -184,6 +185,11 @@ function section_install
       msg "oh-my-bash install started..."
       bash "$DOTFILES/scripts/install-ohmybash.sh" \
         && msg_yay "oh-my-bash installed!"
+      ;;
+    ohmyposh)
+      msg "oh-my-posh install started..."
+      bash "$DOTFILES/scripts/install-ohmyposh.sh" \
+        && msg_yay "oh-my-posh installed!"
       ;;
     pip)
       msg "pip install started..."
