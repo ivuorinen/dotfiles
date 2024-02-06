@@ -24,6 +24,10 @@ export ANDROID_HOME="$XDG_DATA_HOME/android"
 # bob manages nvim versions
 export PATH="$XDG_DATA_HOME/bob/nvim-bin:$PATH"
 
+# bkt (shell command caching tool) configuration
+export BKT_TTL=1m
+
+# brew, https://docs.brew.sh/Manpage
 export HOMEBREW_NO_ENV_HINTS=true
 
 # composer, https://getcomposer.org/

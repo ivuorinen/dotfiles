@@ -9,6 +9,7 @@ tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
+tap "keith/formulae"
 tap "mongodb/brew"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
@@ -20,10 +21,6 @@ brew "act"
 brew "ca-certificates"
 # YAML Parser
 brew "libyaml"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
-# Automate deployment, configuration, and upgrading
-brew "ansible"
 # Checks ansible playbooks for practices and behaviour
 brew "ansible-lint"
 # Generic-purpose lossless compression algorithm by Google
@@ -108,6 +105,10 @@ brew "dotenv-linter"
 brew "editorconfig-checker", link: false
 # Useful examples at the command-line
 brew "eg-examples"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Development kit for the Java programming language
+brew "openjdk"
 # Spellchecker wrapping library
 brew "enchant"
 # Run arbitrary commands when files change
@@ -158,8 +159,6 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -208,6 +207,8 @@ brew "mas"
 brew "mutt"
 # NCurses Disk Usage
 brew "ncdu"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
@@ -218,14 +219,14 @@ brew "nvm"
 brew "openjdk@11"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
-# Development kit for the Java programming language
-brew "openjdk"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Highly capable, feature-rich programming language
 brew "perl"
 # General-purpose scripting language
 brew "php@8.1"
+# Coreutils progress viewer
+brew "progress"
 # Simple Python style checker in one Python file
 brew "pycodestyle"
 # Python version management
@@ -238,6 +239,8 @@ brew "pyenv-virtualenv"
 brew "python@3.10"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.8"
+# Install various Ruby versions and implementations
+brew "ruby-build"
 # Ruby version manager
 brew "rbenv"
 # RC file (dotfile) management
@@ -306,16 +309,29 @@ brew "ddosify/tap/ddosify"
 brew "gesquive/tap/git-user"
 # A simple terminal UI for git commands, written in Go
 brew "jesseduffield/lazygit/lazygit"
+brew "keith/formulae/reminders-cli"
 # High-performance, schema-free, document-oriented database
 brew "mongodb/brew/mongodb-community"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.2"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.3"
+# Mcrypt PHP extension
+brew "shivammathur/extensions/mcrypt@8.3"
+# PCOV PHP extension
+brew "shivammathur/extensions/pcov@8.3"
+# Redis PHP extension
+brew "shivammathur/extensions/redis@8.3"
+# Uuid PHP extension
+brew "shivammathur/extensions/uuid@8.3"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@7.4"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@8.0"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@8.1"
+# Yaml PHP extension
+brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
 brew "shivammathur/php/php"
 # General-purpose scripting language
@@ -384,13 +400,13 @@ cask "omnifocus"
 cask "postman"
 # Display image info and preview unsupported formats in QuickLook
 cask "qlimagesize"
-# QuickLook generator for Markdown files
+# Quick Look generator for Markdown files
 cask "qlmarkdown"
-# QuickLook plugin for plaintext files without an extension
+# Quick Look plugin for plaintext files without an extension
 cask "qlstephen"
-# QuickLook plugin for JSON files
+# Quick Look plugin for JSON files
 cask "quicklook-json"
-# QuickLook generator for Adobe Swatch Exchange files
+# Quick Look generator for Adobe Swatch Exchange files
 cask "quicklookase"
 # Automatically hides or quits apps after periods of inactivity
 cask "quitter"
@@ -424,95 +440,3 @@ cask "vlc"
 cask "voikkospellservice"
 # Rust-based terminal
 cask "warp"
-mas "1Password for Safari", id: 1569813296
-mas "Actions", id: 1586435171
-mas "Audiobook Builder", id: 1437681957
-mas "Ivory", id: 6444602274
-mas "Keynote", id: 409183694
-mas "LastPass", id: 926036361
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "Pixelmator Pro", id: 1289583905
-mas "Final Cut Pro", id: 424389933
-mas "Tailscale", id: 1475387142
-mas "Xcode", id: 497799835
-vscode "4ops.terraform"
-vscode "adamiBs.terraform-live-graph"
-vscode "akamud.vscode-theme-onelight"
-vscode "amiralizadeh9480.laravel-extra-intellisense"
-vscode "andrewleedham.vscode-css-modules"
-vscode "andrewmcodes.tailwindcss-extension-pack"
-vscode "austenc.tailwind-docs"
-vscode "bmewburn.vscode-intelephense-client"
-vscode "Box-Of-Hats.bemhelper"
-vscode "bradlc.vscode-tailwindcss"
-vscode "christian-kohler.npm-intellisense"
-vscode "christian-kohler.path-intellisense"
-vscode "DavidAnson.vscode-markdownlint"
-vscode "dbaeumer.vscode-eslint"
-vscode "DotJoshJohnson.xml"
-vscode "eamodio.gitlens"
-vscode "EditorConfig.EditorConfig"
-vscode "esbenp.prettier-vscode"
-vscode "formulahendry.auto-close-tag"
-vscode "formulahendry.auto-rename-tag"
-vscode "formulahendry.code-runner"
-vscode "foxundermoon.shell-format"
-vscode "gencer.html-slim-scss-css-class-completion"
-vscode "GitHub.copilot"
-vscode "GitHub.copilot-chat"
-vscode "github.vscode-github-actions"
-vscode "GitHub.vscode-pull-request-github"
-vscode "GraphQL.vscode-graphql"
-vscode "GraphQL.vscode-graphql-execution"
-vscode "GraphQL.vscode-graphql-syntax"
-vscode "hashicorp.terraform"
-vscode "heybourn.headwind"
-vscode "JohnnyMorganz.stylua"
-vscode "jumpinjackie.vscode-map-preview"
-vscode "k--kato.intellij-idea-keybindings"
-vscode "liamhammett.inline-parameters"
-vscode "macieklad.tailwind-sass-syntax"
-vscode "MehediDracula.php-namespace-resolver"
-vscode "mikestead.dotenv"
-vscode "MisterJ.vue-volar-extention-pack"
-vscode "MrChetan.phpstorm-parameter-hints-in-vscode"
-vscode "mrorz.language-gettext"
-vscode "ms-azuretools.vscode-azureterraform"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-python.python"
-vscode "ms-python.vscode-pylance"
-vscode "ms-toolsai.jupyter"
-vscode "ms-toolsai.jupyter-renderers"
-vscode "ms-toolsai.vscode-jupyter-cell-tags"
-vscode "ms-toolsai.vscode-jupyter-slideshow"
-vscode "ms-vscode-remote.remote-containers"
-vscode "ms-vscode-remote.remote-wsl"
-vscode "ms-vscode.azure-account"
-vscode "ms-vscode.cpptools"
-vscode "msjsdiag.vscode-react-native"
-vscode "mtxr.sqltools"
-vscode "neilbrayfield.php-docblocker"
-vscode "nhoizey.gremlins"
-vscode "octref.vetur"
-vscode "oderwat.indent-rainbow"
-vscode "pflannery.vscode-versionlens"
-vscode "phiter.phpstorm-snippets"
-vscode "sibiraj-s.vscode-scss-formatter"
-vscode "SonarSource.sonarlint-vscode"
-vscode "stylelint.vscode-stylelint"
-vscode "sumneko.lua"
-vscode "syler.sass-indented"
-vscode "timonwong.shellcheck"
-vscode "tootone.org-mode"
-vscode "valeryanm.vscode-phpsab"
-vscode "Vue.volar"
-vscode "Vue.vscode-typescript-vue-plugin"
-vscode "WakaTime.vscode-wakatime"
-vscode "wix.vscode-import-cost"
-vscode "XadillaX.viml"
-vscode "xdebug.php-debug"
-vscode "xdebug.php-pack"
-vscode "yinfei.luahelper"
-vscode "yoavbls.pretty-ts-errors"
-vscode "ZainChen.json"

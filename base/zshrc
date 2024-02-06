@@ -61,8 +61,8 @@ antigen bundle jreese/zsh-titles
 antigen bundle zsh-users/zsh-completions
 
 # these should be available if there's need
-x-have brew && antigen bundle brew
-x-have php && antigen bundle php
+# x-have brew && antigen bundle brew
+# x-have php && antigen bundle php
 x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
 # nvm is a strange beast
@@ -71,7 +71,7 @@ antigen bundle nvm
 # antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
 
 # nice to have stuff
-antigen bundle gcloud
+# antigen bundle gcloud
 
 # this needs to be the last item
 antigen bundle zsh-users/zsh-syntax-highlighting
@@ -80,11 +80,6 @@ antigen apply
 # shellcheck source=../config/fzf/fzf.zsh
 [ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
   && source "${DOTFILES}/config/fzf/fzf.zsh"
-
-x-have op && {
-  eval "$(op completion zsh)"
-  compdef _op op
-}
 
 x-have rbenv && {
   eval "$(rbenv init - zsh)"
