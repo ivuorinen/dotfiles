@@ -85,14 +85,18 @@ x-have rbenv && {
   eval "$(rbenv init - zsh)"
 }
 
-# Autoupdate tmux window name
-TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
-[ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
-  tmux-window-name()
-  {
-    ($TMUX_WINDOW_NAME_PLUGIN &)
+# Run only if tmux is active
+[[ -n "$TMUX" ]] && {
+  # Autoupdate tmux window name
+  TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
+  [ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
+    tmux-window-name()
+    {
+      ($TMUX_WINDOW_NAME_PLUGIN &)
+    }
+    add-zsh-hook chpwd tmux-window-name
+    tmux-window-name
   }
-  add-zsh-hook chpwd tmux-window-name
 }
 
 # eval "$(starship init zsh)"
