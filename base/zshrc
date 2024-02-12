@@ -100,5 +100,7 @@ x-have rbenv && {
 }
 
 # eval "$(starship init zsh)"
-eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
+x-have oh-my-posh && {
+  eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
+}
 source "$DOTFILES/config/alias"
