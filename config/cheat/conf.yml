@@ -72,7 +72,7 @@ cheatpaths:
     tags: [pure-bash-bible]
     readonly: true
   - name: tldr
-    path: ~/.dotfiles/config/cheat/cheatsheets/tldr
+    path: ~/.dotfiles/config/cheat/cheatsheets/tldr/tldr
     tags: [tldr]
     readonly: true
 # While it requires no configuration here, it's also worth noting that

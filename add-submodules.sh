@@ -13,6 +13,8 @@ git submodule add --name dotbot-pip \
 # other repos
 git submodule add --name cheat-community \
   -f https://github.com/cheat/cheatsheets.git config/cheat/cheatsheets/community
+git submodule add --name cheat-tldr \
+  -f https://github.com/ivuorinen/cheatsheet-tldr.git config/cheat/cheatsheets/tldr
 
 # tmux plugin manager and plugins
 git submodule add --name tmux/tmux-continuum \

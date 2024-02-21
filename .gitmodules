@@ -55,3 +55,6 @@
 [submodule "tmux/tmux-current-pane-hostname"]
 	path = config/tmux/plugins/tmux-current-pane-hostname
 	url = https://github.com/soyuka/tmux-current-pane-hostname.git
+[submodule "cheat-tldr"]
+	path = config/cheat/cheatsheets/tldr
+	url = https://github.com/ivuorinen/cheatsheet-tldr.git
