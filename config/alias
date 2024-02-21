@@ -75,6 +75,8 @@ alias code_scanner='docker run
   registry.gitlab.com/gitlab-org/ci-cd/codequality:"${CODEQUALITY_VERSION:-latest}"
   /code'
 
+alias trivy_scan='docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy'
+
 alias zedit='$EDITOR ~/.dotfiles'
 
 alias irssi="irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi"
