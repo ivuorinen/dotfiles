@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# work around https://github.com/Microsoft/vscode/issues/3941
-# and anyone else who expects to see a 'python' executable
-
-exec python3 "$@"

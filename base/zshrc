@@ -85,6 +85,12 @@ x-have rbenv && {
   eval "$(rbenv init - zsh)"
 }
 
+x-have pyenv && {
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+  eval "$(pyenv virtualenv-init -)"
+}
+
 # Run only if tmux is active
 [[ -n "$TMUX" ]] && {
   # Autoupdate tmux window name
