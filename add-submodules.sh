@@ -30,7 +30,7 @@ git submodule add --name tmux/tmux-sessionist \
 git submodule add --name tmux/tmux-suspend \
   -f https://github.com/MunifTanjim/tmux-suspend.git config/tmux/plugins/tmux-suspend
 git submodule add --name tmux/tmux-window-name \
-  -f https://github.com/ofirgall/tmux-window-name.git config/tmux/plugins/tmux-window-name
+  -f https://github.com/ivuorinen/tmux-window-name.git config/tmux/plugins/tmux-window-name
 git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
 git submodule add --name tmux/tmux-current-pane-hostname \
