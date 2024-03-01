@@ -6,7 +6,9 @@ tap "gesquive/tap"
 tap "github/gh"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
+tap "homebrew/cask"
 tap "homebrew/cask-fonts"
+tap "homebrew/core"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "keith/formulae"
@@ -15,14 +17,6 @@ tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
-# Run your GitHub Actions locally
-brew "act"
-# Mozilla CA certificate store
-brew "ca-certificates"
-# YAML Parser
-brew "libyaml"
-# Checks ansible playbooks for practices and behaviour
-brew "ansible-lint"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -41,26 +35,20 @@ brew "jpeg-xl"
 brew "aom"
 # Apache Portable Runtime library
 brew "apr"
+# Mozilla CA certificate store
+brew "ca-certificates"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
 # Password hashing library and CLI utility
 brew "argon2"
 # Open Source Kubernetes Marketplace
 brew "arkade"
-# Automatic configure script builder
-brew "autoconf"
-# GNU multiple precision arithmetic library
-brew "gmp"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
-# Extendable version manager with support for Ruby, Node.js, Erlang & more
-brew "asdf"
 # Spell checker with better logic than ispell
 brew "aspell"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Official Amazon AWS command-line interface
-brew "awscli"
+# Automatic configure script builder
+brew "autoconf"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -69,8 +57,6 @@ brew "bat"
 brew "icu4c"
 # Yet another cross-platform graphical process/system monitor
 brew "bottom"
-# Switch Apache / Valet / CLI configs between PHP versions
-brew "brew-php-switcher"
 # Software library to render fonts
 brew "freetype"
 # XML-based font configuration API for X Windows
@@ -79,40 +65,26 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
-# Manage compile and link flags for libraries
-brew "pkg-config"
 # Human-friendly and fast alternative to cut and (sometimes) awk
 brew "choose-rust"
 # Cross-platform make
 brew "cmake"
+# GNU multiple precision arithmetic library
+brew "gmp"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
 # Get, unpack, build, and install modules from CPAN
 brew "cpanminus"
 # Open source suite of directory software
 brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
-# Diff that understands syntax
-brew "difftastic"
-# Tool for exploring each layer in a docker image
-brew "dive"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
-# Command-line DNS client
-brew "dog"
 # Lightning-fast linter for .env files written in Rust
 brew "dotenv-linter"
-# Tool to verify that your files are in harmony with your .editorconfig
-brew "editorconfig-checker", link: false
-# Useful examples at the command-line
-brew "eg-examples"
-# OpenType text shaping engine
-brew "harfbuzz"
-# Development kit for the Java programming language
-brew "openjdk"
 # Spellchecker wrapping library
 brew "enchant"
-# Run arbitrary commands when files change
-brew "entr"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Simple, fast and user-friendly alternative to find
@@ -128,7 +100,7 @@ brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
 # Disk usage analyzer with console interface written in Go
-brew "gdu", link: false
+brew "gdu"
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
@@ -139,8 +111,6 @@ brew "git-crypt"
 brew "git-extras"
 # See your latest local git branches, formatted real fancy
 brew "git-recent"
-# Open-source GitLab command-line tool
-brew "glab"
 # Render markdown on the CLI
 brew "glow"
 # GNU implementation of the famous stream editor
@@ -159,6 +129,8 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
+# OpenType text shaping engine
+brew "harfbuzz"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -173,10 +145,6 @@ brew "gzip"
 brew "hadolint"
 # Improved top (interactive process viewer)
 brew "htop"
-# Website copier/offline browser
-brew "httrack"
-# Configurable static site generator
-brew "hugo"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
 # Tools and libraries to manipulate images in many formats
@@ -187,22 +155,22 @@ brew "irssi"
 brew "jq"
 # Network authentication protocol
 brew "krb5"
-# Lazier way to manage everything docker
-brew "lazydocker"
+# Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
+brew "legitify"
 # Postgres C API library
 brew "libpq"
-# Linguistic software and Finnish dictionary
-brew "libvoikko"
-# Rainbows and unicorns in your console!
-brew "lolcat"
+# Manage compile and link flags for libraries
+brew "pkg-config"
+# YAML Parser
+brew "libyaml"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
 brew "lzip"
 # Swiss Army Knife for macOS
 brew "m-cli"
-# Mac App Store command-line interface
-brew "mas"
 # Mongrel of mail user agents (part elm, pine, mush, mh, etc.)
 brew "mutt"
 # NCurses Disk Usage
@@ -219,42 +187,30 @@ brew "nvm"
 brew "openjdk@11"
 # Generate clients, server & docs from an OpenAPI spec (v2, v3)
 brew "openapi-generator"
-# Swiss-army knife of markup format conversion
-brew "pandoc"
+# Development kit for the Java programming language
+brew "openjdk"
 # Highly capable, feature-rich programming language
 brew "perl"
-# General-purpose scripting language
-brew "php@8.1"
 # Coreutils progress viewer
 brew "progress"
-# Simple Python style checker in one Python file
-brew "pycodestyle"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
 brew "pyenv-pip-migrate"
 # Pyenv plugin to manage virtualenv
 brew "pyenv-virtualenv"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.10"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.8"
-# Install various Ruby versions and implementations
-brew "ruby-build"
 # Ruby version manager
 brew "rbenv"
 # RC file (dotfile) management
 brew "rcm"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Safe, concurrent, practical language
+brew "rust"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Autoformat shell script source code
 brew "shfmt"
-# Support CI generation of SBOMs via golang tooling
-brew "spdx-sbom-generator"
-# Version control system designed to be a better CVS
-brew "subversion"
 # Feature-rich console based todo list manager
 brew "task"
 # Terminal user interface for taskwarrior
@@ -273,45 +229,29 @@ brew "tfenv"
 brew "tflint"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
-# Programmatically correct mistyped console commands
-brew "thefuck"
 # Terminal multiplexer
 brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Vulnerability scanner for container images, file systems, and Git repos
-brew "trivy"
-# Modern watch command
-brew "viddy"
 # Tool for creating isolated virtual python environments
 brew "virtualenv"
 # Command-line interface to the WakaTime api
 brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
-# Watch files and take action when they change
-brew "watchman"
 # Internet file retriever
 brew "wget"
-# Personal information dashboard for your terminal
-brew "wtfutil"
 # Check your $HOME for unwanted files and directories
 brew "xdg-ninja", args: ["HEAD"]
 # Hackable, minimal, fast TUI file explorer
 brew "xplr"
 # JavaScript package manager
 brew "yarn"
-# A vulnerability scanner for container images and filesystems
-brew "anchore/grype/grype"
 # High-performance load testing tool, written in Golang.
 brew "ddosify/tap/ddosify"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
-# A simple terminal UI for git commands, written in Go
-brew "jesseduffield/lazygit/lazygit"
 brew "keith/formulae/reminders-cli"
-# High-performance, schema-free, document-oriented database
-brew "mongodb/brew/mongodb-community"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.2"
 # Imagick PHP extension
@@ -334,12 +274,6 @@ brew "shivammathur/extensions/xdebug@8.1"
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
 brew "shivammathur/php/php"
-# General-purpose scripting language
-brew "shivammathur/php/php@7.4"
-# General-purpose scripting language
-brew "shivammathur/php/php@8.0"
-# Ookla Speedtest
-brew "teamookla/speedtest/speedtest"
 # Command-line interface for 1Password
 cask "1password-cli"
 # GPU-accelerated terminal emulator
@@ -354,7 +288,7 @@ cask "coda"
 cask "dbeaver-community"
 # Database version management tool
 cask "dbngin"
-# App to build and share containerized applications and microservices
+# App to build and share containerised applications and microservices
 cask "docker"
 # UI toolkit for building applications for mobile, web and desktop
 cask "flutter"
@@ -376,8 +310,6 @@ cask "font-source-serif-pro"
 cask "fontplop"
 # GIT client
 cask "fork"
-# Set of tools to manage resources and applications hosted on Google Cloud
-cask "google-cloud-sdk"
 # HTTP and GraphQL Client
 cask "insomnia"
 # JetBrains tools manager
@@ -394,7 +326,7 @@ cask "ngrok"
 cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Scheduling application focusing on organization
+# Scheduling application focusing on organisation
 cask "omnifocus"
 # Collaboration platform for API development
 cask "postman"
@@ -440,3 +372,5 @@ cask "vlc"
 cask "voikkospellservice"
 # Rust-based terminal
 cask "warp"
+# Application for generating TOTP and HOTP codes
+cask "yubico-authenticator"
