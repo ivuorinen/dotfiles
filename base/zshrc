@@ -61,17 +61,11 @@ antigen bundle jreese/zsh-titles
 antigen bundle zsh-users/zsh-completions
 
 # these should be available if there's need
-# x-have brew && antigen bundle brew
-# x-have php && antigen bundle php
 x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
 # nvm is a strange beast
 zstyle ':omz:plugins:nvm' autoload yes
 antigen bundle nvm
-# antigen bundle "$DOTFILES/config/zsh/plugins/nvm-auto-use"
-
-# nice to have stuff
-# antigen bundle gcloud
 
 # this needs to be the last item
 antigen bundle zsh-users/zsh-syntax-highlighting
@@ -110,3 +104,11 @@ x-have oh-my-posh && {
   eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
 }
 source "$DOTFILES/config/alias"
+
+# Herd checks for a few environment variables to inject PHP binaries and configurations.
+# Herd injected PHP binary.
+# export PATH="/Users/ivuorinen/Library/Application Support/Herd/bin/":$PATH
+# Herd injected PHP 8.3 configuration.
+# export HERD_PHP_83_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/83/"
+# Herd injected PHP 7.4 configuration.
+# export HERD_PHP_74_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/74/"
