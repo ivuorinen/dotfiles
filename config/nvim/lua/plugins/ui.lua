@@ -1,5 +1,24 @@
 -- luacheck: globals vim
 return {
+  -- Neotree configuration
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+      filesystem = {
+        filtered_items = {
+          always_show = {
+            ".github",
+            ".gitignore",
+            ".editorconfig",
+            ".python-version",
+            ".nvmrc",
+            ".env",
+            ".env.example",
+          },
+        },
+      },
+    },
+  },
   -- Cloak allows you to overlay *'s over defined patterns in defined files.
   -- https://github.com/laytan/cloak.nvim
   { "laytan/cloak.nvim" },
