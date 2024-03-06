@@ -6,9 +6,7 @@ tap "gesquive/tap"
 tap "github/gh"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-fonts"
-tap "homebrew/core"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "keith/formulae"
@@ -41,10 +39,6 @@ brew "ca-certificates"
 brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
-# Password hashing library and CLI utility
-brew "argon2"
-# Open Source Kubernetes Marketplace
-brew "arkade"
 # Spell checker with better logic than ispell
 brew "aspell"
 # Automatic configure script builder
@@ -73,8 +67,6 @@ brew "cmake"
 brew "gmp"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
-# Get, unpack, build, and install modules from CPAN
-brew "cpanminus"
 # Open source suite of directory software
 brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
@@ -175,22 +167,10 @@ brew "m-cli"
 brew "mutt"
 # NCurses Disk Usage
 brew "ncdu"
-# Ambitious Vim-fork focused on extensibility and agility
-brew "neovim"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
-# Manage multiple Node.js versions
-brew "nvm"
-# Development kit for the Java programming language
-brew "openjdk@11"
-# Generate clients, server & docs from an OpenAPI spec (v2, v3)
-brew "openapi-generator"
-# Development kit for the Java programming language
-brew "openjdk"
-# Highly capable, feature-rich programming language
-brew "perl"
 # Coreutils progress viewer
 brew "progress"
 # Python version management
@@ -201,8 +181,6 @@ brew "pyenv-pip-migrate"
 brew "pyenv-virtualenv"
 # Ruby version manager
 brew "rbenv"
-# RC file (dotfile) management
-brew "rcm"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # Safe, concurrent, practical language
@@ -215,8 +193,6 @@ brew "shfmt"
 brew "task"
 # Terminal user interface for taskwarrior
 brew "taskwarrior-tui"
-# Very fast implementation of tldr in Rust
-brew "tealdeer"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Thin wrapper for Terraform e.g. for locking state
@@ -243,45 +219,15 @@ brew "watch"
 brew "wget"
 # Check your $HOME for unwanted files and directories
 brew "xdg-ninja", args: ["HEAD"]
-# Hackable, minimal, fast TUI file explorer
-brew "xplr"
 # JavaScript package manager
 brew "yarn"
-# High-performance load testing tool, written in Golang.
-brew "ddosify/tap/ddosify"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
 brew "keith/formulae/reminders-cli"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.2"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.3"
-# Mcrypt PHP extension
-brew "shivammathur/extensions/mcrypt@8.3"
-# PCOV PHP extension
-brew "shivammathur/extensions/pcov@8.3"
-# Redis PHP extension
-brew "shivammathur/extensions/redis@8.3"
-# Uuid PHP extension
-brew "shivammathur/extensions/uuid@8.3"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@7.4"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.0"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.1"
-# Yaml PHP extension
-brew "shivammathur/extensions/yaml@8.3"
-# General-purpose scripting language
-brew "shivammathur/php/php"
 # Command-line interface for 1Password
 cask "1password-cli"
 # GPU-accelerated terminal emulator
 cask "alacritty"
-# Automatic tiling window manager similar to xmonad
-cask "amethyst"
-# Turn audio CDs and files into audiobooks
-cask "audiobook-builder"
 # Text editor
 cask "coda"
 # Universal database tool and SQL client
@@ -290,8 +236,6 @@ cask "dbeaver-community"
 cask "dbngin"
 # App to build and share containerised applications and microservices
 cask "docker"
-# UI toolkit for building applications for mobile, web and desktop
-cask "flutter"
 # Unofficial overcast.fm podcast app
 cask "fog"
 # Typeface made for developers
@@ -344,12 +288,6 @@ cask "quicklookase"
 cask "quitter"
 # Control your tools with a few keystrokes
 cask "raycast"
-# Move and resize windows using keyboard shortcuts or snap areas
-cask "rectangle"
-# GUI for rsync
-cask "rsyncosx"
-# GUI for rsync
-cask "rsyncui"
 # MySQL/MariaDB database management
 cask "sequel-ace"
 # Plugin for AWS CLI to start and end sessions that connect to managed instances
@@ -370,7 +308,5 @@ cask "visual-studio-code"
 cask "vlc"
 # Spell-checking service for Finnish
 cask "voikkospellservice"
-# Rust-based terminal
-cask "warp"
 # Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
