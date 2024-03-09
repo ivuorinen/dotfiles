@@ -35,10 +35,10 @@ brew "aom"
 brew "apr"
 # Mozilla CA certificate store
 brew "ca-certificates"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
+# Password hashing library and CLI utility
+brew "argon2"
 # Spell checker with better logic than ispell
 brew "aspell"
 # Automatic configure script builder
@@ -47,8 +47,6 @@ brew "autoconf"
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
 # Yet another cross-platform graphical process/system monitor
 brew "bottom"
 # Software library to render fonts
@@ -59,6 +57,8 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
+# Mozilla CA bundle for Python
+brew "certifi"
 # Human-friendly and fast alternative to cut and (sometimes) awk
 brew "choose-rust"
 # Cross-platform make
@@ -121,6 +121,8 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Framework for layout and rendering of i18n text
@@ -149,14 +151,12 @@ brew "jq"
 brew "krb5"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
 brew "legitify"
+# Secure hashing function
+brew "libb2"
 # Postgres C API library
 brew "libpq"
-# Manage compile and link flags for libraries
-brew "pkg-config"
 # YAML Parser
 brew "libyaml"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
@@ -171,6 +171,8 @@ brew "ncdu"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
+# Manage compile and link flags for libraries
+brew "pkg-config"
 # Coreutils progress viewer
 brew "progress"
 # Python version management
@@ -179,6 +181,10 @@ brew "pyenv"
 brew "pyenv-pip-migrate"
 # Pyenv plugin to manage virtualenv
 brew "pyenv-virtualenv"
+# Cryptographic recipes and primitives for Python
+brew "python-cryptography"
+# Install various Ruby versions and implementations
+brew "ruby-build"
 # Ruby version manager
 brew "rbenv"
 # Search tool like grep and The Silver Searcher

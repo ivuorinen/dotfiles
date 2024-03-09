@@ -29,6 +29,8 @@ export BKT_TTL=1m
 
 # brew, https://docs.brew.sh/Manpage
 export HOMEBREW_NO_ENV_HINTS=true
+export HOMEBREW_BUNDLE_MAS_SKIP=true
+export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/homebrew/Brewfile"
 
 # composer, https://getcomposer.org/
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"

@@ -225,7 +225,7 @@ function section_brew
         msg_yay "Done!"
         ;;
       updatebundle)
-        # Updates .dotfiles/Brewfile with descriptions
+        # Updates .dotfiles/homebrew/Brewfile with descriptions
         brew bundle dump \
           --force \
           --file="$BREWFILE" \
