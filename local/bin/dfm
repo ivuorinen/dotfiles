@@ -213,6 +213,8 @@ function section_brew
     "update:Updates and upgrades brew packages"
     "updatebundle:Updates Brewfile with descriptions"
     "autoupdate:Setups brew auto-update and runs it immediately"
+    "leaves:List brew leaves (installed on request)"
+    "clean:Clean up brew packages"
   )
 
   x-have brew && {
@@ -230,6 +232,12 @@ function section_brew
           --force \
           --file="$BREWFILE" \
           --describe && msg_yay "Done!"
+        ;;
+      leaves)
+        brew leaves --installed-on-request
+        ;;
+      clean)
+        brew bundle cleanup --file="$BREWFILE" && msg_yay "Done!"
         ;;
       autoupdate)
         brew autoupdate delete
