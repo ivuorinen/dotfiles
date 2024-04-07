@@ -83,8 +83,8 @@ export OP_CACHE="$XDG_STATE_HOME/1password"
 # pyenv, python environments
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 x-have pyenv && {
-  export PATH="$PYENV_ROOT/shims:$PATH"
   eval "$(pyenv init -)"
 }
 
