@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+REPO=$1
+
+if [ -z "$REPO" ]; then
+  echo "Usage: $0 <repo> (e.g. ivuorinen/dotfiles)"
+  exit 1
+fi
+
+LOCATION=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest" \
+  | sed -Ene '/^[[:blank:]]+"tarball_url":[[:blank:]]"(https:[^"]+)",/s//\1/p')
+
+echo "Downloading and extracting from: $LOCATION"
+
+curl --location --silent "$LOCATION" | tar --extract --gzip --file=-
+
+# vim: set ts=2 sw=2 ft=sh et:
