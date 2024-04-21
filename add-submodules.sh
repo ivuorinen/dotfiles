@@ -10,6 +10,9 @@ git submodule add --name dotbot-include \
 git submodule add --name dotbot-pip \
   -f https://github.com/sobolevn/dotbot-pip.git tools/dotbot-pip
 
+git submodule add --name nvim-kickstart \
+  -f https://github.com/ivuorinen/kickstart.nvim config/nvim-kickstart
+
 # other repos
 git submodule add --name cheat-community \
   -f https://github.com/cheat/cheatsheets.git config/cheat/cheatsheets/community

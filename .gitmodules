@@ -58,3 +58,6 @@
 [submodule "cheat-tldr"]
 	path = config/cheat/cheatsheets/tldr
 	url = https://github.com/ivuorinen/cheatsheet-tldr.git
+[submodule "nvim-kickstart"]
+	path = config/nvim-kickstart
+	url = https://github.com/ivuorinen/kickstart.nvim

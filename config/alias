@@ -51,6 +51,10 @@ alias tmux='tmux new-session -A -s main'
 # tmux: attach or create new session
 alias ta='tmux attach || tmux'
 
+# nvim
+alias nvim-ks='NVIM_APPNAME="nvim-kickstart" nvim'
+alias ks='NVIM_APPNAME="nvim-kickstart" nvim'
+
 # watch with: differences, precise, beep and color
 alias watchx='watch -dpbc'
 # delete .DS_Store files
