@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# age encrypt file with github keys
+
+if ! x-have age; then
+  print "age not installed, could not encrypt file"
+  exit 1
+fi
+
+FILE=$1
+KEYS=$(curl https://github.com/ivuorinen.keys)
+
+age -R "$KEYS" "$FILE" > ${FILE}.age
+
