@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# age decrypt file with github keys
+
+if ! x-have age; then
+  print "age not installed, could not decrypt file"
+  exit 1
+fi
+
+
