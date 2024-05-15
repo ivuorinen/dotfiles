@@ -332,7 +332,7 @@ mouse = "Middle"
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
 [window]
-decorations = "Buttonless"
+decorations = "Full"
 dynamic_title = true
 opacity = 0.98
 
