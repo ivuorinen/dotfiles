@@ -324,21 +324,26 @@ chars = "\u0002/"
 key = "F"
 mods = "Command"
 
+[mouse]
+hide_when_typing = true
+
 [[mouse.bindings]]
 action = "PasteSelection"
 mouse = "Middle"
 
 [selection]
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
+save_to_clipboard = true
 
 [window]
 decorations = "Full"
 dynamic_title = true
 opacity = 0.98
+blur = true
 
 [window.dimensions]
 columns = 200
-lines = 100
+lines = 75
 
 [window.padding]
 x = 5
