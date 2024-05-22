@@ -52,5 +52,9 @@ have_brew()
   fi
 }
 
+if [[ -f "$DOTFILES/config/exports-secret" ]]; then
+  source "$DOTFILES/config/exports-secret"
+fi
+
 source "$DOTFILES/config/exports-shell"
 source "$DOTFILES/config/exports-apps"
