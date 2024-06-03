@@ -1,0 +1,15 @@
+Host vine
+  User ubuntu
+  HostName vine.antiprocess.net
+  IdentityFile ~/.ssh/keys/vine.pem
+
+Host purson
+  User ubuntu
+  HostName purson.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa
+
+Host paimon
+  User ivuorinen
+  HostName paimon.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa
+
