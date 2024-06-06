@@ -61,3 +61,6 @@
 [submodule "nvim-kickstart"]
 	path = config/nvim-kickstart
 	url = https://github.com/ivuorinen/kickstart.nvim
+[submodule "tmux/tmux-dark-notify"]
+	path = config/tmux/plugins/tmux-dark-notify
+	url = https://github.com/erikw/tmux-dark-notify.git
