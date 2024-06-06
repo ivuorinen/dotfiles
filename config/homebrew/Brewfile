@@ -1,5 +1,6 @@
 tap "1password/tap"
 tap "anchore/grype"
+tap "cormacrelf/tap"
 tap "ddosify/tap"
 tap "dm3ch/tap"
 tap "gesquive/tap"
@@ -9,12 +10,18 @@ tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
+tap "k8sgpt-ai/k8sgpt"
 tap "keith/formulae"
 tap "mongodb/brew"
+tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
+# Run your GitHub Actions locally
+brew "act"
+# Simple, modern, secure file encryption
+brew "age"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -35,6 +42,8 @@ brew "aom"
 brew "apr"
 # Mozilla CA certificate store
 brew "ca-certificates"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
 # Password hashing library and CLI utility
@@ -67,6 +76,8 @@ brew "cmake"
 brew "gmp"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
 # Open source suite of directory software
 brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
@@ -139,6 +150,8 @@ brew "gzip"
 brew "hadolint"
 # Improved top (interactive process viewer)
 brew "htop"
+# Portable abstraction of the hierarchical topology of modern architectures
+brew "hwloc"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
 # Tools and libraries to manipulate images in many formats
@@ -147,6 +160,8 @@ brew "imagemagick"
 brew "irssi"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
+# Scanning your k8s clusters, diagnosing, and triaging issues in simple English
+brew "k8sgpt"
 # Network authentication protocol
 brew "krb5"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
@@ -155,6 +170,8 @@ brew "legitify"
 brew "libb2"
 # Postgres C API library
 brew "libpq"
+# Multi-platform support library with a focus on asynchronous I/O
+brew "libuv"
 # YAML Parser
 brew "libyaml"
 # Package manager for the Lua programming language
@@ -171,6 +188,8 @@ brew "ncdu"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
+# General-purpose scripting language
+brew "php"
 # Manage compile and link flags for libraries
 brew "pkg-config"
 # Coreutils progress viewer
@@ -181,8 +200,8 @@ brew "pyenv"
 brew "pyenv-pip-migrate"
 # Pyenv plugin to manage virtualenv
 brew "pyenv-virtualenv"
-# Cryptographic recipes and primitives for Python
-brew "python-cryptography"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
 # Install various Ruby versions and implementations
 brew "ruby-build"
 # Ruby version manager
@@ -227,9 +246,13 @@ brew "wget"
 brew "xdg-ninja", args: ["HEAD"]
 # JavaScript package manager
 brew "yarn"
+# Watcher for macOS 10.14+ light/dark mode changes
+brew "cormacrelf/tap/dark-notify"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
 brew "keith/formulae/reminders-cli"
+# Automated code review tool integrated with any code analysis tools regardless of programming language.
+brew "reviewdog/tap/reviewdog"
 # Command-line interface for 1Password
 cask "1password-cli"
 # GPU-accelerated terminal emulator
@@ -308,6 +331,8 @@ cask "soundsource"
 cask "suspicious-package"
 # Quicklook extension for source files
 cask "syntax-highlight"
+# Configuration application for the Ultimate Hacking Keyboard
+cask "uhk-agent"
 # Open-source code editor
 cask "visual-studio-code"
 # Multimedia player
