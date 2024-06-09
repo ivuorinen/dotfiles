@@ -23,6 +23,18 @@ tap "xwmx/taps"
 brew "act"
 # Simple, modern, secure file encryption
 brew "age"
+# Mozilla CA certificate store
+brew "ca-certificates"
+# Mozilla CA bundle for Python
+brew "certifi"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
+# YAML Parser
+brew "libyaml"
+# Automate deployment, configuration, and upgrading
+brew "ansible"
+# Checks ansible playbooks for practices and behaviour
+brew "ansible-lint"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -41,10 +53,6 @@ brew "jpeg-xl"
 brew "aom"
 # Apache Portable Runtime library
 brew "apr"
-# Mozilla CA certificate store
-brew "ca-certificates"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
 # Password hashing library and CLI utility
@@ -53,6 +61,16 @@ brew "argon2"
 brew "aspell"
 # Automatic configure script builder
 brew "autoconf"
+# Collection of over 500 reusable autoconf macros
+brew "autoconf-archive"
+# GNU multiple precision arithmetic library
+brew "gmp"
+# Manage compile and link flags for libraries
+brew "pkg-config"
+# Automated text file generator
+brew "autogen"
+# Tool for generating GNU Standards-compliant Makefiles
+brew "automake"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -67,18 +85,12 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
-# Mozilla CA bundle for Python
-brew "certifi"
 # Human-friendly and fast alternative to cut and (sometimes) awk
 brew "choose-rust"
 # Cross-platform make
 brew "cmake"
-# GNU multiple precision arithmetic library
-brew "gmp"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
 # Open source suite of directory software
 brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
@@ -161,6 +173,8 @@ brew "imagemagick"
 brew "irssi"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
+# JSON parser for C
+brew "json-c"
 # Scanning your k8s clusters, diagnosing, and triaging issues in simple English
 brew "k8sgpt"
 # Network authentication protocol
@@ -173,14 +187,14 @@ brew "libb2"
 brew "libpq"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
-# YAML Parser
-brew "libyaml"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
 brew "lzip"
 # Swiss Army Knife for macOS
 brew "m-cli"
+# Collection of tools that nobody wrote when UNIX was young
+brew "moreutils"
 # Mongrel of mail user agents (part elm, pine, mush, mh, etc.)
 brew "mutt"
 # NCurses Disk Usage
@@ -189,10 +203,10 @@ brew "ncdu"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
+# ISO-C API and CLI for generating UUIDs
+brew "ossp-uuid"
 # General-purpose scripting language
 brew "php"
-# Manage compile and link flags for libraries
-brew "pkg-config"
 # Coreutils progress viewer
 brew "progress"
 # Python version management
