@@ -29,6 +29,8 @@ packages=(
   github.com/rhysd/actionlint/cmd/actionlint@latest
   # simple terminal UI for git commands
   github.com/jesseduffield/lazygit@latest
+  # Cleans up your $HOME from those pesky dotfiles
+  github.com/doron-cohen/antidot@latest
 )
 
 for pkg in "${packages[@]}"; do
@@ -47,6 +49,11 @@ msg_run "Installing completions for selected packages"
 x-have git-profile && {
   git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
     && msg_ok "Installed completions for git-profile"
+}
+
+x-have antidot && {
+  antidot update \
+    &&  msg_ok "Updated antidot database"
 }
 
 echo ""

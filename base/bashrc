@@ -30,6 +30,10 @@ x-load-configs
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
 
+x-have antidot && {
+  eval "$(antidot init)"
+}
+
 x-have rbenv && {
   eval "$(rbenv init - bash)"
 }
@@ -38,4 +42,3 @@ x-have rbenv && {
 x-have oh-my-posh && {
   eval "$(oh-my-posh init bash --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
 }
-source "$DOTFILES/config/alias"

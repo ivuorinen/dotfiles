@@ -3,6 +3,7 @@ tap "anchore/grype"
 tap "cormacrelf/tap"
 tap "ddosify/tap"
 tap "dm3ch/tap"
+tap "doron-cohen/tap"
 tap "gesquive/tap"
 tap "github/gh"
 tap "homebrew/autoupdate"
@@ -248,6 +249,8 @@ brew "xdg-ninja", args: ["HEAD"]
 brew "yarn"
 # Watcher for macOS 10.14+ light/dark mode changes
 brew "cormacrelf/tap/dark-notify"
+# Cleans up your $HOME from those pesky dotfiles
+brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
 brew "keith/formulae/reminders-cli"

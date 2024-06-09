@@ -18,6 +18,10 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOM
 
 x-load-configs
 
+x-have antidot && {
+  eval "$(antidot init)"
+}
+
 export COMPLETION_WAITING_DOTS=true
 
 if type brew &> /dev/null; then
