@@ -1,0 +1,120 @@
+"$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
+final_space = true
+shell_integration = true
+console_title_template = "{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}"
+version = 2
+
+[[blocks]]
+alignment = "left"
+type = "prompt"
+
+  [[blocks.segments]]
+  foreground = "cyan"
+  style = "powerline"
+  template = "{{ .Icon }}"
+  type = "os"
+
+  [[blocks.segments]]
+  type = "session"
+  style = "plain"
+  template = " {{ if .SSHSession }} {{ .UserName }}@{{ end }}{{ .HostName }}"
+
+  [[blocks.segments]]
+  foreground = "cyan"
+  style = "plain"
+  template = " {{ .Path }} "
+  type = "path"
+
+    [blocks.segments.properties]
+    style = "mixed"
+
+    [blocks.segments.mapped_locations]
+    "~/Code/*" = ""
+
+  [[blocks.segments]]
+  type = "git"
+  style = "plain"
+  foreground = "lightGreen"
+  template = "{{ .UpstreamIcon }}{{ if or (.Staging.Changed) (.Working.Changed) }}({{if .Behind }}\u2193 {{ .Behind }} {{ end }}{{if .Staging.Changed }}\uF046 {{ .Staging.String }} {{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }}| {{ end }}{{ if .Working.Changed }} {{ .Working.String }}{{ end }}){{ end }}"
+
+    [blocks.segments.properties]
+    fetch_status = true
+    fetch_upstream_icon = true
+
+      [blocks.segments.properties.untracked_modes]
+      "~/Code/oh-my-posh/" = "no"
+
+  [[blocks.segments]]
+  type = "terraform"
+  style = "plain"
+  foreground = "#000000"
+  background = "#ebcc34"
+  template = "{{.WorkspaceName}}"
+
+[[blocks]]
+alignment = "left"
+type = "prompt"
+
+  [[blocks.segments]]
+  foreground = "#68a063"
+  style = "plain"
+  template = " {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}"
+  type = "node"
+
+    [blocks.segments.properties]
+    display_mode = "files"
+    fetch_package_manager = true
+    fetch_version = true
+
+  [[blocks.segments]]
+  foreground = "#4063D8"
+  style = "plain"
+  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
+  type = "crystal"
+
+    [blocks.segments.properties]
+    display_mode = "files"
+    fetch_version = true
+
+  [[blocks.segments]]
+  foreground = "#DE3F24"
+  style = "plain"
+  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
+  type = "ruby"
+
+    [blocks.segments.properties]
+    display_mode = "files"
+    fetch_version = true
+
+  [[blocks.segments]]
+  foreground = "#FED142"
+  style = "plain"
+  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
+  type = "python"
+
+    [blocks.segments.properties]
+    display_mode = "context"
+    fetch_virtual_env = false
+
+[[blocks]]
+  alignment = "left"
+  newline = true
+  type = "prompt"
+
+  [[blocks.segments]]
+  background = "transparent"
+  foreground = "lightGreen"
+  foreground_templates = [ "{{ if gt .Code 0 }}red{{ end }}" ]
+  style = "plain"
+  template = "➜"
+  type = "status"
+
+    [blocks.segments.properties]
+    always_enabled = true
+
+[transient_prompt]
+background = "transparent"
+foreground = "lightGreen"
+foreground_templates = [ "{{ if gt .Code 0 }}red{{ end }}" ]
+template = "➜ "
+
