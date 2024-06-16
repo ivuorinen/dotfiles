@@ -18,12 +18,7 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOM
 
 x-load-configs
 
-x-have antidot && {
-  eval "$(antidot init)"
-}
-
 x-have oh-my-posh && {
-  # eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/omp/own.json)"
   eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/omp/own.toml)"
 }
 
@@ -92,6 +87,10 @@ x-have pyenv && {
     add-zsh-hook chpwd tmux-window-name
     tmux-window-name
   }
+}
+
+x-have antidot && {
+  eval "$(antidot init)"
 }
 
 source "$DOTFILES/config/alias"
