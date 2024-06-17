@@ -43,6 +43,12 @@ ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
 # antigen is present
 antigen use oh-my-zsh
 
+export ZSH_TMUX_AUTOSTART=true
+export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
+export ZSH_TMUX_UNICODE=true
+export ZSH_TMUX_AUTOQUIT=false
+export ZSH_TMUX_DEFAULT_SESSION_NAME=main
+
 export NVM_DIR="$XDG_CONFIG_HOME/nvm"
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
 
@@ -51,8 +57,10 @@ export ZSHZ_DATA="$XDG_STATE_HOME/z"
 antigen bundle z
 
 # these should be always available
+antigen bundle tmux
 antigen bundle colored-man-pages
 antigen bundle ssh-agent
+antigen bundle jreese/zsh-titles
 antigen bundle zsh-users/zsh-completions
 
 x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
