@@ -38,7 +38,6 @@ x-have rbenv && {
   eval "$(rbenv init - bash)"
 }
 
-# eval "$(starship init bash)"
 x-have oh-my-posh && {
-  eval "$(oh-my-posh init bash --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
+  eval "$(oh-my-posh init bash --config $DOTFILES/config/omp/own.toml)"
 }

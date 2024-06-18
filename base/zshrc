@@ -19,7 +19,7 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOM
 x-load-configs
 
 x-have oh-my-posh && {
-  eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/omp/own.toml)"
+  eval "$(oh-my-posh init zsh --config $DOTFILES/config/omp/own.toml)"
 }
 
 export COMPLETION_WAITING_DOTS=true
