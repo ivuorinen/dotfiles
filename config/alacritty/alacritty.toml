@@ -1,5 +1,7 @@
 import = [
-  "~/.dotfiles/config/alacritty/theme-active.toml"
+  # Default to night if the copied one doesn't exist.
+  "~/.dotfiles/config/alacritty/theme-night.toml",
+  "~/.config/alacritty/theme-active.toml"
 ]
 
 [env]

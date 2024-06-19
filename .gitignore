@@ -10,6 +10,7 @@ config/cheat/cheatsheets/tldr/*
 config/git/credentials
 config/npm/npmrc
 config/zsh/.zcompdump
+config/alacritty/theme-active.toml
 ssh/local.d/*
 !ssh/local.d/.gitkeep
 !.gitkeep

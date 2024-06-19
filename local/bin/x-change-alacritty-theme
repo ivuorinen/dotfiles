@@ -2,7 +2,7 @@
 # Adapted from https://gist.github.com/xqm32/17777d035930d622d0ff7530bfab61fd
 #
 
-A_DIR="$HOME/.dotfiles/config/alacritty"
+A_DIR="$HOME/.config/alacritty"
 
 set_alacritty_theme() {
   cp -f "$A_DIR/theme-$1.toml" "$A_DIR/theme-active.toml"
