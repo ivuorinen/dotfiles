@@ -25,7 +25,9 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ![screenshot of the oh-my-posh shell](./screenshots/oh-my-posh.png)
 
-![screenshot of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart.png)
+![screenshot of light version of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart-light.png)
+
+![screenshot of dark version of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart-dark.png)
 
 ## Interesting files and locations
 
@@ -109,6 +111,6 @@ portable enough to the user that it should be stored in `$XDG_DATA_HOME`.
 
 `$XDG_DATA_DIRS` defines the preference-ordered set of base directories
 to search for data files in addition to the `$XDG_DATA_HOME` base directory.
-The directories in `$XDG_DATA_DIRS` should be seperated with a colon ':'.
+The directories in `$XDG_DATA_DIRS` should be separated with a colon ':'.
 
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
