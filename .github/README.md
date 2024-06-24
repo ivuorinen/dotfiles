@@ -23,7 +23,9 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ## The looks
 
-![screenshot of tmux with nvim editing this repo](./screenshots/tmux-nvim.png)
+![screenshot of the oh-my-posh shell](./screenshots/oh-my-posh.png)
+
+![screenshot of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart.png)
 
 ## Interesting files and locations
 
