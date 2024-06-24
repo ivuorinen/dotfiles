@@ -1,7 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "final_space": true,
-  "shell_integration": true,
   "console_title_template": "{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}",
   "blocks": [
     {
@@ -112,7 +111,9 @@
         {
           "background": "transparent",
           "foreground": "lightGreen",
-          "foreground_templates": ["{{ if gt .Code 0 }}red{{ end }}"],
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}red{{ end }}"
+          ],
           "properties": {
             "always_enabled": true
           },
@@ -127,7 +128,9 @@
   "transient_prompt": {
     "background": "transparent",
     "foreground": "lightGreen",
-    "foreground_templates": ["{{ if gt .Code 0 }}red{{ end }}"],
+    "foreground_templates": [
+      "{{ if gt .Code 0 }}red{{ end }}"
+    ],
     "template": "\u279c "
   },
   "version": 2
