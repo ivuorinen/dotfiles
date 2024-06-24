@@ -19,7 +19,7 @@ esac
 
 NTFY_VERSION=2.2.0
 NTFY_URL="https://github.com/binwiederhier/ntfy"
-NTFY_DEST="ntfy_${NTFY_VERSION}_${NTFY_ARCH}"
+NTFY_DEST="/tmp/ntfy_${NTFY_VERSION}_${NTFY_ARCH}"
 
 curl -L "$NTFY_URL/releases/download/v${NTFY_VERSION}/${NTFY_DEST}.tar.gz" \
   > "${NTFY_DEST}.tar.gz"
