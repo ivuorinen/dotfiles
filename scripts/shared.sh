@@ -27,6 +27,9 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
+# Other variables
+export OHMYPOSH_CFG="$HOME/.dotfiles/config/omp/own.toml"
+
 # Remove directory from the PATH variable
 # usage: path_remove ~/.local/bin
 function path_remove
