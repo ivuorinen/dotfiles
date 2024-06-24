@@ -31,7 +31,7 @@ Leader: `<ctrl><space>`
     ;       Move to the previously active pane
     =       Choose a paste buffer from a list
     ?       List key bindings
-    D       Choose a client from a list
+    D       Choose and detach a client from a list
     E       Spread panes out evenly
     L       Switch to the last client
     M       Clear the marked pane
