@@ -1,7 +1,7 @@
 Host vine
   User ubuntu
   HostName vine.antiprocess.net
-  IdentityFile ~/.ssh/keys/vine.pem
+  IdentityFile ~/.ssh/id_rsa
 
 Host purson
   User ubuntu
