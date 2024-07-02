@@ -1,25 +1,14 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-export DOTFILES="$HOME/.dotfiles"
-
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-
-# custom variables
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_RUNTIME_DIR="$HOME/.local/run"
+source "$HOME/.dotfiles/config/shared"
 
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 x-load-configs
 
 x-have oh-my-posh && {
-  eval "$(oh-my-posh init zsh --config $DOTFILES/config/omp/own.toml)"
+  eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 }
 
 export COMPLETION_WAITING_DOTS=true
