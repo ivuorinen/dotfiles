@@ -1,26 +1,8 @@
 # this is my bashrc config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-# Defaults
-export DOTFILES="$HOME/.dotfiles"
+source "$HOME/.dotfiles/config/shared"
 
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-
-# custom variables
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_RUNTIME_DIR="$HOME/.local/run"
-
-# Paths
-export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/cargo/bin:$PATH"
-
-source "$DOTFILES/config/exports"
-source "$DOTFILES/config/functions"
-source "$DOTFILES/config/alias"
 x-load-configs
 
 # shellcheck source=../config/fzf/fzf.bash
@@ -30,14 +12,13 @@ x-load-configs
 # Import ssh keys in keychain
 ssh-add -A 2>/dev/null
 
+x-have oh-my-posh && {
+  eval "$(oh-my-posh init bash --config "$DOTFILES/config/omp/own.toml")"
+}
+
+. "$HOME/.local/share/asdf/asdf.sh"
+. "$HOME/.local/share/asdf/completions/asdf.bash"
+
 x-have antidot && {
   eval "$(antidot init)"
-}
-
-x-have rbenv && {
-  eval "$(rbenv init - bash)"
-}
-
-x-have oh-my-posh && {
-  eval "$(oh-my-posh init bash --config $DOTFILES/config/omp/own.toml)"
 }
