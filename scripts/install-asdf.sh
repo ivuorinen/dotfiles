@@ -2,9 +2,7 @@
 #
 # Install asdf
 
-source "${XDG_CONFIG_HOME}/exports"
-source "${XDG_CONFIG_HOME}/alias"
-source "${XDG_CONFIG_HOME}/functions"
+source "${XDG_CONFIG_HOME}/shared"
 source "${DOTFILES}/scripts/shared.sh"
 
 # Installation variables
@@ -32,7 +30,6 @@ asdf plugin add asdf-plugin-manager https://github.com/asdf-community/asdf-plugi
 asdf install asdf-plugin-manager latest
 asdf global asdf-plugin-manager "$(asdf latest asdf-plugin-manager)"
 asdf-plugin-manager version
-asdf-plugin-manager export > "${ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME}"
 asdf-plugin-manager add-all
 
 asdf install

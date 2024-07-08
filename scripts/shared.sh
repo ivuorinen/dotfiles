@@ -12,20 +12,10 @@
     || [[ -n $BASH_VERSION ]] && (return 0 2> /dev/null)
 ) && sourced=1 || sourced=0
 
-export DOTFILES="$HOME/.dotfiles"
+source "$HOME/.dotfiles/config/shared"
+
 DOTFILES_CURRENT_SHELL=$(ps -p $$ -oargs=)
 export DOTFILES_CURRENT_SHELL
-
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-
-# custom variables
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 # Other variables
 export OHMYPOSH_CFG="$HOME/.dotfiles/config/omp/own.toml"
