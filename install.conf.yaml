@@ -16,6 +16,8 @@
     ~/.local/bin:
     ~/.local/run:
     ~/.local/share:
+    ~/.local/share/gnupg:
+      mode: 0700
     ~/.local/state:
     ~/.ssh:
       mode: 0700
