@@ -18,7 +18,7 @@ ripgrep 14.1.0
 semgrep system
 shellcheck 0.10.0
 shfmt 3.8.0
-terraform-ls system
+terraform-ls 0.33.3
 terraform-lsp 0.0.12
 terragrunt 0.60.1
 tf-summarize 0.3.10
