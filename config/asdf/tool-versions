@@ -9,9 +9,9 @@ fd 10.1.0
 github-cli 2.52.0
 hadolint 2.12.0
 kubectl 1.30.2
-lazygit 0.42.0
+lazygit 0.43.1
 neovim system
-nodejs 22.4.0
+nodejs 22.4.1
 pipx 1.6.0
 pre-commit 3.7.1
 ripgrep 14.1.0
@@ -20,7 +20,7 @@ shellcheck 0.10.0
 shfmt 3.8.0
 terraform-ls 0.33.3
 terraform-lsp 0.0.12
-terragrunt 0.60.1
+terragrunt 0.62.0
 tf-summarize 0.3.10
 vault 1.17.2+ent
 yamllint 1.35.1
