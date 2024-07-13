@@ -17,6 +17,14 @@ alias ....="cd ../../.."
 # cd to git root directory
 alias cdgr='cd "$(git root)"'
 
+# interesting folders, and shortcuts
+alias .="cd $HOME"
+alias .b="cd $XDG_BIN_HOME"
+alias .c="cd $HOME/Code"
+alias .d="cd $DOTFILES"
+alias .dx="cd $DOTFILES;ks"
+alias .l="cd $HOME/.local"
+
 # Shortcuts for listing
 alias ll="ls -la"
 alias l="ls -a"
@@ -24,6 +32,7 @@ alias l="ls -a"
 # Prevent common typos
 alias cd..="cd .."
 alias sl="ls"
+alias ls-="ls -$1"
 
 # List only directories
 alias lsd="ls -lF | grep '^d'"
