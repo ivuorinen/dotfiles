@@ -23,7 +23,6 @@ asdf-plugin-manager add-all
 asdf install
 
 ASDF_INSTALLABLES=(
-  "nodejs:github.com/asdf-vm/asdf-nodejs.git"
   "1password-cli:github.com/NeoHsu/asdf-1password-cli.git"
   "age:github.com/threkk/asdf-age.git"
   "bottom:github.com/carbonteq/asdf-btm.git"
@@ -32,20 +31,22 @@ ASDF_INSTALLABLES=(
   "eza:github.com/lwiechec/asdf-eza.git"
   "fd:gitlab.com/wt0f/asdf-fd.git"
   "github-cli:github.com/bartlomiejdanek/asdf-github-cli.git"
+  "golang:github.com/asdf-community/asdf-golang.git"
   "hadolint:github.com/devlincashman/asdf-hadolint.git"
   "kubectl:github.com/asdf-community/asdf-kubectl.git"
   "lazygit:github.com/nklmilojevic/asdf-lazygit.git"
+  "nodejs:github.com/asdf-vm/asdf-nodejs.git"
   "pipx:github.com/yozachar/asdf-pipx.git"
   "pre-commit:github.com/jonathanmorley/asdf-pre-commit.git"
   "ripgrep:gitlab.com/wt0f/asdf-ripgrep.git"
   "semgrep:github.com/brentjanderson/asdf-semgrep.git"
-  "terraform-ls:github.com/asdf-community/asdf-hashicorp.git"
-  "vault:github.com/asdf-community/asdf-hashicorp.git"
   "shellcheck:github.com/luizm/asdf-shellcheck.git"
   "shfmt:github.com/luizm/asdf-shfmt.git"
+  "terraform-ls:github.com/asdf-community/asdf-hashicorp.git"
   "terraform-lsp:github.com/bartlomiejdanek/asdf-terraform-lsp.git"
   "terragrunt:github.com/ohmer/asdf-terragrunt.git"
   "tf-summarize:github.com/adamcrews/asdf-tf-summarize.git"
+  "vault:github.com/asdf-community/asdf-hashicorp.git"
   "yamllint:github.com/ericcornelissen/asdf-yamllint.git"
   "yq:github.com/sudermanjr/asdf-yq.git"
 )

@@ -70,7 +70,7 @@ function section_install
       # $0 install dotenv
       $0 install fzf
       # $0 install gh
-      $0 install go
+      # $0 install go
       $0 install cheat-databases
       $0 install imagick
       # $0 install neofetch
