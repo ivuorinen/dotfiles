@@ -53,7 +53,7 @@ x-have git-profile && {
 
 x-have antidot && {
   antidot update \
-    &&  msg_ok "Updated antidot database"
+    && msg_ok "Updated antidot database"
 }
 
 echo ""

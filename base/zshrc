@@ -78,12 +78,12 @@ x-have pyenv && {
   # Autoupdate tmux window name
   TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
   [ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
-    tmux-window-name()
+    tmux_window_name()
     {
       ($TMUX_WINDOW_NAME_PLUGIN &)
     }
-    add-zsh-hook chpwd tmux-window-name
-    tmux-window-name
+    add-zsh-hook chpwd tmux_window_name
+    tmux_window_name
   }
 }
 
@@ -95,8 +95,8 @@ source "$DOTFILES/config/alias"
 
 # Herd checks for a few environment variables to inject PHP binaries and configurations.
 # Herd injected PHP binary.
-# export PATH="/Users/ivuorinen/Library/Application Support/Herd/bin/":$PATH
+# export PATH="/Users/ivuorinen/Library/Application\ Support/Herd/bin/":$PATH
 # Herd injected PHP 8.3 configuration.
-# export HERD_PHP_83_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/83/"
+# export HERD_PHP_83_INI_SCAN_DIR="/Users/ivuorinen/Library/Application\ Support/Herd/config/php/83/"
 # Herd injected PHP 7.4 configuration.
-# export HERD_PHP_74_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/74/"
+# export HERD_PHP_74_INI_SCAN_DIR="/Users/ivuorinen/Library/Application\ Support/Herd/config/php/74/"

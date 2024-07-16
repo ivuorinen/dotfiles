@@ -2,12 +2,12 @@
 # Load our configuration files
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
-set -euo pipefail
-
-# Set verbosity with VERBOSE=1 x-load-configs
+# Enable verbosity with VERBOSE=1 x-load-configs
 VERBOSE="${VERBOSE:=0}"
+# Enable debugging with DEBUG=1 x-load-configs
+DEBUG="${DEBUG:=0}"
 
-[ "$VERBOSE" = "1" ] && {
+[ "$DEBUG" = "1" ] && {
   set -x
 }
 
@@ -37,7 +37,7 @@ loadConfigFiles()
   HOST_FILE=$CONFIG_FILE-$HOST
   SECRET_HOST=$HOST_FILE-secret
 
-  [ "$VERBOSE" = "1" ] && configMsg "?" "$CONFIG_FILE"
+  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$CONFIG_FILE"
 
   # global (exports|alias|functions) FILENAME for all hosts
   # shellcheck source=../config/exports
@@ -47,19 +47,19 @@ loadConfigFiles()
 
   # global secret FILENAME, git ignored
   # shellcheck source=../config/exports-secret
-  [ "$VERBOSE" = "1" ] && configMsg "?" "$SECRET_FILE"
+  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$SECRET_FILE"
   [ -r "$SECRET_FILE" ] && {
     source "$SECRET_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_FILE"
   }
   # host specific (exports|alias|functions) FILENAME
   # shellcheck source=../config/exports
-  [ "$VERBOSE" = "1" ] && configMsg "?" "$HOST_FILE"
+  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$HOST_FILE"
   [ -r "$HOST_FILE" ] && {
     source "$HOST_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$HOST_FILE"
   }
   # host specific (exports|alias|functions) FILENAME, git ignored
   # shellcheck source=../config/exports
-  [ "$VERBOSE" = "1" ] && configMsg "?" "$SECRET_HOST"
+  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$SECRET_HOST"
   [ -r "$SECRET_HOST" ] && {
     source "$SECRET_HOST" \
       && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_HOST"

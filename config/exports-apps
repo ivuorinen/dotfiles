@@ -69,13 +69,13 @@ export GOBIN="$XDG_BIN_HOME"
 
 # Herd, herd.laravel.com
 # Herd injected PHP binary.
-export PATH="$HOME/Library/Application Support/Herd/bin/":$PATH
+export PATH="$HOME/Library/Application\ Support/Herd/bin/":$PATH
 
 x-have herd && {
   # Herd injected PHP 8.3 configuration.
-  export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
+  export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application\ Support/Herd/config/php/83/"
   # Herd injected PHP 7.4 configuration.
-  export HERD_PHP_74_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/74/"
+  export HERD_PHP_74_INI_SCAN_DIR="$HOME/Library/Application\ Support/Herd/config/php/74/"
 }
 
 # nb, https://xwmx.github.io/nb/

@@ -2,6 +2,4 @@
 
 legacy_version_file=yes
 use_release_candidates=no
-plugin_repository_last_check_duration=60
-disable_plugin_short_name_repository=no
 concurrency=auto

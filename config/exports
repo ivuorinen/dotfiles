@@ -37,12 +37,16 @@ have()
 # function to run dark-notify and change alacritty theme
 # it uses flock to prevent running multiple instances
 # install flock with `brew install flock` on macOS
-function darknotify-alacritty {
+function darknotify-alacritty
+{
   have flock && [[ -f /tmp/dark-notify-alacritty.lock ]] && return
   have dark-notify && {
     # true is used to prevent the command show it was backgrounded
-    true & flock /tmp/dark-notify-alacritty.lock dark-notify -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
+    true \
+      && flock /tmp/dark-notify-alacritty.lock dark-notify -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
   }
+
+  return 0
 }
 darknotify-alacritty
 

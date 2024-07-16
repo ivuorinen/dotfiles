@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/base-configs": "^1.1.0"
+    "@ivuorinen/base-configs": "^1.1.0",
+    "prettier-plugin-sh": "^0.14.0"
   },
   "packageManager": "yarn@1.22.22"
 }

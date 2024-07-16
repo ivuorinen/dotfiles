@@ -27,3 +27,9 @@ space_redirects    = true
 keep_padding       = false
 function_next_line = true # --func-next-line
 
+# Ignore the entire "third_party" directory when calling shfmt on directories,
+# such as "shfmt -l -w .". When formatting files directly,
+# like "shfmt -w third_party/foo.sh" or "shfmt --filename=third_party/foo.sh",
+# the ignore logic is applied only when the --apply-ignore flag is given.
+[{tools/**,local/bin/asdf/**,config/cheat/cheatsheets/**}]
+ignore = true

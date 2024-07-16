@@ -16,6 +16,4 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="$HOME/.local/run"
 
-source "$DOTFILES/config/exports"
-source "$DOTFILES/config/alias"
-
+source "$DOTFILES/config/shared"
