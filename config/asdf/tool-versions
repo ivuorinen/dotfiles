@@ -21,7 +21,7 @@ shellcheck 0.10.0
 shfmt 3.8.0
 terraform-ls 0.33.3
 terraform-lsp 0.0.12
-terragrunt 0.62.0
+terragrunt 0.62.1
 tf-summarize 0.3.10
 vault 1.17.2+ent
 yamllint 1.35.1
