@@ -46,7 +46,6 @@ export ZSHZ_DATA="$XDG_STATE_HOME/z"
 antigen bundle z
 
 # these should be always available
-antigen bundle asdf
 antigen bundle tmux
 antigen bundle colored-man-pages
 antigen bundle ssh-agent
