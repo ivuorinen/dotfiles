@@ -18,6 +18,8 @@ git submodule add --name cheat-community \
   -f https://github.com/cheat/cheatsheets.git config/cheat/cheatsheets/community
 git submodule add --name cheat-tldr \
   -f https://github.com/ivuorinen/cheatsheet-tldr.git config/cheat/cheatsheets/tldr
+git submodule add --name asdf \
+  -f https://github.com/asdf-vm/asdf.git local/bin/asdf
 
 # tmux plugin manager and plugins
 git submodule add --name tmux/tmux-continuum \

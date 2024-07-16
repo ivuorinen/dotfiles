@@ -5,23 +5,11 @@
 source "${XDG_CONFIG_HOME}/shared"
 source "${DOTFILES}/scripts/shared.sh"
 
-# Installation variables
-ASDF_GIT="https://github.com/asdf-vm/asdf.git"
-ASDF_PATH="${XDG_DATA_HOME}/asdf"
-
-if [ ! -d "$ASDF_PATH" ]; then
-  git clone --depth 1 "$ASDF_GIT" "$ASDF_PATH" \
-    --branch v0.14.0
-
-  msg_done "asdf ($ASDF_PATH/) installed"
-else
-  msg_done "asdf ($ASDF_PATH/) already installed"
-fi
-
-export PATH="${ASDF_PATH}/bin:$PATH"
+export ASDF_DIR="${XDG_BIN_HOME}/asdf"
+export PATH="${ASDF_DIR}/bin:$PATH"
 
 msg "Sourcing asdf in your shell"
-. "$ASDF_PATH/asdf.sh"
+. "$ASDF_DIR/asdf.sh"
 
 # Update asdf, and plugins
 asdf update

@@ -64,3 +64,6 @@
 [submodule "tmux/tmux-dark-notify"]
 	path = config/tmux/plugins/tmux-dark-notify
 	url = https://github.com/erikw/tmux-dark-notify.git
+[submodule "asdf"]
+	path = local/bin/asdf
+	url = https://github.com/asdf-vm/asdf.git

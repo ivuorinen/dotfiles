@@ -16,8 +16,8 @@ x-have oh-my-posh && {
   eval "$(oh-my-posh init bash --config "$DOTFILES/config/omp/own.toml")"
 }
 
-. "$HOME/.local/share/asdf/asdf.sh"
-. "$HOME/.local/share/asdf/completions/asdf.bash"
+. "$XDG_BIN_HOME/asdf/asdf.sh"
+. "$XDG_BIN_HOME/asdf/completions/asdf.bash"
 
 x-have antidot && {
   eval "$(antidot init)"
