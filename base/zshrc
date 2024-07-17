@@ -37,9 +37,6 @@ export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false
 export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
-export NVM_DIR="$XDG_CONFIG_HOME/nvm"
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
-
 # z, the zsh version
 export ZSHZ_DATA="$XDG_STATE_HOME/z"
 antigen bundle z
@@ -52,10 +49,6 @@ antigen bundle jreese/zsh-titles
 antigen bundle zsh-users/zsh-completions
 
 x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-
-# nvm is a strange beast
-zstyle ':omz:plugins:nvm' autoload yes
-antigen bundle nvm
 
 # this needs to be the last item
 antigen bundle zsh-users/zsh-syntax-highlighting
@@ -88,8 +81,6 @@ x-have pyenv && {
 x-have antidot && {
   eval "$(antidot init)"
 }
-
-source "$DOTFILES/config/alias"
 
 # Herd checks for a few environment variables to inject PHP binaries and configurations.
 # Herd injected PHP binary.
