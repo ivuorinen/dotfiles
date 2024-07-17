@@ -65,7 +65,7 @@ function section_install
       $0 install asdf
       # $0 install ohmybash
       # $0 install pip
-      $0 install cargo
+      # $0 install cargo
       $0 install composer
       # $0 install dotenv
       $0 install fzf

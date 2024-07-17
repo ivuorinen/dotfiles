@@ -34,6 +34,7 @@ export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
 export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
 export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
+export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
 export PATH="${ASDF_DIR}/bin:${PATH}"
 
 # bob manages nvim versions

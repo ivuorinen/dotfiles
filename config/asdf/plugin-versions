@@ -15,6 +15,7 @@ nodejs                https://github.com/asdf-vm/asdf-nodejs.git                
 pipx                  https://github.com/yozachar/asdf-pipx.git                   31db618
 pre-commit            https://github.com/jonathanmorley/asdf-pre-commit.git       26bfc42
 ripgrep               https://gitlab.com/wt0f/asdf-ripgrep.git                    e836665
+rust                  https://github.com/code-lever/asdf-rust.git                 95acf4f
 semgrep               https://github.com/brentjanderson/asdf-semgrep.git          13ff78b
 shellcheck            https://github.com/luizm/asdf-shellcheck.git                780d78d
 shfmt                 https://github.com/luizm/asdf-shfmt.git                     a42c5ff
