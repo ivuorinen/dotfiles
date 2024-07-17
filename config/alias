@@ -139,7 +139,7 @@ weather()
 }
 
 # Docker
-ssh-docker()
+ssh_docker()
 {
   docker exec -it "$@" bash
 }

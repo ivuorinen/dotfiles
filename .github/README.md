@@ -8,6 +8,9 @@ this repository will live accordingly.
 Please for the love of everything good do not use these 1:1 as your own dotfiles,
 fork or download the repo as a zip and go from there with your own configs.
 
+It would be nice if you'd add an issue linking to your fork or repo so I can
+see what interesing stuff you've done with it. Sharing is caring.
+
 ## Setup
 
 ### First time setup
@@ -35,7 +38,7 @@ fork or download the repo as a zip and go from there with your own configs.
 
 | Path                | Description                                  |
 | ------------------- | -------------------------------------------- |
-| `.github`           | GitHub Repository configuration files.       |
+| `.github`           | GitHub Repository configuration files, meta. |
 | `hosts/{hostname}/` | Configs that should apply to that host only. |
 | `local/bin`         | Helper scripts that I've collected or wrote. |
 | `scripts`           | Setup scripts.                               |
@@ -51,7 +54,9 @@ fork or download the repo as a zip and go from there with your own configs.
 
 ### dfm - the dotfiles manager
 
-`.local/bin/dfm` is a shell script that has some tools that help with dotfiles management.
+[`.local/bin/dfm`][dfm] is a shell script that has some tools that help with dotfiles management.
+
+Running `dfm` gives you a list of available commands.
 
 ## Configuration
 
@@ -66,51 +71,8 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 | `$XDG_DATA_HOME`   | `$HOME/.local/share` | User-specific data files                       |
 | `$XDG_STATE_HOME`  | `$HOME/.local/state` | App state that should persist between restarts |
 
-#### XDG_BIN_HOME (`$HOME/.local/bin`)
+Please see [docs/folders.md][docs-folders] for more information.
 
-`$XDG_BIN_HOME` defines directory that contains local binaries.
-
-User-specific executable files may be stored in `$HOME/.local/bin`.
-Distributions should ensure this directory shows up in the UNIX `$PATH`
-environment variable, at an appropriate place.
-
-#### XDG_DATA_HOME (`$HOME/.local/share`)
-
-`$XDG_DATA_HOME` defines the base directory relative to which
-user-specific _data files_ should be stored.
-
-If `$XDG_DATA_HOME` is either not set or empty,
-a default equal to `$HOME/.local/share` should be used.
-
-#### XDG_CONFIG_HOME (`$HOME/.config`)
-
-`$XDG_CONFIG_HOME` defines the base directory relative to which
-user-specific _configuration files_ should be stored.
-
-If `$XDG_CONFIG_HOME` is either not set or empty,
-a default equal to `$HOME/.config` should be used.
-
-#### XDG_STATE_HOME (`$HOME/.local/state`)
-
-`$XDG_STATE_HOME` defines the base directory relative to which
-user-specific _state files_ should be stored.
-
-If `$XDG_STATE_HOME` is either not set or empty,
-a default equal to `$HOME/.local/state` should be used.
-
-The `$XDG_STATE_HOME` contains _state data_ that should
-_persist between (application) restarts_, but that is not important or
-portable enough to the user that it should be stored in `$XDG_DATA_HOME`.
-
-- It may contain:
-  - actions history (logs, history, recently used files, …)
-  - current state of the application that can be reused
-    on a restart (view, layout, open files, undo history, …)
-
-#### XDG_DATA_DIRS
-
-`$XDG_DATA_DIRS` defines the preference-ordered set of base directories
-to search for data files in addition to the `$XDG_DATA_HOME` base directory.
-The directories in `$XDG_DATA_DIRS` should be separated with a colon ':'.
-
+[dfm]: https://github.com/ivuorinen/dotfiles/blob/main/local/bin/dfm
+[docs-folders]: https://github.com/ivuorinen/dotfiles/blob/main/docs/folders.md
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
