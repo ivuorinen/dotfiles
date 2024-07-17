@@ -1,11 +1,10 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-source "$HOME/.dotfiles/config/shared"
+eval "$HOME/.dotfiles/config/shared.sh"
+x-load-configs
 
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-x-load-configs
 
 x-have oh-my-posh && {
   eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"

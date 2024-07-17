@@ -1,7 +1,7 @@
 # this is my bashrc config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-source "$HOME/.dotfiles/config/shared"
+source "$HOME/.dotfiles/config/shared.sh"
 
 x-load-configs
 

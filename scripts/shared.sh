@@ -12,7 +12,7 @@
     || [[ -n $BASH_VERSION ]] && (return 0 2> /dev/null)
 ) && sourced=1 || sourced=0
 
-source "$HOME/.dotfiles/config/shared"
+source "$HOME/.dotfiles/config/shared.sh"
 
 DOTFILES_CURRENT_SHELL=$(ps -p $$ -oargs=)
 export DOTFILES_CURRENT_SHELL

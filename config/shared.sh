@@ -21,4 +21,3 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOM
 source "$DOTFILES/config/exports"
 source "$DOTFILES/config/functions"
 source "$DOTFILES/config/alias"
-
