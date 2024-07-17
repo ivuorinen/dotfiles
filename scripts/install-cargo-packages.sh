@@ -2,26 +2,11 @@
 # Install cargo/rust packages.
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/config/exports"
-source "$HOME/.dotfiles/config/alias"
-source "$HOME/.dotfiles/config/functions"
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install rust/cargo packages"
 
-! x-have cargo && {
-  msg "cargo could not be found. installing cargo with rustup.rs"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
-}
-
 source "$CARGO_HOME/env"
-
-! x-have rustup && {
-  msg_err "rustup could not be found. Aborting..."
-  exit 1
-}
-
-rustup default stable
 
 # If we have cargo install-update, use it first
 x-have cargo-install-update && {

@@ -3,7 +3,7 @@
 # Install ntfy
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
 x-have "ntfy" && msg "ntfy already installed" && exit 0

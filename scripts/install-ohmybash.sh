@@ -3,7 +3,7 @@
 # Install oh-my-bash
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 export OSH="$HOME/.local/share/oh-my-bash"
 

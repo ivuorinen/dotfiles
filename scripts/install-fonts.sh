@@ -2,7 +2,7 @@
 # Install NerdFonts
 #
 # shellcheck source="shared.sh"
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 GIT_REPO="https://github.com/ryanoasis/nerd-fonts.git"
 TMP_PATH="$XDG_CACHE_HOME/nerd-fonts"

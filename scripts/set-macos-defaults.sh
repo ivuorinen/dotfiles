@@ -9,7 +9,7 @@
 [ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
 
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 msg_run "Starting to set macOS defaults, these require sudo privileges:"
 

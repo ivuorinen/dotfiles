@@ -3,7 +3,7 @@
 # Install fzf
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 FZF_GIT="https://github.com/junegunn/fzf.git"
 FZF_PATH="${XDG_CONFIG_HOME}/fzf"

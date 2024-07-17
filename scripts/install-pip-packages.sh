@@ -2,7 +2,7 @@
 # Install python/pip packages.
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install pip packages"
 

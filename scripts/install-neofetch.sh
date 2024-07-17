@@ -3,7 +3,7 @@
 # Install neofetch from source
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 NEOFETCH_VERSION="7.1.0"
 NEOFETCH_REPO="https://github.com/dylanaraps/neofetch"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 set -e
 
 cd "$DOTFILES" || exit

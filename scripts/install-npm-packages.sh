@@ -2,7 +2,7 @@
 # Install npm packages globally.
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 msg "Starting to install npm packages"
 

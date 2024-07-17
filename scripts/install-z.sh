@@ -3,7 +3,7 @@
 # Install z
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 Z_GIT_PATH="https://github.com/rupa/z.git"
 Z_BIN_PATH="$XDG_BIN_HOME/z"

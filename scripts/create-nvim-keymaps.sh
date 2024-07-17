@@ -2,10 +2,7 @@
 # Create file containing key mappings for Neovim
 # Usage: ./create-nvim-keymaps.sh
 
-source "$HOME/.dotfiles/scripts/shared.sh"
-source "$HOME/.dotfiles/config/exports"
-source "$HOME/.dotfiles/config/alias"
-source "$HOME/.dotfiles/config/functions"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 DEST="$HOME/.dotfiles/docs/nvim-keybindings.md"
 

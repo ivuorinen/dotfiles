@@ -2,7 +2,7 @@
 # Install PHP Package Manager Composer
 #
 # shellcheck source="shared.sh"
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 ! x-have "php" && msg_err "PHP Not Available, cannot install composer" && exit 0
 

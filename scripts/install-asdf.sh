@@ -2,7 +2,7 @@
 #
 # Install asdf
 
-source "${XDG_CONFIG_HOME}/shared"
+source "${XDG_CONFIG_HOME}/shared.sh"
 source "${DOTFILES}/scripts/shared.sh"
 
 export ASDF_DIR="${XDG_BIN_HOME}/asdf"

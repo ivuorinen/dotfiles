@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2231,SC2034,SC2181,SC2068
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/scripts/shared.sh"
 
 PBB_REQUIRED_TOOLS=(git cheat)
 for t in ${PBB_REQUIRED_TOOLS[@]}; do
