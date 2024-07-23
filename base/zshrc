@@ -4,14 +4,16 @@
 # export VERBOSE=1
 # export DEBUG=1
 
+export DOTFILES="$HOME/.dotfiles"
+
+source "$DOTFILES/config/shared.sh"
+
 x-path-prepend "/usr/local/bin"
 x-path-prepend "/opt/homebrew/bin"
 x-path-prepend "$HOME/.local/share/cargo/bin"
 x-path-prepend "$HOME/.local/share/bob/nvim-bin"
 x-path-prepend "$HOME/.local/bin"
 x-path-prepend "$DOTFILES/local/bin"
-
-x-load-configs
 
 eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 

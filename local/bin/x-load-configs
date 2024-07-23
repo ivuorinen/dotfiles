@@ -93,6 +93,5 @@ config_msg "VERBOSE=1" "Verbose mode enabled"
 config_msg "HOST" "$CONFIG_HOST"
 
 load_config_files "$(config_file_path "exports")"
-load_config_files "$(config_file_path "functions")"
 load_config_files "$(config_file_path "alias")"
 exit 0

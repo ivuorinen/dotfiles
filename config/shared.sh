@@ -19,10 +19,10 @@ DEBUG="${DEBUG:-0}"
 # Explicitly set XDG folders, if not already set
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 [ -z "$XDG_CONFIG_HOME" ] && export XDG_CONFIG_HOME="$HOME/.config"
-[ -z "$XDG_DATA_HOME" ] && export $XDG_DATA_HOME="$HOME/.local/share"
-[ -z "$XDG_STATE_HOME" ] && export $XDG_STATE_HOME="$HOME/.local/state"
-[ -z "$XDG_BIN_HOME" ] && export XDG_BIN_HOME="$HOME/.local/bin"
+[ -z "$XDG_DATA_HOME" ] && export XDG_DATA_HOME="$HOME/.local/share"
 [ -z "$XDG_CACHE_HOME" ] && export XDG_CACHE_HOME="$HOME/.cache"
+[ -z "$XDG_STATE_HOME" ] && export XDG_STATE_HOME="$HOME/.local/state"
+[ -z "$XDG_BIN_HOME" ] && export XDG_BIN_HOME="$HOME/.local/bin"
 
 # Paths
 x-path-prepend "/usr/local/bin"

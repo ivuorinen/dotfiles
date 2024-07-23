@@ -42,7 +42,6 @@ main()
   fi
 
   check_command "$1"
-  return 0
 }
 
 main "$@"
