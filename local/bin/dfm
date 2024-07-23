@@ -14,19 +14,92 @@
 
 SCRIPT=$(basename "$0")
 
+if ! declare -f msg > /dev/null; then
+  # Function to print messages if VERBOSE is enabled
+  # $1 - message (string)
+  msg()
+  {
+    [ "$VERBOSE" -eq 1 ] && echo "$1"
+    return 0
+  }
+fi
+
+if ! declare -f msg_err > /dev/null; then
+  # Function to print error messages and exit
+  # $1 - error message (string)
+  msg_err()
+  {
+    echo "(!) ERROR: $1" >&2
+    exit 1
+  }
+fi
+
+if ! declare -f msg_done > /dev/null; then
+  # Function to print done message
+  # $1 - message (string)
+  msg_done()
+  {
+    echo "✓ $1"
+    return 0
+  }
+fi
+
 VERSION_NVM="v0.39.5"
 
-export DOTFILES="$HOME/.dotfiles"
-# shellcheck source=./../../scripts/shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
-source "$DOTFILES/config/exports"
-source "$DOTFILES/config/alias"
-source "$DOTFILES/config/functions"
-
 # Loads configs for better installation experience
-x-load-configs
+source "$DOTFILES/config/shared.sh"
 
-function section_install
+source "${DOTFILES}/local/bin/msgr"
+
+# -- Menu builder -- #
+menu_section()
+{
+  LINE=$(printf '%-18s [ %-15s ]\n' "$1" "$2")
+  echo -e " $(__log_marker) $LINE"
+}
+menu_item()
+{
+  LINE=$(printf '%-15s %-30s\n' "$1" "$2")
+  echo -e "$(__log_indent)$(__log_marker) $LINE"
+}
+
+# Takes a bash array ("cow:moo", "dinosaur:roar") and loops
+# through the keys to build menu section listing.
+menu_usage_header()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  KEYS=""
+  for item in "${MENU_ARRAY[@]}"; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    KEYS+="${CMD} | "
+  done
+
+  # "???" removes 3 last characters, being " | " from the end
+  menu_section "$MENU_CMD" "${KEYS%???}"
+}
+
+# Takes the usage command "$0 dotfiles" and a
+# bash array ("cow:moo" "dinosaur:roar") and loops
+# through in building a menu for dfm command usage listing.
+menu_usage()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  msg "$MENU_CMD"
+
+  for item in "${MENU_ARRAY[@]}"; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    DESC=$(echo "${item}" | awk -F ":" '{print $2}')
+    menu_item "$CMD" "$DESC"
+  done
+}
+
+section_install()
 {
   USAGE_PREFIX="$SCRIPT install <command>"
 
@@ -56,7 +129,6 @@ function section_install
   case "$1" in
     all)
       msgr msg "Starting to install all and reloading configurations..."
-      x-load-configs
       $0 install macos
       $0 install fonts
       $0 install antigen
@@ -79,7 +151,7 @@ function section_install
       $0 install ntfy
       $0 install z
       msgr msg "Reloading configurations again..."
-      x-load-configs
+      source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
       ;;
     antigen)
@@ -210,7 +282,7 @@ function section_install
   esac
 }
 
-function section_brew
+section_brew()
 {
   USAGE_PREFIX="$SCRIPT brew <command>"
 
@@ -258,7 +330,7 @@ function section_brew
   ! x-have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
-function section_helpers
+section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
   MENU=(
@@ -274,7 +346,7 @@ function section_helpers
   esac
 }
 
-function section_docs
+section_docs()
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
 
@@ -288,7 +360,7 @@ function section_docs
   esac
 }
 
-function section_dotfiles
+section_dotfiles()
 {
   USAGE_PREFIX="$SCRIPT dotfiles <command>"
 
@@ -344,7 +416,7 @@ function section_dotfiles
   esac
 }
 
-function section_check
+section_check()
 {
   USAGE_PREFIX="$SCRIPT check <command>"
   X_HOSTNAME=$(hostname)
@@ -369,7 +441,7 @@ function section_check
 }
 
 # Secret menu for visual tests
-function section_tests
+section_tests()
 {
   USAGE_PREFIX="$SCRIPT tests <command>"
 
@@ -398,7 +470,7 @@ function section_tests
   esac
 }
 
-function usage
+usage()
 {
   echo ""
   msg_prompt "Usage: $SCRIPT <section> <command>"

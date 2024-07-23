@@ -4,29 +4,40 @@
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 
-[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-! x-have xcode-select \
-  && msg_err "xcode-select could not be found, skipping" \
-  && exit 0
+# Check if the script is running on macOS
+if [ "$(uname)" != "Darwin" ]; then
+  echo "Not a macOS system"
+  exit 0
+fi
+
+# Check if xcode-select is available
+if ! command -v xcode-select &> /dev/null; then
+  msg_err "xcode-select could not be found, skipping"
+  exit 0
+fi
 
 # Ask for the administrator password upfront
 sudo -v
 
-# Keep-alive: update existing `sudo` time stamp until `settler` has finished
-while true; do
-  sudo -n true
-  sleep 60
-  kill -0 "$$" || exit
-done 2> /dev/null &
+# Keep-alive: update existing `sudo` time stamp until the script has finished
+keep_alive_sudo()
+{
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2> /dev/null &
+}
 
 XCODE_TOOLS_PATH=$(xcode-select -p)
 XCODE_SWIFT_PATH="$XCODE_TOOLS_PATH/usr/bin/swift"
 
-# Modified from https://unix.stackexchange.com/a/408305
-if [ -a "$XCODE_SWIFT_PATH" ]; then
-  echo "You have swift from xcode-select. Continuing..."
-else
+# Function to prompt for XCode CLI Tools installation
+prompt_xcode_install()
+{
   XCODE_MESSAGE="$(
     osascript -e \
       'tell app "System Events" to display dialog "Please click install when Command Line Developer Tools appears"'
@@ -36,11 +47,25 @@ else
     xcode-select --install
   else
     echo "You have cancelled the installation, please rerun the installer."
-    exit
+    exit 1
   fi
-fi
+}
 
-until [ -f "$XCODE_SWIFT_PATH" ]; do
-  echo -n "."
-  sleep 1
-done
+# Main function
+main()
+{
+  keep_alive_sudo
+
+  if [ -x "$XCODE_SWIFT_PATH" ]; then
+    echo "You have swift from xcode-select. Continuing..."
+  else
+    prompt_xcode_install
+  fi
+
+  until [ -f "$XCODE_SWIFT_PATH" ]; do
+    echo -n "."
+    sleep 1
+  done
+}
+
+main "$@"

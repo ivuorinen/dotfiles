@@ -2,76 +2,97 @@
 # Load our configuration files
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+source "$DOTFILES/config/shared.sh"
+
 # Enable verbosity with VERBOSE=1 x-load-configs
-VERBOSE="${VERBOSE:=0}"
+VERBOSE="${VERBOSE:-0}"
 # Enable debugging with DEBUG=1 x-load-configs
-DEBUG="${DEBUG:=0}"
+DEBUG="${DEBUG:-0}"
 
-[ "$DEBUG" = "1" ] && {
-  set -x
+# Get the hostname
+CONFIG_HOST="$(hostname -s)"
+
+# Enable debugging if requested
+[ "$DEBUG" = "1" ] && set -x
+
+CONFIG_PATH="${DOTFILES}/config"
+
+[ -d "$DOTFILES" ] || {
+  msg_err "Error: DOTFILES is not set or $DOTFILES does not exist"
 }
 
-CONFIG_PATH="$DOTFILES/config"
+# Function to print messages if VERBOSE is enabled
+# $1 - message type (string)
+# $2 - message content (string)
+config_msg()
+{
+  # if $1 is empty, return
+  [ -z "$1" ] && return
+  [ -z "$2" ] && $2=""
 
-# Load the shell dotfiles, and then some:
-HOST="$(hostname -s)"
-[ "$VERBOSE" = "1" ] && {
-  echo "x-load-configs: VERBOSE=1"
-  echo "x-load-configs: HOST: $HOST"
+  local msg_type="$1"
+  local msg_content="$2"
+  [[ "$VERBOSE" -eq 1 ]] && printf 'x-load-configs: %s %s\n' "$msg_type" "$msg_content"
+  return 0
 }
 
-configFile()
+# Function to get the full path of a config file
+# $1 - filename (string)
+config_file_path()
 {
   echo "$CONFIG_PATH/$1"
 }
 
-configMsg()
+# Function to source configuration files
+source_config()
 {
-  printf 'x-load-configs: %s %s\n' "$1" "$2"
+  local config_file=$1
+  if [ -f "$config_file" ]; then
+    eval "$config_file"
+    config_msg "Sourced" "$config_file"
+  else
+    msg "Config file $config_file not found"
+  fi
+  return 0
 }
 
-loadConfigFiles()
+# Function to load a configuration file
+# $1 - base config file name (string)
+load_config_files()
 {
-  CONFIG_FILE=$1
-  SECRET_FILE=$CONFIG_FILE-secret
-  HOST_FILE=$CONFIG_FILE-$HOST
-  SECRET_HOST=$HOST_FILE-secret
+  local config_file="$1"
+  local secret_file="${config_file}-secret"
+  local host_file="${config_file}-${CONFIG_HOST}"
+  local secret_host_file="${host_file}-secret"
 
-  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$CONFIG_FILE"
-
-  # global (exports|alias|functions) FILENAME for all hosts
-  # shellcheck source=../config/exports
-  [ -r "$CONFIG_FILE" ] && {
-    source "$CONFIG_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$CONFIG_FILE"
+  config_msg "Looking for" "$config_file"
+  [ -r "$config_file" ] && {
+    source_config "$config_file"
   }
 
-  # global secret FILENAME, git ignored
-  # shellcheck source=../config/exports-secret
-  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$SECRET_FILE"
-  [ -r "$SECRET_FILE" ] && {
-    source "$SECRET_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_FILE"
+  config_msg "Looking for" "$secret_file"
+  [ -r "$secret_file" ] && {
+    source_config "$secret_file"
   }
-  # host specific (exports|alias|functions) FILENAME
-  # shellcheck source=../config/exports
-  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$HOST_FILE"
-  [ -r "$HOST_FILE" ] && {
-    source "$HOST_FILE" && [ "$VERBOSE" = "1" ] && configMsg "Found" "$HOST_FILE"
+
+  config_msg "Looking for" "$host_file"
+  [ -r "$host_file" ] && {
+    source_config "$host_file"
   }
-  # host specific (exports|alias|functions) FILENAME, git ignored
-  # shellcheck source=../config/exports
-  [ "$VERBOSE" = "1" ] && configMsg "Looking for" "$SECRET_HOST"
-  [ -r "$SECRET_HOST" ] && {
-    source "$SECRET_HOST" \
-      && [ "$VERBOSE" = "1" ] && configMsg "Found" "$SECRET_HOST"
+
+  config_msg "Looking for" "$secret_host_file"
+  [ -r "$secret_host_file" ] && {
+    source_config "$secret_host_file"
   }
+  return 0
 }
 
-FILE_EXPORTS=$(configFile "exports")
-FILE_FUNCTIONS=$(configFile "functions")
-FILE_ALIAS=$(configFile "alias")
+config_msg "VERBOSE=1" "Verbose mode enabled"
+config_msg "HOST" "$CONFIG_HOST"
 
-loadConfigFiles "$FILE_EXPORTS"
-loadConfigFiles "$FILE_FUNCTIONS"
-loadConfigFiles "$FILE_ALIAS"
-
+load_config_files "$(config_file_path "exports")"
+load_config_files "$(config_file_path "functions")"
+load_config_files "$(config_file_path "alias")"
 exit 0

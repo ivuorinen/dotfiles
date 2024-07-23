@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 #
 # Install asdf
-
-source "${XDG_CONFIG_HOME}/shared.sh"
-source "${DOTFILES}/scripts/shared.sh"
+source "${DOTFILES}/config/shared.sh"
 
 export ASDF_DIR="${XDG_BIN_HOME}/asdf"
 export PATH="${ASDF_DIR}/bin:$PATH"
@@ -11,16 +9,19 @@ export PATH="${ASDF_DIR}/bin:$PATH"
 msg "Sourcing asdf in your shell"
 . "$ASDF_DIR/asdf.sh"
 
-# Update asdf, and plugins
-asdf update
+# Function to update asdf and plugins
+update_asdf()
+{
+  asdf update
 
-asdf plugin add asdf-plugin-manager https://github.com/asdf-community/asdf-plugin-manager.git
-asdf install asdf-plugin-manager latest
-asdf global asdf-plugin-manager "$(asdf latest asdf-plugin-manager)"
-asdf-plugin-manager version
-asdf-plugin-manager add-all
+  asdf plugin add asdf-plugin-manager https://github.com/asdf-community/asdf-plugin-manager.git
+  asdf install asdf-plugin-manager latest
+  asdf global asdf-plugin-manager "$(asdf latest asdf-plugin-manager)"
+  asdf-plugin-manager version
+  asdf-plugin-manager add-all
 
-asdf install
+  asdf install
+}
 
 ASDF_INSTALLABLES=(
   "1password-cli:github.com/NeoHsu/asdf-1password-cli.git"
@@ -51,14 +52,25 @@ ASDF_INSTALLABLES=(
   "yq:github.com/sudermanjr/asdf-yq.git"
 )
 
-msg "Installing asdf plugins, if not already installed"
-for item in "${ASDF_INSTALLABLES[@]}"; do
-  CMD=$(echo "${item}" | awk -F ":" '{print $1}')
-  URL=$(echo "${item}" | awk -F ":" '{print $2}')
-  asdf plugin add "${CMD}" "https://${URL}"
-  asdf install "${CMD}" latest
-  asdf global "${CMD}" "$(asdf latest "${CMD}")"
-done
+# Function to install asdf plugins
+install_asdf_plugins()
+{
+  msg "Installing asdf plugins, if not already installed"
+  for item in "${ASDF_INSTALLABLES[@]}"; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    URL=$(echo "${item}" | awk -F ":" '{print $2}')
+    asdf plugin add "${CMD}" "https://${URL}"
+    asdf install "${CMD}" latest
+    asdf global "${CMD}" "$(asdf latest "${CMD}")"
+  done
+}
 
-msg "Reshim asdf"
-asdf reshim
+main()
+{
+  update_asdf
+  install_asdf_plugins
+  msg "Reshim asdf"
+  asdf reshim
+}
+
+main "$@"

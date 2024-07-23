@@ -2,7 +2,7 @@
 # Install NerdFonts
 #
 # shellcheck source="shared.sh"
-eval "$HOME/.dotfiles/scripts/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
 GIT_REPO="https://github.com/ryanoasis/nerd-fonts.git"
 TMP_PATH="$XDG_CACHE_HOME/nerd-fonts"
@@ -17,28 +17,50 @@ fonts=(
   SpaceMono
 )
 
-if [ ! -d "$TMP_PATH" ]; then
-  git clone --filter=blob:none --sparse "$GIT_REPO" "$TMP_PATH"
-fi
+# Function to clone or update the NerdFonts repository
+clone_or_update_repo()
+{
+  if [ ! -d "$TMP_PATH" ]; then
+    git clone --quiet --filter=blob:none --sparse "$GIT_REPO" "$TMP_PATH"
+  fi
 
-cd "$TMP_PATH" || {
-  msg_err "No such folder $TMP_PATH"
-  exit 1
+  cd "$TMP_PATH" || msg_err "No such folder $TMP_PATH"
 }
 
-for ext in "${fonts[@]}"; do
-  # Trim spaces
-  ext=${ext// /}
-  # Skip comments
-  if [[ ${ext:0:1} == "#" ]]; then continue; fi
+# Function to add fonts to sparse-checkout
+add_fonts_to_sparse_checkout()
+{
+  for font in "${fonts[@]}"; do
+    # Trim spaces
+    font=${font// /}
+    # Skip comments
+    if [[ ${font:0:1} == "#" ]]; then continue; fi
 
-  msg_run "Adding $ext to sparse-checkout"
-  git sparse-checkout add "patched-fonts/$ext"
-  echo ""
-done
+    msg_run "Adding $font to sparse-checkout"
+    git sparse-checkout add "patched-fonts/$font"
+    echo ""
+  done
+}
 
-msg "Starting to install NerdFonts..."
+# Function to install NerdFonts
+install_fonts()
+{
+  msg "Starting to install NerdFonts..."
+  ./install.sh -q -s ${fonts[*]}
+  msg_ok "Done"
+}
 
-./install.sh -s ${fonts[*]}
+remove_tmp_path()
+{
+  rm -rf "$TMP_PATH"
+}
 
-msg_ok "Done"
+main()
+{
+  clone_or_update_repo
+  add_fonts_to_sparse_checkout
+  install_fonts
+  remove_tmp_path
+}
+
+main "$@"

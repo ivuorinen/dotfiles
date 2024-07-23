@@ -3,4 +3,46 @@
 # Remove a directory from the PATH
 # Usage: x-path-remove <dir>
 
-export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$1\"" | sed 's/:$//')
+# Set verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 <dir>"
+  exit 1
+}
+
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
+
+# Function to remove a directory from PATH
+# $1 - directory to remove (string)
+remove_from_path()
+{
+  local dir=$1
+
+  if ! echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
+    msg "(?) Directory $dir is not in PATH"
+    exit 0
+  fi
+
+  export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$dir\"" | sed 's/:$//')
+  msg "(!) Directory $dir has been removed from PATH"
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  remove_from_path "$1"
+}
+
+main "$@"

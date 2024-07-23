@@ -4,12 +4,14 @@
 # NOTE: Experimental, wip
 #
 # shellcheck source=shared.sh
-eval "$HOME/.dotfiles/scripts/shared.sh"
+source "${DOTFILES}/config/shared.sh"
+
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
 msg_run "Installing git-crypt"
 
-x-have "git-crypt" || {
-
+if ! command -v git-crypt &> /dev/null; then
   REPO_URL="https://github.com/AGWA/git-crypt.git"
   CHECK_PATH="${XDG_BIN_HOME}/git-crypt"
   BUILD_PATH="/tmp/git-crypt"
@@ -23,5 +25,6 @@ x-have "git-crypt" || {
   else
     msg_done "git-crypt ($CHECK_PATH) already installed"
   fi
-}
+fi
+
 msg_done "Done installing git-crypt"

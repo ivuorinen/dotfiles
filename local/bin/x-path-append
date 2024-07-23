@@ -3,5 +3,65 @@
 # Add a directory to the beginning of the PATH if it's not already there.
 # Usage: x-path-append <dir>
 
-x-path-remove "$1"
-export PATH="${PATH:+"$PATH:"}$1"
+# Set verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 <dir>"
+  exit 1
+}
+
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
+
+# Function to remove a directory from PATH
+# $1 - directory to remove (string)
+remove_from_path()
+{
+  local dir=$1
+
+  if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
+    export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$dir\"" | sed 's/:$//')
+    msg "Directory $dir has been removed from PATH"
+  else
+    msg "Directory $dir is not in PATH"
+  fi
+}
+
+# Function to append a directory to PATH
+# $1 - directory to append (string)
+append_to_path()
+{
+  local dir=$1
+
+  if [ ! -d "$dir" ]; then
+    msg "(?) Directory $dir does not exist"
+    exit 0
+  fi
+
+  if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
+    msg "(!) Directory $dir is already in PATH"
+  else
+    export PATH="${PATH:+"$PATH:"}$dir"
+    msg "(!) Directory $dir has been added to the end of PATH"
+  fi
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  remove_from_path "$1"
+  append_to_path "$1"
+}
+
+main "$@"

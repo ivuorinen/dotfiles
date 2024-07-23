@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck source="../scripts/shared.sh"
-# shellcheck disable=1091,2139
 
 # Color the grep output
 alias grep="grep --color"
@@ -32,7 +30,6 @@ alias l="ls -a"
 # Prevent common typos
 alias cd..="cd .."
 alias sl="ls"
-alias ls-="ls -$1"
 
 # List only directories
 alias lsd="ls -lF | grep '^d'"
@@ -115,63 +112,3 @@ if [[ $(uname) == 'Darwin' ]]; then
   # Using herd for php now, so this is not needed anymore
   # x-set-php-aliases
 fi
-
-# Alacritty preexec hook to update dynamic title
-preexec()
-{
-  print -Pn "\e]0;$1%~\a"
-}
-
-# Update dotfiles
-dfu()
-{
-  (
-    cd "$DOTFILES" && git pull --ff-only && ./install -q
-  )
-}
-
-# Weather in Tampere, or other city
-weather()
-{
-  # https://github.com/chubin/wttr.in#usage
-  local city="${1:-Tampere}"
-  curl "http://wttr.in/${city// /+}?2nFQM&lang=fi"
-}
-
-# Docker
-ssh_docker()
-{
-  docker exec -it "$@" bash
-}
-
-# Rector project to php version 8.2 by default.
-rector()
-{
-  local php="${1:-82}"
-  docker run -v "$(pwd)":/project rector/rector:latest process \
-    "/project/$1" \
-    --set "php${php}" \
-    --autoload-file /project/vendor/autoload.php
-}
-
-# Commit everything
-commit()
-{
-  commitMessage="$*"
-
-  if [ "$commitMessage" = "" ]; then
-    commitMessage="Automated commit"
-  fi
-
-  git add .
-  eval "git commit -a -m '${commitMessage}'"
-}
-
-scheduler()
-{
-  while :; do
-    php artisan schedule:run
-    echo "Sleeping 60 seconds..."
-    sleep 60
-  done
-}

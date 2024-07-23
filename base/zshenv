@@ -1,19 +1,8 @@
 # shellcheck shell=bash
 # vim: filetype=zsh
 
-export PATH="$HOME/.local/bin:$HOME/.dotfiles/local/bin:$HOME/.local/go/bin:$PATH"
-
 export DOTFILES="$HOME/.dotfiles"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$PATH"
+export SHARED_SCRIPTS_SOURCED=0
 
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-
-# custom variables
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_RUNTIME_DIR="$HOME/.local/run"
-
-eval "$DOTFILES/config/shared.sh"
+source "$DOTFILES/config/shared.sh"

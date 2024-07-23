@@ -2,14 +2,35 @@
 # shellcheck shell=bash
 # vim: filetype=zsh
 
+# Set XDG directories if not already set
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+[ -z "$XDG_CONFIG_HOME" ] && export $XDG_CONFIG_HOME="$HOME/.config"
+[ -z "$XDG_DATA_HOME" ] && export $XDG_DATA_HOME="$HOME/.local/share"
+[ -z "$XDG_CACHE_HOME" ] && export $XDG_CACHE_HOME="$HOME/.cache"
+[ -z "$XDG_STATE_HOME" ] && export $XDG_STATE_HOME="$HOME/.local/state"
+[ -z "$XDG_BIN_HOME" ] && export $XDG_BIN_HOME="$HOME/.local/bin"
+
+# if DOTFILES is not set, set it to the default location
+[ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
+
+if ! command -v msg &> /dev/null; then
+  # Function to print messages if VERBOSE is enabled
+  # $1 - message (string)
+  msg()
+  {
+    [[ "$VERBOSE" -eq 1 ]] && echo "-> $1"
+    return 0
+  }
+fi
+
 # Cache commands using bkt if installed
-if command -v bkt >&/dev/null; then
+if command -v bkt &> /dev/null; then
   bkt()
   {
     command bkt --cache-dir="$XDG_CACHE_HOME/bkt" "$@"
   }
 else
-  # If bkt isn't installed skip its arguments and just execute directly.
+  # If bkt isn't installed, skip its arguments and just execute directly.
   # Optionally write a msg to stderr suggesting users install bkt.
   bkt()
   {
@@ -18,48 +39,54 @@ else
   }
 fi
 
-# shorthand for checking if the system has the bin in path,
-# this version does not use caching
-# usage: have_command php && php -v
+# Shorthand for checking if the system has the bin in path,
+# this version does not use caching.
+# Usage: have_command php && php -v
 have_command()
 {
-  command -v "$1" >&/dev/null
-}
-
-# shorthand for checking if the system has the bin in path,
-# this version uses caching
-# usage: have php && php -v
-have()
-{
-  bkt -- which "$1" >&/dev/null
-}
-
-# function to run dark-notify and change alacritty theme
-# it uses flock to prevent running multiple instances
-# install flock with `brew install flock` on macOS
-function darknotify_alacritty
-{
-  have flock && [[ -f /tmp/dark-notify-alacritty.lock ]] && return
-  have dark-notify && {
-    # true is used to prevent the command show it was backgrounded
-    true \
-      && flock /tmp/dark-notify-alacritty.lock dark-notify -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
+  [ -z "$1" ] && {
+    echo "Usage: have_command <command>"
+    return 1
   }
 
-  return 0
+  command -v "$1" &> /dev/null
+}
+
+# Shorthand for checking if the system has the bin in path,
+# this version uses caching.
+# Usage: have php && php -v
+have()
+{
+  bkt -- which "$1" &> /dev/null
+}
+
+# Function to run dark-notify and change alacritty theme
+# It uses flock to prevent running multiple instances.
+# Install flock with `brew install flock` on macOS.
+darknotify_alacritty()
+{
+  x-have flock && [[ -f /tmp/dark-notify-alacritty.lock ]] && return
+  x-have dark-notify && {
+    # subprocess is used to prevent the command from showing it was backgrounded
+    (
+      flock /tmp/dark-notify-alacritty.lock dark-notify \
+        -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
+    ) &> /dev/null
+  }
 }
 darknotify_alacritty
 
+# Function to list installed Homebrew packages using bkt caching
 brew_installed()
 {
   bkt -- brew list
 }
 
-# shorthand for checking if brew package is installed
-# usage: have_brew php && php -v
+# Shorthand for checking if a Homebrew package is installed
+# Usage: have_brew php && php -v
 have_brew()
 {
-  ! x-have brew && return 125
+  ! have brew && return 125
 
   if bkt -- brew list "$1" &> /dev/null; then
     return 0
@@ -68,9 +95,369 @@ have_brew()
   fi
 }
 
-if [[ -f "$DOTFILES/config/exports-secret" ]]; then
-  source "$DOTFILES/config/exports-secret"
-fi
+# Alacritty preexec hook to update dynamic title
+preexec()
+{
+  print -Pn "\e]0;$1%~\a"
+}
 
-source "$DOTFILES/config/exports-shell"
-source "$DOTFILES/config/exports-apps"
+# Update dotfiles
+dfu()
+{
+  (
+    cd "$DOTFILES" && git pull --ff-only && ./install -q
+  )
+}
+
+# Weather in Tampere, or other city
+weather()
+{
+  # https://github.com/chubin/wttr.in#usage
+  local city="${1:-Tampere}"
+  curl "http://wttr.in/${city// /+}?2nFQM&lang=fi"
+}
+
+# Docker
+ssh_docker()
+{
+  docker exec -it "$@" bash
+}
+
+# Rector project to php version 8.2 by default.
+rector()
+{
+  local php="${1:-82}"
+  docker run -v "$(pwd)":/project rector/rector:latest process \
+    "/project/$1" \
+    --set "php${php}" \
+    --autoload-file /project/vendor/autoload.php
+}
+
+# Commit everything
+commit()
+{
+  local commitMessage="$*"
+
+  if [ -z "$commitMessage" ]; then
+    commitMessage="Automated commit"
+  fi
+
+  git add .
+  git commit -a -m "$commitMessage"
+}
+
+scheduler()
+{
+  while :; do
+    php artisan schedule:run
+    echo "Sleeping 60 seconds..."
+    sleep 60
+  done
+}
+
+# Run command silently
+# Usage: silent uptime
+silent()
+{
+  "$@" >&/dev/null
+}
+
+# Check if a file contains non-ascii characters
+nonascii()
+{
+  LC_ALL=C grep -n '[^[:print:][:space:]]' "${@}"
+}
+
+# Remove non-ascii characters from string
+# Usage: strip_nonascii "string"
+strip_nonascii()
+{
+  echo "$1" | LC_ALL=C sed 's/[^[:print:][:space:]]//g'
+}
+
+# Slugify a string
+# Usage: slugify "string"
+slugify()
+{
+  echo "$1" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z
+}
+
+# https://stackoverflow.com/a/85932
+fn_exists()
+{
+  declare -f -F "$1" > /dev/null
+  return $?
+}
+
+# Creates a random string
+rnd()
+{
+  echo $RANDOM | md5sum | head -c 20
+}
+
+# return sha256sum for file
+# $1 - filename (string)
+get_sha256sum()
+{
+  sha256sum "$1" | head -c 64
+}
+
+# Replaceable file
+#
+# $1 - filename (string)
+# $2 - filename (string)
+#
+# Returns 1 when replaceable, 0 when not replaceable.
+replacable()
+{
+  FILE1="$1"
+  FILE2="$2"
+
+  [[ ! -r "$FILE1" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "File 1 ($FILE1) does not exist"
+    return 0
+  }
+  [[ ! -r "$FILE2" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "File 2 ($FILE2) does not exist, replaceable"
+    return 1
+  }
+
+  FILE1_HASH=$(get_sha256sum "$FILE1")
+  FILE2_HASH=$(get_sha256sum "$FILE2")
+
+  [[ $FILE1_HASH = "" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 1 ($FILE1)"
+    return 0
+  }
+  [[ $FILE2_HASH = "" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 2 ($FILE2), replaceable"
+    return 1
+  }
+
+  [[ "$FILE1_HASH" == "$FILE2_HASH" ]] && {
+    [[ $VERBOSE -eq 1 ]] && msg_ok "Files match, not replaceable: $FILE1"
+    return 0
+  }
+
+  [[ $VERBOSE -eq 1 ]] && msg_warn "Files do not match ($FILE1_HASH != $FILE2_HASH), replaceable"
+
+  return 1
+}
+
+export COMPLETION_WAITING_DOTS=true
+
+# Bash completion file location
+export BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME}/bash-completion/bash_completion"
+
+# History env variables
+export HIST_STAMPS="yyyy-mm-dd"
+# Larger bash history (allow 32³ entries; default is 500)
+export HISTSIZE=32768
+export HISTFILESIZE=$HISTSIZE
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+export HISTCONTROL=ignoreboth
+# Make some commands not show up in history
+export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
+# And include the parameter for ZSH
+export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
+
+# Less history location
+export LESSHISTFILE="$XDG_STATE_HOME"/less/history
+
+# Highlight section titles in manual pages
+# export LESS_TERMCAP_md="$ORANGE"
+
+# zsh autoloaded terminfo
+export TERMINFO="${XDG_DATA_HOME}/terminfo"
+export TERMINFO_DIRS="${XDG_DATA_HOME}/terminfo":/usr/share/terminfo
+
+# Don't clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Always enable colored `grep` output
+export GREP_OPTIONS="--color=auto"
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+hash shopt 2> /dev/null && shopt -s checkwinsize
+
+# Antigen configuration
+# https://github.com/zsh-users/antigen/wiki/Configuration
+msg "Setting up Antigen configuration"
+export ADOTDIR="$XDG_DATA_HOME/antigen"
+export ANTIGEN_CACHE="$XDG_CACHE_HOME/antigen"
+export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
+export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
+
+# Ansible configuration
+# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
+msg "Setting up Ansible configuration"
+export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
+export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
+export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
+x-dc "$ANSIBLE_HOME"
+x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
+
+# asdf
+# https://github.com/asdf-vm/asdf
+msg "Setting up asdf configuration"
+export ASDF_DIR="${XDG_BIN_HOME}/asdf"
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+export ASDF_DATA_DIR="${ASDF_DIR}"
+# This seems wrong, but `asdf info` and `versions.bash` differ on path resolution.
+export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=".config/asdf/tool-versions"
+export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
+export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
+export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
+export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
+export ASDF_GOLANG_MOD_VERSION_ENABLED=true
+export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
+export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
+export PATH="${ASDF_DIR}/bin:${PATH}"
+
+# bob manages nvim versions
+msg "Setting up bob configuration"
+x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
+
+# bkt (shell command caching tool) configuration
+msg "Setting up bkt configuration"
+export BKT_TTL=1m
+
+# brew, https://docs.brew.sh/Manpage
+msg "Setting up Homebrew configuration"
+export HOMEBREW_NO_ANALYTICS=true
+export HOMEBREW_NO_ENV_HINTS=true
+export HOMEBREW_BUNDLE_MAS_SKIP=true
+export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/homebrew/Brewfile"
+x-have brew && {
+  eval "$(brew shellenv)"
+}
+
+# composer, https://getcomposer.org/
+msg "Setting up Composer configuration"
+export COMPOSER_HOME="$XDG_STATE_HOME/composer"
+export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
+export PATH="$COMPOSER_BIN:$PATH"
+
+# docker, https://docs.docker.com/engine/reference/commandline/cli/
+msg "Setting up Docker configuration"
+export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+x-dc "$DOCKER_CONFIG"
+# Docker: Disable snyk ad
+export DOCKER_SCAN_SUGGEST=false
+
+# ffmpeg
+# https://ffmpeg.org/ffmpeg.html
+msg "Setting up FFmpeg configuration"
+export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
+x-have ffmpeg && x-dc "$FFMPEG_DATADIR"
+
+# GnuPG
+# https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
+msg "Setting up GnuPG configuration"
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+
+# Go
+# https://golang.org/doc/code.html
+msg "Setting up Go configuration"
+export GOPATH="$XDG_DATA_HOME/go"
+export GOBIN="$XDG_BIN_HOME"
+
+# Herd, herd.laravel.com
+# Herd injected PHP binary.
+msg "Setting up Herd configuration"
+export PATH="$HOME/Library/Application\ Support/Herd/bin/":$PATH
+x-have herd && {
+  # Herd injected PHP 8.3 configuration.
+  export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application\ Support/Herd/config/php/83/"
+  # Herd injected PHP 7.4 configuration.
+  export HERD_PHP_74_INI_SCAN_DIR="$HOME/Library/Application\ Support/Herd/config/php/74/"
+}
+
+# nb, https://xwmx.github.io/nb/
+msg "Setting up nb configuration"
+export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
+export NB_DIR="$XDG_STATE_HOME/nb"
+
+# NPM: Add npm packages to path
+msg "Setting up NPM configuration"
+x-have node && {
+  NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
+  export PATH="$NVM_NODE_BIN_DIR:$PATH"
+}
+
+# oh-my-posh (omp) configuration
+msg "Setting up oh-my-posh configuration"
+export OHMYPOSH_CFG="$DOTFILES/config/omp/own.toml"
+
+# op (1Password cli) is present
+msg "Setting up 1Password CLI configuration"
+export OP_CACHE="$XDG_STATE_HOME/1password"
+
+# Python
+#
+# pyenv, python environments
+msg "Setting up Python configuration"
+export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
+export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+x-have pyenv && {
+  eval "$(pyenv init -)"
+}
+
+# Ruby
+#
+# including: bundler, rbenv
+msg "Setting up Ruby configuration"
+export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME"/bundle
+export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
+export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
+export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
+x-dc "$RBENV_ROOT"
+x-have gem && export PATH="${GEM_HOME}/bin:$PATH"
+
+# Rust / cargo
+msg "Setting up Rust/Cargo configuration"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export PATH="$CARGO_HOME/bin:$PATH"
+
+# screen
+# https://www.gnu.org/software/screen/manual/screen.html
+msg "Setting up screen configuration"
+export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
+
+# sonarlint
+# https://www.sonarlint.org/
+msg "Setting up Sonarlint configuration"
+export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
+
+# terraform
+# https://www.terraform.io/docs/cli/config/config-file.html
+# https://www.terraform.io/docs/cli/config/environment-variables.html
+msg "Setting up Terraform configuration"
+export TF_DATA_DIR="$XDG_STATE_HOME/terraform"
+export TF_CLI_CONFIG_FILE="$XDG_CONFIG_HOME/terraform/terraformrc"
+export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
+
+# tldr / tealdeer
+msg "Setting up tldr configuration"
+export TEALDEER_CONFIG_DIR="$XDG_CONFIG_HOME/tealdeer/"
+
+# tmux
+# https://tmux.github.io/
+msg "Setting up tmux configuration"
+export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
+
+# wakatime, https://github.com/wakatime/wakatime-cli
+msg "Setting up Wakatime configuration"
+export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
+x-dc "$WAKATIME_HOME"
+
+# Misc
+msg "Setting up miscellaneous configuration"
+export CHEAT_USE_FZF=true
+export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"

@@ -1,86 +1,121 @@
 # this is my zsh config. there are many like it, but this one is mine.
 # shellcheck shell=bash
 
-eval "$HOME/.dotfiles/config/shared.sh"
+# export VERBOSE=1
+# export DEBUG=1
+
+x-path-prepend "/usr/local/bin"
+x-path-prepend "/opt/homebrew/bin"
+x-path-prepend "$HOME/.local/share/cargo/bin"
+x-path-prepend "$HOME/.local/share/bob/nvim-bin"
+x-path-prepend "$HOME/.local/bin"
+x-path-prepend "$DOTFILES/local/bin"
+
 x-load-configs
 
-export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 
-x-have oh-my-posh && {
-  eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
-}
-
-export COMPLETION_WAITING_DOTS=true
-
-if type brew &> /dev/null; then
-  eval "$(brew shellenv)"
-  FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:${FPATH}"
+# Load asdf
+export ASDF_DIR="$XDG_BIN_HOME/asdf"
+if [[ -d $ASDF_DIR ]]; then
+  [[ -d $ASDF_DIR/bin ]] && x-path-prepend "$ASDF_DIR/bin"
+  [[ -d $ASDF_DIR/shims ]] && x-path-prepend "$ASDF_DIR/shims"
+  [[ -d $ASDF_DIR/completions ]] && fpath=("$ASDF_DIR/completions" $fpath)
+  [[ -d $ASDF_DIR/plugins ]] && fpath=("$ASDF_DIR/plugins" $fpath)
+  source "$ASDF_DIR/asdf.sh"
 fi
 
-export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
-x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
+# Function to load antigen if available
+load_antigen()
+{
+  local antigen_zsh_path="$XDG_BIN_HOME/antigen.zsh"
+  # shellcheck source=../../.local/bin/antigen.zsh
+  if [[ -f "$antigen_zsh_path" ]]; then
+    source "$antigen_zsh_path"
 
-# Add completion scripts to zsh path
-FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
+    antigen use oh-my-zsh
 
-# Try to load antigen, if present
-ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
-# shellcheck source=../../.local/bin/antigen.zsh
-[[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
+    export ZSH_TMUX_AUTOSTART=true
+    export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
+    export ZSH_TMUX_UNICODE=true
+    export ZSH_TMUX_AUTOQUIT=false
+    export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
-# antigen is present
-antigen use oh-my-zsh
+    # z, the zsh version
+    export ZSHZ_DATA="$XDG_STATE_HOME/z"
+    antigen bundle z
 
-export ZSH_TMUX_AUTOSTART=true
-export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
-export ZSH_TMUX_UNICODE=true
-export ZSH_TMUX_AUTOQUIT=false
-export ZSH_TMUX_DEFAULT_SESSION_NAME=main
+    # these should be always available
+    antigen bundle brew
+    antigen bundle tmux
+    antigen bundle colored-man-pages
+    antigen bundle ssh-agent
+    antigen bundle jreese/zsh-titles
+    antigen bundle zsh-users/zsh-completions
 
-# z, the zsh version
-export ZSHZ_DATA="$XDG_STATE_HOME/z"
-antigen bundle z
+    x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
-# these should be always available
-antigen bundle tmux
-antigen bundle colored-man-pages
-antigen bundle ssh-agent
-antigen bundle jreese/zsh-titles
-antigen bundle zsh-users/zsh-completions
-
-x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-
-# this needs to be the last item
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen apply
-
-# shellcheck source=../config/fzf/fzf.zsh
-[ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
-  && source "${DOTFILES}/config/fzf/fzf.zsh"
-
-x-have pyenv && {
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
+    # this needs to be the last item
+    antigen bundle zsh-users/zsh-syntax-highlighting
+    antigen apply
+  fi
 }
 
-# Run only if tmux is active
-[[ -n "$TMUX" ]] && {
-  # Autoupdate tmux window name
-  TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
-  [ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
-    tmux_window_name()
-    {
-      ($TMUX_WINDOW_NAME_PLUGIN &)
-    }
-    add-zsh-hook chpwd tmux_window_name
-    tmux_window_name
-  }
+# Function to source FZF configuration
+source_fzf_config()
+{
+  local fzf_config="${DOTFILES}/config/fzf/fzf.zsh"
+  if [[ -f "$fzf_config" ]]; then
+    # shellcheck source=config/fzf/fzf.zsh
+    source "$fzf_config"
+  fi
 }
 
-x-have antidot && {
-  eval "$(antidot init)"
+# Function to initialize pyenv if available
+initialize_pyenv()
+{
+  if x-have pyenv; then
+    [[ -d $PYENV_ROOT/bin ]] && x-path-append "$PYENV_ROOT/bin"
+    [[ -d $PYENV_ROOT/shims ]] && x-path-append "$PYENV_ROOT/shims"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+  fi
 }
+
+# Function to set up tmux window name plugin if tmux is active
+setup_tmux_window_name_plugin()
+{
+  if [[ -n "$TMUX" ]]; then
+    local tmux_window_name_plugin="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
+    if [[ -f "$tmux_window_name_plugin" ]]; then
+      tmux_window_name()
+      {
+        ($tmux_window_name_plugin &)
+      }
+      add-zsh-hook chpwd tmux_window_name
+      tmux_window_name
+    fi
+  fi
+}
+
+# Function to initialize antidot if available
+initialize_antidot()
+{
+  if x-have antidot; then
+    eval "$(antidot init)"
+  fi
+}
+
+main()
+{
+  load_antigen
+  source_fzf_config
+  initialize_pyenv
+  setup_tmux_window_name_plugin
+  initialize_antidot
+}
+
+main "$@"
 
 # Herd checks for a few environment variables to inject PHP binaries and configurations.
 # Herd injected PHP binary.

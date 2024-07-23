@@ -2,7 +2,10 @@
 # Install Go packages
 #
 # shellcheck source=shared.sh
-eval "$HOME/.dotfiles/scripts/shared.sh"
+eval "$DOTFILES/config/shared.sh"
+
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
 msg_run "Installing go packages"
 
@@ -33,32 +36,50 @@ packages=(
   github.com/doron-cohen/antidot@latest
 )
 
-for pkg in "${packages[@]}"; do
-  # Trim spaces
-  pkg=${pkg// /}
-  # Skip comments
-  if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+# Function to install go packages
+install_packages()
+{
+  for pkg in "${packages[@]}"; do
+    # Trim spaces
+    pkg=${pkg// /}
+    # Skip comments
+    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  msg_nested "Installing go package: $pkg"
-  go install "$pkg"
-  echo ""
-done
-
-msg_run "Installing completions for selected packages"
-
-x-have git-profile && {
-  git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
-    && msg_ok "Installed completions for git-profile"
+    msg_nested "Installing go package: $pkg"
+    go install "$pkg"
+    echo ""
+  done
 }
 
-x-have antidot && {
-  antidot update \
-    && msg_ok "Updated antidot database"
+# Function to install completions and run actions for selected packages
+post_install()
+{
+  msg_run "Installing completions for selected packages"
+
+  if command -v git-profile &> /dev/null; then
+    git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
+      && msg_ok "Installed completions for git-profile"
+  fi
+
+  if command -v antidot &> /dev/null; then
+    antidot update \
+      && msg_ok "Updated antidot database"
+  fi
 }
 
-echo ""
+# Function to clear go cache
+clear_go_cache()
+{
+  msg_run "Clearing go cache"
+  go clean -cache -modcache
+}
 
-msg_run "Clearing go cache"
-go clean -cache -modcache
+main()
+{
+  install_packages
+  post_install
+  clear_go_cache
+  msg_ok "Done"
+}
 
-msg_ok "Done"
+main "$@"

@@ -9,7 +9,7 @@
 [ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
 
 # shellcheck source=shared.sh
-eval "$HOME/.dotfiles/scripts/shared.sh"
+eval "$HOME/.dotfiles/config/shared.sh"
 
 msg_run "Starting to set macOS defaults, these require sudo privileges:"
 
@@ -63,7 +63,7 @@ defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Disable the “Are you sure you want to open this application?” dialog
+# Disable the "Are you sure you want to open this application?" dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Disable Resume system-wide
@@ -79,10 +79,10 @@ defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
 # in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
-# Disable smart quotes as they’re annoying when typing code
+# Disable smart quotes as they're annoying when typing code
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
-# Disable smart dashes as they’re annoying when typing code
+# Disable smart dashes as they're annoying when typing code
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 ###############################################################################
@@ -94,7 +94,7 @@ msg_nested "Setting SSD-specific tweaks"
 # Disable hibernation (speeds up entering sleep mode)
 sudo pmset -a hibernatemode 0
 
-# Disable the sudden motion sensor as it’s not useful for SSDs
+# Disable the sudden motion sensor as it's not useful for SSDs
 sudo pmset -a sms 0
 
 ###############################################################################
@@ -117,7 +117,7 @@ defaults write com.apple.BluetoothAudioAgent "Negotiated Bitpool Min" 80
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
 # Set language and text formats
-# Note: if you’re in the US, replace `EUR` with `USD`, `Centimeters` with
+# Note: if you're in the US, replace `EUR` with `USD`, `Centimeters` with
 # `Inches`, `en_GB` with `en_US`, and `true` with `false`.
 defaults write NSGlobalDomain AppleLanguages -array "en"
 defaults write NSGlobalDomain AppleLocale -string "en_GB@currency=EUR"
@@ -197,7 +197,7 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 # chflags nohidden /Users
 
 # Expand the following File Info panes:
-# “General”, “Open with”, and “Sharing & Permissions”
+# "General", "Open with", and "Sharing & Permissions"
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
   General -bool true \
   OpenWith -bool true \
@@ -235,17 +235,17 @@ defaults write com.apple.dock tilesize -int 30
 defaults write com.apple.dock show-process-indicators -bool true
 
 # Wipe all (default) app icons from the Dock
-# This is only really useful when setting up a new Mac, or if you don’t use
+# This is only really useful when setting up a new Mac, or if you don't use
 # the Dock to launch apps.
 # defaults write com.apple.dock persistent-apps -array ""
 
 # Disable Dashboard
 defaults write com.apple.dashboard mcx-disabled -bool true
 
-# Don’t show Dashboard as a Space
+# Don't show Dashboard as a Space
 defaults write com.apple.dock dashboard-in-overlay -bool true
 
-# Don’t automatically rearrange Spaces based on most recent use
+# Don't automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
 
 # Make Dock icons of hidden applications translucent
@@ -257,7 +257,7 @@ defaults write com.apple.dock showhidden -bool true
 
 msg_nested "Settings for Safari & WebKit"
 
-# Enable Safari’s debug menu
+# Enable Safari's debug menu
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 
 # Enable the Develop menu and the Web Inspector in Safari
@@ -268,7 +268,7 @@ defaults write com.apple.Safari \
   com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled \
   -bool true
 
-# Don’t display the annoying prompt when quitting iTerm
+# Don't display the annoying prompt when quitting iTerm
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 # Use iTerm2 preferences from the .dotfiles folder.
 defaults write com.googlecode.iterm2 PrefsCustomFolder \
@@ -315,7 +315,7 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 msg_nested "Settings for Messages"
 
-# Disable smart quotes as it’s annoying for messages that contain code
+# Disable smart quotes as it's annoying for messages that contain code
 defaults write com.apple.messageshelper.MessageController \
   SOInputLineSettings \
   -dict-add "automaticQuoteSubstitutionEnabled" \
@@ -335,7 +335,7 @@ msg_nested "Restarting applications to apply changes"
 
 for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
   "Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer" \
-  "Terminal" "Transmission" "Twitter" "iCal"; do
+  "Terminal" "Transmission" "iCal"; do
   killall "${app}" > /dev/null 2>&1
 done
 
