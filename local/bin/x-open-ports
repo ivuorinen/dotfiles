@@ -6,16 +6,34 @@
 # Modified by:     Ismo Vuorinen <https://github.com/ivuorinen> 2020
 # Originally from: https://www.commandlinefu.com/commands/view/8951
 # Original author: https://www.commandlinefu.com/commands/by/wickedcpj
-#
-echo 'User:           Command:                  PID:     Port:'
-echo '========================================================='
 
-lsof -i 4 -P -n +c 0 \
-  | grep -i 'listen' \
-  | awk '{print $3, $1, $2, $9}' \
-  | sed 's/ [a-z0-9\.\*]*:/ /' \
-  | sort -k 3 -n \
-  | xargs printf '%-15s %-25s %-8s %-5s\n' \
-  | uniq
+set -euo pipefail
 
-echo ""
+# Function to print the header
+print_header()
+{
+  echo 'User:           Command:                  PID:     Port:'
+  echo '========================================================='
+}
+
+# Function to list open ports
+list_open_ports()
+{
+  lsof -i 4 -P -n +c 0 \
+    | grep -i 'listen' \
+    | awk '{print $3, $1, $2, $9}' \
+    | sed 's/ [a-z0-9\.\*]*:/ /' \
+    | sort -k 3 -n \
+    | xargs printf '%-15s %-25s %-8s %-5s\n' \
+    | uniq
+}
+
+# Main function
+main()
+{
+  print_header
+  list_open_ports
+  echo ""
+}
+
+main "$@"

@@ -1,19 +1,66 @@
 #!/usr/bin/env bash
+#
 # Adapted from https://gist.github.com/xqm32/17777d035930d622d0ff7530bfab61fd
 #
 
+set -euo pipefail
+
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
 A_DIR="$HOME/.config/alacritty"
 
-set_alacritty_theme() {
-  cp -f "$A_DIR/theme-$1.toml" "$A_DIR/theme-active.toml"
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 <theme>"
+  echo "Available themes: dark, night, day"
+  exit 1
 }
-ALACRITTY_THEME=$1
-if [ "$ALACRITTY_THEME" = "dark" ] || [ "$ALACRITTY_THEME" = "night" ]; then
-  set_alacritty_theme "night"
-else
-  set_alacritty_theme "day"
-fi
 
-# Notify alacritty about the changes
-touch "$A_DIR/alacritty.toml"
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
 
+# Function to set the alacritty theme
+# $1 - theme (string)
+set_alacritty_theme()
+{
+  local theme=$1
+  msg "Setting alacritty theme to $theme"
+  cp -f "$A_DIR/theme-$theme.toml" "$A_DIR/theme-active.toml"
+}
+
+# Function to notify alacritty about the changes
+notify_alacritty()
+{
+  msg "Notifying alacritty about the changes"
+  touch "$A_DIR/alacritty.toml"
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  local alacritty_theme=$1
+
+  case "$alacritty_theme" in
+    day)
+      set_alacritty_theme "day"
+      ;;
+    *)
+      set_alacritty_theme "night"
+      ;;
+  esac
+
+  notify_alacritty
+  msg "Theme set successfully!"
+}
+
+main "$@"

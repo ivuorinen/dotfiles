@@ -1,43 +1,91 @@
 #!/usr/bin/env bash
 #
-# Backup local MySQL Database tables with certain prefix.
+# Backup local MySQL Database tables with a certain prefix.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 # License: MIT
 
-SCRIPT=$(basename "$0")
-PREFIX=$1
-FILENAME=$2
-DATABASE=$3
+set -euo pipefail
 
-: "${VERBOSE:=0}"
-: "${DEFAULT_DATABASE:="wordpress"}"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+# Default database
+DEFAULT_DATABASE="wordpress"
 
-if [ -z "${PREFIX}" ]; then
-  echo "(!) TABLE_PREFIX (first argument) is missing"
+# Function to print usage information
+usage()
+{
   echo "(>) Usage: $SCRIPT <TABLE_PREFIX> <FILENAME_PREFIX> [<DATABASE>]"
   echo " * <TABLE_PREFIX>    = database table prefix, e.g. 'wp_'"
   echo " * <FILENAME_PREFIX> = FILENAME prefix, defaults to table prefix. Use something descriptive e.g. 'wordpress'"
   echo " * <DATABASE>        = [optional] Third argument DATABASE, defaults to '$DEFAULT_DATABASE'."
-  exit 0
-fi
+  exit 1
+}
 
-if [ -z "${FILENAME}" ]; then
-  # echo "FILENAME (second argument) is missing, using PREFIX ($PREFIX)"
-  FILENAME=$PREFIX
-fi
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
 
-if [ -z "${DATABASE}" ]; then
-  # echo "DATABASE (third argument) is missing, using default ($DEFAULT_DATABASE)"
-  DATABASE=$DEFAULT_DATABASE
-fi
+# Function to print error messages and exit
+# $1 - error message (string)
+msg_err()
+{
+  echo "(!) ERROR: $1" >&2
+  exit 1
+}
 
-TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
-FILENAME_TIMESTAMP="${DATABASE}_${FILENAME}_${TIMESTAMP}.sql"
+# Function to backup MySQL tables with a certain prefix
+# $1 - table prefix (string)
+# $2 - filename prefix (string)
+# $3 - database name (string)
+backup_mysql_tables()
+{
+  local prefix=$1
+  local filename=$2
+  local database=$3
 
-mysqldump \
-  "${DATABASE}" \
-  "$(
-    echo "show tables like '${PREFIX}%';" \
-      | mysql "${DATABASE}" \
-      | sed '/Tables_in/d'
-  )" > "${FILENAME_TIMESTAMP}"
+  local timestamp
+  timestamp=$(date "+%Y%m%d_%H%M%S")
+  local filename_timestamp="${database}_${filename}_${timestamp}.sql"
+
+  msg "Backing up tables with prefix '$prefix' from database '$database' to file '$filename_timestamp'"
+
+  mysqldump \
+    "${database}" \
+    "$(
+      echo "show tables like '${prefix}%';" \
+        | mysql "${database}" \
+        | sed '/Tables_in/d'
+    )" > "${filename_timestamp}"
+
+  msg "Backup completed and saved to '$filename_timestamp'"
+}
+
+# Main function
+main()
+{
+  if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    usage
+  fi
+
+  local prefix=$1
+  local filename=$2
+  local database=${3:-$DEFAULT_DATABASE}
+
+  if [ -z "$prefix" ]; then
+    msg_err "TABLE_PREFIX (first argument) is missing"
+  fi
+
+  if [ -z "$filename" ]; then
+    filename=$prefix
+  fi
+
+  backup_mysql_tables "$prefix" "$filename" "$database"
+}
+
+# Script name for usage information
+SCRIPT=$(basename "$0")
+
+main "$@"

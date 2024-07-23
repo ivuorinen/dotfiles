@@ -1,9 +1,48 @@
 #!/usr/bin/env bash
 # Returns which status
-which "$1" >&/dev/null
 
-if [ $? -eq 0 ]; then
-  exit 0
-else
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 <command>"
   exit 1
-fi
+}
+
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
+}
+
+# Function to check if a command exists
+# $1 - command to check (string)
+check_command()
+{
+  local cmd=$1
+
+  if command -v "$cmd" > /dev/null 2>&1; then
+    msg "(*) '$cmd' is available on the system."
+    exit 0
+  else
+    msg "(!) '$cmd' is NOT available on the system."
+    exit 1
+  fi
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  check_command "$1"
+  return 0
+}
+
+main "$@"

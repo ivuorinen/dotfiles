@@ -352,10 +352,12 @@ section_docs()
 
   MENU=(
     "tmux:Update tmux keybindings documentation"
+    "nvim:Update nvim keybindings documentation"
   )
 
   case "$1" in
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
+    nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
     *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }

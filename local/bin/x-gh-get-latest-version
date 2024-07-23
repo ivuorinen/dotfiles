@@ -1,18 +1,68 @@
 #!/usr/bin/env bash
+#
+# Get latest release version from GitHub
+# Usage: x-gh-get-latest-version <repo>
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 
-REPO=$1
+set -euo pipefail
 
-if [ -z "$REPO" ]; then
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print usage information
+usage()
+{
   echo "Usage: $0 <repo> (e.g. ivuorinen/dotfiles)"
   exit 1
-fi
+}
 
-VERSION=$(
-  curl -s "https://api.github.com/repos/${REPO}/releases/latest" \
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
+}
+
+# Function to fetch the latest release version from GitHub
+# $1 - GitHub repository (string)
+get_latest_release()
+{
+  local repo=$1
+
+  local version
+  version=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
     | grep "tag_name" \
-    | awk '{print substr($2, 2, length($2)-3)}'
-)
+    | awk -F '"' '{print $4}')
 
-echo "$VERSION"
+  if [ -z "$version" ]; then
+    msg "Failed to fetch the latest release version for repository: $repo"
+    echo ""
+    exit 1
+  fi
+
+  echo "$version"
+  return 0
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  local repo=$1
+
+  msg "Fetching the latest release version for repository: $repo"
+
+  local version
+  version=$(get_latest_release "$repo")
+
+  echo "$version"
+  return 0
+}
+
+main "$@"
 
 # vim: set ts=2 sw=2 ft=sh et:

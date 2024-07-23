@@ -14,32 +14,46 @@
 # ./when-up ssh 1.2.3.4
 #
 
-#
-#  Ensure we received the correct number of arguments.
-#
-if [ $# -lt 2 ]; then
+# Ensure we received the correct number of arguments.
+if [ "$#" -lt 2 ]; then
   echo "Usage: $0 HOST COMMAND..."
   exit 1
 fi
 
-if [ "$1" = "ssh" ]; then
-  HOST=$2
-else
-  HOST=$1
-fi
+get_host()
+{
+  if [ "$1" = "ssh" ]; then
+    echo "$2"
+  else
+    echo "$1"
+  fi
+}
 
-echo "Waiting for $HOST to come online..."
+wait_for_host()
+{
+  local host=$1
 
-ping -c 1 -W 1 "$HOST" > /dev/null
-while [ $? -ne 0 ]; do
-  sleep 1
-  ping -c 1 -W 1 "$HOST" > /dev/null
-done
+  echo "Waiting for $host to come online..."
 
-# By the time we reach here the ping-command has completed successfully
-# so we can launch the command we were given - along with any arguments.
-if [ "$1" != "ssh" ]; then
-  shift
-fi
+  while ! ping -c 1 -W 1 "$host" > /dev/null 2>&1; do
+    sleep 1
+  done
+}
 
-"$@"
+main()
+{
+  local host
+
+  host=$(get_host "$@")
+  wait_for_host "$host"
+
+  if [ "$1" = "ssh" ]; then
+    shift 1
+  else
+    shift
+  fi
+
+  "$@"
+}
+
+main "$@"

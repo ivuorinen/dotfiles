@@ -8,7 +8,39 @@
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 # License: MIT <https://opensource.org/license/mit/>
 
-for f in */; do (cd "$f" && echo "-> $f" && git pull --rebase --autostash --prune); done
+set -euo pipefail
 
-echo "Done."
-echo ""
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [ "$VERBOSE" -eq 1 ] && echo "$1"
+}
+
+# Function to update a git repository
+# $1 - directory (string)
+update_repo()
+{
+  local dir=$1
+  (
+    cd "$dir" || exit
+    msg "Updating $dir"
+    git pull --rebase --autostash --prune
+  )
+}
+
+# Main function to update all subfolder git repositories
+main()
+{
+  for dir in */; do
+    update_repo "$dir"
+  done
+
+  echo "Done."
+  echo ""
+}
+
+main "$@"

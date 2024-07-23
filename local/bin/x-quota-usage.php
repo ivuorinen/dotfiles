@@ -1,5 +1,15 @@
 #!/usr/bin/env php
 <?php
+/**
+ * Quota usage
+ * Show quota usage
+ *
+ * @package x-quota-usage
+ * @version 1.0.0
+ * @link https://github.com/ivuorinen/dotfiles/blob/main/local/bin/x-quota-usage.php
+ * @license MIT
+ * @author Ismo Vuorinen <https://github.com/ivuorinen>
+ */
 error_reporting(E_ALL);
 
 $debug = false;
