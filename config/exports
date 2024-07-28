@@ -13,6 +13,8 @@
 # if DOTFILES is not set, set it to the default location
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
 
+export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
   # $1 - message (string)
@@ -69,10 +71,11 @@ darknotify_alacritty()
   x-have dark-notify && {
     # subprocess is used to prevent the command from showing it was backgrounded
     (
-      flock /tmp/dark-notify-alacritty.lock dark-notify \
+      silent flock /tmp/dark-notify-alacritty.lock dark-notify \
         -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
     ) &> /dev/null
   }
+  return 0
 }
 darknotify_alacritty
 
@@ -98,14 +101,14 @@ have_brew()
 # Alacritty preexec hook to update dynamic title
 preexec()
 {
-  print -Pn "\e]0;$1%~\a"
+  print -n -P "\e]0;$1%~\a"
 }
 
 # Update dotfiles
 dfu()
 {
   (
-    cd "$DOTFILES" && git pull --ff-only && ./install -q
+    cd "$DOTFILES" && git pull --ff-only && ./install
   )
 }
 
@@ -450,3 +453,4 @@ x-dc "$WAKATIME_HOME"
 msg "Setting up miscellaneous configuration"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
+
