@@ -6,13 +6,6 @@
 # Set verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-# Function to print usage information
-usage()
-{
-  echo "Usage: $0 <dir>"
-  exit 1
-}
-
 # Function to print messages if VERBOSE is enabled
 # $1 - message (string)
 msg()
@@ -20,33 +13,21 @@ msg()
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
 }
 
-# Function to add a directory to the front of PATH
-# $1 - directory to add (string)
-prepend_to_path()
-{
-  local dir=$1
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <dir>"
+  exit 1
+fi
 
-  if [ ! -d "$dir" ]; then
-    msg "(?) Directory $dir does not exist"
-    exit 0
-  fi
+dir="$1"
 
-  if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
-    msg "(!) Directory $dir is already in PATH"
-  else
-    export PATH="$dir${PATH:+":$PATH"}"
-    msg "(!) Directory $dir has been added to the front of PATH"
-  fi
-}
+if [ ! -d "$dir" ]; then
+  msg "(?) Directory $dir does not exist"
+  exit 0
+fi
 
-# Main function
-main()
-{
-  if [ "$#" -ne 1 ]; then
-    usage
-  fi
-
-  prepend_to_path "$1"
-}
-
-main "$@"
+if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
+  msg "(!) Directory $dir is already in PATH"
+else
+  export PATH="$dir${PATH:+":$PATH"}"
+  msg "(!) Directory $dir has been added to the front of PATH"
+fi
