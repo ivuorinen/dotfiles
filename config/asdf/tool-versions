@@ -14,7 +14,7 @@ lazygit 0.43.1
 neovim system
 nodejs 22.5.1
 pipx 1.6.0
-pre-commit 3.7.1
+pre-commit 3.8.0
 ripgrep 14.1.0
 rust 1.79.0
 semgrep system
@@ -22,7 +22,7 @@ shellcheck 0.10.0
 shfmt 3.8.0
 terraform-ls 0.33.3
 terraform-lsp 0.0.12
-terragrunt 0.64.0
+terragrunt 0.64.2
 tf-summarize 0.3.10
 vault 1.17.2+ent
 yamllint 1.35.1
