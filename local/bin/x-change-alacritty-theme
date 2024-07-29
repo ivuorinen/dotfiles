@@ -14,7 +14,7 @@ A_DIR="$HOME/.config/alacritty"
 usage()
 {
   echo "Usage: $0 <theme>"
-  echo "Available themes: dark, night, day"
+  echo "Available themes: (dark|night) to turn dark mode on, (day|light) to turn off"
   exit 1
 }
 
@@ -23,6 +23,7 @@ usage()
 msg()
 {
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
 }
 
 # Function to set the alacritty theme
@@ -30,8 +31,10 @@ msg()
 set_alacritty_theme()
 {
   local theme=$1
-  msg "Setting alacritty theme to $theme"
-  cp -f "$A_DIR/theme-$theme.toml" "$A_DIR/theme-active.toml"
+  local theme_file="$A_DIR/theme-$theme.toml"
+  msg "Setting alacritty theme to $theme ($theme_file)"
+  cp -f "$theme_file" "$A_DIR/theme-active.toml"
+  return 0
 }
 
 # Function to notify alacritty about the changes
@@ -39,6 +42,7 @@ notify_alacritty()
 {
   msg "Notifying alacritty about the changes"
   touch "$A_DIR/alacritty.toml"
+  return 0
 }
 
 # Main function
@@ -51,7 +55,7 @@ main()
   local alacritty_theme=$1
 
   case "$alacritty_theme" in
-    day)
+    day | light)
       set_alacritty_theme "day"
       ;;
     *)
@@ -61,6 +65,7 @@ main()
 
   notify_alacritty
   msg "Theme set successfully!"
+  exit 0
 }
 
 main "$@"

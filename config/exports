@@ -71,7 +71,7 @@ darknotify_alacritty()
   x-have dark-notify && {
     # subprocess is used to prevent the command from showing it was backgrounded
     (
-      silent flock /tmp/dark-notify-alacritty.lock dark-notify \
+      flock /tmp/dark-notify-alacritty.lock dark-notify \
         -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
     ) &> /dev/null
   }
