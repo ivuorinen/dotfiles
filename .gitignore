@@ -22,4 +22,7 @@ node_modules
 iTermServer-*
 lock
 config/iterm2/AppSupport
+config/gnupg/S.*
+config/gnupg/s
+config/gnupg/private-keys-v1.d
 

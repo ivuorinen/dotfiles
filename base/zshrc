@@ -48,6 +48,7 @@ load_antigen()
     x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
     # these should be always available
+    antigen bundle gpg-agent
     antigen bundle brew
     antigen bundle tmux
     antigen bundle colored-man-pages
