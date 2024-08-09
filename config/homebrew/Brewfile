@@ -8,7 +8,6 @@ tap "gesquive/tap"
 tap "github/gh"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "k8sgpt-ai/k8sgpt"
@@ -57,26 +56,28 @@ brew "apr"
 brew "apr-util"
 # Password hashing library and CLI utility
 brew "argon2"
-# Spell checker with better logic than ispell
-brew "aspell"
 # Automatic configure script builder
 brew "autoconf"
-# Collection of over 500 reusable autoconf macros
-brew "autoconf-archive"
+# Tool for generating GNU Standards-compliant Makefiles
+brew "automake"
 # GNU multiple precision arithmetic library
 brew "gmp"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Extendable version manager with support for Ruby, Node.js, Erlang & more
+brew "asdf"
+# Spell checker with better logic than ispell
+brew "aspell"
+# Collection of over 500 reusable autoconf macros
+brew "autoconf-archive"
 # Manage compile and link flags for libraries
 brew "pkg-config"
 # Automated text file generator
 brew "autogen"
-# Tool for generating GNU Standards-compliant Makefiles
-brew "automake"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
-# Yet another cross-platform graphical process/system monitor
-brew "bottom"
 # Software library to render fonts
 brew "freetype"
 # XML-based font configuration API for X Windows
@@ -89,24 +90,18 @@ brew "glib"
 brew "choose-rust"
 # Cross-platform make
 brew "cmake"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
-# Open source suite of directory software
-brew "openldap"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
-# Lightning-fast linter for .env files written in Rust
-brew "dotenv-linter"
 # Spellchecker wrapping library
 brew "enchant"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
-# Simple, fast and user-friendly alternative to find
-brew "fd"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
+# Lock file during command
+brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
 # Monitor a directory for changes and run a shell command
@@ -117,8 +112,6 @@ brew "fzf"
 brew "gd"
 # Disk usage analyzer with console interface written in Go
 brew "gdu"
-# GitHub command-line tool
-brew "gh"
 # Distributed revision control system
 brew "git"
 # Enable transparent encryption/decryption of files in a git repo
@@ -137,10 +130,10 @@ brew "unbound"
 brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
-# Open source programming language to build simple/reliable/efficient software
-brew "go"
 # Library access to GnuPG
 brew "gpgme"
+# Open source suite of directory software
+brew "openldap"
 # Manage your GnuPG keys with ease!
 brew "gpg-tui"
 # Image manipulation
@@ -159,8 +152,6 @@ brew "graphviz"
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
-# Smarter Dockerfile linter to validate best practices
-brew "hadolint"
 # Improved top (interactive process viewer)
 brew "htop"
 # Portable abstraction of the hierarchical topology of modern architectures
@@ -177,8 +168,6 @@ brew "jq"
 brew "json-c"
 # Scanning your k8s clusters, diagnosing, and triaging issues in simple English
 brew "k8sgpt"
-# Network authentication protocol
-brew "krb5"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
 brew "legitify"
 # Secure hashing function
@@ -205,8 +194,6 @@ brew "nginx"
 brew "nmap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
-# General-purpose scripting language
-brew "php"
 # Coreutils progress viewer
 brew "progress"
 # Python version management
@@ -221,22 +208,12 @@ brew "python@3.11"
 brew "ruby-build"
 # Ruby version manager
 brew "rbenv"
-# Search tool like grep and The Silver Searcher
-brew "ripgrep"
-# Safe, concurrent, practical language
-brew "rust"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
-# Autoformat shell script source code
-brew "shfmt"
 # Feature-rich console based todo list manager
 brew "task"
-# Terminal user interface for taskwarrior
-brew "taskwarrior-tui"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
-# Thin wrapper for Terraform e.g. for locking state
-brew "terragrunt"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
 # Terraform version manager inspired by rbenv
@@ -259,17 +236,32 @@ brew "watch"
 brew "wget"
 # Check your $HOME for unwanted files and directories
 brew "xdg-ninja", args: ["HEAD"]
-# JavaScript package manager
-brew "yarn"
 # Watcher for macOS 10.14+ light/dark mode changes
 brew "cormacrelf/tap/dark-notify"
 # Cleans up your $HOME from those pesky dotfiles
 brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
-brew "keith/formulae/reminders-cli"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
 brew "reviewdog/tap/reviewdog"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.3"
+# Mcrypt PHP extension
+brew "shivammathur/extensions/mcrypt@8.3"
+# Msgpack PHP extension
+brew "shivammathur/extensions/msgpack@8.3"
+# PCOV PHP extension
+brew "shivammathur/extensions/pcov@8.3"
+# Redis PHP extension
+brew "shivammathur/extensions/redis@8.3"
+# Uuid PHP extension
+brew "shivammathur/extensions/uuid@8.3"
+# Yaml PHP extension
+brew "shivammathur/extensions/yaml@8.3"
+# General-purpose scripting language
+brew "shivammathur/php/php"
+# General-purpose scripting language
+brew "shivammathur/php/php-debug"
 # Command-line interface for 1Password
 cask "1password-cli"
 # GPU-accelerated terminal emulator
@@ -282,22 +274,6 @@ cask "dbeaver-community"
 cask "dbngin"
 # App to build and share containerised applications and microservices
 cask "docker"
-# Unofficial overcast.fm podcast app
-cask "fog"
-# Typeface made for developers
-cask "font-jetbrains-mono"
-# Developer targeted fonts with a high number of glyphs
-cask "font-jetbrains-mono-nerd-font"
-cask "font-lato"
-cask "font-open-sans"
-# Font with a mechanical skeleton and the forms are largely geometric
-cask "font-roboto"
-cask "font-source-code-pro"
-cask "font-source-code-pro-for-powerline"
-cask "font-source-sans-pro"
-cask "font-source-serif-pro"
-# Open Source Webfont Converter
-cask "fontplop"
 # GIT client
 cask "fork"
 # HTTP and GraphQL Client
@@ -348,6 +324,8 @@ cask "soundsource"
 cask "suspicious-package"
 # Quicklook extension for source files
 cask "syntax-highlight"
+# Python IDE for beginners
+cask "thonny"
 # Configuration application for the Ultimate Hacking Keyboard
 cask "uhk-agent"
 # Open-source code editor
@@ -358,3 +336,5 @@ cask "vlc"
 cask "voikkospellservice"
 # Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
+# Multiplayer code editor
+cask "zed"
