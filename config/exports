@@ -308,8 +308,6 @@ msg "Setting up asdf configuration"
 export ASDF_DIR="${XDG_BIN_HOME}/asdf"
 export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
 export ASDF_DATA_DIR="${ASDF_DIR}"
-# This seems wrong, but `asdf info` and `versions.bash` differ on path resolution.
-export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=".config/asdf/tool-versions"
 export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
 export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
 export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
@@ -317,6 +315,7 @@ export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
 export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
 export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
+export ASDF_DIRENV_IGNORE_MISSING_PLUGINS=1
 export PATH="${ASDF_DIR}/bin:${PATH}"
 
 # bob manages nvim versions
@@ -342,6 +341,11 @@ msg "Setting up Composer configuration"
 export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 export PATH="$COMPOSER_BIN:$PATH"
+
+# direnv, https://direnv.net/
+# https://direnv.net/docs/hook.html
+# Set the hook to show the direnv message in a different color
+export DIRENV_LOG_FORMAT=$'\033[2mdirenv: %s\033[0m'
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 msg "Setting up Docker configuration"

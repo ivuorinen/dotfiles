@@ -108,6 +108,11 @@ initialize_antidot()
   fi
 }
 
+initialize_direnv()
+{
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
+}
+
 main()
 {
   load_antigen
@@ -115,6 +120,7 @@ main()
   initialize_pyenv
   setup_tmux_window_name_plugin
   initialize_antidot
+  initialize_direnv
 }
 
 main "$@"
