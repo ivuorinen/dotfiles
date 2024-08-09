@@ -16,6 +16,7 @@ nodejs 22.6.0
 pipx 1.6.0
 pre-commit 3.8.0
 ripgrep 14.1.0
+ruby 3.3.4
 rust 1.80.1
 semgrep system
 shellcheck 0.10.0
