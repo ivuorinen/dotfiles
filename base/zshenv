@@ -1,6 +1,0 @@
-# shellcheck shell=bash
-# vim: filetype=zsh
-
-export DOTFILES="$HOME/.dotfiles"
-export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$PATH"
-export SHARED_SCRIPTS_SOURCED=0

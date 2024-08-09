@@ -5,15 +5,10 @@
 # export DEBUG=1
 
 export DOTFILES="$HOME/.dotfiles"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$HOME/.local/share/bob/nvim-bin:$HOME/.local/share/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
-
-x-path-prepend "/usr/local/bin"
-x-path-prepend "/opt/homebrew/bin"
-x-path-prepend "$HOME/.local/share/cargo/bin"
-x-path-prepend "$HOME/.local/share/bob/nvim-bin"
-x-path-prepend "$HOME/.local/bin"
-x-path-prepend "$DOTFILES/local/bin"
 
 eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 
@@ -43,19 +38,23 @@ load_antigen()
     export ZSH_TMUX_AUTOQUIT=false
     export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
+    zstyle :omz:plugins:ssh-agent quiet yes
+    zstyle :omz:plugins:ssh-agent lazy yes
+
     # z, the zsh version
     export ZSHZ_DATA="$XDG_STATE_HOME/z"
     antigen bundle z
+
+    x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
     # these should be always available
     antigen bundle brew
     antigen bundle tmux
     antigen bundle colored-man-pages
-    antigen bundle ssh-agent
+    # antigen bundle ssh-agent
     antigen bundle jreese/zsh-titles
     antigen bundle zsh-users/zsh-completions
 
-    x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
     # this needs to be the last item
     antigen bundle zsh-users/zsh-syntax-highlighting
@@ -125,10 +124,3 @@ main()
 
 main "$@"
 
-# Herd checks for a few environment variables to inject PHP binaries and configurations.
-# Herd injected PHP binary.
-# export PATH="/Users/ivuorinen/Library/Application\ Support/Herd/bin/":$PATH
-# Herd injected PHP 8.3 configuration.
-# export HERD_PHP_83_INI_SCAN_DIR="/Users/ivuorinen/Library/Application\ Support/Herd/config/php/83/"
-# Herd injected PHP 7.4 configuration.
-# export HERD_PHP_74_INI_SCAN_DIR="/Users/ivuorinen/Library/Application\ Support/Herd/config/php/74/"
