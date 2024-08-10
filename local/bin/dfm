@@ -412,6 +412,9 @@ section_dotfiles()
       ! x-have yamlfmt && msg_err "yamlfmt not found"
       ;;
     shfmt)
+      # If system doesn't have fd or shfmt installed, exit
+      ! x-have fd && msg_err "fd not found, install with asdf"
+      ! x-have shfmt && msg_err "shfmt not found, install with asdf"
       # Format shell scripts according to following rules.
       fd --full-path "$DOTFILES" -tx \
         -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
