@@ -3,8 +3,6 @@
 ```txt
 
 n  <Esc>       * <Cmd>nohlsearch<CR>
-n  <Space>tc   * <Cmd>CloakToggle<CR>
-                 Toggle Cloak
 n  <Space>zg   * :Rg<CR>
                  FZF: search with rg (aka live grep).
 n  <Space>zm   * :Maps<CR>
@@ -19,34 +17,36 @@ n  <Space>zc   * :Commands<CR>
                  FZF: search commands.
 n  <Space>zf   * :FZF<Space>
                  FZF: search for files in given path.
-   <Space>f    * <Lua 69: ~/.dotfiles/config/nvim-kickstart/init.lua:505>
-                 [F]ormat buffer
-n  <Space>e    * <Lua 52: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
-n  <Space>4    * <Lua 49: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>tc   * <Cmd>CloakToggle<CR>
+                 [tc] Toggle Cloak
+n  <Space>4    * <Lua 84: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to file 4
-n  <Space>3    * <Lua 48: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>3    * <Lua 83: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to file 3
-n  <Space>2    * <Lua 47: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>2    * <Lua 82: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to file 2
-n  <Space>1    * <Lua 46: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>1    * <Lua 81: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to file 1
-n  <Space>xn   * <Lua 45: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>xn   * <Lua 80: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to next file
-n  <Space>xN   * <Lua 44: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
-                 harpoon to previous file
-n  <Space>xa   * <Lua 43: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>xa   * <Lua 79: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon quick menu
-n  <Space>xA   * <Lua 42: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>xN   * <Lua 78: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+                 harpoon to previous file
+n  <Space>xA   * <Lua 77: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon file
-n  <Space>5    * <Lua 39: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <Space>5    * <Lua 76: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
                  harpoon to file 5
-n  <Space>tz   * <Lua 37: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
-                 Toggle ZenMode
+n  <Space>tz   * <Lua 51: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+                 [tz] Toggle ZenMode
+n  <Space>e    * <Lua 47: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+   <Space>f    * <Lua 40: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+                 [f] Format buffer
 n  <Space>qq   * <Cmd>wq!<CR>
                  Quickly Quit
-n  <Space>bq   * <Lua 27: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1984>
+n  <Space>bq   * <Lua 28: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1984>
                  Open diagnostic [Q]uickfix list
-n  <Space>be   * <Lua 26: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1694>
+n  <Space>be   * <Lua 27: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1694>
                  Show diagnostic [E]rror messages
 x  #           * <Lua 7: vim/_defaults.lua:0>
                  :help v_#-default
@@ -74,108 +74,98 @@ n  ]%            <Plug>(MatchitNormalMultiForward)
 n  ]d          * <Lua 14: vim/_defaults.lua:0>
                  Jump to the next diagnostic
 x  a%            <Plug>(MatchitVisualTextObject)
-o  al            <Lua 236: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  al            <Lua 247: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around last textobject
-o  an            <Lua 235: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  an            <Lua 246: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around next textobject
-x  al            <Lua 232: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  al            <Lua 243: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around last textobject
-x  an            <Lua 231: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  an            <Lua 242: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around next textobject
-o  a             <Lua 229: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  a             <Lua 240: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around textobject
-x  a             <Lua 227: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  a             <Lua 238: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Around textobject
-n  dj          * <Lua 25: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1222>
+n  dj          * <Lua 26: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1222>
                  Go to next [D]iagnostic message
-n  dk          * <Lua 23: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1145>
+n  dk          * <Lua 25: ~/.local/share/bob/v0.10.0/nvim-macos-arm64/share/nvim/runtime/lua/vim/diagnostic.lua:1145>
                  Go to previous [D]iagnostic message
 o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
-o  g]            <Lua 226: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
+n  gR          * :RegexplainerToggle<CR>
+                 Toggle Regexplainer
+o  g]            <Lua 237: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
                  Move to right "around"
-x  g]            <Lua 225: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
+x  g]            <Lua 236: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
                  Move to right "around"
-n  g]            <Lua 224: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
+n  g]            <Lua 235: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1169>
                  Move to right "around"
-o  g[            <Lua 223: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
+o  g[            <Lua 234: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
                  Move to left "around"
-x  g[            <Lua 222: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
+x  g[            <Lua 233: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
                  Move to left "around"
-n  g[            <Lua 221: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
+n  g[            <Lua 232: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1168>
                  Move to left "around"
-n  gcA         * <Lua 209: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:218>
-                 Comment insert end of line
-n  gcO         * <Lua 208: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:179>
-                 Comment insert above
-n  gco         * <Lua 11: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:182>
-                 Comment insert below
-x  gb          * <Plug>(comment_toggle_blockwise_visual)
-                 Comment toggle blockwise (visual)
-n  gbc         * <Lua 12: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/init.lua:107>
-                 Comment toggle current block
-n  gb          * <Plug>(comment_toggle_blockwise)
-                 Comment toggle blockwise
 o  gc          * <Lua 13: vim/_defaults.lua:0>
                  Comment textobject
-n  gcc         * <Lua 10: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/init.lua:103>
-                 Comment toggle current line
-x  gc          * <Plug>(comment_toggle_linewise_visual)
-                 Comment toggle linewise (visual)
-n  gc          * <Plug>(comment_toggle_linewise)
-                 Comment toggle linewise
+n  gcc         * <Lua 12: vim/_defaults.lua:0>
+                 Toggle comment line
+x  gc          * <Lua 11: vim/_defaults.lua:0>
+                 Toggle comment
+n  gc          * <Lua 10: vim/_defaults.lua:0>
+                 Toggle comment
 x  gx          * <Lua 9: vim/_defaults.lua:0>
                  Opens filepath or URI under cursor with the system handler (file explorer, web browser, …)
 n  gx          * <Lua 8: vim/_defaults.lua:0>
                  Opens filepath or URI under cursor with the system handler (file explorer, web browser, …)
-o  il            <Lua 238: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  il            <Lua 249: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside last textobject
-o  in            <Lua 237: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  in            <Lua 248: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside next textobject
-x  il            <Lua 234: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  il            <Lua 245: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside last textobject
-x  in            <Lua 233: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  in            <Lua 244: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside next textobject
-o  i             <Lua 230: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+o  i             <Lua 241: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside textobject
-x  i             <Lua 228: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
+x  i             <Lua 239: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/ai.lua:1172>
                  Inside textobject
-n  shn         * <Lua 255: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  shn         * <Lua 266: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Highlight next surrounding
-n  sFn         * <Lua 254: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sFn         * <Lua 265: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find next left surrounding
-n  sfn         * <Lua 253: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sfn         * <Lua 264: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find next right surrounding
-n  srn         * <Lua 252: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  srn         * <Lua 263: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Replace next surrounding
-n  sdn         * <Lua 251: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sdn         * <Lua 262: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Delete next surrounding
-n  shl         * <Lua 250: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  shl         * <Lua 261: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Highlight previous surrounding
-n  sFl         * <Lua 249: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sFl         * <Lua 260: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find previous left surrounding
-n  sfl         * <Lua 248: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sfl         * <Lua 259: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find previous right surrounding
-n  srl         * <Lua 247: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  srl         * <Lua 258: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Replace previous surrounding
-n  sdl         * <Lua 246: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sdl         * <Lua 257: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Delete previous surrounding
 x  sa          * :<C-U>lua MiniSurround.add('visual')<CR>
                  Add surrounding to selection
-n  sn          * <Lua 245: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:892>
+n  sn          * <Lua 256: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:892>
                  Update `MiniSurround.config.n_lines`
-n  sh          * <Lua 244: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sh          * <Lua 255: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Highlight surrounding
-n  sF          * <Lua 243: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sF          * <Lua 254: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find left surrounding
-n  sf          * <Lua 242: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sf          * <Lua 253: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Find right surrounding
-n  sr          * <Lua 241: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sr          * <Lua 252: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Replace surrounding
-n  sd          * <Lua 240: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sd          * <Lua 251: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Delete surrounding
-n  sa          * <Lua 239: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
+n  sa          * <Lua 250: ~/.local/share/nvim-kickstart/lazy/mini.nvim/lua/mini/surround.lua:1252>
                  Add surrounding
 x  <Plug>(MatchitVisualTextObject)   <Plug>(MatchitVisualMultiBackward)o<Plug>(MatchitVisualMultiForward)
 o  <Plug>(MatchitOperationMultiForward) * :<C-U>call matchit#MultiMatch("W",  "o")<CR>
@@ -197,28 +187,12 @@ x  <Plug>(fzf-maps-x) * :<C-U>call fzf#vim#maps('x', 0)<CR>
 n  <Plug>(fzf-maps-n) * :<C-U>call fzf#vim#maps('n', 0)<CR>
 n  <Plug>(fzf-normal) * <Nop>
 n  <Plug>(fzf-insert) * i
-x  <Plug>(comment_toggle_blockwise_visual) * <Esc><Cmd>lua require("Comment.api").locked("toggle.blockwise")(vim.fn.visualmode())<CR>
-                 Comment toggle blockwise (visual)
-x  <Plug>(comment_toggle_linewise_visual) * <Esc><Cmd>lua require("Comment.api").locked("toggle.linewise")(vim.fn.visualmode())<CR>
-                 Comment toggle linewise (visual)
-n  <Plug>(comment_toggle_blockwise_count) * <Lua 206: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle blockwise with count
-n  <Plug>(comment_toggle_linewise_count) * <Lua 205: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle linewise with count
-n  <Plug>(comment_toggle_blockwise_current) * <Lua 204: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle current block
-n  <Plug>(comment_toggle_linewise_current) * <Lua 203: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle current line
-n  <Plug>(comment_toggle_blockwise) * <Lua 202: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle blockwise
-n  <Plug>(comment_toggle_linewise) * <Lua 201: ~/.local/share/nvim-kickstart/lazy/Comment.nvim/lua/Comment/api.lua:246>
-                 Comment toggle linewise
-n  <C-Bslash>  * <Lua 58: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <C-Bslash>  * <Lua 60: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
 n  <C-S>       * <Cmd>w<CR>
                  Save file
-n  <C-K>       * <Lua 59: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
-n  <C-J>       * <Lua 54: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
-n  <C-H>       * <Lua 57: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <C-K>       * <Lua 57: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <C-J>       * <Lua 56: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <C-H>       * <Lua 58: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
 n  <Down>      * <Cmd>echo "Use j to move!!"<CR>
 n  <Up>        * <Cmd>echo "Use k to move!!"<CR>
 n  <Right>     * <Cmd>echo "Use l to move!!"<CR>
@@ -227,7 +201,7 @@ n  <C-W><C-D>    <C-W>d
                  Show diagnostics under the cursor
 n  <C-W>d      * <Lua 16: vim/_defaults.lua:0>
                  Show diagnostics under the cursor
-n  <C-L>       * <Lua 56: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
+n  <C-L>       * <Lua 59: ~/.local/share/nvim-kickstart/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:121>
 ```
 
-- Generated on Mon 22 Jul 2024 17:32:22 EEST
+- Generated on Sat 10 Aug 2024 13:01:59 EEST

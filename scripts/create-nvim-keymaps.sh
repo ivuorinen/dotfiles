@@ -12,7 +12,7 @@ main()
 
   {
     printf "# nvim keybindings\n\n"
-    printf "\`\`\`txt\n"
+    printf "\`\`\`txt"
   } > "$DEST"
 
   NVIM_APPNAME="nvim-kickstart" nvim -c "redir! >> $DEST" -c 'silent verbose map' -c 'redir END' -c 'q'
