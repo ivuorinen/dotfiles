@@ -351,13 +351,21 @@ section_docs()
   USAGE_PREFIX="$SCRIPT docs <command>"
 
   MENU=(
+    "all:Update all keybindings documentations"
     "tmux:Update tmux keybindings documentation"
     "nvim:Update nvim keybindings documentation"
+    "wezterm:Update wezterm keybindings documentation"
   )
 
   case "$1" in
+    all)
+      $0 docs tmux
+      $0 docs nvim
+      $0 docs wezterm
+      ;;
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
+    wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
     *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
