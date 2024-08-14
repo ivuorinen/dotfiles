@@ -459,3 +459,13 @@ msg "Setting up miscellaneous configuration"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
+X_EXPORTS_FILES=(
+  "$HOME/.config/exports-secret"
+  "$HOME/.config/exports-$(hostname)"
+  "$HOME/.config/exports-$(hostname)-secret"
+)
+for exportFile in "${X_EXPORTS_FILES[@]}"; do
+  [ -f "$exportFile" ] && source "$exportFile" && msg "Sourced $exportFile"
+done
+unset X_EXPORTS_FILES
+

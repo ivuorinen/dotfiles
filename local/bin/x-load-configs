@@ -17,7 +17,7 @@ CONFIG_HOST="$(hostname -s)"
 # Enable debugging if requested
 [ "$DEBUG" = "1" ] && set -x
 
-CONFIG_PATH="${DOTFILES}/config"
+CONFIG_PATH="${HOME}/.config"
 
 [ -d "$DOTFILES" ] || {
   msg_err "Error: DOTFILES is not set or $DOTFILES does not exist"
