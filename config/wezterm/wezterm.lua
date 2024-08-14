@@ -11,6 +11,8 @@ config.window_background_opacity = 0.97
 -- Don't show tab bar
 config.enable_tab_bar = false
 
+config.send_composed_key_when_left_alt_is_pressed = true
+
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
   if appearance:find("Dark") then
