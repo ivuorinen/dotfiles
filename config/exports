@@ -15,6 +15,16 @@
 
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+# Load asdf
+export ASDF_DIR="$XDG_BIN_HOME/asdf"
+if [[ -d $ASDF_DIR ]]; then
+  [[ -d $ASDF_DIR/bin ]] && x-path-prepend "$ASDF_DIR/bin"
+  [[ -d $ASDF_DIR/shims ]] && x-path-prepend "$ASDF_DIR/shims"
+  [[ -d $ASDF_DIR/completions ]] && fpath=("$ASDF_DIR/completions" $fpath)
+  [[ -d $ASDF_DIR/plugins ]] && fpath=("$ASDF_DIR/plugins" $fpath)
+  source "$ASDF_DIR/asdf.sh"
+fi
+
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
   # $1 - message (string)
@@ -285,6 +295,8 @@ export GREP_OPTIONS="--color=auto"
 # update the values of LINES and COLUMNS.
 hash shopt 2> /dev/null && shopt -s checkwinsize
 
+export SHORT_HOST=$(hostname -s)
+
 # Antigen configuration
 # https://github.com/zsh-users/antigen/wiki/Configuration
 msg "Setting up Antigen configuration"
@@ -401,6 +413,7 @@ export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 x-have pyenv && {
   eval "$(pyenv init -)"
+  eval "$(pyenv virtualenv-init -)"
 }
 
 # Ruby
@@ -468,4 +481,3 @@ for exportFile in "${X_EXPORTS_FILES[@]}"; do
   [ -f "$exportFile" ] && source "$exportFile" && msg "Sourced $exportFile"
 done
 unset X_EXPORTS_FILES
-

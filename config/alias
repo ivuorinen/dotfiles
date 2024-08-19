@@ -112,3 +112,13 @@ if [[ $(uname) == 'Darwin' ]]; then
   # Using herd for php now, so this is not needed anymore
   # x-set-php-aliases
 fi
+
+X_ALIAS_FILES=(
+  "$HOME/.config/alias-secret"
+  "$HOME/.config/alias-$(hostname)"
+  "$HOME/.config/alias-$(hostname)-secret"
+)
+for aliasFile in "${X_ALIAS_FILES[@]}"; do
+  [ -f "$aliasFile" ] && source "$aliasFile" && msg "Sourced $aliasFile"
+done
+unset X_ALIAS_FILES

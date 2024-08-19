@@ -5,22 +5,13 @@
 # export DEBUG=1
 
 export DOTFILES="$HOME/.dotfiles"
-export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$HOME/.local/share/bob/nvim-bin:$HOME/.local/share/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+LOCAL_SHARE="$HOME/.local/share"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
 
 eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
-
-# Load asdf
-export ASDF_DIR="$XDG_BIN_HOME/asdf"
-if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/bin ]] && x-path-prepend "$ASDF_DIR/bin"
-  [[ -d $ASDF_DIR/shims ]] && x-path-prepend "$ASDF_DIR/shims"
-  [[ -d $ASDF_DIR/completions ]] && fpath=("$ASDF_DIR/completions" $fpath)
-  [[ -d $ASDF_DIR/plugins ]] && fpath=("$ASDF_DIR/plugins" $fpath)
-  source "$ASDF_DIR/asdf.sh"
-fi
 
 # Function to load antigen if available
 load_antigen()
@@ -38,8 +29,15 @@ load_antigen()
     export ZSH_TMUX_AUTOQUIT=false
     export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
-    zstyle :omz:plugins:ssh-agent quiet yes
+    zstyle :omz:plugins:eza 'dirs-first' yes
+    zstyle :omz:plugins:eza 'git-status' yes
+    zstyle :omz:plugins:eza 'icons' yes
+
+    if [[ "$OSTYPE" == darwin* ]]; then
+      zstyle :omz:plugins:ssh-agent keychain yes
+    fi
     zstyle :omz:plugins:ssh-agent lazy yes
+    zstyle :omz:plugins:ssh-agent quiet yes
 
     # z, the zsh version
     export ZSHZ_DATA="$XDG_STATE_HOME/z"
@@ -48,14 +46,15 @@ load_antigen()
     x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
 
     # these should be always available
+    antigen bundle jreese/zsh-titles
+    antigen bundle gnu-utils
+    antigen bundle ssh-agent
     antigen bundle gpg-agent
     antigen bundle brew
     antigen bundle tmux
     antigen bundle colored-man-pages
-    # antigen bundle ssh-agent
-    antigen bundle jreese/zsh-titles
     antigen bundle zsh-users/zsh-completions
-
+    antigen bundle eza
 
     # this needs to be the last item
     antigen bundle zsh-users/zsh-syntax-highlighting
@@ -70,17 +69,6 @@ source_fzf_config()
   if [[ -f "$fzf_config" ]]; then
     # shellcheck source=config/fzf/fzf.zsh
     source "$fzf_config"
-  fi
-}
-
-# Function to initialize pyenv if available
-initialize_pyenv()
-{
-  if x-have pyenv; then
-    [[ -d $PYENV_ROOT/bin ]] && x-path-append "$PYENV_ROOT/bin"
-    [[ -d $PYENV_ROOT/shims ]] && x-path-append "$PYENV_ROOT/shims"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
   fi
 }
 
@@ -100,28 +88,15 @@ setup_tmux_window_name_plugin()
   fi
 }
 
-# Function to initialize antidot if available
-initialize_antidot()
-{
-  if x-have antidot; then
-    eval "$(antidot init)"
-  fi
-}
-
-initialize_direnv()
-{
-  source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
-}
-
 main()
 {
   load_antigen
   source_fzf_config
-  initialize_pyenv
   setup_tmux_window_name_plugin
-  initialize_antidot
-  initialize_direnv
+  if x-have antidot; then
+    eval "$(antidot init)"
+  fi
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 }
 
 main "$@"
-
