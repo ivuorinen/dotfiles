@@ -7,12 +7,12 @@ dotenv-linter 3.3.0
 editorconfig-checker 2.8.0
 eza 0.19.0
 fd 10.1.0
-github-cli 2.54.0
+github-cli 2.55.0
 golang 1.23.0
 hadolint 2.12.0
 kubectl 1.31.0
 lazygit 0.43.1
-nodejs 22.4.1
+nodejs 22.6.0
 pipx 1.6.0
 pre-commit 3.8.0
 ripgrep 14.1.0
