@@ -79,4 +79,3 @@ Leader: `<ctrl><space>`
     S-Left  Move the visible part of the window left
     S-Right Move the visible part of the window right
 ```
-

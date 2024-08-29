@@ -1,6 +1,8 @@
-# only care about files that are under our control
+# only care about files that are directly under our control
 config/cheat/cheatsheets/community/*
+config/cheat/cheatsheets/tldr/*
 config/tmux/plugins/*
+local/bin/asdf/*
 tools/*
 node_modules/*
 
