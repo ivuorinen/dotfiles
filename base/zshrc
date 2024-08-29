@@ -56,7 +56,7 @@ load_antigen()
     antigen bundle ssh-agent
     antigen bundle gpg-agent
     antigen bundle brew
-    antigen bundle tmux
+    # antigen bundle tmux
     antigen bundle colored-man-pages
     antigen bundle zsh-users/zsh-completions
     antigen bundle eza

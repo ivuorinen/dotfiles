@@ -61,6 +61,9 @@ alias ta='tmux attach || tmux'
 alias nvim-ks='NVIM_APPNAME="nvim-kickstart" nvim'
 alias ks='NVIM_APPNAME="nvim-kickstart" nvim'
 
+# xdg-ninja aliases for better experience
+alias xdg='xdg-ninja --skip-ok --skip-unsupported'
+
 # watch with: differences, precise, beep and color
 alias watchx='watch -dpbc'
 # delete .DS_Store files
