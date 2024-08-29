@@ -1,0 +1,11 @@
+[global]
+disable_stdin = true
+
+[whitelist]
+prefix = [
+  "~/Code/ivuorinen/"
+]
+exact = [
+  "~/.dotfiles/.envrc"
+]
+
