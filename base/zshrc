@@ -23,15 +23,20 @@ load_antigen()
 
     antigen use oh-my-zsh
 
+    # Disable ls colors to avoid issues with eza
+    export DISABLE_LS_COLORS=true
+
     export ZSH_TMUX_AUTOSTART=false
     export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
     export ZSH_TMUX_UNICODE=true
     export ZSH_TMUX_AUTOQUIT=false
     export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
-    zstyle :omz:plugins:eza 'dirs-first' yes
-    zstyle :omz:plugins:eza 'git-status' yes
-    zstyle :omz:plugins:eza 'icons' yes
+    zstyle ':omz:plugins:eza' 'dirs-first' yes
+    zstyle ':omz:plugins:eza' 'git-status' yes
+    zstyle ':omz:plugins:eza' 'icons' yes
+    zstyle ':omz:plugins:eza' 'ls' yes
+    zstyle ':omz:plugins:eza' 'prompt' yes
 
     if [[ "$OSTYPE" == darwin* ]]; then
       zstyle :omz:plugins:ssh-agent keychain yes
