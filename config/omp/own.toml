@@ -2,6 +2,7 @@
 final_space = true
 console_title_template = "{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}"
 version = 2
+auto_upgrade = true
 
 [[blocks]]
 alignment = "left"
