@@ -15,6 +15,12 @@
 
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+# Load bash completions if available for zsh
+if [[ -n "$ZSH_VERSION" ]]; then
+    autoload bashcompinit
+    bashcompinit
+fi
+
 # Load asdf
 export ASDF_DIR="$XDG_BIN_HOME/asdf"
 if [[ -d $ASDF_DIR ]]; then
@@ -322,13 +328,17 @@ export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
 export ASDF_DATA_DIR="${ASDF_DIR}"
 export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
 export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
-export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
-export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
-export ASDF_GOLANG_MOD_VERSION_ENABLED=true
-export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
+## Default package files
 export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
 export ASDF_GEM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/gem-packages"
+export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
+export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
+export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/python-packages"
+## Plugin configuration
 export ASDF_DIRENV_IGNORE_MISSING_PLUGINS=1
+export ASDF_GOLANG_MOD_VERSION_ENABLED=true
+export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
+## Add asdf to path
 export PATH="${ASDF_DIR}/bin:${PATH}"
 
 # bob manages nvim versions
@@ -410,6 +420,8 @@ export OP_CACHE="$XDG_STATE_HOME/1password"
 msg "Setting up Python configuration"
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
 export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
+## for MichaelAquilina/zsh-autoswitch-virtualenv
+export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 x-have pyenv && {
   eval "$(pyenv init -)"
