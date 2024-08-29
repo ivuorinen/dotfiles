@@ -356,6 +356,8 @@ export HOMEBREW_NO_ENV_HINTS=true
 export HOMEBREW_BUNDLE_MAS_SKIP=true
 export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/homebrew/Brewfile"
 x-have brew && {
+  # Add brew autocompletion to fpath
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
   eval "$(brew shellenv)"
 }
 
