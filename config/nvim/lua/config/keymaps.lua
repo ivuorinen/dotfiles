@@ -6,17 +6,11 @@ local wk = require("which-key")
 -- ╭──────────────────────────────────────────────────────────╮
 -- │                       Comment box                        │
 -- ╰──────────────────────────────────────────────────────────╯
-wk.register({
-  ["<Leader>"] = {
-    b = {
-      c = {
-        name = "□ Comment boxes",
-        b = { "<Cmd>CBccbox<CR>", "Box Title" },
-        t = { "<Cmd>CBllline<CR>", "Titled Line" },
-        l = { "<Cmd>CBline<CR>", "Simple Line" },
-        m = { "<Cmd>CBllbox14<CR>", "Marked" },
-        d = { "<Cmd>CBd<CR>", "Remove a box" },
-      },
-    },
-  },
+wk.add({
+  { "<Leader>bc", group = "□ Comment box" },
+  { "<Leader>bcb", "<Cmd>CBccbox<CR>", desc = "Box Title" },
+  { "<Leader>bcd", "<Cmd>CBd<CR>", desc = "Remove a box" },
+  { "<Leader>bcl", "<Cmd>CBline<CR>", desc = "Simple Line" },
+  { "<Leader>bcm", "<Cmd>CBllbox14<CR>", desc = "Marked" },
+  { "<Leader>bct", "<Cmd>CBllline<CR>", desc = "Titled Line" },
 })
