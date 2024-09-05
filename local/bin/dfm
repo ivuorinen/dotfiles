@@ -161,7 +161,7 @@ section_install()
       ;;
     asdf)
       msg "Installing asdf..."
-      bash "$DOTFILES/scripts/install-asdf.sh" \
+      bash "$DOTFILES/scripts/install-asdf.sh install" \
         && msg_yay "asdf installed!"
       ;;
     cargo)
