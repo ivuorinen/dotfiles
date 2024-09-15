@@ -1,0 +1,361 @@
+#!/usr/bin/env bash
+# This script checks if all versions of tools installed via asdf are in use
+# in any .tool-versions file in the home directory or its subdirectories,
+# excluding some directories that shouldn't be scanned.
+#
+# It will print out the tools and versions that are not in use and remove them.
+#
+# This script is useful for cleaning up old versions of tools that are no longer
+# in use and are taking up extra space on your system.
+#
+# Usage: x-asdf-cleanup
+# Author: Ismo Vuorinen <https://github.com/ivuorinen>
+# License: MIT
+#
+# vim: set ft=sh ts=2 sw=2 et: ft=sh
+
+# set -euo pipefail
+
+VERSION="1.0.0"
+BASENAME=$(basename "$0")
+
+# Check if asdf is installed
+if ! command -v asdf &> /dev/null; then
+  echo "(!) asdf itself is not installed or not in PATH"
+  exit 1
+fi
+
+if ! command -v fd &> /dev/null; then
+  echo "(!) Required tool fd is not installed or not in PATH"
+  echo "It's used to find .tool-versions files faster"
+  echo "Install it with asdf:"
+  echo "asdf plugin add fd && asdf install fd latest"
+  exit 1
+fi
+
+# Enable debugging: DEBUG=1 x-asdf-cleanup
+# or run with --debug option: x-asdf-cleanup --debug
+if [ "_$DEBUG" != "_" ]; then
+  set -x
+fi
+
+# Define the base directory to search for .tool-versions files
+BASE_DIR="$HOME"
+
+# Define the exclude patterns
+EXCLUDE_PATTERNS=("Library" "Photos" ".cache" ".local/state" ".git" ".Trash")
+
+# Dry run flag
+# If set to true, the script will only print out the versions that would be uninstalled
+DRYRUN=false
+
+usage() {
+  echo "Usage: $BASENAME [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  --base-dir=DIR  Specify the base directory to search for .tool-versions files"
+  echo "  --dry-run       Perform a dry run without uninstalling any versions"
+  echo "  --exclude=DIR   Exclude a directory from the search path, can be used multiple times"
+  echo "  --debug         Show debug information and exit"
+  echo "  --verbose       Enable verbose output"
+  echo "  -h, --help      Show this help message and exit"
+  echo "  -v, --version   Show the version of the script and exit"
+  exit 1
+}
+
+# Function to parse arguments
+parse_arguments() {
+  for arg in "$@"; do
+    case $arg in
+       -h|--help)
+        usage
+        ;;
+      -v|--version)
+        version
+        ;;
+      --base-dir=*)
+        BASE_DIR="${arg#*=}"
+        shift
+        ;;
+      --dry-run)
+        DRYRUN=true
+        shift
+        ;;
+      --exclude=*)
+        EXCLUDE_PATTERNS+=("${arg#*=}")
+        shift
+        ;;
+      --verbose)
+        VERBOSE=true
+        shift
+        ;;
+      --debug)
+        DEBUG=true
+        shift
+        debug_info "$@"
+        ;;
+      *)
+        echo "Unknown option: $arg"
+        usage
+        ;;
+    esac
+  done
+}
+
+# Function to check if the parameter given exists and is a directory
+# Usage: is_dir "directory"
+# Output: "yes" or "no"
+is_dir() {
+  local dir="$1"
+  if [ -d "$dir" ]; then
+    echo "yes"
+  else
+    echo "no"
+  fi
+}
+
+# Function to display debug information
+#
+# It will print out the script variables, tool versions
+# and the remaining arguments.
+#
+# Usage: debug_info "$@"
+#        Where $@ is the list of arguments passed to the script
+# Output: Debug information
+debug_info() {
+  echo "----------------------------------------"
+  echo "Script variables:"
+  echo "----------------------------------------"
+  echo " BASE_DIR         = $BASE_DIR"
+  echo " BASE_DIR IS DIR  = $(is_dir "$BASE_DIR")"
+  echo " DEBUG            = $DEBUG"
+  echo " DRY_RUN          = $DRYRUN"
+  echo " EXCLUDE_PATTERNS = ${EXCLUDE_PATTERNS[*]}"
+  echo " VERBOSE          = $VERBOSE"
+  echo " VERSION          = $VERSION"
+  echo " Remaining arguments:"
+  for var in "$@"; do
+    echo "  $var"
+  done
+  echo "----------------------------------------"
+  echo "Tool versions:"
+  echo "----------------------------------------"
+  echo "asdf version: $(asdf --version)"
+  echo "fd version:   $(fd --version)"
+  echo "----------------------------------------"
+  exit 0
+}
+
+version() {
+  echo "$BASENAME $VERSION"
+  echo "Author: Ismo Vuorinen <https://github.com/ivuorinen>"
+  exit 0
+}
+
+# Trim whitespace from a string
+# Usage: trim_whitespace "  hello world  "
+# Output: "hello world"
+trim_whitespace() {
+  local var="$1"
+  var="${var#"${var%%[![:space:]]*}"}"   # Remove leading whitespace
+  var="${var%"${var##*[![:space:]]}"}"   # Remove trailing whitespace
+  echo "$var"
+}
+
+# Function to process each .tool-versions file
+# Usage: process_file "file"
+# Output: "tool version"
+process_file() {
+  local file="$1"
+  awk '{for (i=2; i<=NF; i++) print $1, $i}' "$file"
+}
+
+# Function to find .tool-versions files using fd
+# It will exclude directories defined in EXCLUDE_PATTERNS
+# Usage: find_tool_versions_files
+# Output: List of .tool-versions files found
+find_tool_versions_files() {
+  local fd_command="fd --base-directory $BASE_DIR --glob '.tool-versions' --hidden"
+  for pattern in "${EXCLUDE_PATTERNS[@]}"; do
+    fd_command="$fd_command --exclude $pattern"
+  done
+  eval "$fd_command"
+}
+
+# Function to read and combine the contents of all found files.
+# It will store the tool names and versions in an associative array.
+# The key is "name version" and the value is 1.
+# Uses process_file to process each file.
+#
+# Usage: read_defined_versions
+# Output: defined_versions associative array
+read_defined_versions() {
+  for file in $files; do
+    while read -r name version; do
+      defined_versions["$name $version"]=1
+    done < <(process_file "$BASE_DIR/$file")
+  done
+}
+
+# Function to get the list of installed versions from asdf list command
+# Usage: read_installed_versions
+# Output: keep_version associative array
+#        (tools set as global in asdf are kept)
+#        (system versions are ignored)
+#        (tools with no versions installed are removed)
+read_installed_versions() {
+  local current_tool=""
+  local line
+  # Use IFS to read lines with spaces, this is needed for asdf list command
+  while IFS= read -r line; do
+    # Read the tool name
+    if [[ "$line" =~ ^[^[:space:]] ]]; then
+      current_tool=$(trim_whitespace "$line")
+      continue
+    fi
+
+    # We are now processing the versions for a tool
+    line=$(trim_whitespace "$line")
+    if [[ "$line" =~ ^\* ]]; then
+      local version="${line:1}"  # Remove the leading '*'
+      version=$(trim_whitespace "$version")  # Trim any remaining whitespace
+      keep_version["$current_tool $version"]=1
+      [ "$VERBOSE" = true ] && echo "(*) Keep: $current_tool $version ($line)"
+    fi
+    if [[ "$line" == "No versions installed" ]]; then
+      # Remove all versions for the tool that has no versions installed
+      # This way we are not confusing the uninstall script later
+      [ "$VERBOSE" = true ] && echo "(?) No versions installed for $current_tool"
+      for key in "${!defined_versions[@]}"; do
+        if [[ "$key" =~ ^$current_tool ]]; then
+          unset defined_versions["$key"]
+        fi
+      done
+      continue
+    fi
+
+    # If version starts with * remove it
+    if [[ "$line" =~ ^\* ]]; then
+      line="${line:1}"
+    fi
+    installed_versions["$current_tool $line"]=1
+
+  done < <(asdf list)
+}
+
+# Function to display all defined versions
+# List the tools and versions found in .tool-versions files
+# Output: defined_versions
+display_defined_versions() {
+  echo "All Defined Versions:"
+  for key in "${!defined_versions[@]}"; do
+    echo "$key"
+  done
+  echo
+}
+
+display_installed_versions() {
+  echo "All Installed Versions:"
+  for key in "${!installed_versions[@]}"; do
+    echo "$key"
+  done
+  echo
+}
+
+# Function to display versions to keep
+# List the tools and versions set as global in asdf
+# Output: keep_version
+display_versions_to_keep() {
+  echo ""
+  echo "Versions to Keep (tools set as global):"
+  for key in "${!keep_version[@]}"; do
+    echo "$key"
+  done
+  echo
+}
+
+# Function to determine versions to uninstall
+# Compare defined_versions and keep_version arrays
+# Output: uninstall_list array
+#        (versions to uninstall)
+#        (versions set as global are not uninstalled)
+#        (versions not found in .tool-versions files are uninstalled)
+determine_versions_to_uninstall() {
+  echo ""
+  echo "Versions to Uninstall:"
+  for key in "${!installed_versions[@]}"; do
+    if [[ -z ${keep_version[$key]} ]]; then
+      echo "$key"
+      uninstall_list+=("$key")
+    fi
+  done
+  echo
+}
+
+# Function to uninstall versions
+# It will prompt the user for confirmation before uninstalling
+# If DRYRUN is set to true, it will only print out the versions that would be uninstalled
+#
+# Usage: uninstall_versions
+# Output: Uninstall the versions in uninstall_list array
+uninstall_versions() {
+  if [[ ${#uninstall_list[@]} -gt 0 ]]; then
+    if [ "$DRYRUN" = true ]; then
+      confirm="y"
+    fi
+    if [ ! "$DRYRUN" = true ]; then
+        read -p "Do you want to proceed with uninstallation? (y/N): " confirm
+    fi
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      for key in "${uninstall_list[@]}"; do
+        local name="${key% *}"
+        local version="${key#* }"
+        if [ "$DRYRUN" = true ]; then
+          echo "(?) Dry run: would uninstall $name $version"
+        else
+          echo "(*) Uninstalling $name: $version"
+          asdf uninstall $name $version
+        fi
+      done
+    else
+      echo "Uninstallation aborted by user."
+    fi
+  else
+    echo "No versions to uninstall."
+  fi
+}
+
+# Main script execution
+main() {
+  parse_arguments "$@"
+
+  BASEDIR_IS_DIR=$(is_dir "$BASE_DIR")
+  if [ "$BASEDIR_IS_DIR" = "no" ]; then
+    echo "(!) Base directory $BASE_DIR does not exist or is not a directory"
+    exit 1
+  fi
+
+  files=$(find_tool_versions_files)
+  echo "Found .tool-versions files:"
+  echo "$files"
+  echo
+
+  # Declare associative arrays
+  declare -A defined_versions
+  declare -A installed_versions
+  declare -A keep_version
+
+  read_defined_versions
+  display_defined_versions
+
+  read_installed_versions
+  display_installed_versions
+  display_versions_to_keep
+
+  determine_versions_to_uninstall
+  uninstall_versions
+}
+
+# Execute the main function
+main "$@"
+
