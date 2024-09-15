@@ -2,6 +2,10 @@
 # Install cargo/rust packages.
 #
 # shellcheck source=shared.sh
+
+echo "This file has been deprecated in favor of asdf. Please use asdf instead."
+exit 0
+
 eval "$HOME/.dotfiles/config/shared.sh"
 
 msg "Starting to install rust/cargo packages"

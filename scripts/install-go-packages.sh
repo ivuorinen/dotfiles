@@ -2,6 +2,10 @@
 # Install Go packages
 #
 # shellcheck source=shared.sh
+
+echo "This file has been deprecated in favor of asdf. Please use asdf instead."
+exit 0
+
 eval "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1

@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 #
-# Install asdf
+# Install asdf and plugins I use
+#
+# It also updates asdf and the plugins, and then reshim asdf.
+#
+# Usage: ./install-asdf.sh [both|install|add_plugins]
+# Author: Ismo Vuorinen <https://github.com/ivuorinen>
+# License: MIT
+#
 source "${DOTFILES}/config/shared.sh"
 
 export ASDF_DIR="${XDG_BIN_HOME}/asdf"
@@ -80,13 +87,18 @@ reshim()
 # create usage function
 usage()
 {
-  echo "Usage: $0 [install|add_plugins]"
+  echo "Usage: $0 [both|install|add_plugins]"
   exit 1
 }
 
 main()
 {
   case $1 in
+    "both")
+      install_asdf_plugins
+      update_asdf
+      reshim
+      ;;
     "install")
       update_asdf
       reshim

@@ -19,7 +19,7 @@ indent_size = 1
 indent_size = 1
 indent_style = tab
 
-[{local/bin/*,**/*.sh,**/zshrc,config/*}]
+[{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]
 shell_variant      = bash # --language-variant
 binary_next_line   = true
 switch_case_indent = true # --case-indent
