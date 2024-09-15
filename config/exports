@@ -448,6 +448,7 @@ msg "Setting up Rust/Cargo configuration"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
+export RUST_WITHOUT=rust-docs
 
 # screen
 # https://www.gnu.org/software/screen/manual/screen.html
