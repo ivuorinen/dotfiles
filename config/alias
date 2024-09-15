@@ -122,6 +122,7 @@ X_ALIAS_FILES=(
   "$HOME/.config/alias-$(hostname)-secret"
 )
 for aliasFile in "${X_ALIAS_FILES[@]}"; do
+  # shellcheck source=$HOME/.config/alias-secret
   [ -f "$aliasFile" ] && source "$aliasFile" && msg "Sourced $aliasFile"
 done
 unset X_ALIAS_FILES

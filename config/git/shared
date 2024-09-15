@@ -17,11 +17,12 @@
   llog = log --pretty=fuller
   logs = log --graph --pretty=format:'%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
   nah = !git reset --hard && git clean -df
+  recent = "!r() { count=$1; git for-each-ref --sort=-committerdate refs/heads --format='%(HEAD)%(color:yellow)%(refname:short)|%(color:bold green)%(committerdate:relative)|%(color:blue)%(subject)|%(color:magenta)%(authorname)%(color:reset)' --color=always --count=${count:=10} | column -ts'|';}; r"
   reset-origin = !git fetch origin && git reset --hard origin/master && git clean -f -d
   reset-upstream = !git fetch upstream && git reset --hard upstream/master && git clean -f -d
-  recent = "!r() { count=$1; git for-each-ref --sort=-committerdate refs/heads --format='%(HEAD)%(color:yellow)%(refname:short)|%(color:bold green)%(committerdate:relative)|%(color:blue)%(subject)|%(color:magenta)%(authorname)%(color:reset)' --color=always --count=${count:=10} | column -ts'|';}; r"
   rl = reflog --format='%C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)'
   tagdate = log --date-order --graph --tags --simplify-by-decoration --pretty=format:\"%ai %h %d\"
+  undo = reset --soft HEAD^
   undo-commit = reset HEAD~ --soft
 
 [filter "lfs"]
@@ -29,15 +30,6 @@
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
-
-[diff]
-  tool = difftastic
-
-[difftool]
-  prompt = false
-
-[difftool "difftastic"]
-  cmd = difft "$LOCAL" "$REMOTE"
 
 [color]
   ui = true
