@@ -1,13 +1,14 @@
+---
 name: Release Daily State # Workflow name displayed on GitHub
 on:
   workflow_dispatch: # Trigger manually
   schedule:
     - cron: '30 20 * * *' # UTC is 2-3 hours behind Europe/Helsinki, my timezone
-permissions:
-  contents: write
 jobs:
   new-daily-release:
     runs-on: self-hosted
+    permissions:
+      contents: write
     outputs:
       created: ${{ steps.daily-version.outputs.created }}
       version: ${{ steps.daily-version.outputs.version }}
