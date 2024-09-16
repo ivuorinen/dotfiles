@@ -147,7 +147,7 @@ rector()
 {
   local php="${1:-82}"
   docker run -v "$(pwd)":/project rector/rector:latest process \
-    "/project/$1" \
+    "/project/" \
     --set "php${php}" \
     --autoload-file /project/vendor/autoload.php
 }
