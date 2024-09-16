@@ -93,7 +93,7 @@ darknotify_alacritty()
   }
   return 0
 }
-darknotify_alacritty
+# darknotify_alacritty
 
 # Function to list installed Homebrew packages using bkt caching
 brew_installed()
