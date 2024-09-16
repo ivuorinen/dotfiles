@@ -53,9 +53,9 @@ alias flush="dscacheutil -flushcache"
 alias updatedb="sudo /usr/libexec/locate.updatedb"
 
 # tmux: automatically attach or create session with name 'main'
-alias tmux='tmux new-session -A -s main'
+alias tm='command tmux new-session -A -s main'
 # tmux: attach or create new session
-alias ta='tmux attach || tmux'
+alias ta='command tmux attach || command tmux'
 
 # nvim
 alias nvim-ks='NVIM_APPNAME="nvim-kickstart" nvim'
