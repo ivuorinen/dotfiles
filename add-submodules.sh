@@ -40,6 +40,8 @@ git submodule add --name tmux/tmux-yank \
   -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
 git submodule add --name tmux/tmux-current-pane-hostname \
   -f https://github.com/soyuka/tmux-current-pane-hostname.git config/tmux/plugins/tmux-current-pane-hostname
+git submodule add --name tmux/tmux-dark-notify \
+  -f https://github.com/erikw/tmux-dark-notify.git config/tmux/plugins/tmux-dark-notify
 
 # Takes submodules and sets them to ignore all changes
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
@@ -50,6 +52,5 @@ done
 [ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm
 [ -d "config/tmux/plugins/tmux" ] && rm -rf config/tmux/plugins/tmux
 [ -d "config/tmux/plugins/tmux-menus" ] && rm -rf config/tmux/plugins/tmux-menus
-[ -d "config/tmux/plugins/tmux-dark-notify" ] && rm -rf config/tmux/plugins/tmux-dark-notify
 [ -d "tools/dotbot-crontab" ] && rm -rf tools/dotbot-crontab
 [ -d "tools/dotbot-snap" ] && rm -rf tools/dotbot-snap
