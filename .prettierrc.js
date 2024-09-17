@@ -1,5 +1,4 @@
 module.exports = {
-  plugins: ['prettier-plugin-sh'],
   ...require('@ivuorinen/prettier-config'),
   trailingComma: 'all',
   // Add custom options below:

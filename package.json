@@ -2,7 +2,6 @@
   "name": "ivuorinen-dotfiles",
   "version": "1.0.0",
   "description": "ivuorinen's dotfiles, this is for linting and formatters",
-  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
@@ -28,8 +27,7 @@
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/base-configs": "^2.0.0",
-    "prettier-plugin-sh": "^0.14.0"
+    "@ivuorinen/base-configs": "^2.0.0"
   },
   "packageManager": "yarn@1.22.22"
 }
