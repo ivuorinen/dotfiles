@@ -53,6 +53,7 @@
       mode: 0600
       path: ssh/*
 - shell:
+    - bash add-submodules.sh
     - git submodule update --init --recursive --force
     - bash local/bin/dfm install all
 - pipx:
