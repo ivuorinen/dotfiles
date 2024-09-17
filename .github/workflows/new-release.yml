@@ -1,9 +1,9 @@
 ---
-name: Release Daily State # Workflow name displayed on GitHub
+name: Release Daily State
 on:
-  workflow_dispatch: # Trigger manually
+  workflow_dispatch:
   schedule:
-    - cron: '30 20 * * *' # UTC is 2-3 hours behind Europe/Helsinki, my timezone
+    - cron: '0 21 * * *' # 00:00 at Europe/Helsinki
 jobs:
   new-daily-release:
     runs-on: self-hosted
@@ -13,10 +13,12 @@ jobs:
       created: ${{ steps.daily-version.outputs.created }}
       version: ${{ steps.daily-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4 # Checkout our working repository
+      - uses: actions/checkout@v4
+
       - name: Create tag if necessary
         uses: fregante/daily-version-action@v2
         id: daily-version
+
       - name: Create changelog text
         if: steps.daily-version.outputs.created
         id: changelog
@@ -24,6 +26,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
+
       - name: Create release
         if: steps.daily-version.outputs.created
         uses: actions/create-release@latest
