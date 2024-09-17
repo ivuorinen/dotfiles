@@ -370,7 +370,8 @@ export PATH="$COMPOSER_BIN:$PATH"
 # direnv, https://direnv.net/
 # https://direnv.net/docs/hook.html
 # Set the hook to show the direnv message in a different color
-export DIRENV_LOG_FORMAT=$'\033[2mdirenv: %s\033[0m'
+# export DIRENV_LOG_FORMAT=$'\033[2mdirenv: %s\033[0m'
+export DIRENV_LOG_FORMAT=
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 msg "Setting up Docker configuration"
