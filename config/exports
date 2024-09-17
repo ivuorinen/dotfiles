@@ -270,6 +270,7 @@ export BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME}/bash-completion/bash_comple
 
 # History env variables
 export HIST_STAMPS="yyyy-mm-dd"
+export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 # Larger bash history (allow 32³ entries; default is 500)
 export HISTSIZE=32768
 export HISTFILESIZE=$HISTSIZE
@@ -328,6 +329,7 @@ export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
 export ASDF_DATA_DIR="${ASDF_DIR}"
 export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
 export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
+export ASDF_FORCE_PREPEND=yes
 ## Default package files
 export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
 export ASDF_GEM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/gem-packages"
@@ -340,6 +342,23 @@ export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
 ## Add asdf to path
 export PATH="${ASDF_DIR}/bin:${PATH}"
+
+# aws
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
+msg "Setting up AWS configuration"
+export AWS_CONFIG_FILE="${XDG_STATE_HOME}/aws/config"
+export AWS_SHARED_CREDENTIALS_FILE="${XDG_STATE_HOME}/aws/credentials"
+export AWS_DATA_PATH="${XDG_DATA_HOME}/aws"
+export AWS_DEFAULT_REGION="eu-west-1"
+export AWS_DEFAULT_OUTPUT="table"
+export AWS_CONFIGURE_KEYS=true
+export AWS_CONFIGURE_REGION=true
+export AWS_CONFIGURE_OUTPUT=true
+export AWS_CONFIGURE_PROFILE=true
+export AWS_CONFIGURE_PROMPT=true
+export AWS_CONFIGURE_PROMPT_DEFAULT="default"
 
 # bob manages nvim versions
 msg "Setting up bob configuration"
@@ -375,7 +394,7 @@ export DIRENV_LOG_FORMAT=
 
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 msg "Setting up Docker configuration"
-export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
 x-dc "$DOCKER_CONFIG"
 # Docker: Disable snyk ad
 export DOCKER_SCAN_SUGGEST=false
@@ -389,7 +408,7 @@ x-have ffmpeg && x-dc "$FFMPEG_DATADIR"
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
 msg "Setting up GnuPG configuration"
-export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 
 # Go
 # https://golang.org/doc/code.html
