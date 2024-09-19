@@ -44,6 +44,23 @@ if ! declare -f msg_done > /dev/null; then
   }
 fi
 
+if ! declare -f array_diff > /dev/null; then
+  # Function to compare two arrays and return the difference
+  # Example: array_diff DIFFERENCE ARRAY1 ARRAY2
+  # $1 - variable to store the difference
+  # $2 - first array
+  # $3 - second array
+  # Output to $1 the difference between $2 and $3
+  # Source: https://stackoverflow.com/a/42399479/594940
+  array_diff()
+  {
+    eval local ARR1=\(\"\${$2[@]}\"\)
+    eval local ARR2=\(\"\${$3[@]}\"\)
+    local IFS=$'\n'
+    mapfile -t "$1" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
+  }
+fi
+
 VERSION_NVM="v0.39.5"
 
 # Loads configs for better installation experience
@@ -293,6 +310,7 @@ section_brew()
     "autoupdate:Setups brew auto-update and runs it immediately"
     "leaves:List brew leaves (installed on request)"
     "clean:Clean up brew packages"
+    "untracked:List untracked brew packages"
   )
 
   x-have brew && {
@@ -317,6 +335,46 @@ section_brew()
         ;;
       leaves)
         brew leaves --installed-on-request
+        ;;
+      untracked)
+        declare -a BREW_LIST_ALL
+        while IFS= read -r line; do
+          BREW_LIST_ALL+=("$line")
+        done < <(brew list --formula --installed-on-request -1 --full-name)
+        while IFS= read -r c; do
+          BREW_LIST_ALL+=("$c")
+        done < <(brew list --cask -1 --full-name)
+
+        # Remove entries that are installed as dependencies
+        declare -a BREW_LIST_DEPENDENCIES
+        while IFS= read -r l; do
+          BREW_LIST_DEPENDENCIES+=("$l")
+        done < <(brew list -1 --installed-as-dependency)
+
+        declare -a BREW_LIST_BUNDLED
+        while IFS= read -r b; do
+          BREW_LIST_BUNDLED+=("$b")
+        done < <(brew bundle list --all --file="$BREWFILE")
+
+        declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
+        for f in "${BREW_LIST_ALL[@]}"; do
+          if [[ ! " ${BREW_LIST_DEPENDENCIES[@]} " =~ " ${f} " ]]; then
+            BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
+          fi
+        done
+
+        array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
+
+        # If there are no untracked packages, exit
+        if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
+          msg_yay "No untracked packages found!"
+          exit 0
+        fi
+
+        echo "Untracked:"
+        for f in "${BREW_LIST_UNTRACKED[@]}"; do
+          echo "  $f"
+        done
         ;;
       clean)
         brew bundle cleanup --file="$BREWFILE" && msg_yay "Done!"
@@ -421,7 +479,9 @@ section_dotfiles()
       ! x-have shfmt && msg_err "shfmt not found, install with asdf"
       # Format shell scripts according to following rules.
       fd --full-path "$DOTFILES" -tx \
+        --hidden \
         -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
+        -E 'test' -E '**/bin/asdf/**' -E '**/tldr/*' \
         -x shfmt \
         --language-dialect bash \
         --func-next-line --list --write \

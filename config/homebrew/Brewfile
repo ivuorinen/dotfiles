@@ -77,10 +77,6 @@ brew "cryptography"
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
-# Spellchecker wrapping library
-brew "enchant"
-# Banner-like program prints strings as ASCII art
-brew "figlet"
 # Lock file during command
 brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
@@ -91,28 +87,14 @@ brew "gd"
 brew "gh"
 # Distributed revision control system
 brew "git"
-# Enable transparent encryption/decryption of files in a git repo
-brew "git-crypt"
-# Small git utilities
-brew "git-extras"
-# See your latest local git branches, formatted real fancy
-brew "git-recent"
 # Render markdown on the CLI
 brew "glow"
-# GNU implementation of the famous stream editor
-brew "gnu-sed"
 # Validating, recursive, caching DNS resolver
 brew "unbound"
 # GNU Transport Layer Security (TLS) Library
 brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
-# Library access to GnuPG
-brew "gpgme"
-# Open source suite of directory software
-brew "openldap"
-# Manage your GnuPG keys with ease!
-brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
 # C/C++ and Java libraries for Unicode and globalization
@@ -125,8 +107,6 @@ brew "pango"
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
 brew "graphviz"
-# GNU grep, egrep and fgrep
-brew "grep"
 # Popular GNU data compression program
 brew "gzip"
 # Improved top (interactive process viewer)
@@ -157,18 +137,14 @@ brew "libuv"
 brew "libyaml"
 # Package manager for the Lua programming language
 brew "luarocks"
-# LZMA-based compression program similar to gzip or bzip2
-brew "lzip"
 # Swiss Army Knife for macOS
 brew "m-cli"
-# NCurses Disk Usage
-brew "ncdu"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@1.1"
+# Open source suite of directory software
+brew "openldap"
 # General-purpose scripting language
 brew "php"
 # Manage compile and link flags for libraries
@@ -193,10 +169,8 @@ brew "wget"
 brew "xdg-ninja", args: ["HEAD"]
 # Watcher for macOS 10.14+ light/dark mode changes
 brew "cormacrelf/tap/dark-notify"
-# lets you quickly switch between multiple git user profiles
-brew "gesquive/tap/git-user"
-# Automated code review tool integrated with any code analysis tools regardless of programming language.
-brew "reviewdog/tap/reviewdog"
+# Igbinary PHP extension
+brew "shivammathur/extensions/igbinary@8.3"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.3"
 # Mcrypt PHP extension

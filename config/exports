@@ -18,8 +18,8 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_
 
 # Load bash completions if available for zsh
 if [[ -n "$ZSH_VERSION" ]]; then
-    autoload bashcompinit
-    bashcompinit
+  autoload bashcompinit
+  bashcompinit
 fi
 
 # Load asdf
