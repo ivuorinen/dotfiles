@@ -52,6 +52,11 @@ alias flush="dscacheutil -flushcache"
 # Update locatedb
 alias updatedb="sudo /usr/libexec/locate.updatedb"
 
+# Date helpers
+alias isodate="date +'%Y-%m-%d'"
+alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
+alias x-timestamp="date +'%s'"
+
 # tmux: automatically attach or create session with name 'main'
 alias tm='command tmux new-session -A -s main'
 # tmux: attach or create new session
