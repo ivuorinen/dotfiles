@@ -16,24 +16,11 @@ tap "mongodb/brew"
 tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
+tap "snyk/tap"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
 # Run your GitHub Actions locally
 brew "act"
-# Simple, modern, secure file encryption
-brew "age"
-# Mozilla CA certificate store
-brew "ca-certificates"
-# Mozilla CA bundle for Python
-brew "certifi"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
-# YAML Parser
-brew "libyaml"
-# Automate deployment, configuration, and upgrading
-brew "ansible"
-# Checks ansible playbooks for practices and behaviour
-brew "ansible-lint"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -52,32 +39,28 @@ brew "jpeg-xl"
 brew "aom"
 # Apache Portable Runtime library
 brew "apr"
+# Mozilla CA certificate store
+brew "ca-certificates"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
 # Password hashing library and CLI utility
 brew "argon2"
+# Spell checker with better logic than ispell
+brew "aspell"
 # Automatic configure script builder
 brew "autoconf"
-# Tool for generating GNU Standards-compliant Makefiles
-brew "automake"
+# Collection of over 500 reusable autoconf macros
+brew "autoconf-archive"
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
 # GNU multiple precision arithmetic library
 brew "gmp"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
-# Extendable version manager with support for Ruby, Node.js, Erlang & more
-brew "asdf"
-# Spell checker with better logic than ispell
-brew "aspell"
-# Collection of over 500 reusable autoconf macros
-brew "autoconf-archive"
-# Manage compile and link flags for libraries
-brew "pkg-config"
-# Automated text file generator
-brew "autogen"
-# Bourne-Again SHell, a UNIX command interpreter
-brew "bash"
-# Clone of cat(1) with syntax highlighting and Git integration
-brew "bat"
+# Bash Automated Testing System
+brew "bats-core"
 # Software library to render fonts
 brew "freetype"
 # XML-based font configuration API for X Windows
@@ -86,32 +69,26 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
-# Human-friendly and fast alternative to cut and (sometimes) awk
-brew "choose-rust"
-# Cross-platform make
-brew "cmake"
+# Mozilla CA bundle for Python
+brew "certifi"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
 # Spellchecker wrapping library
 brew "enchant"
-# Perl lib for reading and writing EXIF metadata
-brew "exiftool"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
 # Lock file during command
 brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
-# Monitor a directory for changes and run a shell command
-brew "fswatch"
-# Command-line fuzzy finder written in Go
-brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
-# Disk usage analyzer with console interface written in Go
-brew "gdu"
+# GitHub command-line tool
+brew "gh"
 # Distributed revision control system
 brew "git"
 # Enable transparent encryption/decryption of files in a git repo
@@ -166,8 +143,8 @@ brew "irssi"
 brew "jq"
 # JSON parser for C
 brew "json-c"
-# Scanning your k8s clusters, diagnosing, and triaging issues in simple English
-brew "k8sgpt"
+# Network authentication protocol
+brew "krb5"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
 brew "legitify"
 # Secure hashing function
@@ -176,58 +153,36 @@ brew "libb2"
 brew "libpq"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
+# YAML Parser
+brew "libyaml"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
 brew "lzip"
 # Swiss Army Knife for macOS
 brew "m-cli"
-# Collection of tools that nobody wrote when UNIX was young
-brew "moreutils"
-# Mongrel of mail user agents (part elm, pine, mush, mh, etc.)
-brew "mutt"
 # NCurses Disk Usage
 brew "ncdu"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
-# ISO-C API and CLI for generating UUIDs
-brew "ossp-uuid"
-# Coreutils progress viewer
-brew "progress"
-# Python version management
-brew "pyenv"
-# Migrate pip packages from one Python version to another
-brew "pyenv-pip-migrate"
-# Pyenv plugin to manage virtualenv
-brew "pyenv-virtualenv"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Install various Ruby versions and implementations
-brew "ruby-build"
-# Ruby version manager
-brew "rbenv"
-# Static analysis and lint tool, for (ba)sh scripts
-brew "shellcheck"
-# Feature-rich console based todo list manager
-brew "task"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@1.1"
+# General-purpose scripting language
+brew "php"
+# Manage compile and link flags for libraries
+brew "pkg-config"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
-# Terraform version manager inspired by rbenv
-brew "tfenv"
-# Linter for Terraform files
-brew "tflint"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Terminal multiplexer
 brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Tool for creating isolated virtual python environments
-brew "virtualenv"
 # Command-line interface to the WakaTime api
 brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
@@ -238,8 +193,6 @@ brew "wget"
 brew "xdg-ninja", args: ["HEAD"]
 # Watcher for macOS 10.14+ light/dark mode changes
 brew "cormacrelf/tap/dark-notify"
-# Cleans up your $HOME from those pesky dotfiles
-brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
@@ -259,13 +212,9 @@ brew "shivammathur/extensions/uuid@8.3"
 # Yaml PHP extension
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
-brew "shivammathur/php/php"
-# General-purpose scripting language
 brew "shivammathur/php/php-debug"
-# Command-line interface for 1Password
-cask "1password-cli"
-# GPU-accelerated terminal emulator
-cask "alacritty"
+# Find & fix known vulnerabilities in open-source dependencies
+brew "snyk/tap/snyk"
 # Text editor
 cask "coda"
 # Universal database tool and SQL client
@@ -274,6 +223,15 @@ cask "dbeaver-community"
 cask "dbngin"
 # App to build and share containerised applications and microservices
 cask "docker"
+cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-lato"
+cask "font-open-sans"
+cask "font-roboto"
+cask "font-source-code-pro"
+cask "font-source-code-pro-for-powerline"
+cask "font-source-sans-pro"
+cask "font-source-serif-pro"
 # GIT client
 cask "fork"
 # HTTP and GraphQL Client
@@ -284,18 +242,12 @@ cask "jetbrains-toolbox"
 cask "keybase"
 # Kubernetes IDE
 cask "lens"
-# Keep all tasks from your todo apps on your menu bar
-cask "monofocus"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Simple application that will prevent iTunes or Apple Music from launching
 cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Scheduling application focusing on organisation
-cask "omnifocus"
-# Collaboration platform for API development
-cask "postman"
 # Display image info and preview unsupported formats in QuickLook
 cask "qlimagesize"
 # Quick Look generator for Markdown files
@@ -326,6 +278,8 @@ cask "suspicious-package"
 cask "syntax-highlight"
 # Python IDE for beginners
 cask "thonny"
+# To-do list
+cask "todoist"
 # Configuration application for the Ultimate Hacking Keyboard
 cask "uhk-agent"
 # Open-source code editor
@@ -334,6 +288,8 @@ cask "visual-studio-code"
 cask "vlc"
 # Spell-checking service for Finnish
 cask "voikkospellservice"
+# GPU-accelerated cross-platform terminal emulator and multiplexer
+cask "wezterm"
 # Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
 # Multiplayer code editor

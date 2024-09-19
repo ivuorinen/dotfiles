@@ -1,8 +1,6 @@
 // These are golang packages I use,
 // so they should be available with all versions
 
-// sysadmin/scripting utilities, distributed as a single binary
-github.com/skx/sysbox@release-0.18.0
 // Git Profile allows you to switch between user profiles in git repos
 github.com/dotzero/git-profile@v1.4.0
 // An extensible command line tool or library to format yaml files.

@@ -9,6 +9,7 @@
 [ -z "$XDG_CACHE_HOME" ] && export XDG_CACHE_HOME="$HOME/.cache"
 [ -z "$XDG_STATE_HOME" ] && export XDG_STATE_HOME="$HOME/.local/state"
 [ -z "$XDG_BIN_HOME" ] && export XDG_BIN_HOME="$HOME/.local/bin"
+[ -z "$XDG_RUNTIME_DIR" ] && export XDG_RUNTIME_DIR="$HOME/.local/run"
 
 # if DOTFILES is not set, set it to the default location
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
@@ -399,12 +400,6 @@ x-dc "$DOCKER_CONFIG"
 # Docker: Disable snyk ad
 export DOCKER_SCAN_SUGGEST=false
 
-# ffmpeg
-# https://ffmpeg.org/ffmpeg.html
-msg "Setting up FFmpeg configuration"
-export FFMPEG_DATADIR="$XDG_CONFIG_HOME/ffmpeg"
-x-have ffmpeg && x-dc "$FFMPEG_DATADIR"
-
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
 msg "Setting up GnuPG configuration"
@@ -415,11 +410,6 @@ export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 msg "Setting up Go configuration"
 export GOPATH="$XDG_DATA_HOME/go"
 export GOBIN="$XDG_BIN_HOME"
-
-# nb, https://xwmx.github.io/nb/
-msg "Setting up nb configuration"
-export NBRC_PATH="$XDG_CONFIG_HOME/nbrc"
-export NB_DIR="$XDG_STATE_HOME/nb"
 
 # NPM: Add npm packages to path
 msg "Setting up NPM configuration"
@@ -445,29 +435,9 @@ export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 ## for MichaelAquilina/zsh-autoswitch-virtualenv
 export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-x-have pyenv && {
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
-}
-
-# Ruby
-#
-# including: bundler, rbenv
-msg "Setting up Ruby configuration"
-export GEM_HOME="${XDG_DATA_HOME}"/gem
-export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
-export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME"/bundle
-export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
-export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
-export RBENV_ROOT="$XDG_STATE_HOME/rbenv"
-x-dc "$RBENV_ROOT"
-x-have gem && export PATH="${GEM_HOME}/bin:$PATH"
 
 # Rust / cargo
 msg "Setting up Rust/Cargo configuration"
-export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export PATH="$CARGO_HOME/bin:$PATH"
 export RUST_WITHOUT=rust-docs
 
 # screen
@@ -487,10 +457,6 @@ msg "Setting up Terraform configuration"
 export TF_DATA_DIR="$XDG_STATE_HOME/terraform"
 export TF_CLI_CONFIG_FILE="$XDG_CONFIG_HOME/terraform/terraformrc"
 export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
-
-# tldr / tealdeer
-msg "Setting up tldr configuration"
-export TEALDEER_CONFIG_DIR="$XDG_CONFIG_HOME/tealdeer/"
 
 # tmux
 # https://tmux.github.io/

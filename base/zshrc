@@ -6,7 +6,7 @@
 
 export DOTFILES="$HOME/.dotfiles"
 LOCAL_SHARE="$HOME/.local/share"
-export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim-kickstart/mason/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
@@ -48,15 +48,9 @@ load_antigen()
     export ZSHZ_DATA="$XDG_STATE_HOME/z"
     antigen bundle z
 
-    x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-
     # these should be always available
     antigen bundle jreese/zsh-titles
-    antigen bundle gnu-utils
-    antigen bundle ssh-agent
-    antigen bundle gpg-agent
     antigen bundle brew
-    # antigen bundle tmux
     antigen bundle colored-man-pages
     antigen bundle zsh-users/zsh-completions
     antigen bundle eza
