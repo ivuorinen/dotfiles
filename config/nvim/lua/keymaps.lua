@@ -4,11 +4,12 @@ vim.api.nvim_set_keymap('i', 'jj', '<Esc>', { noremap = false })
 vim.api.nvim_set_keymap('n', 'tw', ':Twilight<enter>', { noremap = false })
 
 -- buffers
-vim.api.nvim_set_keymap('n', 'bk', ':blast<enter>', { desc = 'Last', noremap = false })
-vim.api.nvim_set_keymap('n', 'bj', ':bfirst<enter>', { desc = 'First', noremap = false })
-vim.api.nvim_set_keymap('n', 'bh', ':bprev<enter>', { desc = 'Prev', noremap = false })
-vim.api.nvim_set_keymap('n', 'bl', ':bnext<enter>', { desc = 'Next', noremap = false })
-vim.api.nvim_set_keymap('n', 'bd', ':bdelete<enter>', { desc = 'Delete', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bk', ':blast<enter>', { desc = 'Last', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bj', ':bfirst<enter>', { desc = 'First', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bh', ':bprev<enter>', { desc = 'Prev', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bl', ':bnext<enter>', { desc = 'Next', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bd', ':bdelete<enter>', { desc = 'Delete', noremap = false })
+vim.api.nvim_set_keymap('n', '<C-w>', ':bdelete<enter>', { desc = 'Delete buffer', noremap = false })
 
 -- files
 vim.api.nvim_set_keymap('n', 'QQ', ':q!<enter>', { desc = 'Quickly Quit', noremap = false })

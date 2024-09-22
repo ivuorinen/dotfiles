@@ -4,7 +4,8 @@ return {
   'zbirenbaum/copilot.lua',
   cmd = 'Copilot',
   build = ':Copilot setup',
-  event = 'InsertEnter',
+  event = { 'InsertEnter', 'LspAttach' },
+  fix_pairs = true,
   opts = {
     suggestion = { enabled = false },
     panel = { enabled = false },

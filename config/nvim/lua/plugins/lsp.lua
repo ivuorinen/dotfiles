@@ -20,6 +20,18 @@ return {
       },
     },
     'b0o/schemastore.nvim',
+    {
+      -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+      -- used for completion, annotations and signatures of Neovim apis
+      'folke/lazydev.nvim',
+      ft = 'lua',
+      opts = {
+        library = {
+          -- Load luvit types when the `vim.uv` word is found
+          { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        },
+      },
+    },
   },
   config = function()
     -- Diagnostic keymaps
@@ -151,8 +163,6 @@ return {
       'ansible-lint',
       'bash-language-server',
       'blade-formatter',
-      'cfn-lint',
-      'codeql',
       'codespell',
       'commitlint',
       'diagnostic-languageserver',
@@ -165,7 +175,6 @@ return {
       'jq',
       'jsonlint',
       'luacheck',
-      'nginx-language-server',
       'php-cs-fixer',
       'phpcs',
       'phpmd',
