@@ -3,24 +3,24 @@ return {
   -- for messages, cmdline and the popupmenu.
   -- https://github.com/folke/noice.nvim
   {
-    "folke/noice.nvim",
+    'folke/noice.nvim',
     dependencies = {
-      "MunifTanjim/nui.nvim",
+      'MunifTanjim/nui.nvim',
       -- A fancy, configurable, notification manager for NeoVim
       -- https://github.com/rcarriga/nvim-notify
       {
-        "rcarriga/nvim-notify",
+        'rcarriga/nvim-notify',
         config = function()
-          require("notify").setup({
-            background_colour = "#000000",
+          require('notify').setup {
+            background_colour = '#000000',
             enabled = false,
-          })
+          }
         end,
       },
     },
     setup = function()
-      vim.g.noice_ignored_filetypes = { "fugitiveblame", "fugitive", "gitcommit" }
-      require("noice").setup({
+      vim.g.noice_ignored_filetypes = { 'fugitiveblame', 'fugitive', 'gitcommit' }
+      require('noice').setup {
         -- you can enable a preset for easier configuration
         presets = {
           bottom_search = true, -- use a classic bottom cmdline for search
@@ -33,48 +33,48 @@ return {
           cmdline_popup = {
             position = {
               row = 5,
-              col = "50%",
+              col = '50%',
             },
             size = {
               width = 60,
-              height = "auto",
+              height = 'auto',
             },
           },
           popupmenu = {
-            relative = "editor",
+            relative = 'editor',
             position = {
               row = 8,
-              col = "50%",
+              col = '50%',
             },
             size = {
               width = 60,
               height = 10,
             },
             border = {
-              style = "rounded",
+              style = 'rounded',
               padding = { 0, 1 },
             },
             win_options = {
-              winhighlight = { Normal = "Normal", FloatBorder = "DiagnosticInfo" },
+              winhighlight = { Normal = 'Normal', FloatBorder = 'DiagnosticInfo' },
             },
           },
         },
         routes = {
           {
             filter = {
-              event = "msg_show",
+              event = 'msg_show',
               any = {
-                { find = "%d+L, %d+B" },
-                { find = "; after #%d+" },
-                { find = "; before #%d+" },
-                { find = "%d fewer lines" },
-                { find = "%d more lines" },
+                { find = '%d+L, %d+B' },
+                { find = '; after #%d+' },
+                { find = '; before #%d+' },
+                { find = '%d fewer lines' },
+                { find = '%d more lines' },
               },
             },
             opts = { skip = true },
           },
         },
-      })
+      }
     end,
   },
 }

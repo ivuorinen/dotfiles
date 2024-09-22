@@ -1,15 +1,17 @@
 -- Autoformat
 -- https://github.com/stevearc/conform.nvim
 return {
-  "stevearc/conform.nvim",
-  event = { "BufWritePre" },
-  cmd = { "ConformInfo" },
+  'stevearc/conform.nvim',
+  event = { 'BufWritePre' },
+  cmd = { 'ConformInfo' },
   keys = {
     {
-      "<leader>f",
-      function() require("conform").format({ async = true, lsp_fallback = true }) end,
-      mode = "",
-      desc = "[f] Format buffer",
+      '<leader>f',
+      function()
+        require('conform').format { async = true, lsp_fallback = true }
+      end,
+      mode = '',
+      desc = '[f] Format buffer',
     },
   },
   opts = {
@@ -25,12 +27,12 @@ return {
       }
     end,
     formatters_by_ft = {
-      lua = { "stylua" },
+      lua = { 'stylua' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
-      javascript = { "prettierd", "prettier", stop_after_first = true },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
     },
   },
 }
