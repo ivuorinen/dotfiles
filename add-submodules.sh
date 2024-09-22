@@ -10,9 +10,6 @@ git submodule add --name dotbot-include \
 git submodule add --name dotbot-pip \
   -f https://github.com/sobolevn/dotbot-pip.git tools/dotbot-pip
 
-git submodule add --name nvim-kickstart \
-  -f https://github.com/ivuorinen/kickstart.nvim config/nvim-kickstart
-
 # other repos
 git submodule add --name cheat-community \
   -f https://github.com/cheat/cheatsheets.git config/cheat/cheatsheets/community
@@ -54,3 +51,4 @@ done
 [ -d "config/tmux/plugins/tmux-menus" ] && rm -rf config/tmux/plugins/tmux-menus
 [ -d "tools/dotbot-crontab" ] && rm -rf tools/dotbot-crontab
 [ -d "tools/dotbot-snap" ] && rm -rf tools/dotbot-snap
+[ -d "config/nvim-kickstart" ] && rm -rf config/nvim-kickstart
