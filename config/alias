@@ -66,10 +66,10 @@ alias ta='command tmux attach || command tmux'
 alias nvim-ks='NVIM_APPNAME="nvim-kickstart" nvim'
 alias ks='NVIM_APPNAME="nvim-kickstart" nvim'
 alias nvim-lazy='NVIM_APPNAME="nvim-lazy" nvim'
-alias nl=='NVIM_APPNAME="nvim-lazy" nvim'
+alias nl='NVIM_APPNAME="nvim-lazy" nvim'
 alias vim='nvim'
 alias vi='nvim'
-alias c='NVIM_APPNAME="nvim-clean" nvim'
+alias c='nvim'
 
 # xdg-ninja aliases for better experience
 alias xdg='xdg-ninja --skip-ok --skip-unsupported'
