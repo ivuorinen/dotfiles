@@ -5,6 +5,11 @@ return {
   dependencies = {
     { 'nvim-telescope/telescope.nvim' },
   },
+  keys = {
+    { 'n', 'gpd', '<cmd>lua require("goto-preview").goto_preview_definition()<CR>' },
+    { 'n', 'gpi', '<cmd>lua require("goto-preview").goto_preview_implementation()<CR>' },
+    { 'n', 'gP', '<cmd>lua require("goto-preview").close_all_windows()<CR>' },
+  },
   config = function()
     require('goto-preview').setup {
       width = 120, -- Width of the floating window

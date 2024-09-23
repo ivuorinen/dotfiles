@@ -17,7 +17,21 @@ return {
       {
         'zbirenbaum/copilot-cmp',
         dependencies = {
-          'zbirenbaum/copilot.lua',
+          {
+            'zbirenbaum/copilot.lua',
+            cmd = 'Copilot',
+            build = ':Copilot setup',
+            event = { 'InsertEnter', 'LspAttach' },
+            fix_pairs = true,
+            opts = {
+              suggestion = { enabled = false },
+              panel = { enabled = false },
+              filetypes = {
+                markdown = true,
+                help = true,
+              },
+            },
+          }
         },
         config = function()
           require('copilot_cmp').setup()
@@ -25,7 +39,6 @@ return {
       },
     },
     config = function()
-      -- nvim-cmp setup
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       local lspkind = require 'lspkind'
@@ -35,8 +48,11 @@ return {
         formatting = {
           format = lspkind.cmp_format {
             mode = 'symbol',
-            max_width = 50,
-            symbol_map = { Copilot = '' },
+            min_width = 40,
+            max_width = 100,
+            symbol_map = {
+              Copilot = ''
+            },
           },
         },
         view = {
