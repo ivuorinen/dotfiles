@@ -4,9 +4,12 @@ return {
   {
     'nvim-telescope/telescope.nvim',
     version = '*',
+    lazy = false,
     dependencies = {
       { 'nvim-lua/plenary.nvim' },
       { 'nvim-telescope/telescope-symbols.nvim' },
+      { 'folke/which-key.nvim' },
+      { 'ThePrimeagen/harpoon' },
 
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
       -- Only load if `make` is available
@@ -16,13 +19,10 @@ return {
         cond = vim.fn.executable 'make' == 1,
       },
     },
-    setup = function()
+    config = function()
       local t = require 'telescope'
       local a = require 'telescope.actions'
-      local b = require 'telescope.builtin'
       local themes = require 'telescope.themes'
-      require('telescope').load_extension 'harpoon'
-      t.load_extension 'git_worktree'
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
@@ -54,11 +54,34 @@ return {
         },
       }
 
+      -- Load extensions
+      pcall(t.load_extension, 'harpoon')
+      pcall(t.load_extension, 'git_worktree')
       -- Enable telescope fzf native, if installed
       pcall(t.load_extension, 'fzf')
 
+      -- [[ Telescope Keymaps ]]
       -- See `:help telescope.builtin`
-      vim.keymap.set('n', '<leader>so', b.oldfiles, { desc = '[?] Find recently opened files' })
+      -- See `:help telescope.keymap`
+      local b = require 'telescope.builtin'
+
+      local wk = require 'which-key'
+      wk.add {
+        -- { '<leader><space>', b.buffers, desc = '[ ] Find existing buffers' },
+        { '<leader>gR', "<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>", desc = 'Create Git worktree' },
+        { '<leader>gr', "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>", desc = 'Git worktrees' },
+        { '<leader>sS', b.git_status, desc = '' },
+        { '<leader>sd', b.diagnostics, desc = '[S]earch [D]iagnostics' },
+        { '<leader>sf', b.find_files, desc = '[S]earch [F]iles' },
+        { '<leader>sg', b.live_grep, desc = '[S]earch by [G]rep' },
+        { '<leader>sm', ':Telescope harpoon marks<CR>', desc = 'Harpoon Marks' },
+        { '<leader>sn', "<cmd>lua require('telescope').extensions.notify.notify()<CR>", desc = 'Notify' },
+        { '<leader>so', b.oldfiles, desc = '[?] Find recently opened files' },
+        { '<leader>sw', b.grep_string, desc = '[S]earch current [W]ord' },
+        { '<leader>st', ':TodoTelescope<CR>', desc = 'Telescope: Todo' },
+        { '<leader><tab>', "<Cmd>lua require('telescope.builtin').commands()<CR>", desc = 'Telescope: Commands' },
+      }
+
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to telescope to change theme, layout, etc.
         b.current_buffer_fuzzy_find(themes.get_dropdown {
@@ -66,20 +89,6 @@ return {
           previewer = true,
         })
       end, { desc = '[/] Fuzzily search in current buffer]' })
-
-      vim.keymap.set('n', '<leader>sf', b.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>sw', b.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', b.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', b.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sb', b.buffers, { desc = '[ ] Find existing buffers' })
-      vim.keymap.set('n', '<leader>sS', b.git_status, { desc = '' })
-      vim.keymap.set('n', '<leader>sm', ':Telescope harpoon marks<CR>', { desc = 'Harpoon [M]arks' })
-      vim.keymap.set('n', '<Leader>sr', "<CMD>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>")
-      vim.keymap.set('n', '<Leader>sR', "<CMD>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>")
-      vim.keymap.set('n', '<Leader>sn', "<CMD>lua require('telescope').extensions.notify.notify()<CR>")
-
-      vim.api.nvim_set_keymap('n', 'st', ':TodoTelescope<CR>', { noremap = true })
-      vim.api.nvim_set_keymap('n', '<Leader><tab>', "<Cmd>lua require('telescope.builtin').commands()<CR>", { noremap = false })
     end,
   },
 }

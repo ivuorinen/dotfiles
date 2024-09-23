@@ -78,3 +78,8 @@ vim.o.undofile = true
 vim.o.completeopt = 'menuone,noselect'
 -- Fixes Notify opacity issues
 vim.o.termguicolors = true
+
+-- Set spell checking
+vim.o.spell = true
+
+vim.g.loaded_perl_provider = 0

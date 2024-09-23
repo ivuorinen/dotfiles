@@ -1,15 +1,12 @@
 vim.api.nvim_set_keymap('i', 'jj', '<Esc>', { noremap = false })
 
--- twilight
-vim.api.nvim_set_keymap('n', 'tw', ':Twilight<enter>', { noremap = false })
-
 -- buffers
-vim.api.nvim_set_keymap('n', '<leader>bk', ':blast<enter>', { desc = 'Last', noremap = false })
-vim.api.nvim_set_keymap('n', '<leader>bj', ':bfirst<enter>', { desc = 'First', noremap = false })
-vim.api.nvim_set_keymap('n', '<leader>bh', ':bprev<enter>', { desc = 'Prev', noremap = false })
-vim.api.nvim_set_keymap('n', '<leader>bl', ':bnext<enter>', { desc = 'Next', noremap = false })
-vim.api.nvim_set_keymap('n', '<leader>bd', ':bdelete<enter>', { desc = 'Delete', noremap = false })
-vim.api.nvim_set_keymap('n', '<C-w>', ':bdelete<enter>', { desc = 'Delete buffer', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bk', ':blast<enter>', { desc = 'Buffer: Last', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bj', ':bfirst<enter>', { desc = 'Buffer: First', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bh', ':bprev<enter>', { desc = 'Buffer: Prev', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bl', ':bnext<enter>', { desc = 'Buffer: Next', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bd', ':Bdelete<enter>', { desc = 'Buffer: Delete', noremap = false })
+vim.api.nvim_set_keymap('n', '<leader>bw', ':Bwipeout<enter>', { desc = 'Buffer: Wipeout', noremap = false })
 
 -- files
 vim.api.nvim_set_keymap('n', 'QQ', ':q!<enter>', { desc = 'Quickly Quit', noremap = false })
@@ -33,9 +30,6 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- Noice
-vim.api.nvim_set_keymap('n', '<leader>nn', ':Noice dismiss<CR>', { desc = 'Noice dismiss', noremap = true })
 
 vim.keymap.set('n', '<leader>xe', '<cmd>GoIfErr<cr>', { desc = 'Go If Error', silent = true, noremap = true })
 

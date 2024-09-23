@@ -1,9 +1,5 @@
 return {
 
-  -- fugitive.vim: A Git wrapper so awesome, it should be illegal
-  -- https://github.com/tpope/vim-fugitive
-  { 'tpope/vim-fugitive' },
-
   -- Git integration for buffers
   -- https://github.com/lewis6991/gitsigns.nvim
   {
@@ -19,7 +15,7 @@ return {
         },
         current_line_blame = false,
         on_attach = function(bufnr)
-          local gs = package.loaded.gitsigns
+          local gs = require 'gitsigns'
 
           local function map(mode, l, r, opts)
             opts = opts or {}

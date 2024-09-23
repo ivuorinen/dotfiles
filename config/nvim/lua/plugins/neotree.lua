@@ -30,7 +30,7 @@ return {
   },
   cmd = 'Neotree',
   keys = {
-    { '<leader>e', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
+    { '<leader>e', ':Neotree reveal<CR>', desc = 'NeoTree reveal' },
   },
   opts = {
     close_if_last_window = true,
