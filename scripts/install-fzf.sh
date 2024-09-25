@@ -2,6 +2,10 @@
 #
 # Install fzf
 #
+
+echo "This file ($0) has been deprecated in favor of asdf. Please use asdf instead."
+exit 0
+
 # shellcheck source=shared.sh
 eval "$DOTFILES/config/shared.sh"
 

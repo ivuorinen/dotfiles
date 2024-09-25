@@ -3,7 +3,7 @@
 #
 # shellcheck source=shared.sh
 
-echo "This file has been deprecated in favor of asdf. Please use asdf instead."
+echo "This file ($0) has been deprecated in favor of asdf. Please use asdf instead."
 exit 0
 
 eval "$DOTFILES/config/shared.sh"
