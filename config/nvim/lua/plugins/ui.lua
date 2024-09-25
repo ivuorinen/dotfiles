@@ -72,6 +72,9 @@ return {
     enabled = true,
     lazy = false,
     version = '*',
+    keys = {
+      { '<leader>tc', '<cmd>CloakToggle<cr>', desc = '[tc] Toggle Cloak' },
+    },
     config = function()
       require('cloak').setup {
         enabled = true,
@@ -95,9 +98,6 @@ return {
         },
       }
     end,
-    keys = {
-      { '<leader>tc', '<cmd>CloakToggle<cr>', desc = '[tc] Toggle Cloak' },
-    },
   },
   -- Close buffer without messing up with the window.
   -- https://github.com/famiu/bufdelete.nvim
@@ -125,18 +125,6 @@ return {
   {
     'LudoPinelli/comment-box.nvim',
     opts = {},
-    init = function()
-      local wk = require 'which-key'
-
-      wk.add {
-        { '<leader>cb', group = 'CommentBox' },
-        { '<leader>cbb', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
-        { '<leader>cbd', '<Cmd>CBd<CR>', desc = 'CommentBox: Remove a box' },
-        { '<leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
-        { '<leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
-        { '<leader>cbt', '<Cmd>CBllline<CR>', desc = 'CommentBox: Titled Line' },
-      }
-    end,
   },
   -- Automatically expand width of the current window.
   -- Maximizes and restore it. And all this with nice animations!

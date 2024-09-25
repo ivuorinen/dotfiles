@@ -3,12 +3,12 @@ return {
   lazy = false,
   dependencies = 'nvim-tree/nvim-web-devicons',
   keys = {
-    { '<leader>xx', '<cmd>TroubleToggle<cr>', desc = 'Toggle Trouble' },
-    { '<leader>xw', '<cmd>TroubleToggle workspace_diagnostics<cr>', desc = 'Toggle Workspace Diagnostics' },
-    { '<leader>xd', '<cmd>TroubleToggle document_diagnostics<cr>', desc = 'Toggle Document Diagnostics' },
-    { '<leader>xl', '<cmd>TroubleToggle loclist<cr>', desc = 'Toggle Loclist' },
-    { '<leader>xq', '<cmd>TroubleToggle quickfix<cr>', desc = 'Toggle Quickfix' },
-    { 'gR', '<cmd>TroubleToggle lsp_references<cr>', desc = 'Toggle LSP References' },
+    { '<leader>xx', '<cmd>Trouble<cr>', desc = 'Toggle Trouble' },
+    { '<leader>xw', '<cmd>Trouble workspace_diagnostics<cr>', desc = 'Toggle Workspace Diagnostics' },
+    { '<leader>xd', '<cmd>Trouble document_diagnostics<cr>', desc = 'Toggle Document Diagnostics' },
+    { '<leader>xl', '<cmd>Trouble loclist<cr>', desc = 'Toggle Loclist' },
+    { '<leader>xq', '<cmd>Trouble quickfix<cr>', desc = 'Toggle Quickfix' },
+    { 'gR', '<cmd>Trouble lsp_references<cr>', desc = 'Toggle LSP References' },
   },
   config = function()
     require('trouble').setup {

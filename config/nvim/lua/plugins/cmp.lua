@@ -31,7 +31,7 @@ return {
                 help = true,
               },
             },
-          }
+          },
         },
         config = function()
           require('copilot_cmp').setup()
@@ -51,7 +51,7 @@ return {
             min_width = 40,
             max_width = 100,
             symbol_map = {
-              Copilot = ''
+              Copilot = '',
             },
           },
         },

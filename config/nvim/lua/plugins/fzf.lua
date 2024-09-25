@@ -8,7 +8,7 @@ return {
   keys = {
     -- Stolen from https://github.com/erikw/dotfiles/blob/d68d6274d67ac47afa20b9a0b9f3b0fa54bcdaf3/.config/nvim/lua/plugins.lua
     -- Search for files in given path.
-    { '<Leader><space>', ':FZF<space>', desc = 'FZF: search for files in given path.' },
+    { '<Leader>zf', ':FZF<space>', desc = 'FZF: search for files in given path.' },
     -- Sublime-like shortcut 'go to file' ctrl+p.
     { '<C-p>', ':Files<CR>', desc = 'FZF: search for files starting at current directory.' },
     { '<Leader>zc', ':Commands<CR>', desc = 'FZF: search commands.' },

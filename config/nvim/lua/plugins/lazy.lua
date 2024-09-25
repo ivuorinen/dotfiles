@@ -1,15 +1,28 @@
 return {
-  -- vscode-like pictograms for neovim lsp completion items
-  -- https://github.com/onsails/lspkind-nvim
-  { 'onsails/lspkind.nvim' },
+  -- A better annotation generator.
+  -- Supports multiple languages and annotation conventions.
+  -- https://github.com/danymat/neogen
+  {
+    'danymat/neogen',
+    version = '*',
+    keys = {
+      {
+        '<leader>cg',
+        '<cmd>lua require("neogen").generate()<CR>',
+        desc = 'Generate annotations',
+      },
+    },
+    config = function()
+      require('neogen').setup {
+        enabled = true,
+        snippet_engine = 'luasnip',
+      }
+    end,
+  },
 
   -- Rethinking Vim as a tool for writing
   -- https://github.com/preservim/vim-pencil
   { 'preservim/vim-pencil' },
-
-  -- obsession.vim: continuously updated session files
-  -- https://github.com/tpope/vim-obsession
-  { 'tpope/vim-obsession' },
 
   -- surround.vim: Delete/change/add parentheses/quotes/XML-tags/much more with ease
   -- https://github.com/tpope/vim-surround
@@ -24,11 +37,6 @@ return {
       require('todo-comments').setup {}
     end,
   },
-
-  -- LSP Configuration & Plugins
-  -- Meta type definitions for the Lua platform Luvit.
-  -- https://github.com/Bilal2453/luvit-meta
-  { 'Bilal2453/luvit-meta', lazy = true },
 
   -- Indent guides for Neovim
   -- https://github.com/lukas-reineke/indent-blankline.nvim

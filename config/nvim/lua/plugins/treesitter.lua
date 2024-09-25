@@ -10,6 +10,10 @@ return {
   },
   config = function()
     require('nvim-treesitter.configs').setup {
+      auto_install = true,
+      ignore_install = {},
+      sync_install = true,
+      modules = {},
 
       -- Add languages to be installed here that you want installed for treesitter
       ensure_installed = {
@@ -95,10 +99,10 @@ return {
         swap = {
           enable = true,
           swap_next = {
-            ['<leader>a'] = '@parameter.inner',
+            ['<leader>cn'] = '@parameter.inner',
           },
           swap_previous = {
-            ['<leader>A'] = '@parameter.inner',
+            ['<leader>cP'] = '@parameter.inner',
           },
         },
       },

@@ -18,17 +18,29 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require 'options'
-require 'keymaps'
+-- Add ~/.local/bin to the PATH
+vim.fn.setenv('PATH', vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH')
 
-require('lazy').setup {
+require 'options'
+
+require('lazy').setup('plugins', {
   checker = {
     -- Automatically check for updates
     enabled = true,
     nofity = false,
   },
-  spec = {
-    -- Import plugins from `lua/plugins` directory
-    { import = 'plugins' },
+  change_detection = {
+    notify = false,
   },
-}
+})
+
+-- [[ Highlight on yank ]]
+-- See `:help vim.highlight.on_yank()`
+local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = highlight_group,
+  pattern = '*',
+})

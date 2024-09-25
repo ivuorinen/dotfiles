@@ -1,3 +1,22 @@
+-- Not UFO in the sky, but an ultra fold in Neovim.
+-- https://github.com/kevinhwang91/nvim-ufo/
+
+-- fold_virt_text_handler
+-- This handler is called when the fold text is too long to fit in the window.
+-- It is expected to truncate the text and return a new list of virtual text.
+-- The handler is called with the following arguments:
+-- virtText: The current virtual text list.
+-- lnum: The line number of the first line in the fold.
+-- endLnum: The line number of the last line in the fold.
+-- width: The width of the window.
+--
+--@type function
+--@param virtText
+--@param lnum
+--@param endLnum
+--@param width
+--@param truncate
+--@return table
 local handler = function(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}
   local suffix = (' 󰁂 %d '):format(endLnum - lnum)
@@ -27,8 +46,6 @@ local handler = function(virtText, lnum, endLnum, width, truncate)
 end
 
 return {
-  -- Not UFO in the sky, but an ultra fold in Neovim.
-  -- https://github.com/kevinhwang91/nvim-ufo/
   {
     'kevinhwang91/nvim-ufo',
     lazy = false,

@@ -1,65 +1,39 @@
 -- Quickstart configs for Nvim LSP
 -- https://github.com/neovim/nvim-lspconfig
 return {
-  -- Neovim plugin to manage global and project-local settings
-  -- Should be included before LSP Config
-  -- https://github.com/folke/neoconf.nvim
-  {
-    'folke/neoconf.nvim',
-    keys = {
-      { '<leader>?c', '<cmd>Neoconf<CR>', desc = 'Neoconf: Open' },
-      { '<leader>?g', '<cmd>Neoconf global<CR>', desc = 'Neoconf: Global' },
-      { '<leader>?l', '<cmd>Neoconf local<CR>', desc = 'Neoconf: Local' },
-      { '<leader>?m', '<cmd>Neoconf lsp<CR>', desc = 'Neoconf: Show merged LSP config' },
-      { '<leader>?s', '<cmd>Neoconf show<CR>', desc = 'Neoconf: Show merged config' },
-    },
-    config = function()
-      require('neoconf').setup()
-    end,
-  },
-
   {
     'neovim/nvim-lspconfig',
+    lazy = false,
     dependencies = {
+      -- Neovim plugin to manage global and project-local settings
+      -- Should be included before LSP Config
+      -- https://github.com/folke/neoconf.nvim
+      {
+        'folke/neoconf.nvim',
+        lazy = false,
+        keys = {
+          { '<leader>?c', '<cmd>Neoconf<CR>', desc = 'Neoconf: Open' },
+          { '<leader>?g', '<cmd>Neoconf global<CR>', desc = 'Neoconf: Global' },
+          { '<leader>?l', '<cmd>Neoconf local<CR>', desc = 'Neoconf: Local' },
+          { '<leader>?m', '<cmd>Neoconf lsp<CR>', desc = 'Neoconf: Show merged LSP config' },
+          { '<leader>?s', '<cmd>Neoconf show<CR>', desc = 'Neoconf: Show merged config' },
+        },
+        config = function()
+          require('neoconf').setup()
+        end,
+      },
       -- Automatically install LSPs to stdpath for neovim
-      'williamboman/mason.nvim',
+      {
+        'williamboman/mason.nvim',
+        lazy = false,
+        run = ':call MasonUpdate',
+      },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      -- Useful status updates for LSP
-      {
-        'j-hui/fidget.nvim',
-        opts = {
-          notification = {
-            window = {
-              winblend = 50,
-              align = 'top',
-            },
-          },
-        },
-      },
       'b0o/schemastore.nvim',
-      {
-        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-        -- used for completion, annotations and signatures of Neovim apis
-        'folke/lazydev.nvim',
-        dependencies = {
-          -- `wezterm-types` provides types for the Wezterm terminal
-          {
-            'justinsgithub/wezterm-types',
-            as = 'wezterm',
-          },
-        },
-        ft = 'lua',
-        opts = {
-          library = {
-            -- Load luvit types when the `vim.uv` word is found
-            { path = 'luvit-meta/library', words = { 'vim%.uv' } },
-            -- Load wezterm types when the `wezterm` word is found
-            { path = 'wezterm-types', mods = { 'wezterm' } },
-          },
-        },
-      },
-      'folke/neoconf.nvim',
+      -- vscode-like pictograms for neovim lsp completion items
+      -- https://github.com/onsails/lspkind-nvim
+      { 'onsails/lspkind.nvim' },
     },
     keys = {
       { '<leader>do', '<cmd>lua vim.diagnostic.open_float()<CR>', desc = 'Diagnostic: Open float' },
@@ -215,7 +189,7 @@ return {
       end
 
       -- Turn on lsp status information
-      require('fidget').setup()
+      -- require('fidget').setup()
 
       -- Example custom configuration for lua
       --
