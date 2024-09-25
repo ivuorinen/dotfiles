@@ -39,6 +39,9 @@ return {
   {
     'folke/twilight.nvim',
     ft = 'markdown', -- Highlight markdown files
+    keys = {
+      { 'n', 'tw', '<cmd>Twilight<cr>', desc = 'Twilight' },
+    },
   },
 
   -- Seamless navigation between tmux panes and vim splits
@@ -55,11 +58,11 @@ return {
       'TmuxNavigatePrevious',
     },
     keys = {
-      { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
-      { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>' },
-      { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>' },
-      { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>' },
-      { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
+      { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>', desc = 'tmux: Navigate Left' },
+      { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>', desc = 'tmux: Navigate Down' },
+      { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>', desc = 'tmux: Navigate Up' },
+      { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>', desc = 'tmux: Navigate Right' },
+      { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>', desc = 'tmux: Navigate Previous' },
     },
   },
   -- Cloak allows you to overlay *'s over defined patterns in defined files.
@@ -69,6 +72,9 @@ return {
     enabled = true,
     lazy = false,
     version = '*',
+    keys = {
+      { '<leader>tc', '<cmd>CloakToggle<cr>', desc = '[tc] Toggle Cloak' },
+    },
     config = function()
       require('cloak').setup {
         enabled = true,
@@ -92,9 +98,6 @@ return {
         },
       }
     end,
-    keys = {
-      { '<leader>tc', '<cmd>CloakToggle<cr>', desc = '[tc] Toggle Cloak' },
-    },
   },
   -- Close buffer without messing up with the window.
   -- https://github.com/famiu/bufdelete.nvim
@@ -122,18 +125,6 @@ return {
   {
     'LudoPinelli/comment-box.nvim',
     opts = {},
-    init = function()
-      local wk = require 'which-key'
-
-      wk.add {
-        { '<leader>cb', group = 'CommentBox' },
-        { '<Leader>cbt', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
-        { '<Leader>cbd', '<Cmd>CBd<CR>', desc = 'Remove a box' },
-        { '<Leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
-        { '<Leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
-        { '<Leader>cbt', '<Cmd>CBllline<CR>', desc = 'CommentBox: Titled Line' },
-      }
-    end,
   },
   -- Automatically expand width of the current window.
   -- Maximizes and restore it. And all this with nice animations!

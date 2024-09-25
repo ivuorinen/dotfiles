@@ -6,7 +6,7 @@
 
 export DOTFILES="$HOME/.dotfiles"
 LOCAL_SHARE="$HOME/.local/share"
-export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim-kickstart/mason/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim/mason/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"

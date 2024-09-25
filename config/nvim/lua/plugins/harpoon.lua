@@ -15,7 +15,7 @@ return {
 
       vim.keymap.set('n', '<leader>ht', function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
+      end, { desc = 'Open Harpoon Quick menu' })
 
       -- basic telescope configuration
       local conf = require('telescope.config').values
@@ -37,27 +37,27 @@ return {
           :find()
       end
 
-      vim.keymap.set('n', '<leader>xa', function()
+      vim.keymap.set('n', '<leader>hw', function()
         toggle_telescope(harpoon:list())
-      end, { desc = 'Open harpoon window' })
+      end, { desc = 'Open harpoon window with telescope' })
     end,
     keys = {
       {
-        '<leader>xa',
+        '<leader>ha',
         function()
           require('harpoon'):list():add()
         end,
         desc = 'harpoon file',
       },
       {
-        '<leader>xN',
+        '<leader>hp',
         function()
           require('harpoon'):list():prev()
         end,
         desc = 'harpoon to previous file',
       },
       {
-        '<leader>xn',
+        '<leader>hn',
         function()
           require('harpoon'):list():next()
         end,

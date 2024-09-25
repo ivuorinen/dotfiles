@@ -1,29 +1,30 @@
 return {
-
-  'ray-x/go.nvim',
-  'ray-x/guihua.lua',
-
   {
     'rcarriga/nvim-dap-ui',
     dependencies = {
       'mfussenegger/nvim-dap',
       'nvim-neotest/nvim-nio',
       'theHamsta/nvim-dap-virtual-text',
+      'ray-x/go.nvim',
+      'ray-x/guihua.lua',
       'leoluz/nvim-dap-go',
+    },
+    keys = {
+      { '<leader>dt', '<cmd>DapUiToggle', desc = 'DAP: Toggle UI' },
+      { '<leader>db', '<cmd>DapToggleBreakpoint', desc = 'DAP: Toggle Breakpoint' },
+      { '<leader>dc', '<cmd>DapContinue', desc = 'DAP: Continue' },
+      { '<leader>dr', ":lua require('dapui').open({reset = true})<CR>", desc = 'DAP: Reset' },
+      { '<leader>ht', ":lua require('harpoon.ui').toggle_quick_menu()<CR>", desc = 'DAP: Harpoon UI' },
     },
     setup = function()
       require('dapui').setup()
       require('dap-go').setup()
       require('nvim-dap-virtual-text').setup()
 
-      vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
-
-      -- Debugger
-      vim.api.nvim_set_keymap('n', '<leader>dt', ':DapUiToggle<CR>', { noremap = true })
-      vim.api.nvim_set_keymap('n', '<leader>db', ':DapToggleBreakpoint<CR>', { noremap = true })
-      vim.api.nvim_set_keymap('n', '<leader>dc', ':DapContinue<CR>', { noremap = true })
-      vim.api.nvim_set_keymap('n', '<leader>dr', ":lua require('dapui').open({reset = true})<CR>", { noremap = true })
-      vim.api.nvim_set_keymap('n', '<leader>ht', ":lua require('harpoon.ui').toggle_quick_menu()<CR>", { noremap = true })
+      vim.fn.sign_define(
+        'DapBreakpoint',
+        { text = '🔴', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+      )
     end,
   },
 }

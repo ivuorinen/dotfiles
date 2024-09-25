@@ -2,6 +2,15 @@ return {
   -- A small Neovim plugin for previewing definitions using floating windows.
   -- https://github.com/rmagatti/goto-preview
   'rmagatti/goto-preview',
+  dependencies = {
+    { 'nvim-telescope/telescope.nvim' },
+  },
+  keys = {
+    { 'n', 'gp', group = 'Goto Preview' },
+    { 'n', 'gpd', '<cmd>lua require("goto-preview").goto_preview_definition()<CR>' },
+    { 'n', 'gpi', '<cmd>lua require("goto-preview").goto_preview_implementation()<CR>' },
+    { 'n', 'gpP', '<cmd>lua require("goto-preview").close_all_windows()<CR>' },
+  },
   config = function()
     require('goto-preview').setup {
       width = 120, -- Width of the floating window

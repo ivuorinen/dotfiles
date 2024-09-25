@@ -17,3 +17,5 @@ github.com/charmbracelet/glow@v1.5.1
 github.com/rhysd/actionlint/cmd/actionlint@v1.7.1
 // Cleans up your $HOME from those pesky dotfiles
 github.com/doron-cohen/antidot@v0.6.3
+// FZF is a general-purpose command-line fuzzy finder.
+github.com/junegunn/fzf@latest

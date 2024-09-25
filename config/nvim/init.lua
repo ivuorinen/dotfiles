@@ -3,65 +3,44 @@
 -- Install lazylazy
 -- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system {
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  }
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
+  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
+      { out, 'WarningMsg' },
+      { '\nPress any key to exit...' },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
-require 'options'
-require 'keymaps'
+-- Add ~/.local/bin to the PATH
+vim.fn.setenv('PATH', vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH')
 
-require('lazy').setup {
+require 'options'
+
+require('lazy').setup('plugins', {
   checker = {
     -- Automatically check for updates
     enabled = true,
+    nofity = false,
   },
-  spec = {
-    -- Useful plugin to show you pending keybinds.
-    -- https://github.com/folke/which-key.nvim
-    {
-      'folke/which-key.nvim',
-      event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-      priority = 1001, -- Make sure to load this as soon as possible
-      config = function() -- This is the function that runs, AFTER loading
-        local wk = require 'which-key'
-        wk.setup()
-
-        wk.add {
-          { '<leader>b', group = '[b] Buffer' },
-          { '<leader>c', group = '[c] Code' },
-          { '<leader>d', group = '[d] Document' },
-          { '<leader>f', group = '[f] File' },
-          { '<leader>g', group = '[g] Git' },
-          { '<leader>l', group = '[l] LSP' },
-          { '<leader>o', group = '[o] Open' },
-          { '<leader>p', group = '[p] Project' },
-          { '<leader>q', group = '[q] Quit' },
-          { '<leader>s', group = '[s] Search' },
-          { '<leader>t', group = '[t] Toggle' },
-          { '<leader>w', group = '[w] Workspace' },
-          { '<leader>z', group = '[x] FZF' },
-          { '<leader>?', group = '[?] Help' },
-          {
-            '<leader>?w',
-            function()
-              wk.show { global = false }
-            end,
-            desc = 'Buffer Local Keymaps (which-key)',
-          },
-        }
-      end,
-    },
-    -- Import plugins from `lua/plugins` directory
-    { import = 'plugins' },
+  change_detection = {
+    notify = false,
   },
-}
+})
 
-require 'config.misc'
+-- [[ Highlight on yank ]]
+-- See `:help vim.highlight.on_yank()`
+local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = highlight_group,
+  pattern = '*',
+})

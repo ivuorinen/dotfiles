@@ -78,3 +78,14 @@ vim.o.undofile = true
 vim.o.completeopt = 'menuone,noselect'
 -- Fixes Notify opacity issues
 vim.o.termguicolors = true
+
+-- Set spell checking
+vim.o.spell = true
+vim.o.spelllang = 'en_us'
+
+vim.g.loaded_perl_provider = 0
+
+-- ── Deal with word wrap ───────────────────────────────────────────────────────
+local m = vim.api.nvim_set_keymap
+m('n', 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
+m('n', 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })

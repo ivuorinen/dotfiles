@@ -19,3 +19,5 @@ bob-nvim
 // bottom, btm - A cross-platform graphical process/system monitor with
 // a customizable interface and a multitude of features.
 bottom
+// A modern alternative to ls
+eza
