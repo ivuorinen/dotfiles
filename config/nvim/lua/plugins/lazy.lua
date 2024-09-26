@@ -69,32 +69,6 @@ return {
     event = 'VeryLazy',
   },
 
-  -- fzf <3 vim
-  -- https://github.com/junegunn/fzf.vim
-  {
-    'junegunn/fzf.vim',
-    dependencies = {
-      { 'junegunn/fzf', run = ':call fzf#install()' },
-    },
-    config = function()
-      require('fzf').setup {
-        winopts = {
-          win_height = 0.85,
-          win_width = 0.85,
-        },
-      }
-    end,
-    opts = {
-      -- To ignore a certain path in a git project from both RG and FD used by FZF,
-      -- the eaiest way is to create ignore files and exclude the in local git clone.
-      -- Ref: https://stackoverflow.com/a/1753078/265508
-      -- $ cd git_proj/
-      -- $ echo "path/to/exclude" > .rgignore
-      -- $ echo "path/to/exclude" > .fdignore
-      -- $ printf ".rgignore\n.fdignore" >> .git/info/exclude
-    },
-  },
-
   -- Highlight, list and search todo comments in your projects
   -- https://github.com/folke/todo-comments.nvim
   {

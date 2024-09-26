@@ -46,9 +46,9 @@ return {
       -- Easily install and manage LSP servers, DAP servers, linters,
       -- and formatters.
       -- https://github.com/williamboman/mason.nvim
-      { 'williamboman/mason.nvim', opts = {} },
-      { 'williamboman/mason-lspconfig.nvim', opts = {} },
-      { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
+      { 'williamboman/mason.nvim' },
+      { 'williamboman/mason-lspconfig.nvim' },
+      { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 
       -- ── Linting ─────────────────────────────────────────────────────────
       -- An asynchronous linter plugin for Neovim complementary to the
@@ -92,6 +92,8 @@ return {
             vim.lsp.buf.format()
           elseif vim.lsp.buf.formatting then
             vim.lsp.buf.formatting()
+          else
+            require('conform').format { async = true, lsp_fallback = true }
           end
         end, { desc = 'Format current buffer with LSP' })
       end
