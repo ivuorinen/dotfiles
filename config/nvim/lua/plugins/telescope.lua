@@ -28,15 +28,6 @@ return {
     t.setup {
       defaults = {
         layout_strategy = 'horizontal',
-        layout_config = {
-          preview_width = 0.65,
-          horizontal = {
-            size = {
-              width = '95%',
-              height = '95%',
-            },
-          },
-        },
         pickers = {
           find_files = {
             theme = 'dropdown',
@@ -63,22 +54,6 @@ return {
     -- See `:help telescope.builtin`
     -- See `:help telescope.keymap`
     local b = require 'telescope.builtin'
-
-    local wk = require 'which-key'
-    wk.add {
-      { '<leader><space>', b.buffers, desc = '[ ] Find existing buffers' },
-      { '<leader><tab>', "<Cmd>lua require('telescope.builtin').commands()<CR>", desc = 'Telescope: Commands' },
-      { '<leader>sS', b.git_status, desc = 'Git Status' },
-      { '<leader>sd', b.diagnostics, desc = 'Search Diagnostics' },
-      { '<leader>sf', b.find_files, desc = 'Search Files' },
-      { '<leader>sg', b.live_grep, desc = 'Search by Grep' },
-      { '<leader>sm', ':Telescope harpoon marks<CR>', desc = 'Harpoon Marks' },
-      { '<leader>sn', "<cmd>lua require('telescope').extensions.notify.notify()<CR>", desc = 'Notify' },
-      { '<leader>so', b.oldfiles, desc = 'Find recently Opened files' },
-      { '<leader>st', ':TodoTelescope<CR>', desc = 'Telescope: Todo' },
-      { '<leader>sw', b.grep_string, desc = 'Search current Word' },
-    }
-
     vim.keymap.set('n', '<leader>/', function()
       -- You can pass additional configuration to telescope to change theme, layout, etc.
       b.current_buffer_fuzzy_find(themes.get_dropdown {

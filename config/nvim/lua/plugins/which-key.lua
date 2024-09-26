@@ -23,15 +23,16 @@ return {
         '<leader>b',
         group = '[b] Buffer',
         expand = function()
+          -- Add the current buffers to the menu
           return require('which-key.extras').expand.buf()
         end,
       },
-      { '<leader>bk', ':blast<cr>', desc = 'Buffer: Last', mode = 'n' },
-      { '<leader>bj', ':bfirst<cr>', desc = 'Buffer: First', mode = 'n' },
-      { '<leader>bh', ':bprev<cr>', desc = 'Buffer: Prev', mode = 'n' },
-      { '<leader>bl', ':bnext<cr>', desc = 'Buffer: Next', mode = 'n' },
-      { '<leader>bd', ':Bdelete<cr>', desc = 'Buffer: Delete', mode = 'n' },
-      { '<leader>bw', ':Bwipeout<cr>', desc = 'Buffer: Wipeout', mode = 'n' },
+      { '<leader>bk', '<cmd>blast<cr>', desc = 'Buffer: Last', mode = 'n' },
+      { '<leader>bj', '<cmd>bfirst<cr>', desc = 'Buffer: First', mode = 'n' },
+      { '<leader>bh', '<cmd>bprev<cr>', desc = 'Buffer: Prev', mode = 'n' },
+      { '<leader>bl', '<cmd>bnext<cr>', desc = 'Buffer: Next', mode = 'n' },
+      { '<leader>bd', '<cmd>Bdelete<cr>', desc = 'Buffer: Delete', mode = 'n' },
+      { '<leader>bw', '<cmd>Bwipeout<cr>', desc = 'Buffer: Wipeout', mode = 'n' },
 
       -- ── Code ────────────────────────────────────────────────────────────
       { '<leader>c', group = '[c] Code' },
@@ -78,7 +79,7 @@ return {
       { '<leader>dc', '<cmd>DapContinue', desc = 'DAP: Continue' },
       { '<leader>do', '<cmd>lua vim.diagnostic.open_float()<CR>', desc = 'Diagnostic: Open float' },
       { '<leader>dq', '<cmd>lua vim.diagnostic.setloclist()<CR>', desc = 'Diagnostic: Set loc list' },
-      { '<leader>dr', ":lua require('dapui').open({reset = true})<CR>", desc = 'DAP: Reset' },
+      { '<leader>dr', "<cmd>lua require('dapui').open({reset = true})<CR>", desc = 'DAP: Reset' },
       { '<leader>ds', '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>', desc = 'LSP: Document Symbols' },
       { '<leader>dt', '<cmd>DapUiToggle', desc = 'DAP: Toggle UI' },
 
@@ -88,7 +89,7 @@ return {
       { '<leader>ha', '<cmd>lua require("harpoon"):list():add()<cr>', desc = 'harpoon file' },
       { '<leader>hn', '<cmd>lua require("harpoon"):list():next()<cr>', desc = 'harpoon to next file' },
       { '<leader>hp', '<cmd>lua require("harpoon"):list():prev()<cr>', desc = 'harpoon to previous file' },
-      { '<leader>ht', ":lua require('harpoon.ui').toggle_quick_menu()<CR>", desc = 'DAP: Harpoon UI' },
+      { '<leader>ht', "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", desc = 'DAP: Harpoon UI' },
 
       -- ── LSP ─────────────────────────────────────────────────────────────
       { '<leader>l', group = '[l] LSP' },
@@ -96,20 +97,31 @@ return {
 
       -- ── Quit ────────────────────────────────────────────────────────────
       { '<leader>q', group = '[q] Quit' },
-      { '<leader>qf', ':q<CR>', desc = 'Quicker close split' },
-      { '<leader>qq', ':wq!<CR>', desc = 'Quit with force saving' },
-      { '<leader>qw', ':wq<CR>', desc = 'Write and quit' },
+      { '<leader>qf', '<cmd>q<CR>', desc = 'Quicker close split' },
+      { '<leader>qq', '<cmd>wq!<CR>', desc = 'Quit with force saving' },
+      { '<leader>qw', '<cmd>wq<CR>', desc = 'Write and quit' },
 
       -- ── Search ──────────────────────────────────────────────────────────
       { '<leader>s', group = '[s] Search' },
       -- See: lua/plugins/telescope.lua
+      { '<leader><space>', "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = 'Find existing buffers' },
+      { '<leader><tab>', "<cmd>lua require('telescope.builtin').commands()<CR>", desc = 'Telescope: Commands' },
+      { '<leader>sS', "<cmd>lua require('telescope.builtin').git_status()<cr>", desc = 'Git Status' },
+      { '<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", desc = 'Search Diagnostics' },
+      { '<leader>sf', "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = 'Search Files' },
+      { '<leader>sg', "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = 'Search by Grep' },
+      { '<leader>sm', '<cmd>Telescope harpoon marks<CR>', desc = 'Harpoon Marks' },
+      { '<leader>sn', "<cmd>lua require('telescope').extensions.notify.notify()<CR>", desc = 'Notify' },
+      { '<leader>so', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", desc = 'Find recently Opened files' },
+      { '<leader>st', '<cmd>TodoTelescope<CR>', desc = 'Telescope: Todo' },
+      { '<leader>sw', "<cmd>lua require('telescope.builtin').grep_string()<cr>", desc = 'Search current Word' },
 
       -- ── Toggle ──────────────────────────────────────────────────────────
       { '<leader>t', group = '[t] Toggle' },
       { '<leader>tc', '<cmd>CloakToggle<cr>', desc = 'Toggle Cloak' },
-      { '<leader>tn', ':Noice dismiss<CR>', desc = 'Noice dismiss' },
-      { '<leader>ts', ':noh<CR>', desc = 'Toggle Search Highlighting' },
-      { '<leader>tt', ':TransparentToggle<CR>', desc = 'Toggle Transparency' },
+      { '<leader>tn', '<cmd>Noice dismiss<CR>', desc = 'Noice dismiss' },
+      { '<leader>ts', '<cmd>noh<CR>', desc = 'Toggle Search Highlighting' },
+      { '<leader>tt', '<cmd>TransparentToggle<CR>', desc = 'Toggle Transparency' },
       { '<leader>tw', '<cmd>Twilight<cr>', desc = 'Toggle Twilight' },
 
       -- ── Workspace ───────────────────────────────────────────────────────
@@ -119,26 +131,13 @@ return {
       { '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', desc = 'LSP: Workspace Remove Folder' },
       { '<leader>ws', '<cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>', desc = 'LSP: Workspace Symbols' },
 
-      -- Trouble
+      -- ── Trouble ─────────────────────────────────────────────────────────
       { '<leader>x', group = '[x] Trouble' },
       { '<leader>xx', '<cmd>Trouble<cr>', desc = 'Toggle Trouble' },
       { '<leader>xw', '<cmd>Trouble workspace_diagnostics<cr>', desc = 'Toggle Workspace Diagnostics' },
       { '<leader>xd', '<cmd>Trouble document_diagnostics<cr>', desc = 'Toggle Document Diagnostics' },
       { '<leader>xl', '<cmd>Trouble loclist<cr>', desc = 'Toggle Loclist' },
       { '<leader>xq', '<cmd>Trouble quickfix<cr>', desc = 'Toggle Quickfix' },
-
-      -- ── FZF ─────────────────────────────────────────────────────────────
-      { '<leader>z', group = '[z] FZF' },
-      -- Stolen from https://github.com/erikw/dotfiles/blob/d68d6274d67ac47afa20b9a0b9f3b0fa54bcdaf3/.config/nvim/lua/plugins.lua
-      { '<leader>zf', ':FZF<space>', desc = 'FZF: search for files in given path.' },
-      { '<leader>zc', ':Commands<CR>', desc = 'FZF: search commands.' },
-      { '<leader>zt', ':Tags<CR>', desc = 'FZF: search in tags file' },
-      { '<leader>zb', ':Buffers<CR>', desc = 'FZF: search open buffers.' },
-      -- Ref: https://medium.com/@paulodiovani/vim-buffers-windows-and-tabs-an-overview-8e2a57c57afa
-      { '<leader>zt', ':Windows<CR>', desc = 'FZF: search open tabs.' },
-      { '<leader>zh', ':History<CR>', desc = 'FZF: search history of opened files' },
-      { '<leader>zm', ':Maps<CR>', desc = 'FZF: search mappings.' },
-      { '<leader>zg', ':Rg<CR>', desc = 'FZF: search with rg (aka live grep).' },
 
       -- ── Help & Neoconf ──────────────────────────────────────────────────
       { '<leader>?', group = '[?] Help & neoconf' },
@@ -156,7 +155,7 @@ return {
       { '<leader>4', '<cmd>lua require("harpoon"):list():select(4)<cr>', desc = 'harpoon to file 4' },
       { '<leader>5', '<cmd>lua require("harpoon"):list():select(5)<cr>', desc = 'harpoon to file 5' },
       { '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', desc = 'LSP: Type Definition' },
-      { '<leader>e', ':Neotree reveal<CR>', desc = 'NeoTree reveal' },
+      { '<leader>e', '<cmd>Neotree reveal<CR>', desc = 'NeoTree reveal' },
 
       -- ╭─────────────────────────────────────────────────────────╮
       -- │                     Without leader                      │
@@ -176,13 +175,16 @@ return {
       { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>', desc = 'tmux: Navigate Previous' },
 
       -- ── Old habits ──────────────────────────────────────────────────────
-      { '<C-s>', ':w<CR>', desc = 'Save file' },
+      { '<C-s>', '<cmd>w<CR>', desc = 'Save file' },
 
       -- ── Text manipulation in visual mode ────────────────────────────────
-      { '>', '>gv', desc = 'Indent Right', mode = 'v' },
-      { '<', '<gv', desc = 'Indent Left', mode = 'v' },
-      { 'J', ":m '>+1<CR>gv=gv", desc = 'Move Block Down', mode = 'v' },
-      { 'K', ":m '<-2<CR>gv=gv", desc = 'Move Block Up', mode = 'v' },
+      {
+        mode = 'v',
+        { '>', '>gv', desc = 'Indent Right' },
+        { '<', '<gv', desc = 'Indent Left' },
+        { 'J', "<cmd>m '>+1<CR>gv=gv", desc = 'Move Block Down' },
+        { 'K', "<cmd>m '<-2<CR>gv=gv", desc = 'Move Block Up' },
+      },
 
       -- ── LSP ─────────────────────────────────────────────────────────────
       { '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', desc = 'LSP: Signature Documentation' },
@@ -197,10 +199,10 @@ return {
 
       -- ── Misc keybinds ───────────────────────────────────────────────────
       -- Sublime-like shortcut 'go to file' ctrl+p.
-      { '<C-p>', ':Files<CR>', desc = 'FZF: search for files starting at current directory.' },
-      { 'QQ', ':q!<CR>', desc = 'Quit without saving' },
-      { 'WW', ':w!<CR>', desc = 'Force write to file' },
-      { 'ss', ':noh<CR>', desc = 'Clear Search Highlighting' },
+      { '<C-p>', '<cmd>Telescope find_files<CR>', desc = 'Search for files starting at current directory.' },
+      { 'QQ', '<cmd>q!<CR>', desc = 'Quit without saving' },
+      { 'WW', '<cmd>w!<CR>', desc = 'Force write to file' },
+      { 'ss', '<cmd>noh<CR>', desc = 'Clear Search Highlighting' },
       { 'jj', '<Esc>', desc = 'Esc without touching esc in insert mode', mode = 'i' },
 
       -- ── Splits ──────────────────────────────────────────────────────────
@@ -211,8 +213,8 @@ return {
       { '<C-j>', '<C-w><C-j>', desc = 'Move focus to the lower window' },
       { '<C-k>', '<C-w><C-k>', desc = 'Move focus to the upper window' },
       --  Split resizing
-      { '<C-w>,', ':vertical resize -10<CR>', desc = 'V Resize -' },
-      { '<C-w>.', ':vertical resize +10<CR>', desc = 'V Resize +' },
+      { '<C-w>,', '<cmd>vertical resize -10<CR>', desc = 'V Resize -' },
+      { '<C-w>.', '<cmd>vertical resize +10<CR>', desc = 'V Resize +' },
 
       -- ── Disable arrow keys in normal mode ───────────────────────────────
       { '<left>', '<cmd>echo "Use h to move!!"<CR>' },
@@ -231,7 +233,7 @@ return {
 
       -- ── Search ──────────────────────────────────────────────────────────
       -- :noh if you have search highlights
-      { '<Esc><Esc>', ':noh<CR>', desc = 'Clear search highlights' },
+      { '<Esc><Esc>', '<cmd>noh<CR>', desc = 'Clear search highlights' },
     }
   end,
 }
