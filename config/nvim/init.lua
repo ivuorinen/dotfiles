@@ -1,6 +1,8 @@
--- vim: ts=2 sts=2 sw=2 et
+-- ╭─────────────────────────────────────────────────────────╮
+-- │            ivuorinen's Neovim configuration             │
+-- ╰─────────────────────────────────────────────────────────╯
 
--- Install lazylazy
+-- ── Install lazylazy ────────────────────────────────────────────────
 -- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -18,29 +20,32 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Add ~/.local/bin to the PATH
+-- ── Add ~/.local/bin to the PATH ────────────────────────────────────
 vim.fn.setenv('PATH', vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH')
 
 require 'options'
+require 'autogroups'
 
-require('lazy').setup('plugins', {
-  checker = {
-    -- Automatically check for updates
-    enabled = true,
-    nofity = false,
-  },
-  change_detection = {
-    notify = false,
-  },
-})
+-- ── Load plugins ────────────────────────────────────────────────────
+require('lazy').setup(
+  -- Automatically load plugins from lua/plugins
+  'plugins',
+  -- Lazy Configuration
+  {
+    checker = {
+      -- Automatically check for updates
+      enabled = true,
+      -- We don't want to be notified about updates
+      nofity = false,
+    },
+    change_detection = {
+      -- No need to notify about changes
+      notify = false,
+    },
+    install = {
+      colorscheme = { vim.g.colors_theme },
+    },
+  }
+)
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
+-- vim: ts=2 sts=2 sw=2 et

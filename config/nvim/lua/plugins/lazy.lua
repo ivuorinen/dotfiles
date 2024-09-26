@@ -5,44 +5,101 @@ return {
   {
     'danymat/neogen',
     version = '*',
-    keys = {
-      {
-        '<leader>cg',
-        '<cmd>lua require("neogen").generate()<CR>',
-        desc = 'Generate annotations',
-      },
+    opts = {
+      enabled = true,
+      snippet_engine = 'luasnip',
+    },
+  },
+
+  -- The Refactoring library based off the Refactoring book by Martin Fowler
+  -- https://github.com/ThePrimeagen/refactoring.nvim
+  {
+    'ThePrimeagen/refactoring.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
     },
     config = function()
-      require('neogen').setup {
-        enabled = true,
-        snippet_engine = 'luasnip',
-      }
+      require('refactoring').setup()
+
+      local r = require 'refactoring'
+
+      vim.keymap.set('x', '<leader>re', function()
+        r.refactor 'Extract Function'
+      end)
+      vim.keymap.set('x', '<leader>rf', function()
+        r.refactor 'Extract Function To File'
+      end)
+      -- Extract function supports only visual mode
+      vim.keymap.set('x', '<leader>rv', function()
+        r.refactor 'Extract Variable'
+      end)
+      -- Extract variable supports only visual mode
+      vim.keymap.set('n', '<leader>rI', function()
+        r.refactor 'Inline Function'
+      end)
+      -- Inline func supports only normal
+      vim.keymap.set({ 'n', 'x' }, '<leader>ri', function()
+        r.refactor 'Inline Variable'
+      end)
+      -- Inline var supports both normal and visual mode
+
+      vim.keymap.set('n', '<leader>rb', function()
+        r.refactor 'Extract Block'
+      end)
+      vim.keymap.set('n', '<leader>rbf', function()
+        r.refactor 'Extract Block To File'
+      end)
+      -- Extract block supports only normal mode
     end,
   },
 
-  -- Rethinking Vim as a tool for writing
-  -- https://github.com/preservim/vim-pencil
-  { 'preservim/vim-pencil' },
+  -- All the npm/yarn/pnpm commands I don't want to type
+  -- https://github.com/vuki656/package-info.nvim
+  {
+    'vuki656/package-info.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+  },
 
-  -- surround.vim: Delete/change/add parentheses/quotes/XML-tags/much more with ease
-  -- https://github.com/tpope/vim-surround
-  { 'tpope/vim-surround' },
+  -- Add/change/delete surrounding delimiter pairs with ease. Written with ❤️ in Lua.
+  -- https://github.com/kylechui/nvim-surround
+  {
+    'kylechui/nvim-surround',
+    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
+  },
+
+  -- fzf <3 vim
+  -- https://github.com/junegunn/fzf.vim
+  {
+    'junegunn/fzf.vim',
+    dependencies = {
+      { 'junegunn/fzf', run = ':call fzf#install()' },
+    },
+    config = function()
+      require('fzf').setup {
+        winopts = {
+          win_height = 0.85,
+          win_width = 0.85,
+        },
+      }
+    end,
+    opts = {
+      -- To ignore a certain path in a git project from both RG and FD used by FZF,
+      -- the eaiest way is to create ignore files and exclude the in local git clone.
+      -- Ref: https://stackoverflow.com/a/1753078/265508
+      -- $ cd git_proj/
+      -- $ echo "path/to/exclude" > .rgignore
+      -- $ echo "path/to/exclude" > .fdignore
+      -- $ printf ".rgignore\n.fdignore" >> .git/info/exclude
+    },
+  },
 
   -- Highlight, list and search todo comments in your projects
   -- https://github.com/folke/todo-comments.nvim
   {
     'folke/todo-comments.nvim',
     dependencies = 'nvim-lua/plenary.nvim',
-    config = function()
-      require('todo-comments').setup {}
-    end,
-  },
-
-  -- Indent guides for Neovim
-  -- https://github.com/lukas-reineke/indent-blankline.nvim
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
     opts = {},
   },
 
@@ -51,9 +108,7 @@ return {
   {
     'numToStr/Comment.nvim', -- "gc" to comment visual regions/lines
     event = { 'BufRead', 'BufNewFile' },
-    config = function()
-      require('Comment').setup()
-    end,
+    opts = {},
   },
 
   -- Detect tabstop and shiftwidth automatically
