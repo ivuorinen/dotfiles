@@ -1,6 +1,6 @@
+-- Auto completion
+-- https://github.com/hrsh7th/nvim-cmp
 return {
-  -- Auto completion
-  -- https://github.com/hrsh7th/nvim-cmp
   {
     'hrsh7th/nvim-cmp',
     lazy = false,
@@ -63,7 +63,7 @@ return {
       require('copilot_cmp').setup()
 
       local has_words_before = function()
-        if vim.api.nvim_buf_get_option(0, 'buftype') == 'prompt' then
+        if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then
           return false
         end
         local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -142,7 +142,7 @@ return {
           comparators = {
             require('copilot_cmp.comparators').prioritize,
 
-            -- Below is the default comparitor list and order for nvim-cmp
+            -- Below is the default comparator list and order for nvim-cmp
             cmp.config.compare.offset,
             -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
             cmp.config.compare.exact,

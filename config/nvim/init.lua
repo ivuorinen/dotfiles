@@ -36,7 +36,7 @@ require('lazy').setup(
       -- Automatically check for updates
       enabled = true,
       -- We don't want to be notified about updates
-      nofity = false,
+      notify = false,
     },
     change_detection = {
       -- No need to notify about changes

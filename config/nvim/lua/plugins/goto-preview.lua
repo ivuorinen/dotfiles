@@ -1,6 +1,6 @@
+-- A small Neovim plugin for previewing definitions using floating windows.
+-- https://github.com/rmagatti/goto-preview
 return {
-  -- A small Neovim plugin for previewing definitions using floating windows.
-  -- https://github.com/rmagatti/goto-preview
   'rmagatti/goto-preview',
   dependencies = {
     { 'nvim-telescope/telescope.nvim' },

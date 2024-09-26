@@ -8,6 +8,9 @@ return {
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',
     {
+      -- This plugins prompts the user to pick a window and returns
+      -- the window id of the picked window
+      -- https://github.com/s1n7ax/nvim-window-picker
       's1n7ax/nvim-window-picker',
       version = '2.*',
       opts = {

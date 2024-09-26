@@ -7,11 +7,9 @@ return {
   keys = {
     {
       '<leader>cf',
-      function()
-        require('conform').format { async = true, lsp_fallback = true }
-      end,
+      '<cmd>lua require("conform").format({ async = true, lsp_fallback = true })<cr>',
       mode = '',
-      desc = '[f] Format buffer',
+      desc = 'Format buffer',
     },
   },
   opts = {

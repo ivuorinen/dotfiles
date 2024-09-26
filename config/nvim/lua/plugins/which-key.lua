@@ -37,9 +37,7 @@ return {
       -- ── Code ────────────────────────────────────────────────────────────
       { '<leader>c', group = '[c] Code' },
       { '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', desc = 'LSP: Code Action' },
-      { '<leader>cr', '<cmd>lua vim.lsp.buf.rename()<CR>', desc = 'LSP: Rename' },
       { '<leader>cg', '<cmd>lua require("neogen").generate()<CR>', desc = 'Generate annotations' },
-
       -- ── Code: CommentBox ────────────────────────────────────────────────
       { '<leader>cb', group = 'CommentBox' },
       { '<leader>cbb', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
@@ -47,21 +45,41 @@ return {
       { '<leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
       { '<leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
       { '<leader>cbt', '<Cmd>CBllline<CR>', desc = 'CommentBox: Titled Line' },
-      -- Code: package.json control
+      -- ── Code: package.json control ──────────────────────────────────────
       -- See: lua/plugins/lazy.lua
       { '<leader>cn', group = 'package.json control' },
       { '<leader>cnd', '<cmd>lua require("package-info").delete()<cr>', desc = 'Delete package' },
       { '<leader>cni', '<cmd>lua require("package-info").install()<cr>', desc = 'Install package' },
       { '<leader>cns', '<cmd>lua require("package-info").show({ force = true })<cr>', desc = 'Show package info' },
       { '<leader>cnu', '<cmd>lua require("package-info").change_version()<cr>', desc = 'Change version' },
-      -- Code: LSPSaga
+      -- ── Code: Refactoring ───────────────────────────────────────────────
+      { '<leader>cx', group = '[x] Refactoring' },
+      {
+        mode = { 'x' },
+        -- Extract function supports only visual mode
+        { '<leader>cxe', "<cmd>lua require('refactoring').refactor('Extract Function')<cr>", desc = 'Extract Function' },
+        { '<leader>cxf', "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>", desc = 'Extract Function to File' },
+        -- Extract variable supports only visual mode
+        { '<leader>cxv', "<cmd>lua require('refactoring').refactor('Extract Variable')<cr>", desc = 'Extract Variable' },
+      },
+      -- Inline func supports only normal
+      { '<leader>cxi', "<cmd>lua require('refactoring').refactor('Inline Function')<cr>", desc = 'Inline Function' },
+      -- Extract block supports only normal mode
+      { '<leader>cxb', "<cmd>lua require('refactoring').refactor('Extract Block')<cr>", desc = 'Extract Block' },
+      { '<leader>cxbf', "<cmd>lua require('refactoring').refactor('Extract Block To File')<cr>", desc = 'Extract Block to File' },
+      {
+        mode = { 'n', 'x' },
+        -- Inline var supports both normal and visual mode
+        { '<leader>cxi', "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>", desc = 'Inline Variable' },
+      },
+      -- ── Code: LSPSaga ───────────────────────────────────────────────────
       -- See: lua/plugins/lsp.lua
       { '<C-a>', '<cmd>Lspsaga term_toggle<cr>', desc = 'LSPSaga: Open Floaterm' },
       { '<leader>ca', '<cmd>Lspsaga code_action<cr>', desc = 'LSPSaga: Code Actions' },
       { '<leader>cci', '<cmd>Lspsaga incoming_calls<cr>', desc = 'LSPSaga: Incoming Calls' },
       { '<leader>cco', '<cmd>Lspsaga outgoing_calls<cr>', desc = 'LSPSaga: Outgoing Calls' },
       { '<leader>cd', '<cmd>Lspsaga show_line_diagnostics<cr>', desc = 'LSPSaga: Show Line Diagnostics' },
-      { '<leader>cf', '<cmd>Lspsaga lsp_finder<cr>', desc = 'LSPSaga: LSP Finder' },
+      -- <leader>cf = Code Format, see: lua/plugins/autoformat.lua
       { '<leader>ci', '<cmd>Lspsaga implement<cr>', desc = 'LSPSaga: Implementations' },
       { '<leader>cl', '<cmd>Lspsaga show_cursor_diagnostics<cr>', desc = 'LSPSaga: Show Cursor Diagnostics' },
       { '<leader>cp', '<cmd>Lspsaga peek_definition<cr>', desc = 'LSPSaga: Peek Definition' },
@@ -84,8 +102,8 @@ return {
       { '<leader>dt', '<cmd>DapUiToggle', desc = 'DAP: Toggle UI' },
 
       -- ── Harpoon ─────────────────────────────────────────────────────────
+      -- See: lua/plugins/telescope.lua
       { '<leader>h', group = '[h] Harpoon' },
-      -- See: lua/plugins/harpoon.lua
       { '<leader>ha', '<cmd>lua require("harpoon"):list():add()<cr>', desc = 'harpoon file' },
       { '<leader>hn', '<cmd>lua require("harpoon"):list():next()<cr>', desc = 'harpoon to next file' },
       { '<leader>hp', '<cmd>lua require("harpoon"):list():prev()<cr>', desc = 'harpoon to previous file' },
@@ -106,13 +124,12 @@ return {
       -- See: lua/plugins/telescope.lua
       { '<leader><space>', "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = 'Find existing buffers' },
       { '<leader><tab>', "<cmd>lua require('telescope.builtin').commands()<CR>", desc = 'Telescope: Commands' },
-      { '<leader>sS', "<cmd>lua require('telescope.builtin').git_status()<cr>", desc = 'Git Status' },
       { '<leader>sd', "<cmd>lua require('telescope.builtin').diagnostics()<cr>", desc = 'Search Diagnostics' },
-      { '<leader>sf', "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = 'Search Files' },
       { '<leader>sg', "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = 'Search by Grep' },
       { '<leader>sm', '<cmd>Telescope harpoon marks<CR>', desc = 'Harpoon Marks' },
       { '<leader>sn', "<cmd>lua require('telescope').extensions.notify.notify()<CR>", desc = 'Notify' },
       { '<leader>so', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", desc = 'Find recently Opened files' },
+      { '<leader>sp', "<cmd>lua require('telescope').extensions.lazy_plugins.lazy_plugins()<cr>", desc = 'Find neovim/lazy configs' },
       { '<leader>st', '<cmd>TodoTelescope<CR>', desc = 'Telescope: Todo' },
       { '<leader>sw', "<cmd>lua require('telescope.builtin').grep_string()<cr>", desc = 'Search current Word' },
 
