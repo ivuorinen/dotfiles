@@ -8,56 +8,83 @@ return {
       -- Neovim plugin to manage global and project-local settings
       -- Should be included before LSP Config
       -- https://github.com/folke/neoconf.nvim
+      { 'folke/neoconf.nvim', opts = {} },
+
+      -- Garbage collector that stops inactive LSP clients to free RAM
+      -- https://github.com/Zeioth/garbage-day.nvim
       {
-        'folke/neoconf.nvim',
-        lazy = false,
-        keys = {
-          { '<leader>?c', '<cmd>Neoconf<CR>', desc = 'Neoconf: Open' },
-          { '<leader>?g', '<cmd>Neoconf global<CR>', desc = 'Neoconf: Global' },
-          { '<leader>?l', '<cmd>Neoconf local<CR>', desc = 'Neoconf: Local' },
-          { '<leader>?m', '<cmd>Neoconf lsp<CR>', desc = 'Neoconf: Show merged LSP config' },
-          { '<leader>?s', '<cmd>Neoconf show<CR>', desc = 'Neoconf: Show merged config' },
+        'zeioth/garbage-day.nvim',
+        dependencies = 'neovim/nvim-lspconfig',
+        event = 'VeryLazy',
+        opts = {},
+      },
+
+      -- improve neovim lsp experience
+      -- https://github.com/nvimdev/lspsaga.nvim
+      {
+        'nvimdev/lspsaga.nvim',
+        dependencies = {
+          'nvim-treesitter/nvim-treesitter', -- optional
+          'nvim-tree/nvim-web-devicons', -- optional
         },
-        config = function()
-          require('neoconf').setup()
-        end,
+        opts = {
+          code_action = {
+            show_server_name = true,
+          },
+          diagnostic = {
+            keys = {
+              quit = { 'q', '<ESC>' },
+            },
+          },
+        },
       },
+
+      -- ── Mason and LSPConfig integration ─────────────────────────────────
       -- Automatically install LSPs to stdpath for neovim
+
+      -- Portable package manager for Neovim that runs everywhere Neovim runs.
+      -- Easily install and manage LSP servers, DAP servers, linters,
+      -- and formatters.
+      -- https://github.com/williamboman/mason.nvim
+      { 'williamboman/mason.nvim', opts = {} },
+      { 'williamboman/mason-lspconfig.nvim', opts = {} },
+      { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
+
+      -- ── Linting ─────────────────────────────────────────────────────────
+      -- An asynchronous linter plugin for Neovim complementary to the
+      -- built-in Language Server Protocol support.
+      -- https://github.com/mfussenegger/nvim-lint
       {
-        'williamboman/mason.nvim',
-        lazy = false,
-        run = ':call MasonUpdate',
+        'mfussenegger/nvim-lint',
+        event = { 'BufReadPre', 'BufNewFile' },
       },
-      'williamboman/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
-      'b0o/schemastore.nvim',
+      -- Extension to mason.nvim that makes it
+      -- easier to use nvim-lint with mason.nvim
+      -- https://github.com/rshkarin/mason-nvim-lint
+      { 'rshkarin/mason-nvim-lint' },
+
+      -- ── Misc ────────────────────────────────────────────────────────────
       -- vscode-like pictograms for neovim lsp completion items
       -- https://github.com/onsails/lspkind-nvim
       { 'onsails/lspkind.nvim' },
-    },
-    keys = {
-      { '<leader>do', '<cmd>lua vim.diagnostic.open_float()<CR>', desc = 'Diagnostic: Open float' },
-      { '<leader>dq', '<cmd>lua vim.diagnostic.setloclist()<CR>', desc = 'Diagnostic: Set loc list' },
-      { 'dn', '<cmd>lua vim.diagnostic.goto_next()<CR>', desc = 'Diagnostic: Goto Next' },
-      { 'dp', '<cmd>lua vim.diagnostic.goto_prev()<CR>', desc = 'Diagnostic: Goto Prev' },
-      { '<leader>cr', '<cmd>lua vim.lsp.buf.rename()<CR>', desc = 'LSP: Rename' },
-      { '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', desc = 'LSP: Code Action' },
-      { 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', desc = 'LSP: Goto Definition' },
-      { 'gr', '<cmd>lua require("telescope.builtin").lsp_references()<CR>', desc = 'LSP: Goto References' },
-      { 'gI', '<cmd>lua vim.lsp.buf.implementation()<CR>', desc = 'LSP: Goto Implementation' },
-      { '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', desc = 'LSP: Type Definition' },
-      { '<leader>ds', '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>', desc = 'LSP: Document Symbols' },
-      { '<leader>ws', '<cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>', desc = 'LSP: Workspace Symbols' },
-      { 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', desc = 'LSP: Hover Documentation' },
-      { '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', desc = 'LSP: Signature Documentation' },
-      { 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', desc = 'LSP: Goto Declaration' },
-      { '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', desc = 'LSP: Workspace Add Folder' },
-      { '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', desc = 'LSP: Workspace Remove Folder' },
-      { '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', desc = 'LSP: Workspace List Folders' },
+      -- JSON schemas for Neovim
+      -- https://github.com/b0o/SchemaStore.nvim
+      { 'b0o/schemastore.nvim' },
     },
     config = function()
-      -- LSP settings.
+      -- ── LSP settings. ───────────────────────────────────────────────────
       --  This function gets run when an LSP connects to a particular buffer.
+
+      -- Make runtime files discoverable to the server
+      local runtime_path = vim.split(package.path, ';')
+      table.insert(runtime_path, 'lua/?.lua')
+      table.insert(runtime_path, 'lua/?/init.lua')
+
+      -- Generate a command `:Format` local to the LSP buffer
+      --
+      ---@param _     nil    Skipped
+      ---@param bufnr number Buffer number
+      ---@output nil
       local on_attach = function(_, bufnr)
         -- Create a command `:Format` local to the LSP buffer
         vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -69,18 +96,18 @@ return {
         end, { desc = 'Format current buffer with LSP' })
       end
 
-      -- Setup mason so it can manage external tooling
+      -- ── Setup mason so it can manage external tooling ───────────────────
       require('mason').setup()
 
-      -- Enable the following language servers
-      -- Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+      -- ── Enable the following language servers ───────────────────────────
+      -- :help lspconfig-all for all pre-configured LSPs
       local servers = {
-        -- :help lspconfig-all for all pre-configured LSPs
         ast_grep = {},
 
         actionlint = {}, -- GitHub Actions
         ansiblels = {}, -- Ansible
         bashls = {}, -- Bash
+        -- csharp_ls = {}, -- C#, requires dotnet executable
         css_variables = {}, -- CSS
         cssls = {}, -- CSS
         docker_compose_language_service = {}, -- Docker compose
@@ -110,11 +137,29 @@ return {
         lua_ls = {
           settings = {
             Lua = {
+              runtime = {
+                -- Tell the language server which version of Lua you're using (most likely LuaJIT)
+                version = 'LuaJIT',
+                -- Setup your lua path
+                path = runtime_path,
+              },
+              diagnostics = {
+                globals = { 'vim' },
+                disable = {
+                  -- Ignore Lua_LS's noisy `missing-fields` warnings
+                  'missing-fields',
+                },
+              },
+              workspace = {
+                library = vim.api.nvim_get_runtime_file('', true),
+                checkThirdParty = false,
+              },
+              -- Do not send telemetry data containing a randomized but unique identifier
+              telemetry = { enable = false },
+
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              diagnostics = { disable = { 'missing-fields' } },
             },
           },
         },
@@ -133,18 +178,21 @@ return {
                 url = '',
               },
               schemas = require('schemastore').yaml.schemas(),
+              validate = { enable = true },
             },
           },
         },
       }
 
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
+      -- Mason servers should be it's own variable for mason-nvim-lint
+      -- See: https://mason-registry.dev/registry/list
+      local mason_servers = {
         'actionlint',
         'ansible-language-server',
         'ansible-lint',
         'bash-language-server',
         'blade-formatter',
+        'clang-format',
         'commitlint',
         'diagnostic-languageserver',
         'docker-compose-language-service',
@@ -164,14 +212,19 @@ return {
         'shfmt',
         'stylelint',
         'stylua',
+        'vue-language-server',
         'yamllint',
-      })
+      }
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, mason_servers)
+
+      -- ── Automagically install tools ─────────────────────────────────────
       require('mason-tool-installer').setup {
         ensure_installed = ensure_installed,
         auto_update = true,
       }
 
-      -- Ensure the servers above are installed
+      -- ── Ensure the servers above are installed ──────────────────────────
       require('mason-lspconfig').setup {
         automatic_installation = true,
         ensure_installed = servers,
@@ -181,6 +234,20 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
+      require('mason-lspconfig').setup_handlers {
+        -- The first entry (without a key) will be the default handler
+        -- and will be called for each installed server that doesn't have
+        -- a dedicated handler.
+        function(server_name) -- default handler (optional)
+          require('lspconfig')[server_name].setup {}
+        end,
+        -- Next, you can provide a dedicated handler for specific servers.
+        -- For example, a handler override for the `rust_analyzer`:
+        -- ['rust_analyzer'] = function()
+        --   require('rust-tools').setup {}
+        -- end,
+      }
+
       for _, lsp in ipairs(servers) do
         require('lspconfig')[lsp].setup {
           on_attach = on_attach,
@@ -188,37 +255,11 @@ return {
         }
       end
 
-      -- Turn on lsp status information
-      -- require('fidget').setup()
-
-      -- Example custom configuration for lua
-      --
-      -- Make runtime files discoverable to the server
-      local runtime_path = vim.split(package.path, ';')
-      table.insert(runtime_path, 'lua/?.lua')
-      table.insert(runtime_path, 'lua/?/init.lua')
-
       require('lspconfig').lua_ls.setup {
         on_attach = on_attach,
         capabilities = capabilities,
         settings = {
-          Lua = {
-            runtime = {
-              -- Tell the language server which version of Lua you're using (most likely LuaJIT)
-              version = 'LuaJIT',
-              -- Setup your lua path
-              path = runtime_path,
-            },
-            diagnostics = {
-              globals = { 'vim' },
-            },
-            workspace = {
-              library = vim.api.nvim_get_runtime_file('', true),
-              checkThirdParty = false,
-            },
-            -- Do not send telemetry data containing a randomized but unique identifier
-            telemetry = { enable = false },
-          },
+          Lua = servers.lua_ls.settings.Lua,
         },
       }
 
@@ -229,6 +270,20 @@ return {
             name = 'bash-language-server',
             cmd = { 'bash-language-server', 'start' },
           }
+        end,
+      })
+
+      -- ── Setup linting ───────────────────────────────────────────────────
+      require('mason-nvim-lint').setup {
+        ensure_installed = mason_servers or {},
+        quiet_mode = true,
+      }
+      local lint = require 'lint'
+      local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
+        group = lint_augroup,
+        callback = function()
+          lint.try_lint()
         end,
       })
     end,

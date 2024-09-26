@@ -1,16 +1,21 @@
+-- ╭─────────────────────────────────────────────────────────╮
+-- │              neovim configuration options               │
+-- ╰─────────────────────────────────────────────────────────╯
+-- See `:help vim.opt`
+-- For more options, you can see `:help option-list`
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
+-- Set the colorscheme and variants
+vim.g.colors_theme = 'tokyonight'
+vim.g.colors_variant_light = 'tokyonight-day'
+vim.g.colors_variant_dark = 'tokyonight-storm'
 
 -- Make sure editorconfig support is enabled
 vim.g.editorconfig = true
 
--- [[ Setting options ]]
--- See `:help vim.opt`
--- For more options, you can see `:help option-list`
-
+-- Enable line numbers and relative line numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
 
@@ -22,7 +27,6 @@ vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
@@ -34,7 +38,8 @@ vim.opt.smartindent = true -- Insert indents automatically
 -- Save undo history
 vim.opt.undofile = true
 
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+-- Case-insensitive searching UNLESS \C or one or
+-- more capital letters in the search term
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
@@ -47,7 +52,7 @@ vim.wo.signcolumn = 'yes'
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 250
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true
@@ -66,7 +71,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 15
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -76,6 +81,7 @@ vim.o.undofile = true
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
 -- Fixes Notify opacity issues
 vim.o.termguicolors = true
 
@@ -83,9 +89,18 @@ vim.o.termguicolors = true
 vim.o.spell = true
 vim.o.spelllang = 'en_us'
 
+-- Tree-sitter settings
 vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
+-- anuvyklack/windows.nvim settings
+vim.o.winwidth = 15
+vim.o.winminwidth = 10
+vim.o.equalalways = false
 
 -- ── Deal with word wrap ───────────────────────────────────────────────────────
 local m = vim.api.nvim_set_keymap
 m('n', 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
 m('n', 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })
+
+-- vim: ts=2 sts=2 sw=2 et

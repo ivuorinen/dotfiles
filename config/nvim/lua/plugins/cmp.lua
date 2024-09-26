@@ -1,22 +1,39 @@
 return {
-  -- Autocompletion
+  -- Auto completion
   -- https://github.com/hrsh7th/nvim-cmp
   {
     'hrsh7th/nvim-cmp',
+    lazy = false,
     event = 'InsertEnter',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-      -- Adds other completion capabilities.
-      --  nvim-cmp does not ship with all sources by default. They are split
-      --  into multiple repos for maintenance purposes.
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-      'onsails/lspkind.nvim',
+      -- ── LuaSnip Dependencies ────────────────────────────────────────────
+      -- Snippet Engine for Neovim written in Lua.
+      -- https://github.com/L3MON4D3/LuaSnip
+      { 'L3MON4D3/LuaSnip', build = 'make install_jsregexp' },
+      -- luasnip completion source for nvim-cmp
+      -- https://github.com/saadparwaiz1/cmp_luasnip
+      { 'saadparwaiz1/cmp_luasnip' },
+      -- ── Adds other completion capabilities. ─────────────────────────────
+      -- ── nvim-cmp does not ship with all sources by default.
+      -- ── They are split into multiple repos for maintenance purposes.
+      { 'hrsh7th/cmp-nvim-lsp' },
+      { 'hrsh7th/cmp-buffer' },
+      { 'hrsh7th/cmp-path' },
+      -- https://github.com/SergioRibera/cmp-dotenv
+      { 'SergioRibera/cmp-dotenv' },
+      -- ── Other deps ──────────────────────────────────────────────────────
+      -- vscode-like pictograms for neovim lsp completion items
+      -- https://github.com/onsails/lspkind.nvim
+      { 'onsails/lspkind.nvim' },
+      -- Lua plugin to turn github copilot into a cmp source
+      -- https://github.com/zbirenbaum/copilot-cmp
       {
         'zbirenbaum/copilot-cmp',
         dependencies = {
+          -- Fully featured & enhanced replacement for copilot.vim complete
+          -- with API for interacting with Github Copilot
+          -- https://github.com/zbirenbaum/copilot.lua
           {
             'zbirenbaum/copilot.lua',
             cmd = 'Copilot',
@@ -43,20 +60,37 @@ return {
       local luasnip = require 'luasnip'
       local lspkind = require 'lspkind'
       luasnip.config.setup {}
+      require('copilot_cmp').setup()
+
+      local has_words_before = function()
+        if vim.api.nvim_buf_get_option(0, 'buftype') == 'prompt' then
+          return false
+        end
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match '^%s*$' == nil
+      end
 
       cmp.setup {
         formatting = {
           format = lspkind.cmp_format {
             mode = 'symbol',
-            min_width = 40,
-            max_width = 100,
+            max_width = function()
+              return math.floor(0.45 * vim.o.columns)
+            end,
+            show_labelDetails = true,
             symbol_map = {
               Copilot = '',
             },
           },
         },
         view = {
-          entries = 'native',
+          width = function(_, _)
+            return math.min(80, vim.o.columns)
+          end,
+          entries = {
+            name = 'custom',
+            selection_order = 'near_cursor',
+          },
         },
         snippet = {
           expand = function(args)
@@ -69,14 +103,14 @@ return {
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
-          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-c>'] = cmp.mapping.complete(),
           ['<CR>'] = cmp.mapping.confirm {
             behavior = cmp.ConfirmBehavior.Replace,
             select = true,
           },
           ['<Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
+            if cmp.visible() and has_words_before() then
+              cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
             elseif luasnip.expand_or_jumpable() then
               luasnip.expand_or_jump()
             else
@@ -100,6 +134,26 @@ return {
           { name = 'nvim_lsp', group_index = 2 },
           { name = 'path', group_index = 2 },
           { name = 'luasnip', group_index = 2 },
+          { name = 'buffer', group_index = 2 },
+          { name = 'dotenv', group_index = 2 },
+        },
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            require('copilot_cmp.comparators').prioritize,
+
+            -- Below is the default comparitor list and order for nvim-cmp
+            cmp.config.compare.offset,
+            -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.locality,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
         },
       }
     end,
