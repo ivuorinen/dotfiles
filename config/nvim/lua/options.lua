@@ -4,6 +4,10 @@
 -- See `:help vim.opt`
 -- For more options, you can see `:help option-list`
 
+-- Enables the experimental nvim 0.5 features
+vim.loader.enable()
+
+-- Map leader and local leader
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -73,12 +77,6 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 15
 
--- Enable break indent
-vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
@@ -92,6 +90,13 @@ vim.o.spelllang = 'en_us'
 -- Tree-sitter settings
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
+
+-- kevinhwang91/nvim-ufo settings
+vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
 
 -- anuvyklack/windows.nvim settings
 vim.o.winwidth = 15

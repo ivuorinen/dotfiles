@@ -5,11 +5,6 @@ return {
     'neovim/nvim-lspconfig',
     lazy = false,
     dependencies = {
-      -- Neovim plugin to manage global and project-local settings
-      -- Should be included before LSP Config
-      -- https://github.com/folke/neoconf.nvim
-      { 'folke/neoconf.nvim', opts = {} },
-
       -- Garbage collector that stops inactive LSP clients to free RAM
       -- https://github.com/Zeioth/garbage-day.nvim
       {

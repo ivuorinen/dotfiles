@@ -115,3 +115,6 @@ Noice
 fzf
 linters
 LSPConfig
+deps
+Noice
+stdpath
