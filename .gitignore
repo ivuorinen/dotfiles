@@ -26,4 +26,6 @@ config/iterm2/AppSupport
 config/gnupg/S.*
 config/gnupg/s
 config/gnupg/private-keys-v1.d
+config/nvim/spell/*
+!config/nvim/spell/.gitkeep
 
