@@ -32,9 +32,7 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  See `:help 'clipboard'`
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
+vim.schedule(function() vim.opt.clipboard = 'unnamedplus' end)
 
 vim.opt.breakindent = true -- Enable break indent
 vim.opt.smartindent = true -- Insert indents automatically
@@ -102,6 +100,14 @@ vim.o.foldenable = true
 vim.o.winwidth = 15
 vim.o.winminwidth = 10
 vim.o.equalalways = false
+
+-- folke/noice.nvim settings
+vim.g.noice_ignored_filetypes = {
+  'fugitiveblame',
+  'fugitive',
+  'gitcommit',
+  'noice',
+}
 
 -- ── Deal with word wrap ───────────────────────────────────────────────────────
 local m = vim.api.nvim_set_keymap

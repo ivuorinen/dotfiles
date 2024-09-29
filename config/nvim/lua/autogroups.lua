@@ -9,18 +9,14 @@ local autocmd = vim.api.nvim_create_autocmd -- Create autocommand
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = augroup('YankHighlight', { clear = true })
 autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
+  callback = function() vim.highlight.on_yank() end,
   group = highlight_group,
   pattern = '*',
 })
 
 -- ── Windows to close with "q" ───────────────────────────────────────
 autocmd('FileType', {
-  callback = function()
-    vim.keymap.set('n', '<esc>', ':bd<CR>', { buffer = true, silent = true })
-  end,
+  callback = function() vim.keymap.set('n', '<esc>', ':bd<CR>', { buffer = true, silent = true }) end,
   pattern = {
     'help',
     'startuptime',

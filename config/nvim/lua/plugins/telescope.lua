@@ -41,12 +41,18 @@ return {
             :find()
         end
 
-        vim.keymap.set('n', '<leader>hw', function()
-          toggle_telescope(harpoon:list())
-        end, { desc = 'Open harpoon window with telescope' })
-        vim.keymap.set('n', '<leader>ht', function()
-          harpoon.ui:toggle_quick_menu(harpoon:list())
-        end, { desc = 'Open Harpoon Quick menu' })
+        vim.keymap.set(
+          'n',
+          '<leader>hw',
+          function() toggle_telescope(harpoon:list()) end,
+          { desc = 'Open harpoon window with telescope' }
+        )
+        vim.keymap.set(
+          'n',
+          '<leader>ht',
+          function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+          { desc = 'Open Harpoon Quick menu' }
+        )
       end,
     },
     -- A Telescope picker to quickly access configurations
@@ -84,6 +90,12 @@ return {
             ['<C-k>'] = a.move_selection_previous,
             ['<C-d>'] = a.move_selection_previous,
           },
+        },
+      },
+      extensions = {
+        lazy_plugins = {
+          -- Must be a valid path to the file containing the lazy spec and setup() call.
+          lazy_config = vim.fn.stdpath 'config' .. '/init.lua',
         },
       },
     }

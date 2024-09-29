@@ -4,9 +4,7 @@ return {
   {
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      vim.cmd.colorscheme(vim.g.colors_theme)
-    end,
+    init = function() vim.cmd.colorscheme(vim.g.colors_theme) end,
     opts = {
       transparent = true,
     },
@@ -29,6 +27,58 @@ return {
     },
   },
 
+  -- vim dashboard
+  -- https://github.com/nvimdev/dashboard-nvim
+  {
+    'nvimdev/dashboard-nvim',
+    event = 'VimEnter',
+    config = function()
+      require('dashboard').setup {
+        config = {
+          disable_move = true,
+          week_header = {
+            enable = true,
+          },
+          shortcut = {
+            {
+              desc = '󰊳 Lazy Update',
+              group = '@property',
+              action = 'Lazy update',
+              key = 'u',
+            },
+            {
+              icon = ' ',
+              icon_hl = '@variable',
+              desc = 'Files',
+              group = 'Label',
+              action = 'Telescope find_files',
+              key = 'f',
+            },
+            {
+              desc = ' Marks',
+              group = 'DiagnosticHint',
+              action = 'Telescope harpoon marks',
+              key = 'a',
+            },
+            {
+              desc = '⚑ TODO',
+              group = 'DiagnosticOptions',
+              action = 'TodoTelescope',
+              key = 't',
+            },
+            {
+              desc = '🔍 Search',
+              group = 'Number',
+              action = 'Telescope live_grep',
+              key = 's',
+            },
+          },
+        },
+      }
+    end,
+    dependencies = { { 'nvim-tree/nvim-web-devicons' } },
+  },
+
   -- Remove all background colors to make nvim transparent
   -- https://github.com/xiyaowong/nvim-transparent
   { 'xiyaowong/nvim-transparent', opts = {} },
@@ -40,7 +90,21 @@ return {
 
   -- Indent guides for Neovim
   -- https://github.com/lukas-reineke/indent-blankline.nvim
-  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    config = function()
+      require('ibl').setup {
+        indent = {
+          char = '│',
+        },
+        exclude = {
+          filetypes = { 'terminal', 'dashboard' },
+          buftypes = { 'dashboard' },
+        },
+      }
+    end,
+  },
 
   -- Git integration for buffers
   -- https://github.com/lewis6991/gitsigns.nvim
@@ -67,22 +131,14 @@ return {
 
         -- Navigation
         map('n', 'gn', function()
-          if vim.wo.diff then
-            return ']c'
-          end
-          vim.schedule(function()
-            gs.next_hunk()
-          end)
+          if vim.wo.diff then return ']c' end
+          vim.schedule(function() gs.next_hunk() end)
           return '<Ignore>'
         end, { expr = true })
 
         map('n', 'gp', function()
-          if vim.wo.diff then
-            return '[c'
-          end
-          vim.schedule(function()
-            gs.prev_hunk()
-          end)
+          if vim.wo.diff then return '[c' end
+          vim.schedule(function() gs.prev_hunk() end)
           return '<Ignore>'
         end, { expr = true })
       end,
@@ -142,7 +198,6 @@ return {
   {
     'bennypowers/nvim-regexplainer',
     event = 'BufEnter',
-    lazy = false,
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
       'MunifTanjim/nui.nvim',

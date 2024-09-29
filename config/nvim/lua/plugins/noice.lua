@@ -2,13 +2,6 @@
 -- for messages, cmdline and the popupmenu.
 -- https://github.com/folke/noice.nvim
 
-vim.g.noice_ignored_filetypes = {
-  'fugitiveblame',
-  'fugitive',
-  'gitcommit',
-  'noice',
-}
-
 return {
   'folke/noice.nvim',
   lazy = false,

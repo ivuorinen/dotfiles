@@ -27,12 +27,12 @@ return {
           return require('which-key.extras').expand.buf()
         end,
       },
-      { '<leader>bk', '<cmd>blast<cr>', desc = 'Buffer: Last', mode = 'n' },
-      { '<leader>bj', '<cmd>bfirst<cr>', desc = 'Buffer: First', mode = 'n' },
-      { '<leader>bh', '<cmd>bprev<cr>', desc = 'Buffer: Prev', mode = 'n' },
-      { '<leader>bl', '<cmd>bnext<cr>', desc = 'Buffer: Next', mode = 'n' },
-      { '<leader>bd', '<cmd>Bdelete<cr>', desc = 'Buffer: Delete', mode = 'n' },
-      { '<leader>bw', '<cmd>Bwipeout<cr>', desc = 'Buffer: Wipeout', mode = 'n' },
+      { '<leader>bk', '<cmd>blast<cr>', desc = 'Buffer: Last' },
+      { '<leader>bj', '<cmd>bfirst<cr>', desc = 'Buffer: First' },
+      { '<leader>bh', '<cmd>bprev<cr>', desc = 'Buffer: Prev' },
+      { '<leader>bl', '<cmd>bnext<cr>', desc = 'Buffer: Next' },
+      { '<leader>bd', '<cmd>Bdelete<cr>', desc = 'Buffer: Delete' },
+      { '<leader>bw', '<cmd>Bwipeout<cr>', desc = 'Buffer: Wipeout' },
 
       -- ── Code ────────────────────────────────────────────────────────────
       { '<leader>c', group = '[c] Code' },
@@ -52,26 +52,56 @@ return {
       { '<leader>cni', '<cmd>lua require("package-info").install()<cr>', desc = 'Install package' },
       { '<leader>cns', '<cmd>lua require("package-info").show({ force = true })<cr>', desc = 'Show package info' },
       { '<leader>cnu', '<cmd>lua require("package-info").change_version()<cr>', desc = 'Change version' },
+
       -- ── Code: Refactoring ───────────────────────────────────────────────
       { '<leader>cx', group = '[x] Refactoring' },
       {
         mode = { 'x' },
         -- Extract function supports only visual mode
-        { '<leader>cxe', "<cmd>lua require('refactoring').refactor('Extract Function')<cr>", desc = 'Extract Function' },
-        { '<leader>cxf', "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>", desc = 'Extract Function to File' },
+        {
+          '<leader>cxe',
+          "<cmd>lua require('refactoring').refactor('Extract Function')<cr>",
+          desc = 'Extract Function',
+        },
+        {
+          '<leader>cxf',
+          "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>",
+          desc = 'Extract Function to File',
+        },
         -- Extract variable supports only visual mode
-        { '<leader>cxv', "<cmd>lua require('refactoring').refactor('Extract Variable')<cr>", desc = 'Extract Variable' },
+        {
+          '<leader>cxv',
+          "<cmd>lua require('refactoring').refactor('Extract Variable')<cr>",
+          desc = 'Extract Variable',
+        },
       },
       -- Inline func supports only normal
-      { '<leader>cxi', "<cmd>lua require('refactoring').refactor('Inline Function')<cr>", desc = 'Inline Function' },
+      {
+        '<leader>cxi',
+        "<cmd>lua require('refactoring').refactor('Inline Function')<cr>",
+        desc = 'Inline Function',
+      },
       -- Extract block supports only normal mode
-      { '<leader>cxb', "<cmd>lua require('refactoring').refactor('Extract Block')<cr>", desc = 'Extract Block' },
-      { '<leader>cxbf', "<cmd>lua require('refactoring').refactor('Extract Block To File')<cr>", desc = 'Extract Block to File' },
+      {
+        '<leader>cxb',
+        "<cmd>lua require('refactoring').refactor('Extract Block')<cr>",
+        desc = 'Extract Block',
+      },
+      {
+        '<leader>cxbf',
+        "<cmd>lua require('refactoring').refactor('Extract Block To File')<cr>",
+        desc = 'Extract Block to File',
+      },
       {
         mode = { 'n', 'x' },
         -- Inline var supports both normal and visual mode
-        { '<leader>cxi', "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>", desc = 'Inline Variable' },
+        {
+          '<leader>cxi',
+          "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>",
+          desc = 'Inline Variable',
+        },
       },
+
       -- ── Code: LSPSaga ───────────────────────────────────────────────────
       -- See: lua/plugins/lsp.lua
       { '<C-a>', '<cmd>Lspsaga term_toggle<cr>', desc = 'LSPSaga: Open Floaterm' },
@@ -79,7 +109,12 @@ return {
       { '<leader>cci', '<cmd>Lspsaga incoming_calls<cr>', desc = 'LSPSaga: Incoming Calls' },
       { '<leader>cco', '<cmd>Lspsaga outgoing_calls<cr>', desc = 'LSPSaga: Outgoing Calls' },
       { '<leader>cd', '<cmd>Lspsaga show_line_diagnostics<cr>', desc = 'LSPSaga: Show Line Diagnostics' },
-      -- <leader>cf = Code Format, see: lua/plugins/autoformat.lua
+      {
+        '<leader>cf',
+        '<cmd>lua require("conform").format({ async = true, lsp_fallback = true })<cr>',
+        mode = { 'n', 'v' },
+        desc = 'Format buffer',
+      },
       { '<leader>ci', '<cmd>Lspsaga implement<cr>', desc = 'LSPSaga: Implementations' },
       { '<leader>cl', '<cmd>Lspsaga show_cursor_diagnostics<cr>', desc = 'LSPSaga: Show Cursor Diagnostics' },
       { '<leader>cp', '<cmd>Lspsaga peek_definition<cr>', desc = 'LSPSaga: Peek Definition' },
@@ -98,7 +133,11 @@ return {
       { '<leader>do', '<cmd>lua vim.diagnostic.open_float()<CR>', desc = 'Diagnostic: Open float' },
       { '<leader>dq', '<cmd>lua vim.diagnostic.setloclist()<CR>', desc = 'Diagnostic: Set loc list' },
       { '<leader>dr', "<cmd>lua require('dapui').open({reset = true})<CR>", desc = 'DAP: Reset' },
-      { '<leader>ds', '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>', desc = 'LSP: Document Symbols' },
+      {
+        '<leader>ds',
+        '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>',
+        desc = 'LSP: Document Symbols',
+      },
       { '<leader>dt', '<cmd>DapUiToggle', desc = 'DAP: Toggle UI' },
 
       -- ── Harpoon ─────────────────────────────────────────────────────────
@@ -129,7 +168,11 @@ return {
       { '<leader>sm', '<cmd>Telescope harpoon marks<CR>', desc = 'Harpoon Marks' },
       { '<leader>sn', "<cmd>lua require('telescope').extensions.notify.notify()<CR>", desc = 'Notify' },
       { '<leader>so', "<cmd>lua require('telescope.builtin').oldfiles()<cr>", desc = 'Find recently Opened files' },
-      { '<leader>sp', "<cmd>lua require('telescope').extensions.lazy_plugins.lazy_plugins()<cr>", desc = 'Find neovim/lazy configs' },
+      {
+        '<leader>sp',
+        "<cmd>lua require('telescope').extensions.lazy_plugins.lazy_plugins()<cr>",
+        desc = 'Find neovim/lazy configs',
+      },
       { '<leader>st', '<cmd>TodoTelescope<CR>', desc = 'Telescope: Todo' },
       { '<leader>sw', "<cmd>lua require('telescope.builtin').grep_string()<cr>", desc = 'Search current Word' },
 
@@ -144,9 +187,17 @@ return {
       -- ── Workspace ───────────────────────────────────────────────────────
       { '<leader>w', group = '[w] Workspace' },
       { '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', desc = 'LSP: Workspace Add Folder' },
-      { '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', desc = 'LSP: Workspace List Folders' },
+      {
+        '<leader>wl',
+        '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>',
+        desc = 'LSP: Workspace List Folders',
+      },
       { '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', desc = 'LSP: Workspace Remove Folder' },
-      { '<leader>ws', '<cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>', desc = 'LSP: Workspace Symbols' },
+      {
+        '<leader>ws',
+        '<cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>',
+        desc = 'LSP: Workspace Symbols',
+      },
 
       -- ── Trouble ─────────────────────────────────────────────────────────
       { '<leader>x', group = '[x] Trouble' },
@@ -156,14 +207,13 @@ return {
       { '<leader>xl', '<cmd>Trouble loclist<cr>', desc = 'Toggle Loclist' },
       { '<leader>xq', '<cmd>Trouble quickfix<cr>', desc = 'Toggle Quickfix' },
 
-      -- ── Help & Neoconf ──────────────────────────────────────────────────
-      { '<leader>?', group = '[?] Help & neoconf' },
-      { '<leader>?c', '<cmd>Neoconf<CR>', desc = 'Neoconf: Open' },
-      { '<leader>?g', '<cmd>Neoconf global<CR>', desc = 'Neoconf: Global' },
-      { '<leader>?l', '<cmd>Neoconf local<CR>', desc = 'Neoconf: Local' },
-      { '<leader>?m', '<cmd>Neoconf lsp<CR>', desc = 'Neoconf: Show merged LSP config' },
-      { '<leader>?s', '<cmd>Neoconf show<CR>', desc = 'Neoconf: Show merged config' },
-      { '<leader>?w', '<cmd>lua require("which-key").show({global = false})<cr>', desc = 'Buffer Local Keymaps (which-key)' },
+      -- ── Help ────────────────────────────────────────────────────────────
+      { '<leader>?', group = '[?] Help & Cheat sheets' },
+      {
+        '<leader>?w',
+        '<cmd>lua require("which-key").show({global = false})<cr>',
+        desc = 'Buffer Local Keymaps (which-key)',
+      },
 
       -- ── Misc ────────────────────────────────────────────────────────────
       { '<leader>1', '<cmd>lua require("harpoon"):list():select(1)<cr>', desc = 'harpoon to file 1' },
