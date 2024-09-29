@@ -204,8 +204,6 @@ cask "font-open-sans"
 cask "font-roboto"
 cask "font-source-code-pro"
 cask "font-source-code-pro-for-powerline"
-cask "font-source-sans-pro"
-cask "font-source-serif-pro"
 # GIT client
 cask "fork"
 # HTTP and GraphQL Client
