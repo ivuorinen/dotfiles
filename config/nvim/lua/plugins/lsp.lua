@@ -1,62 +1,62 @@
--- Quickstart configs for Nvim LSP
+-- Quick start configs for Nvim LSP
 -- https://github.com/neovim/nvim-lspconfig
 return {
   {
     'neovim/nvim-lspconfig',
     lazy = false,
     dependencies = {
-      -- Garbage collector that stops inactive LSP clients to free RAM
-      -- https://github.com/Zeioth/garbage-day.nvim
-      {
-        'zeioth/garbage-day.nvim',
-        dependencies = 'neovim/nvim-lspconfig',
-        event = 'VeryLazy',
-        opts = {},
-      },
-
-      -- improve neovim lsp experience
-      -- https://github.com/nvimdev/lspsaga.nvim
-      {
-        'nvimdev/lspsaga.nvim',
-        dependencies = {
-          'nvim-treesitter/nvim-treesitter', -- optional
-          'nvim-tree/nvim-web-devicons', -- optional
-        },
-        opts = {
-          code_action = {
-            show_server_name = true,
-          },
-          diagnostic = {
-            keys = {
-              quit = { 'q', '<ESC>' },
-            },
-          },
-        },
-      },
-
       -- ── Mason and LSPConfig integration ─────────────────────────────────
       -- Automatically install LSPs to stdpath for neovim
 
       -- Portable package manager for Neovim that runs everywhere Neovim runs.
-      -- Easily install and manage LSP servers, DAP servers, linters,
-      -- and formatters.
+      -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
       -- https://github.com/williamboman/mason.nvim
-      { 'williamboman/mason.nvim' },
+      {
+        'williamboman/mason.nvim',
+        cmd = 'Mason',
+        run = ':MasonUpdate',
+      },
+      -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
+      -- https://github.com/williamboman/mason-lspconfig.nvim
       { 'williamboman/mason-lspconfig.nvim' },
+      -- Install and upgrade third party tools automatically
+      -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
       { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 
-      -- ── Linting ─────────────────────────────────────────────────────────
-      -- An asynchronous linter plugin for Neovim complementary to the
-      -- built-in Language Server Protocol support.
-      -- https://github.com/mfussenegger/nvim-lint
+      -- ── Formatting ──────────────────────────────────────────────────────
+      -- Lightweight yet powerful formatter plugin for Neovim
+      -- https://github.com/stevearc/conform.nvim
       {
-        'mfussenegger/nvim-lint',
-        event = { 'BufReadPre', 'BufNewFile' },
+        'stevearc/conform.nvim',
+        event = { 'BufWritePre' },
+        cmd = { 'ConformInfo' },
+        opts = {
+          formatters_by_ft = {
+            lua = { 'stylua' },
+            -- Conform will run multiple formatters sequentially
+            -- python = { 'isort', 'black', lsp_format = 'fallback' },
+            -- You can customize some of the format options for the filetype (:help conform.format)
+            -- rust = { 'rustfmt', lsp_format = 'fallback' },
+            -- Conform will run the first available formatter
+            javascript = { 'prettier', 'eslint', stop_after_first = true },
+          },
+          notify_on_error = true,
+          format_on_save = function(bufnr)
+            -- Disable "format_on_save lsp_fallback" for languages that don't
+            -- have a well standardized coding style. You can add additional
+            -- languages here or re-enable it for the disabled ones.
+            local disable_filetypes = { c = true, cpp = true }
+            return {
+              -- formatters = { 'injected' },
+              lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+              timeout_ms = 500,
+            }
+          end,
+        },
       },
-      -- Extension to mason.nvim that makes it
-      -- easier to use nvim-lint with mason.nvim
-      -- https://github.com/rshkarin/mason-nvim-lint
-      { 'rshkarin/mason-nvim-lint' },
+      -- Automatically install formatters registered with conform.nvim via mason.nvim
+      -- https://github.com/zapling/mason-conform.nvim
+      { 'zapling/mason-conform.nvim' },
 
       -- ── Misc ────────────────────────────────────────────────────────────
       -- vscode-like pictograms for neovim lsp completion items
@@ -83,13 +83,13 @@ return {
       local on_attach = function(_, bufnr)
         -- Create a command `:Format` local to the LSP buffer
         vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-          if vim.lsp.buf.format then
-            vim.lsp.buf.format()
-          elseif vim.lsp.buf.formatting then
-            vim.lsp.buf.formatting()
-          else
-            require('conform').format { async = true, lsp_fallback = true }
-          end
+          require('conform').format { formatters = { 'injected' }, async = true, lsp_fallback = true }
+
+          -- if vim.lsp.buf.format then
+          --   vim.lsp.buf.format()
+          -- elseif vim.lsp.buf.formatting then
+          --   vim.lsp.buf.formatting()
+          -- end
         end, { desc = 'Format current buffer with LSP' })
       end
 
@@ -99,37 +99,13 @@ return {
       -- ── Enable the following language servers ───────────────────────────
       -- :help lspconfig-all for all pre-configured LSPs
       local servers = {
-        ast_grep = {},
-
-        actionlint = {}, -- GitHub Actions
-        ansiblels = {}, -- Ansible
         bashls = {}, -- Bash
         -- csharp_ls = {}, -- C#, requires dotnet executable
-        css_variables = {}, -- CSS
-        cssls = {}, -- CSS
-        docker_compose_language_service = {}, -- Docker compose
-        dockerls = {}, -- Docker
-        eslint = {}, -- ESLint
-        gitlab_ci_ls = {}, -- GitLab CI
         gopls = {}, -- Go
         html = {}, -- HTML
         intelephense = {}, -- PHP
-        pest_ls = {}, -- Pest (PHP)
-        phpactor = {}, -- PHP
-        psalm = {}, -- PHP
-        pyright = {}, -- Python
-        semgrep = {}, -- Security
-        shellcheck = {}, -- Shell scripts
-        shfmt = {}, -- Shell scripts formatting
-        stylelint_lsp = {}, -- Stylelint for S/CSS
-        stylua = {}, -- Used to format Lua code
         tailwindcss = {}, -- Tailwind CSS
-        terraformls = {}, -- Terraform
-        tflint = {}, -- Terraform
-        ts_ls = {}, -- TypeScript/JS
-        typos_lsp = {}, -- Better writing
-        volar = {}, -- Vue
-        yamlls = {}, -- YAML
+        ts_ls = {}, -- TypeScript
 
         lua_ls = {
           settings = {
@@ -184,31 +160,24 @@ return {
       -- Mason servers should be it's own variable for mason-nvim-lint
       -- See: https://mason-registry.dev/registry/list
       local mason_servers = {
-        'actionlint',
-        'ansible-language-server',
-        'ansible-lint',
         'bash-language-server',
-        'blade-formatter',
         'clang-format',
+        'codespell',
         'commitlint',
         'diagnostic-languageserver',
-        'docker-compose-language-service',
-        'dockerfile-language-server',
         'editorconfig-checker',
         'fixjson',
-        'flake8',
-        'html-lsp',
-        'jq',
         'jsonlint',
+        'lua-language-server',
         'luacheck',
-        'php-cs-fixer',
+        'phpcbf',
         'phpcs',
         'phpmd',
-        'semgrep',
+        'prettier',
         'shellcheck',
         'shfmt',
-        'stylelint',
         'stylua',
+        'vim-language-server',
         'vue-language-server',
         'yamllint',
       }
@@ -221,43 +190,35 @@ return {
         auto_update = true,
       }
 
-      -- ── Ensure the servers above are installed ──────────────────────────
-      require('mason-lspconfig').setup {
-        automatic_installation = true,
-        ensure_installed = servers,
-      }
-
       -- nvim-cmp supports additional completion capabilities
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+      -- Tell the server the capability of foldingRange,
+      -- Neovim hasn't added foldingRange to default capabilities, users must add it manually
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = true,
+        lineFoldingOnly = true,
+      }
 
-      require('mason-lspconfig').setup_handlers {
+      local lspconfig_handlers = {
         -- The first entry (without a key) will be the default handler
         -- and will be called for each installed server that doesn't have
         -- a dedicated handler.
         function(server_name) -- default handler (optional)
-          require('lspconfig')[server_name].setup {}
+          require('lspconfig')[server_name].setup {
+            on_attach = on_attach,
+            capabilities = capabilities,
+          }
         end,
-        -- Next, you can provide a dedicated handler for specific servers.
-        -- For example, a handler override for the `rust_analyzer`:
-        -- ['rust_analyzer'] = function()
-        --   require('rust-tools').setup {}
-        -- end,
+        -- Next, you can provide targeted overrides for specific servers.
+        ['lua_ls'] = function() require('lspconfig')['lua_ls'].setup { settings = servers.lua_ls } end,
+        ['jsonls'] = function() require('lspconfig')['jsonls'].setup { settings = servers.jsonls } end,
       }
 
-      for _, lsp in ipairs(servers) do
-        require('lspconfig')[lsp].setup {
-          on_attach = on_attach,
-          capabilities = capabilities,
-        }
-      end
-
-      require('lspconfig').lua_ls.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          Lua = servers.lua_ls.settings.Lua,
-        },
+      require('mason-lspconfig').setup {
+        ensure_installed = vim.tbl_keys(servers or {}),
+        automatic_installation = true,
+        handlers = lspconfig_handlers,
       }
 
       vim.api.nvim_create_autocmd('FileType', {
@@ -270,19 +231,158 @@ return {
         end,
       })
 
-      -- ── Setup linting ───────────────────────────────────────────────────
-      require('mason-nvim-lint').setup {
-        ensure_installed = mason_servers or {},
-        quiet_mode = true,
+      -- ── Setup formatting ────────────────────────────────────────────────
+      require('mason-conform').setup {
+        -- ignore_install = { 'prettier' }, -- List of formatters to ignore during install
       }
-      local lint = require 'lint'
-      local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
-        group = lint_augroup,
-        callback = function()
-          lint.try_lint()
+    end,
+  },
+
+  -- Garbage collector that stops inactive LSP clients to free RAM
+  -- https://github.com/Zeioth/garbage-day.nvim
+  {
+    'zeioth/garbage-day.nvim',
+    dependencies = 'neovim/nvim-lspconfig',
+    event = 'VeryLazy',
+    opts = {},
+  },
+
+  -- improve neovim lsp experience
+  -- https://github.com/nvimdev/lspsaga.nvim
+  -- https://nvimdev.github.io/lspsaga/
+  {
+    'nvimdev/lspsaga.nvim',
+    event = 'LspAttach',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter', -- optional
+      'nvim-tree/nvim-web-devicons', -- optional
+    },
+    opts = {
+      code_action = {
+        show_server_name = true,
+      },
+      diagnostic = {
+        keys = {
+          quit = { 'q', '<ESC>' },
+        },
+      },
+    },
+  },
+
+  -- Not UFO in the sky, but an ultra fold in Neovim.
+  -- https://github.com/kevinhwang91/nvim-ufo/
+  {
+    'kevinhwang91/nvim-ufo',
+    version = '*',
+    dependencies = {
+      { 'neovim/nvim-lspconfig' },
+      { 'kevinhwang91/promise-async' },
+      { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' },
+      {
+        -- Status column plugin that provides a configurable
+        -- 'statuscolumn' and click handlers.
+        -- https://github.com/luukvbaal/statuscol.nvim
+        'luukvbaal/statuscol.nvim',
+        config = function()
+          local builtin = require 'statuscol.builtin'
+          require('statuscol').setup {
+            relculright = true,
+            segments = {
+              {
+                text = { builtin.foldfunc },
+                click = 'v:lua.ScFa',
+              },
+              {
+                sign = {
+                  namespace = { 'diagnostic/signs' },
+                  maxwidth = 2,
+                  -- auto = true,
+                },
+                click = 'v:lua.ScSa',
+              },
+              {
+                text = { builtin.lnumfunc, ' ' },
+                click = 'v:lua.ScLa',
+              },
+            },
+          }
         end,
-      })
+      },
+    },
+    config = function()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+      local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
+      for _, ls in ipairs(language_servers) do
+        require('lspconfig')[ls].setup {
+          capabilities = capabilities,
+          -- you can add other fields for setting up lsp server in this table
+        }
+      end
+
+      require('ufo').setup {
+        open_fold_hl_timeout = 150,
+        close_fold_kinds_for_ft = { 'imports', 'comment' },
+        preview = {
+          win_config = {
+            border = { '', '─', '', '', '', '─', '', '' },
+            winhighlight = 'Normal:Folded',
+            winblend = 0,
+          },
+          mappings = {
+            scrollU = '<C-u>',
+            scrollD = '<C-d>',
+            jumpTop = '[',
+            jumpBot = ']',
+          },
+        },
+
+        provider_selector = function(_, _, _) -- bufnr, filetype, buftype
+          return { 'treesitter', 'indent' }
+        end,
+
+        -- fold_virt_text_handler
+        --
+        -- This handler is called when the fold text is too long to fit in the window.
+        -- It is expected to truncate the text and return a new list of virtual text.
+        --
+        ---@param virtText table The current virtual text list.
+        ---@param lnum number The line number of the first line in the fold.
+        ---@param endLnum number The line number of the last line in the fold.
+        ---@param width number The width of the window.
+        ---@param truncate function Truncate function
+        ---@return table
+        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+          local newVirtText = {}
+          local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+          local sufWidth = vim.fn.strdisplaywidth(suffix)
+          local targetWidth = width - sufWidth
+          local curWidth = 0
+          for _, chunk in ipairs(virtText) do
+            local chunkText = chunk[1]
+            local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            if targetWidth > curWidth + chunkWidth then
+              table.insert(newVirtText, chunk)
+            else
+              chunkText = truncate(chunkText, targetWidth - curWidth)
+              local hlGroup = chunk[2]
+              table.insert(newVirtText, { chunkText, hlGroup })
+              chunkWidth = vim.fn.strdisplaywidth(chunkText)
+              -- str width returned from truncate() may less than 2nd argument, need padding
+              if curWidth + chunkWidth < targetWidth then
+                suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+              end
+              break
+            end
+            curWidth = curWidth + chunkWidth
+          end
+          table.insert(newVirtText, { suffix, 'MoreMsg' })
+          return newVirtText
+        end,
+      }
     end,
   },
 }

@@ -20,6 +20,7 @@ return {
       { 'hrsh7th/cmp-nvim-lsp' },
       { 'hrsh7th/cmp-buffer' },
       { 'hrsh7th/cmp-path' },
+      -- cmp import and use all environment variables from .env.* and system
       -- https://github.com/SergioRibera/cmp-dotenv
       { 'SergioRibera/cmp-dotenv' },
       -- ── Other deps ──────────────────────────────────────────────────────
@@ -39,8 +40,8 @@ return {
             cmd = 'Copilot',
             build = ':Copilot setup',
             event = { 'InsertEnter', 'LspAttach' },
-            fix_pairs = true,
             opts = {
+              fix_pairs = true,
               suggestion = { enabled = false },
               panel = { enabled = false },
               filetypes = {
@@ -50,9 +51,7 @@ return {
             },
           },
         },
-        config = function()
-          require('copilot_cmp').setup()
-        end,
+        config = function() require('copilot_cmp').setup() end,
       },
     },
     config = function()
@@ -63,10 +62,8 @@ return {
       require('copilot_cmp').setup()
 
       local has_words_before = function()
-        if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then
-          return false
-        end
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then return false end
+        local line, col = table.unpack(vim.api.nvim_win_get_cursor(0))
         return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match '^%s*$' == nil
       end
 
@@ -74,9 +71,7 @@ return {
         formatting = {
           format = lspkind.cmp_format {
             mode = 'symbol',
-            max_width = function()
-              return math.floor(0.45 * vim.o.columns)
-            end,
+            max_width = function() return math.floor(0.45 * vim.o.columns) end,
             show_labelDetails = true,
             symbol_map = {
               Copilot = '',
@@ -84,18 +79,14 @@ return {
           },
         },
         view = {
-          width = function(_, _)
-            return math.min(80, vim.o.columns)
-          end,
+          width = function(_, _) return math.min(80, vim.o.columns) end,
           entries = {
             name = 'custom',
             selection_order = 'near_cursor',
           },
         },
         snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
+          expand = function(args) luasnip.lsp_expand(args.body) end,
         },
         mapping = cmp.mapping.preset.insert {
           ['<C-d>'] = cmp.mapping.scroll_docs(-4),
