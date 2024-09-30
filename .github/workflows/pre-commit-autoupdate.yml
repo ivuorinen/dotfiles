@@ -12,7 +12,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v4.8.0
       - run: pip install pre-commit
       - run: pre-commit autoupdate
       - uses: peter-evans/create-pull-request@v4
