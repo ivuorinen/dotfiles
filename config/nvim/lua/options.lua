@@ -32,7 +32,10 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  See `:help 'clipboard'`
-vim.schedule(function() vim.opt.clipboard = 'unnamedplus' end)
+vim.schedule(function()
+  local c = vim.env.SSH_TTY and '' or 'unnamedplus'
+  vim.opt.clipboard = c
+end)
 
 vim.opt.breakindent = true -- Enable break indent
 vim.opt.smartindent = true -- Insert indents automatically
@@ -92,7 +95,8 @@ vim.g.loaded_ruby_provider = 0
 -- kevinhwang91/nvim-ufo settings
 vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
 vim.o.foldcolumn = '1' -- '0' is not bad
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+-- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
@@ -111,7 +115,17 @@ vim.g.noice_ignored_filetypes = {
 
 -- ── Deal with word wrap ───────────────────────────────────────────────────────
 local m = vim.api.nvim_set_keymap
-m('n', 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
-m('n', 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })
+m(
+  'n',
+  'k',
+  "v:count == 0 ? 'gk' : 'k'",
+  { desc = 'Move up', noremap = true, expr = true }
+)
+m(
+  'n',
+  'j',
+  "v:count == 0 ? 'gj' : 'j'",
+  { desc = 'Move down', noremap = true, expr = true }
+)
 
 -- vim: ts=2 sts=2 sw=2 et

@@ -19,9 +19,6 @@ return {
       -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
       -- https://github.com/williamboman/mason-lspconfig.nvim
       { 'williamboman/mason-lspconfig.nvim' },
-      -- Install and upgrade third party tools automatically
-      -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
-      { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 
       -- ── Formatting ──────────────────────────────────────────────────────
       -- Lightweight yet powerful formatter plugin for Neovim
@@ -30,33 +27,81 @@ return {
         'stevearc/conform.nvim',
         event = { 'BufWritePre' },
         cmd = { 'ConformInfo' },
-        opts = {
-          formatters_by_ft = {
-            lua = { 'stylua' },
-            -- Conform will run multiple formatters sequentially
-            -- python = { 'isort', 'black', lsp_format = 'fallback' },
-            -- You can customize some of the format options for the filetype (:help conform.format)
-            -- rust = { 'rustfmt', lsp_format = 'fallback' },
-            -- Conform will run the first available formatter
-            javascript = { 'prettier', 'eslint', stop_after_first = true },
-          },
-          notify_on_error = true,
-          format_on_save = function(bufnr)
-            -- Disable "format_on_save lsp_fallback" for languages that don't
-            -- have a well standardized coding style. You can add additional
-            -- languages here or re-enable it for the disabled ones.
-            local disable_filetypes = { c = true, cpp = true }
-            return {
-              -- formatters = { 'injected' },
-              lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-              timeout_ms = 500,
-            }
-          end,
-        },
+        config = function()
+          -- Select first conform formatter that is available
+          ---@param bufnr integer
+          ---@param ... string
+          ---@return string
+          local function first(bufnr, ...)
+            local conform = require 'conform'
+            for i = 1, select('#', ...) do
+              local formatter = select(i, ...)
+              if conform.get_formatter_info(formatter, bufnr).available then
+                return formatter
+              end
+            end
+            return select(1, ...)
+          end
+
+          require('conform').setup {
+            -- Enable or disable logging
+            notify_on_error = true,
+            -- Set the default formatter for all filetypes
+            default_formatter = 'injected',
+            -- Set the default formatter for all filetypes
+            default_formatter_opts = {
+              lsp_format = 'fallback',
+              -- Set the default formatter for all filetypes
+              -- formatter = 'injected',
+              -- Set the default formatter for all filetypes
+              -- formatter_opts = {},
+            },
+            formatters_by_ft = {
+              markdown = function(bufnr)
+                return { first(bufnr, 'prettierd', 'prettier'), 'injected' }
+              end,
+              javascript = function(bufnr)
+                return { first(bufnr, 'prettier', 'eslint'), 'injected' }
+              end,
+              lua = { 'stylua' },
+              -- Conform will run multiple formatters sequentially
+              -- python = { 'isort', 'black', lsp_format = 'fallback' },
+              -- You can customize some of the format options for the filetype (:help conform.format)
+              -- rust = { 'rustfmt', lsp_format = 'fallback' },
+            },
+            format_on_save = function(bufnr)
+              -- Disable autoformat on certain filetypes
+              local ignore_filetypes = {
+                'c',
+                'cpp',
+                'sql',
+                'java',
+              }
+              if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+                return
+              end
+              -- Disable with a global or buffer-local variable
+              if
+                vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat
+              then
+                return
+              end
+              -- Disable autoformat for files in a certain path
+              local bufname = vim.api.nvim_buf_get_name(bufnr)
+              if bufname:match '/node_modules/' then return end
+              if bufname:match '/vendor/' then return end
+              if bufname:match '/dist/' then return end
+              if bufname:match '/build/' then return end
+
+              return { timeout_ms = 500, lsp_format = 'fallback' }
+            end,
+          }
+        end,
+        init = function()
+          -- If you want the formatexpr, here is the place to set it
+          vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+        end,
       },
-      -- Automatically install formatters registered with conform.nvim via mason.nvim
-      -- https://github.com/zapling/mason-conform.nvim
-      { 'zapling/mason-conform.nvim' },
 
       -- ── Misc ────────────────────────────────────────────────────────────
       -- vscode-like pictograms for neovim lsp completion items
@@ -82,19 +127,27 @@ return {
       ---@output nil
       local on_attach = function(_, bufnr)
         -- Create a command `:Format` local to the LSP buffer
-        vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-          require('conform').format { formatters = { 'injected' }, async = true, lsp_fallback = true }
-
-          -- if vim.lsp.buf.format then
-          --   vim.lsp.buf.format()
-          -- elseif vim.lsp.buf.formatting then
-          --   vim.lsp.buf.formatting()
-          -- end
-        end, { desc = 'Format current buffer with LSP' })
+        vim.api.nvim_create_user_command('Format', function(args)
+          local range = nil
+          if args.count ~= -1 then
+            local end_line = vim.api.nvim_buf_get_lines(
+              bufnr,
+              args.line2 - 1,
+              args.line2,
+              true
+            )[1]
+            range = {
+              start = { args.line1, 0 },
+              ['end'] = { args.line2, end_line:len() },
+            }
+          end
+          require('conform').format {
+            async = true,
+            lsp_format = 'fallback',
+            range = range,
+          }
+        end, { range = true, desc = 'Format current buffer with LSP' })
       end
-
-      -- ── Setup mason so it can manage external tooling ───────────────────
-      require('mason').setup()
 
       -- ── Enable the following language servers ───────────────────────────
       -- :help lspconfig-all for all pre-configured LSPs
@@ -106,6 +159,7 @@ return {
         intelephense = {}, -- PHP
         tailwindcss = {}, -- Tailwind CSS
         ts_ls = {}, -- TypeScript
+        volar = {}, -- Vue
 
         lua_ls = {
           settings = {
@@ -184,10 +238,10 @@ return {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, mason_servers)
 
-      -- ── Automagically install tools ─────────────────────────────────────
-      require('mason-tool-installer').setup {
+      -- ── Setup mason so it can manage external tooling ───────────────────
+      require('mason').setup {
         ensure_installed = ensure_installed,
-        auto_update = true,
+        automatic_installation = true,
       }
 
       -- nvim-cmp supports additional completion capabilities
@@ -198,6 +252,15 @@ return {
       capabilities.textDocument.foldingRange = {
         dynamicRegistration = true,
         lineFoldingOnly = true,
+      }
+
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
+      capabilities.textDocument.completion.completionItem.resolveSupport = {
+        properties = {
+          'documentation',
+          'detail',
+          'additionalTextEdits',
+        },
       }
 
       local lspconfig_handlers = {
@@ -211,29 +274,18 @@ return {
           }
         end,
         -- Next, you can provide targeted overrides for specific servers.
-        ['lua_ls'] = function() require('lspconfig')['lua_ls'].setup { settings = servers.lua_ls } end,
-        ['jsonls'] = function() require('lspconfig')['jsonls'].setup { settings = servers.jsonls } end,
+        ['lua_ls'] = function()
+          require('lspconfig')['lua_ls'].setup { settings = servers.lua_ls }
+        end,
+        ['jsonls'] = function()
+          require('lspconfig')['jsonls'].setup { settings = servers.jsonls }
+        end,
       }
 
       require('mason-lspconfig').setup {
         ensure_installed = vim.tbl_keys(servers or {}),
         automatic_installation = true,
         handlers = lspconfig_handlers,
-      }
-
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = 'sh',
-        callback = function()
-          vim.lsp.start {
-            name = 'bash-language-server',
-            cmd = { 'bash-language-server', 'start' },
-          }
-        end,
-      })
-
-      -- ── Setup formatting ────────────────────────────────────────────────
-      require('mason-conform').setup {
-        -- ignore_install = { 'prettier' }, -- List of formatters to ignore during install
       }
     end,
   },
@@ -309,80 +361,71 @@ return {
         end,
       },
     },
-    config = function()
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
-      local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
-      for _, ls in ipairs(language_servers) do
-        require('lspconfig')[ls].setup {
-          capabilities = capabilities,
-          -- you can add other fields for setting up lsp server in this table
-        }
-      end
-
-      require('ufo').setup {
-        open_fold_hl_timeout = 150,
-        close_fold_kinds_for_ft = { 'imports', 'comment' },
-        preview = {
-          win_config = {
-            border = { '', '─', '', '', '', '─', '', '' },
-            winhighlight = 'Normal:Folded',
-            winblend = 0,
-          },
-          mappings = {
-            scrollU = '<C-u>',
-            scrollD = '<C-d>',
-            jumpTop = '[',
-            jumpBot = ']',
-          },
+    opts = {
+      open_fold_hl_timeout = 150,
+      close_fold_kinds_for_ft = { 'imports', 'comment' },
+      preview = {
+        win_config = {
+          border = { '', '─', '', '', '', '─', '', '' },
+          winhighlight = 'Normal:Folded',
+          winblend = 0,
         },
+        mappings = {
+          scrollU = '<C-u>',
+          scrollD = '<C-d>',
+          jumpTop = '[',
+          jumpBot = ']',
+        },
+      },
 
-        provider_selector = function(_, _, _) -- bufnr, filetype, buftype
-          return { 'treesitter', 'indent' }
-        end,
+      provider_selector = function(_, _, _) -- bufnr, filetype, buftype
+        return { 'treesitter', 'indent' }
+      end,
 
-        -- fold_virt_text_handler
-        --
-        -- This handler is called when the fold text is too long to fit in the window.
-        -- It is expected to truncate the text and return a new list of virtual text.
-        --
-        ---@param virtText table The current virtual text list.
-        ---@param lnum number The line number of the first line in the fold.
-        ---@param endLnum number The line number of the last line in the fold.
-        ---@param width number The width of the window.
-        ---@param truncate function Truncate function
-        ---@return table
-        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
-          local newVirtText = {}
-          local suffix = (' 󰁂 %d '):format(endLnum - lnum)
-          local sufWidth = vim.fn.strdisplaywidth(suffix)
-          local targetWidth = width - sufWidth
-          local curWidth = 0
-          for _, chunk in ipairs(virtText) do
-            local chunkText = chunk[1]
-            local chunkWidth = vim.fn.strdisplaywidth(chunkText)
-            if targetWidth > curWidth + chunkWidth then
-              table.insert(newVirtText, chunk)
-            else
-              chunkText = truncate(chunkText, targetWidth - curWidth)
-              local hlGroup = chunk[2]
-              table.insert(newVirtText, { chunkText, hlGroup })
-              chunkWidth = vim.fn.strdisplaywidth(chunkText)
-              -- str width returned from truncate() may less than 2nd argument, need padding
-              if curWidth + chunkWidth < targetWidth then
-                suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
-              end
-              break
+      -- fold_virt_text_handler
+      --
+      -- This handler is called when the fold text is too long to fit in the window.
+      -- It is expected to truncate the text and return a new list of virtual text.
+      --
+      ---@param virtText table The current virtual text list.
+      ---@param lnum number The line number of the first line in the fold.
+      ---@param endLnum number The line number of the last line in the fold.
+      ---@param width number The width of the window.
+      ---@param truncate function Truncate function
+      ---@return table
+      fold_virt_text_handler = function(
+        virtText,
+        lnum,
+        endLnum,
+        width,
+        truncate
+      )
+        local newVirtText = {}
+        local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+        local sufWidth = vim.fn.strdisplaywidth(suffix)
+        local targetWidth = width - sufWidth
+        local curWidth = 0
+        for _, chunk in ipairs(virtText) do
+          local chunkText = chunk[1]
+          local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+          if targetWidth > curWidth + chunkWidth then
+            table.insert(newVirtText, chunk)
+          else
+            chunkText = truncate(chunkText, targetWidth - curWidth)
+            local hlGroup = chunk[2]
+            table.insert(newVirtText, { chunkText, hlGroup })
+            chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            -- str width returned from truncate() may less than 2nd argument, need padding
+            if curWidth + chunkWidth < targetWidth then
+              suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
             end
-            curWidth = curWidth + chunkWidth
+            break
           end
-          table.insert(newVirtText, { suffix, 'MoreMsg' })
-          return newVirtText
-        end,
-      }
-    end,
+          curWidth = curWidth + chunkWidth
+        end
+        table.insert(newVirtText, { suffix, 'MoreMsg' })
+        return newVirtText
+      end,
+    },
   },
 }

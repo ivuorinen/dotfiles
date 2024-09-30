@@ -4,9 +4,11 @@ return {
   {
     'hrsh7th/nvim-cmp',
     lazy = false,
+    version = false, -- Use the latest version of the plugin
     event = 'InsertEnter',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
+
       -- ── LuaSnip Dependencies ────────────────────────────────────────────
       -- Snippet Engine for Neovim written in Lua.
       -- https://github.com/L3MON4D3/LuaSnip
@@ -14,6 +16,7 @@ return {
       -- luasnip completion source for nvim-cmp
       -- https://github.com/saadparwaiz1/cmp_luasnip
       { 'saadparwaiz1/cmp_luasnip' },
+
       -- ── Adds other completion capabilities. ─────────────────────────────
       -- ── nvim-cmp does not ship with all sources by default.
       -- ── They are split into multiple repos for maintenance purposes.
@@ -23,6 +26,7 @@ return {
       -- cmp import and use all environment variables from .env.* and system
       -- https://github.com/SergioRibera/cmp-dotenv
       { 'SergioRibera/cmp-dotenv' },
+
       -- ── Other deps ──────────────────────────────────────────────────────
       -- vscode-like pictograms for neovim lsp completion items
       -- https://github.com/onsails/lspkind.nvim
@@ -62,9 +66,15 @@ return {
       require('copilot_cmp').setup()
 
       local has_words_before = function()
-        if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then return false end
+        if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then
+          return false
+        end
         local line, col = table.unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match '^%s*$' == nil
+        return col ~= 0
+          and vim.api
+              .nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]
+              :match '^%s*$'
+            == nil
       end
 
       cmp.setup {
@@ -75,6 +85,8 @@ return {
             show_labelDetails = true,
             symbol_map = {
               Copilot = '',
+              Text = '',
+              Constructor = '',
             },
           },
         },
