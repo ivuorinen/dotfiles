@@ -34,18 +34,14 @@ return {
     event = 'VimEnter',
     config = function()
       require('dashboard').setup {
+        theme = 'doom',
         config = {
           disable_move = true,
           week_header = {
             enable = true,
           },
-          shortcut = {
-            {
-              desc = '󰊳 Lazy Update',
-              group = '@property',
-              action = 'Lazy update',
-              key = 'u',
-            },
+          shortcut = {},
+          center = {
             {
               icon = ' ',
               icon_hl = '@variable',
@@ -55,22 +51,32 @@ return {
               key = 'f',
             },
             {
-              desc = ' Marks',
+              icon = ' ',
+              desc = 'Marks',
               group = 'DiagnosticHint',
               action = 'Telescope harpoon marks',
               key = 'a',
             },
             {
-              desc = '⚑ TODO',
+              icon = '⚑ ',
+              desc = 'TODO',
               group = 'DiagnosticOptions',
               action = 'TodoTelescope',
               key = 't',
             },
             {
-              desc = '🔍 Search',
+              icon = ' ',
+              desc = 'Search',
               group = 'Number',
               action = 'Telescope live_grep',
               key = 's',
+            },
+            {
+              icon = '󰊳 ',
+              desc = 'Lazy Update',
+              group = '@property',
+              action = 'Lazy update',
+              key = 'u',
             },
           },
         },
@@ -110,6 +116,7 @@ return {
   -- https://github.com/lewis6991/gitsigns.nvim
   {
     'lewis6991/gitsigns.nvim',
+    version = false,
     lazy = false,
     opts = {
       signs = {
@@ -228,7 +235,10 @@ return {
   -- https://github.com/MeanderingProgrammer/render-markdown.nvim
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
     ft = 'markdown',
     opts = {},
   },
