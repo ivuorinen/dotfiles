@@ -6,15 +6,14 @@ on:
   workflow_dispatch:
 jobs:
   auto-update:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5.2.0
-      - run: pip install pre-commit
-      - run: pre-commit autoupdate
+      - run: pip install pre-commit && pre-commit autoupdate
       - uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
