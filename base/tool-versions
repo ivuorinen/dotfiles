@@ -1,7 +1,7 @@
 asdf-plugin-manager 1.4.0
 nodejs 22.9.0
-golang 1.23.1
-python 3.12.6
+golang 1.23.2
+python 3.12.7
 ruby 3.3.4
 rust 1.81.0
 direnv 2.34.0
@@ -11,7 +11,7 @@ age 1.2.0
 bottom 0.10.2
 dotenv-linter 3.3.0
 editorconfig-checker 2.8.0
-github-cli 2.57.0
+github-cli 2.58.0
 hadolint 2.12.0
 kubectl 1.31.1
 pipx 1.7.1
@@ -19,8 +19,8 @@ pre-commit 3.8.0
 ripgrep 14.1.1
 shellcheck 0.10.0
 shfmt 3.9.0
-terragrunt 0.67.10
-tf-summarize 0.3.10
+terragrunt 0.67.15
+tf-summarize 0.3.11
 yamllint 1.35.1
 yq 4.44.3
 bats 1.11.0
