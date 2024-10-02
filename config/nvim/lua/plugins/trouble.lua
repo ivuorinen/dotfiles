@@ -7,7 +7,7 @@ return {
   lazy = false,
   dependencies = { 'nvim-tree/nvim-web-devicons' },
   opts = {
-    auto_preview = false,
+    auto_preview = true,
     auto_fold = true,
     auto_close = true,
     use_lsp_diagnostic_signs = true,

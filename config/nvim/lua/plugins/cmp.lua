@@ -12,9 +12,16 @@ return {
       -- ── LuaSnip Dependencies ────────────────────────────────────────────
       -- Snippet Engine for Neovim written in Lua.
       -- https://github.com/L3MON4D3/LuaSnip
-      { 'L3MON4D3/LuaSnip', build = 'make install_jsregexp' },
-      -- luasnip completion source for nvim-cmp
-      -- https://github.com/saadparwaiz1/cmp_luasnip
+      {
+        'L3MON4D3/LuaSnip',
+        build = 'make install_jsregexp',
+        dependencies = {
+          -- luasnip completion source for nvim-cmp
+          -- https://github.com/saadparwaiz1/cmp_luasnip
+          'saadparwaiz1/cmp_luasnip',
+          'rafamadriz/friendly-snippets',
+        },
+      },
       { 'saadparwaiz1/cmp_luasnip' },
 
       -- ── Adds other completion capabilities. ─────────────────────────────
@@ -23,9 +30,25 @@ return {
       { 'hrsh7th/cmp-nvim-lsp' },
       { 'hrsh7th/cmp-buffer' },
       { 'hrsh7th/cmp-path' },
+      { 'hrsh7th/cmp-nvim-lsp-signature-help' },
+      { 'hrsh7th/cmp-emoji' },
+      { 'hrsh7th/cmp-cmdline' },
       -- cmp import and use all environment variables from .env.* and system
       -- https://github.com/SergioRibera/cmp-dotenv
       { 'SergioRibera/cmp-dotenv' },
+      -- A dictionary completion source for nvim-cmp
+      -- https://github.com/uga-rosa/cmp-dictionary
+      { 'uga-rosa/cmp-dictionary' },
+      -- An additional source for nvim-cmp to autocomplete packages and its versions
+      -- https://github.com/David-Kunz/cmp-npm
+      {
+        'David-Kunz/cmp-npm',
+        dependencies = { 'nvim-lua/plenary.nvim' },
+        ft = 'json',
+        opts = {},
+      },
+      -- https://github.com/chrisgrieser/cmp-nerdfont
+      { 'chrisgrieser/cmp-nerdfont' },
 
       -- ── Other deps ──────────────────────────────────────────────────────
       -- vscode-like pictograms for neovim lsp completion items
@@ -63,7 +86,13 @@ return {
       local luasnip = require 'luasnip'
       local lspkind = require 'lspkind'
       luasnip.config.setup {}
+      require('luasnip.loaders.from_vscode').lazy_load()
       require('copilot_cmp').setup()
+
+      require('cmp_dictionary').setup {
+        paths = { '/usr/share/dict/words' },
+        exact_length = 2,
+      }
 
       local has_words_before = function()
         if vim.api.nvim_get_option_value('buftype', {}) == 'prompt' then
@@ -90,12 +119,16 @@ return {
             },
           },
         },
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
         view = {
           width = function(_, _) return math.min(80, vim.o.columns) end,
-          entries = {
-            name = 'custom',
-            selection_order = 'near_cursor',
-          },
+          -- entries = {
+          --   name = 'custom',
+          --   selection_order = 'near_cursor',
+          -- },
         },
         snippet = {
           expand = function(args) luasnip.lsp_expand(args.body) end,
@@ -131,14 +164,20 @@ return {
           end, { 'i', 's' }),
         },
         sources = {
+          -- function arg popups while typing
+          { name = 'nvim_lsp_signature_help', group_index = 2 },
+
           -- Copilot Source
           { name = 'copilot', group_index = 2 },
           -- Other Sources
+          { name = 'dictionary', keyword_length = 2, group_index = 2 },
+          { name = 'npm', keyword_length = 4, group_index = 2 },
           { name = 'nvim_lsp', group_index = 2 },
-          { name = 'path', group_index = 2 },
           { name = 'luasnip', group_index = 2 },
-          { name = 'buffer', group_index = 2 },
           { name = 'dotenv', group_index = 2 },
+          { name = 'path', group_index = 2 },
+          { name = 'emoji', group_index = 2 },
+          { name = 'nerdfont', group_index = 2 },
         },
         sorting = {
           priority_weight = 2,
@@ -147,7 +186,7 @@ return {
 
             -- Below is the default comparator list and order for nvim-cmp
             cmp.config.compare.offset,
-            -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
+            cmp.config.compare.scopes, --this is commented in nvim-cmp too
             cmp.config.compare.exact,
             cmp.config.compare.score,
             cmp.config.compare.recently_used,
@@ -158,6 +197,34 @@ return {
             cmp.config.compare.order,
           },
         },
+      }
+
+      cmp.setup.cmdline({ '/', '?' }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' },
+        },
+      })
+
+      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' },
+        }, {
+          { name = 'cmdline' },
+        }),
+        matching = { disallow_symbol_nonprefix_matching = false },
+      })
+    end,
+  },
+  -- Luasnip choice node completion source for nvim-cmp
+  -- https://github.com/doxnit/cmp-luasnip-choice
+  {
+    'doxnit/cmp-luasnip-choice',
+    config = function()
+      require('cmp_luasnip_choice').setup {
+        auto_open = true, -- Automatically open nvim-cmp on choice node (default: true)
       }
     end,
   },
