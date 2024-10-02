@@ -22,10 +22,8 @@ return {
       {
         '<leader>b',
         group = '[b] Buffer',
-        expand = function()
-          -- Add the current buffers to the menu
-          return require('which-key.extras').expand.buf()
-        end,
+        -- Add the current buffers to the menu
+        expand = function() return require('which-key.extras').expand.buf() end,
       },
       {
         { '<leader>bk', '<cmd>blast<cr>', desc = 'Buffer: Last' },
@@ -38,56 +36,23 @@ return {
 
       -- ── Code ────────────────────────────────────────────────────────────
       { '<leader>c', group = '[c] Code' },
-      {
-        {
-          '<leader>ca',
-          '<cmd>lua vim.lsp.buf.code_action()<CR>',
-          desc = 'LSP: Code Action',
-        },
-        {
-          '<leader>cg',
-          '<cmd>lua require("neogen").generate()<CR>',
-          desc = 'Generate annotations',
-        },
-      },
+      { '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', desc = 'LSP: Code Action' },
+      { '<leader>cg', '<cmd>lua require("neogen").generate()<CR>', desc = 'Generate annotations' },
+
+      -- Code: treesj
+      { '<leader>cc', group = 'Code Split/Join' },
+      -- see: lua/plugins/treesj.lua
+      { '<leader>cct', '<cmd>TSJToggle<CR>', desc = 'Split/Join: Toggle' },
+      { '<leader>ccs', '<cmd>TSJSplit<CR>', desc = 'Split/Join: Split' },
+      { '<leader>ccj', '<cmd>TSJJoin<CR>', desc = 'Split/Join: Join' },
+
       -- ── Code: CommentBox ────────────────────────────────────────────────
-      {
-        { '<leader>cb', group = 'CommentBox' },
-        { '<leader>cbb', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
-        { '<leader>cbd', '<Cmd>CBd<CR>', desc = 'CommentBox: Remove a box' },
-        { '<leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
-        { '<leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
-        {
-          '<leader>cbt',
-          '<Cmd>CBllline<CR>',
-          desc = 'CommentBox: Titled Line',
-        },
-      },
-      -- ── Code: package.json control ──────────────────────────────────────
-      -- See: lua/plugins/lazy.lua
-      { '<leader>cn', group = 'package.json control' },
-      {
-        {
-          '<leader>cnd',
-          '<cmd>lua require("package-info").delete()<cr>',
-          desc = 'Delete package',
-        },
-        {
-          '<leader>cni',
-          '<cmd>lua require("package-info").install()<cr>',
-          desc = 'Install package',
-        },
-        {
-          '<leader>cns',
-          '<cmd>lua require("package-info").show({ force = true })<cr>',
-          desc = 'Show package info',
-        },
-        {
-          '<leader>cnu',
-          '<cmd>lua require("package-info").change_version()<cr>',
-          desc = 'Change version',
-        },
-      },
+      { '<leader>cb', group = 'CommentBox' },
+      { '<leader>cbb', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
+      { '<leader>cbd', '<Cmd>CBd<CR>', desc = 'CommentBox: Remove a box' },
+      { '<leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
+      { '<leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
+      { '<leader>cbt', '<Cmd>CBllline<CR>', desc = 'CommentBox: Titled Line' },
 
       -- ── Code: Refactoring ───────────────────────────────────────────────
       { '<leader>cx', group = '[x] Refactoring' },
@@ -410,36 +375,7 @@ return {
       },
 
       -- ── Misc ────────────────────────────────────────────────────────────
-      {
-        '<leader>1',
-        '<cmd>lua require("harpoon"):list():select(1)<cr>',
-        desc = 'harpoon to file 1',
-      },
-      {
-        '<leader>2',
-        '<cmd>lua require("harpoon"):list():select(2)<cr>',
-        desc = 'harpoon to file 2',
-      },
-      {
-        '<leader>3',
-        '<cmd>lua require("harpoon"):list():select(3)<cr>',
-        desc = 'harpoon to file 3',
-      },
-      {
-        '<leader>4',
-        '<cmd>lua require("harpoon"):list():select(4)<cr>',
-        desc = 'harpoon to file 4',
-      },
-      {
-        '<leader>5',
-        '<cmd>lua require("harpoon"):list():select(5)<cr>',
-        desc = 'harpoon to file 5',
-      },
-      {
-        '<leader>D',
-        '<cmd>lua vim.lsp.buf.type_definition()<CR>',
-        desc = 'LSP: Type Definition',
-      },
+      { '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', desc = 'LSP: Type Definition' },
       { '<leader>e', '<cmd>Neotree reveal<CR>', desc = 'NeoTree reveal' },
 
       -- ╭─────────────────────────────────────────────────────────╮

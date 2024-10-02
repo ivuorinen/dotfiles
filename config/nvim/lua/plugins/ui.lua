@@ -27,6 +27,10 @@ return {
     },
   },
 
+  -- Extensible Neovim Scrollbar
+  -- https://github.com/petertriho/nvim-scrollbar
+  { 'petertriho/nvim-scrollbar', opts = {} },
+
   -- vim dashboard
   -- https://github.com/nvimdev/dashboard-nvim
   {

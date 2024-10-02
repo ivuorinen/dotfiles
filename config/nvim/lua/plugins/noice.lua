@@ -1,7 +1,6 @@
 -- Highly experimental plugin that completely replaces the UI
 -- for messages, cmdline and the popupmenu.
 -- https://github.com/folke/noice.nvim
-
 return {
   'folke/noice.nvim',
   lazy = false,
@@ -41,6 +40,13 @@ return {
             { find = '%d fewer lines' },
             { find = '%d more lines' },
           },
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = 'notify',
+          find = 'No information available',
         },
         opts = { skip = true },
       },
