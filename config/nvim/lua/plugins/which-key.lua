@@ -36,8 +36,16 @@ return {
 
       -- ── Code ────────────────────────────────────────────────────────────
       { '<leader>c', group = '[c] Code' },
-      { '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', desc = 'LSP: Code Action' },
-      { '<leader>cg', '<cmd>lua require("neogen").generate()<CR>', desc = 'Generate annotations' },
+      {
+        '<leader>ca',
+        '<cmd>lua vim.lsp.buf.code_action()<CR>',
+        desc = 'LSP: Code Action',
+      },
+      {
+        '<leader>cg',
+        '<cmd>lua require("neogen").generate()<CR>',
+        desc = 'Generate annotations',
+      },
 
       -- Code: treesj
       { '<leader>cc', group = 'Code Split/Join' },
@@ -369,13 +377,17 @@ return {
       {
         {
           '<leader>?w',
-          '<cmd>lua require("which-key").show({global = false})<cr>',
+          '<cmd>lua require("which-key").show({global = true})<cr>',
           desc = 'Buffer Local Keymaps (which-key)',
         },
       },
 
       -- ── Misc ────────────────────────────────────────────────────────────
-      { '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', desc = 'LSP: Type Definition' },
+      {
+        '<leader>D',
+        '<cmd>lua vim.lsp.buf.type_definition()<CR>',
+        desc = 'LSP: Type Definition',
+      },
       { '<leader>e', '<cmd>Neotree reveal<CR>', desc = 'NeoTree reveal' },
 
       -- ╭─────────────────────────────────────────────────────────╮
