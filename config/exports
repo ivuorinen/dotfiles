@@ -25,12 +25,11 @@ fi
 # Load asdf
 export ASDF_DIR="$XDG_BIN_HOME/asdf"
 if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/bin ]] && x-path-prepend "$ASDF_DIR/bin"
-  [[ -d $ASDF_DIR/shims ]] && x-path-prepend "$ASDF_DIR/shims"
   [[ -d $ASDF_DIR/completions ]] && fpath=("$ASDF_DIR/completions" $fpath)
   [[ -d $ASDF_DIR/plugins ]] && fpath=("$ASDF_DIR/plugins" $fpath)
   source "$ASDF_DIR/asdf.sh"
 fi
+export PATH="$ASDF_DIR/bin:$ASDF_DIR/shims:$PATH"
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
