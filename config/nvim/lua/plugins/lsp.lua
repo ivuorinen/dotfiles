@@ -19,6 +19,11 @@ capabilities.textDocument.foldingRange = {
 }
 
 return {
+  {
+    'folke/neoconf.nvim',
+    cmd = 'Neoconf',
+    opts = {},
+  },
   -- Portable package manager for Neovim that runs everywhere Neovim runs.
   -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
   -- https://github.com/williamboman/mason.nvim
@@ -31,15 +36,12 @@ return {
       -- Mason servers to install
       -- See: https://mason-registry.dev/registry/list
       ensure_installed = {
-        'bash-language-server',
         'clang-format',
         'codespell',
         'commitlint',
-        'diagnostic-languageserver',
         'editorconfig-checker',
         'fixjson',
         'jsonlint',
-        'lua-language-server',
         'luacheck',
         'phpcbf',
         'phpcs',
@@ -48,8 +50,6 @@ return {
         'shellcheck',
         'shfmt',
         'stylua',
-        'vim-language-server',
-        'vue-language-server',
         'yamllint',
       },
     },
@@ -64,13 +64,16 @@ return {
       ensure_installed = {
         'bashls',
         -- 'csharp_ls',
+        'diagnosticls',
         'gopls',
         'html',
         'intelephense',
+        'jsonls',
+        'lua_ls',
         'tailwindcss',
         'ts_ls',
-        'lua_ls',
-        'jsonls',
+        'vimls',
+        'volar',
       },
       automatic_installation = true,
       handlers = {
@@ -184,13 +187,33 @@ return {
             },
           }
         end,
+        ['ts_ls'] = function()
+          local mason_registry = require 'mason-registry'
+          local ts_plugin_location = mason_registry
+            .get_package('vue-language-server')
+            :get_install_path() .. '/node_modules/@vue/typescript-plugin'
+          require('lspconfig')['volar'].setup {
+            init_options = {
+              plugins = {
+                {
+                  name = '@vue/typescript-plugin',
+                  location = ts_plugin_location,
+                  languages = { 'javascript', 'typescript', 'vue' },
+                },
+              },
+            },
+            filetypes = {
+              'typescript',
+              'javascript',
+              'javascriptreact',
+              'typescriptreact',
+              'vue',
+            },
+          }
+        end,
       },
     },
   },
-
-  -- Automatically install formatters registered with conform.nvim via mason.nvim
-  -- https://github.com/zapling/mason-conform.nvim
-  -- { 'zapling/mason-conform.nvim', opts = {} },
 
   -- ── Misc ───────────────────────────────────────────────────
   -- vscode-like pictograms for neovim lsp completion items
@@ -203,7 +226,7 @@ return {
   -- ── LSP ────────────────────────────────────────────────────
   -- Quick start configs for Nvim LSP
   -- https://github.com/neovim/nvim-lspconfig
-  { 'neovim/nvim-lspconfig' },
+  { 'neovim/nvim-lspconfig', dependencies = { 'folke/neoconf.nvim' } },
 
   -- Garbage collector that stops inactive LSP clients to free RAM
   -- https://github.com/Zeioth/garbage-day.nvim
