@@ -14,15 +14,17 @@ return {
       -- https://github.com/L3MON4D3/LuaSnip
       {
         'L3MON4D3/LuaSnip',
+        version = '*',
+        event = 'BufReadPre',
         build = 'make install_jsregexp',
         dependencies = {
           -- luasnip completion source for nvim-cmp
           -- https://github.com/saadparwaiz1/cmp_luasnip
           'saadparwaiz1/cmp_luasnip',
           'rafamadriz/friendly-snippets',
+          'molleweide/LuaSnip-snippets.nvim',
         },
       },
-      { 'saadparwaiz1/cmp_luasnip' },
 
       -- ── Adds other completion capabilities. ─────────────────────────────
       -- ── nvim-cmp does not ship with all sources by default.
@@ -86,7 +88,9 @@ return {
       local luasnip = require 'luasnip'
       local lspkind = require 'lspkind'
       luasnip.config.setup {}
+      luasnip.snippets = require('luasnip_snippets').load_snippets()
       require('luasnip.loaders.from_vscode').lazy_load()
+
       require('copilot_cmp').setup()
 
       require('cmp_dictionary').setup {
