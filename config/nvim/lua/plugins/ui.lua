@@ -82,6 +82,13 @@ return {
               action = 'Lazy update',
               key = 'u',
             },
+            {
+              icon = '☉ ',
+              desc = 'Quit',
+              group = 'DiagnosticError',
+              action = 'q',
+              key = 'q',
+            },
           },
         },
       }
