@@ -8,6 +8,9 @@ return {
   end,
   dependencies = {
     'nvim-treesitter/nvim-treesitter-textobjects',
+    'nvim-treesitter/nvim-treesitter-refactor',
+    'nvim-treesitter/nvim-treesitter-context',
+    'JoosepAlviste/nvim-ts-context-commentstring',
   },
   config = function()
     require('nvim-treesitter.configs').setup {
@@ -47,6 +50,32 @@ return {
         'yaml',
       },
 
+      refactor = {
+        navigation = {
+          enable = true,
+          -- Assign keymaps to false to disable them, e.g. `goto_definition = false`.
+          keymaps = {
+            goto_definition = '<leader>gnd',
+            list_definitions = '<leader>gnD',
+            list_definitions_toc = '<leader>gO',
+            goto_next_usage = '<a-*>',
+            goto_previous_usage = '<a-#>',
+          },
+        },
+        smart_rename = {
+          enable = true,
+          -- Assign keymaps to false to disable them, e.g. `smart_rename = false`.
+          keymaps = {
+            smart_rename = 'grr',
+          },
+        },
+        highlight_definitions = {
+          enable = true,
+          -- Set to false if you have an `updatetime` of ~100.
+          clear_on_cursor_move = true,
+        },
+        highlight_current_scope = { enable = false },
+      },
       highlight = { enable = true },
       indent = { enable = true },
       incremental_selection = {
