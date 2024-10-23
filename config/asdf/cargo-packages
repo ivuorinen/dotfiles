@@ -21,3 +21,5 @@ bob-nvim
 bottom
 // A modern alternative to ls
 eza
+// Tmux Sessionizer: A tool for opening git repositories as tmux sessions
+tmux-sessionizer
