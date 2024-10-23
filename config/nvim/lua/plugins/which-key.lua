@@ -190,6 +190,11 @@ return {
         '<cmd>Lspsaga diagnostic_jump_next<cr>',
         desc = 'LSPSaga: Diagnostic Jump Next',
       },
+      {
+        '<leader>cx',
+        '<cmd>Telescope import<cr>',
+        desc = 'Telescope import',
+      },
 
       -- ── DAP ─────────────────────────────────────────────────────────────
       { '<leader>d', group = '[d] DAP' },
@@ -266,23 +271,33 @@ return {
       -- See: lua/plugins/telescope.lua
       {
         '<leader><space>',
-        "<cmd>lua require('telescope.builtin').buffers()<cr>",
+        '<cmd>Telescope buffers<cr>',
         desc = 'Find existing buffers',
       },
       {
-        '<leader><tab>',
-        "<cmd>lua require('telescope.builtin').commands()<CR>",
+        '<leader>sc',
+        '<cmd>Telescope commands<CR>',
         desc = 'Telescope: Commands',
       },
       {
         '<leader>sd',
-        "<cmd>lua require('telescope.builtin').diagnostics()<cr>",
+        '<cmd>Telescope diagnostics<cr>',
         desc = 'Search Diagnostics',
       },
       {
         '<leader>sg',
-        "<cmd>lua require('telescope.builtin').live_grep()<cr>",
+        '<cmd>Telescope live_grep<cr>',
         desc = 'Search by Grep',
+      },
+      {
+        '<leader>sh',
+        '<cmd>Telescope highlights<cr>',
+        desc = 'List highlights',
+      },
+      {
+        '<leader>sl',
+        '<cmd>Telescope luasnip<CR>',
+        desc = 'Search LuaSnip',
       },
       {
         '<leader>sm',
@@ -296,7 +311,7 @@ return {
       },
       {
         '<leader>so',
-        "<cmd>lua require('telescope.builtin').oldfiles()<cr>",
+        '<cmd>Telescope oldfiles<cr>',
         desc = 'Find recently Opened files',
       },
       {
@@ -304,10 +319,54 @@ return {
         "<cmd>lua require('telescope').extensions.lazy_plugins.lazy_plugins()<cr>",
         desc = 'Find neovim/lazy configs',
       },
+      {
+        '<leader>sq',
+        '<cmd>Telescope quickfix<cr>',
+        desc = 'Quickfix list',
+      },
+      {
+        '<leader>sr',
+        group = 'References',
+        {
+          '<leader>srd',
+          '<cmd>Telescope lsp_definitions<CR>',
+          desc = 'Definitions',
+        },
+        {
+          '<leader>sri',
+          '<cmd>Telescope lsp_implementations<CR>',
+          desc = 'Implementations',
+        },
+        {
+          '<leader>srp',
+          '<cmd>Telescope lsp_document_symbols<CR>',
+          desc = 'Document Symbols',
+        },
+        {
+          '<leader>srr',
+          '<cmd>Telescope lsp_references<CR>',
+          desc = 'LSP References',
+        },
+        {
+          '<leader>srt',
+          '<cmd>Telescope lsp_type_definitions<CR>',
+          desc = 'Type Definitions',
+        },
+        {
+          '<leader>srw',
+          '<cmd>Telescope lsp_workspace_symbols<CR>',
+          desc = 'Workspace Symbols',
+        },
+      },
+      {
+        '<leader>ss',
+        '<cmd>Telescope treesitter',
+        desc = 'Treesitter symbols',
+      },
       { '<leader>st', '<cmd>TodoTelescope<CR>', desc = 'Telescope: Show Todo' },
       {
         '<leader>sw',
-        "<cmd>lua require('telescope.builtin').grep_string()<cr>",
+        '<cmd>Telescope grep_string<cr>',
         desc = 'Search current Word',
       },
 
@@ -375,6 +434,16 @@ return {
       -- ── Help ────────────────────────────────────────────────────────────
       { '<leader>?', group = '[?] Help & Cheat sheets' },
       {
+        {
+          '<leader>?h',
+          '<cmd>Telescope help_tags<cr>',
+          desc = 'Help tags',
+        },
+        {
+          '<leader>?m',
+          '<cmd>Telescope man_pages<cr>',
+          desc = 'Man pages',
+        },
         {
           '<leader>?w',
           '<cmd>lua require("which-key").show({global = true})<cr>',
