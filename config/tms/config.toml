@@ -1,0 +1,5 @@
+default_session = "main"
+
+[[search_dirs]]
+path = "~/Code"
+depth = 10

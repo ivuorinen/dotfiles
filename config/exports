@@ -465,6 +465,9 @@ export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
 msg "Setting up tmux configuration"
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 
+# tms, https://github.com/jrmoulton/tmux-sessionizer
+export TMS_CONFIG_FILE="${XDG_CONFIG_HOME}/tms/config.toml"
+
 # wakatime, https://github.com/wakatime/wakatime-cli
 msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
