@@ -445,6 +445,9 @@ export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 # tms, https://github.com/jrmoulton/tmux-sessionizer
 export TMS_CONFIG_FILE="${XDG_CONFIG_HOME}/tms/config.toml"
 
+# tms, https://github.com/jrmoulton/tmux-sessionizer
+export TMS_CONFIG_FILE="${XDG_CONFIG_HOME}/tms/config.toml"
+
 # wakatime, https://github.com/wakatime/wakatime-cli
 msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
