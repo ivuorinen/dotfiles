@@ -1,121 +1,116 @@
 "$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
-final_space = true
-console_title_template = "{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}"
-version = 2
+console_title_template = '{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}'
+version = 3
 auto_upgrade = true
-
-[[blocks]]
-alignment = "left"
-type = "prompt"
-
-  [[blocks.segments]]
-  foreground = "cyan"
-  style = "powerline"
-  template = "{{ .Icon }}"
-  type = "os"
-
-  [[blocks.segments]]
-  type = "session"
-  style = "plain"
-  template = " {{ if .SSHSession }} {{ .UserName }}@{{ end }}{{ .HostName }}"
-
-  [[blocks.segments]]
-  foreground = "cyan"
-  style = "plain"
-  template = " {{ .Path }} "
-  type = "path"
-
-    [blocks.segments.properties]
-    style = "mixed"
-
-    [blocks.segments.mapped_locations]
-    "~/Code/*" = ""
-    "~/Code/ivuorinen/" = ""
-
-  [[blocks.segments]]
-  type = "git"
-  style = "plain"
-  foreground = "lightGreen"
-  template = "{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}"
-
-    [blocks.segments.properties]
-    fetch_status = true
-    fetch_upstream_icon = true
-
-      [blocks.segments.properties.untracked_modes]
-      "~/Code/oh-my-posh/" = "no"
-
-  [[blocks.segments]]
-  type = "terraform"
-  style = "plain"
-  foreground = "#000000"
-  background = "#ebcc34"
-  template = "{{.WorkspaceName}}"
-
-[[blocks]]
-alignment = "left"
-type = "prompt"
-
-  [[blocks.segments]]
-  foreground = "#68a063"
-  style = "plain"
-  template = " {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}"
-  type = "node"
-
-    [blocks.segments.properties]
-    display_mode = "files"
-    fetch_package_manager = true
-    fetch_version = true
-
-  [[blocks.segments]]
-  foreground = "#4063D8"
-  style = "plain"
-  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
-  type = "crystal"
-
-    [blocks.segments.properties]
-    display_mode = "files"
-    fetch_version = true
-
-  [[blocks.segments]]
-  foreground = "#DE3F24"
-  style = "plain"
-  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
-  type = "ruby"
-
-    [blocks.segments.properties]
-    display_mode = "files"
-    fetch_version = true
-
-  [[blocks.segments]]
-  foreground = "#FED142"
-  style = "plain"
-  template = " {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}"
-  type = "python"
-
-    [blocks.segments.properties]
-    display_mode = "context"
-    fetch_virtual_env = false
-
-[[blocks]]
-  alignment = "left"
-  newline = true
-  type = "prompt"
-
-  [[blocks.segments]]
-  background = "transparent"
-  foreground = "lightGreen"
-  foreground_templates = [ "{{ if gt .Code 0 }}red{{ end }}" ]
-  style = "plain"
-  template = "➜"
-  type = "status"
-
-    [blocks.segments.properties]
-    always_enabled = true
+final_space = true
 
 [transient_prompt]
-background = "transparent"
-foreground = "lightGreen"
-foreground_templates = [ "{{ if gt .Code 0 }}red{{ end }}" ]
-template = "➜ "
+  template = '➜ '
+  foreground = 'lightGreen'
+  background = 'transparent'
+  foreground_templates = ['{{ if gt .Code 0 }}red{{ end }}']
 
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    style = 'powerline'
+    template = '{{ .Icon }}'
+    foreground = 'cyan'
+    type = 'os'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ if .SSHSession }} {{ .UserName }}@{{ end }}{{ .HostName }}'
+    type = 'session'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ .Path }} '
+    foreground = 'cyan'
+    type = 'path'
+
+    [blocks.segments.properties]
+      style = 'mixed'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = '{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}'
+    foreground = 'lightGreen'
+    type = 'git'
+
+    [blocks.segments.properties]
+      fetch_status = true
+      fetch_upstream_icon = true
+
+      [blocks.segments.properties.untracked_modes]
+        '~/Code/oh-my-posh/' = 'no'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = '{{.WorkspaceName}}'
+    foreground = '#000000'
+    background = '#ebcc34'
+    type = 'terraform'
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}'
+    foreground = '#68a063'
+    type = 'node'
+
+    [blocks.segments.properties]
+      display_mode = 'files'
+      fetch_package_manager = true
+      fetch_version = true
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}'
+    foreground = '#4063D8'
+    type = 'crystal'
+
+    [blocks.segments.properties]
+      display_mode = 'files'
+      fetch_version = true
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}'
+    foreground = '#DE3F24'
+    type = 'ruby'
+
+    [blocks.segments.properties]
+      display_mode = 'files'
+      fetch_version = true
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = ' {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }}'
+    foreground = '#FED142'
+    type = 'python'
+
+    [blocks.segments.properties]
+      display_mode = 'context'
+      fetch_virtual_env = false
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+  newline = true
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = '➜'
+    foreground = 'lightGreen'
+    background = 'transparent'
+    type = 'status'
+    foreground_templates = ['{{ if gt .Code 0 }}red{{ end }}']
+
+    [blocks.segments.properties]
+      always_enabled = true
