@@ -396,13 +396,56 @@ section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
   MENU=(
+    "aliases:<shell> (bash, zsh) Show aliases for bash or zsh"
+    "colors:Show colors"
+    "env:Show environment variables"
+    "functions:Show functions"
+    "nvim:Show nvim keybindings"
     "path:Show \$PATH dir by dir"
+    "tmux:Show tmux keybindings"
+    "wezterm:Show wezterm keybindings"
   )
 
-  case "$1" in
+  CMD="$1"
+  shift
+  SECTION="$1"
+  shift
+
+  case "$CMD" in
     path)
       # shellcheck disable=2001
       for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done
+      ;;
+    aliases)
+      case "$SECTION" in
+        "zsh")
+          zsh -ixc : 2>&1 | grep -E '> alias' | sed "s|$HOME|~|" | grep -v "(eval)"
+          ;;
+        "bash")
+          bash -ixc : 2>&1 | grep -E '> alias' | sed "s|$HOME|~|" | grep -v "(eval)"
+          ;;
+        *)
+          echo "$SCRIPT helpers aliases <shell> (bash, zsh)"
+          ;;
+      esac
+      ;;
+    "colors")
+      for i in {0..255}; do echo -en "\e[38;5;${i}m${i} "; done
+      ;;
+    "env")
+      env | sort
+      ;;
+    "functions")
+      declare -F
+      ;;
+    "nvim")
+      cat "$DOTFILES/docs/nvim-keybindings.md"
+      ;;
+    "tmux")
+      cat "$DOTFILES/docs/tmux-keybindings.md"
+      ;;
+    "wezterm")
+      cat "$DOTFILES/docs/wezterm-keybindings.md"
       ;;
     *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
@@ -524,9 +567,16 @@ section_tests()
 
   MENU=(
     "msg:List all log functions from shared.sh"
+    "params:List all parameters"
   )
 
   case "$1" in
+    params)
+      echo "All parameters:"
+      for i in "$@"; do
+        echo "  $i"
+      done
+      ;;
     msg)
       msg "msg"
       msg_done "msg_done"
@@ -566,14 +616,21 @@ usage()
   section_helpers
 }
 
-# The main loop. first keyword after $0 triggers section, or help.
-case "$1" in
-  install) section_install "$2" ;;
-  brew) section_brew "$2" ;;
-  check) section_check "$2" ;;
-  dotfiles) section_dotfiles "$2" ;;
-  helpers) section_helpers "$2" ;;
-  docs) section_docs "$2" ;;
-  tests) section_tests "$2" ;;
-  *) usage && exit 0 ;;
-esac
+main()
+{
+  SECTION="$1"
+  shift
+  # The main loop. The first keyword after $0 triggers section, or help.
+  case "$SECTION" in
+    install) section_install "$@" ;;
+    brew) section_brew "$@" ;;
+    check) section_check "$@" ;;
+    dotfiles) section_dotfiles "$@" ;;
+    helpers) section_helpers "$@" ;;
+    docs) section_docs "$@" ;;
+    tests) section_tests "$@" ;;
+    *) usage && exit 0 ;;
+  esac
+}
+
+main "$@"
