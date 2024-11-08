@@ -53,7 +53,7 @@ load_antigen()
     antigen bundle brew
     antigen bundle colored-man-pages
     antigen bundle zsh-users/zsh-completions
-    antigen bundle eza
+    x-have eza && antigen bundle eza
 
     # this needs to be the last item
     antigen bundle zsh-users/zsh-syntax-highlighting
@@ -99,3 +99,7 @@ main()
 }
 
 main "$@"
+
+# Lando
+export PATH="$HOME/.lando/bin${PATH+:$PATH}"; #landopath
+
