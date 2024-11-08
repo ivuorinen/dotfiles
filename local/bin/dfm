@@ -392,6 +392,51 @@ section_brew()
   ! x-have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
 }
 
+section_asdf()
+{
+  USAGE_PREFIX="$SCRIPT asdf <command>"
+  MENU=(
+    "install:Install asdf"
+    "current:Show asdf current versions"
+    "global:Show asdf global versions"
+    "installed:Show asdf installed versions"
+    "local:Show asdf local versions"
+    "versions:Show asdf versions"
+    "where:Show asdf where"
+    "which:Show asdf which"
+  )
+
+  case "$1" in
+    install)
+      msg "Installing asdf..."
+      bash "$DOTFILES/scripts/install-asdf.sh both" \
+        && msg_yay "asdf installed!"
+      ;;
+    current)
+      asdf current
+      ;;
+    global)
+      asdf global
+      ;;
+    installed)
+      asdf list
+      ;;
+    local)
+      asdf local
+      ;;
+    versions)
+      asdf list all
+      ;;
+    where)
+      asdf where
+      ;;
+    which)
+      asdf which
+      ;;
+    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
 section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
@@ -605,6 +650,8 @@ usage()
   echo ""
   section_install
   echo ""
+  section_asdf
+  echo ""
   section_brew
   echo ""
   section_check
@@ -623,6 +670,7 @@ main()
   # The main loop. The first keyword after $0 triggers section, or help.
   case "$SECTION" in
     install) section_install "$@" ;;
+    asdf) section_asdf "$@" ;;
     brew) section_brew "$@" ;;
     check) section_check "$@" ;;
     dotfiles) section_dotfiles "$@" ;;
