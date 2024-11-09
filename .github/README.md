@@ -6,10 +6,10 @@ aware of yet. As I find more interesting tools, configs and other stuff,
 this repository will live accordingly.
 
 Please for the love of everything good do not use these 1:1 as your own dotfiles,
-fork or download the repo as a zip and go from there with your own configs.
+fork or download the repository as a zip and go from there with your own configs.
 
 It would be nice if you'd add an issue linking to your fork or repo so I can
-see what interesing stuff you've done with it. Sharing is caring.
+see what interesting stuff you've done with it. Sharing is caring.
 
 ## Setup
 
@@ -28,9 +28,9 @@ see what interesing stuff you've done with it. Sharing is caring.
 
 ![screenshot of the oh-my-posh shell](./screenshots/oh-my-posh.png)
 
-![screenshot of light version of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart-light.png)
+![screenshot of light version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-light.png)
 
-![screenshot of dark version of tmux with nvim editing this repo](./screenshots/tmux-nvim-kickstart-dark.png)
+![screenshot of dark version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-dark.png)
 
 ## Interesting files and locations
 
@@ -52,7 +52,7 @@ see what interesing stuff you've done with it. Sharing is caring.
 | `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `state` |
 | `ssh/`    | `.ssh/`     | SSH Configurations.                         |
 
-### dfm - the dotfiles manager
+### `dfm` - the dotfiles manager
 
 [`.local/bin/dfm`][dfm] is a shell script that has some tools that help with dotfiles management.
 
