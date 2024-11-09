@@ -41,7 +41,7 @@ return {
   config = function()
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities.textDocument.foldingRange = {
-      dynamicRegistration = false,
+      dynamicRegistration = true,
       lineFoldingOnly = true,
     }
     local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
@@ -84,7 +84,13 @@ return {
       ---@param width number The width of the window.
       ---@param truncate function Truncate function
       ---@return table
-      fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+      fold_virt_text_handler = function(
+        virtText,
+        lnum,
+        endLnum,
+        width,
+        truncate
+      )
         local newVirtText = {}
         local suffix = (' 󰁂 %d '):format(endLnum - lnum)
         local sufWidth = vim.fn.strdisplaywidth(suffix)

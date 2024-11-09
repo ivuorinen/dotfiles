@@ -27,9 +27,9 @@ return {
     },
   },
 
-  -- Extensible Neovim Scrollbar
-  -- https://github.com/petertriho/nvim-scrollbar
-  { 'petertriho/nvim-scrollbar', opts = {} },
+  -- A neovim plugin that shows colorcolumn dynamically
+  -- https://github.com/Bekaboo/deadcolumn.nvim
+  { 'Bekaboo/deadcolumn.nvim' },
 
   -- vim dashboard
   -- https://github.com/nvimdev/dashboard-nvim
@@ -110,25 +110,60 @@ return {
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
-    config = function()
-      require('ibl').setup {
-        indent = {
-          char = '│',
+    opts = {
+      scope = { show_start = false, show_end = false },
+      indent = {
+        char = '│',
+        tab_char = '│',
+      },
+      exclude = {
+        filetypes = {
+          'Trouble',
+          'alpha',
+          'dashboard',
+          'help',
+          'lazy',
+          'lazyterm',
+          'mason',
+          'neo-tree',
+          'notify',
+          'terminal',
+          'toggleterm',
+          'trouble',
         },
-        exclude = {
-          filetypes = { 'terminal', 'dashboard' },
-          buftypes = { 'dashboard' },
-        },
-      }
+        buftypes = { 'dashboard' },
+      },
+    },
+  },
+
+  -- icons
+  {
+    'echasnovski/mini.icons',
+    opts = {
+      file = {
+        ['.keep'] = { glyph = '󰊢', hl = 'MiniIconsGrey' },
+        ['devcontainer.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+      },
+      filetype = {
+        dotenv = { glyph = '', hl = 'MiniIconsYellow' },
+      },
+    },
+    init = function()
+      package.preload['nvim-web-devicons'] = function()
+        require('mini.icons').mock_nvim_web_devicons()
+        return package.loaded['nvim-web-devicons']
+      end
     end,
   },
+
+  -- ui components
+  { 'MunifTanjim/nui.nvim', lazy = true },
 
   -- Git integration for buffers
   -- https://github.com/lewis6991/gitsigns.nvim
   {
     'lewis6991/gitsigns.nvim',
     version = false,
-    lazy = false,
     opts = {
       signs = {
         add = { text = '+' },
@@ -174,6 +209,7 @@ return {
       'TmuxNavigateRight',
       'TmuxNavigatePrevious',
     },
+    opts = {},
   },
 
   -- Cloak allows you to overlay *'s over defined patterns in defined files.

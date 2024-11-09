@@ -141,8 +141,8 @@ return {
       {
         '<leader>cf',
         '<cmd>lua require("conform").format({ async = true, lsp_fallback = true })<cr>',
-        mode = { 'n', 'v' },
-        desc = 'Format buffer',
+        mode = {},
+        desc = 'Format buffer with Conform',
       },
       {
         '<leader>ci',
@@ -509,7 +509,7 @@ return {
       },
 
       -- ── Old habits ──────────────────────────────────────────────────────
-      { '<C-s>', '<cmd>w<CR>', desc = 'Save file' },
+      { '<C-s>', '<cmd>w!<CR>', desc = 'Save file' },
 
       -- ── Text manipulation in visual mode ────────────────────────────────
       {
