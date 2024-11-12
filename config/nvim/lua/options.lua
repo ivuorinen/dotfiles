@@ -19,6 +19,9 @@ vim.g.colors_variant_dark = 'tokyonight-storm'
 -- Make sure editorconfig support is enabled
 vim.g.editorconfig = true
 
+-- Enable the colorcolumn
+vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
+
 -- Enable line numbers and relative line numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
