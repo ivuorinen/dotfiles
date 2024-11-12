@@ -16,6 +16,28 @@ return {
         local builtin = require 'statuscol.builtin'
         require('statuscol').setup {
           relculright = true,
+          ft_ignore = {
+            'dashboard',
+            'NvimTree',
+            'help',
+            'vim',
+            'alpha',
+            'dashboard',
+            'neo-tree',
+            'Trouble',
+            'lazy',
+            'toggleterm',
+          },
+          bt_ignore = {
+            'help',
+            'vim',
+            'alpha',
+            'dashboard',
+            'neo-tree',
+            'Trouble',
+            'lazy',
+            'toggleterm',
+          },
           segments = {
             {
               text = { builtin.foldfunc },
