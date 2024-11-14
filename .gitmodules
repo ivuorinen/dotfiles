@@ -23,10 +23,6 @@
 	path = config/tmux/plugins/tmux-continuum
 	url = https://github.com/tmux-plugins/tmux-continuum
 	ignore = dirty
-[submodule "tmux/tmux-resurrect"]
-	path = config/tmux/plugins/tmux-resurrect
-	url = https://github.com/tmux-plugins/tmux-resurrect
-	ignore = dirty
 [submodule "tmux/tmux-sensible"]
 	path = config/tmux/plugins/tmux-sensible
 	url = https://github.com/tmux-plugins/tmux-sensible.git

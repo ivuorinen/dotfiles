@@ -23,8 +23,6 @@ git submodule add --name tmux/tmux-continuum \
   -f https://github.com/tmux-plugins/tmux-continuum config/tmux/plugins/tmux-continuum
 git submodule add --name tmux/tmux-mode-indicator \
   -f https://github.com/MunifTanjim/tmux-mode-indicator.git config/tmux/plugins/tmux-mode-indicator
-git submodule add --name tmux/tmux-resurrect \
-  -f https://github.com/tmux-plugins/tmux-resurrect config/tmux/plugins/tmux-resurrect
 git submodule add --name tmux/tmux-sensible \
   -f https://github.com/tmux-plugins/tmux-sensible.git config/tmux/plugins/tmux-sensible
 git submodule add --name tmux/tmux-sessionist \
@@ -49,6 +47,7 @@ done
 [ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm
 [ -d "config/tmux/plugins/tmux" ] && rm -rf config/tmux/plugins/tmux
 [ -d "config/tmux/plugins/tmux-menus" ] && rm -rf config/tmux/plugins/tmux-menus
+[ -d "config/tmux/plugins/tmux-resurrect" ] && rm -rf config/tmux/plugins/tmux-resurrect
 [ -d "tools/dotbot-crontab" ] && rm -rf tools/dotbot-crontab
 [ -d "tools/dotbot-snap" ] && rm -rf tools/dotbot-snap
 [ -d "config/nvim-kickstart" ] && rm -rf config/nvim-kickstart
