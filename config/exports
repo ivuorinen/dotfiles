@@ -14,22 +14,21 @@
 # if DOTFILES is not set, set it to the default location
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
 
+# zsh completions directory
+[ -z "$ZSH_COMPLETIONS" ] && export ZSH_COMPLETIONS="$XDG_CONFIG_HOME/zsh/completion"
+
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-# Load bash completions if available for zsh
-if [[ -n "$ZSH_VERSION" ]]; then
-  autoload bashcompinit
-  bashcompinit
-fi
+# Add zsh completions to FPATH, compinit will be called later
+FPATH="$ZSH_COMPLETIONS:$FPATH"
 
 # Load asdf
 export ASDF_DIR="$XDG_BIN_HOME/asdf"
 if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/completions ]] && fpath=("$ASDF_DIR/completions" $fpath)
-  [[ -d $ASDF_DIR/plugins ]] && fpath=("$ASDF_DIR/plugins" $fpath)
+  [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
+  [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
   source "$ASDF_DIR/asdf.sh"
 fi
-export PATH="$ASDF_DIR/bin:$ASDF_DIR/shims:$PATH"
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
@@ -124,7 +123,7 @@ preexec()
 dfu()
 {
   (
-    cd "$DOTFILES" && git pull --ff-only && ./install
+    cd "$DOTFILES" && git rebase --ff --autostash && ./install
   )
 }
 

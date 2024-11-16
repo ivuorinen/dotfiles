@@ -1,4 +1,5 @@
 # this is my zsh config. there are many like it, but this one is mine.
+# https://zsh.sourceforge.io/Intro/intro_3.html
 # shellcheck shell=bash
 
 # export VERBOSE=1
@@ -10,6 +11,16 @@ export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim/mason/bin:$L
 export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
+
+export ZDOTDIR="$DOTFILES/zsh"
+ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
+
+# If not running interactively, don't do anything
+case $- in
+  *i*) ;;
+    *) return;;
+esac
 
 eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 
@@ -88,19 +99,16 @@ setup_tmux_window_name_plugin()
   fi
 }
 
-main()
-{
-  load_antigen
-  source_fzf_config
-  setup_tmux_window_name_plugin
-  if x-have antidot; then
-    eval "$(antidot init)"
-  fi
-  source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
-}
-
-main "$@"
+load_antigen
+source_fzf_config
+setup_tmux_window_name_plugin
+if x-have antidot; then
+  eval "$(antidot init)"
+fi
 
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}"; #landopath
 
+autoload -Uz compinit bashcompinit
+compinit -d $ZSH_COMPDUMP
+bashcompinit
