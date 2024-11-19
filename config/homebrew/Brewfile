@@ -53,6 +53,10 @@ brew "aspell"
 brew "autoconf"
 # Collection of over 500 reusable autoconf macros
 brew "autoconf-archive"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
+# Official Amazon AWS command-line interface
+brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # GNU multiple precision arithmetic library
@@ -71,8 +75,6 @@ brew "gettext"
 brew "glib"
 # Mozilla CA bundle for Python
 brew "certifi"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
@@ -85,6 +87,12 @@ brew "freetds"
 brew "gd"
 # GitHub command-line tool
 brew "gh"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Secure hashing function
+brew "libb2"
+# Framework for layout and rendering of i18n text
+brew "pango"
 # Distributed revision control system
 brew "git"
 # Render markdown on the CLI
@@ -97,12 +105,6 @@ brew "gnutls"
 brew "gnupg"
 # Image manipulation
 brew "netpbm"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c"
-# OpenType text shaping engine
-brew "harfbuzz"
-# Framework for layout and rendering of i18n text
-brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -127,8 +129,6 @@ brew "json-c"
 brew "krb5"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
 brew "legitify"
-# Secure hashing function
-brew "libb2"
 # Postgres C API library
 brew "libpq"
 # Multi-platform support library with a focus on asynchronous I/O
@@ -143,10 +143,14 @@ brew "m-cli"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
+# Libraries for security-enabled client and server applications
+brew "nss"
 # Open source suite of directory software
 brew "openldap"
 # General-purpose scripting language
 brew "php"
+# General-purpose scripting language
+brew "php@8.2"
 # Manage compile and link flags for libraries
 brew "pkg-config"
 # Send macOS User Notifications from the command-line
@@ -204,6 +208,8 @@ cask "font-open-sans"
 cask "font-roboto"
 cask "font-source-code-pro"
 cask "font-source-code-pro-for-powerline"
+cask "font-source-sans-pro"
+cask "font-source-serif-pro"
 # GIT client
 cask "fork"
 # HTTP and GraphQL Client
