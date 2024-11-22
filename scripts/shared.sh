@@ -11,7 +11,7 @@
 [ -z "$SHARED_SCRIPTS_SOURCED" ] && {
 
   source "${DOTFILES}/config/shared.sh"
-  msgr done "(!) shared.sh not sourced"
+  msgr warn "(!) shared.sh not sourced"
 
   # Set variable that checks if the shared.sh script has been sourced only once
   # shellcheck disable=SC2034

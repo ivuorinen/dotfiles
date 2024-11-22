@@ -27,7 +27,7 @@ if ! command -v msg &> /dev/null; then
   # $1 - message (string)
   msg()
   {
-    [[ "$VERBOSE" -eq 1 ]] && echo "-> $1"
+    [[ "$VERBOSE" -eq 1 ]] && msgr msg "-> $1"
     return 0
   }
 fi
@@ -224,11 +224,11 @@ replacable()
   FILE2="$2"
 
   [[ ! -r "$FILE1" ]] && {
-    [[ $VERBOSE -eq 1 ]] && msg_err "File 1 ($FILE1) does not exist"
+    [[ $VERBOSE -eq 1 ]] && msgr err "File 1 ($FILE1) does not exist"
     return 0
   }
   [[ ! -r "$FILE2" ]] && {
-    [[ $VERBOSE -eq 1 ]] && msg_err "File 2 ($FILE2) does not exist, replaceable"
+    [[ $VERBOSE -eq 1 ]] && msgr err "File 2 ($FILE2) does not exist, replaceable"
     return 1
   }
 
@@ -236,20 +236,20 @@ replacable()
   FILE2_HASH=$(get_sha256sum "$FILE2")
 
   [[ $FILE1_HASH = "" ]] && {
-    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 1 ($FILE1)"
+    [[ $VERBOSE -eq 1 ]] && msgr err "Could not get hash for file 1 ($FILE1)"
     return 0
   }
   [[ $FILE2_HASH = "" ]] && {
-    [[ $VERBOSE -eq 1 ]] && msg_err "Could not get hash for file 2 ($FILE2), replaceable"
+    [[ $VERBOSE -eq 1 ]] && msgr err "Could not get hash for file 2 ($FILE2), replaceable"
     return 1
   }
 
   [[ "$FILE1_HASH" == "$FILE2_HASH" ]] && {
-    [[ $VERBOSE -eq 1 ]] && msg_ok "Files match, not replaceable: $FILE1"
+    [[ $VERBOSE -eq 1 ]] && msgr ok "Files match, not replaceable: $FILE1"
     return 0
   }
 
-  [[ $VERBOSE -eq 1 ]] && msg_warn "Files do not match ($FILE1_HASH != $FILE2_HASH), replaceable"
+  [[ $VERBOSE -eq 1 ]] && msgr warn "Files do not match ($FILE1_HASH != $FILE2_HASH), replaceable"
 
   return 1
 }
@@ -328,6 +328,7 @@ fi
 # https://getantidote.github.io/
 msg "Setting up Antidote configuration"
 export ANTIDOTE_DIR="$DOTFILES/tools/antidote"
+export ANTIDOTE_HOME="$XDG_CACHE_HOME/antidote"
 export ANTIDOTE_PLUGINS="$XDG_CONFIG_HOME/zsh/antidote_plugins"
 
 # Antigen configuration
@@ -416,6 +417,9 @@ export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 msg "Setting up Go configuration"
 export GOPATH="$XDG_DATA_HOME/go"
 export GOBIN="$XDG_BIN_HOME"
+
+# Lando
+export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
 # NPM: Add npm packages to path
 msg "Setting up NPM configuration"

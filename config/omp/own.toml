@@ -97,7 +97,8 @@ final_space = true
 
     [blocks.segments.properties]
       display_mode = 'context'
-      fetch_virtual_env = false
+      fetch_version = true
+      fetch_virtual_env = true
 
 [[blocks]]
   type = 'prompt'
