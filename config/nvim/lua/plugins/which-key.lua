@@ -47,13 +47,6 @@ return {
         desc = 'Generate annotations',
       },
 
-      -- Code: treesj
-      { '<leader>cc', group = 'Code Split/Join' },
-      -- see: lua/plugins/treesj.lua
-      { '<leader>cct', '<cmd>TSJToggle<CR>', desc = 'Split/Join: Toggle' },
-      { '<leader>ccs', '<cmd>TSJSplit<CR>', desc = 'Split/Join: Split' },
-      { '<leader>ccj', '<cmd>TSJJoin<CR>', desc = 'Split/Join: Join' },
-
       -- ── Code: CommentBox ────────────────────────────────────────────────
       { '<leader>cb', group = 'CommentBox' },
       { '<leader>cbb', '<Cmd>CBccbox<CR>', desc = 'CommentBox: Box Title' },
@@ -61,55 +54,6 @@ return {
       { '<leader>cbl', '<Cmd>CBline<CR>', desc = 'CommentBox: Simple Line' },
       { '<leader>cbm', '<Cmd>CBllbox14<CR>', desc = 'CommentBox: Marked' },
       { '<leader>cbt', '<Cmd>CBllline<CR>', desc = 'CommentBox: Titled Line' },
-
-      -- ── Code: Refactoring ───────────────────────────────────────────────
-      { '<leader>cx', group = '[x] Refactoring' },
-      {
-        mode = { 'x' },
-        -- Extract function supports only visual mode
-        {
-          '<leader>cxe',
-          "<cmd>lua require('refactoring').refactor('Extract Function')<cr>",
-          desc = 'Extract Function',
-        },
-        {
-          '<leader>cxf',
-          "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>",
-          desc = 'Extract Function to File',
-        },
-        -- Extract variable supports only visual mode
-        {
-          '<leader>cxv',
-          "<cmd>lua require('refactoring').refactor('Extract Variable')<cr>",
-          desc = 'Extract Variable',
-        },
-      },
-      -- Inline func supports only normal
-      {
-        '<leader>cxif',
-        "<cmd>lua require('refactoring').refactor('Inline Function')<cr>",
-        desc = 'Inline Function',
-      },
-      -- Extract block supports only normal mode
-      {
-        '<leader>cxb',
-        "<cmd>lua require('refactoring').refactor('Extract Block')<cr>",
-        desc = 'Extract Block',
-      },
-      {
-        '<leader>cxbf',
-        "<cmd>lua require('refactoring').refactor('Extract Block To File')<cr>",
-        desc = 'Extract Block to File',
-      },
-      {
-        mode = { 'n', 'x' },
-        -- Inline var supports both normal and visual mode
-        {
-          '<leader>cxiv',
-          "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>",
-          desc = 'Inline Variable',
-        },
-      },
 
       -- ── Code: LSPSaga ───────────────────────────────────────────────────
       -- See: lua/plugins/lsp.lua
@@ -194,38 +138,6 @@ return {
         '<leader>cx',
         '<cmd>Telescope import<cr>',
         desc = 'Telescope import',
-      },
-
-      -- ── DAP ─────────────────────────────────────────────────────────────
-      { '<leader>d', group = '[d] DAP' },
-      {
-        {
-          '<leader>db',
-          '<cmd>DapToggleBreakpoint',
-          desc = 'DAP: Toggle Breakpoint',
-        },
-        { '<leader>dc', '<cmd>DapContinue', desc = 'DAP: Continue' },
-        {
-          '<leader>do',
-          '<cmd>lua vim.diagnostic.open_float()<CR>',
-          desc = 'Diagnostic: Open float',
-        },
-        {
-          '<leader>dq',
-          '<cmd>lua vim.diagnostic.setloclist()<CR>',
-          desc = 'Diagnostic: Set loc list',
-        },
-        {
-          '<leader>dr',
-          "<cmd>lua require('dapui').open({reset = true})<CR>",
-          desc = 'DAP: Reset',
-        },
-        {
-          '<leader>ds',
-          '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>',
-          desc = 'LSP: Document Symbols',
-        },
-        { '<leader>dt', '<cmd>DapUiToggle', desc = 'DAP: Toggle UI' },
       },
 
       -- ── Harpoon ─────────────────────────────────────────────────────────
@@ -381,7 +293,6 @@ return {
           '<cmd>TransparentToggle<CR>',
           desc = 'Toggle Transparency',
         },
-        { '<leader>tw', '<cmd>Twilight<cr>', desc = 'Toggle Twilight' },
       },
 
       -- ── Workspace ───────────────────────────────────────────────────────
@@ -513,7 +424,7 @@ return {
 
       -- ── Text manipulation in visual mode ────────────────────────────────
       {
-        mode = 'v',
+        mode = { 'v', 'n' },
         { '>', '>gv', desc = 'Indent Right' },
         { '<', '<gv', desc = 'Indent Left' },
         { 'J', "<cmd>m '>+1<CR>gv=gv", desc = 'Move Block Down' },

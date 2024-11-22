@@ -38,15 +38,13 @@ return {
           'diagnostics',
         },
         lualine_c = {
-          'buffers',
-          -- 'filename',
+          'filename',
         },
         lualine_x = {
-          -- 'fileformat',
           'filetype',
         },
         lualine_y = {
-          -- 'progress'
+          'location',
         },
         lualine_z = {
           {
