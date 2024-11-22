@@ -3,18 +3,15 @@
 #
 # shellcheck source=shared.sh
 
-echo "This file ($0) has been deprecated in favor of asdf. Please use asdf instead."
-exit 0
-
 eval "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-msg "Starting to install npm packages"
+msgr msg "Starting to install npm packages"
 
 if ! command -v npm &> /dev/null; then
-  msg_err "npm could not be found."
+  msgr err "npm could not be found."
   exit 0
 fi
 
@@ -38,9 +35,9 @@ install_packages()
     if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
     if npm ls -g -p "$pkg" &> /dev/null; then
-      msg_run_done "$pkg" "already installed"
+      msgr run_done "$pkg" "already installed"
     else
-      msg_run "Installing npm package:" "$pkg"
+      msgr run "Installing npm package:" "$pkg"
       npm install -g --no-fund --no-progress --no-timing "$pkg"
     fi
     echo ""
@@ -50,7 +47,7 @@ install_packages()
 # Function to upgrade all global npm packages
 upgrade_global_packages()
 {
-  msg_run "Upgrading all global packages"
+  msgr run "Upgrading all global packages"
   npm -g --no-progress --no-timing --no-fund outdated
   npm -g --no-timing --no-fund upgrade
 }
@@ -58,7 +55,7 @@ upgrade_global_packages()
 # Function to clean npm cache
 clean_npm_cache()
 {
-  msg_run "Cleaning up npm cache"
+  msgr run "Cleaning up npm cache"
   npm cache verify
   npm cache clean --force
   npm cache verify
@@ -69,7 +66,7 @@ main()
   install_packages
   upgrade_global_packages
   clean_npm_cache
-  msg_yay "npm package installations complete"
+  msgr yay "npm package installations complete"
 }
 
 main "$@"

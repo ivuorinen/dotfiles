@@ -17,6 +17,10 @@ git submodule add --name cheat-tldr \
   -f https://github.com/ivuorinen/cheatsheet-tldr.git config/cheat/cheatsheets/tldr
 git submodule add --name asdf \
   -f https://github.com/asdf-vm/asdf.git local/bin/asdf
+git submodule add --name antidote \
+  --depth 1 \
+  -f https://github.com/mattmc3/antidote.git tools/antidote \
+
 
 # tmux plugin manager and plugins
 git submodule add --name tmux/tmux-continuum \
@@ -42,6 +46,9 @@ git submodule add --name tmux/tmux-dark-notify \
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
   git config "submodule.${MODULE}.ignore" all
 done
+
+# Mark certain repositories shallow
+git config -f .gitmodules submodule.antidote.shallow true
 
 # remove old submodules
 [ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm

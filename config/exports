@@ -22,14 +22,6 @@ export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_
 # Add zsh completions to FPATH, compinit will be called later
 FPATH="$ZSH_COMPLETIONS:$FPATH"
 
-# Load asdf
-export ASDF_DIR="$XDG_BIN_HOME/asdf"
-if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
-  [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
-  source "$ASDF_DIR/asdf.sh"
-fi
-
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
   # $1 - message (string)
@@ -303,6 +295,41 @@ hash shopt 2> /dev/null && shopt -s checkwinsize
 
 export SHORT_HOST=$(hostname -s)
 
+# asdf
+# https://github.com/asdf-vm/asdf
+msg "Setting up asdf configuration"
+export ASDF_DIR="${XDG_BIN_HOME}/asdf"
+if [[ -d $ASDF_DIR ]]; then
+  [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
+  [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
+
+  export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+  export ASDF_DATA_DIR="${ASDF_DIR}"
+  export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
+  export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
+  export ASDF_FORCE_PREPEND=yes
+  ## Default package files
+  export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
+  export ASDF_GEM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/gem-packages"
+  export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
+  export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
+  export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/python-packages"
+  ## Plugin configuration
+  export ASDF_DIRENV_IGNORE_MISSING_PLUGINS=1
+  export ASDF_GOLANG_MOD_VERSION_ENABLED=true
+  export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
+  ## Add asdf to path
+  export PATH="${ASDF_DIR}/bin:${PATH}"
+
+  source "$ASDF_DIR/asdf.sh"
+fi
+
+# Antidote configuration
+# https://getantidote.github.io/
+msg "Setting up Antidote configuration"
+export ANTIDOTE_DIR="$DOTFILES/tools/antidote"
+export ANTIDOTE_PLUGINS="$XDG_CONFIG_HOME/zsh/antidote_plugins"
+
 # Antigen configuration
 # https://github.com/zsh-users/antigen/wiki/Configuration
 msg "Setting up Antigen configuration"
@@ -319,28 +346,6 @@ export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
 export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
-
-# asdf
-# https://github.com/asdf-vm/asdf
-msg "Setting up asdf configuration"
-export ASDF_DIR="${XDG_BIN_HOME}/asdf"
-export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
-export ASDF_DATA_DIR="${ASDF_DIR}"
-export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
-export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
-export ASDF_FORCE_PREPEND=yes
-## Default package files
-export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
-export ASDF_GEM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/gem-packages"
-export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
-export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
-export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/python-packages"
-## Plugin configuration
-export ASDF_DIRENV_IGNORE_MISSING_PLUGINS=1
-export ASDF_GOLANG_MOD_VERSION_ENABLED=true
-export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
-## Add asdf to path
-export PATH="${ASDF_DIR}/bin:${PATH}"
 
 # aws
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
@@ -436,6 +441,8 @@ export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 ## for MichaelAquilina/zsh-autoswitch-virtualenv
 export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+x-have pyenv && eval "$(pyenv init -)"
 
 # Rust / cargo
 msg "Setting up Rust/Cargo configuration"

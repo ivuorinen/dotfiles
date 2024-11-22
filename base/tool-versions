@@ -1,7 +1,5 @@
 asdf-plugin-manager 1.4.0
-nodejs 23.1.0
 golang 1.23.3
-python 3.12.7
 ruby 3.3.4
 rust 1.82.0
 direnv 2.35.0
@@ -14,7 +12,6 @@ editorconfig-checker 2.8.0
 github-cli 2.61.0
 hadolint 2.12.0
 kubectl 1.31.2
-pipx 1.7.1
 pre-commit 4.0.1
 ripgrep 14.1.1
 shellcheck 0.10.0
@@ -26,3 +23,5 @@ yq 4.44.3
 bats 1.11.0
 gitleaks 8.18.4
 delta 0.18.1
+eza 0.20.8
+sops 3.9.1

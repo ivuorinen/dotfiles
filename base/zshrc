@@ -13,16 +13,33 @@ export SHARED_SCRIPTS_SOURCED=0
 source "$DOTFILES/config/shared.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
-export ZDOTDIR="$DOTFILES/zsh"
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
-
-# If not running interactively, don't do anything
-case $- in
-  *i*) ;;
-    *) return;;
-esac
-
 eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
+
+load_antidote()
+{
+  [[ ! -d "$ANTIDOTE_DIR" ]] && {
+    git submodule add \
+      --name antidote \
+      --depth=1 \
+      -f https://github.com/mattmc3/antidote.git "${ANTIDOTE_DIR}"
+    git config -f .gitmodules submodule.antidote.shallow true
+  }
+  zstyle ':antidote:bundle' use-friendly-names 'yes'
+
+  zsh_plugins=${ANTIDOTE_PLUGINS}
+  [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
+  # Lazy-load antidote from its functions directory.
+  FPATH="$ANTIDOTE_DIR/functions:$FPATH"
+  autoload -Uz antidote
+  # Generate a new static file whenever .zsh_plugins.txt is updated.
+  if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
+    antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
+  fi
+
+  # Source your static plugins file.
+  source ${zsh_plugins}.zsh
+}
 
 # Function to load antigen if available
 load_antigen()
@@ -55,9 +72,14 @@ load_antigen()
     zstyle :omz:plugins:ssh-agent lazy yes
     zstyle :omz:plugins:ssh-agent quiet yes
 
+    # nvm
+    zstyle ':omz:plugins:nvm' autoload yes
+
     # z, the zsh version
     export ZSHZ_DATA="$XDG_STATE_HOME/z"
     antigen bundle z
+
+    antigen bundle nvm
 
     # these should be always available
     antigen bundle jreese/zsh-titles
@@ -99,15 +121,11 @@ setup_tmux_window_name_plugin()
   fi
 }
 
-load_antigen
+# load_antigen
+load_antidote
 source_fzf_config
 setup_tmux_window_name_plugin
-if x-have antidot; then
-  eval "$(antidot init)"
-fi
-
-# Lando
-export PATH="$HOME/.lando/bin${PATH+:$PATH}"; #landopath
+x-have antidot && eval "$(antidot init)"
 
 autoload -Uz compinit bashcompinit
 compinit -d $ZSH_COMPDUMP

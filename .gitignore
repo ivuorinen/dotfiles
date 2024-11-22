@@ -28,4 +28,5 @@ config/gnupg/s
 config/gnupg/private-keys-v1.d
 config/nvim/spell/*
 !config/nvim/spell/.gitkeep
+antidote_plugins.zsh
 

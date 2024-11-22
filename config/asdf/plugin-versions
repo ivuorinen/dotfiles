@@ -7,16 +7,14 @@ delta                 https://github.com/andweeb/asdf-delta.git                 
 direnv                https://github.com/asdf-community/asdf-direnv.git           6ff3dbe
 dotenv-linter         https://github.com/wesleimp/asdf-dotenv-linter.git          1369f53
 editorconfig-checker  https://github.com/gabitchov/asdf-editorconfig-checker.git  585c1d5
+eza                   https://github.com/lwiechec/asdf-eza.git                    11f578d
 fd                    https://gitlab.com/wt0f/asdf-fd.git                         17d56e0
 github-cli            https://github.com/bartlomiejdanek/asdf-github-cli.git      e0605b7
 gitleaks              https://github.com/jmcvetta/asdf-gitleaks.git               0cc0d7e
 golang                https://github.com/asdf-community/asdf-golang.git           e2527a3
 hadolint              https://github.com/devlincashman/asdf-hadolint.git          335e230
 kubectl               https://github.com/asdf-community/asdf-kubectl.git          2fb3b57
-nodejs                https://github.com/asdf-vm/asdf-nodejs.git                  c36e6f0
-pipx                  https://github.com/yozachar/asdf-pipx.git                   31db618
 pre-commit            https://github.com/jonathanmorley/asdf-pre-commit.git       26bfc42
-python                https://github.com/asdf-community/asdf-python               a3a0185
 ripgrep               https://gitlab.com/wt0f/asdf-ripgrep.git                    e836665
 ruby                  https://github.com/asdf-vm/asdf-ruby.git                    194fe45
 rust                  https://github.com/code-lever/asdf-rust.git                 95acf4f

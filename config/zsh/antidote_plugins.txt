@@ -1,0 +1,31 @@
+# This file is for Antidote plugins
+# https://getantidote.github.io/usage
+# vim: ft=ini
+
+# set up Zsh completions with plugins
+mattmc3/ez-compinit
+zsh-users/zsh-completions kind:fpath path:src
+
+# frameworks like oh-my-zsh are supported
+getantidote/use-omz        # handle OMZ dependencies
+ohmyzsh/ohmyzsh path:lib   # load OMZ's library
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages  # load OMZ plugins
+
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages
+ohmyzsh/ohmyzsh path:plugins/extract
+ohmyzsh/ohmyzsh path:plugins/z
+ohmyzsh/ohmyzsh path:plugins/eza
+
+# Add some programmer plugins
+ohmyzsh/ohmyzsh path:plugins/git
+ohmyzsh/ohmyzsh path:plugins/golang
+ohmyzsh/ohmyzsh path:plugins/python
+ohmyzsh/ohmyzsh path:plugins/nvm
+
+# Add core plugins that make Zsh a bit more like Fish
+zsh-users/zsh-completions path:src kind:fpath
+zdharma-continuum/fast-syntax-highlighting
+
+# Add some plugins that are not in OMZ
+jreese/zsh-titles
+yuki-ycino/tms
