@@ -197,6 +197,11 @@ return {
         desc = 'Search Diagnostics',
       },
       {
+        '<leader>sf',
+        '<cmd>Telescope find_files<cr>',
+        desc = 'Find files',
+      },
+      {
         '<leader>sg',
         '<cmd>Telescope live_grep<cr>',
         desc = 'Search by Grep',
