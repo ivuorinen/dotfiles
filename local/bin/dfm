@@ -122,7 +122,6 @@ section_install()
 
   MENU=(
     "all:Installs everything in the correct order"
-    "antigen:Updates the antigen.zsh file"
     "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
@@ -148,33 +147,21 @@ section_install()
       msgr msg "Starting to install all and reloading configurations..."
       $0 install macos
       $0 install fonts
-      $0 install antigen
       $0 brew install
       $0 install ohmyposh
       $0 install asdf
-      # $0 install ohmybash
-      # $0 install pip
-      # $0 install cargo
       $0 install composer
-      # $0 install dotenv
       $0 install fzf
-      # $0 install gh
-      # $0 install go
+      $0 install go
       $0 install cheat-databases
       $0 install imagick
-      # $0 install neofetch
-      # $0 install nvm
-      # $0 install npm
-      $0 install ntfy
+      $0 install nvm
+      $0 install npm
+      # $0 install ntfy
       $0 install z
       msgr msg "Reloading configurations again..."
       source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
-      ;;
-    antigen)
-      msg "Installing antigen..."
-      curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
-        && msg_yay "New antigen installed!"
       ;;
     asdf)
       msg "Installing asdf..."
@@ -197,13 +184,6 @@ section_install()
       msg "Installing composer..."
       bash "$DOTFILES/scripts/install-composer.sh" \
         && msg_yay "composer installed!"
-      ;;
-    dotenv)
-      msg "Installing dotenv-linter..."
-      curl -sSfL \
-        https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
-        | sh -s -- -b "$XDG_BIN_HOME" \
-        && msg_yay "dotenv-linter installed!"
       ;;
     fonts)
       msg "Installing fonts..."
@@ -231,13 +211,6 @@ section_install()
         && chmod +x "$XDG_BIN_HOME/magick" \
         && msg_yay "imagick installed!"
       ;;
-    starship)
-      msg "Installing starship.rs..."
-      curl -sS https://starship.rs/install.sh | sh -s -- \
-        --bin-dir ~/.local/bin \
-        --yes \
-        && msg_yay "starship installed!"
-      ;;
     macos)
       msg "Setting up macOS defaults..."
       bash "$DOTFILES/scripts/set-macos-defaults.sh" \
@@ -250,9 +223,11 @@ section_install()
       ;;
     nvm)
       msg "Installing nvm..."
-      curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash
-      git checkout "$DOTFILES/base/zshrc"
-      git checkout "$DOTFILES/base/bashrc"
+      NVM_VERSION=$(x-gh-get-latest-version nvm-sh/nvm)
+      msg "Latest nvm version: $NVM_VERSION"
+      NVM_INSTALL="https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh"
+      NVM_CURL="curl -o- \"$NVM_INSTALL\" | bash"
+      PROFILE=/dev/null bash -c "$NVM_CURL"
       $0 install nvm-latest
       msg_yay "nvm installed!"
       ;;
@@ -275,11 +250,6 @@ section_install()
       msg "ntfy install started..."
       bash "$DOTFILES/scripts/install-ntfy.sh" \
         && msg_yay "ntfy installed!"
-      ;;
-    ohmybash)
-      msg "oh-my-bash install started..."
-      bash "$DOTFILES/scripts/install-ohmybash.sh" \
-        && msg_yay "oh-my-bash installed!"
       ;;
     ohmyposh)
       msg "oh-my-posh install started..."

@@ -405,6 +405,7 @@ x-dc "$DOCKER_CONFIG"
 export DOCKER_SCAN_SUGGEST=false
 
 # fzf
+export FZF_BASE="${XDG_CONFIG_HOME}/fzf"
 export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
 
 # GnuPG

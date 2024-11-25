@@ -52,46 +52,6 @@ load_antidote()
   source ${zsh_plugins}.zsh
 }
 
-# Function to load antigen if available
-load_antigen()
-{
-  local antigen_zsh_path="$XDG_BIN_HOME/antigen.zsh"
-  # shellcheck source=../../.local/bin/antigen.zsh
-  if [[ -f "$antigen_zsh_path" ]]; then
-    source "$antigen_zsh_path"
-
-    antigen use oh-my-zsh
-
-
-    if [[ "$OSTYPE" == darwin* ]]; then
-      zstyle :omz:plugins:ssh-agent keychain yes
-    fi
-    zstyle :omz:plugins:ssh-agent lazy yes
-    zstyle :omz:plugins:ssh-agent quiet yes
-
-    # nvm
-    zstyle ':omz:plugins:nvm' autoload yes
-
-    # z, the zsh version
-    export ZSHZ_DATA="$XDG_STATE_HOME/z"
-    antigen bundle z
-
-    antigen bundle nvm
-
-    # these should be always available
-    antigen bundle jreese/zsh-titles
-    antigen bundle brew
-    antigen bundle colored-man-pages
-    antigen bundle zsh-users/zsh-completions
-    x-have eza && antigen bundle eza
-    x-have tms && antigen bundle yuki-ycino/tms
-
-    # this needs to be the last bundle
-    antigen bundle zsh-users/zsh-syntax-highlighting
-    antigen apply
-  fi
-}
-
 # Function to source FZF configuration
 source_fzf_config()
 {
@@ -118,7 +78,6 @@ setup_tmux_window_name_plugin()
   fi
 }
 
-# load_antigen
 load_antidote
 source_fzf_config
 setup_tmux_window_name_plugin
