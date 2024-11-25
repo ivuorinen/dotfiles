@@ -474,6 +474,12 @@ export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
+## These settings are for zsh-tmux
+export ZSH_TMUX_AUTOSTART=false
+export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
+export ZSH_TMUX_UNICODE=true
+export ZSH_TMUX_AUTOQUIT=false
+export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
 # tms, https://github.com/jrmoulton/tmux-sessionizer
 export TMS_CONFIG_FILE="${XDG_CONFIG_HOME}/tms/config.toml"
@@ -485,6 +491,7 @@ x-dc "$WAKATIME_HOME"
 
 # Misc
 msg "Setting up miscellaneous configuration"
+export ZSHZ_DATA="$XDG_STATE_HOME/z"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 

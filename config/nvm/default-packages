@@ -1,0 +1,5 @@
+# $NVM_DIR/default-packages
+
+yarn
+neovim
+corepack

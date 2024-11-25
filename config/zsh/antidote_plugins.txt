@@ -13,8 +13,9 @@ ohmyzsh/ohmyzsh path:plugins/colored-man-pages  # load OMZ plugins
 
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/extract
-ohmyzsh/ohmyzsh path:plugins/z
 ohmyzsh/ohmyzsh path:plugins/eza
+ohmyzsh/ohmyzsh path:plugins/tmux
+ohmyzsh/ohmyzsh path:plugins/z
 
 # Add some programmer plugins
 ohmyzsh/ohmyzsh path:plugins/git
@@ -23,7 +24,6 @@ ohmyzsh/ohmyzsh path:plugins/python
 ohmyzsh/ohmyzsh path:plugins/nvm
 
 # Add core plugins that make Zsh a bit more like Fish
-zsh-users/zsh-completions path:src kind:fpath
 zdharma-continuum/fast-syntax-highlighting
 
 # Add some plugins that are not in OMZ
