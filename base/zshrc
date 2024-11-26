@@ -14,8 +14,40 @@ source "$DOTFILES/config/shared.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
-eval "$(oh-my-posh init zsh --config "$DOTFILES/config/omp/own.toml")"
 
+# Setup prompt
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' unstagedstr '%F{red}*'   # display this when there are unstaged changes
+zstyle ':vcs_info:*' stagedstr '%F{yellow}+'  # display this when there are staged changes
+zstyle ':vcs_info:*' actionformats '%F{5}%F{2}%b%F{3}|%F{1}%a%c%u%F{5}%f '
+zstyle ':vcs_info:*' formats '%F{5}%F{2}%b%c%u%F{5}%f '
+zstyle ':vcs_info:*' enable git cvs svn
+
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}"
+ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_DIRTY=""
+ZSH_THEME_GIT_PROMPT_CLEAN=""
+
+ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[green]%}✚"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}✹"
+ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✖"
+ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[magenta]%}➜"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[yellow]%}═"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[cyan]%}✭"
+
+theme_precmd () {
+  vcs_info
+}
+
+setopt PROMPT_SUBST
+NEWLINE=$'\n'
+PROMPT='%F{green}%m%f %F{blue}%~%f %{$reset_color%}${vcs_info_msg_0_}$(git_prompt_status)%{$reset_color%}${NEWLINE}➜ '
+
+autoload -U add-zsh-hook
+add-zsh-hook precmd theme_precmd
+
+# Setup antidote
 load_antidote()
 {
   [[ ! -d "$ANTIDOTE_DIR" ]] && {
@@ -28,6 +60,7 @@ load_antidote()
 
   # Plugin configurations
   zstyle ':antidote:bundle' use-friendly-names 'yes'
+  zstyle ':omz:update' mode reminder
   zstyle ':omz:plugins:nvm' autoload yes
 
   # Disable ls colors to avoid issues with eza
@@ -66,7 +99,7 @@ source_fzf_config()
 setup_tmux_window_name_plugin()
 {
   if [[ -n "$TMUX" ]]; then
-    local tmux_window_name_plugin="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
+    local tmux_window_name_plugin="$TMUX_PLUGINS/tmux-window-name/scripts/rename_session_windows.py"
     if [[ -f "$tmux_window_name_plugin" ]]; then
       tmux_window_name()
       {

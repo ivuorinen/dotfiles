@@ -1,7 +1,7 @@
 "$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
 console_title_template = '{{.UserName}}@{{.HostName}} {{.Shell}} in {{.PWD}}'
 version = 3
-auto_upgrade = true
+auto_upgrade = false
 final_space = true
 
 [transient_prompt]
