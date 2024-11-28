@@ -4,6 +4,7 @@
 
 # export VERBOSE=1
 # export DEBUG=1
+autoload -U promptinit; promptinit
 
 export DOTFILES="$HOME/.dotfiles"
 LOCAL_SHARE="$HOME/.local/share"
@@ -15,75 +16,8 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
-# Setup prompt
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' unstagedstr '%F{red}*'   # display this when there are unstaged changes
-zstyle ':vcs_info:*' stagedstr '%F{yellow}+'  # display this when there are staged changes
-zstyle ':vcs_info:*' actionformats '%F{5}%F{2}%b%F{3}|%F{1}%a%c%u%F{5}%f '
-zstyle ':vcs_info:*' formats '%F{5}%F{2}%b%c%u%F{5}%f '
-zstyle ':vcs_info:*' enable git cvs svn
-
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}"
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DIRTY=""
-ZSH_THEME_GIT_PROMPT_CLEAN=""
-
-ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[green]%}✚"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}✹"
-ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✖"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[magenta]%}➜"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[yellow]%}═"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[cyan]%}✭"
-
-theme_precmd () {
-  vcs_info
-}
-
-setopt PROMPT_SUBST
-NEWLINE=$'\n'
-PROMPT='%F{green}%m%f %F{blue}%~%f %{$reset_color%}${vcs_info_msg_0_}$(git_prompt_status)%{$reset_color%}${NEWLINE}➜ '
-
-autoload -U add-zsh-hook
-add-zsh-hook precmd theme_precmd
-
-# Setup antidote
-load_antidote()
-{
-  [[ ! -d "$ANTIDOTE_DIR" ]] && {
-    git submodule add \
-      --name antidote \
-      --depth=1 \
-      -f https://github.com/mattmc3/antidote.git "${ANTIDOTE_DIR}"
-    git config -f .gitmodules submodule.antidote.shallow true
-  }
-
-  # Plugin configurations
-  zstyle ':antidote:bundle' use-friendly-names 'yes'
-  zstyle ':omz:update' mode reminder
-  zstyle ':omz:plugins:nvm' autoload yes
-
-  # Disable ls colors to avoid issues with eza
-  export DISABLE_LS_COLORS=true
-  zstyle ':omz:plugins:eza' 'dirs-first' yes
-  zstyle ':omz:plugins:eza' 'git-status' yes
-  zstyle ':omz:plugins:eza' 'icons' yes
-  zstyle ':omz:plugins:eza' 'ls' yes
-  zstyle ':omz:plugins:eza' 'prompt' yes
-
-  zsh_plugins=${ANTIDOTE_PLUGINS}
-  [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
-  # Lazy-load antidote from its functions directory.
-  FPATH="$ANTIDOTE_DIR/functions:$FPATH"
-  autoload -Uz antidote
-  # Generate a new static file whenever .zsh_plugins.txt is updated.
-  if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
-    antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
-  fi
-
-  # Source your static plugins file.
-  source ${zsh_plugins}.zsh
-}
+source "$DOTFILES/config/zsh/antidote.zsh"
+# source "$DOTFILES/config/zsh/prompt.zsh"
 
 # Function to source FZF configuration
 source_fzf_config()
@@ -111,7 +45,6 @@ setup_tmux_window_name_plugin()
   fi
 }
 
-load_antidote
 source_fzf_config
 setup_tmux_window_name_plugin
 x-have antidot && eval "$(antidot init)"

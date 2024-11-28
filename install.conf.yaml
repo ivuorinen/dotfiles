@@ -19,6 +19,7 @@
     ~/.local/share/gnupg:
       mode: 0700
     ~/.local/state:
+    ~/.local/state/zsh:
     ~/.ssh:
       mode: 0700
     ~/.ssh/local.d:

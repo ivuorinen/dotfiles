@@ -10,6 +10,10 @@ zsh-users/zsh-completions kind:fpath path:src
 getantidote/use-omz        # handle OMZ dependencies
 ohmyzsh/ohmyzsh path:lib   # load OMZ's library
 
+# Use pure prompt
+mafredri/zsh-async
+sindresorhus/pure
+
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/brew
 ohmyzsh/ohmyzsh path:plugins/extract
@@ -20,7 +24,6 @@ ohmyzsh/ohmyzsh path:plugins/golang
 ohmyzsh/ohmyzsh path:plugins/gpg-agent
 ohmyzsh/ohmyzsh path:plugins/nvm
 ohmyzsh/ohmyzsh path:plugins/python
-# ohmyzsh/ohmyzsh path:plugins/ssh-agent
 ohmyzsh/ohmyzsh path:plugins/tmux
 ohmyzsh/ohmyzsh path:plugins/z
 
@@ -35,4 +38,4 @@ jreese/zsh-titles
 yuki-ycino/tms
 
 # This needs to be last bundle
-zsh-users/zsh-syntax-highlighting
+# zsh-users/zsh-syntax-highlighting
