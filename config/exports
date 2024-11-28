@@ -27,7 +27,7 @@ if ! command -v msg &> /dev/null; then
   # $1 - message (string)
   msg()
   {
-    [[ "$VERBOSE" -eq 1 ]] && msgr msg "-> $1"
+    [[ $VERBOSE -eq 1 ]] && msgr msg "-> $1"
     return 0
   }
 fi
@@ -43,7 +43,7 @@ else
   # Optionally write a msg to stderr suggesting users install bkt.
   bkt()
   {
-    while [[ "$1" == --* ]]; do shift; done
+    while [[ $1 == --* ]]; do shift; done
     "$@"
   }
 fi
@@ -182,6 +182,7 @@ nonascii()
 # Usage: strip_nonascii "string"
 strip_nonascii()
 {
+  # shellcheck disable=SC2001
   echo "$1" | LC_ALL=C sed 's/[^[:print:][:space:]]//g'
 }
 
@@ -189,7 +190,7 @@ strip_nonascii()
 # Usage: slugify "string"
 slugify()
 {
-  echo "$1" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z
+  echo "$1" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr '[:upper:]' '[:lower:]'
 }
 
 # https://stackoverflow.com/a/85932
@@ -223,11 +224,11 @@ replacable()
   FILE1="$1"
   FILE2="$2"
 
-  [[ ! -r "$FILE1" ]] && {
+  [[ ! -r $FILE1 ]] && {
     [[ $VERBOSE -eq 1 ]] && msgr err "File 1 ($FILE1) does not exist"
     return 0
   }
-  [[ ! -r "$FILE2" ]] && {
+  [[ ! -r $FILE2 ]] && {
     [[ $VERBOSE -eq 1 ]] && msgr err "File 2 ($FILE2) does not exist, replaceable"
     return 1
   }
@@ -235,16 +236,16 @@ replacable()
   FILE1_HASH=$(get_sha256sum "$FILE1")
   FILE2_HASH=$(get_sha256sum "$FILE2")
 
-  [[ $FILE1_HASH = "" ]] && {
+  [[ $FILE1_HASH == "" ]] && {
     [[ $VERBOSE -eq 1 ]] && msgr err "Could not get hash for file 1 ($FILE1)"
     return 0
   }
-  [[ $FILE2_HASH = "" ]] && {
+  [[ $FILE2_HASH == "" ]] && {
     [[ $VERBOSE -eq 1 ]] && msgr err "Could not get hash for file 2 ($FILE2), replaceable"
     return 1
   }
 
-  [[ "$FILE1_HASH" == "$FILE2_HASH" ]] && {
+  [[ $FILE1_HASH == "$FILE2_HASH" ]] && {
     [[ $VERBOSE -eq 1 ]] && msgr ok "Files match, not replaceable: $FILE1"
     return 0
   }
@@ -293,6 +294,7 @@ export GREP_OPTIONS="--color=auto"
 # update the values of LINES and COLUMNS.
 hash shopt 2> /dev/null && shopt -s checkwinsize
 
+# shellcheck disable=SC2155
 export SHORT_HOST=$(hostname -s)
 
 # asdf
@@ -474,6 +476,7 @@ export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
 # tmux
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
+export TMUX_PLUGINS="$XDG_CONFIG_HOME/tmux/plugins"
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 ## These settings are for zsh-tmux
 export ZSH_TMUX_AUTOSTART=false
@@ -502,6 +505,7 @@ X_EXPORTS_FILES=(
   "$HOME/.config/exports-$(hostname)-secret"
 )
 for exportFile in "${X_EXPORTS_FILES[@]}"; do
+  # shellcheck source=$HOME/.config/exports-secret
   [ -f "$exportFile" ] && source "$exportFile" && msg "Sourced $exportFile"
 done
 unset X_EXPORTS_FILES
