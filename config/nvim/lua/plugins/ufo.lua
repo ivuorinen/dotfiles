@@ -4,7 +4,6 @@ return {
   'kevinhwang91/nvim-ufo',
   version = '*',
   dependencies = {
-    { 'neovim/nvim-lspconfig' },
     { 'kevinhwang91/promise-async' },
     { 'nvim-treesitter/nvim-treesitter' },
     {
@@ -61,19 +60,6 @@ return {
     },
   },
   config = function()
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.foldingRange = {
-      dynamicRegistration = true,
-      lineFoldingOnly = true,
-    }
-    local language_servers = require('lspconfig').util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
-    for _, ls in ipairs(language_servers) do
-      require('lspconfig')[ls].setup {
-        capabilities = capabilities,
-        -- you can add other fields for setting up lsp server in this table
-      }
-    end
-
     require('ufo').setup {
       open_fold_hl_timeout = 150,
       close_fold_kinds_for_ft = { 'imports', 'comment' },

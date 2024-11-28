@@ -68,4 +68,10 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  desc = 'Set filetype for SSH config directory',
+  pattern = '*/?.ssh/{config|shared}.d/*',
+  command = 'set filetype=sshconfig',
+})
+
 -- vim: ts=2 sts=2 sw=2 et

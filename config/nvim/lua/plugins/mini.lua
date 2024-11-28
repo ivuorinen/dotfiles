@@ -16,6 +16,24 @@ return {
   -- Replaced kylechui/nvim-surround
   { 'echasnovski/mini.surround', version = '*', opts = {} },
 
+  -- Move lines and blocks of text
+  { 'echasnovski/mini.move', version = '*', opts = {} },
+
+  -- Jump to next/previous single character
+  {
+    'echasnovski/mini.jump',
+    version = '*',
+    opts = {
+      mappings = {
+        forward = 'f',
+        backward = 'F',
+        forward_till = 't',
+        backward_till = 'T',
+        repeat_jump = ';',
+      },
+    },
+  },
+
   -- Icons
   {
     'echasnovski/mini.icons',
@@ -29,6 +47,9 @@ return {
       },
     },
   },
+
+  -- Highlight cursor word and its matches
+  { 'echasnovski/mini.cursorword', version = '*' },
 
   -- Split and join arguments, lists, and other sequences
   -- Replaced Wansmer/treesj

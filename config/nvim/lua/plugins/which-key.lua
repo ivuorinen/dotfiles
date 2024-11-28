@@ -140,6 +140,12 @@ return {
         desc = 'Telescope import',
       },
 
+      {
+        '<leader>f',
+        '<cmd>Telescope find_files<cr>',
+        desc = 'Find files',
+      },
+
       -- ── Harpoon ─────────────────────────────────────────────────────────
       -- See: lua/plugins/telescope.lua
       { '<leader>h', group = '[h] Harpoon' },
@@ -297,6 +303,11 @@ return {
           '<leader>tt',
           '<cmd>TransparentToggle<CR>',
           desc = 'Toggle Transparency',
+        },
+        {
+          '<leader>tl',
+          '<cmd>exec &bg=="light"? "set bg=dark" : "set bg=light"<CR>',
+          desc = 'Toggle Light/Dark Theme',
         },
       },
 
