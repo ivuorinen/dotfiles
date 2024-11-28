@@ -24,6 +24,10 @@ zstyle ':omz:plugins:nvm' autoload yes
 export PURE_PROMPT_SYMBOL='➜'
 export PURE_GIT_UNTRACKED_DIRTY=0
 zstyle ':prompt:pure:git:stash' show yes
+zstyle ':prompt:pure:execution_time' show no
+zstyle ':prompt:pure:user' color magenta
+zstyle ':prompt:pure:user:root' color red
+zstyle ':prompt:pure:host' color green
 zstyle ':prompt:pure:path' color white
 zstyle ':prompt:pure:prompt:success' color green
 zstyle ':prompt:pure:prompt:error' color red
