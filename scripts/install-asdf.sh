@@ -52,7 +52,6 @@ update_asdf()
   asdf global asdf-plugin-manager "$(asdf latest asdf-plugin-manager)"
   asdf-plugin-manager version
   asdf-plugin-manager add-all
-  asdf-plugin-manager update-all
   asdf-plugin-manager export > "${ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME}"
 
   asdf install
@@ -76,8 +75,6 @@ install_asdf_plugins()
     URL=$(echo "${item}" | awk -F ":" '{print $2}')
 
     asdf plugin add "${CMD}" "https://${URL}"
-    asdf install "${CMD}" latest
-    asdf global "${CMD}" "$(asdf latest "${CMD}")"
   done
 
   msg "Exporting asdf plugin versions"
