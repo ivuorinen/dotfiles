@@ -416,7 +416,7 @@ section_helpers()
     "env:Show environment variables"
     "functions:Show functions"
     "nvim:Show nvim keybindings"
-    "path:Show \$PATH dir by dir"
+    'path:Show $PATH dir by dir'
     "tmux:Show tmux keybindings"
     "wezterm:Show wezterm keybindings"
   )
@@ -564,12 +564,12 @@ section_check()
 
   case "$1" in
     a | arch)
-      [[ "$2" = "" ]] && echo "$X_ARCH" && exit 0
-      [[ $X_ARCH = "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_ARCH" && exit 0
+      [[ $X_ARCH == "$2" ]] && exit 0 || exit 1
       ;;
     h | host | hostname)
-      [[ "$2" = "" ]] && echo "$X_HOSTNAME" && exit 0
-      [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_HOSTNAME" && exit 0
+      [[ $X_HOSTNAME == "$2" ]] && exit 0 || exit 1
       ;;
     *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
