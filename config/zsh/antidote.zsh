@@ -23,6 +23,7 @@ zstyle ':omz:plugins:nvm' autoload yes
 # Pure prompt settings
 export PURE_PROMPT_SYMBOL='➜'
 export PURE_GIT_UNTRACKED_DIRTY=0
+export PURE_CMD_MAX_EXEC_TIME=86400 # 24 hours
 zstyle ':prompt:pure:git:stash' show yes
 zstyle ':prompt:pure:execution_time' show no
 zstyle ':prompt:pure:user' color magenta
