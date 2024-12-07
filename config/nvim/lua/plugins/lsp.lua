@@ -104,7 +104,7 @@ return {
           },
         },
         tailwindcss = {},
-        ts_ls = {
+        tsserver = {
           settings = {
             typescript = {
               inlayHints = {
