@@ -32,7 +32,6 @@ nld('bw', ':lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 
 -- Code
 nld('cg', ':lua require("neogen").generate()<CR>', 'Generate annotations')
-nld('cf', ':lua vim.lsp.buf.format({ async = false })<cr>', 'Format')
 
 -- LSPSaga
 nld('ca', ':Lspsaga code_action<cr>', 'Code Action')

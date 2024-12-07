@@ -22,7 +22,6 @@ return {
       -- Add languages to be installed here that you want installed for treesitter
       ensure_installed = {
         'bash',
-        'c',
         'css',
         'diff',
         'go',
@@ -38,7 +37,6 @@ return {
         'python',
         'query',
         'regex',
-        'rust',
         'sql',
         'terraform',
         'toml',
@@ -81,10 +79,10 @@ return {
       incremental_selection = {
         enable = true,
         keymaps = {
-          init_selection = '<a-space>',
-          node_incremental = '<a-space>',
+          init_selection = '<a-s>',
+          node_incremental = '<a-s>',
           scope_incremental = '<c-s>',
-          node_decremental = '<c-backspace>',
+          node_decremental = '<a-backspace>',
         },
       },
       textobjects = {
