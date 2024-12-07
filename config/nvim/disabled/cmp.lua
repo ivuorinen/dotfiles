@@ -104,9 +104,9 @@ return {
         end
         local line, col = table.unpack(vim.api.nvim_win_get_cursor(0))
         return col ~= 0
-          and vim.api
-              .nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]
-              :match '^%s*$'
+            and vim.api
+            .nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]
+            :match '^%s*$'
             == nil
       end
 
@@ -114,7 +114,7 @@ return {
         formatting = {
           format = lspkind.cmp_format {
             mode = 'symbol',
-            max_width = function() return math.floor(0.45 * vim.o.columns) end,
+            max_width = function() return math.floor(0.55 * vim.o.columns) end,
             show_labelDetails = true,
             symbol_map = {
               Copilot = '',
@@ -128,7 +128,7 @@ return {
           documentation = cmp.config.window.bordered(),
         },
         view = {
-          width = function(_, _) return math.min(80, vim.o.columns) end,
+          width = function(_, _) return math.min(90, vim.o.columns) end,
           -- entries = {
           --   name = 'custom',
           --   selection_order = 'near_cursor',
@@ -170,18 +170,18 @@ return {
         sources = {
           -- function arg popups while typing
           { name = 'nvim_lsp_signature_help', group_index = 2 },
+          { name = 'nvim_lsp',                group_index = 2 },
 
           -- Copilot Source
-          { name = 'copilot', group_index = 2 },
+          { name = 'copilot',                 group_index = 2 },
           -- Other Sources
-          { name = 'dictionary', keyword_length = 2, group_index = 2 },
-          { name = 'npm', keyword_length = 4, group_index = 2 },
-          { name = 'nvim_lsp', group_index = 2 },
-          { name = 'luasnip', group_index = 2 },
-          { name = 'dotenv', group_index = 2 },
-          { name = 'path', group_index = 2 },
-          { name = 'emoji', group_index = 2 },
-          { name = 'nerdfont', group_index = 2 },
+          { name = 'dictionary',              keyword_length = 2, group_index = 2 },
+          { name = 'npm',                     keyword_length = 4, group_index = 2 },
+          { name = 'luasnip',                 group_index = 2 },
+          { name = 'dotenv',                  group_index = 2 },
+          { name = 'path',                    group_index = 2 },
+          { name = 'emoji',                   group_index = 2 },
+          { name = 'nerdfont',                group_index = 2 },
         },
         sorting = {
           priority_weight = 2,
@@ -190,7 +190,7 @@ return {
 
             -- Below is the default comparator list and order for nvim-cmp
             cmp.config.compare.offset,
-            cmp.config.compare.scopes, --this is commented in nvim-cmp too
+            -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
             cmp.config.compare.exact,
             cmp.config.compare.score,
             cmp.config.compare.recently_used,

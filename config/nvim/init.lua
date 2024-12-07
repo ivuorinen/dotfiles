@@ -5,7 +5,7 @@
 -- ── Install lazylazy ────────────────────────────────────────────────
 -- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.loop.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system {
     'git',
@@ -57,5 +57,7 @@ require('lazy').setup(
     },
   }
 )
+
+require 'keymaps'
 
 -- vim: ts=2 sts=2 sw=2 et

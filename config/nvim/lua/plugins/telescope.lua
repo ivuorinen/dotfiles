@@ -7,7 +7,6 @@ return {
   dependencies = {
     { 'nvim-lua/plenary.nvim' },
     { 'nvim-telescope/telescope-symbols.nvim' },
-    { 'folke/which-key.nvim' },
 
     -- A Telescope picker to quickly access configurations
     -- of plugins managed by lazy.nvim.
