@@ -4,7 +4,6 @@
 -- See `:help vim.opt`
 -- For more options, you can see `:help option-list`
 
--- Enables the experimental nvim 0.5 features
 vim.loader.enable()
 
 -- Map leader and local leader
@@ -103,11 +102,6 @@ vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
--- anuvyklack/windows.nvim settings
-vim.o.winwidth = 15
-vim.o.winminwidth = 10
-vim.o.equalalways = false
-
 -- folke/noice.nvim settings
 vim.g.noice_ignored_filetypes = {
   'fugitiveblame',
@@ -115,20 +109,5 @@ vim.g.noice_ignored_filetypes = {
   'gitcommit',
   'noice',
 }
-
--- ── Deal with word wrap ───────────────────────────────────────────────────────
-local m = vim.api.nvim_set_keymap
-m(
-  'n',
-  'k',
-  "v:count == 0 ? 'gk' : 'k'",
-  { desc = 'Move up', noremap = true, expr = true }
-)
-m(
-  'n',
-  'j',
-  "v:count == 0 ? 'gj' : 'j'",
-  { desc = 'Move down', noremap = true, expr = true }
-)
 
 -- vim: ts=2 sts=2 sw=2 et

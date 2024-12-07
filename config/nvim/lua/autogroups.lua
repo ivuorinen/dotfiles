@@ -52,7 +52,7 @@ autocmd('FileType', {
 })
 
 -- ── wrap and check for spell in text filetypes ──────────────────────
-vim.api.nvim_create_autocmd('FileType', {
+autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
   pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
   callback = function()
@@ -62,16 +62,29 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- ── Fix conceallevel for json files ─────────────────────────────────
-vim.api.nvim_create_autocmd({ 'FileType' }, {
+autocmd({ 'FileType' }, {
   group = augroup('json_conceal', { clear = true }),
   pattern = { 'json', 'jsonc', 'json5' },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+-- ── Set filetype for SSH config directory ───────────────────────────
+autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
   pattern = '*/?.ssh/{config|shared}.d/*',
   command = 'set filetype=sshconfig',
+})
+
+autocmd('FileType', {
+  group = augroup('set_filetype', { clear = true }),
+  pattern = { 'Dockerfile', 'Dockerfile.*' },
+  callback = function() vim.bo.filetype = 'dockerfile' end,
+})
+
+autocmd('BufWritePre', {
+  group = augroup('Format', { clear = true }),
+  pattern = '*', -- All files
+  callback = function() vim.lsp.buf.format({ async = false }) end,
 })
 
 -- vim: ts=2 sts=2 sw=2 et

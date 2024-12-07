@@ -7,6 +7,14 @@ return {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader>cf',
+        '<cmd>lua require("conform").format({ async = true, lsp_fallback = true })<cr>',
+        mode = {},
+        desc = 'Format buffer with Conform',
+      },
+    },
     opts = {
       -- Enable or disable logging
       notify_on_error = false,
