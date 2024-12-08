@@ -19,8 +19,12 @@ main()
 
   printf "\n\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$DEST"
 
-  # Remove lines with "Last set from" from the file
-  sed -e '/^	Last set from/d' "$DEST" > "${DEST}.tmp" && mv "${DEST}.tmp" "$DEST"
+  # Remove unnecessary information from the output and the last line
+  sed -E \
+    -e 's/<Lua [^:]+: ([^:>]+):[0-9]+>/\1/' \
+    -e '/^	Last set from/d' "$DEST" \
+    > "${DEST}.tmp" \
+    && mv "${DEST}.tmp" "$DEST"
 
   msg "Neovim keybindings documentation generated at $DEST"
 }

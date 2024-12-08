@@ -1,239 +1,189 @@
--- ── Mason and LSPConfig integration ────────────────────────────────────
-
--- ── LSP settings. ───────────────────────────────────────────────
---  This function gets run when an LSP connects to a particular buffer.
-
--- Make runtime files discoverable to the server
-local runtime_path = vim.split(package.path, ';')
-table.insert(runtime_path, 'lua/?.lua')
-table.insert(runtime_path, 'lua/?/init.lua')
-
--- nvim-cmp supports additional completion capabilities
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
--- Tell the server the capability of foldingRange,
--- Neovim hasn't added foldingRange to default capabilities, users must add it manually
-capabilities.textDocument.foldingRange = {
-  dynamicRegistration = true,
-  lineFoldingOnly = true,
-}
-
 return {
+  -- improve neovim lsp experience
+  -- https://github.com/nvimdev/lspsaga.nvim
+  -- https://nvimdev.github.io/lspsaga/
   {
-    'folke/neoconf.nvim',
-    cmd = 'Neoconf',
-    opts = {},
-  },
-  -- Portable package manager for Neovim that runs everywhere Neovim runs.
-  -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
-  -- https://github.com/williamboman/mason.nvim
-  {
-    'williamboman/mason.nvim',
-    cmd = 'Mason',
-    run = ':MasonUpdate',
+    'nvimdev/lspsaga.nvim',
+    event = 'LspAttach',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
     opts = {
-      PATH = 'prepend',
-      -- Mason servers to install
-      -- See: https://mason-registry.dev/registry/list
-      ensure_installed = {
-        'clang-format',
-        'codespell',
-        'commitlint',
-        'editorconfig-checker',
-        'fixjson',
-        'jsonlint',
-        'luacheck',
-        'phpcbf',
-        'phpcs',
-        'phpmd',
-        'prettier',
-        'shellcheck',
-        'shfmt',
-        'stylua',
-        'yamllint',
+      code_action = {
+        show_server_name = true,
+        keys = {
+          quit = { 'q', '<ESC>' },
+        },
+      },
+      diagnostic = {
+        keys = {
+          quit = { 'q', '<ESC>' },
+        },
       },
     },
   },
-  -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
-  -- https://github.com/williamboman/mason-lspconfig.nvim
+  -- A simple wrapper for nvim-lspconfig and mason-lspconfig
+  -- to easily setup LSP servers.
+  -- https://github.com/junnplus/lsp-setup.nvim
   {
-    'williamboman/mason-lspconfig.nvim',
+    'junnplus/lsp-setup.nvim',
+    dependencies = {
+      'neovim/nvim-lspconfig',
+      { 'williamboman/mason.nvim', cmd = 'Mason', run = ':MasonUpdate' },
+      'williamboman/mason-lspconfig.nvim',
+      'folke/neodev.nvim',
+      'b0o/schemastore.nvim',
+      'saghen/blink.cmp',
+    },
     opts = {
-      -- ── Enable the following language servers ───────────────────────────
-      -- :help lspconfig-all for all pre-configured LSPs
-      ensure_installed = {
-        'bashls',
-        -- 'csharp_ls',
-        'diagnosticls',
-        'gopls',
-        'html',
-        'intelephense',
-        'jsonls',
-        'lua_ls',
-        'tailwindcss',
-        'ts_ls',
-        'vimls',
-        'volar',
+      default_mappings = false,
+      mappings = {
+        gd = 'lua require"telescope.builtin".lsp_definitions()',
+        gi = 'lua require"telescope.builtin".lsp_implementations()',
+        gr = 'lua require"telescope.builtin".lsp_references()',
       },
-      automatic_installation = true,
-      handlers = {
-        -- The first entry (without a key) will be the default handler
-        -- and will be called for each installed server that doesn't have
-        -- a dedicated handler.
-        function(server_name) -- default handler (optional)
-          require('lspconfig')[server_name].setup {
-            on_attach = function(_, bufnr)
-              -- Create a command `:Format` local to the LSP buffer
-              vim.api.nvim_buf_create_user_command(
-                bufnr,
-                'Format',
-                function(_)
-                  require('conform').format {
-                    formatters = { 'injected' },
-                    async = true,
-                    lsp_fallback = true,
-                  }
-                end,
-                { desc = 'Format current buffer with LSP' }
-              )
-            end,
-            capabilities = capabilities,
-          }
-        end,
-        -- Next, you can provide targeted overrides for specific servers.
-        ['lua_ls'] = function()
-          require('lspconfig')['lua_ls'].setup {
-            on_attach = function(_, bufnr)
-              -- Create a command `:Format` local to the LSP buffer
-              vim.api.nvim_buf_create_user_command(
-                bufnr,
-                'Format',
-                function(_)
-                  require('conform').format {
-                    formatters = { 'injected' },
-                    async = true,
-                    lsp_fallback = true,
-                  }
-                end,
-                { desc = 'Format current buffer with LSP' }
-              )
-            end,
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                runtime = {
-                  -- Tell the language server which version of Lua you're
-                  -- using (most likely LuaJIT)
-                  version = 'LuaJIT',
-                  -- Setup your lua path
-                  path = runtime_path,
+      inlay_hints = {
+        enabled = true,
+      },
+      servers = {
+        bashls = {},
+        -- csharp_ls = {},
+        diagnosticls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              hints = {
+                rangeVariableTypes = true,
+                parameterNames = true,
+                constantValues = true,
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                functionTypeParameters = true,
+              },
+            },
+          },
+        },
+        html = {},
+        intelephense = {},
+        jsonls = {},
+        lua_ls = {
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = { 'vim' },
+                disable = {
+                  -- Ignore lua_ls noisy `missing-fields` warnings
+                  'missing-fields',
                 },
-                diagnostics = {
-                  globals = { 'vim' },
-                  disable = {
-                    -- Ignore lua_ls noisy `missing-fields` warnings
-                    'missing-fields',
-                  },
+              },
+              hint = {
+                enable = false,
+                arrayIndex = 'Auto',
+                await = true,
+                paramName = 'All',
+                paramType = true,
+                semicolon = 'SameLine',
+                setType = false,
+              },
+            },
+          },
+        },
+        tailwindcss = {},
+        ts_ls = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        },
+        vimls = {},
+        volar = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                enumMemberValues = {
+                  enabled = true,
                 },
-                workspace = {
-                  library = vim.api.nvim_get_runtime_file('', true),
-                  checkThirdParty = false,
+                functionLikeReturnTypes = {
+                  enabled = true,
                 },
-                -- Do not send telemetry data containing a randomized
-                -- but unique identifier
-                telemetry = { enable = false },
-
-                completion = {
-                  callSnippet = 'Replace',
+                propertyDeclarationTypes = {
+                  enabled = true,
+                },
+                parameterTypes = {
+                  enabled = true,
+                  suppressWhenArgumentMatchesName = true,
+                },
+                variableTypes = {
+                  enabled = true,
                 },
               },
             },
-          }
-        end,
-        ['jsonls'] = function()
-          require('lspconfig')['jsonls'].setup {
-            on_attach = function(_, bufnr)
-              -- Create a command `:Format` local to the LSP buffer
-              vim.api.nvim_buf_create_user_command(
-                bufnr,
-                'Format',
-                function(_)
-                  require('conform').format {
-                    formatters = { 'injected' },
-                    async = true,
-                    lsp_fallback = true,
-                  }
-                end,
-                { desc = 'Format current buffer with LSP' }
-              )
-            end,
-            capabilities = capabilities,
-            settings = {
-              json = {
-                schemas = require('schemastore').json.schemas(),
-                validate = { enable = true },
-              },
-              yaml = {
-                schemaStore = {
-                  -- You must disable built-in SchemaStore support if you want to use
-                  -- this plugin and its advanced options like `ignore`.
-                  enable = false,
-                  -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-                  url = '',
-                },
-                schemas = require('schemastore').yaml.schemas(),
-                validate = { enable = true },
-              },
-            },
-          }
-        end,
-        ['ts_ls'] = function()
-          local mason_registry = require 'mason-registry'
-          local ts_plugin_location = mason_registry
-            .get_package('vue-language-server')
-            :get_install_path() .. '/node_modules/@vue/typescript-plugin'
-          require('lspconfig')['volar'].setup {
-            init_options = {
-              plugins = {
-                {
-                  name = '@vue/typescript-plugin',
-                  location = ts_plugin_location,
-                  languages = { 'javascript', 'typescript', 'vue' },
-                },
-              },
-            },
-            filetypes = {
-              'typescript',
-              'javascript',
-              'javascriptreact',
-              'typescriptreact',
-              'vue',
-            },
-          }
-        end,
+          },
+        },
       },
     },
-  },
+    config = function(_, opts)
+      require('neodev').setup()
+      require('lsp-setup').setup(opts)
+      local lspconfig = require('lspconfig')
+      for server, config in pairs(opts.servers) do
+        -- passing config.capabilities to blink.cmp merges with the capabilities in your
+        -- `opts[server].capabilities, if you've defined it
+        config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
+        lspconfig[server].setup(config)
+      end
 
-  -- ── Misc ───────────────────────────────────────────────────
-  -- vscode-like pictograms for neovim lsp completion items
-  -- https://github.com/onsails/lspkind-nvim
-  { 'onsails/lspkind.nvim', opts = {} },
-  -- JSON schemas for Neovim
-  -- https://github.com/b0o/SchemaStore.nvim
-  { 'b0o/schemastore.nvim' },
-
-  -- ── LSP ────────────────────────────────────────────────────
-  -- Quick start configs for Nvim LSP
-  -- https://github.com/neovim/nvim-lspconfig
-  { 'neovim/nvim-lspconfig', dependencies = { 'folke/neoconf.nvim' } },
-
-  -- Garbage collector that stops inactive LSP clients to free RAM
-  -- https://github.com/Zeioth/garbage-day.nvim
-  {
-    'zeioth/garbage-day.nvim',
-    dependencies = 'neovim/nvim-lspconfig',
-    event = 'VeryLazy',
-    opts = {},
+      lspconfig.lua_ls.on_init = function(client)
+        if client.workspace_folders then
+          local path = client.workspace_folders[1].name
+          if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
+            return
+          end
+        end
+        client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+          runtime = {
+            -- Tell the language server which version of Lua you're using
+            -- (most likely LuaJIT in the case of Neovim)
+            version = 'LuaJIT'
+          },
+          -- Make the server aware of Neovim runtime files
+          workspace = {
+            checkThirdParty = false,
+            library = {
+              vim.env.VIMRUNTIME
+            }
+          }
+        })
+      end
+      lspconfig.jsonls.settings = {
+        json = {
+          schemas = require('schemastore').json.schemas(),
+          validate = { enable = true },
+        },
+        yaml = {
+          schemaStore = {
+            -- You must disable built-in SchemaStore support if you want to use
+            -- this plugin and its advanced options like `ignore`.
+            enable = false,
+            -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+            url = '',
+          },
+          schemas = require('schemastore').yaml.schemas(),
+          validate = { enable = true },
+        },
+      }
+    end,
   },
 }

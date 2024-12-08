@@ -35,6 +35,7 @@ return {
       window = {
         mappings = {
           ['<Esc>'] = 'close_window',
+          ['q'] = 'close_window',
         },
       },
       filtered_items = {
