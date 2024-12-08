@@ -1,4 +1,31 @@
 return {
+  -- improve neovim lsp experience
+  -- https://github.com/nvimdev/lspsaga.nvim
+  -- https://nvimdev.github.io/lspsaga/
+  {
+    'nvimdev/lspsaga.nvim',
+    event = 'LspAttach',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
+    opts = {
+      code_action = {
+        show_server_name = true,
+        keys = {
+          quit = { 'q', '<ESC>' },
+        },
+      },
+      diagnostic = {
+        keys = {
+          quit = { 'q', '<ESC>' },
+        },
+      },
+    },
+  },
+  -- A simple wrapper for nvim-lspconfig and mason-lspconfig
+  -- to easily setup LSP servers.
+  -- https://github.com/junnplus/lsp-setup.nvim
   {
     'junnplus/lsp-setup.nvim',
     dependencies = {
@@ -6,7 +33,8 @@ return {
       { 'williamboman/mason.nvim', cmd = 'Mason', run = ':MasonUpdate' },
       'williamboman/mason-lspconfig.nvim',
       'folke/neodev.nvim',
-      { 'saghen/blink.cmp' },
+      'b0o/schemastore.nvim',
+      'saghen/blink.cmp',
     },
     opts = {
       default_mappings = false,
@@ -21,7 +49,7 @@ return {
       servers = {
         bashls = {},
         -- csharp_ls = {},
-        -- diagnosticls = {},
+        diagnosticls = {},
         gopls = {
           settings = {
             gopls = {
@@ -39,49 +67,8 @@ return {
         },
         html = {},
         intelephense = {},
-        jsonls = {
-          settings = {
-            -- json = {
-            --   schemas = require('schemastore').json.schemas(),
-            --   validate = { enable = true },
-            -- },
-            -- yaml = {
-            --   schemaStore = {
-            --     -- You must disable built-in SchemaStore support if you want to use
-            --     -- this plugin and its advanced options like `ignore`.
-            --     enable = false,
-            --     -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-            --     url = '',
-            --   },
-            --   schemas = require('schemastore').yaml.schemas(),
-            --   validate = { enable = true },
-            -- },
-          },
-        },
+        jsonls = {},
         lua_ls = {
-          on_init = function(client)
-            if client.workspace_folders then
-              local path = client.workspace_folders[1].name
-              if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
-                return
-              end
-            end
-            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-              runtime = {
-                -- Tell the language server which version of Lua you're using
-                -- (most likely LuaJIT in the case of Neovim)
-                version = 'LuaJIT'
-              },
-              -- Make the server aware of Neovim runtime files
-              workspace = {
-                checkThirdParty = false,
-                library = {
-                  vim.env.VIMRUNTIME
-                }
-              }
-            })
-          end,
-
           settings = {
             Lua = {
               diagnostics = {
@@ -157,6 +144,46 @@ return {
         config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
         lspconfig[server].setup(config)
       end
+
+      lspconfig.lua_ls.on_init = function(client)
+        if client.workspace_folders then
+          local path = client.workspace_folders[1].name
+          if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
+            return
+          end
+        end
+        client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+          runtime = {
+            -- Tell the language server which version of Lua you're using
+            -- (most likely LuaJIT in the case of Neovim)
+            version = 'LuaJIT'
+          },
+          -- Make the server aware of Neovim runtime files
+          workspace = {
+            checkThirdParty = false,
+            library = {
+              vim.env.VIMRUNTIME
+            }
+          }
+        })
+      end
+      lspconfig.jsonls.settings = {
+        json = {
+          schemas = require('schemastore').json.schemas(),
+          validate = { enable = true },
+        },
+        yaml = {
+          schemaStore = {
+            -- You must disable built-in SchemaStore support if you want to use
+            -- this plugin and its advanced options like `ignore`.
+            enable = false,
+            -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+            url = '',
+          },
+          schemas = require('schemastore').yaml.schemas(),
+          validate = { enable = true },
+        },
+      }
     end,
   },
 }

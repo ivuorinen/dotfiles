@@ -79,7 +79,6 @@ return {
     }
 
     -- Load extensions
-    pcall(t.load_extension, 'harpoon')
     pcall(t.load_extension, 'git_worktree')
     pcall(t.load_extension, 'lazy_plugins')
     pcall(t.load_extension, 'luasnip')
