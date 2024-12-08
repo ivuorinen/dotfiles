@@ -1,22 +1,26 @@
 return {
-  -- add blink.compat
-  {
-    'saghen/blink.compat',
-    -- use the latest release, via version = '*', if you also use the latest release for blink.cmp
-    version = '*',
-    -- lazy.nvim will automatically load the plugin when it's required by blink.cmp
-    lazy = true,
-    -- make sure to set opts so that lazy.nvim calls blink.compat's setup
-    opts = {
-      impersonate_nvim_cmp = true,
-    },
-  },
+  -- Performant, batteries-included completion plugin for Neovim
+  -- https:/github.com/saghen/blink.cmp
   {
     'saghen/blink.cmp',
+    version = '*',
     lazy = false, -- lazy loading handled internally
-    -- optional: provides snippets for the snippet source
     dependencies = {
-      'rafamadriz/friendly-snippets',
+      -- Compatibility layer for using nvim-cmp sources on blink.cmp
+      -- https://github.com/Saghen/blink.compat
+      {
+        'saghen/blink.compat',
+        version = '*',
+        -- lazy.nvim will automatically load the plugin when it's required by blink.cmp
+        lazy = true,
+        opts = {
+          -- make sure to set opts so that lazy.nvim calls blink.compat's setup
+          impersonate_nvim_cmp = true,
+        },
+      },
+      -- Set of preconfigured snippets for different languages.
+      -- https://github.com/rafamadriz/friendly-snippets
+      { 'rafamadriz/friendly-snippets' },
       -- Lua plugin to turn github copilot into a cmp source
       -- https://github.com/giuxtaposition/blink-cmp-copilot
       {
@@ -42,8 +46,6 @@ return {
         },
       },
     },
-    -- use a release tag to download pre-built binaries
-    version = '*',
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -54,6 +56,7 @@ return {
       -- your own keymap.
       keymap = {
         preset = 'super-tab',
+        -- Use Ctrl-x to trigger auto completion
         ['<C-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
       },
 
@@ -77,7 +80,7 @@ return {
           auto_show = true
         },
         ghost_text = {
-          enabled = true,
+          enabled = false,
         },
       },
 

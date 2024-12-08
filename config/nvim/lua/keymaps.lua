@@ -56,11 +56,6 @@ nld('cbl', '<Cmd>CBline<CR>', 'CB: Simple Line')
 nld('cbm', '<Cmd>CBllbox14<CR>', 'CB: Marked')
 nld('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 
--- Harpoon keymaps
-nld('ha', ':lua require("harpoon"):list():add()<cr>', 'harpoon file')
-nld('hn', ':lua require("harpoon"):list():next()<cr>', 'harpoon to next')
-nld('hp', ':lua require("harpoon"):list():prev()<cr>', 'harpoon to prev')
-
 -- LSP
 nld('la', ':lua vim.lsp.buf.code_action()<CR>', 'Code Action')
 nld('lf', ':lua vim.lsp.buf.format()<CR>', 'Format')
@@ -80,7 +75,6 @@ nld('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
 nld('sg', ':Telescope live_grep<cr>', 'Search by Grep')
 nld('sh', ':Telescope highlights<cr>', 'List Highlights')
 nld('sl', ':Telescope luasnip<CR>', 'Search LuaSnip')
-nld('sm', ':Telescope harpoon marks<CR>', 'Harpoon Marks')
 nld('sn', ':lua require("telescope").extensions.notify.notify()<CR>', 'Show Notifications')
 nld('so', ':Telescope oldfiles<CR>', 'Old Files')
 nld('sp', ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>', 'Lazy Plugins')

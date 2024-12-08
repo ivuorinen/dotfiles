@@ -5,7 +5,7 @@
 local augroup = vim.api.nvim_create_augroup -- Create/get autocommand group
 local autocmd = vim.api.nvim_create_autocmd -- Create autocommand
 
--- ── Highlight on yank ───────────────────────────────────────────────
+-- Highlight on yank
 -- See `:help vim.highlight.on_yank()`
 autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
@@ -13,7 +13,7 @@ autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- ── Windows to close with "q" ───────────────────────────────────────
+-- Windows to close with "q"
 autocmd('FileType', {
   group = augroup('close_with_q', { clear = true }),
   pattern = {
@@ -44,14 +44,14 @@ autocmd('FileType', {
   end,
 })
 
--- ── make it easier to close man-files when opened inline ────────────
+-- make it easier to close man-files when opened inline
 autocmd('FileType', {
   group = augroup('man_unlisted', { clear = true }),
   pattern = { 'man' },
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 
--- ── wrap and check for spell in text filetypes ──────────────────────
+-- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
   pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
@@ -61,26 +61,35 @@ autocmd('FileType', {
   end,
 })
 
--- ── Fix conceallevel for json files ─────────────────────────────────
+-- Fix conceallevel for json files
 autocmd({ 'FileType' }, {
   group = augroup('json_conceal', { clear = true }),
   pattern = { 'json', 'jsonc', 'json5' },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
--- ── Set filetype for SSH config directory ───────────────────────────
+-- Set filetype for SSH config directory
 autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
   pattern = '*/?.ssh/{config|shared}.d/*',
   command = 'set filetype=sshconfig',
 })
 
+-- Set Dockerfile filetype
 autocmd('FileType', {
   group = augroup('set_filetype', { clear = true }),
   pattern = { 'Dockerfile', 'Dockerfile.*' },
   callback = function() vim.bo.filetype = 'dockerfile' end,
 })
 
+-- Start bash-language-server on shell scripts
+autocmd('FileType', {
+  group = augroup('bashls', { clear = true }),
+  pattern = { 'sh', 'bash', 'zsh' },
+  callback = function() require('lsp').start('bashls') end,
+})
+
+-- Format on save, unless disabled
 autocmd('BufWritePre', {
   group = augroup('Format', { clear = true }),
   pattern = '*', -- All files

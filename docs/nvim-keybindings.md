@@ -82,8 +82,6 @@ n  <Space>so   * :Telescope oldfiles<CR>
                  Old Files
 n  <Space>sn   * :lua require("telescope").extensions.notify.notify()<CR>
                  Show Notifications
-n  <Space>sm   * :Telescope harpoon marks<CR>
-                 Harpoon Marks
 n  <Space>sl   * :Telescope luasnip<CR>
                  Search LuaSnip
 n  <Space>sh   * :Telescope highlights<CR>
@@ -110,12 +108,6 @@ n  <Space>lf   * :lua vim.lsp.buf.format()<CR>
                  Format
 n  <Space>la   * :lua vim.lsp.buf.code_action()<CR>
                  Code Action
-n  <Space>hp   * :lua require("harpoon"):list():prev()<CR>
-                 harpoon to prev
-n  <Space>hn   * :lua require("harpoon"):list():next()<CR>
-                 harpoon to next
-n  <Space>ha   * :lua require("harpoon"):list():add()<CR>
-                 harpoon file
 n  <Space>cbt  * <Cmd>CBllline<CR>
                  CB: Titled Line
 n  <Space>cbm  * <Cmd>CBllbox14<CR>
@@ -154,8 +146,6 @@ n  <Space>cd   * :Lspsaga show_line_diagnostics<CR>
                  Line Diagnostics
 n  <Space>ca   * :Lspsaga code_action<CR>
                  Code Action
-n  <Space>cf   * :lua vim.lsp.buf.format({ async = false })<CR>
-                 Format
 n  <Space>cg   * :lua require("neogen").generate()<CR>
                  Generate annotations
 n  <Space>bw   * :lua MiniBufremove.wipeout()<CR>
@@ -170,10 +160,6 @@ n  <Space>bh   * :bprev<CR>
                  Prev
 n  <Space>bd   * :lua MiniBufremove.delete()<CR>
                  Delete
-n  <Space>ht   * ~/.config/nvim/lua/plugins/harpoon.lua
-                 Open Harpoon Quick menu
-n  <Space>hw   * ~/.config/nvim/lua/plugins/harpoon.lua
-                 Open harpoon window with telescope
 n  <Space>/    * ~/.config/nvim/lua/plugins/telescope.lua
                  [/] Fuzzily search in current buffer]
 x  #           * vim/_defaults.lua
@@ -201,7 +187,7 @@ n  >           * >gv
                  Indent Right
 n  @           * ~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
-x  @           * mode() == 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
+x  @           * mode() ==# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
                  :help v_@-default
 o  F           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
                  Jump backward
@@ -213,7 +199,7 @@ n  K           * :Lspsaga hover_doc<CR>
                  Hover Documentation
 n  Q           * ~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
-x  Q           * mode() == 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
+x  Q           * mode() ==# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
                  :help v_Q-default
 o  T           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
                  Jump backward till
@@ -393,11 +379,11 @@ x  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
 n  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
-x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
-                 Flash
 n  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
 o  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
+x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
 n  <C-W>.      * :vertical resize +10<CR>
                  V Resize +
@@ -426,6 +412,7 @@ x  <Plug>(MatchitVisualBackward) * :<C-U>call matchit#Match_wrapper('',0,'v')<CR
 x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>:if col("''") != col("$") | exe ":normal! m'" | endif<CR>gv``
 n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
 n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
+n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
 n  <M-k>       * :m '<-2<CR>gv=gv
                  Move Block Up
 n  <M-j>       * :m '>+1<CR>gv=gv
@@ -442,7 +429,6 @@ x  <M-l>       * <Cmd>lua MiniMove.move_selection('right')<CR>
                  Move right
 x  <M-h>       * <Cmd>lua MiniMove.move_selection('left')<CR>
                  Move left
-n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
 n  <C-W><C-D>    <C-W>d
                  Show diagnostics under the cursor
 n  <C-W>d      * vim/_defaults.lua
@@ -451,4 +437,4 @@ n  <C-L>       * <Cmd>nohlsearch|diffupdate|normal! <C-L><CR>
                  :help CTRL-L-default
 ```
 
-- Generated on Sat  7 Dec 2024 03:39:50 EET
+- Generated on Sun  8 Dec 2024 02:56:08 EET
