@@ -64,7 +64,6 @@ return {
           { mode = 'n', keys = '<Leader>b',  desc = '+Buffers' },
           { mode = 'n', keys = '<Leader>c',  desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
-          { mode = 'n', keys = '<Leader>l',  desc = '+LSP' },
           { mode = 'n', keys = '<Leader>q',  desc = '+Quit' },
           { mode = 'n', keys = '<Leader>s',  desc = '+Telescope' },
           { mode = 'n', keys = '<Leader>t',  desc = '+Toggle' },
@@ -74,7 +73,6 @@ return {
           { mode = 'n', keys = '<Leader>?',  desc = '+Help' },
           { mode = 'n', keys = 'd',          desc = '+Diagnostics' },
           { mode = 'n', keys = 'y',          desc = '+Yank' },
-          -- { mode = 'n', keys = 'gp',        desc = '+' },
         },
       }
     end,

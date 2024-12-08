@@ -8,6 +8,8 @@ return {
     ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
+      gitbrowse = { enabled = true },
+      notify = { enabled = true },
       notifier = { enabled = true },
       quickfile = { enabled = true },
       statuscolumn = { enabled = true },
@@ -18,6 +20,9 @@ return {
         }
       }
     },
+    keys = {
+      { '<leader>o', function() Snacks.gitbrowse() end, desc = 'Open repo in browser' },
+    },
   },
   -- A pretty diagnostics, references, telescope results,
   -- quickfix and location list to help you solve all the
@@ -27,6 +32,7 @@ return {
     'folke/trouble.nvim',
     lazy = false,
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    ---@type trouble.Config
     opts = {
       auto_preview = true,
       auto_fold = true,
@@ -40,6 +46,7 @@ return {
   {
     'folke/flash.nvim',
     event = 'VeryLazy',
+    ---@type Flash.Config
     opts = {},
     keys = {
       {

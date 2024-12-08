@@ -1,17 +1,76 @@
+-- ╭─────────────────────────────────────────────────────────╮
+-- │            Function shortcuts for keymap set            │
+-- ╰─────────────────────────────────────────────────────────╯
+
+-- Keymap set shortcut
+--@type vim.keymap.set
 local s = vim.keymap.set
+
+-- Handle description
+---@param desc string|table? Optional description. Can be a string or a table.
+---@return table -- The description as a table.
+local function handleDesc(desc)
+  if type(desc) == "string" then
+    -- Convert string to table with `desc` as a key
+    return { desc = desc }
+  elseif type(desc) == "table" then
+    -- Use the table as is
+    return desc
+  else
+    -- Default to an empty table if `desc` is nil or an unsupported type
+    return {}
+  end
+end
+
 -- Normal mode keymaps
+---@param key string rhs, required
+---@param cmd string|function lhs, required
+---@param opts table? options, optional
 local n = function(key, cmd, opts) s('n', key, cmd, opts) end
--- Visual mode keymaps
-local v = function(key, cmd, opts) s('v', key, cmd, opts) end
 
 -- Leader keymap shortcut function
 -- It prepends '<leader>' to the key
-local nl = function(key, cmd, opts) n('<leader>' .. key, cmd, opts) end
+---@param key string rhs, required, but will be prepended with '<leader>'
+---@param cmd string|function lhs, required
+---@param opts table|string? options (or just description), optional
+local nl = function(key, cmd, opts)
+  opts = handleDesc(opts)
+  n('<leader>' .. key, cmd, opts)
+end
+
 -- Local leader keymap shortcut function
 -- It prepends '<leader>' to the key and uses desc from opts
-local nld = function(key, cmd, desc) nl(key, cmd, { desc = desc }) end
--- Leader keymap shortcut function for visual mode
-local xld = function(key, cmd, desc) s('x', '<leader>' .. key, cmd, { desc = desc }) end
+---@param key string rhs, required, but will be prepended with '<leader>'
+---@param cmd string|function lhs, required
+---@param desc table|string description, required
+local nld = function(key, cmd, desc)
+  desc = handleDesc(desc)
+  nl(key, cmd, desc)
+end
+
+-- Keymap shortcut function with mode defined, good for sorting by rhs
+---@param key string rhs, required
+---@param mode string|string[] one of n, v, x, or table of modes { 'n', 'v' }
+---@param cmd string|function lhs, required
+---@param desc string|table description, required
+local d = function(key, mode, cmd, desc)
+  desc = handleDesc(desc)
+  s(mode, key, cmd, desc)
+end
+
+-- Leader based keymap shortcut function with mode defined
+---@param key string rhs, required, but will be prepended with '<leader>'
+---@param mode string|string[] one of n, v, x, or table of modes { 'n', 'v' }
+---@param cmd string|function lhs, required
+---@param desc string|table description (or opts), required
+local ld = function(key, mode, cmd, desc)
+  desc = handleDesc(desc)
+  s(mode, '<leader>' .. key, cmd, desc)
+end
+
+-- ╭─────────────────────────────────────────────────────────╮
+-- │                         Keymaps                         │
+-- ╰─────────────────────────────────────────────────────────╯
 
 -- Disable arrow keys in normal mode
 n('<left>', ':echo "Use h to move!!"<CR>')
@@ -34,26 +93,25 @@ nld('bw', ':lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 nld('cg', ':lua require("neogen").generate()<CR>', 'Generate annotations')
 
 -- LSP
-n('<C-k>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature Help' })
+n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature Help' })
 n('<C-h>', ':lua vim.lsp.buf.hover()<CR>', { desc = 'Hover' })
 n('K', ':Lspsaga hover_doc<cr>', { desc = 'Hover Documentation' })
-nld('ca', ':Lspsaga code_action<cr>', 'Code Action')
-nld('cci', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
-nld('cco', ':Lspsaga outgoing_calls<cr>', 'Outgoing Calls')
-nld('cd', ':Lspsaga show_line_diagnostics<cr>', 'Line Diagnostics')
-nld('cf', ':lua vim.lsp.buf.format()<CR>', 'Format')
-xld('cf', ':lua vim.lsp.buf.format()<CR>', 'Format')
-nld('ci', ':Lspsaga implement<cr>', 'Implementations')
-nld('cl', ':Lspsaga show_cursor_diagnostics<cr>', 'Show Cursor Diagnostics')
-nld('cp', ':Lspsaga peek_definition<cr>', 'Peek Definition')
-nld('cr', ':Lspsaga rename<cr>', 'Rename')
-nld('cR', ':Lspsaga rename ++project<cr>', 'Rename Project wide')
-nld('cs', ':Telescope lsp_document_symbols<CR>', 'LSP Document Symbols')
-nld('ct', ':Lspsaga peek_type_definition<cr>', 'Peek Type Definition')
-nld('cT', ':Telescope lsp_type_definitions<CR>', 'LSP Type Definitions')
-nld('cu', ':Lspsaga preview_definition<cr>', 'Preview Definition')
-nld('cv', ':Lspsaga diagnostic_jump_prev<cr>', 'Diagnostic Jump Prev')
-nld('cw', ':Lspsaga diagnostic_jump_next<cr>', 'Diagnostic Jump Next')
+ld('ca', 'n', ':Lspsaga code_action<cr>', 'Code Action')
+ld('cci', 'n', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
+ld('cco', 'n', ':Lspsaga outgoing_calls<cr>', 'Outgoing Calls')
+ld('cd', 'n', ':Lspsaga show_line_diagnostics<cr>', 'Line Diagnostics')
+ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
+ld('ci', 'n', ':Lspsaga implement<cr>', 'Implementations')
+ld('cl', 'n', ':Lspsaga show_cursor_diagnostics<cr>', 'Show Cursor Diagnostics')
+ld('cp', 'n', ':Lspsaga peek_definition<cr>', 'Peek Definition')
+ld('cr', 'n', ':Lspsaga rename<cr>', 'Rename')
+ld('cR', 'n', ':Lspsaga rename ++project<cr>', 'Rename Project wide')
+ld('cs', 'n', ':Telescope lsp_document_symbols<CR>', 'LSP Document Symbols')
+ld('ct', 'n', ':Lspsaga peek_type_definition<cr>', 'Peek Type Definition')
+ld('cT', 'n', ':Telescope lsp_type_definitions<CR>', 'LSP Type Definitions')
+ld('cu', 'n', ':Lspsaga preview_definition<cr>', 'Preview Definition')
+ld('cv', 'n', ':Lspsaga diagnostic_jump_prev<cr>', 'Diagnostic Jump Prev')
+ld('cw', 'n', ':Lspsaga diagnostic_jump_next<cr>', 'Diagnostic Jump Next')
 
 -- CommentBox keymaps
 nld('cbb', '<Cmd>CBccbox<CR>', 'CB: Box Title')
@@ -97,14 +155,10 @@ nld('xw', ':Trouble workspace_diagnostics<cr>', 'Trouble: Workspace Diagnostics'
 nld('xx', ':Trouble diagnostics<cr>', 'Trouble: Diagnostic')
 
 -- Text manipulation
-n('>', '>gv', { desc = 'Indent Right' })
-n('<', '<gv', { desc = 'Indent Left' })
-n('<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move Block Down' })
-n('<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move Block Up' })
-v('>', '>gv', { desc = 'Indent Right' })
-v('<', '<gv', { desc = 'Indent Left' })
-v('<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move Block Down' })
-v('<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move Block Up' })
+d('<', { 'n', 'v' }, '<gv', 'Indent Left')
+d('>', { 'n', 'v' }, '>gv', 'Indent Right')
+d('<C-k>', { 'n', 'v' }, ":m '<-2<CR>gv=gv", 'Move Block Up')
+d('<C-j>', { 'n', 'v' }, ":m '>+1<CR>gv=gv", 'Move Block Down')
 
 -- Toggle settings
 nld('tc', ':CloakToggle<cr>', 'Cloak: Toggle')
