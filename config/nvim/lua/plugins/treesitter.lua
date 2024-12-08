@@ -13,10 +13,10 @@ return {
     'JoosepAlviste/nvim-ts-context-commentstring',
   },
   opts = {
-    auto_install = true,
-    ignore_install = {},
-    sync_install = true,
-    modules = {},
+    auto_install = true,  -- Auto install the parser generators
+    ignore_install = {},  -- List of parsers to ignore installing
+    sync_install = false, -- Sync install the parser generators, install async
+    -- modules = {},         -- Load only specific modules
 
     -- Add languages to be installed here that you want installed for treesitter
     ensure_installed = {
@@ -52,18 +52,18 @@ return {
         enable = true,
         -- Assign keymaps to false to disable them, e.g. `goto_definition = false`.
         keymaps = {
-          goto_definition = '<leader>gnd',
-          list_definitions = '<leader>gnD',
-          list_definitions_toc = '<leader>gO',
-          goto_next_usage = '<a-*>',
-          goto_previous_usage = '<a-#>',
+          goto_definition = '<leader>zgd',
+          list_definitions = '<leader>zgl',
+          list_definitions_toc = '<leader>zg0',
+          goto_next_usage = '<a-n>',
+          goto_previous_usage = '<a-p>',
         },
       },
       smart_rename = {
         enable = true,
         -- Assign keymaps to false to disable them, e.g. `smart_rename = false`.
         keymaps = {
-          smart_rename = 'grr',
+          smart_rename = '<leader>zr',
         },
       },
       highlight_definitions = {
@@ -75,15 +75,16 @@ return {
     },
     highlight = { enable = true },
     indent = { enable = true },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<a-s>',
-        node_incremental = '<a-s>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<a-backspace>',
-      },
-    },
+    -- incremental_selection = {
+    --   enable = true,
+    --   keymaps = {
+    --     init_selection = '<leader>zs',
+    --     node_decremental = '<leader>zsd',
+    --     node_incremental = '<leader>zsi',
+    --     scope_decremental = '<leader>zsD',
+    --     scope_incremental = '<leader>zsI',
+    --   },
+    -- },
     textobjects = {
       select = {
         enable = true,
@@ -106,36 +107,12 @@ return {
       move = {
         enable = true,
         set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']f'] = '@function.outer',
-          [']]'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']F'] = '@function.outer',
-          [']['] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[f'] = '@function.outer',
-          ['[['] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[F'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ['<leader>cn'] = '@parameter.inner',
-        },
-        swap_previous = {
-          ['<leader>cP'] = '@parameter.inner',
-        },
       },
     },
   },
   config = function(_, opts)
     require('nvim-treesitter.configs').setup(opts)
+
     vim.api.nvim_create_autocmd({ "FileType" }, {
       callback = function()
         -- Set foldmethod to treesitter if available
@@ -147,10 +124,8 @@ return {
           vim.opt.foldmethod = "syntax"
         end
 
-        vim.opt.foldtext = ""       -- Don't show fold text
-        vim.opt.foldlevel = 99      -- Open all folds by default
-        vim.opt.foldlevelstart = 99 -- Start folding at level 1
-        vim.opt.foldnestmax = 99    -- Maximum fold nesting
+        vim.opt.foldlevel = 9    -- Open all folds by default
+        vim.opt.foldnestmax = 99 -- Maximum fold nesting
       end,
     })
   end,
