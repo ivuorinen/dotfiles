@@ -64,12 +64,13 @@ return {
           { mode = 'n', keys = '<Leader>b',  desc = '+Buffers' },
           { mode = 'n', keys = '<Leader>c',  desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
-          { mode = 'n', keys = '<Leader>h',  desc = '+Harpoon' },
           { mode = 'n', keys = '<Leader>l',  desc = '+LSP' },
           { mode = 'n', keys = '<Leader>q',  desc = '+Quit' },
           { mode = 'n', keys = '<Leader>s',  desc = '+Telescope' },
           { mode = 'n', keys = '<Leader>t',  desc = '+Toggle' },
           { mode = 'n', keys = '<Leader>x',  desc = '+Trouble' },
+          { mode = 'n', keys = '<leader>z',  desc = '+TreeSitter' },
+          { mode = 'n', keys = '<leader>zg', desc = '+Goto' },
           { mode = 'n', keys = '<Leader>?',  desc = '+Help' },
           { mode = 'n', keys = 'd',          desc = '+Diagnostics' },
           { mode = 'n', keys = 'y',          desc = '+Yank' },
@@ -89,6 +90,9 @@ return {
   -- Work with diff hunks
   -- Replaced lewis6991/gitsigns.nvim
   { 'echasnovski/mini.diff',       version = '*', opts = {} },
+
+  -- Git integration
+  { 'echasnovski/mini-git',        version = '*', opts = {}, main = 'mini.git' },
 
   -- Highlight patterns in text
   -- Replaced folke/todo-comments.nvim
@@ -174,10 +178,21 @@ return {
   -- Replaced glepnir/dashboard-nvim
   { 'echasnovski/mini.starter',     version = '*', opts = {} },
 
+  -- Minimal and fast statusline module with opinionated default look
+  -- Replaced nvim-lualine/lualine.nvim
+  {
+    'echasnovski/mini.statusline',
+    version = '*',
+    opts = {
+      use_icons = true,
+      set_vim_settings = true,
+    }
+  },
+
   -- Fast and feature-rich surround actions
   -- Replaced kylechui/nvim-surround
-  { 'echasnovski/mini.surround',    version = '*', opts = {} },
+  { 'echasnovski/mini.surround',   version = '*', opts = {} },
 
   -- Work with trailing whitespace
-  { 'echasnovski/mini.trailspace',  version = '*', opts = {} },
+  { 'echasnovski/mini.trailspace', version = '*', opts = {} },
 }

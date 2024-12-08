@@ -62,28 +62,16 @@ n  <Space>st   * :TodoTelescope<CR>
                  Search Todos
 n  <Space>ss   * :Telescope treesitter<CR>
                  Treesitter
-n  <Space>srw  * :Telescope lsp_workspace_symbols<CR>
-                 LSP Workspace Symbols
-n  <Space>srt  * :Telescope lsp_type_definitions<CR>
-                 LSP Type Definitions
-n  <Space>srr  * :Telescope lsp_references<CR>
-                 LSP References
-n  <Space>srp  * :Telescope lsp_document_symbols<CR>
-                 LSP Document Symbols
-n  <Space>sri  * :Telescope lsp_implementations<CR>
-                 LSP Implementations
-n  <Space>srd  * :Telescope lsp_definitions<CR>
-                 LSP Definitions
 n  <Space>sq   * :Telescope quickfix<CR>
                  Quickfix
 n  <Space>sp   * :lua require("telescope").extensions.lazy_plugins.lazy_plugins()<CR>
                  Lazy Plugins
 n  <Space>so   * :Telescope oldfiles<CR>
                  Old Files
-n  <Space>sn   * :lua require("telescope").extensions.notify.notify()<CR>
-                 Show Notifications
 n  <Space>sl   * :Telescope luasnip<CR>
                  Search LuaSnip
+n  <Space>sk   * :Telescope keymaps<CR>
+                 Search Keymaps
 n  <Space>sh   * :Telescope highlights<CR>
                  List Highlights
 n  <Space>sg   * :Telescope live_grep<CR>
@@ -92,22 +80,12 @@ n  <Space>sd   * :Telescope diagnostics<CR>
                  Search Diagnostics
 n  <Space>sc   * :Telescope commands<CR>
                  Commands
-n  <Space>sb   * :Telescope buffers<CR>
+n  <Space>/    * ~/.config/nvim/lua/keymaps.lua
+                 Fuzzily search in current buffer
+n  <Space>,    * :Telescope buffers<CR>
                  Find existing buffers
 n  <Space>f    * :Telescope find_files<CR>
                  Find Files
-n  <Space>ls   * :lua require("telescope.builtin").lsp_document_symbols()<CR>
-                 Document Symbols
-n  <Space>lR   * :lua vim.lsp.buf.references()<CR>
-                 References
-n  <Space>lr   * :lua vim.lsp.buf.rename()<CR>
-                 Rename
-x  <Space>lf   * :lua vim.lsp.buf.format()<CR>
-                 Format
-n  <Space>lf   * :lua vim.lsp.buf.format()<CR>
-                 Format
-n  <Space>la   * :lua vim.lsp.buf.code_action()<CR>
-                 Code Action
 n  <Space>cbt  * <Cmd>CBllline<CR>
                  CB: Titled Line
 n  <Space>cbm  * <Cmd>CBllbox14<CR>
@@ -124,10 +102,12 @@ n  <Space>cv   * :Lspsaga diagnostic_jump_prev<CR>
                  Diagnostic Jump Prev
 n  <Space>cu   * :Lspsaga preview_definition<CR>
                  Preview Definition
+n  <Space>cT   * :Telescope lsp_type_definitions<CR>
+                 LSP Type Definitions
 n  <Space>ct   * :Lspsaga peek_type_definition<CR>
                  Peek Type Definition
-n  <Space>cs   * :Lspsaga signature_help<CR>
-                 Signature Documentation
+n  <Space>cs   * :Telescope lsp_document_symbols<CR>
+                 LSP Document Symbols
 n  <Space>cR   * :Lspsaga rename ++project<CR>
                  Rename Project wide
 n  <Space>cr   * :Lspsaga rename<CR>
@@ -138,12 +118,16 @@ n  <Space>cl   * :Lspsaga show_cursor_diagnostics<CR>
                  Show Cursor Diagnostics
 n  <Space>ci   * :Lspsaga implement<CR>
                  Implementations
+x  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cd   * :Lspsaga show_line_diagnostics<CR>
+                 Line Diagnostics
 n  <Space>cco  * :Lspsaga outgoing_calls<CR>
                  Outgoing Calls
 n  <Space>cci  * :Lspsaga incoming_calls<CR>
                  Incoming Calls
-n  <Space>cd   * :Lspsaga show_line_diagnostics<CR>
-                 Line Diagnostics
 n  <Space>ca   * :Lspsaga code_action<CR>
                  Code Action
 n  <Space>cg   * :lua require("neogen").generate()<CR>
@@ -160,8 +144,6 @@ n  <Space>bh   * :bprev<CR>
                  Prev
 n  <Space>bd   * :lua MiniBufremove.delete()<CR>
                  Delete
-n  <Space>/    * ~/.config/nvim/lua/plugins/telescope.lua
-                 [/] Fuzzily search in current buffer]
 x  #           * vim/_defaults.lua
                  :help v_#-default
 o  %             <Plug>(MatchitOperationForward)
@@ -211,19 +193,13 @@ n  Y           * y$
                  :help Y-default
 x  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash Treesitter
-o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
-                 Flash Treesitter
 n  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash Treesitter
+o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash Treesitter
 o  [%            <Plug>(MatchitOperationMultiBackward)
 x  [%            <Plug>(MatchitVisualMultiBackward)
 n  [%            <Plug>(MatchitNormalMultiBackward)
-o  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
-                 Go to indent scope top
-x  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
-                 Go to indent scope top
-n  [i          * <Cmd>lua MiniIndentscope.operator('top', true)<CR>
-                 Go to indent scope top
 o  [h          * V<Cmd>lua MiniDiff.goto_hunk('prev')<CR>
                  Previous hunk
 x  [h          * <Cmd>lua MiniDiff.goto_hunk('prev')<CR>
@@ -236,17 +212,17 @@ x  [H          * <Cmd>lua MiniDiff.goto_hunk('first')<CR>
                  First hunk
 n  [H          * <Cmd>lua MiniDiff.goto_hunk('first')<CR>
                  First hunk
+o  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
+                 Go to indent scope top
+x  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
+                 Go to indent scope top
+n  [i          * <Cmd>lua MiniIndentscope.operator('top', true)<CR>
+                 Go to indent scope top
 n  [d          * vim/_defaults.lua
                  Jump to the previous diagnostic
 o  ]%            <Plug>(MatchitOperationMultiForward)
 x  ]%            <Plug>(MatchitVisualMultiForward)
 n  ]%            <Plug>(MatchitNormalMultiForward)
-o  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
-                 Go to indent scope bottom
-x  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
-                 Go to indent scope bottom
-n  ]i          * <Cmd>lua MiniIndentscope.operator('bottom', true)<CR>
-                 Go to indent scope bottom
 o  ]H          * V<Cmd>lua MiniDiff.goto_hunk('last')<CR>
                  Last hunk
 x  ]H          * <Cmd>lua MiniDiff.goto_hunk('last')<CR>
@@ -259,6 +235,12 @@ x  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
                  Next hunk
 n  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
                  Next hunk
+o  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
+                 Go to indent scope bottom
+x  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
+                 Go to indent scope bottom
+n  ]i          * <Cmd>lua MiniIndentscope.operator('bottom', true)<CR>
+                 Go to indent scope bottom
 n  ]d          * vim/_defaults.lua
                  Jump to the next diagnostic
 x  a%            <Plug>(MatchitVisualTextObject)
@@ -277,10 +259,6 @@ n  gR          * :RegexplainerToggle<CR>
 o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
-x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
-                 Toggle arguments
-n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
-                 Toggle arguments
 o  gh          * <Cmd>lua MiniDiff.textobject()<CR>
                  Hunk range textobject
 x  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
@@ -317,6 +295,10 @@ n  g==           g=_
                  Evaluate line
 n  g=          * v:lua.MiniOperators.evaluate()
                  Evaluate operator
+x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
+                 Toggle arguments
+n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
+                 Toggle arguments
 o  gc          * <Cmd>lua MiniComment.textobject()<CR>
                  Comment textobject
 n  gcc         * ~/.local/share/nvim/lazy/mini.comment/lua/mini/comment.lua
@@ -437,4 +419,4 @@ n  <C-L>       * <Cmd>nohlsearch|diffupdate|normal! <C-L><CR>
                  :help CTRL-L-default
 ```
 
-- Generated on Sun  8 Dec 2024 02:56:08 EET
+- Generated on Sun  8 Dec 2024 16:23:16 EET

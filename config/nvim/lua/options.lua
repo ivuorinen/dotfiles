@@ -7,7 +7,6 @@
 
 local g = vim.g     -- A table to store global variables
 local o = vim.opt   -- A table to store global options
-local wo = vim.wo   -- A table to store window-local options
 
 vim.loader.enable() -- Enable the plugin loader
 
@@ -41,12 +40,8 @@ o.termguicolors = true             -- Fixes Notify opacity issues
 o.timeoutlen = 250                 -- Decrease mapped sequence wait time
 o.undofile = true                  -- Save undo history
 o.updatetime = 250                 -- 250 ms = 2,5 seconds
-
 o.ignorecase = true                -- Ignore case in search patterns
 o.smartcase = true                 -- Override 'ignorecase' if pattern contains upper case chars
-
--- vim.window_options
-wo.signcolumn = 'yes' -- Always show signcolumns
 
 
 o.list = true -- Show some invisible characters

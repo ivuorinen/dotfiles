@@ -82,13 +82,6 @@ autocmd('FileType', {
   callback = function() vim.bo.filetype = 'dockerfile' end,
 })
 
--- Start bash-language-server on shell scripts
-autocmd('FileType', {
-  group = augroup('bashls', { clear = true }),
-  pattern = { 'sh', 'bash', 'zsh' },
-  callback = function() require('lsp').start('bashls') end,
-})
-
 -- Format on save, unless disabled
 autocmd('BufWritePre', {
   group = augroup('Format', { clear = true }),
