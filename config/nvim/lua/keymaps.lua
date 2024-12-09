@@ -19,7 +19,7 @@ local function handleDesc(desc)
     -- If desc doesn't have 'desc' key, combine it with
     -- others with empty description
     if not desc.desc then
-      desc = table.insert(desc, { desc = '' })
+      desc.desc = ''
       return desc
     end
     -- Use the table as is
@@ -192,8 +192,12 @@ n('<C-w>+', ':resize +5<CR>', { desc = 'H Resize +' })
 n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- Deal with word wrap
-n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true })
-n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true })
+n('k',
+  "v:count == 0 ? 'gk' : 'k'",
+  { desc = 'Move up', noremap = true, expr = true })
+n('j',
+  "v:count == 0 ? 'gj' : 'j'",
+  { desc = 'Move down', noremap = true, expr = true })
 
 -- Quit
 nld('qf', ':q<CR>', 'Quicker close split')

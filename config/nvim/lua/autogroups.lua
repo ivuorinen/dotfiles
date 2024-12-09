@@ -86,13 +86,6 @@ autocmd({ 'BufRead', 'BufNewFile' }, {
   command = 'set filetype=sshconfig',
 })
 
--- Set Dockerfile filetype
-autocmd('FileType', {
-  group = augroup('set_filetype', { clear = true }),
-  pattern = { 'Dockerfile', 'Dockerfile.*' },
-  callback = function() vim.bo.filetype = 'dockerfile' end,
-})
-
 -- Format on save, unless disabled
 autocmd('BufWritePre', {
   group = augroup('Format', { clear = true }),
