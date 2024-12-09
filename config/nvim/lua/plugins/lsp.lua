@@ -9,6 +9,7 @@ return {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons',
     },
+    ---@type LspsagaConfig
     opts = {
       code_action = {
         show_server_name = true,
@@ -29,12 +30,16 @@ return {
   {
     'junnplus/lsp-setup.nvim',
     dependencies = {
-      'neovim/nvim-lspconfig',
-      { 'williamboman/mason.nvim', cmd = 'Mason', run = ':MasonUpdate' },
-      'williamboman/mason-lspconfig.nvim',
-      'folke/neodev.nvim',
-      'b0o/schemastore.nvim',
-      'saghen/blink.cmp',
+      { 'neovim/nvim-lspconfig' },
+      {
+        'williamboman/mason.nvim',
+        cmd = 'Mason',
+        run = ':MasonUpdate'
+      },
+      { 'williamboman/mason-lspconfig.nvim' },
+      { 'folke/neodev.nvim' },
+      { 'b0o/schemastore.nvim' },
+      { 'saghen/blink.cmp' },
     },
     opts = {
       default_mappings = false,

@@ -89,7 +89,9 @@ n('<down>', ':echo "Use j to move!!"<CR>')
 n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
--- Buffer
+-- Buffer operations
+-- Mappings for buffer management operations like switching, deleting, etc.
+-- Convention: All mappings start with 'b' followed by the operation
 nld('bd', ':lua MiniBufremove.delete()<CR>', 'Delete')
 nld('bh', ':bprev<cr>', 'Prev')
 nld('bj', ':bfirst<cr>', 'First')
@@ -120,7 +122,9 @@ ld('cu', 'n', ':Lspsaga preview_definition<cr>', 'Preview Definition')
 ld('cv', 'n', ':Lspsaga diagnostic_jump_prev<cr>', 'Diagnostic Jump Prev')
 ld('cw', 'n', ':Lspsaga diagnostic_jump_next<cr>', 'Diagnostic Jump Next')
 
--- CommentBox keymaps
+-- CommentBox operations
+-- Mappings for creating and managing comment boxes
+-- Convention: All mappings start with 'cb' followed by the box type
 nld('cbb', '<Cmd>CBccbox<CR>', 'CB: Box Title')
 nld('cbd', '<Cmd>CBd<CR>', 'CB: Remove a box')
 nld('cbl', '<Cmd>CBline<CR>', 'CB: Simple Line')
@@ -175,13 +179,13 @@ d('<C-j>', { 'n', 'v' }, ":m '>+1<CR>gv=gv", 'Move Block Down')
 nld('o', function() require('snacks').gitbrowse() end, 'Open repo in browser')
 
 -- Toggle settings
+local function toggle_background()
+  vim.o.bg = vim.o.bg == "light" and "dark" or "light"
+end
+
 nld('tc', ':CloakToggle<cr>', 'Cloak: Toggle')
 nld('te', ':Neotree toggle<cr>', 'Toggle Neotree')
-nld(
-  'tl',
-  ':lua vim.o.bg = vim.o.bg:get() == "light" and "dark" or "light"<cr>',
-  'Toggle Light/Dark Mode'
-)
+nld('tl', toggle_background, 'Toggle Light/Dark Mode')
 nld('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 
 -- Splits
@@ -201,6 +205,14 @@ n('j',
 
 -- Quit
 nld('qf', ':q<CR>', 'Quicker close split')
-nld('qq', ':wq!<CR>', 'Quit with force saving')
+nld('qq', function()
+  if vim.fn.confirm("Force save and quit?", "&Yes\n&No", 2) == 1 then
+    vim.cmd('wq!')
+  end
+end, 'Quit with force saving')
 nld('qw', ':wq<CR>', 'Write and quit')
-nld('qQ', ':q!<CR>', 'Force quit without saving')
+nld('qQ', function()
+  if vim.fn.confirm("Force quit without saving?", "&Yes\n&No", 2) == 1 then
+    vim.cmd('q!')
+  end
+end, 'Force quit without saving')

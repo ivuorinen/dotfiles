@@ -20,7 +20,10 @@ autocmd('TextYankPost', {
 autocmd({ "BufEnter", "BufWinEnter", "TabEnter" }, {
   callback = function()
     local max_line_count = vim.fn.line("$")
-    vim.opt.numberwidth = #tostring(max_line_count) + 1
+    -- Only adjust if the file is large enough to matter
+    if max_line_count > 99 then
+      vim.opt.numberwidth = #tostring(max_line_count) + 1
+    end
   end,
 })
 
@@ -65,7 +68,7 @@ autocmd('FileType', {
 -- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
-  pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
+  pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown', 'asciidoc', 'rst', 'tex' },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
@@ -82,7 +85,7 @@ autocmd({ 'FileType' }, {
 -- Set filetype for SSH config directory
 autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
-  pattern = '*/?.ssh/{config|shared}.d/*',
+  pattern = { '*/?.ssh/{config|shared}.d/*', '*/?.ssh/config.local', '*/?.ssh/config.work' },
   command = 'set filetype=sshconfig',
 })
 
