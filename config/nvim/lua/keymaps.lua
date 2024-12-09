@@ -1,6 +1,7 @@
 -- ╭─────────────────────────────────────────────────────────╮
 -- │            Function shortcuts for keymap set            │
 -- ╰─────────────────────────────────────────────────────────╯
+-- vim: set ft=lua ts=2 sw=2 tw=0 et cc=80 :
 
 -- Keymap set shortcut
 --@type vim.keymap.set
@@ -15,7 +16,8 @@ local function handleDesc(desc)
     -- If the string is empty, just return as an empty description
     return { desc = desc }
   elseif type(desc) == "table" then
-    -- If desc doesn't have 'desc' key, combine it with others with empty description
+    -- If desc doesn't have 'desc' key, combine it with
+    -- others with empty description
     if not desc.desc then
       desc = table.insert(desc, { desc = '' })
       return desc
@@ -31,14 +33,14 @@ end
 -- Normal mode keymaps
 ---@param key string rhs, required
 ---@param cmd string|function lhs, required
----@param opts table? options, optional
+---@param opts table? Options, optional
 local n = function(key, cmd, opts) s('n', key, cmd, opts) end
 
 -- Leader keymap shortcut function
 -- It prepends '<leader>' to the key
 ---@param key string rhs, required, but will be prepended with '<leader>'
 ---@param cmd string|function lhs, required
----@param opts table|string? options (or just description), optional
+---@param opts table|string? Options (or just description), optional
 local nl = function(key, cmd, opts)
   opts = handleDesc(opts)
   n('<leader>' .. key, cmd, opts)
@@ -87,7 +89,7 @@ n('<down>', ':echo "Use j to move!!"<CR>')
 n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
--- Buffer keymaps
+-- Buffer
 nld('bd', ':lua MiniBufremove.delete()<CR>', 'Delete')
 nld('bh', ':bprev<cr>', 'Prev')
 nld('bj', ':bfirst<cr>', 'First')
@@ -99,7 +101,7 @@ nld('bw', ':lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 nld('cg', ':lua require("neogen").generate()<CR>', 'Generate annotations')
 
 -- LSP
-n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature Help' })
+n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature' })
 n('K', ':Lspsaga hover_doc<cr>', { desc = 'Hover Documentation' })
 ld('ca', 'n', ':Lspsaga code_action<cr>', 'Code Action')
 ld('cci', 'n', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
@@ -107,7 +109,7 @@ ld('cco', 'n', ':Lspsaga outgoing_calls<cr>', 'Outgoing Calls')
 ld('cd', 'n', ':Lspsaga show_line_diagnostics<cr>', 'Line Diagnostics')
 ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
 ld('ci', 'n', ':Lspsaga implement<cr>', 'Implementations')
-ld('cl', 'n', ':Lspsaga show_cursor_diagnostics<cr>', 'Show Cursor Diagnostics')
+ld('cl', 'n', ':Lspsaga show_cursor_diagnostics<cr>', 'Cursor Diagnostics')
 ld('cp', 'n', ':Lspsaga peek_definition<cr>', 'Peek Definition')
 ld('cr', 'n', ':Lspsaga rename<cr>', 'Rename')
 ld('cR', 'n', ':Lspsaga rename ++project<cr>', 'Rename Project wide')
@@ -145,7 +147,9 @@ nld('sh', ':Telescope highlights<cr>', 'List Highlights')
 nld('sk', ':Telescope keymaps<cr>', 'Search Keymaps')
 nld('sl', ':Telescope luasnip<CR>', 'Search LuaSnip')
 nld('so', ':Telescope oldfiles<CR>', 'Old Files')
-nld('sp', ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>', 'Lazy Plugins')
+nld('sp',
+  ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>',
+  'Lazy Plugins')
 nld('sq', ':Telescope quickfix<cr>', 'Quickfix')
 nld('ss', ':Telescope treesitter<cr>', 'Treesitter')
 nld('st', ':TodoTelescope<cr>', 'Search Todos')
@@ -153,10 +157,12 @@ nld('sw', ':Telescope grep_string<cr>', 'Grep String')
 nld('sx', ':Telescope import<cr>', 'Telescope: Import')
 
 -- Trouble
-nld('xd', ':Trouble document_diagnostics<cr>', 'Trouble: Document Diagnostics')
+nld('xd',
+  ':Trouble document_diagnostics<cr>', 'Trouble: Document Diagnostics')
 nld('xl', ':Trouble loclist<cr>', 'Trouble: Location List')
 nld('xq', ':Trouble quickfix<cr>', 'Trouble: Quickfix')
-nld('xw', ':Trouble workspace_diagnostics<cr>', 'Trouble: Workspace Diagnostics')
+nld('xw',
+  ':Trouble workspace_diagnostics<cr>', 'Trouble: Workspace Diagnostics')
 nld('xx', ':Trouble diagnostics<cr>', 'Trouble: Diagnostic')
 
 -- Text manipulation
@@ -173,7 +179,7 @@ nld('tc', ':CloakToggle<cr>', 'Cloak: Toggle')
 nld('te', ':Neotree toggle<cr>', 'Toggle Neotree')
 nld(
   'tl',
-  ':lua vim.opt.background = vim.opt.background:get() == "light" and "dark" or "light"<cr>',
+  ':lua vim.o.bg = vim.o.bg:get() == "light" and "dark" or "light"<cr>',
   'Toggle Light/Dark Mode'
 )
 nld('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
@@ -186,13 +192,11 @@ n('<C-w>+', ':resize +5<CR>', { desc = 'H Resize +' })
 n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- Deal with word wrap
-n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
-n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })
+n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true })
+n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true })
 
 -- Quit
 nld('qf', ':q<CR>', 'Quicker close split')
 nld('qq', ':wq!<CR>', 'Quit with force saving')
 nld('qw', ':wq<CR>', 'Write and quit')
 nld('qQ', ':q!<CR>', 'Force quit without saving')
-
--- vim: set ft=lua ts=2 sw=2 tw=0 et :
