@@ -20,9 +20,6 @@ return {
         }
       }
     },
-    keys = {
-      { '<leader>o', function() Snacks.gitbrowse() end, desc = 'Open repo in browser' },
-    },
   },
   -- A pretty diagnostics, references, telescope results,
   -- quickfix and location list to help you solve all the

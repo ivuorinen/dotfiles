@@ -12,13 +12,19 @@ local s = vim.keymap.set
 local function handleDesc(desc)
   if type(desc) == "string" then
     -- Convert string to table with `desc` as a key
+    -- If the string is empty, just return as an empty description
     return { desc = desc }
   elseif type(desc) == "table" then
+    -- If desc doesn't have 'desc' key, combine it with others with empty description
+    if not desc.desc then
+      desc = table.insert(desc, { desc = '' })
+      return desc
+    end
     -- Use the table as is
     return desc
   else
     -- Default to an empty table if `desc` is nil or an unsupported type
-    return {}
+    return { desc = '' }
   end
 end
 
@@ -42,30 +48,30 @@ end
 -- It prepends '<leader>' to the key and uses desc from opts
 ---@param key string rhs, required, but will be prepended with '<leader>'
 ---@param cmd string|function lhs, required
----@param desc table|string description, required
-local nld = function(key, cmd, desc)
-  desc = handleDesc(desc)
-  nl(key, cmd, desc)
+---@param opts table|string description, required
+local nld = function(key, cmd, opts)
+  opts = handleDesc(opts)
+  nl(key, cmd, opts)
 end
 
 -- Keymap shortcut function with mode defined, good for sorting by rhs
 ---@param key string rhs, required
 ---@param mode string|string[] one of n, v, x, or table of modes { 'n', 'v' }
 ---@param cmd string|function lhs, required
----@param desc string|table description, required
-local d = function(key, mode, cmd, desc)
-  desc = handleDesc(desc)
-  s(mode, key, cmd, desc)
+---@param opts string|table description, required
+local d = function(key, mode, cmd, opts)
+  opts = handleDesc(opts)
+  s(mode, key, cmd, opts)
 end
 
 -- Leader based keymap shortcut function with mode defined
 ---@param key string rhs, required, but will be prepended with '<leader>'
 ---@param mode string|string[] one of n, v, x, or table of modes { 'n', 'v' }
 ---@param cmd string|function lhs, required
----@param desc string|table description (or opts), required
-local ld = function(key, mode, cmd, desc)
-  desc = handleDesc(desc)
-  s(mode, '<leader>' .. key, cmd, desc)
+---@param opts string|table description (or opts), required
+local ld = function(key, mode, cmd, opts)
+  opts = handleDesc(opts)
+  s(mode, '<leader>' .. key, cmd, opts)
 end
 
 -- ╭─────────────────────────────────────────────────────────╮
@@ -94,7 +100,6 @@ nld('cg', ':lua require("neogen").generate()<CR>', 'Generate annotations')
 
 -- LSP
 n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature Help' })
-n('<C-h>', ':lua vim.lsp.buf.hover()<CR>', { desc = 'Hover' })
 n('K', ':Lspsaga hover_doc<cr>', { desc = 'Hover Documentation' })
 ld('ca', 'n', ':Lspsaga code_action<cr>', 'Code Action')
 ld('cci', 'n', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
@@ -145,7 +150,7 @@ nld('sq', ':Telescope quickfix<cr>', 'Quickfix')
 nld('ss', ':Telescope treesitter<cr>', 'Treesitter')
 nld('st', ':TodoTelescope<cr>', 'Search Todos')
 nld('sw', ':Telescope grep_string<cr>', 'Grep String')
-nld('sx', ':Telescope import', 'Telescope: Import')
+nld('sx', ':Telescope import<cr>', 'Telescope: Import')
 
 -- Trouble
 nld('xd', ':Trouble document_diagnostics<cr>', 'Trouble: Document Diagnostics')
@@ -160,15 +165,25 @@ d('>', { 'n', 'v' }, '>gv', 'Indent Right')
 d('<C-k>', { 'n', 'v' }, ":m '<-2<CR>gv=gv", 'Move Block Up')
 d('<C-j>', { 'n', 'v' }, ":m '>+1<CR>gv=gv", 'Move Block Down')
 
+-- Other functionality
+nld('o', function() require('snacks').gitbrowse() end, 'Open repo in browser')
+
 -- Toggle settings
 nld('tc', ':CloakToggle<cr>', 'Cloak: Toggle')
 nld('te', ':Neotree toggle<cr>', 'Toggle Neotree')
-nld('tl', ':exec &bg=="light" ? "set bg=dark" : "set bg=light"<cr>', 'Toggle Light/Dark Mode')
+nld(
+  'tl',
+  ':lua vim.opt.background = vim.opt.background:get() == "light" and "dark" or "light"<cr>',
+  'Toggle Light/Dark Mode'
+)
 nld('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 
 -- Splits
 n('<C-w>,', ':vertical resize -10<CR>', { desc = 'V Resize -' })
 n('<C-w>.', ':vertical resize +10<CR>', { desc = 'V Resize +' })
+n('<C-w>-', ':resize -5<CR>', { desc = 'H Resize -' })
+n('<C-w>+', ':resize +5<CR>', { desc = 'H Resize +' })
+n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- Deal with word wrap
 n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
@@ -178,5 +193,6 @@ n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr =
 nld('qf', ':q<CR>', 'Quicker close split')
 nld('qq', ':wq!<CR>', 'Quit with force saving')
 nld('qw', ':wq<CR>', 'Write and quit')
+nld('qQ', ':q!<CR>', 'Force quit without saving')
 
 -- vim: set ft=lua ts=2 sw=2 tw=0 et :

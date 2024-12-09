@@ -27,14 +27,6 @@ return {
     },
   },
 
-  -- Neovim plugin to animate the cursor with a smear effect in all terminals
-  -- https://github.com/sphamba/smear-cursor.nvim
-  {
-    'sphamba/smear-cursor.nvim',
-    version = '*',
-    opts = {}
-  },
-
   -- A neovim plugin that shows colorcolumn dynamically
   -- https://github.com/Bekaboo/deadcolumn.nvim
   { 'Bekaboo/deadcolumn.nvim' },

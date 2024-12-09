@@ -101,20 +101,28 @@ return {
       highlighters = {
         -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
         fixme = {
-          pattern = '%f[%w]()FIXME()%f[%W]',
+          pattern = '%f[%w]()FIXME:?%s*()%f[%W]',
           group = 'MiniHipatternsFixme',
         },
         hack = {
-          pattern = '%f[%w]()HACK()%f[%W]',
+          pattern = '%f[%w]()HACK:?%s*()%f[%W]',
           group = 'MiniHipatternsHack',
         },
         todo = {
-          pattern = '%f[%w]()TODO()%f[%W]',
+          pattern = '%f[%w]()NOTE:?%s*()%f[%W]',
           group = 'MiniHipatternsTodo',
         },
         note = {
           pattern = '%f[%w]()NOTE()%f[%W]',
           group = 'MiniHipatternsNote',
+        },
+        bug = {
+          pattern = '%f[%w]()BUG:?%s*()%f[%W]',
+          group = 'MiniHipatternsBug',
+        },
+        perf = {
+          pattern = '%f[%w]()PERF:?%s*()%f[%W]',
+          group = 'MiniHipatternsPerf',
         },
       },
     },
@@ -184,6 +192,25 @@ return {
     opts = {
       use_icons = true,
       set_vim_settings = true,
+      content = {
+        active = function()
+          local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+          local git = MiniStatusline.section_git({ trunc_width = 75 })
+          local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+          local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+          local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+          local location = MiniStatusline.section_location({ trunc_width = 75 })
+          return MiniStatusline.combine_groups({
+            { hl = mode_hl,                 strings = { mode } },
+            { hl = 'MiniStatuslineDevinfo', strings = { git, diagnostics } },
+            '%<', -- Mark general truncate point
+            { hl = 'MiniStatuslineFilename', strings = { filename } },
+            '%=', -- End left alignment
+            { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+            { hl = mode_hl,                  strings = { location } },
+          })
+        end,
+      },
     }
   },
 

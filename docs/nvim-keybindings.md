@@ -30,6 +30,8 @@ n  <C-W>       *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
                  Query keys after "<C-W>"
 n  <Esc><Esc>  * :nohlsearch<CR>
                  Clear Search Highlighting
+n  <Space>qQ   * :q!<CR>
+                 Force quit without saving
 n  <Space>qw   * :wq<CR>
                  Write and quit
 n  <Space>qq   * :wq!<CR>
@@ -38,12 +40,14 @@ n  <Space>qf   * :q<CR>
                  Quicker close split
 n  <Space>tn   * :Noice dismiss<CR>
                  Noice: Dismiss Notification
-n  <Space>tl   * :exec &bg=="light" ? "set bg=dark" : "set bg=light"<CR>
+n  <Space>tl   * :lua vim.opt.background = vim.opt.background:get() == "light" and "dark" or "light"<CR>
                  Toggle Light/Dark Mode
 n  <Space>te   * :Neotree toggle<CR>
                  Toggle Neotree
 n  <Space>tc   * :CloakToggle<CR>
                  Cloak: Toggle
+n  <Space>o    * ~/.config/nvim/lua/keymaps.lua
+                 Open repo in browser
 n  <Space>xx   * :Trouble diagnostics<CR>
                  Trouble: Diagnostic
 n  <Space>xw   * :Trouble workspace_diagnostics<CR>
@@ -54,7 +58,7 @@ n  <Space>xl   * :Trouble loclist<CR>
                  Trouble: Location List
 n  <Space>xd   * :Trouble document_diagnostics<CR>
                  Trouble: Document Diagnostics
-n  <Space>sx   * :Telescope import
+n  <Space>sx   * :Telescope import<CR>
                  Telescope: Import
 n  <Space>sw   * :Telescope grep_string<CR>
                  Grep String
@@ -191,11 +195,11 @@ n  T           * <Cmd>lua MiniJump.smart_jump(true, true)<CR>
                  Jump backward till
 n  Y           * y$
                  :help Y-default
-x  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash Treesitter
 n  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash Treesitter
-o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+x  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash Treesitter
 o  [%            <Plug>(MatchitOperationMultiBackward)
 x  [%            <Plug>(MatchitVisualMultiBackward)
@@ -259,16 +263,6 @@ n  gR          * :RegexplainerToggle<CR>
 o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
-o  gh          * <Cmd>lua MiniDiff.textobject()<CR>
-                 Hunk range textobject
-x  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
-                 Reset hunks
-n  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
-                 Reset hunks
-x  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
-                 Apply hunks
-n  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
-                 Apply hunks
 x  gs          * <Cmd>lua MiniOperators.sort('visual')<CR>
                  Sort selection
 n  gss           ^gsg_
@@ -299,6 +293,16 @@ x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_vis
                  Toggle arguments
 n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
                  Toggle arguments
+o  gh          * <Cmd>lua MiniDiff.textobject()<CR>
+                 Hunk range textobject
+x  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Reset hunks
+n  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Reset hunks
+x  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Apply hunks
+n  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Apply hunks
 o  gc          * <Cmd>lua MiniComment.textobject()<CR>
                  Comment textobject
 n  gcc         * ~/.local/share/nvim/lazy/mini.comment/lua/mini/comment.lua
@@ -361,20 +365,30 @@ x  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
 n  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
+x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
 n  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
 o  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
-x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
-                 Flash
+n  <C-W>=      * <C-W>=
+                 Equal Size Splits
+n  <C-W>+      * :resize +5<CR>
+                 H Resize +
+n  <C-W>-      * :resize -5<CR>
+                 H Resize -
 n  <C-W>.      * :vertical resize +10<CR>
                  V Resize +
 n  <C-W>,      * :vertical resize -10<CR>
                  V Resize -
-n  <C-H>       * :lua vim.lsp.buf.hover()<CR>
-                 Hover
-n  <C-K>       * :lua vim.lsp.buf.signature_help()<CR>
-                 Signature Help
+v  <C-J>       * :m '>+1<CR>gv=gv
+                 Move Block Down
+n  <C-J>       * :m '>+1<CR>gv=gv
+                 Move Block Down
+v  <C-K>       * :m '<-2<CR>gv=gv
+                 Move Block Up
+n  <C-K>       * :m '<-2<CR>gv=gv
+                 Move Block Up
 n  <C-S>       * :w!<CR>
                  Save
 n  <Down>      * :echo "Use j to move!!"<CR>
@@ -395,18 +409,18 @@ x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>
 n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
 n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
 n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
-n  <M-k>       * :m '<-2<CR>gv=gv
-                 Move Block Up
-n  <M-j>       * :m '>+1<CR>gv=gv
-                 Move Block Down
+n  <M-k>       * <Cmd>lua MiniMove.move_line('up')<CR>
+                 Move line up
+n  <M-j>       * <Cmd>lua MiniMove.move_line('down')<CR>
+                 Move line down
 n  <M-l>       * <Cmd>lua MiniMove.move_line('right')<CR>
                  Move line right
 n  <M-h>       * <Cmd>lua MiniMove.move_line('left')<CR>
                  Move line left
-v  <M-k>       * :m '<-2<CR>gv=gv
-                 Move Block Up
-v  <M-j>       * :m '>+1<CR>gv=gv
-                 Move Block Down
+x  <M-k>       * <Cmd>lua MiniMove.move_selection('up')<CR>
+                 Move up
+x  <M-j>       * <Cmd>lua MiniMove.move_selection('down')<CR>
+                 Move down
 x  <M-l>       * <Cmd>lua MiniMove.move_selection('right')<CR>
                  Move right
 x  <M-h>       * <Cmd>lua MiniMove.move_selection('left')<CR>
@@ -415,8 +429,8 @@ n  <C-W><C-D>    <C-W>d
                  Show diagnostics under the cursor
 n  <C-W>d      * vim/_defaults.lua
                  Show diagnostics under the cursor
-n  <C-L>       * <Cmd>nohlsearch|diffupdate|normal! <C-L><CR>
-                 :help CTRL-L-default
+n  <C-L>       * :lua vim.lsp.buf.signature_help()<CR>
+                 Signature Help
 ```
 
-- Generated on Sun  8 Dec 2024 16:23:16 EET
+- Generated on Mon  9 Dec 2024 09:21:57 EET

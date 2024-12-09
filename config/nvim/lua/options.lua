@@ -27,6 +27,7 @@ o.cursorline = true                -- Show which line your cursor is on
 o.inccommand = 'split'             -- Preview substitutions live, as you type!
 o.mouse = 'a'                      -- Enable mouse support
 o.number = true                    -- Show line numbers
+o.numberwidth = 3                  -- Set the width of the number column
 o.relativenumber = true            -- Show relative line numbers
 o.scrolloff = 15                   -- Show context around cursor
 o.showmode = false                 -- Don't show mode

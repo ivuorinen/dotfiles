@@ -13,6 +13,17 @@ autocmd('TextYankPost', {
   pattern = '*',
 })
 
+-- Set the numberwidth to the maximum line number.
+--
+-- This fixes the issue where the line numbers jump
+-- around when moving between lines relative line numbers enabled.
+autocmd({ "BufEnter", "BufWinEnter", "TabEnter" }, {
+  callback = function()
+    local max_line_count = vim.fn.line("$")
+    vim.opt.numberwidth = #tostring(max_line_count) + 1
+  end,
+})
+
 -- Windows to close with "q"
 autocmd('FileType', {
   group = augroup('close_with_q', { clear = true }),
