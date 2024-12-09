@@ -21,6 +21,11 @@ return {
       local miniclue = require 'mini.clue'
 
       miniclue.setup {
+        window = {
+          config = {
+            width = 'auto',
+          },
+        },
         triggers = {
           -- Leader triggers
           { mode = 'n', keys = '<Leader>' },
@@ -53,8 +58,8 @@ return {
           { mode = 'x', keys = 'z' },
         },
 
+        -- These mark the sections in the popup
         clues = {
-          -- Enhance this by adding descriptions for <Leader> mapping groups
           miniclue.gen_clues.builtin_completion(),
           miniclue.gen_clues.g(),
           miniclue.gen_clues.marks(),
@@ -176,6 +181,9 @@ return {
   -- Text edit operators
   { 'echasnovski/mini.operators',   version = '*', opts = {} },
 
+  -- Session management (read, write, delete)
+  { 'echasnovski/mini.sessions',    version = '*', opts = {} },
+
   -- Split and join arguments, lists, and other sequences
   -- Replaced Wansmer/treesj
   { 'echasnovski/mini.splitjoin',   version = '*', opts = {} },
@@ -197,8 +205,8 @@ return {
           local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
           local git = MiniStatusline.section_git({ trunc_width = 75 })
           local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-          local filename = MiniStatusline.section_filename({ trunc_width = 140 })
-          local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+          local filename = MiniStatusline.section_filename({ trunc_width = 50 })
+          -- local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
           local location = MiniStatusline.section_location({ trunc_width = 75 })
           return MiniStatusline.combine_groups({
             { hl = mode_hl,                 strings = { mode } },
@@ -206,7 +214,7 @@ return {
             '%<', -- Mark general truncate point
             { hl = 'MiniStatuslineFilename', strings = { filename } },
             '%=', -- End left alignment
-            { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+            -- { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
             { hl = mode_hl,                  strings = { location } },
           })
         end,
