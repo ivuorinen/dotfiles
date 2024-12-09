@@ -5,7 +5,7 @@
 local augroup = vim.api.nvim_create_augroup -- Create/get autocommand group
 local autocmd = vim.api.nvim_create_autocmd -- Create autocommand
 
--- ── Highlight on yank ───────────────────────────────────────────────
+-- Highlight on yank
 -- See `:help vim.highlight.on_yank()`
 autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
@@ -13,7 +13,18 @@ autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- ── Windows to close with "q" ───────────────────────────────────────
+-- Set the numberwidth to the maximum line number.
+--
+-- This fixes the issue where the line numbers jump
+-- around when moving between lines relative line numbers enabled.
+autocmd({ "BufEnter", "BufWinEnter", "TabEnter" }, {
+  callback = function()
+    local max_line_count = vim.fn.line("$")
+    vim.opt.numberwidth = #tostring(max_line_count) + 1
+  end,
+})
+
+-- Windows to close with "q"
 autocmd('FileType', {
   group = augroup('close_with_q', { clear = true }),
   pattern = {
@@ -44,15 +55,15 @@ autocmd('FileType', {
   end,
 })
 
--- ── make it easier to close man-files when opened inline ────────────
+-- make it easier to close man-files when opened inline
 autocmd('FileType', {
   group = augroup('man_unlisted', { clear = true }),
   pattern = { 'man' },
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 
--- ── wrap and check for spell in text filetypes ──────────────────────
-vim.api.nvim_create_autocmd('FileType', {
+-- wrap and check for spell in text filetypes
+autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
   pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
   callback = function()
@@ -61,17 +72,29 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- ── Fix conceallevel for json files ─────────────────────────────────
-vim.api.nvim_create_autocmd({ 'FileType' }, {
+-- Fix conceallevel for json files
+autocmd({ 'FileType' }, {
   group = augroup('json_conceal', { clear = true }),
   pattern = { 'json', 'jsonc', 'json5' },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+-- Set filetype for SSH config directory
+autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
   pattern = '*/?.ssh/{config|shared}.d/*',
   command = 'set filetype=sshconfig',
+})
+
+-- Format on save, unless disabled
+autocmd('BufWritePre', {
+  group = augroup('Format', { clear = true }),
+  pattern = '*', -- All files
+  callback = function()
+    if not vim.g.disable_autoformat then
+      vim.lsp.buf.format({ async = false })
+    end
+  end,
 })
 
 -- vim: ts=2 sts=2 sw=2 et

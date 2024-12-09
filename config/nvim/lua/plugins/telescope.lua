@@ -7,7 +7,6 @@ return {
   dependencies = {
     { 'nvim-lua/plenary.nvim' },
     { 'nvim-telescope/telescope-symbols.nvim' },
-    { 'folke/which-key.nvim' },
 
     -- A Telescope picker to quickly access configurations
     -- of plugins managed by lazy.nvim.
@@ -33,7 +32,6 @@ return {
   config = function()
     local t = require 'telescope'
     local a = require 'telescope.actions'
-    local themes = require 'telescope.themes'
 
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
@@ -80,7 +78,6 @@ return {
     }
 
     -- Load extensions
-    pcall(t.load_extension, 'harpoon')
     pcall(t.load_extension, 'git_worktree')
     pcall(t.load_extension, 'lazy_plugins')
     pcall(t.load_extension, 'luasnip')
@@ -92,14 +89,5 @@ return {
     -- [[ Telescope Keymaps ]]
     -- See `:help telescope.builtin`
     -- See `:help telescope.keymap`
-    vim.keymap.set('n', '<leader>/', function()
-      -- You can pass additional configuration to telescope to change theme, layout, etc.
-      require('telescope.builtin').current_buffer_fuzzy_find(
-        themes.get_dropdown {
-          winblend = 20,
-          previewer = true,
-        }
-      )
-    end, { desc = '[/] Fuzzily search in current buffer]' })
   end,
 }

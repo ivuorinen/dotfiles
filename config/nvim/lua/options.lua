@@ -2,35 +2,54 @@
 -- │              neovim configuration options               │
 -- ╰─────────────────────────────────────────────────────────╯
 -- See `:help vim.opt`
+--     `:help vim.g`
 -- For more options, you can see `:help option-list`
 
--- Enables the experimental nvim 0.5 features
-vim.loader.enable()
+local g = vim.g     -- A table to store global variables
+local o = vim.opt   -- A table to store global options
 
--- Map leader and local leader
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.loader.enable() -- Enable the plugin loader
 
--- Set the colorscheme and variants
-vim.g.colors_theme = 'tokyonight'
-vim.g.colors_variant_light = 'tokyonight-day'
-vim.g.colors_variant_dark = 'tokyonight-storm'
+-- vim.global
+g.mapleader = ' '                          -- Space as the leader key
+g.maplocalleader = ' '                     -- Space as the local leader key
+g.colors_theme = 'tokyonight'              -- Set the colorscheme
+g.colors_variant_light = 'tokyonight-day'  -- Set the light variant
+g.colors_variant_dark = 'tokyonight-storm' -- Set the dark variant
+g.editorconfig = true                      -- Make sure editorconfig support is enabled
+g.loaded_perl_provider = 0                 -- Disable perl provider
+g.loaded_ruby_provider = 0                 -- Disable ruby provider
 
--- Make sure editorconfig support is enabled
-vim.g.editorconfig = true
+-- vim.options
+o.breakindent = true               -- Enable break indent
+o.completeopt = 'menuone,noselect' -- Popup menu when typing
+o.cursorline = true                -- Show which line your cursor is on
+o.inccommand = 'split'             -- Preview substitutions live, as you type!
+o.mouse = 'a'                      -- Enable mouse support
+o.number = true                    -- Show line numbers
+o.numberwidth = 3                  -- Set the width of the number column
+o.relativenumber = true            -- Show relative line numbers
+o.scrolloff = 15                   -- Show context around cursor
+o.showmode = false                 -- Don't show mode
+o.signcolumn = 'yes:2'             -- Keep signcolumn on by default
+o.smartindent = true               -- Insert indents automatically
+o.spell = true                     -- Enable spell checking
+o.spelllang = 'en_us'              -- Set the spell checking language
+o.splitbelow = true                -- split to the bottom
+o.splitright = true                -- vsplit to the right
+o.termguicolors = true             -- Fixes Notify opacity issues
+o.timeoutlen = 250                 -- Decrease mapped sequence wait time
+o.undofile = true                  -- Save undo history
+o.updatetime = 250                 -- 250 ms = 2,5 seconds
+o.ignorecase = true                -- Ignore case in search patterns
+o.smartcase = true                 -- Override 'ignorecase' if pattern contains upper case chars
+
+
+o.list = true -- Show some invisible characters
+o.listchars = { tab = '» ', trail = '·', nbsp = '␣' } -- Which invisible chars to show
 
 -- Enable the colorcolumn
 vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
-
--- Enable line numbers and relative line numbers
-vim.opt.number = true
-vim.opt.relativenumber = true
-
--- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
-
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -39,96 +58,5 @@ vim.schedule(function()
   local c = vim.env.SSH_TTY and '' or 'unnamedplus'
   vim.opt.clipboard = c
 end)
-
-vim.opt.breakindent = true -- Enable break indent
-vim.opt.smartindent = true -- Insert indents automatically
-
--- Save undo history
-vim.opt.undofile = true
-
--- Case-insensitive searching UNLESS \C or one or
--- more capital letters in the search term
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-
--- Keep signcolumn on by default
-vim.opt.signcolumn = 'yes'
-
--- Decrease update time
-vim.opt.updatetime = 250
-vim.wo.signcolumn = 'yes'
-
--- Decrease mapped sequence wait time
--- Displays which-key popup sooner
-vim.opt.timeoutlen = 250
-
--- Configure how new splits should be opened
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
-
--- Show which line your cursor is on
-vim.opt.cursorline = true
-
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 15
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
-
--- Fixes Notify opacity issues
-vim.o.termguicolors = true
-
--- Set spell checking
-vim.o.spell = true
-vim.o.spelllang = 'en_us'
-
--- Tree-sitter settings
-vim.g.loaded_perl_provider = 0
-vim.g.loaded_ruby_provider = 0
-
--- kevinhwang91/nvim-ufo settings
-vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
-vim.o.foldcolumn = '1' -- '0' is not bad
--- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevel = 99
-vim.o.foldlevelstart = 99
-vim.o.foldenable = true
-
--- anuvyklack/windows.nvim settings
-vim.o.winwidth = 15
-vim.o.winminwidth = 10
-vim.o.equalalways = false
-
--- folke/noice.nvim settings
-vim.g.noice_ignored_filetypes = {
-  'fugitiveblame',
-  'fugitive',
-  'gitcommit',
-  'noice',
-}
-
--- ── Deal with word wrap ───────────────────────────────────────────────────────
-local m = vim.api.nvim_set_keymap
-m(
-  'n',
-  'k',
-  "v:count == 0 ? 'gk' : 'k'",
-  { desc = 'Move up', noremap = true, expr = true }
-)
-m(
-  'n',
-  'j',
-  "v:count == 0 ? 'gj' : 'j'",
-  { desc = 'Move down', noremap = true, expr = true }
-)
 
 -- vim: ts=2 sts=2 sw=2 et
