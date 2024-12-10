@@ -92,6 +92,7 @@ n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 -- Buffer operations
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
+nld('ba', ':%bd|e#|bd#<cr>', 'Close all except current')
 nld('bd', ':lua MiniBufremove.delete()<CR>', 'Delete')
 nld('bh', ':bprev<cr>', 'Prev')
 nld('bj', ':bfirst<cr>', 'First')
