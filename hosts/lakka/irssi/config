@@ -27,13 +27,13 @@ servers = (
     family = "inet";
   },
   { address = "irc.efnet.net"; chatnet = "EFNet"; port = "6667"; },
-  { 
+  {
     address = "irc.undernet.org";
     chatnet = "Undernet";
     port = "6667";
   },
   { address = "irc.dal.net"; chatnet = "DALnet"; port = "6667"; },
-  { 
+  {
     address = "irc.quakenet.org";
     chatnet = "QuakeNet";
     port = "6667";
@@ -50,7 +50,7 @@ chatnets = {
     max_whois = "4";
     max_query_chans = "5";
   };
-  EFNet = { 
+  EFNet = {
     type = "IRC";
     max_kicks = "4";
     max_msgs = "3";

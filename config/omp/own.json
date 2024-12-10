@@ -16,7 +16,7 @@
         {
           "type": "session",
           "style": "plain",
-          "template": " {{ if .SSHSession }} {{ .UserName }}@{{ end }}{{ .HostName }}"
+          "template": " {{ if .SSHSession }}\ueba9 {{ .UserName }}@{{ end }}{{ .HostName }}"
         },
         {
           "foreground": "cyan",
@@ -27,14 +27,14 @@
           "template": " {{ .Path }} ",
           "type": "path",
           "mapped_locations": {
-            "~/Code/*": "\uF09B"
+            "~/Code/*": "\uf09b"
           }
         },
         {
           "type": "git",
           "style": "plain",
           "foreground": "lightGreen",
-          "template": "{{ .UpstreamIcon }}{{ if or (.Staging.Changed) (.Working.Changed) }}({{if .Behind }}\u2193 {{ .Behind }} {{ end }}{{if .Staging.Changed }}\uF046 {{ .Staging.String }} {{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }}| {{ end }}{{ if .Working.Changed }} {{ .Working.String }}{{ end }}){{ end }}",
+          "template": "{{ .UpstreamIcon }}{{ if or (.Staging.Changed) (.Working.Changed) }}({{if .Behind }}\u2193 {{ .Behind }} {{ end }}{{if .Staging.Changed }}\uf046 {{ .Staging.String }} {{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }}| {{ end }}{{ if .Working.Changed }}\uf044 {{ .Working.String }}{{ end }}){{ end }}",
           "properties": {
             "fetch_status": true,
             "fetch_upstream_icon": true,
@@ -100,7 +100,7 @@
         {
           "type": "php",
           "style": "plain",
-          "template": "  {{ .Full }} "
+          "template": " \ue73d {{ .Full }} "
         }
       ],
       "type": "prompt"

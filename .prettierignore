@@ -1,12 +1,14 @@
+# vim: ft=gitignore
 .mypy_cache/*
 Brewfile.lock.json
 config/cheat/cheatsheets/community
 config/cheat/cheatsheets/tldr
 config/fzf/*
-config/nvim-kickstart/*
+config/nvim/*
 config/tmux/plugins/*
 config/zsh/*
 lazy-lock.json
 local/bin/antigen.zsh
 local/bin/asdf
+tools/antidote/*
 tools/dotbot*
