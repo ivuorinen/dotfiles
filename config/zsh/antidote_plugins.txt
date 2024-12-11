@@ -10,9 +10,11 @@ zsh-users/zsh-completions kind:fpath path:src
 getantidote/use-omz        # handle OMZ dependencies
 ohmyzsh/ohmyzsh path:lib   # load OMZ's library
 
-# Use pure prompt
-mafredri/zsh-async
-sindresorhus/pure
+# Theme
+# mafredri/zsh-async # for pure
+# sindresorhus/pure  # pure itself
+
+romkatv/powerlevel10k
 
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/brew
