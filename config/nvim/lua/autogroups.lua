@@ -83,6 +83,8 @@ autocmd({ 'FileType' }, {
 })
 
 -- Set filetype for SSH config directory
+-- Pattern handles directories with files like:
+-- .dotfiles/ssh/config.d/*, .ssh/config.local, .ssh/config.work
 autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
   pattern = { '*/?.ssh/{config|shared}.d/*', '*/?.ssh/config.local', '*/?.ssh/config.work' },

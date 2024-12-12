@@ -18,9 +18,11 @@ return {
           impersonate_nvim_cmp = true,
         },
       },
+
       -- Set of preconfigured snippets for different languages.
       -- https://github.com/rafamadriz/friendly-snippets
       { 'rafamadriz/friendly-snippets' },
+
       -- Lua plugin to turn github copilot into a cmp source
       -- https://github.com/giuxtaposition/blink-cmp-copilot
       {
@@ -73,7 +75,10 @@ return {
       completion = {
         menu = {
           draw = {
-            columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind", gap = 1 } },
+            columns = {
+              { "label",     "label_description", gap = 1 },
+              { "kind_icon", "kind",              gap = 1 }
+            },
           },
         },
         documentation = {

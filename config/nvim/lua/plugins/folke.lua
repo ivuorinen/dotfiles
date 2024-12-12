@@ -9,8 +9,11 @@ return {
     opts = {
       bigfile = { enabled = true },
       gitbrowse = { enabled = true },
+      notifier = {
+        enabled = true,
+        timeout = 3000,
+      },
       notify = { enabled = true },
-      notifier = { enabled = true },
       quickfile = { enabled = true },
       statuscolumn = {
         enabled = true,

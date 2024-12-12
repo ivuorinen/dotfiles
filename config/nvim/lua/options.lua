@@ -33,7 +33,7 @@ o.numberwidth = 3                  -- Set the width of the number column
 o.relativenumber = true            -- Show relative line numbers
 o.scrolloff = 15                   -- Show context around cursor
 o.showmode = false                 -- Don't show mode
-o.signcolumn = 'yes:2'             -- Keep signcolumn on by default
+o.signcolumn = 'yes:3'             -- Keep signcolumn on by default
 o.smartindent = true               -- Insert indents automatically
 o.spell = true                     -- Enable spell checking
 o.spelllang = 'en_us'              -- Set the spell checking language
@@ -46,7 +46,7 @@ o.updatetime = 250                 -- 250 ms = 2,5 seconds
 o.ignorecase = true                -- Ignore case in search patterns
 o.smartcase = true                 -- Override 'ignorecase' if pattern contains upper case chars
 
-
+-- List options
 o.list = true -- Show some invisible characters
 o.listchars = { tab = '» ', trail = '·', nbsp = '␣' } -- Which invisible chars to show
 

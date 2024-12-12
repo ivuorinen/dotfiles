@@ -4,6 +4,9 @@ return {
   -- Presets for common options and mappings
   { 'echasnovski/mini.basics',    version = '*' },
 
+  -- Extend and create a/i textobjects
+  { 'echasnovski/mini.ai',        version = '*' },
+
   -- Animate common Neovim actions
   -- Replaced anuvyklack/windows.nvim
   { 'echasnovski/mini.animate',   version = '*', opts = {} },
@@ -69,6 +72,7 @@ return {
           { mode = 'n', keys = '<Leader>b',  desc = '+Buffers' },
           { mode = 'n', keys = '<Leader>c',  desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
+          { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
           { mode = 'n', keys = '<Leader>q',  desc = '+Quit' },
           { mode = 'n', keys = '<Leader>s',  desc = '+Telescope' },
           { mode = 'n', keys = '<Leader>t',  desc = '+Toggle' },
@@ -104,7 +108,7 @@ return {
     version = '*',
     opts = {
       highlighters = {
-        -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
+        -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE', 'BUG', 'PERF' words
         fixme = {
           pattern = '%f[%w]()FIXME:?%s*()%f[%W]',
           group = 'MiniHipatternsFixme',
@@ -182,15 +186,40 @@ return {
   { 'echasnovski/mini.operators',   version = '*', opts = {} },
 
   -- Session management (read, write, delete)
-  { 'echasnovski/mini.sessions',    version = '*', opts = {} },
+  {
+    'echasnovski/mini.sessions',
+    version = '*',
+    opts = {
+      autoread = true,
+      autowrite = true,
+    }
+  },
 
   -- Split and join arguments, lists, and other sequences
   -- Replaced Wansmer/treesj
-  { 'echasnovski/mini.splitjoin',   version = '*', opts = {} },
+  { 'echasnovski/mini.splitjoin',  version = '*', opts = {} },
 
   -- Fast and flexible start screen
   -- Replaced glepnir/dashboard-nvim
-  { 'echasnovski/mini.starter',     version = '*', opts = {} },
+  {
+    'echasnovski/mini.starter',
+    version = '*',
+    config = function()
+      local starter = require('mini.starter')
+      starter.setup({
+        items = {
+          starter.sections.telescope(),
+          starter.sections.builtin_actions(),
+          starter.sections.sessions(5, true),
+        },
+        content_hooks = {
+          starter.gen_hook.adding_bullet(),
+          starter.gen_hook.indexing('all', { 'Builtin actions' }),
+          starter.gen_hook.aligning('center', 'center'),
+        },
+      })
+    end
+  },
 
   -- Minimal and fast statusline module with opinionated default look
   -- Replaced nvim-lualine/lualine.nvim

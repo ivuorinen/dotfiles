@@ -8,6 +8,9 @@ return {
     { 'nvim-lua/plenary.nvim' },
     { 'nvim-telescope/telescope-symbols.nvim' },
 
+    -- Telescope plugin for file browsing
+    { 'nvim-telescope/telescope-file-browser.nvim' },
+
     -- A Telescope picker to quickly access configurations
     -- of plugins managed by lazy.nvim.
     -- https://github.com/polirritmico/telescope-lazy-plugins.nvim
