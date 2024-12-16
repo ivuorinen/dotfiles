@@ -61,12 +61,6 @@ cheatpaths:
     path: ~/.config/cheat/cheatsheets/community
     tags: [community]
     readonly: true
-  # If you have personalized cheatsheets, list them last. They will take
-  # precedence over the more global cheatsheets.
-  - name: personal
-    path: ~/.dotfiles/config/cheat/cheatsheets/personal
-    tags: [personal]
-    readonly: false
   - name: pure-bash-bible
     path: ~/.dotfiles/config/cheat/cheatsheets/pure-bash-bible
     tags: [pure-bash-bible]
@@ -75,6 +69,13 @@ cheatpaths:
     path: ~/.dotfiles/config/cheat/cheatsheets/tldr/tldr
     tags: [tldr]
     readonly: true
+  # If you have personalized cheatsheets, list them last. They will take
+  # precedence over the more global cheatsheets.
+  - name: personal
+    path: ~/.dotfiles/config/cheat/cheatsheets/personal
+    tags: [personal]
+    readonly: false
+
 # While it requires no configuration here, it's also worth noting that
 # cheat will automatically append directories named '.cheat' within the
 # current working directory to the 'cheatpath'. This can be very useful if
