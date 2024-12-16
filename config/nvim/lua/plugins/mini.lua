@@ -2,14 +2,14 @@
 -- https://github.com/echasnovski/mini.nvim/tree/main?tab=readme-ov-file#modules
 return {
   -- Presets for common options and mappings
-  { 'echasnovski/mini.basics',    version = '*' },
+  { 'echasnovski/mini.basics', version = '*' },
 
   -- Extend and create a/i textobjects
-  { 'echasnovski/mini.ai',        version = '*' },
+  { 'echasnovski/mini.ai', version = '*' },
 
   -- Animate common Neovim actions
   -- Replaced anuvyklack/windows.nvim
-  { 'echasnovski/mini.animate',   version = '*', opts = {} },
+  { 'echasnovski/mini.animate', version = '*', opts = {} },
 
   -- Buffer removing (unshow, delete, wipeout), which saves window layout
   -- Replaced famiu/bufdelete.nvim
@@ -69,19 +69,19 @@ return {
           miniclue.gen_clues.registers(),
           miniclue.gen_clues.windows(),
           miniclue.gen_clues.z(),
-          { mode = 'n', keys = '<Leader>b',  desc = '+Buffers' },
-          { mode = 'n', keys = '<Leader>c',  desc = '+Code' },
+          { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
+          { mode = 'n', keys = '<Leader>c', desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
           { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
-          { mode = 'n', keys = '<Leader>q',  desc = '+Quit' },
-          { mode = 'n', keys = '<Leader>s',  desc = '+Telescope' },
-          { mode = 'n', keys = '<Leader>t',  desc = '+Toggle' },
-          { mode = 'n', keys = '<Leader>x',  desc = '+Trouble' },
-          { mode = 'n', keys = '<leader>z',  desc = '+TreeSitter' },
+          { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
+          { mode = 'n', keys = '<Leader>s', desc = '+Telescope' },
+          { mode = 'n', keys = '<Leader>t', desc = '+Toggle' },
+          { mode = 'n', keys = '<Leader>x', desc = '+Trouble' },
+          { mode = 'n', keys = '<leader>z', desc = '+TreeSitter' },
           { mode = 'n', keys = '<leader>zg', desc = '+Goto' },
-          { mode = 'n', keys = '<Leader>?',  desc = '+Help' },
-          { mode = 'n', keys = 'd',          desc = '+Diagnostics' },
-          { mode = 'n', keys = 'y',          desc = '+Yank' },
+          { mode = 'n', keys = '<Leader>?', desc = '+Help' },
+          { mode = 'n', keys = 'd', desc = '+Diagnostics' },
+          { mode = 'n', keys = 'y', desc = '+Yank' },
         },
       }
     end,
@@ -89,17 +89,22 @@ return {
 
   -- Comment lines
   -- Replaced numToStr/Comment.nvim
-  { 'echasnovski/mini.comment',    version = '*', opts = {} },
+  { 'echasnovski/mini.comment', version = '*', opts = {} },
 
   -- Highlight cursor word and its matches
   { 'echasnovski/mini.cursorword', version = '*' },
 
   -- Work with diff hunks
   -- Replaced lewis6991/gitsigns.nvim
-  { 'echasnovski/mini.diff',       version = '*', opts = {} },
+  { 'echasnovski/mini.diff', version = '*', opts = {} },
 
   -- Git integration
-  { 'echasnovski/mini-git',        version = '*', opts = {}, main = 'mini.git' },
+  {
+    'echasnovski/mini-git',
+    version = '*',
+    opts = {},
+    main = 'mini.git',
+  },
 
   -- Highlight patterns in text
   -- Replaced folke/todo-comments.nvim
@@ -180,10 +185,10 @@ return {
   },
 
   -- Move lines and blocks of text
-  { 'echasnovski/mini.move',        version = '*', opts = {} },
+  { 'echasnovski/mini.move', version = '*', opts = {} },
 
   -- Text edit operators
-  { 'echasnovski/mini.operators',   version = '*', opts = {} },
+  { 'echasnovski/mini.operators', version = '*', opts = {} },
 
   -- Session management (read, write, delete)
   {
@@ -192,12 +197,12 @@ return {
     opts = {
       autoread = true,
       autowrite = true,
-    }
+    },
   },
 
   -- Split and join arguments, lists, and other sequences
   -- Replaced Wansmer/treesj
-  { 'echasnovski/mini.splitjoin',  version = '*', opts = {} },
+  { 'echasnovski/mini.splitjoin', version = '*', opts = {} },
 
   -- Fast and flexible start screen
   -- Replaced glepnir/dashboard-nvim
@@ -205,8 +210,8 @@ return {
     'echasnovski/mini.starter',
     version = '*',
     config = function()
-      local starter = require('mini.starter')
-      starter.setup({
+      local starter = require 'mini.starter'
+      starter.setup {
         items = {
           starter.sections.telescope(),
           starter.sections.builtin_actions(),
@@ -217,8 +222,8 @@ return {
           starter.gen_hook.indexing('all', { 'Builtin actions' }),
           starter.gen_hook.aligning('center', 'center'),
         },
-      })
-    end
+      }
+    end,
   },
 
   -- Minimal and fast statusline module with opinionated default look
@@ -231,29 +236,34 @@ return {
       set_vim_settings = true,
       content = {
         active = function()
-          local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
-          local git = MiniStatusline.section_git({ trunc_width = 75 })
-          local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-          local filename = MiniStatusline.section_filename({ trunc_width = 50 })
+          local mode, mode_hl =
+            MiniStatusline.section_mode { trunc_width = 120 }
+          local git = MiniStatusline.section_git { trunc_width = 75 }
+          local diagnostics =
+            MiniStatusline.section_diagnostics { trunc_width = 75 }
+          local filename = MiniStatusline.section_filename { trunc_width = 50 }
           -- local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-          local location = MiniStatusline.section_location({ trunc_width = 75 })
-          return MiniStatusline.combine_groups({
-            { hl = mode_hl,                 strings = { mode } },
+          local location = MiniStatusline.section_location { trunc_width = 75 }
+          return MiniStatusline.combine_groups {
+            { hl = mode_hl, strings = { mode } },
             { hl = 'MiniStatuslineDevinfo', strings = { git, diagnostics } },
             '%<', -- Mark general truncate point
             { hl = 'MiniStatuslineFilename', strings = { filename } },
             '%=', -- End left alignment
             -- { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-            { hl = mode_hl,                  strings = { location } },
-          })
+            { hl = mode_hl, strings = { location } },
+          }
         end,
       },
-    }
+    },
   },
 
   -- Fast and feature-rich surround actions
   -- Replaced kylechui/nvim-surround
-  { 'echasnovski/mini.surround',   version = '*', opts = {} },
+  -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+  -- - sd'   - [S]urround [D]elete [']quotes
+  -- - sr)'  - [S]urround [R]eplace [)] [']
+  { 'echasnovski/mini.surround', version = '*', opts = {} },
 
   -- Work with trailing whitespace
   { 'echasnovski/mini.trailspace', version = '*', opts = {} },

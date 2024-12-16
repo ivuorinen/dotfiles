@@ -14,7 +14,7 @@ return {
   },
   ---@type TSConfig
   opts = {
-    auto_install = true,  -- Auto install the parser generators
+    auto_install = true, -- Auto install the parser generators
     sync_install = false, -- Sync install the parser generators, install async
 
     -- Add languages to be installed here that you want installed for treesitter
@@ -49,18 +49,18 @@ return {
   config = function(_, opts)
     require('nvim-treesitter.configs').setup(opts)
 
-    vim.api.nvim_create_autocmd({ "FileType" }, {
+    vim.api.nvim_create_autocmd({ 'FileType' }, {
       callback = function()
         -- Set foldmethod to treesitter if available
-        if require("nvim-treesitter.parsers").has_parser() then
-          vim.opt.foldmethod = "expr"
-          vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+        if require('nvim-treesitter.parsers').has_parser() then
+          vim.opt.foldmethod = 'expr'
+          vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
         else
           -- Otherwise, set foldmethod to syntax
-          vim.opt.foldmethod = "syntax"
+          vim.opt.foldmethod = 'syntax'
         end
 
-        vim.opt.foldlevel = 9    -- Open all folds by default
+        vim.opt.foldlevel = 9 -- Open all folds by default
         vim.opt.foldnestmax = 99 -- Maximum fold nesting
       end,
     })

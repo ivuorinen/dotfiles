@@ -2,7 +2,7 @@ return {
   -- A collection of small QoL plugins for Neovim
   -- https://github.com/folke/snacks.nvim
   {
-    "folke/snacks.nvim",
+    'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
     ---@type snacks.Config
@@ -17,24 +17,24 @@ return {
       quickfile = { enabled = true },
       statuscolumn = {
         enabled = true,
-        left = { "mark", "sign" }, -- priority of signs on the left (high to low)
-        right = { "fold", "git" }, -- priority of signs on the right (high to low)
+        left = { 'mark', 'sign' }, -- priority of signs on the left (high to low)
+        right = { 'fold', 'git' }, -- priority of signs on the right (high to low)
         folds = {
-          open = true,             -- show open fold icons
-          git_hl = false,          -- use Git Signs hl for fold icons
+          open = true, -- show open fold icons
+          git_hl = false, -- use Git Signs hl for fold icons
         },
         git = {
           -- patterns to match Git signs
-          patterns = { "GitSign", "MiniDiffSign" },
+          patterns = { 'GitSign', 'MiniDiffSign' },
         },
         refresh = 50, -- refresh at most every 50ms
       },
       words = { enabled = true },
       styles = {
         notification = {
-          wo = { wrap = true } -- Wrap notifications
-        }
-      }
+          wo = { wrap = true }, -- Wrap notifications
+        },
+      },
     },
   },
   -- A pretty diagnostics, references, telescope results,

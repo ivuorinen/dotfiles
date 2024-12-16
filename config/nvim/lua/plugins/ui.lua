@@ -33,7 +33,7 @@ return {
 
   -- Remove all background colors to make nvim transparent
   -- https://github.com/xiyaowong/nvim-transparent
-  { 'xiyaowong/nvim-transparent',     opts = {} },
+  { 'xiyaowong/nvim-transparent', opts = {} },
 
   -- Display a character as the colorcolumn
   -- https://github.com/lukas-reineke/virt-column.nvim
@@ -91,7 +91,7 @@ return {
   {
     'LudoPinelli/comment-box.nvim',
     event = 'BufEnter',
-    opts = {}
+    opts = {},
   },
 
   -- Plugin to improve viewing Markdown files in Neovim

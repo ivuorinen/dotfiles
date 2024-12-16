@@ -12,7 +12,6 @@ return {
         'saghen/blink.compat',
         version = '*',
         -- lazy.nvim will automatically load the plugin when it's required by blink.cmp
-        lazy = true,
         opts = {
           -- make sure to set opts so that lazy.nvim calls blink.compat's setup
           impersonate_nvim_cmp = true,
@@ -26,7 +25,7 @@ return {
       -- Lua plugin to turn github copilot into a cmp source
       -- https://github.com/giuxtaposition/blink-cmp-copilot
       {
-        "giuxtaposition/blink-cmp-copilot",
+        'giuxtaposition/blink-cmp-copilot',
         dependencies = {
           -- Fully featured & enhanced replacement for copilot.vim complete
           -- with API for interacting with Github Copilot
@@ -76,13 +75,13 @@ return {
         menu = {
           draw = {
             columns = {
-              { "label",     "label_description", gap = 1 },
-              { "kind_icon", "kind",              gap = 1 }
+              { 'label', 'label_description', gap = 1 },
+              { 'kind_icon', 'kind', gap = 1 },
             },
           },
         },
         documentation = {
-          auto_show = true
+          auto_show = true,
         },
         ghost_text = {
           enabled = false,
@@ -95,7 +94,7 @@ return {
         providers = {
           copilot = {
             name = 'copilot',
-            module = 'blink-cmp-copilot'
+            module = 'blink-cmp-copilot',
           },
         },
         completion = {
@@ -113,10 +112,10 @@ return {
       -- completion = { accept = { auto_brackets = { enabled = true } } }
 
       -- experimental signature help support
-      signature = { enabled = true }
+      signature = { enabled = true },
     },
     -- allows extending the enabled_providers array elsewhere in your config
     -- without having to redefine it
-    opts_extend = { "sources.completion.enabled_providers" },
+    opts_extend = { 'sources.completion.enabled_providers' },
   },
 }

@@ -31,6 +31,24 @@ return {
   cmd = 'Neotree',
   opts = {
     close_if_last_window = true,
+    popup_border_style = 'rounded',
+    enable_git_status = true,
+    enable_diagnostics = true,
+    git_status = {
+      symbols = {
+        -- Change type
+        added = '',
+        modified = '',
+        deleted = '✖',
+        renamed = '󰁕',
+        -- Status type
+        untracked = '',
+        ignored = '',
+        unstaged = '󰄱',
+        staged = '',
+        conflict = '',
+      },
+    },
     filesystem = {
       window = {
         mappings = {
@@ -42,8 +60,10 @@ return {
         hide_dotfiles = true,
         hide_gitignored = true,
         hide_hidden = true, -- only works on Windows for hidden files/directories
-        hide_by_name = {
+        never_show = {
           '.DS_Store',
+        },
+        hide_by_name = {
           'node_modules',
         },
         always_show = {
@@ -85,6 +105,7 @@ return {
           '.*rc.*',
           '.env*',
           '.prettierrc*',
+          '.markdownlint*',
           '.stylua.*',
         },
       },

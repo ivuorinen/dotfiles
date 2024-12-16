@@ -16,11 +16,11 @@ K = {}
 ---@param desc string|table? Optional description. Can be a string or a table.
 ---@return table -- The description as a table.
 local function handleDesc(desc)
-  if type(desc) == "string" then
+  if type(desc) == 'string' then
     -- Convert string to table with `desc` as a key
     -- If the string is empty, just return as an empty description
     return { desc = desc }
-  elseif type(desc) == "table" then
+  elseif type(desc) == 'table' then
     -- If desc doesn't have 'desc' key, combine it with
     -- others with empty description
     if not desc.desc then
@@ -79,6 +79,4 @@ end
 -- ╰─────────────────────────────────────────────────────────╯
 
 -- Toggle background between light and dark
-function ToggleBackground()
-  vim.o.bg = vim.o.bg == "light" and "dark" or "light"
-end
+function ToggleBackground() vim.o.bg = vim.o.bg == 'light' and 'dark' or 'light' end

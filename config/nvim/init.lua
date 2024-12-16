@@ -18,7 +18,7 @@ if not vim.loop.fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
-      { out,                            'WarningMsg' },
+      { out, 'WarningMsg' },
       { '\nPress any key to exit...' },
     }, true, {})
     vim.fn.getchar()
@@ -38,7 +38,7 @@ require 'autogroups'
 
 -- ── Load plugins ────────────────────────────────────────────────────
 require('lazy').setup(
--- Automatically load plugins from lua/plugins
+  -- Automatically load plugins from lua/plugins
   'plugins',
   -- Lazy Configuration
   {

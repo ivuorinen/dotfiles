@@ -51,3 +51,8 @@ repos:
     rev: 39.63.1
     hooks:
       - id: renovate-config-validator
+
+  - repo: https://github.com/JohnnyMorganz/StyLua
+    rev: v2.0.2
+    hooks:
+      - id: stylua # or stylua-system / stylua-github

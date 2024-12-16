@@ -1,6 +1,6 @@
 -- vim: set ft=lua ts=2 sw=2 tw=0 et cc=120 :
 
-require('utils')
+require 'utils'
 
 -- ╭─────────────────────────────────────────────────────────╮
 -- │                         Keymaps                         │
@@ -78,7 +78,6 @@ K.nl('cbl', '<Cmd>CBline<CR>', 'CB: Simple Line')
 K.nl('cbm', '<Cmd>CBllbox14<CR>', 'CB: Marked')
 K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 
-
 -- ── Telescope operations ────────────────────────────────────────────
 -- Mappings for Telescope operations like finding files, buffers, etc.
 -- Convention: All mappings start with 's' followed by the operation
@@ -127,14 +126,14 @@ K.nl('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 -- Convention is 'q' followed by the operation
 K.nl('qf', ':q<CR>', 'Quicker close split')
 K.nl('qq', function()
-  if vim.fn.confirm("Force save and quit?", "&Yes\n&No", 2) == 1 then
-    vim.cmd('wq!')
+  if vim.fn.confirm('Force save and quit?', '&Yes\n&No', 2) == 1 then
+    vim.cmd 'wq!'
   end
 end, 'Quit with force saving')
 K.nl('qw', ':wq<CR>', 'Write and quit')
 K.nl('qQ', function()
-  if vim.fn.confirm("Force quit without saving?", "&Yes\n&No", 2) == 1 then
-    vim.cmd('q!')
+  if vim.fn.confirm('Force quit without saving?', '&Yes\n&No', 2) == 1 then
+    vim.cmd 'q!'
   end
 end, 'Force quit without saving')
 

@@ -17,9 +17,9 @@ autocmd('TextYankPost', {
 --
 -- This fixes the issue where the line numbers jump
 -- around when moving between lines relative line numbers enabled.
-autocmd({ "BufEnter", "BufWinEnter", "TabEnter" }, {
+autocmd({ 'BufEnter', 'BufWinEnter', 'TabEnter' }, {
   callback = function()
-    local max_line_count = vim.fn.line("$")
+    local max_line_count = vim.fn.line '$'
     -- Only adjust if the file is large enough to matter
     if max_line_count > 99 then
       vim.opt.numberwidth = #tostring(max_line_count) + 1
@@ -68,7 +68,16 @@ autocmd('FileType', {
 -- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
-  pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown', 'asciidoc', 'rst', 'tex' },
+  pattern = {
+    'text',
+    'plaintex',
+    'typst',
+    'gitcommit',
+    'markdown',
+    'asciidoc',
+    'rst',
+    'tex',
+  },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
@@ -87,7 +96,11 @@ autocmd({ 'FileType' }, {
 -- .dotfiles/ssh/config.d/*, .ssh/config.local, .ssh/config.work
 autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
-  pattern = { '*/?.ssh/{config|shared}.d/*', '*/?.ssh/config.local', '*/?.ssh/config.work' },
+  pattern = {
+    '*/?.ssh/{config|shared}.d/*',
+    '*/?.ssh/config.local',
+    '*/?.ssh/config.work',
+  },
   command = 'set filetype=sshconfig',
 })
 
