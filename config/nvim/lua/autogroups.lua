@@ -104,15 +104,4 @@ autocmd({ 'BufRead', 'BufNewFile' }, {
   command = 'set filetype=sshconfig',
 })
 
--- Format on save, unless disabled
-autocmd('BufWritePre', {
-  group = augroup('Format', { clear = true }),
-  pattern = '*', -- All files
-  callback = function()
-    if not vim.g.disable_autoformat then
-      vim.lsp.buf.format({ async = false })
-    end
-  end,
-})
-
 -- vim: ts=2 sts=2 sw=2 et

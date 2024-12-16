@@ -20,8 +20,16 @@ K.n('<C-w>+', ':resize +10<CR>', { desc = 'H Resize +' })
 K.n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- ── Deal with word wrap ─────────────────────────────────────────────
-K.n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
-K.n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })
+K.n(
+  'k',
+  "v:count == 0 ? 'gk' : 'k'",
+  { desc = 'Move up', noremap = true, expr = true }
+)
+K.n(
+  'j',
+  "v:count == 0 ? 'gj' : 'j'",
+  { desc = 'Move down', noremap = true, expr = true }
+)
 
 -- ── Text manipulation ───────────────────────────────────────────────
 K.d('<', { 'n', 'v' }, '<gv', 'Indent Left')
@@ -55,7 +63,7 @@ K.ld('ca', 'n', ':Lspsaga code_action<cr>', 'Code Action')
 K.ld('cci', 'n', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
 K.ld('cco', 'n', ':Lspsaga outgoing_calls<cr>', 'Outgoing Calls')
 K.ld('cd', 'n', ':Lspsaga show_line_diagnostics<cr>', 'Line Diagnostics')
-K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
+-- K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
 K.ld('cg', 'n', ':lua require("neogen").generate()<CR>', 'Generate annotations')
 K.ld('ci', 'n', ':Lspsaga implement<cr>', 'Implementations')
 K.ld('cl', 'n', ':Lspsaga show_cursor_diagnostics<cr>', 'Cursor Diagnostics')
@@ -84,14 +92,18 @@ K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 -- unless it's a generic operation like searching or finding buffers
 K.nl('f', ':Telescope find_files<cr>', 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
-K.nl('/', function()
-  require('telescope.builtin').current_buffer_fuzzy_find(
-    require('telescope.themes').get_dropdown {
-      winblend = 20,
-      previewer = true,
-    }
-  )
-end, 'Fuzzily search in current buffer')
+K.nl(
+  '/',
+  function()
+    require('telescope.builtin').current_buffer_fuzzy_find(
+      require('telescope.themes').get_dropdown {
+        winblend = 20,
+        previewer = true,
+      }
+    )
+  end,
+  'Fuzzily search in current buffer'
+)
 
 K.nl('sc', ':Telescope commands<cr>', 'Commands')
 K.nl('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
@@ -100,7 +112,11 @@ K.nl('sh', ':Telescope help_tags<cr>', 'Help tags')
 K.nl('sk', ':Telescope keymaps<cr>', 'Search Keymaps')
 K.nl('sl', ':Telescope luasnip<CR>', 'Search LuaSnip')
 K.nl('so', ':Telescope oldfiles<CR>', 'Old Files')
-K.nl('sp', ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>', 'Lazy Plugins')
+K.nl(
+  'sp',
+  ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>',
+  'Lazy Plugins'
+)
 K.nl('sq', ':Telescope quickfix<cr>', 'Quickfix')
 K.nl('ss', ':Telescope treesitter<cr>', 'Treesitter')
 K.nl('st', ':TodoTelescope<cr>', 'Search Todos')
