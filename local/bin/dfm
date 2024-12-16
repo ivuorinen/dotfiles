@@ -29,7 +29,9 @@ if ! declare -f msg_err > /dev/null; then
   # $1 - error message (string)
   msg_err()
   {
+    # shellcheck disable=SC2317
     echo "(!) ERROR: $1" >&2
+    # shellcheck disable=SC2317
     exit 1
   }
 fi
@@ -39,7 +41,9 @@ if ! declare -f msg_done > /dev/null; then
   # $1 - message (string)
   msg_done()
   {
+    # shellcheck disable=SC2317
     echo "✓ $1"
+    # shellcheck disable=SC2317
     return 0
   }
 fi
@@ -54,14 +58,14 @@ if ! declare -f array_diff > /dev/null; then
   # Source: https://stackoverflow.com/a/42399479/594940
   array_diff()
   {
+    # shellcheck disable=SC1083,SC2086
     eval local ARR1=\(\"\${$2[@]}\"\)
+    # shellcheck disable=SC1083,SC2086
     eval local ARR2=\(\"\${$3[@]}\"\)
     local IFS=$'\n'
     mapfile -t "$1" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
   }
 fi
-
-VERSION_NVM="v0.39.5"
 
 # Loads configs for better installation experience
 source "$DOTFILES/config/shared.sh"
@@ -148,13 +152,13 @@ section_install()
       $0 install macos
       $0 install fonts
       $0 brew install
-      $0 install ohmyposh
+      #$0 install ohmyposh
       $0 install asdf
       $0 install composer
       $0 install fzf
-      $0 install go
+      #$0 install go
       $0 install cheat-databases
-      $0 install imagick
+      #$0 install imagick
       $0 install nvm
       $0 install npm
       # $0 install ntfy
@@ -328,7 +332,8 @@ section_brew()
 
         declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
         for f in "${BREW_LIST_ALL[@]}"; do
-          if [[ ! " ${BREW_LIST_DEPENDENCIES[@]} " =~ " ${f} " ]]; then
+          # shellcheck disable=SC2199
+          if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
             BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
           fi
         done
@@ -416,6 +421,7 @@ section_helpers()
     "env:Show environment variables"
     "functions:Show functions"
     "nvim:Show nvim keybindings"
+    # shellcheck disable=SC2016
     'path:Show $PATH dir by dir'
     "tmux:Show tmux keybindings"
     "wezterm:Show wezterm keybindings"
@@ -445,7 +451,29 @@ section_helpers()
       esac
       ;;
     "colors")
-      for i in {0..255}; do echo -en "\e[38;5;${i}m${i} "; done
+      max=255
+      start=0
+
+      while [ "$start" -le "$max" ]; do
+        for i in $(seq "$start" $((start + 9))); do
+          if [ "$i" -le "$max" ]; then
+            # Outputs colored number
+            # printf " \e[38;5;%sm%4s\e[0m" "$i" "$i"
+
+            # Outputs colored block with number inside
+            # printf " \e[48;5;%sm\e[38;5;15m%5s \e[0m" "$i" "$i"
+
+            # Outputs colored block and color number
+            # printf " \e[48;5;%sm   \e[0m %3d" "$i" "$i"
+
+            # Outputs color number and colored block
+            printf "%3d \e[48;5;%sm   \e[0m " "$i" "$i"
+          fi
+        done
+        printf "\n"
+        start=$((start + 10))
+      done
+
       ;;
     "env")
       env | sort
