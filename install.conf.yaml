@@ -35,10 +35,14 @@
       glob: true
       relink: true
       path: config/*
-      exclude: [config/nvm]
+      exclude: [config/nvm, config/fzf]
     ~/.local/bin:
       glob: true
       path: local/bin/*
+      exclude: [local/bin/fzf]
+    ~/.local/fzf:
+      glob: true
+      path: config/fzf/*
     ~/.local/man:
       glob: true
       path: local/man/**
@@ -55,5 +59,5 @@
     - bash local/bin/dfm install all
 - pipx:
     file: tools/requirements-pipx.txt
-    stdout: false
+    stdout: true
     stderr: true
