@@ -8,8 +8,6 @@
 local g = vim.g -- A table to store global variables
 local o = vim.opt -- A table to store global options
 
-vim.loader.enable() -- Enable the plugin loader
-
 -- vim.global
 g.mapleader = ' ' -- Space as the leader key
 g.maplocalleader = ' ' -- Space as the local leader key
@@ -24,32 +22,22 @@ g.loaded_ruby_provider = 0 -- Disable ruby provider
 g.loaded_java_provider = 0 -- Disable java provider
 
 -- vim.options
-o.breakindent = true -- Enable break indent
-o.completeopt = 'menuone,noselect' -- Popup menu when typing
-o.cursorline = true -- Show which line your cursor is on
+-- Most of the good defaults are provided by `mini.basics`
+-- See: lua/plugins/mini.lua
+o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
-o.mouse = 'a' -- Enable mouse support
 o.number = true -- Show line numbers
 o.numberwidth = 3 -- Set the width of the number column
 o.relativenumber = true -- Show relative line numbers
 o.scrolloff = 15 -- Show context around cursor
-o.showmode = false -- Don't show mode
 o.signcolumn = 'yes:3' -- Keep signcolumn on by default
-o.smartindent = true -- Insert indents automatically
 o.spell = true -- Enable spell checking
 o.spelllang = 'en_us' -- Set the spell checking language
 o.splitbelow = true -- split to the bottom
 o.splitright = true -- vsplit to the right
-o.termguicolors = true -- Fixes Notify opacity issues
+o.termguicolors = true -- Enable GUI colors
 o.timeoutlen = 250 -- Decrease mapped sequence wait time
-o.undofile = true -- Save undo history
 o.updatetime = 250 -- 250 ms = 2,5 seconds
-o.ignorecase = true -- Ignore case in search patterns
-o.smartcase = true -- Override 'ignorecase' if pattern contains upper case chars
-
--- List options
-o.list = true -- Show some invisible characters
-o.listchars = { tab = '» ', trail = '·', nbsp = '␣' } -- Which invisible chars to show
 
 -- Enable the colorcolumn
 vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
