@@ -8,7 +8,7 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
 # You can set 0 to disable the padding feature
-accordion-padding = 40
+accordion-padding = 10
 
 # Possible values: tiles|accordion
 default-root-container-layout = 'tiles'
@@ -60,12 +60,12 @@ preset = 'qwerty'
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 10
-inner.vertical =   10
+inner.horizontal = 5
+inner.vertical =   5
 outer.top =        5
-outer.right =      10
+outer.right =      5
 outer.bottom =     5
-outer.left =       10
+outer.left =       5
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -105,10 +105,6 @@ alt-shift-down = 'join-with down'
 alt-shift-up = 'join-with up'
 alt-shift-right = 'join-with right'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#layout
-alt-period = 'layout tiles horizontal vertical'
-alt-comma = 'layout accordion horizontal vertical'
-
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 alt-h = 'focus left'
 alt-j = 'focus down'
@@ -126,36 +122,38 @@ alt-shift-minus = 'resize smart -50'
 alt-shift-equal = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-alt-1 = 'workspace 1'
-alt-2 = 'workspace 2'
-alt-3 = 'workspace 3'
-alt-4 = 'workspace 4'
+alt-cmd-z = 'workspace 1'
+alt-cmd-x = 'workspace 2'
+# alt-cmd-c = 'workspace 3'
+# alt-cmd-v = 'workspace 4'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-1 = 'move-node-to-workspace 1 --focus-follows-window'
 alt-shift-2 = 'move-node-to-workspace 2 --focus-follows-window'
-alt-shift-3 = 'move-node-to-workspace 3 --focus-follows-window'
-alt-shift-4 = 'move-node-to-workspace 4 --focus-follows-window'
+# alt-shift-3 = 'move-node-to-workspace 3 --focus-follows-window'
+# alt-shift-4 = 'move-node-to-workspace 4 --focus-follows-window'
 
 alt-tab = 'workspace-back-and-forth'
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
-alt-shift-semicolon = 'mode service'
-alt-shift-enter = 'mode apps'
+alt-cmd-s = 'mode service'
+alt-cmd-a = 'mode apps'
 
 # Taken:
 # - <alt>         + hjkl 1234 ,.
 # - <alt><shift>  + hjkl 1234 -=; <cr> ↑↓←→
-alt-t = 'exec-and-forget open -a /Applications/Ferdium.app'
+alt-c = 'exec-and-forget open -a /Applications/Ferdium.app'
 alt-o = 'exec-and-forget open -a /Applications/Obsidian.app'
 alt-b = 'exec-and-forget open -a /Applications/Brave Browser.app'
+alt-t = 'exec-and-forget open -a /Applications/TIDAL.app'
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
+# See: https://nikitabobko.github.io/AeroSpace/commands#layout
 f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
