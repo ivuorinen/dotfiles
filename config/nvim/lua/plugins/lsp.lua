@@ -134,7 +134,6 @@ return {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons',
     },
-    ---@type LspsagaConfig
     opts = {
       code_action = {
         show_server_name = true,
@@ -192,6 +191,7 @@ return {
           auto_install = true,
           auto_update = true,
           ensure_installed = {
+            'actionlint',
             'editorconfig-checker',
             'goimports',
             'gotests',
