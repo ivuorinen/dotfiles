@@ -30,12 +30,24 @@ end
 
 -- Helper function to show a notification
 ---@param msg string Show a message
----@param level number|"info"|"warn"|"error"|"trace" Notification level
+---@param level "info"|"warn"|"error"|"trace" Notification level
 local function n(msg, level)
   if msg == nil then msg = M.name .. ': No message provided' end
   if level == nil then level = 'trace' end
 
-  vim.notify(M.name .. ': ' .. msg, level)
+  local log_level = vim.log.levels.INFO
+
+  if level == 'info' then
+    log_level = vim.log.levels.INFO
+  elseif level == 'warn' then
+    log_level = vim.log.levels.WARN
+  elseif level == 'error' then
+    log_level = vim.log.levels.ERROR
+  elseif level == 'trace' then
+    log_level = vim.log.levels.TRACE
+  end
+
+  vim.notify(M.name .. ': ' .. msg, log_level)
 end
 
 ---@class NvmDefaultOptions
