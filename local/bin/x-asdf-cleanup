@@ -165,21 +165,43 @@ trim_whitespace() {
 # Function to process each .tool-versions file
 # Usage: process_file "file"
 # Output: "tool version"
-process_file() {
+process_tool_versions_file() {
   local file="$1"
   awk '{for (i=2; i<=NF; i++) print $1, $i}' "$file"
 }
 
-# Function to find .tool-versions files using fd
+# Function to find version files using fd
 # It will exclude directories defined in EXCLUDE_PATTERNS
-# Usage: find_tool_versions_files
-# Output: List of .tool-versions files found
-find_tool_versions_files() {
-  local fd_command="fd --base-directory $BASE_DIR --glob '.tool-versions' --hidden"
+# Usage: find_version_files "file"
+# Output: List of files found
+find_version_files() {
+  local FILE="$1"
+  local fd_command="fd --base-directory $BASE_DIR --glob '$FILE' --hidden"
   for pattern in "${EXCLUDE_PATTERNS[@]}"; do
     fd_command="$fd_command --exclude $pattern"
   done
   eval "$fd_command"
+}
+
+# Helper to find_version_files function to find .tool-versions files
+# Usage: find_tool_versions_files
+# Output: List of .tool-versions files found
+find_tool_versions_files() {
+  echo find_version_files ".tool-versions"
+}
+
+# Helper to find_version_files function to find .nvmrc files
+# Usage: find_nvmrc_files
+# Output: List of .nvmrc files found
+find_nvmrc_files() {
+  echo find_version_files ".nvmrc"
+}
+
+# Helper to find_version_files function to find .python-version files
+# Usage: find_python_version_files
+# Output: List of .python-version files found
+find_python_version_files() {
+  echo find_version_files ".python-version"
 }
 
 # Function to read and combine the contents of all found files.
@@ -193,7 +215,7 @@ read_defined_versions() {
   for file in $files; do
     while read -r name version; do
       defined_versions["$name $version"]=1
-    done < <(process_file "$BASE_DIR/$file")
+    done < <(process_tool_versions_file "$BASE_DIR/$file")
   done
 }
 
