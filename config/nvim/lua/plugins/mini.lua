@@ -1,8 +1,12 @@
 return {
   -- Library of 40+ independent Lua modules improving overall Neovim
   -- (version 0.8 and higher) experience with minimal effort
+  --
   -- https://github.com/echasnovski/mini.nvim
   -- https://github.com/echasnovski/mini.nvim/tree/main?tab=readme-ov-file#modules
+  --
+  -- YouTube: Text editing with 'mini.nvim' - Neovimconf 2024 - Evgeni Chasnovski
+  -- https://www.youtube.com/watch?v=cNK5kYJ7mrs
   {
     'echasnovski/mini.nvim',
     version = '*',
