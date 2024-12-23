@@ -11,3 +11,5 @@
 [include]
   path = ~/.config/git/overrides/config
 
+[advice]
+  detachedHead = false

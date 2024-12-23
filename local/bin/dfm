@@ -169,7 +169,7 @@ section_install()
       ;;
     asdf)
       msg "Installing asdf..."
-      bash "$DOTFILES/scripts/install-asdf.sh both" \
+      $0 asdf plugins-add \
         && msg_yay "asdf installed!"
       ;;
     cargo)
@@ -371,21 +371,111 @@ section_asdf()
 {
   USAGE_PREFIX="$SCRIPT asdf <command>"
   MENU=(
-    "install:Install asdf"
     "current:Show asdf current versions"
     "global:Show asdf global versions"
     "installed:Show asdf installed versions"
     "local:Show asdf local versions"
+    "plugins-add:Add and update direnv and asdf-plugin-manager, and all other plugins"
+    "plugins-update:Update all asdf plugins"
+    "reset:Reset asdf plugins"
     "versions:Show asdf versions"
     "where:Show asdf where"
     "which:Show asdf which"
   )
 
   case "$1" in
-    install)
-      msg "Installing asdf..."
-      bash "$DOTFILES/scripts/install-asdf.sh both" \
-        && msg_yay "asdf installed!"
+    plugins-update)
+      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
+
+      msgr run "Updating all asdf plugins"
+      $APM_BIN update-all
+      $APM_BIN export > "$ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME"
+      msgr run_done "Updated all plugins"
+      ;;
+    plugins-add)
+      X_GH_BIN="$DOTFILES/local/bin/x-gh-get-latest-version"
+      LATEST_APM="$($X_GH_BIN asdf-community/asdf-plugin-manager | sed 's/^v//')"
+      LATEST_DIRENV="$($X_GH_BIN asdf-community/asdf-direnv)"
+      PLUGIN_VERSIONS="$DOTFILES/config/asdf/plugin-versions"
+      APM_BIN="$HOME/.local/bin/asdf/shims/asdf-plugin-manager"
+
+      msgr run "Adding and updating direnv and asdf-plugin-manager"
+      asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
+      asdf global direnv "$LATEST_DIRENV"
+      asdf install direnv "$LATEST_DIRENV"
+
+      asdf plugin add asdf-plugin-manager https://github.com/asdf-community/asdf-plugin-manager.git
+      asdf global asdf-plugin-manager "$LATEST_APM"
+      asdf install asdf-plugin-manager "$LATEST_APM"
+      asdf reshim
+      msgr run_done "direnv and asdf-plugin-manager added and updated"
+
+      msgr run "Reset plugin-versions file to the original using git"
+      if git ls-files --error-unmatch "$PLUGIN_VERSIONS" > /dev/null 2>&1; then
+        git checkout -- "$PLUGIN_VERSIONS"
+      fi
+      msgr run_done "Reset plugin-versions file"
+
+      msgr run "Adding all plugins with asdf-plugin-manager"
+      "$APM_BIN" add-all
+      msgr run_done "Added all plugins with asdf-plugin-manager"
+
+      msgr run "Install all plugins"
+      PLUGINS=$($APM_BIN list | awk -F ' ' '{print $1}' | sort)
+      for P in $PLUGINS; do
+        msgr run "Installing $P"
+        asdf install "$P" latest
+        asdf global "$P" latest
+      done
+
+
+      msgr run_done "Installed all plugins"
+
+      msgr run "Reshimming"
+      asdf reshim
+      msgr run_done "Reshimmed"
+      ;;
+    plugins-remove)
+      PLUGIN_VERSIONS="$DOTFILES/config/asdf/plugin-versions"
+
+      msgr run "Remove installed plugins"
+      INSTALLED_ASDF_PLUGINS=$(asdf list | grep -vE "direnv|asdf-plugin-manager" | grep -v "^ ")
+      for P in $INSTALLED_ASDF_PLUGINS; do
+        asdf plugin remove "$P"
+        msgr nested_done "Removed $P"
+      done
+
+      msgr run "Reset plugin-versions file to the original using git"
+      if git ls-files --error-unmatch "$PLUGIN_VERSIONS" > /dev/null 2>&1; then
+        git checkout -- "$PLUGIN_VERSIONS"
+      fi
+      msgr run_done "Reset plugin-versions file"
+
+      msgr run_done "Remove plugins done!"
+      ;;
+    reset)
+      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
+
+      msgr run "Get currently installed plugins, remove those that are not defined"
+      $0 asdf plugins-remove
+      $0 asdf plugins-add
+      $0 asdf fixtoolversions
+      asdf reshim
+      msgr yay "Reset asdf plugins done!"
+      ;;
+    fixtoolversions)
+      ASDF_TOOL_VERSIONS_FILE="$DOTFILES/base/tool-versions"
+      ASDF_TOOL_FILE_PLUGINS=$(awk '{print $1 " " $2}' "$ASDF_TOOL_VERSIONS_FILE")
+      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
+
+      msgr run "Loading $ASDF_TOOL_VERSIONS_FILE and collecting installed"
+      ASDF_PLUGINS_DEFINED=$($APM_BIN list | awk -F ' ' '{print $1}')
+
+      echo "$ASDF_TOOL_FILE_PLUGINS" | \
+        grep -Fxv -f <(echo "$ASDF_PLUGINS_DEFINED") > tmp && \
+        mv tmp "$ASDF_TOOL_VERSIONS_FILE"
+
+      msgr run_done "Fixed $ASDF_TOOL_VERSIONS_FILE"
       ;;
     current)
       asdf current
