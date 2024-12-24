@@ -1,13 +1,60 @@
 #!/usr/bin/env bash
 # age encrypt file with github keys
 
-if ! x-have age; then
-  print "age not installed, could not encrypt file"
+# Use ENV or default values for keys file and source
+KEYS_FILE="${AGE_KEYSFILE:-$HOME/.ssh/keys.txt}"
+KEYS_SOURCE="${AGE_KEYSSOURCE:-https://github.com/ivuorinen.keys}"
+
+# Check for required commands
+if ! command -v age &>/dev/null; then
+  echo "Error: age is not installed. Please install it to continue."
   exit 1
 fi
 
-FILE=$1
-KEYS=$(curl https://github.com/ivuorinen.keys)
+if ! command -v curl &>/dev/null; then
+  echo "Error: curl is not installed. Please install it to continue."
+  exit 1
+fi
 
-age -R "$KEYS" "$FILE" > ${FILE}.age
+# Ensure a file is provided
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <file-to-encrypt>"
+  exit 1
+fi
 
+FILE="$1"
+if [[ ! -f "$FILE" ]]; then
+  echo "Error: File '$FILE' does not exist."
+  exit 1
+fi
+
+# Check if keys file exists, otherwise fetch it
+if [[ ! -f "$KEYS_FILE" ]]; then
+  echo "Keys file '$KEYS_FILE' not found. Attempting to fetch from $KEYS_SOURCE..."
+
+  # Create the directory if it doesn't exist
+  mkdir -p "$(dirname "$KEYS_FILE")"
+
+  # Fetch the keys and save to the file
+  curl -s "$KEYS_SOURCE" -o "$KEYS_FILE"
+
+  if [[ $? -ne 0 || ! -s "$KEYS_FILE" ]]; then
+    echo "Error: Failed to fetch keys from $KEYS_SOURCE"
+    exit 1
+  fi
+
+  # Set permissions to 0400
+  chmod 0400 "$KEYS_FILE"
+  echo "Keys file fetched and permissions set to 0400."
+fi
+
+# Encrypt the file
+OUTPUT_FILE="${FILE}.age"
+age -R "$KEYS_FILE" "$FILE" >"$OUTPUT_FILE"
+
+if [[ $? -eq 0 ]]; then
+  echo "File encrypted successfully: $OUTPUT_FILE"
+else
+  echo "Error: Failed to encrypt file."
+  exit 1
+fi
