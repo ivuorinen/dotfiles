@@ -2,7 +2,8 @@
 name: Pre-commit autoupdate
 on:
   schedule:
-    - cron: "0 0 * * *"
+    # At 04:00 on Monday and Thursday.
+    - cron: "0 4 * * 1,4"
   workflow_dispatch:
 jobs:
   auto-update:
