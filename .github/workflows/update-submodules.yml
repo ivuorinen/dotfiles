@@ -1,8 +1,9 @@
 ---
 name: Update submodules
 on:
-  # At 04:00 on Monday and Thursday.
-  schedule: "0 4 * * 1,4"
+  schedule:
+    # At 04:00 on Monday and Thursday.
+    - cron: "0 4 * * 1,4"
   workflow_dispatch:
 jobs:
   update-submodules:
