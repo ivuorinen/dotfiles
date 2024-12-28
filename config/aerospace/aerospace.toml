@@ -71,6 +71,10 @@ run = 'layout floating'
 if.app-id = 'com.tidal.desktop'
 run = ['layout floating', 'move-node-to-workspace 2']
 
+[[on-window-detected]]
+if.app-id = 'com.apple.TV'
+run = 'layout floating'
+
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 [key-mapping]
@@ -87,7 +91,7 @@ preset = 'qwerty'
 inner.horizontal = 5
 inner.vertical =   5
 # outer.top =        0
-outer.top = [{ monitor.'^built-in retina display$' = 20 }, 0]
+outer.top = [{ monitor.'^built-in retina display$' = 0 }, 0]
 outer.right =      0
 outer.bottom =     0
 outer.left =       0
