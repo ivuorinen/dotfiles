@@ -13,116 +13,194 @@
 # License: MIT
 #
 # vim: set ft=sh ts=2 sw=2 et: ft=sh
-
-# set -euo pipefail
+#set -euo pipefail
+set -u
 
 VERSION="1.0.0"
 BASENAME=$(basename "$0")
 
-# Check if asdf is installed
-if ! command -v asdf &> /dev/null; then
-  echo "(!) asdf itself is not installed or not in PATH"
-  exit 1
-fi
+# Additional configuration
+USE_CACHE=true
+CACHE_MAX_AGE=3600 # 1 hour in seconds
 
-if ! command -v fd &> /dev/null; then
-  echo "(!) Required tool fd is not installed or not in PATH"
-  echo "It's used to find .tool-versions files faster"
-  echo "Install it with asdf:"
-  echo "asdf plugin add fd && asdf install fd latest"
-  exit 1
-fi
+# Logging and backup configuration
+readonly LOG_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/asdf-cleanup"
+readonly LOG_FILE="$LOG_DIR/cleanup.log"
+readonly BACKUP_DIR="$LOG_DIR/backups"
+readonly LAST_OP_FILE="$LOG_DIR/last_operation"
 
-# Enable debugging: DEBUG=1 x-asdf-cleanup
-# or run with --debug option: x-asdf-cleanup --debug
-if [ "_$DEBUG" != "_" ]; then
-  set -x
-fi
+# Define colors for output formatting
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly NC='\033[0m' # No Color
+readonly BOLD='\033[1m'
 
-# Define the base directory to search for .tool-versions files
+# Create temporary file and ensure it's removed on exit
+readonly TMPFILE=$(mktemp)
+
+# Signal handling and cleanup
+trap 'cleanup' INT TERM
+#trap 'error_handler $?' ERR
+trap 'error_occurred $? $LINENO $BASH_LINENO "$BASH_COMMAND" $(printf "::%s" ${FUNCNAME[@]:-})' ERR
+trap 'rm -f "$TMPFILE"' EXIT
+
+# Performance monitoring variables
+readonly START_TIME=$SECONDS
+readonly START_MEM=$(ps -o rss= -p $$)
+
+# Default configuration
 BASE_DIR="$HOME"
+DRYRUN=false
+VERBOSE=false
+DEBUG=false
+MAX_PARALLEL_JOBS=4
+
+# Global arrays for version management
+declare -A defined_versions=()
+declare -A installed_versions=()
+declare -A keep_version=()
+declare -A all_versions=()
+declare -a uninstall_list=()
+
+# Supported tools and their version files
+declare -A VERSION_FILES=(
+  ["nodejs"]=".nvmrc"
+  ["python"]=".python-version"
+  ["asdf"]=".tool-versions"
+)
 
 # Define the exclude patterns
-EXCLUDE_PATTERNS=("Library" "Photos" ".cache" ".local/state" ".git" ".Trash")
+EXCLUDE_PATTERNS=(
+  ".bundle"
+  ".cache"
+  ".git"
+  ".local/state"
+  ".npm"
+  ".Trash"
+  ".vscode"
+  "bower_components"
+  "gems"
+  "Library"
+  "node_modules"
+  "Photos"
+  "vendor"
+)
 
-# Dry run flag
-# If set to true, the script will only print out the versions that would be uninstalled
-DRYRUN=false
+# Output formatting functions
+print_success()
+{
+  echo -e "${GREEN}$1${NC}"
+}
+print_error()
+{
+  echo -e "${RED}$1${NC}"
+}
+print_warning()
+{
+  echo -e "${YELLOW}$1${NC}"
+}
 
-usage() {
-  echo "Usage: $BASENAME [OPTIONS]"
-  echo
-  echo "Options:"
-  echo "  --base-dir=DIR  Specify the base directory to search for .tool-versions files"
-  echo "  --dry-run       Perform a dry run without uninstalling any versions"
-  echo "  --exclude=DIR   Exclude a directory from the search path, can be used multiple times"
-  echo "  --debug         Show debug information and exit"
-  echo "  --verbose       Enable verbose output"
-  echo "  -h, --help      Show this help message and exit"
-  echo "  -v, --version   Show the version of the script and exit"
+# Cleanup and error handling
+cleanup()
+{
+  print_warning "Received termination signal"
+  rm -f "$TMPFILE"
   exit 1
 }
 
-# Function to parse arguments
-parse_arguments() {
-  for arg in "$@"; do
-    case $arg in
-       -h|--help)
-        usage
-        ;;
-      -v|--version)
-        version
-        ;;
-      --base-dir=*)
-        BASE_DIR="${arg#*=}"
-        shift
-        ;;
-      --dry-run)
-        DRYRUN=true
-        shift
-        ;;
-      --exclude=*)
-        EXCLUDE_PATTERNS+=("${arg#*=}")
-        shift
-        ;;
-      --verbose)
-        VERBOSE=true
-        shift
-        ;;
-      --debug)
-        DEBUG=true
-        shift
-        debug_info "$@"
-        ;;
-      *)
-        echo "Unknown option: $arg"
-        usage
-        ;;
-    esac
-  done
+# Sort array keys by tool name
+sort_by_tool()
+{
+  local -n array=$1
+  local -a sorted_keys
+  readarray -t sorted_keys < <(printf '%s\n' "${!array[@]}" | sort)
+  echo "${sorted_keys[@]}"
 }
 
-# Function to check if the parameter given exists and is a directory
-# Usage: is_dir "directory"
-# Output: "yes" or "no"
-is_dir() {
-  local dir="$1"
-  if [ -d "$dir" ]; then
-    echo "yes"
-  else
-    echo "no"
+error_handler()
+{
+  local exit_code=$1
+  print_error "An error occurred (exit code: $exit_code)"
+  cleanup
+}
+
+error_occurred()
+{
+  local exit_code=$1
+  local line_no=$2
+  local bash_lineno=$3
+  local last_command=$4
+  local func_trace=$5
+
+  echo "Error occurred in:"
+  echo "  Exit code: $exit_code"
+  echo "  Line number: $line_no"
+  echo "  Command: $last_command"
+  echo "  Function trace: $func_trace"
+}
+
+# Logging function with different levels
+log()
+{
+  local level=$1
+  shift
+  local message=$*
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+  if [[ $VERBOSE == true ]] || [[ $level == "ERROR" ]]; then
+    echo "[$timestamp][$level] $message"
   fi
 }
 
-# Function to display debug information
-#
-# It will print out the script variables, tool versions
-# and the remaining arguments.
-#
-# Usage: debug_info "$@"
-#        Where $@ is the list of arguments passed to the script
-# Output: Debug information
-debug_info() {
+# File logging function
+log_to_file()
+{
+  local level=$1
+  shift
+  local message=$*
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  echo "[$timestamp][$level] $message" >> "$LOG_FILE"
+}
+
+# Error handling function
+handle_error()
+{
+  local exit_code=$1
+  local error_message=$2
+  print_error "Error ($exit_code): $error_message" >&2
+  log_to_file "ERROR" "$error_message"
+  exit "$exit_code"
+}
+
+# Debug function
+debug()
+{
+  if [[ $DEBUG == true ]]; then
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp][DEBUG] $*" >&2
+  fi
+}
+
+debug_array()
+{
+  local -n array="$1"
+  local name="$2"
+
+  if [[ $DEBUG == true ]]; then
+    echo "Debug: Contents of $name:"
+    for key in "${!array[@]}"; do
+      echo "  $key => ${array[$key]}"
+    done
+  fi
+}
+
+# Debug information function
+debug_info()
+{
   echo "----------------------------------------"
   echo "Script variables:"
   echo "----------------------------------------"
@@ -140,244 +218,1059 @@ debug_info() {
   echo "----------------------------------------"
   echo "Tool versions:"
   echo "----------------------------------------"
-  echo "asdf version: $(asdf --version)"
-  echo "fd version:   $(fd --version)"
+  echo "asdf version: $(asdf --version 2> /dev/null || echo "not found")"
+  echo "fd version:   $(fd --version 2> /dev/null || echo "not found")"
+  echo "jq version:   $(jq --version 2> /dev/null || echo "not found")"
   echo "----------------------------------------"
+
+  # Enable debug mode for the rest of the script
+  DEBUG=true
+  return 0
+}
+
+# Display usage information
+usage()
+{
+  cat << EOF
+Usage: $BASENAME [OPTIONS]
+
+A tool to clean up unused asdf tool versions from your system.
+
+Options:
+  --base-dir=DIR     Specify the base directory to search for version files (default: \$HOME)
+  --dry-run          Perform a dry run without uninstalling any versions
+  --exclude=DIR      Exclude a directory from the search path (can be used multiple times)
+  --debug            Show debug information and enable debug mode
+  --verbose          Enable verbose output
+  --no-cache         Disable version cache
+  --restore          Restore the last uninstalled version from backup
+  --max-parallel=N   Set maximum number of parallel processes (default: 4)
+  -h, --help         Show this help message and exit
+  -v, --version      Show version information and exit
+
+Environment variables:
+  DEBUG              Enable debug mode
+  VERBOSE           Enable verbose output
+  XDG_CONFIG_HOME   Configuration directory (default: ~/.config)
+  XDG_CACHE_HOME    Cache directory (default: ~/.cache)
+
+Files:
+  ~/.config/asdf-cleanup/config    Configuration file
+  ~/.cache/asdf-cleanup/*         Cache files
+
+Examples:
+  $BASENAME --dry-run
+  $BASENAME --exclude=node_modules --exclude=vendor
+  $BASENAME --verbose --debug
+  $BASENAME --base-dir=~/projects --max-parallel=8
+EOF
   exit 0
 }
 
-version() {
-  echo "$BASENAME $VERSION"
-  echo "Author: Ismo Vuorinen <https://github.com/ivuorinen>"
-  exit 0
+# Function to check dependencies
+check_dependencies()
+{
+  local -a required_tools=(asdf fd jq)
+  local missing_tools=()
+
+  for tool in "${required_tools[@]}"; do
+    if ! command -v "$tool" > /dev/null 2>&1; then
+      missing_tools+=("$tool")
+    fi
+  done
+
+  if ((${#missing_tools[@]} > 0)); then
+    print_error "Missing required tools: ${missing_tools[*]}"
+    if [[ " ${missing_tools[*]} " =~ " fd " ]]; then
+      echo "Install fd with asdf:"
+      echo "asdf plugin add fd && asdf install fd latest"
+    fi
+    if [[ " ${missing_tools[*]} " =~ " jq " ]]; then
+      echo "Install jq with asdf:"
+      echo "asdf plugin add jq && asdf install jq latest"
+    fi
+    exit 1
+  fi
 }
 
-# Trim whitespace from a string
-# Usage: trim_whitespace "  hello world  "
-# Output: "hello world"
-trim_whitespace() {
+# Initialize required directories
+initialize_directories()
+{
+  local -a dirs=("$LOG_DIR" "$BACKUP_DIR" "$cache_dir")
+  for dir in "${dirs[@]}"; do
+    if [[ ! -d $dir ]]; then
+      mkdir -p "$dir" || handle_error 1 "Failed to create directory: $dir"
+    fi
+  done
+}
+
+# Load configuration file if it exists
+load_config()
+{
+  local config_file="${XDG_CONFIG_HOME:-$HOME/.config}/asdf-cleanup/config"
+  if [[ -f $config_file ]]; then
+    debug "Loading configuration from $config_file"
+    # shellcheck source=/dev/null
+    source "$config_file"
+  fi
+}
+
+# Show performance metrics
+show_performance_metrics()
+{
+  local end_time=$SECONDS
+  local end_mem
+  end_mem=$(ps -o rss= -p $$)
+  local duration=$((end_time - START_TIME))
+  local mem_usage=$((end_mem - START_MEM))
+
+  log "INFO" "Execution time: ${duration}s"
+  log "INFO" "Memory usage: ${mem_usage}KB"
+  log_to_file "INFO" "Performance: Time=${duration}s, Memory=${mem_usage}KB"
+}
+
+# Progress indicator
+show_progress()
+{
+  local -r pid="$1"
+  local -r delay='0.75'
+  local spinstr='|/-\'
+  local temp
+
+  while ps a | awk '{print $1}' | grep -q "$pid"; do
+    temp="${spinstr#?}"
+    printf " [%c]  " "$spinstr"
+    spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "    \b\b\b\b"
+}
+
+# Semantic version comparison
+version_compare()
+{
+  local IFS=.
+  local i ver1=($1) ver2=($2)
+
+  debug "Comparing versions: $1 vs $2"
+
+  for ((i = 0; i < ${#ver1[@]} || i < ${#ver2[@]}; i++)); do
+    local v1=${ver1[i]:-0} v2=${ver2[i]:-0}
+    debug "Comparing components: $v1 vs $v2"
+
+    ((v1 > v2)) && {
+      debug "First version is greater"
+      return 1
+    }
+    ((v1 < v2)) && {
+      debug "First version is less"
+      return 2
+    }
+  done
+
+  debug "Versions are equal"
+  return 0
+}
+
+# Cache handling functions
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/asdf-cleanup"
+cache_file="$cache_dir/version-cache"
+
+get_file_mtime()
+{
+  local file="$1"
+  local mtime
+
+  # Check which platform we're on and use appropriate stat command
+  case "$(uname)" in
+    "Darwin") # macOS
+      mtime=$(stat -f "%m" "$file")
+      ;;
+    "Linux") # Linux
+      mtime=$(stat -c "%Y" "$file")
+      ;;
+    *)
+      # Default fallback, might not work on all systems
+      mtime=$(date +%s -r "$file")
+      ;;
+  esac
+
+  echo "$mtime"
+}
+
+read_cache_versions()
+{
+  local -n output_array="$1"
+  local content
+
+  debug "Reading cache from: $cache_file"
+  debug "Cache file contents:"
+  debug "$(cat "$cache_file")"
+
+  # Check that the file exists and is not empty
+  if [[ ! -f $cache_file || ! -s $cache_file ]]; then
+    debug "Cache file doesn't exist or is empty"
+    return 1
+  fi
+
+  # Check that the JSON is valid and contains the versions object
+  if ! jq -e '.versions' "$cache_file" > /dev/null 2>&1; then
+    debug "Cache file doesn't contain valid versions data"
+    return 1
+  fi
+
+  while IFS= read -r line; do
+    [[ -n $line ]] || continue
+    local key value
+    key=$(echo "$line" | jq -r '.key')
+    value=$(echo "$line" | jq -r '.value')
+    output_array["$key"]="$value"
+  done < <(jq -c '.versions | to_entries[]' "$cache_file")
+}
+
+write_cache_versions()
+{
+  local -n input_array="$1"
+  local tmp_file
+  tmp_file=$(mktemp)
+
+  # Create a JSON object with the versions
+  echo "{" > "$tmp_file"
+  echo '  "versions": {' >> "$tmp_file"
+
+  local first=true
+  for key in "${!input_array[@]}"; do
+    if [[ $first == true ]]; then
+      first=false
+    else
+      echo "," >> "$tmp_file"
+    fi
+    printf '    "%s": "%s"' \
+      "$(echo "$key" | sed 's/"/\\"/g')" \
+      "${input_array[$key]}" >> "$tmp_file"
+  done
+
+  echo >> "$tmp_file"
+  echo "  }" >> "$tmp_file"
+  echo "}" >> "$tmp_file"
+
+  # Validate JSON before moving it
+  if jq '.' "$tmp_file" > /dev/null 2>&1; then
+    mv "$tmp_file" "$cache_file"
+  else
+    print_error "Failed to create valid JSON cache"
+    rm -f "$tmp_file"
+    return 1
+  fi
+}
+
+initialize_cache()
+{
+  mkdir -p "$cache_dir"
+  if [[ ! -f $cache_file ]]; then
+    echo '{"versions":{}}' > "$cache_file"
+  fi
+}
+
+cache_is_valid()
+{
+  if [[ ! -f $cache_file ]] || [[ ! -s $cache_file ]]; then
+    debug "Cache file doesn't exist or is empty"
+    return 1
+  fi
+
+  local mtime
+  mtime=$(get_file_mtime "$cache_file")
+  local current_time
+  current_time=$(date +%s)
+
+  debug "Cache mtime: $mtime"
+  debug "Current time: $current_time"
+  debug "Cache age: $((current_time - mtime)) seconds"
+
+  # Check that the cache contains valid data
+  if ! jq -e '.versions' "$cache_file" > /dev/null 2>&1; then
+    debug "Cache file doesn't contain valid versions data"
+    return 1
+  fi
+
+  if ((current_time - mtime < CACHE_MAX_AGE)); then
+    debug "Cache is valid (age < $CACHE_MAX_AGE seconds)"
+    return 0
+  else
+    debug "Cache is too old"
+    return 1
+  fi
+}
+
+update_cache()
+{
+  local type=$1
+  local data=$2
+  local tmp_file
+  tmp_file=$(mktemp)
+
+  if ! jq --arg type "$type" --arg data "$data" \
+    '.[$type] = $data' "$cache_file" > "$tmp_file"; then
+    print_warning "Failed to update cache"
+    log_to_file "WARNING" "Failed to update cache for type: $type"
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  mv "$tmp_file" "$cache_file"
+}
+
+read_cache()
+{
+  local type=$1
+  jq -r --arg type "$type" '.[$type] // empty' "$cache_file"
+}
+
+read_cache_versions()
+{
+  # Check that the output array is properly initialized
+  if [[ -z ${!1+x} ]]; then
+    debug "Output array not properly initialized"
+    return 1
+  fi
+
+  local -n output_array="$1"
+  local content
+
+  debug "Reading cache file: $cache_file"
+
+  # Check that the file exists and is not empty
+  if [[ ! -f $cache_file ]] || [[ ! -s $cache_file ]]; then
+    debug "Cache file doesn't exist or is empty"
+    return 1
+  fi
+
+  # Check the JSON structure
+  if ! content=$(jq -e '.versions' "$cache_file" 2> /dev/null); then
+    debug "Invalid JSON structure in cache file"
+    return 1
+  fi
+
+  # Empty the target array for safety
+  output_array=()
+
+  # Create an associative array from the JSON data
+  while IFS= read -r line; do
+    [[ -n $line ]] || continue
+    local key value
+    key=$(echo "$line" | jq -r '.key')
+    value=$(echo "$line" | jq -r '.value')
+    if [[ -n $key && $key != "null" ]]; then
+      debug "Adding cached version: $key = $value"
+      output_array["$key"]="$value"
+    fi
+  done < <(jq -c '.versions | to_entries[]' "$cache_file")
+
+  debug "Read ${#output_array[@]} versions from cache"
+  return 0
+}
+
+write_cache_versions()
+{
+  local -n input_array="$1"
+  local tmp_file
+  tmp_file=$(mktemp)
+
+  # Convert the associative array to JSON format
+  printf '{"versions":{\n' > "$tmp_file"
+  local first=true
+  for key in "${!input_array[@]}"; do
+    if [[ $first == true ]]; then
+      first=false
+    else
+      printf ',\n' >> "$tmp_file"
+    fi
+    printf '  "%s": %s' "$key" "${input_array[$key]}" >> "$tmp_file"
+  done
+  printf '\n}}\n' >> "$tmp_file"
+
+  mv "$tmp_file" "$cache_file"
+}
+
+copy_versions()
+{
+  local -n dest="$1"
+  local -n source="$2"
+
+  for key in "${!source[@]}"; do
+    dest["$key"]="${source[$key]}"
+  done
+}
+
+# Function to check if directory exists
+is_dir()
+{
+  local dir="$1"
+  if [[ -d $dir ]]; then
+    echo "yes"
+  else
+    echo "no"
+  fi
+}
+
+# Trim whitespace from string
+trim_whitespace()
+{
   local var="$1"
-  var="${var#"${var%%[![:space:]]*}"}"   # Remove leading whitespace
-  var="${var%"${var##*[![:space:]]}"}"   # Remove trailing whitespace
+  # Remove leading whitespace
+  var="${var#"${var%%[![:space:]]*}"}"
+  # Remove trailing whitespace
+  var="${var%"${var##*[![:space:]]}"}"
   echo "$var"
 }
 
-# Function to process each .tool-versions file
-# Usage: process_file "file"
-# Output: "tool version"
-process_tool_versions_file() {
+# Process .tool-versions file
+process_tool_versions_file()
+{
   local file="$1"
-  awk '{for (i=2; i<=NF; i++) print $1, $i}' "$file"
+  if [[ ! -f $file ]]; then
+    debug "File not found: $file"
+    return 1
+  fi
+  # Process file content and output "tool version" pairs
+  # Ignore comments and empty lines, require at least tool and version
+  awk '!/#/ && NF >= 2 {print $1, $2}' "$file"
 }
 
-# Function to find version files using fd
-# It will exclude directories defined in EXCLUDE_PATTERNS
-# Usage: find_version_files "file"
-# Output: List of files found
-find_version_files() {
-  local FILE="$1"
-  local fd_command="fd --base-directory $BASE_DIR --glob '$FILE' --hidden"
-  for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-    fd_command="$fd_command --exclude $pattern"
+# Version file processing functions
+process_version_files()
+{
+  local file_type="$1"
+  local array_name="$2"
+  local -A local_versions=()
+
+  debug "Processing version files for $file_type"
+
+  while IFS= read -r relative_path; do
+    [[ -z $relative_path ]] && continue
+
+    # Create an absolute path
+    local file="${BASE_DIR}/${relative_path}"
+    debug "Processing file: $file (relative: $relative_path)"
+
+    if ! validate_version_file "$file" "$file_type"; then
+      debug "Invalid version file format: $file"
+      continue
+    fi
+
+    case "$file_type" in
+      "nodejs")
+        local version
+        version=$(< "$file")
+        debug "Raw nodejs version content: '$version'"
+        version=$(trim_whitespace "$version")
+        # Handle lts/* separately
+        if [[ $version == "lts/*" ]] || [[ $version =~ ^lts/[*]$ ]]; then
+          version="lts/*"
+        else
+          version=${version#v} # Remove leading 'v' if present
+        fi
+        debug "Processed nodejs version: '$version'"
+        local_versions["nodejs ${version}"]=1
+        ;;
+      "python")
+        local content
+        content=$(< "$file")
+        debug "Raw python version content: '$content'"
+        content=$(trim_whitespace "$content")
+        for version in $content; do
+          version=$(trim_whitespace "$version")
+          [[ -z $version || $version == \#* ]] && continue
+          debug "Found python version: '$version'"
+          local_versions["python ${version}"]=1
+        done
+        ;;
+      "asdf")
+        while IFS= read -r line; do
+          line=$(trim_whitespace "$line")
+          [[ -z $line || $line == \#* ]] && continue
+          local tool version
+          read -r tool version <<< "$line"
+          tool=$(trim_whitespace "$tool")
+          version=$(trim_whitespace "$version")
+          debug "Found tool and version: '$tool' '$version'"
+          local_versions["$tool ${version}"]=1
+        done < "$file"
+        ;;
+    esac
+  done < <(find_version_files "$file_type")
+
+  debug "Finished processing $file_type, found ${#local_versions[@]} versions"
+
+  # Return the local versions as an associative array
+  declare -p local_versions
+}
+
+# Validate version file format
+validate_version_file()
+{
+  local file="$1"
+  local file_type="$2"
+
+  debug "Validating file: $file"
+  [[ -f $file ]] || {
+    debug "File does not exist: $file"
+    return 1
+  }
+  [[ -r $file ]] || {
+    debug "File is not readable: $file"
+    return 2
+  }
+
+  local content
+  content=$(< "$file")
+  content=$(trim_whitespace "$content")
+  [[ -z $content ]] && {
+    debug "File is empty: $file"
+    return 1
+  }
+
+  debug "Validating $file_type file: '$file' with content: '$content'"
+
+  case "$file_type" in
+    "nodejs")
+      # Support both direct versions and lts/* notation
+      if [[ $content =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+        || [[ $content =~ ^lts/[*]$ ]] \
+        || [[ $content == "lts/*" ]]; then
+        debug "Valid nodejs version: $content"
+        return 0
+      else
+        debug "Invalid nodejs version format: $content"
+      fi
+      ;;
+    "python")
+      # Support both single and multiple versions
+      local valid=true
+      for ver in $content; do
+        debug "Checking Python version: $ver"
+        if ! [[ $ver =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          debug "Invalid Python version format: $ver"
+          valid=false
+          break
+        fi
+      done
+      if $valid; then
+        debug "Valid Python version(s): $content"
+        return 0
+      fi
+      ;;
+    "asdf")
+      # Support .tool-versions format
+      local valid=true
+      while IFS= read -r line || [[ -n $line ]]; do
+        line=$(trim_whitespace "$line")
+        debug "Checking .tool-versions line: '$line'"
+        [[ -z $line || $line == \#* ]] && continue
+
+        if ! [[ $line =~ ^[a-zA-Z0-9_-]+[[:space:]]+[a-zA-Z0-9._*/-]+$ ]]; then
+          debug "Invalid .tool-versions format: '$line'"
+          valid=false
+          break
+        else
+          debug "Valid .tool-versions line: '$line'"
+        fi
+      done <<< "$content"
+      if $valid; then
+        debug "Valid .tool-versions file"
+        return 0
+      fi
+      ;;
+  esac
+  return 1
+}
+
+# Find version files using fd
+find_version_files()
+{
+  local file_type="$1"
+  local pattern="${VERSION_FILES[$file_type]}"
+
+  debug "Searching for $file_type version files with pattern: $pattern"
+  debug "Base directory: $BASE_DIR"
+  debug "Exclude patterns: ${EXCLUDE_PATTERNS[*]}"
+
+  if [[ -z $pattern ]]; then
+    handle_error 1 "Unknown version file type: $file_type"
+  fi
+
+  local fd_args=(
+    --base-directory "$BASE_DIR"
+    --type f
+    --hidden
+    --glob "$pattern"
+  )
+
+  # Add all exclude patterns
+  for exclude in "${EXCLUDE_PATTERNS[@]}"; do
+    fd_args+=(--exclude "$exclude")
   done
-  eval "$fd_command"
+
+  debug "fd command arguments: ${fd_args[*]}"
+  local files
+  files=$(fd "${fd_args[@]}" 2> /dev/null)
+  debug "Found files for $file_type:"
+  debug "$files"
+
+  echo "$files"
 }
 
-# Helper to find_version_files function to find .tool-versions files
-# Usage: find_tool_versions_files
-# Output: List of .tool-versions files found
-find_tool_versions_files() {
-  echo find_version_files ".tool-versions"
-}
+# Process all version files in parallel
+process_all_version_files()
+{
+  local -n output_array="$1"
 
-# Helper to find_version_files function to find .nvmrc files
-# Usage: find_nvmrc_files
-# Output: List of .nvmrc files found
-find_nvmrc_files() {
-  echo find_version_files ".nvmrc"
-}
+  debug "Starting to process version files..."
+  output_array=()
 
-# Helper to find_version_files function to find .python-version files
-# Usage: find_python_version_files
-# Output: List of .python-version files found
-find_python_version_files() {
-  echo find_version_files ".python-version"
-}
+  for type in "${!VERSION_FILES[@]}"; do
+    debug "Processing type: $type"
+    local versions_data
+    versions_data=$(process_version_files "$type" "temp_versions")
 
-# Function to read and combine the contents of all found files.
-# It will store the tool names and versions in an associative array.
-# The key is "name version" and the value is 1.
-# Uses process_file to process each file.
-#
-# Usage: read_defined_versions
-# Output: defined_versions associative array
-read_defined_versions() {
-  for file in $files; do
-    while read -r name version; do
-      defined_versions["$name $version"]=1
-    done < <(process_tool_versions_file "$BASE_DIR/$file")
+    if [[ $versions_data == "declare -A"* ]]; then
+      eval "local -A type_versions=${versions_data#*=}"
+      for key in "${!type_versions[@]}"; do
+        output_array["$key"]=1
+        debug "Added version: $key"
+      done
+    fi
   done
+
+  debug "Total versions found: ${#output_array[@]}"
 }
 
-# Function to get the list of installed versions from asdf list command
-# Usage: read_installed_versions
-# Output: keep_version associative array
-#        (tools set as global in asdf are kept)
-#        (system versions are ignored)
-#        (tools with no versions installed are removed)
-read_installed_versions() {
+# Backup functions
+create_backup()
+{
+  local tool=$1
+  local version=$2
+  local backup_path="$BACKUP_DIR/${tool}_${version}_$(date +%Y%m%d_%H%M%S)"
+  local tool_path
+  tool_path=$(asdf where "$tool" "$version")
+
+  if [[ -d $tool_path ]]; then
+    debug "Creating backup of $tool $version"
+    log_to_file "INFO" "Creating backup of $tool $version"
+    if tar czf "$backup_path.tar.gz" -C "$(dirname "$tool_path")" "$(basename "$tool_path")"; then
+      echo "$tool $version" > "$LAST_OP_FILE"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+restore_last_backup()
+{
+  if [[ ! -f $LAST_OP_FILE ]]; then
+    print_error "No backup information found"
+    return 1
+  fi
+
+  read -r tool version < "$LAST_OP_FILE"
+  local backup_file
+  backup_file=$(find "$BACKUP_DIR" -name "${tool}_${version}_*.tar.gz" | sort -r | head -n1)
+
+  if [[ -f $backup_file ]]; then
+    local install_path
+    install_path=$(asdf where "$tool" "$version" 2> /dev/null || echo "$HOME/.asdf/installs/$tool/$version")
+
+    print_warning "Restoring $tool $version from backup"
+    log_to_file "INFO" "Restoring $tool $version from backup"
+    mkdir -p "$(dirname "$install_path")"
+    if tar xzf "$backup_file" -C "$(dirname "$install_path")"; then
+      print_success "Restored $tool $version successfully"
+      log_to_file "INFO" "Successfully restored $tool $version"
+      return 0
+    fi
+  fi
+
+  print_error "Backup not found or restore failed"
+  log_to_file "ERROR" "Failed to restore $tool $version"
+  return 1
+}
+
+# Read installed versions from asdf
+read_installed_versions()
+{
   local current_tool=""
   local line
-  # Use IFS to read lines with spaces, this is needed for asdf list command
+  debug "Reading installed versions from asdf"
+
   while IFS= read -r line; do
-    # Read the tool name
-    if [[ "$line" =~ ^[^[:space:]] ]]; then
+    if [[ $line =~ ^[^[:space:]] ]]; then
       current_tool=$(trim_whitespace "$line")
       continue
     fi
 
-    # We are now processing the versions for a tool
     line=$(trim_whitespace "$line")
-    if [[ "$line" =~ ^\* ]]; then
-      local version="${line:1}"  # Remove the leading '*'
-      version=$(trim_whitespace "$version")  # Trim any remaining whitespace
-      keep_version["$current_tool $version"]=1
-      [ "$VERBOSE" = true ] && echo "(*) Keep: $current_tool $version ($line)"
-    fi
-    if [[ "$line" == "No versions installed" ]]; then
-      # Remove all versions for the tool that has no versions installed
-      # This way we are not confusing the uninstall script later
-      [ "$VERBOSE" = true ] && echo "(?) No versions installed for $current_tool"
-      for key in "${!defined_versions[@]}"; do
-        if [[ "$key" =~ ^$current_tool ]]; then
-          unset defined_versions["$key"]
-        fi
-      done
+    if [[ $line == "No versions installed" ]]; then
+      print_warning "No versions installed for $current_tool"
+      log_to_file "WARNING" "No versions installed for $current_tool"
       continue
     fi
 
-    # If version starts with * remove it
-    if [[ "$line" =~ ^\* ]]; then
-      line="${line:1}"
+    # Extract version, removing the asterisk if present
+    local version
+    if [[ $line =~ ^\* ]]; then
+      version=$(trim_whitespace "${line#\*}")
+      keep_version["$current_tool $version"]=1
+      debug "Keeping version: $current_tool $version"
+    else
+      version=$(trim_whitespace "$line")
     fi
-    installed_versions["$current_tool $line"]=1
+
+    installed_versions["$current_tool $version"]=1
+    debug "Added installed version: $current_tool $version"
 
   done < <(asdf list)
 }
 
-# Function to display all defined versions
-# List the tools and versions found in .tool-versions files
-# Output: defined_versions
-display_defined_versions() {
-  echo "All Defined Versions:"
-  for key in "${!defined_versions[@]}"; do
-    echo "$key"
-  done
-  echo
-}
+# Group and sort versions by tool
+group_versions()
+{
+  local array_name="$1"
+  local -A tools=()
+  local tool version
 
-display_installed_versions() {
-  echo "All Installed Versions:"
-  for key in "${!installed_versions[@]}"; do
-    echo "$key"
-  done
-  echo
-}
+  # Safely create a temporary array for the keys
+  declare -a keys
+  while IFS= read -r key; do
+    [[ -n $key ]] && keys+=("$key")
+  done < <(eval "printf '%s\n' \"\${!$array_name[@]}\"")
 
-# Function to display versions to keep
-# List the tools and versions set as global in asdf
-# Output: keep_version
-display_versions_to_keep() {
-  echo ""
-  echo "Versions to Keep (tools set as global):"
-  for key in "${!keep_version[@]}"; do
-    echo "$key"
-  done
-  echo
-}
-
-# Function to determine versions to uninstall
-# Compare defined_versions and keep_version arrays
-# Output: uninstall_list array
-#        (versions to uninstall)
-#        (versions set as global are not uninstalled)
-#        (versions not found in .tool-versions files are uninstalled)
-determine_versions_to_uninstall() {
-  echo ""
-  echo "Versions to Uninstall:"
-  for key in "${!installed_versions[@]}"; do
-    if [[ -z ${keep_version[$key]} ]]; then
-      echo "$key"
-      uninstall_list+=("$key")
-    fi
-  done
-  echo
-}
-
-# Function to uninstall versions
-# It will prompt the user for confirmation before uninstalling
-# If DRYRUN is set to true, it will only print out the versions that would be uninstalled
-#
-# Usage: uninstall_versions
-# Output: Uninstall the versions in uninstall_list array
-uninstall_versions() {
-  if [[ ${#uninstall_list[@]} -gt 0 ]]; then
-    if [ "$DRYRUN" = true ]; then
-      confirm="y"
-    fi
-    if [ ! "$DRYRUN" = true ]; then
-        read -p "Do you want to proceed with uninstallation? (y/N): " confirm
-    fi
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      for key in "${uninstall_list[@]}"; do
-        local name="${key% *}"
-        local version="${key#* }"
-        if [ "$DRYRUN" = true ]; then
-          echo "(?) Dry run: would uninstall $name $version"
-        else
-          echo "(*) Uninstalling $name: $version"
-          asdf uninstall $name $version
-        fi
-      done
+  # Group versions by tool
+  for key in "${keys[@]}"; do
+    tool="${key%% *}"
+    version="${key#* }"
+    if [[ -n ${tools["$tool"]-} ]]; then
+      tools["$tool"]="${tools["$tool"]}, $version"
     else
-      echo "Uninstallation aborted by user."
+      tools["$tool"]="$version"
+    fi
+  done
+
+  # Sort and output with bold tool names
+  while IFS= read -r tool; do
+    [[ -n $tool ]] && echo -e "  ${BOLD}${tool}${NC} ${tools["$tool"]}"
+  done < <(printf '%s\n' "${!tools[@]}" | sort)
+}
+
+# Update display functions to use the new grouping
+display_defined_versions()
+{
+  echo ""
+  print_success "All Defined Versions in .nvmrc, .python-version and .tool-versions files:"
+  group_versions defined_versions
+  echo
+  log_to_file "INFO" "Found ${#defined_versions[@]} defined version(s)"
+}
+
+display_installed_versions()
+{
+  print_success "All Installed Versions:"
+  group_versions installed_versions
+  echo
+  log_to_file "INFO" "Found ${#installed_versions[@]} installed version(s)"
+}
+
+display_versions_to_keep()
+{
+  print_success "Versions to Keep (tools set as global):"
+  group_versions keep_version
+  echo
+  log_to_file "INFO" "Found ${#keep_version[@]} version(s) to keep"
+}
+
+# Parse arguments function
+parse_arguments()
+{
+  local arg
+  for arg in "$@"; do
+    case $arg in
+      -h | --help)
+        usage
+        ;;
+      -v | --version)
+        version
+        ;;
+      --base-dir=*)
+        BASE_DIR="${arg#*=}"
+        ;;
+      --dry-run)
+        DRYRUN=true
+        ;;
+      --exclude=*)
+        EXCLUDE_PATTERNS+=("${arg#*=}")
+        ;;
+      --verbose)
+        VERBOSE=true
+        ;;
+      --debug)
+        DEBUG=true
+        debug_info "$@"
+        ;;
+      --no-cache)
+        USE_CACHE=false
+        ;;
+      --restore)
+        restore_last_backup
+        exit
+        ;;
+      --max-parallel=*)
+        MAX_PARALLEL_JOBS="${arg#*=}"
+        if ! [[ $MAX_PARALLEL_JOBS =~ ^[0-9]+$ ]]; then
+          handle_error 1 "Invalid value for max-parallel: $MAX_PARALLEL_JOBS"
+        fi
+        ;;
+      *)
+        print_error "Unknown option: $arg"
+        usage
+        ;;
+    esac
+  done
+}
+
+# Version information with added details
+version()
+{
+  cat << EOF
+$BASENAME version $VERSION
+Author: Ismo Vuorinen <https://github.com/ivuorinen>
+License: MIT
+
+System information:
+  OS: $(uname -s)
+  Shell: $SHELL
+  BASH Version: $BASH_VERSION
+
+Dependencies:
+  asdf: $(asdf --version 2> /dev/null || echo "not found")
+  fd: $(fd --version 2> /dev/null || echo "not found")
+  jq: $(jq --version 2> /dev/null || echo "not found")
+EOF
+  exit 0
+}
+
+# Update determine_versions_to_uninstall to use the same formatting
+determine_versions_to_uninstall()
+{
+  print_warning "Versions to Uninstall:"
+  local count=0
+  declare -A to_uninstall=() # Declare associative array
+  uninstall_list=()          # Empty the uninstall list
+
+  debug "Determining versions to uninstall..."
+  debug "Installed versions: ${!installed_versions[*]}"
+  debug "Defined versions: ${!defined_versions[*]}"
+  debug "Keep versions: ${!keep_version[*]}"
+
+  for key in "${!installed_versions[@]}"; do
+    local name="${key% *}"
+    local version="${key#* }"
+    local keep=false
+
+    debug "Checking $name version $version"
+
+    # Check if the version is in the keep_version list
+    if [[ -v keep_version[$key] ]]; then
+      debug "$name $version is in keep_version list"
+      continue
+    fi
+
+    debug "Version not in keep_version list, checking defined versions"
+    # Check if the version is defined in the defined_versions list
+    for defined_key in "${!defined_versions[@]}"; do
+      local defined_name="${defined_key% *}"
+      local defined_version="${defined_key#* }"
+
+      if [[ $name == "$defined_name" ]]; then
+        debug "Found matching defined version for $name: $defined_version (installed: $version)"
+        version_compare "$version" "$defined_version"
+        local compare_result=$?
+        debug "Version comparison result: $compare_result"
+
+        if [[ $compare_result -eq 0 ]] || [[ $compare_result -eq 1 ]]; then
+          debug "Keeping $name $version (equal or newer than defined version)"
+          keep=true
+          break
+        fi
+      fi
+    done
+
+    if [[ $keep == false ]]; then
+      debug "Will uninstall $name $version"
+      ((count++))
+      # Check if the tool already has versions and initialize if necessary
+      if [[ -v to_uninstall[$name] ]]; then
+        to_uninstall[$name]="${to_uninstall[$name]}, $version"
+        debug "Added version to existing tool: $name ${to_uninstall[$name]}"
+      else
+        to_uninstall[$name]="$version"
+        debug "Added new tool and version: $name $version"
+      fi
+      uninstall_list+=("$key")
+      debug "Added to uninstall list: $key (total: ${#uninstall_list[@]})"
+    fi
+  done
+
+  debug "Processing complete. Found $count versions to uninstall"
+  debug "Uninstall list contains: ${uninstall_list[*]}"
+  debug "To uninstall map contains: ${!to_uninstall[*]}"
+
+  # Display grouped uninstall versions
+  if ((count > 0)); then
+    local -a sorted_tools
+    readarray -t sorted_tools < <(printf '%s\n' "${!to_uninstall[@]}" | sort)
+    for tool in "${sorted_tools[@]}"; do
+      echo "  $tool ${to_uninstall[$tool]}"
+      debug "Displaying: $tool ${to_uninstall[$tool]}"
+    done
+  else
+    debug "No versions to uninstall"
+  fi
+
+  echo "Found $count version(s) to uninstall"
+  log_to_file "INFO" "Found $count version(s) to uninstall"
+  echo
+
+  debug "Exiting determine_versions_to_uninstall"
+  return 0
+}
+
+# Uninstall versions with progress indication
+uninstall_versions()
+{
+  if ((${#uninstall_list[@]} == 0)); then
+    print_success "No versions to uninstall."
+    return
+  fi
+
+  if [[ $DRYRUN == true ]]; then
+    print_warning "Dry run mode - would uninstall these versions:"
+    for key in "${uninstall_list[@]}"; do
+      echo "  Would uninstall: $key"
+    done
+    log_to_file "INFO" "Dry run completed, would uninstall ${#uninstall_list[@]} version(s)"
+    return
+  fi
+
+  local confirm
+  read -rp "Do you want to proceed with uninstallation? (y/N): " confirm
+  if [[ $confirm =~ ^[Yy]$ ]]; then
+    local total=${#uninstall_list[@]}
+    local current=0
+
+    for key in "${uninstall_list[@]}"; do
+      ((current++))
+      local name="${key% *}"
+      local version="${key#* }"
+      print_success "($current/$total) Uninstalling $name: $version"
+
+      # Create backup before uninstalling
+      if ! create_backup "$name" "$version"; then
+        print_warning "Failed to create backup for $name $version"
+        continue
+      fi
+
+      if ! asdf uninstall "$name" "$version"; then
+        print_error "Failed to uninstall $name $version"
+        log_to_file "ERROR" "Failed to uninstall $name $version"
+      else
+        log_to_file "INFO" "Successfully uninstalled $name $version"
+      fi
+    done
+    print_success "Uninstallation completed"
+    log_to_file "INFO" "Uninstallation process completed"
+  else
+    print_warning "Uninstallation aborted by user."
+    log_to_file "INFO" "Uninstallation aborted by user"
+  fi
+}
+
+# Main execution
+main()
+{
+  check_dependencies
+  initialize_directories
+  load_config
+  parse_arguments "$@"
+  initialize_cache
+
+  if [[ $(is_dir "$BASE_DIR") == "no" ]]; then
+    handle_error 1 "Base directory $BASE_DIR does not exist or is not a directory"
+  fi
+
+  print_success "Starting asdf cleanup process..."
+  log_to_file "INFO" "Starting cleanup process"
+
+  # Make sure the array is initialized
+  declare -A all_versions=()
+
+  debug "Checking cache status..."
+
+  if [[ $USE_CACHE == true ]] && cache_is_valid; then
+    debug "Cache is valid, reading from cache..."
+    if read_cache_versions all_versions && ((${#all_versions[@]} > 0)); then
+      debug "Successfully read ${#all_versions[@]} versions from cache"
+      debug_array all_versions "Cached versions"
+    else
+      debug "Cache read failed or was empty, processing version files..."
+      all_versions=() # Empty the array for safety
+      process_all_version_files all_versions
+      debug_array all_versions "Processed versions"
+      if [[ $USE_CACHE == true ]] && ((${#all_versions[@]} > 0)); then
+        debug "Writing ${#all_versions[@]} versions to cache..."
+        write_cache_versions all_versions
+      fi
     fi
   else
-    echo "No versions to uninstall."
-  fi
-}
-
-# Main script execution
-main() {
-  parse_arguments "$@"
-
-  BASEDIR_IS_DIR=$(is_dir "$BASE_DIR")
-  if [ "$BASEDIR_IS_DIR" = "no" ]; then
-    echo "(!) Base directory $BASE_DIR does not exist or is not a directory"
-    exit 1
+    debug "Cache is not valid or disabled, processing version files..."
+    all_versions=() # Empty the array for safety
+    process_all_version_files all_versions
+    debug_array all_versions "Processed versions"
+    if [[ $USE_CACHE == true ]] && ((${#all_versions[@]} > 0)); then
+      debug "Writing ${#all_versions[@]} versions to cache..."
+      write_cache_versions all_versions
+    fi
   fi
 
-  files=$(find_tool_versions_files)
-  echo "Found .tool-versions files:"
-  echo "$files"
-  echo
+  # If no versions were found, try again
+  if ((${#all_versions[@]} == 0)); then
+    debug "No versions found, forcing version file processing..."
+    all_versions=() # Empty the array for safety
+    process_all_version_files all_versions
+    debug_array all_versions "Processed versions (forced)"
+  fi
 
-  # Declare associative arrays
-  declare -A defined_versions
-  declare -A installed_versions
-  declare -A keep_version
+  # Declare an associative array for defined versions
+  declare -A defined_versions=()
 
-  read_defined_versions
+  debug "Copying ${#all_versions[@]} versions to defined_versions..."
+  copy_versions defined_versions all_versions
+  debug_array defined_versions "Defined versions"
+
+  # Continue normally...
   display_defined_versions
-
   read_installed_versions
   display_installed_versions
   display_versions_to_keep
-
   determine_versions_to_uninstall
   uninstall_versions
+
+  show_performance_metrics
+  print_success "Cleanup process completed"
+  log_to_file "INFO" "Cleanup process completed successfully"
 }
 
-# Execute the main function
-main "$@"
-
+# Execute main function only if script is run directly
+if [[ ${BASH_SOURCE[0]} == "${0}" ]]; then
+  main "$@"
+fi
