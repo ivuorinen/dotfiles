@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
-#
-# set-macos-defaults.sh - Sets macOS Defaults that I like
+# Sets macOS Defaults that I like
 #
 # This script contains large portions from following scripts:
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
-#
 
 [ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
 
 # shellcheck source=shared.sh
-eval "$HOME/.dotfiles/config/shared.sh"
+source "$HOME/.dotfiles/config/shared.sh"
 
-msg_run "Starting to set macOS defaults, these require sudo privileges:"
+msgr run "Starting to set macOS defaults, these require sudo privileges:"
 
 # Ask for the administrator password upfront
 sudo -v
@@ -24,7 +22,7 @@ while true; do
   kill -0 "$$" || exit
 done 2> /dev/null &
 
-msg_nested "Change user shell to zsh if it is available and not the current"
+msgr nested "Change user shell to zsh if it is available and not the current"
 
 # Change user shell to zsh if not that already.
 if hash zsh 2> /dev/null; then
@@ -35,7 +33,7 @@ fi
 # General UI/UX                                                               #
 ###############################################################################
 
-msg_nested "Setting General UI/UX settings"
+msgr nested "Setting General UI/UX settings"
 
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
@@ -89,7 +87,7 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 # SSD-specific tweaks                                                         #
 ###############################################################################
 
-msg_nested "Setting SSD-specific tweaks"
+msgr nested "Setting SSD-specific tweaks"
 
 # Disable hibernation (speeds up entering sleep mode)
 sudo pmset -a hibernatemode 0
@@ -101,7 +99,7 @@ sudo pmset -a sms 0
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
 ###############################################################################
 
-msg_nested "Settings for Trackpad, mouse, keyboard, Bluetooth accessories, and input"
+msgr nested "Settings for Trackpad, mouse, keyboard, Bluetooth accessories, and input"
 
 # Increase sound quality for Bluetooth headphones/headsets
 defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Max (editable)" 80
@@ -137,7 +135,7 @@ launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/nul
 # Screen                                                                      #
 ###############################################################################
 
-msg_nested "Settings for Screen"
+msgr nested "Settings for Screen"
 
 # Require password immediately after sleep or screen saver begins
 defaults write com.apple.screensaver askForPassword -int 1
@@ -147,7 +145,7 @@ defaults write com.apple.screensaver askForPasswordDelay -int 0
 # Finder                                                                      #
 ###############################################################################
 
-msg_nested "Settings for Finder"
+msgr nested "Settings for Finder"
 
 # Set Desktop as the default location for new Finder windows
 # For other paths, use `PfLo` and `file:///full/path/here/`
@@ -207,7 +205,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 # Screenshots                                                                 #
 ###############################################################################
 
-msg_nested "Settings for Screenshots"
+msgr nested "Settings for Screenshots"
 
 # Set default screenshot location
 mkdir -p "$HOME/Documents/Screenshots"
@@ -223,7 +221,7 @@ defaults write com.apple.screencapture "name" -string "screenshot"
 # Dock, Dashboard, and hot corners                                            #
 ###############################################################################
 
-msg_nested "Settings for Dock, Dashboard, and hot corners"
+msgr nested "Settings for Dock, Dashboard, and hot corners"
 
 # Prevent applications from bouncing in Dock
 defaults write com.apple.dock no-bouncing -bool true
@@ -255,7 +253,7 @@ defaults write com.apple.dock showhidden -bool true
 # Safari & WebKit                                                             #
 ###############################################################################
 
-msg_nested "Settings for Safari & WebKit"
+msgr nested "Settings for Safari & WebKit"
 
 # Enable Safari's debug menu
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
@@ -281,7 +279,7 @@ defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 # Activity Monitor                                                            #
 ###############################################################################
 
-msg_nested "Settings for ActivityMonitor"
+msgr nested "Settings for ActivityMonitor"
 
 # Show the main window when launching Activity Monitor
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
@@ -300,7 +298,7 @@ defaults write com.apple.ActivityMonitor SortDirection -int 0
 # Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
 ###############################################################################
 
-msg_nested "Settings for Address Book, Dashboard, iCal, TextEdit, and Disk Utility"
+msgr nested "Settings for Address Book, Dashboard, iCal, TextEdit, and Disk Utility"
 
 # Use plain text mode for new TextEdit documents
 defaults write com.apple.TextEdit RichText -int 0
@@ -313,7 +311,7 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 # Messages                                                                    #
 ###############################################################################
 
-msg_nested "Settings for Messages"
+msgr nested "Settings for Messages"
 
 # Disable smart quotes as it's annoying for messages that contain code
 defaults write com.apple.messageshelper.MessageController \
@@ -327,7 +325,7 @@ defaults write com.apple.messageshelper.MessageController \
   -dict-add "continuousSpellCheckingEnabled" \
   -bool false
 
-msg_nested "Restarting applications to apply changes"
+msgr nested "Restarting applications to apply changes"
 
 ###############################################################################
 # Kill affected applications                                                  #

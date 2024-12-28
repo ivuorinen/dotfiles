@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#
 # Install z
 #
 # shellcheck source=shared.sh
@@ -16,9 +15,9 @@ clone_z_repo()
 
   if [ ! -d "$bin_path" ]; then
     git clone "$git_path" "$bin_path"
-    msg "z installed at $bin_path"
+    msgr run_done "z installed at $bin_path"
   else
-    msg "z ($bin_path/) already installed"
+    msgr ok "z ($bin_path/) already installed"
   fi
 }
 

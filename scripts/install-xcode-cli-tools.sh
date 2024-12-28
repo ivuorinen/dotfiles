@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#
 # Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
@@ -9,13 +8,13 @@ VERBOSE="${VERBOSE:-0}"
 
 # Check if the script is running on macOS
 if [ "$(uname)" != "Darwin" ]; then
-  echo "Not a macOS system"
+  msgr warn "Not a macOS system"
   exit 0
 fi
 
 # Check if xcode-select is available
 if ! command -v xcode-select &> /dev/null; then
-  msg_err "xcode-select could not be found, skipping"
+  msgr err "xcode-select could not be found, skipping"
   exit 0
 fi
 
@@ -46,7 +45,7 @@ prompt_xcode_install()
   if [ "$XCODE_MESSAGE" = "button returned:OK" ]; then
     xcode-select --install
   else
-    echo "You have cancelled the installation, please rerun the installer."
+    msgr warn "You have cancelled the installation, please rerun the installer."
     exit 1
   fi
 }
@@ -57,7 +56,7 @@ main()
   keep_alive_sudo
 
   if [ -x "$XCODE_SWIFT_PATH" ]; then
-    echo "You have swift from xcode-select. Continuing..."
+    msgr run "You have swift from xcode-select. Continuing..."
   else
     prompt_xcode_install
   fi

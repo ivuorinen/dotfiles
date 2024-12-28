@@ -7,10 +7,10 @@ source "${DOTFILES}/config/shared.sh"
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-msg_run "Installing gh (GitHub Client) extensions"
+msgr run "Installing gh (GitHub Client) extensions"
 
 if ! command -v gh &> /dev/null; then
-  msg_err "gh (GitHub Client) could not be found, please install it first"
+  msgr err "gh (GitHub Client) could not be found, please install it first"
   exit 0
 fi
 
@@ -43,7 +43,7 @@ install_extensions()
     # Skip comments
     if [[ ${ext:0:1} == "#" ]]; then continue; fi
 
-    msg_nested "Installing $ext"
+    msgr nested "Installing $ext"
     gh extension install "$ext"
     echo ""
   done
@@ -52,7 +52,7 @@ install_extensions()
 main()
 {
   install_extensions
-  msg_ok "Done"
+  msgr run_done "Done"
 }
 
 main "$@"

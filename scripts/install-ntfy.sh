@@ -3,14 +3,14 @@
 # Install ntfy
 #
 # shellcheck source=shared.sh
-eval "$DOTFILES/config/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
 # Check if ntfy is already installed
 if x-have "ntfy"; then
-  msg "ntfy already installed"
+  msgr done "ntfy already installed"
   exit 0
 fi
 
@@ -23,7 +23,7 @@ case $(dfm check arch) in
     NTFY_ARCH="macOS_all"
     ;;
   *)
-    msg_err "Unsupported OS"
+    msgr err "Unsupported OS"
     ;;
 esac
 
@@ -51,7 +51,7 @@ install_ntfy()
 main()
 {
   install_ntfy
-  msg "ntfy installation complete"
+  msgr done "ntfy installation complete"
 }
 
 main "$@"

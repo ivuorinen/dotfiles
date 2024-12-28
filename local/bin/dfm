@@ -14,62 +14,8 @@
 
 SCRIPT=$(basename "$0")
 
-if ! declare -f msg > /dev/null; then
-  # Function to print messages if VERBOSE is enabled
-  # $1 - message (string)
-  msg()
-  {
-    [ "$VERBOSE" -eq 1 ] && echo "$1"
-    return 0
-  }
-fi
-
-if ! declare -f msg_err > /dev/null; then
-  # Function to print error messages and exit
-  # $1 - error message (string)
-  msg_err()
-  {
-    # shellcheck disable=SC2317
-    echo "(!) ERROR: $1" >&2
-    # shellcheck disable=SC2317
-    exit 1
-  }
-fi
-
-if ! declare -f msg_done > /dev/null; then
-  # Function to print done message
-  # $1 - message (string)
-  msg_done()
-  {
-    # shellcheck disable=SC2317
-    echo "✓ $1"
-    # shellcheck disable=SC2317
-    return 0
-  }
-fi
-
-if ! declare -f array_diff > /dev/null; then
-  # Function to compare two arrays and return the difference
-  # Example: array_diff DIFFERENCE ARRAY1 ARRAY2
-  # $1 - variable to store the difference
-  # $2 - first array
-  # $3 - second array
-  # Output to $1 the difference between $2 and $3
-  # Source: https://stackoverflow.com/a/42399479/594940
-  array_diff()
-  {
-    # shellcheck disable=SC1083,SC2086
-    eval local ARR1=\(\"\${$2[@]}\"\)
-    # shellcheck disable=SC1083,SC2086
-    eval local ARR2=\(\"\${$3[@]}\"\)
-    local IFS=$'\n'
-    mapfile -t "$1" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
-  }
-fi
-
 # Loads configs for better installation experience
 source "$DOTFILES/config/shared.sh"
-
 source "${DOTFILES}/local/bin/msgr"
 
 # -- Menu builder -- #
@@ -153,15 +99,15 @@ section_install()
     "gh:Install GitHub CLI Extensions"
     "go:Install Go Packages"
     "imagick:Install ImageMagick CLI"
-    "starship:Install starship.rs"
     "macos:Setup nice macOS defaults"
     "neofetch:Install neofetch"
-    "nvm:Install Node Version Manager (nvm)"
-    "nvm-latest:Install latest lts node using nvm"
     "npm:Install NPM Packages"
     "ntfy:Install ntfy"
+    "nvm-latest:Install latest lts node using nvm"
+    "nvm:Install Node Version Manager (nvm)"
     "ohmybash:Install oh-my-bash"
     "pip:Install pip/python packages"
+    "starship:Install starship.rs"
     "z:Install z"
   )
 
@@ -171,124 +117,117 @@ section_install()
       $0 install macos
       $0 install fonts
       $0 brew install
-      #$0 install ohmyposh
       $0 install asdf
       $0 install composer
       $0 install fzf
-      #$0 install go
       $0 install cheat-databases
-      #$0 install imagick
       $0 install nvm
-      $0 install npm
-      # $0 install ntfy
+      $0 install npm-packages
       $0 install z
       msgr msg "Reloading configurations again..."
       source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
       ;;
+
     asdf)
-      msg "Installing asdf..."
+      msgr run "Installing asdf..."
       $0 asdf plugins-add \
-        && msg_yay "asdf installed!"
+        && msgr yay "asdf plugins installed!"
       ;;
+
     cargo)
-      msg "Installing cargo packages..."
+      msgr run "Installing cargo packages..."
       bash "$DOTFILES/scripts/install-cargo-packages.sh" \
-        && msg_yay "cargo packages installed!"
+        && msgr yay "cargo packages installed!"
       ;;
+
     cheat-databases)
-      msg "Installing cheat databases..."
+      msgr run "Installing cheat databases..."
       for database in "$DOTFILES"/scripts/install-cheat-*; do
         bash "$database" \
-          && msg_yay "Cheat: $database run"
+          && msgr run_done "Cheat: $database run"
       done
       ;;
+
     composer)
-      msg "Installing composer..."
+      msgr run "Installing composer..."
       bash "$DOTFILES/scripts/install-composer.sh" \
-        && msg_yay "composer installed!"
+        && msgr run_done "composer installed!"
       ;;
+
     fonts)
-      msg "Installing fonts..."
+      msgr run "Installing fonts..."
       bash "$DOTFILES/scripts/install-fonts.sh" \
-        && msg_yay "Installed fonts!"
+        && msgr yay "Installed fonts!"
       ;;
+
     fzf)
-      msg "Installing fzf..."
+      msgr run "Installing fzf..."
       bash "$DOTFILES/scripts/install-fzf.sh" \
-        && msg_yay "fzf installed!"
+        && msgr yay "fzf installed!"
       ;;
+
     gh)
-      msg "Installing GitHub CLI Extensions..."
+      msgr run "Installing GitHub CLI Extensions..."
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \
-        && msg_yay "github cli extensions installed!"
+        && msgr yay "github cli extensions installed!"
       ;;
+
     go)
-      msg "Installing Go Packages..."
+      msgr run "Installing Go Packages..."
       bash "$DOTFILES/scripts/install-go-packages.sh" \
-        && msg_yay "go packages installed!"
+        && msgr yay "go packages installed!"
       ;;
+
     imagick)
-      msg "Installing ImageMagick CLI..."
+      msgr run "Downloading and installing ImageMagick CLI..."
       curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
         && chmod +x "$XDG_BIN_HOME/magick" \
-        && msg_yay "imagick installed!"
+        && msgr yay "imagick downloaded and installed!"
       ;;
+
     macos)
-      msg "Setting up macOS defaults..."
-      bash "$DOTFILES/scripts/set-macos-defaults.sh" \
-        && msg_yay "Brewfile defined apps has been installed!"
+      msgr run "Setting up macOS defaults..."
+      bash "$DOTFILES/scripts/install-macos-defaults.sh" \
+        && msgr yay "macOS defaults set!"
       ;;
-    neofetch)
-      msg "Installing neofetch..."
-      bash "$DOTFILES/scripts/install-neofetch.sh" \
-        && msg_yay "neofetch installed!"
-      ;;
+
     nvm)
-      msg "Installing nvm..."
+      msgr run "Installing nvm..."
+      local NVM_VERSION
       NVM_VERSION=$(x-gh-get-latest-version nvm-sh/nvm)
-      msg "Latest nvm version: $NVM_VERSION"
-      NVM_INSTALL="https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh"
-      NVM_CURL="curl -o- \"$NVM_INSTALL\" | bash"
+      msgr ok "Latest nvm version: $NVM_VERSION"
+      local NVM_INSTALL="https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh"
+      local NVM_CURL="curl -o- \"$NVM_INSTALL\" | bash"
       PROFILE=/dev/null bash -c "$NVM_CURL"
       $0 install nvm-latest
-      msg_yay "nvm installed!"
+      msgr yay "nvm installed!"
       ;;
+
     nvm-latest)
-      msg "Installing latest lts node..."
+      msgr run "Installing latest lts node..."
       if [ -n "$NVM_DIR" ]; then
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       fi
       nvm install --lts --latest-npm --default
       git checkout "$DOTFILES/base/zshrc"
       git checkout "$DOTFILES/base/bashrc"
-      msg_yay "latest lts node installed!"
+      msgr yay "latest lts node installed!"
       ;;
-    npm)
-      msg "NPM Packages install started..."
+
+    npm-packages)
+      msgr run "NPM Packages install started..."
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
-        && msg_yay "NPM Packages have been installed!"
+        && msgr yay "NPM Packages have been installed!"
       ;;
-    ntfy)
-      msg "ntfy install started..."
-      bash "$DOTFILES/scripts/install-ntfy.sh" \
-        && msg_yay "ntfy installed!"
-      ;;
-    ohmyposh)
-      msg "oh-my-posh install started..."
-      bash "$DOTFILES/scripts/install-ohmyposh.sh" \
-        && msg_yay "oh-my-posh installed!"
-      ;;
-    pip)
-      msg "pip install started..."
-      bash "$DOTFILES/scripts/install-pip-packages.sh"
-      ;;
+
     z)
-      msg "Installing z..."
+      msgr run "Installing z..."
       bash "$DOTFILES/scripts/install-z.sh" \
-        && msg_yay "z has been installed!"
+        && msgr yay "z has been installed!"
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -309,12 +248,14 @@ section_brew()
   x-have brew && {
     case "$1" in
       install)
-        brew bundle install --file="$BREWFILE" --force --quiet && msg_yay "Done!"
+        brew bundle install --file="$BREWFILE" --force --quiet && msgr yay "Done!"
         ;;
+
       update)
         brew update && brew outdated && brew upgrade && brew cleanup
-        msg_yay "Done!"
+        msgr yay "Done!"
         ;;
+
       updatebundle)
         # Updates .dotfiles/homebrew/Brewfile with descriptions
         brew bundle dump \
@@ -324,11 +265,13 @@ section_brew()
           --tap \
           --formula \
           --cask \
-          --describe && msg_yay "Done!"
+          --describe && msgr yay "Done!"
         ;;
+
       leaves)
         brew leaves --installed-on-request
         ;;
+
       untracked)
         declare -a BREW_LIST_ALL
         while IFS= read -r line; do
@@ -361,7 +304,7 @@ section_brew()
 
         # If there are no untracked packages, exit
         if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
-          msg_yay "No untracked packages found!"
+          msgr yay "No untracked packages found!"
           exit 0
         fi
 
@@ -370,20 +313,19 @@ section_brew()
           echo "  $f"
         done
         ;;
-      clean)
-        brew bundle cleanup --file="$BREWFILE" && msg_yay "Done!"
-        ;;
+
       autoupdate)
         brew autoupdate delete
         brew autoupdate start 43200 --upgrade --cleanup --immediate
         ;;
-      *)
-        menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-        ;;
+
+      clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+
+      *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
     esac
   }
 
-  ! x-have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
+  ! x-have brew && menu_builder "$USAGE_PREFIX" "brew not available on this system"
 }
 
 section_asdf()
@@ -431,13 +373,13 @@ section_asdf()
 
       while IFS= read -r line; do
         # Ohita tyhjät rivit ja kommentit
-        [[ -z "$line" || "$line" =~ ^# ]] && continue
+        [[ -z $line || $line =~ ^# ]] && continue
 
         local plugin
         plugin=$(echo "$line" | awk '{print $1}')
 
         # Ohita direnv, käsiteltiin jo
-        [[ "$plugin" == "direnv" ]] && continue
+        [[ $plugin == "direnv" ]] && continue
 
         if ! echo "$installed_plugins" | grep -q "^${plugin}$"; then
           msgr nested "Installing $plugin plugin"
@@ -476,30 +418,30 @@ section_asdf()
 
       msgr run "Fixing tool-versions file"
 
-      # Tarkista että tiedosto on olemassa
-      if [[ ! -f "$tool_versions_file" ]]; then
+      # Check that .tool-versions file exists
+      if [[ ! -f $tool_versions_file ]]; then
         msgr error "tool-versions file not found: $tool_versions_file"
         rm -f "$temp_file"
         return 1
       fi
 
-      # Tarkista että asdf on asennettu
+      # Check that asdf can be found in the path
       if ! command -v asdf > /dev/null; then
         msgr error "asdf not found"
         rm -f "$temp_file"
         return 1
       fi
 
-      # Lue asennetut pluginit
+      # Read installed plugins
       msgr nested "Reading installed plugins"
       local installed_plugins
       installed_plugins=$(asdf plugin list | sort)
 
-      # Käy läpi tool-versions tiedosto ja säilytä vain asennetut pluginit
+      # Compare .tool-versions and installed plugins, remove unknown plugins from .tool-versions
       msgr nested "Updating tool-versions file"
       while IFS= read -r line; do
         # Säilytä kommentit ja tyhjät rivit
-        if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
+        if [[ -z $line || $line =~ ^[[:space:]]*# ]]; then
           echo "$line" >> "$temp_file"
           continue
         fi
@@ -514,17 +456,17 @@ section_asdf()
         fi
       done < "$tool_versions_file"
 
-      # Tarkista että temp-tiedosto ei ole tyhjä tai sisällä vain kommentteja
-      if [[ ! -s "$temp_file" ]] || ! grep -v '^[[:space:]]*#' "$temp_file" | grep -q .; then
+      # Check that the temp file is valid
+      if [[ ! -s $temp_file ]] || ! grep -v '^[[:space:]]*#' "$temp_file" | grep -q .; then
         msgr error "Generated file is empty or contains only comments, keeping original"
         rm -f "$temp_file"
         return 1
       fi
 
-      # Varmuuskopioi alkuperäinen
+      # Backup the original .tool-versions
       cp "$tool_versions_file" "${tool_versions_file}.bak"
 
-      # Siirrä uusi versio paikalleen
+      # Overwrite .tool-versions with the generated file
       mv "$temp_file" "$tool_versions_file"
 
       msgr run_done "Updated $tool_versions_file"
@@ -533,30 +475,12 @@ section_asdf()
       return 0
       ;;
 
-    current)
-      asdf current
-      ;;
-
-    global)
-      asdf global
-      ;;
-
-    installed)
-      asdf list
-      ;;
-
-    versions)
-      asdf list all
-      ;;
-
-    where)
-      asdf where
-      ;;
-
-    which)
-      asdf which
-      ;;
-
+    current) asdf current ;;
+    global) asdf global ;;
+    installed) asdf list ;;
+    versions) asdf list all ;;
+    where) asdf where ;;
+    which) asdf which ;;
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
@@ -586,6 +510,7 @@ section_helpers()
       # shellcheck disable=2001
       for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done
       ;;
+
     aliases)
       case "$SECTION" in
         "zsh")
@@ -599,6 +524,7 @@ section_helpers()
           ;;
       esac
       ;;
+
     "colors")
       max=255
       start=0
@@ -622,24 +548,14 @@ section_helpers()
         printf "\n"
         start=$((start + 10))
       done
+      ;;
 
-      ;;
-    "env")
-      env | sort
-      ;;
-    "functions")
-      declare -F
-      ;;
-    "nvim")
-      cat "$DOTFILES/docs/nvim-keybindings.md"
-      ;;
-    "tmux")
-      cat "$DOTFILES/docs/tmux-keybindings.md"
-      ;;
-    "wezterm")
-      cat "$DOTFILES/docs/wezterm-keybindings.md"
-      ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+    "env") env | sort ;;
+    "functions") declare -F ;;
+    "nvim") cat "$DOTFILES/docs/nvim-keybindings.md" ;;
+    "tmux") cat "$DOTFILES/docs/tmux-keybindings.md" ;;
+    "wezterm") cat "$DOTFILES/docs/wezterm-keybindings.md" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -663,7 +579,7 @@ section_docs()
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
     wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -681,37 +597,42 @@ section_dotfiles()
 
   case "$1" in
     fmt)
-      msg_ok "Running all formatters"
+      msgr run "Running all formatters"
       $0 dotfiles yamlfmt
       $0 dotfiles shfmt
-      msg_done "...done!"
+      msgr run_done "...done!"
       ;;
+
     reset_all)
-      msg_ok "Running all reset commands"
+      msgr ok "Running all reset commands"
       $0 dotfiles reset_nvim
       ;;
+
     reset_nvim)
+      msgr run "Cleaning nvim state, cache and config"
       rm -rf \
         ~/.local/share/nvim \
         ~/.local/state/nvim \
         ~/.cache/nvim \
         ~/.config/nvim
-      msg_ok "Deleted old nvim files (share, state and cache + config)"
+      msgr ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim
-      msg_ok "Linked nvim and astronvim"
+      msgr ok "Linked nvim and astronvim"
       x-have npm && $0 install npm
-      msg_ok "Installed packages"
-      msg_done "nvim reset!"
+      msgr ok "Installed packages"
+      msgr run_done "nvim reset!"
       ;;
+
     yamlfmt)
       # format yaml files
       x-have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt"
-      ! x-have yamlfmt && msg_err "yamlfmt not found"
+      ! x-have yamlfmt && msgr err "yamlfmt not found"
       ;;
+
     shfmt)
       # If system doesn't have fd or shfmt installed, exit
-      ! x-have fd && msg_err "fd not found, install with asdf"
-      ! x-have shfmt && msg_err "shfmt not found, install with asdf"
+      ! x-have fd && msgr err "fd not found, install it to continue"
+      ! x-have shfmt && msgr err "shfmt not found, install it to continue"
       # Format shell scripts according to following rules.
       fd --full-path "$DOTFILES" -tx \
         --hidden \
@@ -722,9 +643,10 @@ section_dotfiles()
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
         --binary-next-line {} \;
-      msg_yay "dotfiles have been shfmt formatted!"
+      msgr yay "dotfiles have been shfmt formatted!"
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
@@ -744,11 +666,58 @@ section_check()
       [[ $2 == "" ]] && echo "$X_ARCH" && exit 0
       [[ $X_ARCH == "$2" ]] && exit 0 || exit 1
       ;;
+
     h | host | hostname)
       [[ $2 == "" ]] && echo "$X_HOSTNAME" && exit 0
       [[ $X_HOSTNAME == "$2" ]] && exit 0 || exit 1
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+section_scripts()
+{
+  USAGE_PREFIX="$SCRIPT scripts <command>"
+
+  # Get description from a file
+  get_script_description()
+  {
+    local file
+    local desc
+    file="$1"
+    desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
+    echo "${desc:-No description available}"
+  }
+
+  # Collect scripts and their descriptions
+  declare -A SCRIPT_MENU
+  for script in "$DOTFILES/scripts/install-"*.sh; do
+    if [ -f "$script" ]; then
+      name=$(basename "$script" .sh | sed 's/install-//')
+      desc=$(get_script_description "$script")
+      SCRIPT_MENU[$name]="$desc"
+    fi
+  done
+
+  case "$1" in
+    "")
+      # Show the menu
+      local menu_items=()
+      for name in "${!SCRIPT_MENU[@]}"; do
+        menu_items+=("$name:${SCRIPT_MENU[$name]}")
+      done
+      menu_builder "$USAGE_PREFIX" "${menu_items[@]}"
+      ;;
+    *)
+      # Run the chosen script
+      script_path="$DOTFILES/scripts/install-$1.sh"
+      if [ -f "$script_path" ]; then
+        bash "$script_path"
+      else
+        msgr err "Script not found: $1"
+      fi
+      ;;
   esac
 }
 
@@ -758,7 +727,7 @@ section_tests()
   USAGE_PREFIX="$SCRIPT tests <command>"
 
   MENU=(
-    "msg:List all log functions from shared.sh"
+    "msgr:List all available msgr message types"
     "params:List all parameters"
   )
 
@@ -770,29 +739,29 @@ section_tests()
       done
       ;;
     msg)
-      msg "msg"
-      msg_done "msg_done"
-      msg_done_suffix "msg_done_suffix"
-      msg_err "msg_err"
-      msg_nested "msg_nested"
-      msg_nested_done "msg_nested_done"
-      msg_ok "msg_ok"
-      msg_prompt "msg_prompt"
-      msg_prompt_done "msg_prompt_done"
-      msg_run "msg_run" "second_param"
-      msg_run_done "msg_run_done" "second_param"
-      msg_warn "msg_warn"
-      msg_yay "msg_yay"
-      msg_yay_done "msg_yay_done"
+      # shellcheck disable=SC1010
+      msgr done "msgr done"
+      msgr done_suffix "msgr done_suffix"
+      msgr err "msgr err"
+      msgr nested "msgr nested"
+      msgr nested_done "msgr nested_done"
+      msgr ok "msgr ok"
+      msgr prompt "msgr prompt"
+      msgr prompt_done "msgr prompt_done"
+      msgr run "msgr run" "second_param"
+      msgr run_done "msgr run_done" "second_param"
+      msgr warn "msgr warn"
+      msgr yay "msgr yay"
+      msgr yay_done "msgr yay_done"
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
 usage()
 {
   echo ""
-  msg_prompt "Usage: $SCRIPT <section> <command>"
+  msgr prompt "Usage: $SCRIPT <section> <command>"
   echo $"  Empty <command> prints <section> help."
   echo ""
   section_install
@@ -806,6 +775,8 @@ usage()
   section_dotfiles
   echo ""
   section_docs
+  echo ""
+  section_scripts
   echo ""
   section_helpers
 }
@@ -823,6 +794,7 @@ main()
     dotfiles) section_dotfiles "$@" ;;
     helpers) section_helpers "$@" ;;
     docs) section_docs "$@" ;;
+    scripts) section_scripts "$@" ;;
     tests) section_tests "$@" ;;
     *) usage && exit 0 ;;
   esac

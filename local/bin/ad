@@ -6,12 +6,12 @@ KEYS_FILE="${AGE_KEYSFILE:-$HOME/.ssh/keys.txt}"
 KEYS_SOURCE="${AGE_KEYSSOURCE:-https://github.com/ivuorinen.keys}"
 
 # Check for required commands
-if ! command -v age &>/dev/null; then
+if ! command -v age &> /dev/null; then
   echo "Error: age is not installed. Please install it to continue."
   exit 1
 fi
 
-if ! command -v curl &>/dev/null; then
+if ! command -v curl &> /dev/null; then
   echo "Error: curl is not installed. Please install it to continue."
   exit 1
 fi
@@ -27,7 +27,6 @@ if [[ ! -f "$FILE" ]]; then
   echo "Error: File '$FILE' does not exist."
   exit 1
 fi
-
 
 # Check if keys file exists, otherwise fetch it
 if [[ ! -f "$KEYS_FILE" ]]; then
@@ -51,7 +50,7 @@ fi
 
 # Decrypt the file
 OUTPUT_FILE="${FILE%.age}"
-age -d -i "$KEYS_FILE" "$FILE" >"$OUTPUT_FILE"
+age -d -i "$KEYS_FILE" "$FILE" > "$OUTPUT_FILE"
 
 if [[ $? -eq 0 ]]; then
   echo "File decrypted successfully: $OUTPUT_FILE"
@@ -59,4 +58,3 @@ else
   echo "Error: Failed to decrypt file."
   exit 1
 fi
-

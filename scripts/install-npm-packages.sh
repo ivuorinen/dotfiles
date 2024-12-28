@@ -2,8 +2,7 @@
 # Install npm packages globally.
 #
 # shellcheck source=shared.sh
-
-eval "$DOTFILES/config/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"

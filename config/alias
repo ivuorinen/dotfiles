@@ -130,6 +130,6 @@ X_ALIAS_FILES=(
 )
 for aliasFile in "${X_ALIAS_FILES[@]}"; do
   # shellcheck source=$HOME/.config/alias-secret
-  [ -f "$aliasFile" ] && source "$aliasFile" && msg "Sourced $aliasFile"
+  [ -f "$aliasFile" ] && source "$aliasFile" && msgr ok "Sourced $aliasFile"
 done
 unset X_ALIAS_FILES

@@ -9,7 +9,7 @@ source "${DOTFILES}/config/shared.sh"
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-msg_run "Installing git-crypt"
+msgr run "Installing git-crypt"
 
 if ! command -v git-crypt &> /dev/null; then
   REPO_URL="https://github.com/AGWA/git-crypt.git"
@@ -23,8 +23,8 @@ if ! command -v git-crypt &> /dev/null; then
     cd "$BUILD_PATH" || msg_err "$BUILD_PATH not found"
     make && make install PREFIX="$HOME/.local"
   else
-    msg_done "git-crypt ($CHECK_PATH) already installed"
+    msgr run_done "git-crypt ($CHECK_PATH) already installed"
   fi
 fi
 
-msg_done "Done installing git-crypt"
+msgr run_done "Done installing git-crypt"

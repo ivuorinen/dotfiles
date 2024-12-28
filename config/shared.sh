@@ -42,7 +42,7 @@ if ! declare -f msg > /dev/null; then
   # $1 - message (string)
   msg()
   {
-    [ "$VERBOSE" -eq 1 ] && echo "$1"
+    [ "$VERBOSE" -eq 1 ] && msgr msg "$1"
     return 0
   }
   msg "msg was not defined, defined it now"
@@ -54,7 +54,7 @@ if ! declare -f msg_err > /dev/null; then
   # $1 - error message (string)
   msg_err()
   {
-    echo "(!) ERROR: $1" >&2
+    msgr err "$1" >&2
     exit 1
   }
 fi
@@ -65,7 +65,7 @@ if ! declare -f msg_done > /dev/null; then
   # $1 - message (string)
   msg_done()
   {
-    echo "✓ $1"
+    msgr done "$1"
     return 0
   }
 fi
@@ -76,7 +76,7 @@ if ! declare -f msg_run > /dev/null; then
   # $1 - message (string)
   msg_run()
   {
-    echo "→ $1"
+    msgr run "$1"
     return 0
   }
 fi
@@ -87,8 +87,27 @@ if ! declare -f msg_ok > /dev/null; then
   # $1 - message (string)
   msg_ok()
   {
-    echo "✓ $1"
+    msgr ok "$1"
     return 0
+  }
+fi
+
+if ! declare -f array_diff > /dev/null; then
+  # Function to compare two arrays and return the difference
+  # Example: array_diff DIFFERENCE ARRAY1 ARRAY2
+  # $1 - variable to store the difference
+  # $2 - first array
+  # $3 - second array
+  # Output to $1 the difference between $2 and $3
+  # Source: https://stackoverflow.com/a/42399479/594940
+  array_diff()
+  {
+    # shellcheck disable=SC1083,SC2086
+    eval local ARR1=\(\"\${$2[@]}\"\)
+    # shellcheck disable=SC1083,SC2086
+    eval local ARR2=\(\"\${$3[@]}\"\)
+    local IFS=$'\n'
+    mapfile -t "$1" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
   }
 fi
 

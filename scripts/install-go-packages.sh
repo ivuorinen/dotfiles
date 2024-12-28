@@ -2,18 +2,14 @@
 # Install Go packages
 #
 # shellcheck source=shared.sh
-
-echo "This file ($0) has been deprecated in favor of asdf. Please use asdf instead."
-exit 0
-
-eval "$DOTFILES/config/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-msg_run "Installing go packages"
+msgr run "Installing go packages"
 
-! x-have "go" && msg "go hasn't been installed yet." && exit 0
+! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
 
 packages=(
   # A shell parser, formatter, and interpreter with bash support; includes shfmt
@@ -49,7 +45,7 @@ install_packages()
     # Skip comments
     if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-    msg_nested "Installing go package: $pkg"
+    msgr nested "Installing go package: $pkg"
     go install "$pkg"
     echo ""
   done
@@ -58,23 +54,23 @@ install_packages()
 # Function to install completions and run actions for selected packages
 post_install()
 {
-  msg_run "Installing completions for selected packages"
+  msgr run "Installing completions for selected packages"
 
   if command -v git-profile &> /dev/null; then
     git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
-      && msg_ok "Installed completions for git-profile"
+      && msgr run_done "Installed completions for git-profile"
   fi
 
   if command -v antidot &> /dev/null; then
     antidot update \
-      && msg_ok "Updated antidot database"
+      && msgr run_done "Updated antidot database"
   fi
 }
 
 # Function to clear go cache
 clear_go_cache()
 {
-  msg_run "Clearing go cache"
+  msgr run "Clearing go cache"
   go clean -cache -modcache
 }
 
@@ -83,7 +79,7 @@ main()
   install_packages
   post_install
   clear_go_cache
-  msg_ok "Done"
+  msgr run_done "Done"
 }
 
 main "$@"
