@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# dfm - dotfiles manager
+
+set -euo pipefail
+
+# define default variables
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly CMD_DIR="${SCRIPT_DIR}/cmd"
+readonly LIB_DIR="${SCRIPT_DIR}/lib"
+readonly DEFAULT_CONFIG_PATH="$HOME/.config"
+readonly MAX_RETRIES=3
+export DEFAULT_INSTALL_DIR="$HOME/.local"
+export DEFAULT_VERBOSE=0
+export TEMP_DIR=$(mktemp -d)
+
+# Load the common and utility functions from the lib directory.
+source "${LIB_DIR}/common.sh"
+source "${LIB_DIR}/utils.sh"
+
+# Main function for the dfm script.
+#
+# The function checks if any arguments were provided. If no arguments are
+# provided, it lists all available commands. If a command name is provided,
+# it lists the available functions for that command. If a command and function
+# name are provided, it executes the function with the provided arguments.
+#
+# @param args The command-line arguments.
+# @return None
+main()
+{
+  if [[ $# -eq 0 ]]; then
+    main::list_available_commands
+    return 0
+  fi
+
+  local cmd="$1"
+  shift
+
+  if [[ $# -eq 0 ]]; then
+    # Näytä komennon saatavilla olevat funktiot
+    local cmd_file="${CMD_DIR}/${cmd}.sh"
+    if [[ -f "$cmd_file" ]]; then
+      list::print_group "Available functions for '$cmd'"
+      list::loop_functions "$cmd_file"
+    else
+      lib::error "Command '$cmd' not found"
+      return 1
+    fi
+    return 0
+  fi
+
+  local func="$1"
+  shift
+
+  main::execute_command "$cmd" "$func" "$@"
+}
+
+main "$@"
