@@ -64,3 +64,6 @@
 	path = tools/antidote
 	url = https://github.com/mattmc3/antidote.git
 	shallow = true
+[submodule "dotbot-asdf"]
+	path = tools/dotbot-asdf
+	url = https://github.com/sobolevn/dotbot-asdf

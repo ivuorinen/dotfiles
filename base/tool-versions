@@ -1,11 +1,9 @@
-asdf-plugin-manager 1.4.0
 golang 1.23.4
-rust 1.82.0
+rust 1.83.0
 direnv 2.35.0
 fd 10.2.0
 1password-cli 2.30.3
 age 1.2.1
-bottom 0.10.2
 dotenv-linter 3.3.0
 editorconfig-checker 2.8.0
 github-cli 2.64.0
@@ -15,7 +13,7 @@ pre-commit 4.0.1
 ripgrep 14.1.1
 shellcheck 0.10.0
 shfmt 3.10.0
-terragrunt 0.68.8
+terragrunt 0.71.1
 tf-summarize 0.3.14
 yamllint 1.35.1
 yq 4.44.6

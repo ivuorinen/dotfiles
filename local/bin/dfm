@@ -73,6 +73,25 @@ source "$DOTFILES/config/shared.sh"
 source "${DOTFILES}/local/bin/msgr"
 
 # -- Menu builder -- #
+
+menu_builder()
+{
+  local title=$1
+  local commands=("${@:2}")
+  local width=60
+
+  printf "\n%s\n" "$(printf '%.s─' $(seq 1 $width))"
+  printf "%-${width}s\n" "  $title"
+  printf "%s\n" "$(printf '%.s─' $(seq 1 $width))"
+
+  for cmd in "${commands[@]}"; do
+    local name=${cmd%%:*}
+    local desc=${cmd#*:}
+    printf "  %-20s %s\n" "$name" "$desc"
+  done
+  # printf "\n"
+}
+
 menu_section()
 {
   LINE=$(printf '%-18s [ %-15s ]\n' "$1" "$2")
@@ -374,10 +393,11 @@ section_asdf()
     "current:Show asdf current versions"
     "global:Show asdf global versions"
     "installed:Show asdf installed versions"
-    "local:Show asdf local versions"
-    "plugins-add:Add and update direnv and asdf-plugin-manager, and all other plugins"
     "plugins-update:Update all asdf plugins"
+    "plugins-install:Install plugins from configuration"
+    "plugins-remove:Remove installed plugins"
     "reset:Reset asdf plugins"
+    "fix-tool-versions:Remove uninstalled plugins from .tool-versions"
     "versions:Show asdf versions"
     "where:Show asdf where"
     "which:Show asdf which"
@@ -385,120 +405,159 @@ section_asdf()
 
   case "$1" in
     plugins-update)
-      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
-
       msgr run "Updating all asdf plugins"
-      $APM_BIN update-all
-      $APM_BIN export > "$ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME"
+      asdf plugin update --all
       msgr run_done "Updated all plugins"
       ;;
-    plugins-add)
-      X_GH_BIN="$DOTFILES/local/bin/x-gh-get-latest-version"
-      LATEST_APM="$($X_GH_BIN asdf-community/asdf-plugin-manager | sed 's/^v//')"
-      LATEST_DIRENV="$($X_GH_BIN asdf-community/asdf-direnv)"
-      PLUGIN_VERSIONS="$DOTFILES/config/asdf/plugin-versions"
-      APM_BIN="$HOME/.local/bin/asdf/shims/asdf-plugin-manager"
 
-      msgr run "Adding and updating direnv and asdf-plugin-manager"
-      asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
-      asdf global direnv "$LATEST_DIRENV"
-      asdf install direnv "$LATEST_DIRENV"
+    plugins-install)
+      msgr run "Installing plugins from configuration"
 
-      asdf plugin add asdf-plugin-manager https://github.com/asdf-community/asdf-plugin-manager.git
-      asdf global asdf-plugin-manager "$LATEST_APM"
-      asdf install asdf-plugin-manager "$LATEST_APM"
-      asdf reshim
-      msgr run_done "direnv and asdf-plugin-manager added and updated"
+      # Asennetaan ensin direnv jos sitä ei ole
+      if ! asdf plugin list | grep -q "^direnv$"; then
+        msgr nested "Installing direnv plugin"
+        asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
 
-      msgr run "Reset plugin-versions file to the original using git"
-      if git ls-files --error-unmatch "$PLUGIN_VERSIONS" > /dev/null 2>&1; then
-        git checkout -- "$PLUGIN_VERSIONS"
+        # Asennetaan direnv latest
+        local latest_direnv
+        latest_direnv=$(asdf latest direnv)
+        asdf install direnv "$latest_direnv"
+        asdf global direnv "$latest_direnv"
       fi
-      msgr run_done "Reset plugin-versions file"
 
-      msgr run "Adding all plugins with asdf-plugin-manager"
-      "$APM_BIN" add-all
-      msgr run_done "Added all plugins with asdf-plugin-manager"
+      # Tarkistetaan että kaikki konfiguroidut pluginit on asennettu
+      local installed_plugins
+      installed_plugins=$(asdf plugin list)
 
-      msgr run "Install all plugins"
-      PLUGINS=$($APM_BIN list | awk -F ' ' '{print $1}' | sort)
-      for P in $PLUGINS; do
-        msgr run "Installing $P"
-        asdf install "$P" latest
-        asdf global "$P" latest
-      done
+      while IFS= read -r line; do
+        # Ohita tyhjät rivit ja kommentit
+        [[ -z "$line" || "$line" =~ ^# ]] && continue
 
+        local plugin
+        plugin=$(echo "$line" | awk '{print $1}')
 
-      msgr run_done "Installed all plugins"
+        # Ohita direnv, käsiteltiin jo
+        [[ "$plugin" == "direnv" ]] && continue
 
-      msgr run "Reshimming"
-      asdf reshim
-      msgr run_done "Reshimmed"
+        if ! echo "$installed_plugins" | grep -q "^${plugin}$"; then
+          msgr nested "Installing $plugin plugin"
+          asdf plugin add "$plugin"
+        fi
+      done < "$DOTFILES/base/tool-versions"
+
+      msgr run_done "All plugins installed"
       ;;
+
     plugins-remove)
-      PLUGIN_VERSIONS="$DOTFILES/config/asdf/plugin-versions"
-
       msgr run "Remove installed plugins"
-      INSTALLED_ASDF_PLUGINS=$(asdf list | grep -vE "direnv|asdf-plugin-manager" | grep -v "^ ")
-      for P in $INSTALLED_ASDF_PLUGINS; do
-        asdf plugin remove "$P"
-        msgr nested_done "Removed $P"
-      done
+      local installed_plugins
+      installed_plugins=$(asdf plugin list | grep -v "^direnv$")
 
-      msgr run "Reset plugin-versions file to the original using git"
-      if git ls-files --error-unmatch "$PLUGIN_VERSIONS" > /dev/null 2>&1; then
-        git checkout -- "$PLUGIN_VERSIONS"
-      fi
-      msgr run_done "Reset plugin-versions file"
+      for plugin in $installed_plugins; do
+        msgr nested "Removing $plugin"
+        asdf plugin remove "$plugin"
+      done
 
       msgr run_done "Remove plugins done!"
       ;;
-    reset)
-      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
 
-      msgr run "Get currently installed plugins, remove those that are not defined"
+    reset)
+      msgr run "Resetting asdf environment"
       $0 asdf plugins-remove
-      $0 asdf plugins-add
-      $0 asdf fixtoolversions
+      $0 asdf plugins-install
       asdf reshim
       msgr yay "Reset asdf plugins done!"
       ;;
-    fixtoolversions)
-      ASDF_TOOL_VERSIONS_FILE="$DOTFILES/base/tool-versions"
-      ASDF_TOOL_FILE_PLUGINS=$(awk '{print $1 " " $2}' "$ASDF_TOOL_VERSIONS_FILE")
-      APM_BIN="$(asdf where asdf-plugin-manager)/bin/asdf-plugin-manager"
 
-      msgr run "Loading $ASDF_TOOL_VERSIONS_FILE and collecting installed"
-      ASDF_PLUGINS_DEFINED=$($APM_BIN list | awk -F ' ' '{print $1}')
+    fix-tool-versions)
+      local tool_versions_file="$DOTFILES/base/tool-versions"
+      local temp_file
+      temp_file=$(mktemp)
 
-      echo "$ASDF_TOOL_FILE_PLUGINS" | \
-        grep -Fxv -f <(echo "$ASDF_PLUGINS_DEFINED") > tmp && \
-        mv tmp "$ASDF_TOOL_VERSIONS_FILE"
+      msgr run "Fixing tool-versions file"
 
-      msgr run_done "Fixed $ASDF_TOOL_VERSIONS_FILE"
+      # Tarkista että tiedosto on olemassa
+      if [[ ! -f "$tool_versions_file" ]]; then
+        msgr error "tool-versions file not found: $tool_versions_file"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Tarkista että asdf on asennettu
+      if ! command -v asdf > /dev/null; then
+        msgr error "asdf not found"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Lue asennetut pluginit
+      msgr nested "Reading installed plugins"
+      local installed_plugins
+      installed_plugins=$(asdf plugin list | sort)
+
+      # Käy läpi tool-versions tiedosto ja säilytä vain asennetut pluginit
+      msgr nested "Updating tool-versions file"
+      while IFS= read -r line; do
+        # Säilytä kommentit ja tyhjät rivit
+        if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
+          echo "$line" >> "$temp_file"
+          continue
+        fi
+
+        local plugin
+        plugin=$(echo "$line" | awk '{print $1}')
+
+        if echo "$installed_plugins" | grep -q "^${plugin}$"; then
+          echo "$line" >> "$temp_file"
+        else
+          msgr nested "Removing $plugin - not installed"
+        fi
+      done < "$tool_versions_file"
+
+      # Tarkista että temp-tiedosto ei ole tyhjä tai sisällä vain kommentteja
+      if [[ ! -s "$temp_file" ]] || ! grep -v '^[[:space:]]*#' "$temp_file" | grep -q .; then
+        msgr error "Generated file is empty or contains only comments, keeping original"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Varmuuskopioi alkuperäinen
+      cp "$tool_versions_file" "${tool_versions_file}.bak"
+
+      # Siirrä uusi versio paikalleen
+      mv "$temp_file" "$tool_versions_file"
+
+      msgr run_done "Updated $tool_versions_file"
+      msgr nested "Backup saved as ${tool_versions_file}.bak"
+
+      return 0
       ;;
+
     current)
       asdf current
       ;;
+
     global)
       asdf global
       ;;
+
     installed)
       asdf list
       ;;
-    local)
-      asdf local
-      ;;
+
     versions)
       asdf list all
       ;;
+
     where)
       asdf where
       ;;
+
     which)
       asdf which
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 

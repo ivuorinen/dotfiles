@@ -1,0 +1,145 @@
+#compdef dfm
+
+_dfm() {
+  local -a commands sections
+
+  sections=(
+    'install:Installation commands'
+    'asdf:ASDF version manager commands'
+    'brew:Homebrew package manager commands'
+    'check:System check commands'
+    'dotfiles:Dotfiles management commands'
+    'docs:Documentation commands'
+    'helpers:Helper utilities'
+    'tests:Test commands'
+  )
+
+  _arguments -C \
+    "1: :->sections" \
+    "*::arg:->args"
+
+  case "$state" in
+    sections)
+      _describe 'sections' sections
+      ;;
+    args)
+      case $line[1] in
+        install)
+          local -a install_cmds
+          install_cmds=(
+            'all:Install everything in correct order'
+            'cargo:Install rust/cargo packages'
+            'cheat-databases:Install cheat external cheatsheet databases'
+            'composer:Install composer'
+            'dotenv:Install dotenv-linter'
+            'fonts:Install programming fonts'
+            'gh:Install GitHub CLI Extensions'
+            'go:Install Go Packages'
+            'imagick:Install ImageMagick CLI'
+            'starship:Install starship.rs'
+            'macos:Setup nice macOS defaults'
+            'neofetch:Install neofetch'
+            'nvm:Install Node Version Manager'
+            'nvm-latest:Install latest LTS node'
+            'npm:Install NPM Packages'
+            'ntfy:Install ntfy'
+            'ohmybash:Install oh-my-bash'
+            'pip:Install pip/python packages'
+            'z:Install z'
+          )
+          _describe 'install commands' install_cmds
+          ;;
+
+        asdf)
+          local -a asdf_cmds
+          asdf_cmds=(
+            'current:Show current versions'
+            'global:Show global versions'
+            'installed:Show installed versions'
+            'plugins-update:Update all plugins'
+            'plugins-install:Install plugins from configuration'
+            'plugins-remove:Remove installed plugins'
+            'reset:Reset plugins'
+            'fix-tool-versions:Remove uninstalled plugins from .tool-versions'
+            'versions:Show versions'
+            'where:Show where'
+            'which:Show which'
+          )
+          _describe 'asdf commands' asdf_cmds
+          ;;
+
+        brew)
+          local -a brew_cmds
+          brew_cmds=(
+            'install:Install items from Brewfile'
+            'update:Update and upgrade packages'
+            'updatebundle:Update Brewfile with descriptions'
+            'autoupdate:Setup brew auto-update'
+            'leaves:List brew leaves'
+            'clean:Clean up packages'
+            'untracked:List untracked packages'
+          )
+          _describe 'brew commands' brew_cmds
+          ;;
+
+        check)
+          local -a check_cmds
+          check_cmds=(
+            'arch:Check architecture'
+            'host:Check hostname'
+          )
+          _describe 'check commands' check_cmds
+          ;;
+
+        dotfiles)
+          local -a dotfiles_cmds
+          dotfiles_cmds=(
+            'fmt:Run all formatters'
+            'yamlfmt:Run yamlfmt'
+            'shfmt:Run shfmt'
+            'reset_all:Reset everything'
+            'reset_nvim:Reset neovim'
+          )
+          _describe 'dotfiles commands' dotfiles_cmds
+          ;;
+
+        docs)
+          local -a docs_cmds
+          docs_cmds=(
+            'all:Update all documentation'
+            'tmux:Update tmux documentation'
+            'nvim:Update nvim documentation'
+            'wezterm:Update wezterm documentation'
+          )
+          _describe 'docs commands' docs_cmds
+          ;;
+
+        helpers)
+          local -a helpers_cmds
+          helpers_cmds=(
+            'aliases:Show aliases'
+            'colors:Show colors'
+            'env:Show environment variables'
+            'functions:Show functions'
+            'nvim:Show nvim keybindings'
+            'path:Show PATH'
+            'tmux:Show tmux keybindings'
+            'wezterm:Show wezterm keybindings'
+          )
+          _describe 'helper commands' helpers_cmds
+          ;;
+
+        tests)
+          local -a test_cmds
+          test_cmds=(
+            'msg:List log functions'
+            'params:List parameters'
+          )
+          _describe 'test commands' test_cmds
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_dfm "$@"
