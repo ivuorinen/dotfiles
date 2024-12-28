@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install npm packages globally.
+# @description Install npm packages globally.
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

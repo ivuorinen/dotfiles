@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Go packages
+# @description Install Go packages
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

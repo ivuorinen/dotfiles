@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install GitHub CLI extensions
+# @description Install GitHub CLI extensions
 #
 # shellcheck source="shared.sh"
 source "${DOTFILES}/config/shared.sh"

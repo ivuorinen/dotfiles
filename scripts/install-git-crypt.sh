@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+# @description Install git-crypt
 #
-# Install git-crypt
 # NOTE: Experimental, wip
 #
 # shellcheck source=shared.sh

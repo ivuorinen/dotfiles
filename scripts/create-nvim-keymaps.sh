@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create file containing key mappings for Neovim
+# @description Create file containing key mappings for Neovim
 # Usage: ./create-nvim-keymaps.sh
 #
 # shellcheck source=shared.sh

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install z
+# @description Install z
 #
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"

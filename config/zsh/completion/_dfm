@@ -1,6 +1,29 @@
 #compdef dfm
+# Completion for dfm, the dotfiles manager
 
-_dfm() {
+_dfm_get_script_description() {
+  local file="$1"
+  sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1
+}
+
+_dfm_get_available_scripts() {
+  local scripts=()
+  local dotfiles="${HOME}/.dotfiles"
+
+  for script in "${dotfiles}/scripts/install-"*.sh; do
+    if [ -f "$script" ]; then
+      local name=$(basename "$script" .sh | sed 's/install-//')
+      local desc=$(_dfm_get_script_description "$script")
+      [ -z "$desc" ] && desc="No description available"
+      scripts+=("${name}:${desc}")
+    fi
+  done
+
+  echo ${(F)scripts}
+}
+
+_dfm()
+{
   local -a commands sections
 
   sections=(
@@ -11,6 +34,7 @@ _dfm() {
     'dotfiles:Dotfiles management commands'
     'docs:Documentation commands'
     'helpers:Helper utilities'
+    'scripts:Installation scripts'
     'tests:Test commands'
   )
 
@@ -127,6 +151,12 @@ _dfm() {
             'wezterm:Show wezterm keybindings'
           )
           _describe 'helper commands' helpers_cmds
+          ;;
+
+        scripts)
+            local -a script_cmds
+            script_cmds=("${(@f)$(_dfm_get_available_scripts)}")
+            _describe 'available scripts' script_cmds
           ;;
 
         tests)

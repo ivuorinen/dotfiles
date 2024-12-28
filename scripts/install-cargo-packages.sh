@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
-# Install cargo/rust packages.
+# @description Install cargo/rust packages.
 #
 # shellcheck source=shared.sh
+source "$HOME/.dotfiles/config/shared.sh"
 
-eval "$HOME/.dotfiles/config/shared.sh"
-
-msg "Starting to install rust/cargo packages"
+msgr run "Starting to install rust/cargo packages"
 
 source "$CARGO_HOME/env"
 
 # If we have cargo install-update, use it first
 if command -v cargo-install-update &> /dev/null; then
-  msg_run "Updating cargo packages with cargo install-update"
+  msgr run "Updating cargo packages with cargo install-update"
   cargo install-update -a
-  msg_done "Done with cargo install-update"
+  msgr run_done "Done with cargo install-update"
 fi
 
 packages=(
@@ -52,8 +51,9 @@ install_packages()
     # Skip comments
     if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-    msg_run "Installing cargo package $pkg"
+    msgr run "Installing cargo package $pkg"
     cargo install --jobs $BUILD_JOBS "$pkg"
+    msgr run_done "Done installing $pkg"
     echo ""
   done
 }
@@ -61,14 +61,14 @@ install_packages()
 # Function to perform additional steps for installed cargo packages
 post_install_steps()
 {
-  msg_run "Now doing the next steps for cargo packages"
+  msgr run "Now doing the next steps for cargo packages"
 
   # use bob to install latest stable nvim
   if command -v bob &> /dev/null; then
     bob use stable && x-path-append "$XDG_DATA_HOME/bob/nvim-bin"
   fi
 
-  msg_run "Removing cargo cache"
+  msgr run "Removing cargo cache"
   cargo cache --autoclean
   msg_done "Done removing cargo cache"
 }

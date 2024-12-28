@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install PHP Package Manager Composer
+# @description Install PHP Package Manager Composer
 #
 # shellcheck source="shared.sh"
 source "$HOME/.dotfiles/config/shared.sh"

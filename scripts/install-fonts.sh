@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install NerdFonts
+# @description Install NerdFonts
 #
 # shellcheck source="shared.sh"
 source "$DOTFILES/config/shared.sh"

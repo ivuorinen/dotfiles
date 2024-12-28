@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-#
-# Install ntfy
+# @description Install ntfy
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

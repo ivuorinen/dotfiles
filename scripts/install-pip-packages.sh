@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install python/pip packages.
+# @description Install python/pip packages.
 #
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create file containing key mappings for wezterm
+# @description Create file containing key mappings for wezterm
 # Usage: ./create-wezterm-keymaps.sh
 #
 # shellcheck source=shared.sh

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install XCode CLI Tools with osascript magic.
+# @description Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 
