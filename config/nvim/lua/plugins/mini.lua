@@ -224,8 +224,8 @@ return {
             local mode, mode_hl = sl.section_mode { trunc_width = 120 }
             local git = sl.section_git { trunc_width = 75 }
             local diagnostics = sl.section_diagnostics { trunc_width = 75 }
-            local filename = sl.section_filename { trunc_width = 999 }
-            -- local fileinfo = statusline.section_fileinfo({ trunc_width = 120 })
+            local filename = sl.section_filename { trunc_width = 9999 }
+            local fileinfo = sl.section_fileinfo { trunc_width = 120 }
             local location = sl.section_location { trunc_width = 75 }
             return sl.combine_groups {
               { hl = mode_hl, strings = { mode } },
@@ -233,7 +233,7 @@ return {
               '%<', -- Mark general truncate point
               { hl = 'statuslineFilename', strings = { filename } },
               '%=', -- End left alignment
-              -- { hl = 'statuslineFileinfo', strings = { fileinfo } },
+              { hl = 'statuslineFileinfo', strings = { fileinfo } },
               { hl = mode_hl, strings = { location } },
             }
           end,
