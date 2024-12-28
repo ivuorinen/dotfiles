@@ -13,6 +13,7 @@
     "siblings_only": true
   },
   "required-headings": false,
+  "ol-prefix": false,
   "ul-style": {
     "style": "dash"
   }
