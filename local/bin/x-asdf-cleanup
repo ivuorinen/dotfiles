@@ -13,7 +13,6 @@
 # License: MIT
 #
 # vim: set ft=sh ts=2 sw=2 et: ft=sh
-#set -euo pipefail
 set -u
 
 VERSION="1.0.0"
@@ -41,7 +40,7 @@ readonly TMPFILE=$(mktemp)
 
 # Signal handling and cleanup
 trap 'cleanup' INT TERM
-#trap 'error_handler $?' ERR
+trap 'error_handler $?' ERR
 trap 'error_occurred $? $LINENO $BASH_LINENO "$BASH_COMMAND" $(printf "::%s" ${FUNCNAME[@]:-})' ERR
 trap 'rm -f "$TMPFILE"' EXIT
 
@@ -135,7 +134,7 @@ error_occurred()
 
   echo "Error occurred in:"
   echo "  Exit code: $exit_code"
-  echo "  Line number: $line_no"
+  echo "  Line number: $line_no ($bash_lineno)"
   echo "  Command: $last_command"
   echo "  Function trace: $func_trace"
 }
@@ -856,10 +855,23 @@ create_backup()
   local tool_path
   tool_path=$(asdf where "$tool" "$version")
 
+  # Check backup directory permissions
+  if [[ ! -w $BACKUP_DIR ]]; then
+    debug "Backup directory not writable: $BACKUP_DIR"
+    return 1
+  fi
+
   if [[ -d $tool_path ]]; then
     debug "Creating backup of $tool $version"
     log_to_file "INFO" "Creating backup of $tool $version"
     if tar czf "$backup_path.tar.gz" -C "$(dirname "$tool_path")" "$(basename "$tool_path")"; then
+      # Verify backup integrity
+      if ! tar tzf "$backup_path.tar.gz" > /dev/null 2>&1; then
+        debug "Backup verification failed"
+        rm -f "$backup_path.tar.gz"
+        return 1
+      fi
+
       echo "$tool $version" > "$LAST_OP_FILE"
       return 0
     fi
@@ -904,7 +916,15 @@ read_installed_versions()
   local line
   debug "Reading installed versions from asdf"
 
-  while IFS= read -r line; do
+  # Capture asdf output and check for errors
+  local asdf_output
+  if ! asdf_output=$(asdf list 2>&1); then
+    print_error "Failed to read installed versions: $asdf_output"
+    log_to_file "ERROR" "Failed to read installed versions: $asdf_output"
+    return 1
+  fi
+
+  while IFS= read -r line || [[ -n $line ]]; do
     if [[ $line =~ ^[^[:space:]] ]]; then
       current_tool=$(trim_whitespace "$line")
       continue
@@ -930,7 +950,7 @@ read_installed_versions()
     installed_versions["$current_tool $version"]=1
     debug "Added installed version: $current_tool $version"
 
-  done < <(asdf list)
+  done <<< "$asdf_output"
 }
 
 # Group and sort versions by tool

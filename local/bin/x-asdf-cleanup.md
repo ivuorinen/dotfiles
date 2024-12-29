@@ -21,7 +21,7 @@ A tool to clean up unused asdf tool versions from your system.
 
 ```bash
 mkdir -p ~/.local/bin
-curl -o ~/.local/bin/x-asdf-cleanup https://raw.githubusercontent.com/yourusername/dotfiles/main/.dotfiles/local/bin/x-asdf-cleanup
+curl -o ~/.local/bin/x-asdf-cleanup https://raw.githubusercontent.com/ivuorinen/dotfiles/main/.dotfiles/local/bin/x-asdf-cleanup
 chmod +x ~/.local/bin/x-asdf-cleanup
 ```
 
