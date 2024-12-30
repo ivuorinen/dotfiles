@@ -44,10 +44,6 @@ if.app-id = 'org.ferdium.ferdium-app' # Ferdium, has WhatsApp etc.
 run = ['layout floating']
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'finder'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-id = 'com.apple.finder' # Finder
 run = 'layout floating'
 
@@ -68,11 +64,15 @@ if.app-id = 'org.whispersystems.signal-desktop' # Signal
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-id = 'com.tidal.desktop'
+if.app-id = 'com.tidal.desktop' # TIDAL
 run = ['layout floating', 'move-node-to-workspace 2']
 
 [[on-window-detected]]
-if.app-id = 'com.apple.TV'
+if.app-id = 'com.apple.TV' # Apple TV app
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.setapp.DesktopClient'
 run = 'layout floating'
 
 # Possible values: (qwerty|dvorak)
@@ -90,7 +90,6 @@ preset = 'qwerty'
 [gaps]
 inner.horizontal = 5
 inner.vertical =   5
-# outer.top =        0
 outer.top = [{ monitor.'^built-in retina display$' = 0 }, 0]
 outer.right =      0
 outer.bottom =     0
@@ -126,13 +125,9 @@ outer.left =       0
 # end tell'
 # '''
 
-alt-cmd-shift-f = 'fullscreen'
-alt-cmd-f = 'layout floating'
-
-alt-cmd-left = 'join-with left'
-alt-cmd-down = 'join-with down'
-alt-cmd-up = 'join-with up'
-alt-cmd-right = 'join-with right'
+# alt-cmd-shift-f = 'fullscreen'
+# alt-shift-f = 'layout floating'
+# alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 alt-h = 'focus left'
@@ -140,38 +135,53 @@ alt-j = 'focus down'
 alt-k = 'focus up'
 alt-l = 'focus right'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#move
-alt-shift-h = 'move left'
-alt-shift-j = 'move down'
-alt-shift-k = 'move up'
-alt-shift-l = 'move right'
-
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-cmd-shift-1 = 'workspace 1' # Main
-cmd-shift-2 = 'workspace 2' # Music
-
-# See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-alt-cmd-1 = 'move-node-to-workspace 1 --focus-follows-window'
-alt-cmd-2 = 'move-node-to-workspace 2 --focus-follows-window'
+alt-shift-1 = 'workspace 1' # Main
+alt-shift-2 = 'workspace 2' # Media
 
 shift-tab = 'workspace-back-and-forth'
-# alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 alt-a = 'mode apps'
 alt-s = 'mode service'
 alt-d = 'mode resize'
+alt-m = 'mode move'
 
+# ╭──────────────────────────────────────────────────────────╮
+# │                          alt-m                           │
+# ╰──────────────────────────────────────────────────────────╯
+[mode.move.binding]
+esc = ['reload-config', 'mode main']
+# See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
+1 = ['move-node-to-workspace 1 --focus-follows-window']
+2 = ['move-node-to-workspace 2 --focus-follows-window']
+# See: https://nikitabobko.github.io/AeroSpace/commands#move
+h = 'move left'
+j = 'move down'
+k = 'move up'
+l = 'move right'
+# See: https://nikitabobko.github.io/AeroSpace/commands#join-with
+shift-h = 'join-with left'
+shift-j = 'join-with down'
+shift-k = 'join-with up'
+shift-l = 'join-with right'
+
+# ╭──────────────────────────────────────────────────────────╮
+# │                          alt-a                           │
+# ╰──────────────────────────────────────────────────────────╯
 [mode.apps.binding]
 esc = ['reload-config', 'mode main']
-alt-b = ['exec-and-forget open -a /Applications/Brave Browser.app', 'mode main']
-alt-c = ['exec-and-forget open -a /Applications/Ferdium.app', 'mode main']
-alt-o = ['exec-and-forget open -a /Applications/Obsidian.app', 'mode main']
-alt-s = ['exec-and-forget open -a /Applications/Slack.app', 'mode main']
-alt-t = ['exec-and-forget open -a /Applications/TIDAL.app', 'mode main']
-alt-w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main']
+b = ['exec-and-forget open -a /Applications/Brave Browser.app', 'mode main']
+c = ['exec-and-forget open -a /Applications/Ferdium.app', 'mode main']
+o = ['exec-and-forget open -a /Applications/Obsidian.app', 'mode main']
+s = ['exec-and-forget open -a /Applications/Slack.app', 'mode main']
+t = ['exec-and-forget open -a /Applications/TIDAL.app', 'mode main']
+w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main']
 
+# ╭──────────────────────────────────────────────────────────╮
+# │                          alt-s                           │
+# ╰──────────────────────────────────────────────────────────╯
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
@@ -179,9 +189,12 @@ r = ['flatten-workspace-tree', 'mode main'] # reset layout
 f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
+# ╭──────────────────────────────────────────────────────────╮
+# │                          alt-d                           │
+# ╰──────────────────────────────────────────────────────────╯
 [mode.resize.binding]
+esc = ['reload-config', 'mode main']
 # See: https://nikitabobko.github.io/AeroSpace/commands#resize
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 h = 'resize smart -70'
 l = 'resize smart +70'
-esc = ['reload-config', 'mode main']
