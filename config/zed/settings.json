@@ -1,0 +1,57 @@
+{
+  "formatter": {
+    "external": {
+      "command": "node_modules/.bin/prettier",
+      "arguments": [
+        "--stdin-filepath",
+        "{buffer_path}"
+      ]
+    }
+  },
+  "languages": {
+    "Lua": {
+      "enable_language_server": true,
+      "tab_size": 2
+    }
+  },
+  "lsp": {
+    "gopls": {
+      "initialization_options": {
+        "hints": {
+          "assignVariableTypes": true,
+          "compositeLiteralFields": true,
+          "compositeLiteralTypes": true,
+          "constantValues": true,
+          "functionTypeParameters": true,
+          "parameterNames": true,
+          "rangeVariableTypes": true
+        }
+      }
+    }
+  },
+  "preferred_line_length": 100,
+  "format_on_save": "on",
+  "vim_mode": true,
+  "theme": {
+    "mode": "system",
+    "light": "Tokyo Night Light",
+    "dark": "Tokyo Night Storm"
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": true,
+    "show_other_hints": true
+  },
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+  "buffer_font_fallbacks": [
+    "JetBrainsMono Nerd Font"
+  ],
+  "inline_completions": {
+    "disabled_globs": [
+      ".env"
+    ]
+  },
+  "hour_format": "hour24"
+}
