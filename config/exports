@@ -281,8 +281,8 @@ export LESSHISTFILE="$XDG_STATE_HOME"/less/history
 # export LESS_TERMCAP_md="$ORANGE"
 
 # zsh autoloaded terminfo
-export TERMINFO="${XDG_DATA_HOME}/terminfo"
-export TERMINFO_DIRS="${XDG_DATA_HOME}/terminfo":/usr/share/terminfo
+# export TERMINFO="${XDG_DATA_HOME}/terminfo"
+# export TERMINFO_DIRS="${XDG_DATA_HOME}/terminfo":/usr/share/terminfo
 
 # Don't clear the screen after quitting a manual page
 export MANPAGER="less -X"

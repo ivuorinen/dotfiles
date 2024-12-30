@@ -45,6 +45,10 @@ setup_tmux_window_name_plugin()
   fi
 }
 
+if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
+  source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
+fi
+
 source_fzf_config
 setup_tmux_window_name_plugin
 x-have antidot && eval "$(antidot init)"
