@@ -26,7 +26,7 @@ repos:
     rev: v0.43.0
     hooks:
       - id: markdownlint
-        args: [-c, .markdownlint.yaml, --fix]
+        args: [-c, .markdownlint.json, --fix]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
