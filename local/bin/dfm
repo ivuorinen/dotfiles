@@ -131,7 +131,7 @@ section_install()
 
     asdf)
       msgr run "Installing asdf..."
-      $0 asdf plugins-add \
+      $0 asdf plugins-install \
         && msgr yay "asdf plugins installed!"
       ;;
 
@@ -355,30 +355,30 @@ section_asdf()
     plugins-install)
       msgr run "Installing plugins from configuration"
 
-      # Asennetaan ensin direnv jos sitä ei ole
+      # First install direnv if it's not installed
       if ! asdf plugin list | grep -q "^direnv$"; then
         msgr nested "Installing direnv plugin"
         asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
 
-        # Asennetaan direnv latest
+        # Install latest direnv
         local latest_direnv
         latest_direnv=$(asdf latest direnv)
         asdf install direnv "$latest_direnv"
         asdf global direnv "$latest_direnv"
       fi
 
-      # Tarkistetaan että kaikki konfiguroidut pluginit on asennettu
+      # Check that all plugins are installed
       local installed_plugins
       installed_plugins=$(asdf plugin list)
 
       while IFS= read -r line; do
-        # Ohita tyhjät rivit ja kommentit
+        # Skip empty lines and comments
         [[ -z $line || $line =~ ^# ]] && continue
 
         local plugin
         plugin=$(echo "$line" | awk '{print $1}')
 
-        # Ohita direnv, käsiteltiin jo
+        # Skip direnv, it's already installed
         [[ $plugin == "direnv" ]] && continue
 
         if ! echo "$installed_plugins" | grep -q "^${plugin}$"; then
@@ -437,10 +437,11 @@ section_asdf()
       local installed_plugins
       installed_plugins=$(asdf plugin list | sort)
 
-      # Compare .tool-versions and installed plugins, remove unknown plugins from .tool-versions
+      # Compare .tool-versions and installed plugins,
+      # remove unknown plugins from .tool-versions
       msgr nested "Updating tool-versions file"
       while IFS= read -r line; do
-        # Säilytä kommentit ja tyhjät rivit
+        # Keep comments and empty lines
         if [[ -z $line || $line =~ ^[[:space:]]*# ]]; then
           echo "$line" >> "$temp_file"
           continue
@@ -494,7 +495,6 @@ section_helpers()
     "env:Show environment variables"
     "functions:Show functions"
     "nvim:Show nvim keybindings"
-    # shellcheck disable=SC2016
     'path:Show $PATH dir by dir'
     "tmux:Show tmux keybindings"
     "wezterm:Show wezterm keybindings"

@@ -24,3 +24,7 @@ disable=SC1091
 # SC2174: When used with -p, -m only applies to the deepest directory.
 # https://github.com/koalaman/shellcheck/wiki/SC2174
 disable=SC2174
+
+# SC2016: Expressions don't expand in single quotes, use double quotes for that.
+# https://www.shellcheck.net/wiki/SC2016
+disable=SC2016
