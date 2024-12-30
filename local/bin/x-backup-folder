@@ -3,33 +3,84 @@
 # Backup a folder with a timestamp
 # Usage: x-backup-folder folder_to_backup [filename]
 # If filename is not provided, folder_to_backup will be used
+#
 # Example: x-backup-folder ~/Documents/MyFolder
 #
 # Copyright (c) 2022 Ismo Vuorinen. All Rights Reserved.
 # Licensed under the MIT license.
 
-DIRECTORY=$1
-FILENAME=$2
+set -euo pipefail
 
-if [ -z "${DIRECTORY}" ]; then
-  echo "DIRECTORY (first argument) is missing"
-  echo "Usage: $0 folder_to_backup"
-  exit
-fi
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-if [ -z "${FILENAME}" ]; then
-  FILENAME=$DIRECTORY
-fi
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 folder_to_backup [filename]"
+  exit 1
+}
 
-FILENAME=$(
-  ${FILENAME} \
-    | tr '/' _ \
-    | iconv -t ascii//TRANSLIT \
-    | sed -r s/[^a-zA-Z0-9]+/_/g \
-    | sed -r s/^_+\|-+$//g
-)
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
 
-TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
-FILENAME_TIMESTAMP="${FILENAME}_${TIMESTAMP}"
+# Function to print error messages and exit
+# $1 - error message (string)
+msg_err()
+{
+  echo "(!) ERROR: $1" >&2
+  exit 1
+}
 
-tar cvzf "${FILENAME_TIMESTAMP}.tar.gz" "${DIRECTORY}/"
+# Function to sanitize the filename
+# $1 - filename (string)
+sanitize_filename()
+{
+  local filename=$1
+  echo "$filename" | tr '/' '_' | iconv -t ascii//TRANSLIT | sed -r 's/[^a-zA-Z0-9]+/_/g' | sed -r 's/^_+|_+$//g'
+}
+
+# Function to backup the directory
+# $1 - directory to backup (string)
+# $2 - filename prefix (string)
+backup_directory()
+{
+  local directory=$1
+  local filename=$2
+
+  local sanitized_filename
+  sanitized_filename=$(sanitize_filename "$filename")
+
+  local timestamp
+  timestamp=$(date "+%Y%m%d_%H%M%S")
+  local filename_timestamp="${sanitized_filename}_${timestamp}"
+
+  msg "Backing up directory '$directory' to '${filename_timestamp}.tar.gz'"
+
+  tar cvzf "${filename_timestamp}.tar.gz" "${directory}/"
+
+  msg "Backup completed and saved to '${filename_timestamp}.tar.gz'"
+}
+
+# Main function
+main()
+{
+  if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    usage
+  fi
+
+  local directory=$1
+  local filename=${2:-$directory}
+
+  if [ -z "$directory" ]; then
+    msg_err "DIRECTORY (first argument) is missing"
+  fi
+
+  backup_directory "$directory" "$filename"
+}
+
+main "$@"

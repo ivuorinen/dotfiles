@@ -14,25 +14,83 @@
 
 SCRIPT=$(basename "$0")
 
-VERSION_NVM="v0.39.5"
-
-export DOTFILES="$HOME/.dotfiles"
-# shellcheck source=./../../scripts/shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
-source "$DOTFILES/config/exports"
-source "$DOTFILES/config/alias"
-source "$DOTFILES/config/functions"
-
 # Loads configs for better installation experience
-x-load-configs
+source "$DOTFILES/config/shared.sh"
+source "${DOTFILES}/local/bin/msgr"
 
-function section_install
+# -- Menu builder -- #
+
+menu_builder()
+{
+  local title=$1
+  local commands=("${@:2}")
+  local width=60
+
+  printf "\n%s\n" "$(printf '%.s─' $(seq 1 $width))"
+  printf "%-${width}s\n" "  $title"
+  printf "%s\n" "$(printf '%.s─' $(seq 1 $width))"
+
+  for cmd in "${commands[@]}"; do
+    local name=${cmd%%:*}
+    local desc=${cmd#*:}
+    printf "  %-20s %s\n" "$name" "$desc"
+  done
+  # printf "\n"
+}
+
+menu_section()
+{
+  LINE=$(printf '%-18s [ %-15s ]\n' "$1" "$2")
+  echo -e " $(__log_marker) $LINE"
+}
+menu_item()
+{
+  LINE=$(printf '%-15s %-30s\n' "$1" "$2")
+  echo -e "$(__log_indent)$(__log_marker) $LINE"
+}
+
+# Takes a bash array ("cow:moo", "dinosaur:roar") and loops
+# through the keys to build menu section listing.
+menu_usage_header()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  KEYS=""
+  for item in "${MENU_ARRAY[@]}"; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    KEYS+="${CMD} | "
+  done
+
+  # "???" removes 3 last characters, being " | " from the end
+  menu_section "$MENU_CMD" "${KEYS%???}"
+}
+
+# Takes the usage command "$0 dotfiles" and a
+# bash array ("cow:moo" "dinosaur:roar") and loops
+# through in building a menu for dfm command usage listing.
+menu_usage()
+{
+  MENU_CMD="$1"
+  shift
+  MENU_ARRAY=("$@")
+
+  msg "$MENU_CMD"
+
+  for item in "${MENU_ARRAY[@]}"; do
+    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
+    DESC=$(echo "${item}" | awk -F ":" '{print $2}')
+    menu_item "$CMD" "$DESC"
+  done
+}
+
+section_install()
 {
   USAGE_PREFIX="$SCRIPT install <command>"
 
   MENU=(
     "all:Installs everything in the correct order"
-    "antigen:Updates the antigen.zsh file"
     "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
@@ -41,170 +99,139 @@ function section_install
     "gh:Install GitHub CLI Extensions"
     "go:Install Go Packages"
     "imagick:Install ImageMagick CLI"
-    "starship:Install starship.rs"
     "macos:Setup nice macOS defaults"
     "neofetch:Install neofetch"
-    "nvm:Install Node Version Manager (nvm)"
-    "nvm-latest:Install latest lts node using nvm"
     "npm:Install NPM Packages"
     "ntfy:Install ntfy"
+    "nvm-latest:Install latest lts node using nvm"
+    "nvm:Install Node Version Manager (nvm)"
     "ohmybash:Install oh-my-bash"
     "pip:Install pip/python packages"
+    "starship:Install starship.rs"
     "z:Install z"
   )
 
   case "$1" in
     all)
       msgr msg "Starting to install all and reloading configurations..."
-      x-load-configs
       $0 install macos
       $0 install fonts
-      $0 install antigen
       $0 brew install
-      $0 install ohmyposh
-      $0 install ohmybash
-      $0 install pip
-      $0 install cargo
+      $0 install asdf
       $0 install composer
-      $0 install dotenv
       $0 install fzf
-      $0 install gh
-      $0 install go
       $0 install cheat-databases
-      $0 install imagick
-      $0 install neofetch
       $0 install nvm
-      $0 install npm
-      $0 install ntfy
+      $0 install npm-packages
       $0 install z
       msgr msg "Reloading configurations again..."
-      x-load-configs
+      source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
       ;;
-    antigen)
-      msg "Installing antigen..."
-      curl -sSfL git.io/antigen -o "$DOTFILES/local/bin/antigen.zsh" \
-        && msg_yay "New antigen installed!"
+
+    asdf)
+      msgr run "Installing asdf..."
+      $0 asdf plugins-install \
+        && msgr yay "asdf plugins installed!"
       ;;
+
     cargo)
-      msg "Installing cargo packages..."
+      msgr run "Installing cargo packages..."
       bash "$DOTFILES/scripts/install-cargo-packages.sh" \
-        && msg_yay "cargo packages installed!"
+        && msgr yay "cargo packages installed!"
       ;;
+
     cheat-databases)
-      msg "Installing cheat databases..."
+      msgr run "Installing cheat databases..."
       for database in "$DOTFILES"/scripts/install-cheat-*; do
         bash "$database" \
-          && msg_yay "Cheat: $database run"
+          && msgr run_done "Cheat: $database run"
       done
       ;;
+
     composer)
-      msg "Installing composer..."
+      msgr run "Installing composer..."
       bash "$DOTFILES/scripts/install-composer.sh" \
-        && msg_yay "composer installed!"
+        && msgr run_done "composer installed!"
       ;;
-    dotenv)
-      msg "Installing dotenv-linter..."
-      curl -sSfL \
-        https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh \
-        | sh -s -- -b "$XDG_BIN_HOME" \
-        && msg_yay "dotenv-linter installed!"
-      ;;
+
     fonts)
-      msg "Installing fonts..."
+      msgr run "Installing fonts..."
       bash "$DOTFILES/scripts/install-fonts.sh" \
-        && msg_yay "Installed fonts!"
+        && msgr yay "Installed fonts!"
       ;;
+
     fzf)
-      msg "Installing fzf..."
+      msgr run "Installing fzf..."
       bash "$DOTFILES/scripts/install-fzf.sh" \
-        && msg_yay "fzf installed!"
+        && msgr yay "fzf installed!"
       ;;
+
     gh)
-      msg "Installing GitHub CLI Extensions..."
+      msgr run "Installing GitHub CLI Extensions..."
       bash "$DOTFILES/scripts/install-gh-extensions.sh" \
-        && msg_yay "github cli extensions installed!"
+        && msgr yay "github cli extensions installed!"
       ;;
+
     go)
-      msg "Installing Go Packages..."
+      msgr run "Installing Go Packages..."
       bash "$DOTFILES/scripts/install-go-packages.sh" \
-        && msg_yay "go packages installed!"
+        && msgr yay "go packages installed!"
       ;;
+
     imagick)
-      msg "Installing ImageMagick CLI..."
+      msgr run "Downloading and installing ImageMagick CLI..."
       curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
         && chmod +x "$XDG_BIN_HOME/magick" \
-        && msg_yay "imagick installed!"
+        && msgr yay "imagick downloaded and installed!"
       ;;
-    starship)
-      msg "Installing starship.rs..."
-      curl -sS https://starship.rs/install.sh | sh -s -- \
-        --bin-dir ~/.local/bin \
-        --yes \
-        && msg_yay "starship installed!"
-      ;;
+
     macos)
-      msg "Setting up macOS defaults..."
-      bash "$DOTFILES/scripts/set-macos-defaults.sh" \
-        && msg_yay "Brewfile defined apps has been installed!"
+      msgr run "Setting up macOS defaults..."
+      bash "$DOTFILES/scripts/install-macos-defaults.sh" \
+        && msgr yay "macOS defaults set!"
       ;;
-    neofetch)
-      msg "Installing neofetch..."
-      bash "$DOTFILES/scripts/install-neofetch.sh" \
-        && msg_yay "neofetch installed!"
-      ;;
+
     nvm)
-      msg "Installing nvm..."
-      curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$VERSION_NVM/install.sh" | bash
-      git checkout "$DOTFILES/base/zshrc"
-      git checkout "$DOTFILES/base/bashrc"
+      msgr run "Installing nvm..."
+      local NVM_VERSION
+      NVM_VERSION=$(x-gh-get-latest-version nvm-sh/nvm)
+      msgr ok "Latest nvm version: $NVM_VERSION"
+      local NVM_INSTALL="https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh"
+      local NVM_CURL="curl -o- \"$NVM_INSTALL\" | bash"
+      PROFILE=/dev/null bash -c "$NVM_CURL"
       $0 install nvm-latest
-      msg_yay "nvm installed!"
+      msgr yay "nvm installed!"
       ;;
+
     nvm-latest)
-      msg "Installing latest lts node..."
+      msgr run "Installing latest lts node..."
       if [ -n "$NVM_DIR" ]; then
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       fi
       nvm install --lts --latest-npm --default
       git checkout "$DOTFILES/base/zshrc"
       git checkout "$DOTFILES/base/bashrc"
-      msg_yay "latest lts node installed!"
+      msgr yay "latest lts node installed!"
       ;;
-    npm)
-      msg "NPM Packages install started..."
+
+    npm-packages)
+      msgr run "NPM Packages install started..."
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
-        && msg_yay "NPM Packages have been installed!"
+        && msgr yay "NPM Packages have been installed!"
       ;;
-    ntfy)
-      msg "ntfy install started..."
-      bash "$DOTFILES/scripts/install-ntfy.sh" \
-        && msg_yay "ntfy installed!"
-      ;;
-    ohmybash)
-      msg "oh-my-bash install started..."
-      bash "$DOTFILES/scripts/install-ohmybash.sh" \
-        && msg_yay "oh-my-bash installed!"
-      ;;
-    ohmyposh)
-      msg "oh-my-posh install started..."
-      bash "$DOTFILES/scripts/install-ohmyposh.sh" \
-        && msg_yay "oh-my-posh installed!"
-      ;;
-    pip)
-      msg "pip install started..."
-      bash "$DOTFILES/scripts/install-pip-packages.sh"
-      ;;
+
     z)
-      msg "Installing z..."
+      msgr run "Installing z..."
       bash "$DOTFILES/scripts/install-z.sh" \
-        && msg_yay "z has been installed!"
+        && msgr yay "z has been installed!"
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
-function section_brew
+section_brew()
 {
   USAGE_PREFIX="$SCRIPT brew <command>"
 
@@ -215,74 +242,348 @@ function section_brew
     "autoupdate:Setups brew auto-update and runs it immediately"
     "leaves:List brew leaves (installed on request)"
     "clean:Clean up brew packages"
+    "untracked:List untracked brew packages"
   )
 
   x-have brew && {
     case "$1" in
       install)
-        brew bundle install --file="$BREWFILE" --force --quiet && msg_yay "Done!"
+        brew bundle install --file="$BREWFILE" --force --quiet && msgr yay "Done!"
         ;;
+
       update)
         brew update && brew outdated && brew upgrade && brew cleanup
-        msg_yay "Done!"
+        msgr yay "Done!"
         ;;
+
       updatebundle)
         # Updates .dotfiles/homebrew/Brewfile with descriptions
         brew bundle dump \
           --force \
           --file="$BREWFILE" \
-          --describe && msg_yay "Done!"
+          --cleanup \
+          --tap \
+          --formula \
+          --cask \
+          --describe && msgr yay "Done!"
         ;;
+
       leaves)
         brew leaves --installed-on-request
         ;;
-      clean)
-        brew bundle cleanup --file="$BREWFILE" && msg_yay "Done!"
+
+      untracked)
+        declare -a BREW_LIST_ALL
+        while IFS= read -r line; do
+          BREW_LIST_ALL+=("$line")
+        done < <(brew list --formula --installed-on-request -1 --full-name)
+        while IFS= read -r c; do
+          BREW_LIST_ALL+=("$c")
+        done < <(brew list --cask -1 --full-name)
+
+        # Remove entries that are installed as dependencies
+        declare -a BREW_LIST_DEPENDENCIES
+        while IFS= read -r l; do
+          BREW_LIST_DEPENDENCIES+=("$l")
+        done < <(brew list -1 --installed-as-dependency)
+
+        declare -a BREW_LIST_BUNDLED
+        while IFS= read -r b; do
+          BREW_LIST_BUNDLED+=("$b")
+        done < <(brew bundle list --all --file="$BREWFILE")
+
+        declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
+        for f in "${BREW_LIST_ALL[@]}"; do
+          # shellcheck disable=SC2199
+          if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
+            BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
+          fi
+        done
+
+        array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
+
+        # If there are no untracked packages, exit
+        if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
+          msgr yay "No untracked packages found!"
+          exit 0
+        fi
+
+        echo "Untracked:"
+        for f in "${BREW_LIST_UNTRACKED[@]}"; do
+          echo "  $f"
+        done
         ;;
+
       autoupdate)
         brew autoupdate delete
         brew autoupdate start 43200 --upgrade --cleanup --immediate
         ;;
-      *)
-        menu_usage "$USAGE_PREFIX" "${MENU[@]}"
-        ;;
+
+      clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+
+      *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
     esac
   }
 
-  ! x-have brew && menu_section "$USAGE_PREFIX" "brew not available on this system"
+  ! x-have brew && menu_builder "$USAGE_PREFIX" "brew not available on this system"
 }
 
-function section_helpers
+section_asdf()
 {
-  USAGE_PREFIX="$SCRIPT helpers <command>"
+  USAGE_PREFIX="$SCRIPT asdf <command>"
   MENU=(
-    "path:Show \$PATH dir by dir"
+    "current:Show asdf current versions"
+    "global:Show asdf global versions"
+    "installed:Show asdf installed versions"
+    "plugins-update:Update all asdf plugins"
+    "plugins-install:Install plugins from configuration"
+    "plugins-remove:Remove installed plugins"
+    "reset:Reset asdf plugins"
+    "fix-tool-versions:Remove uninstalled plugins from .tool-versions"
+    "versions:Show asdf versions"
+    "where:Show asdf where"
+    "which:Show asdf which"
   )
 
   case "$1" in
+    plugins-update)
+      msgr run "Updating all asdf plugins"
+      asdf plugin update --all
+      msgr run_done "Updated all plugins"
+      ;;
+
+    plugins-install)
+      msgr run "Installing plugins from configuration"
+
+      # First install direnv if it's not installed
+      if ! asdf plugin list | grep -q "^direnv$"; then
+        msgr nested "Installing direnv plugin"
+        asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
+
+        # Install latest direnv
+        local latest_direnv
+        latest_direnv=$(asdf latest direnv)
+        asdf install direnv "$latest_direnv"
+        asdf global direnv "$latest_direnv"
+      fi
+
+      # Check that all plugins are installed
+      local installed_plugins
+      installed_plugins=$(asdf plugin list)
+
+      while IFS= read -r line; do
+        # Skip empty lines and comments
+        [[ -z $line || $line =~ ^# ]] && continue
+
+        local plugin
+        plugin=$(echo "$line" | awk '{print $1}')
+
+        # Skip direnv, it's already installed
+        [[ $plugin == "direnv" ]] && continue
+
+        if ! echo "$installed_plugins" | grep -q "^${plugin}$"; then
+          msgr nested "Installing $plugin plugin"
+          asdf plugin add "$plugin"
+        fi
+      done < "$DOTFILES/base/tool-versions"
+
+      msgr run_done "All plugins installed"
+      ;;
+
+    plugins-remove)
+      msgr run "Remove installed plugins"
+      local installed_plugins
+      installed_plugins=$(asdf plugin list | grep -v "^direnv$")
+
+      for plugin in $installed_plugins; do
+        msgr nested "Removing $plugin"
+        asdf plugin remove "$plugin"
+      done
+
+      msgr run_done "Remove plugins done!"
+      ;;
+
+    reset)
+      msgr run "Resetting asdf environment"
+      $0 asdf plugins-remove
+      $0 asdf plugins-install
+      asdf reshim
+      msgr yay "Reset asdf plugins done!"
+      ;;
+
+    fix-tool-versions)
+      local tool_versions_file="$DOTFILES/base/tool-versions"
+      local temp_file
+      temp_file=$(mktemp)
+
+      msgr run "Fixing tool-versions file"
+
+      # Check that .tool-versions file exists
+      if [[ ! -f $tool_versions_file ]]; then
+        msgr error "tool-versions file not found: $tool_versions_file"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Check that asdf can be found in the path
+      if ! command -v asdf > /dev/null; then
+        msgr error "asdf not found"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Read installed plugins
+      msgr nested "Reading installed plugins"
+      local installed_plugins
+      installed_plugins=$(asdf plugin list | sort)
+
+      # Compare .tool-versions and installed plugins,
+      # remove unknown plugins from .tool-versions
+      msgr nested "Updating tool-versions file"
+      while IFS= read -r line; do
+        # Keep comments and empty lines
+        if [[ -z $line || $line =~ ^[[:space:]]*# ]]; then
+          echo "$line" >> "$temp_file"
+          continue
+        fi
+
+        local plugin
+        plugin=$(echo "$line" | awk '{print $1}')
+
+        if echo "$installed_plugins" | grep -q "^${plugin}$"; then
+          echo "$line" >> "$temp_file"
+        else
+          msgr nested "Removing $plugin - not installed"
+        fi
+      done < "$tool_versions_file"
+
+      # Check that the temp file is valid
+      if [[ ! -s $temp_file ]] || ! grep -v '^[[:space:]]*#' "$temp_file" | grep -q .; then
+        msgr error "Generated file is empty or contains only comments, keeping original"
+        rm -f "$temp_file"
+        return 1
+      fi
+
+      # Backup the original .tool-versions
+      cp "$tool_versions_file" "${tool_versions_file}.bak"
+
+      # Overwrite .tool-versions with the generated file
+      mv "$temp_file" "$tool_versions_file"
+
+      msgr run_done "Updated $tool_versions_file"
+      msgr nested "Backup saved as ${tool_versions_file}.bak"
+
+      return 0
+      ;;
+
+    current) asdf current ;;
+    global) asdf global ;;
+    installed) asdf list ;;
+    versions) asdf list all ;;
+    where) asdf where ;;
+    which) asdf which ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+section_helpers()
+{
+  USAGE_PREFIX="$SCRIPT helpers <command>"
+  MENU=(
+    "aliases:<shell> (bash, zsh) Show aliases for bash or zsh"
+    "colors:Show colors"
+    "env:Show environment variables"
+    "functions:Show functions"
+    "nvim:Show nvim keybindings"
+    'path:Show $PATH dir by dir'
+    "tmux:Show tmux keybindings"
+    "wezterm:Show wezterm keybindings"
+  )
+
+  CMD="$1"
+  shift
+  SECTION="$1"
+  shift
+
+  case "$CMD" in
     path)
       # shellcheck disable=2001
       for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    aliases)
+      case "$SECTION" in
+        "zsh")
+          zsh -ixc : 2>&1 | grep -E '> alias' | sed "s|$HOME|~|" | grep -v "(eval)"
+          ;;
+        "bash")
+          bash -ixc : 2>&1 | grep -E '> alias' | sed "s|$HOME|~|" | grep -v "(eval)"
+          ;;
+        *)
+          echo "$SCRIPT helpers aliases <shell> (bash, zsh)"
+          ;;
+      esac
+      ;;
+
+    "colors")
+      max=255
+      start=0
+
+      while [ "$start" -le "$max" ]; do
+        for i in $(seq "$start" $((start + 9))); do
+          if [ "$i" -le "$max" ]; then
+            # Outputs colored number
+            # printf " \e[38;5;%sm%4s\e[0m" "$i" "$i"
+
+            # Outputs colored block with number inside
+            # printf " \e[48;5;%sm\e[38;5;15m%5s \e[0m" "$i" "$i"
+
+            # Outputs colored block and color number
+            # printf " \e[48;5;%sm   \e[0m %3d" "$i" "$i"
+
+            # Outputs color number and colored block
+            printf "%3d \e[48;5;%sm   \e[0m " "$i" "$i"
+          fi
+        done
+        printf "\n"
+        start=$((start + 10))
+      done
+      ;;
+
+    "env") env | sort ;;
+    "functions") declare -F ;;
+    "nvim") cat "$DOTFILES/docs/nvim-keybindings.md" ;;
+    "tmux") cat "$DOTFILES/docs/tmux-keybindings.md" ;;
+    "wezterm") cat "$DOTFILES/docs/wezterm-keybindings.md" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
-function section_docs
+section_docs()
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
 
   MENU=(
+    "all:Update all keybindings documentations"
     "tmux:Update tmux keybindings documentation"
+    "nvim:Update nvim keybindings documentation"
+    "wezterm:Update wezterm keybindings documentation"
   )
 
   case "$1" in
+    all)
+      $0 docs tmux
+      $0 docs nvim
+      $0 docs wezterm
+      ;;
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+    nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
+    wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
-function section_dotfiles
+section_dotfiles()
 {
   USAGE_PREFIX="$SCRIPT dotfiles <command>"
 
@@ -296,49 +597,60 @@ function section_dotfiles
 
   case "$1" in
     fmt)
-      msg_ok "Running all formatters"
+      msgr run "Running all formatters"
       $0 dotfiles yamlfmt
       $0 dotfiles shfmt
-      msg_done "...done!"
+      msgr run_done "...done!"
       ;;
+
     reset_all)
-      msg_ok "Running all reset commands"
+      msgr ok "Running all reset commands"
       $0 dotfiles reset_nvim
       ;;
+
     reset_nvim)
+      msgr run "Cleaning nvim state, cache and config"
       rm -rf \
         ~/.local/share/nvim \
         ~/.local/state/nvim \
         ~/.cache/nvim \
         ~/.config/nvim
-      msg_ok "Deleted old nvim files (share, state and cache + config)"
+      msgr ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim
-      msg_ok "Linked nvim and astronvim"
+      msgr ok "Linked nvim and astronvim"
       x-have npm && $0 install npm
-      msg_ok "Installed packages"
-      msg_done "nvim reset!"
+      msgr ok "Installed packages"
+      msgr run_done "nvim reset!"
       ;;
+
     yamlfmt)
       # format yaml files
       x-have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt"
-      ! x-have yamlfmt && msg_err "yamlfmt not found"
+      ! x-have yamlfmt && msgr err "yamlfmt not found"
       ;;
+
     shfmt)
+      # If system doesn't have fd or shfmt installed, exit
+      ! x-have fd && msgr err "fd not found, install it to continue"
+      ! x-have shfmt && msgr err "shfmt not found, install it to continue"
       # Format shell scripts according to following rules.
       fd --full-path "$DOTFILES" -tx \
+        --hidden \
         -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
+        -E 'test' -E '**/bin/asdf/**' -E '**/tldr/*' \
         -x shfmt \
         --language-dialect bash \
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
         --binary-next-line {} \;
-      msg_yay "dotfiles have been shfmt formatted!"
+      msgr yay "dotfiles have been shfmt formatted!"
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
-function section_check
+section_check()
 {
   USAGE_PREFIX="$SCRIPT check <command>"
   X_HOSTNAME=$(hostname)
@@ -351,54 +663,110 @@ function section_check
 
   case "$1" in
     a | arch)
-      [[ "$2" = "" ]] && echo "$X_ARCH" && exit 0
-      [[ $X_ARCH = "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_ARCH" && exit 0
+      [[ $X_ARCH == "$2" ]] && exit 0 || exit 1
       ;;
+
     h | host | hostname)
-      [[ "$2" = "" ]] && echo "$X_HOSTNAME" && exit 0
-      [[ $X_HOSTNAME = "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_HOSTNAME" && exit 0
+      [[ $X_HOSTNAME == "$2" ]] && exit 0 || exit 1
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+section_scripts()
+{
+  USAGE_PREFIX="$SCRIPT scripts <command>"
+
+  # Get description from a file
+  get_script_description()
+  {
+    local file
+    local desc
+    file="$1"
+    desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
+    echo "${desc:-No description available}"
+  }
+
+  # Collect scripts and their descriptions
+  declare -A SCRIPT_MENU
+  for script in "$DOTFILES/scripts/install-"*.sh; do
+    if [ -f "$script" ]; then
+      name=$(basename "$script" .sh | sed 's/install-//')
+      desc=$(get_script_description "$script")
+      SCRIPT_MENU[$name]="$desc"
+    fi
+  done
+
+  case "$1" in
+    "")
+      # Show the menu
+      local menu_items=()
+      for name in "${!SCRIPT_MENU[@]}"; do
+        menu_items+=("$name:${SCRIPT_MENU[$name]}")
+      done
+      menu_builder "$USAGE_PREFIX" "${menu_items[@]}"
+      ;;
+    *)
+      # Run the chosen script
+      script_path="$DOTFILES/scripts/install-$1.sh"
+      if [ -f "$script_path" ]; then
+        bash "$script_path"
+      else
+        msgr err "Script not found: $1"
+      fi
+      ;;
   esac
 }
 
 # Secret menu for visual tests
-function section_tests
+section_tests()
 {
   USAGE_PREFIX="$SCRIPT tests <command>"
 
   MENU=(
-    "msg:List all log functions from shared.sh"
+    "msgr:List all available msgr message types"
+    "params:List all parameters"
   )
 
   case "$1" in
-    msg)
-      msg "msg"
-      msg_done "msg_done"
-      msg_done_suffix "msg_done_suffix"
-      msg_err "msg_err"
-      msg_nested "msg_nested"
-      msg_nested_done "msg_nested_done"
-      msg_ok "msg_ok"
-      msg_prompt "msg_prompt"
-      msg_prompt_done "msg_prompt_done"
-      msg_run "msg_run" "second_param"
-      msg_run_done "msg_run_done" "second_param"
-      msg_warn "msg_warn"
-      msg_yay "msg_yay"
-      msg_yay_done "msg_yay_done"
+    params)
+      echo "All parameters:"
+      for i in "$@"; do
+        echo "  $i"
+      done
       ;;
-    *) menu_usage "$USAGE_PREFIX" "${MENU[@]}" ;;
+    msg)
+      # shellcheck disable=SC1010
+      msgr done "msgr done"
+      msgr done_suffix "msgr done_suffix"
+      msgr err "msgr err"
+      msgr nested "msgr nested"
+      msgr nested_done "msgr nested_done"
+      msgr ok "msgr ok"
+      msgr prompt "msgr prompt"
+      msgr prompt_done "msgr prompt_done"
+      msgr run "msgr run" "second_param"
+      msgr run_done "msgr run_done" "second_param"
+      msgr warn "msgr warn"
+      msgr yay "msgr yay"
+      msgr yay_done "msgr yay_done"
+      ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
 
-function usage
+usage()
 {
   echo ""
-  msg_prompt "Usage: $SCRIPT <section> <command>"
+  msgr prompt "Usage: $SCRIPT <section> <command>"
   echo $"  Empty <command> prints <section> help."
   echo ""
   section_install
+  echo ""
+  section_asdf
   echo ""
   section_brew
   echo ""
@@ -408,17 +776,28 @@ function usage
   echo ""
   section_docs
   echo ""
+  section_scripts
+  echo ""
   section_helpers
 }
 
-# The main loop. first keyword after $0 triggers section, or help.
-case "$1" in
-  install) section_install "$2" ;;
-  brew) section_brew "$2" ;;
-  check) section_check "$2" ;;
-  dotfiles) section_dotfiles "$2" ;;
-  helpers) section_helpers "$2" ;;
-  docs) section_docs "$2" ;;
-  tests) section_tests "$2" ;;
-  *) usage && exit 0 ;;
-esac
+main()
+{
+  SECTION="$1"
+  shift
+  # The main loop. The first keyword after $0 triggers section, or help.
+  case "$SECTION" in
+    install) section_install "$@" ;;
+    asdf) section_asdf "$@" ;;
+    brew) section_brew "$@" ;;
+    check) section_check "$@" ;;
+    dotfiles) section_dotfiles "$@" ;;
+    helpers) section_helpers "$@" ;;
+    docs) section_docs "$@" ;;
+    scripts) section_scripts "$@" ;;
+    tests) section_tests "$@" ;;
+    *) usage && exit 0 ;;
+  esac
+}
+
+main "$@"

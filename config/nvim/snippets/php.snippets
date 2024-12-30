@@ -1,0 +1,165 @@
+snippet php "php"
+	<?php
+	${1}
+
+snippet ec "ec"
+	echo '${1}'${2};
+
+snippet vd "vd"
+	var_dump(${1});
+
+# Includes and requires
+
+snippet inc "inc"
+	include_once '${1}';${2}
+
+snippet req "req"
+	require_once '${1}';${2}
+
+# define(...)
+
+snippet def "def"
+	define('${1}'${2});${3}
+
+# Doxygen comments
+
+snippet d "/**"
+	/**
+	* ${1}
+	*/${2}
+
+snippet code "code"
+	* @code
+	* ${1}
+	* @endcode
+
+# Class
+
+snippet cl "cl"
+	class ${1} {
+		${2}
+		function ${3:__construct}(${4}) {
+			${5}
+		}
+	}
+
+snippet pubf "public method"
+	public function ${1}(${2}): $3
+	{
+		${0}
+	}
+
+snippet prof "protected method"
+	protected function ${1}(${2}): $3
+	{
+		${0}
+	}
+
+snippet prif "private method"
+	protected function ${1}(${2}): $3
+	{
+		${0}
+	}
+
+snippet testt "test method (prefix)"
+	public function test_${1}()
+	{
+		${0}
+	}
+
+snippet testa "test method (annotation)"
+	/** @test */
+	public function ${1}()
+	{
+		${0}
+	}
+
+# $this->
+
+snippet . "$this->" i
+	$this->
+
+# If statement
+
+snippet if "if"
+	if (${1}) {
+		${2}
+	}
+
+snippet ife "ife"
+	if (${1}) {
+		${2}
+	} else {
+		${3}
+	}
+
+snippet elif "elif"
+	else if (${1}) {
+		${2}
+	}
+
+snippet el "el"
+	else {
+		${1}
+	}
+
+# Switch
+
+snippet sw "sw"
+	switch (${1}) {
+		default:
+			break;
+	}
+
+snippet case "case"
+	case '${1}':
+		${2}
+		break;${3}
+
+# Do-while loop
+
+snippet do "do"
+	do {
+		${2}
+	} while (${1});
+
+# While loop
+
+snippet wh "wh"
+	while (${1}) {
+		${2}
+	}
+
+# For loop
+
+snippet for "for"
+	for (${1}; ${2}; ${3}) {
+		${4}
+	}
+
+snippet fore "fore"
+	foreach (${1} as ${2}) {
+		${3}
+	}
+
+# Functions and methods
+
+snippet fun "fun"
+	function ${1}(${2}) {
+		${3}
+	}
+
+snippet met "met"
+	${1}function ${2}(${3}) {
+		${4}
+	}
+
+# Return
+
+snippet r "return"
+	return ${1}
+
+# Todos
+
+snippet todo "todo"
+	// TODO ${1}

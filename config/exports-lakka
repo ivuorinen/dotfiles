@@ -1,19 +1,25 @@
 # lakka exports
 
 ## LUA
-x-have luarocks && $(luarocks path --bin)
+if command -v luarocks &> /dev/null; then
+  eval "$(luarocks path --bin)"
+fi
 
 export PATH="$HOME/.local/go/bin:$PATH"
 
-alias logrotate='/usr/sbin/logrotate -s $HOME/logs/state'
+alias logrotate='/usr/sbin/logrotate -s "$HOME/logs/state"'
 alias nano='nano -wS -$'
 alias gpg=gpg2
 
 ACME_PATH="$HOME/.acme.sh"
 # shellcheck source=$HOME/.acme.sh/acme.sh.env
-[[ -s "$ACME_PATH/acme.sh.env" ]] && . "$ACME_PATH/acme.sh.env"
+if [[ -s "$ACME_PATH/acme.sh.env" ]]; then
+  source "$ACME_PATH/acme.sh.env"
+fi
 
 export RVM_PATH="$HOME/.rvm"
 export PATH="$RVM_PATH/bin:$PATH"
 # shellcheck source=$HOME/.rvm/scripts/rvm
-[[ -s "$RVM_PATH/scripts/rvm" ]] && source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
+if [[ -s "$RVM_PATH/scripts/rvm" ]]; then
+  source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
+fi

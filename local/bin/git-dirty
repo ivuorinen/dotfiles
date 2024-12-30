@@ -19,20 +19,28 @@
 # Default dir to check, can be overridden in env (.bashrc, .zshrc, ...)
 : "${GIT_DIRTY_DIR:=$HOME/Code}"
 
-# If user has provided folder as a first argument, use it.
-if [ "$1" != "" ]; then
-  GIT_DIRTY_DIR="$1"
-fi
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
 # UTF-8 ftw
 GITDIRTY="❌ "
 GITCLEAN="✅ "
 
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [ "$VERBOSE" -eq 1 ] && echo "$1"
+}
+
+# Function to handle errors
 catch()
 {
   echo "Error $1 occurred on $2"
 }
 
+# Function to check the git status of a directory
+# $1 - directory (string)
 gitdirty()
 {
   local d="$1"
@@ -40,13 +48,13 @@ gitdirty()
 
   if [[ -d "$d" ]]; then
     if [[ -e "$d/.ignore" ]]; then
-      echo -e ""
+      msg "Skipping ignored directory: $d"
     else
       # Check that $d is not '--', 'vendor', or 'node_modules'
       if [[ "${d:0:2}" == "--" ]] || [[ "$d" == "vendor" ]] || [[ "$d" == "node_modules" ]]; then
-        echo ""
+        msg "Skipping excluded directory: $d"
       else
-        cd "$d"
+        cd "$d" || exit
 
         # If we have `.git` folder, check it.
         if [[ -d ".git" ]]; then
@@ -60,12 +68,14 @@ gitdirty()
           # If it wasn't git repository, check subdirectories.
           gitdirtyrepos ./*
         fi
+        cd - > /dev/null || exit
       fi
-      cd .. > /dev/null
     fi
   fi
 }
 
+# Function to check git status for multiple directories
+# $@ - directories
 gitdirtyrepos()
 {
   for x in "$@"; do
@@ -73,10 +83,20 @@ gitdirtyrepos()
   done
 }
 
-set -e
-trap 'case $? in
-        139) echo "segfault occurred";;
-        11) echo "ssegfault occurred";;
-      esac' EXIT
+# Main function
+main()
+{
+  # If user has provided folder as a first argument, use it.
+  if [ "${1:-}" != "" ]; then
+    GIT_DIRTY_DIR="$1"
+  fi
 
-gitdirtyrepos "$GIT_DIRTY_DIR"
+  trap 'case $? in
+            139) echo "segfault occurred";;
+            11) echo "segfault occurred";;
+          esac' EXIT
+
+  gitdirtyrepos "$GIT_DIRTY_DIR"
+}
+
+main "$@"

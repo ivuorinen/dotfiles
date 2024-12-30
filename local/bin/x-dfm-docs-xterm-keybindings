@@ -2,24 +2,48 @@
 #
 # x-xterm-update-keybindings
 # Updates $HOME/.dotfiles/docs/tmux.md with my keybindings.
+# Usage: x-xterm-update-keybindings
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
+# shellcheck source=./../../config/shared.sh
+source "${DOTFILES}/config/shared.sh"
 
-# shellcheck source=./../../scripts/shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-x-have tmux || {
-  msg_err "tmux not found" && exit 0
+# Check if tmux is installed
+check_tmux_installed()
+{
+  if ! x-have tmux; then
+    msg_err "tmux not found"
+  fi
 }
 
-TMUX_KEYBINDINGS_DOCS="$DOTFILES/docs/tmux-keybindings.md"
+# Generate tmux keybindings documentation
+generate_tmux_keybindings()
+{
+  local tmux_keybindings_docs="$1"
 
-CB="\n\`\`\`\n"
-KB=$(tmux lsk -Tprefix -N | sed -e 's/^/    /;')
-H="# tmux keybindings\n"
-L="\nLeader: \`<ctrl><space>\`\n"
+  local cb="\n\`\`\`\n"
+  local kb
+  kb=$(tmux lsk -Tprefix -N | sed -e 's/^/    /;')
+  local h="# tmux keybindings\n"
+  local l="\nLeader: \`<ctrl><space>\`\n"
 
-# Generalize expanded $HOME to "$HOME"
-KB="${KB//$HOME/\$HOME}"
+  # Generalize expanded $HOME to "$HOME"
+  kb="${kb//$HOME/\$HOME}"
 
-msg "Outputting tmux keybindings to $TMUX_KEYBINDINGS_DOCS"
-echo -e "${H}${L}${CB}${KB}${CB}" > "$TMUX_KEYBINDINGS_DOCS"
-msg_done "Done!"
+  msg "Outputting tmux keybindings to $tmux_keybindings_docs"
+  echo -e "${h}${l}${cb}${kb}${cb}" > "$tmux_keybindings_docs"
+  msg "Done!"
+}
+
+# Main function
+main()
+{
+  check_tmux_installed
+
+  local tmux_keybindings_docs="$DOTFILES/docs/tmux-keybindings.md"
+  generate_tmux_keybindings "$tmux_keybindings_docs"
+}
+
+main "$@"

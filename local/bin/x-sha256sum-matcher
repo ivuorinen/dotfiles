@@ -6,47 +6,73 @@
 # Ismo Vuorinen <https://github.com/ivuorinen> 2023
 # MIT License
 
+set -euo pipefail
+
 # ENV Variables
 : "${VERBOSE:=0}" # VERBOSE=1 x-sha256sum-matcher file1 file2
 
-file_1="$1"
-file_2="$2"
-
-# return sha256sum for file
+# Return sha256sum for file
 # $1 - filename (string)
 get_sha256sum()
 {
   sha256sum "$1" | head -c 64
 }
 
-[ $# -eq 0 ] && {
-  echo "Usage: $0 file1.sh file2.sh" && exit 1
-}
-
+# Print message if VERBOSE is enabled
+# $1 - message (string)
 msg()
 {
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
 }
 
+# Print error message and exit
+# $1 - error message (string)
 error()
 {
-  msg "(!) ERROR: $1" && exit 1
+  msg "(!) ERROR: $1"
+  exit 1
 }
 
-if [ ! -f "$file_1" ]; then
-  error "File 1 does not exist: $file_1"
-fi
+# Validate input arguments
+validate_inputs()
+{
+  if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 file1 file2"
+    exit 1
+  fi
+}
 
-if [ ! -f "$file_2" ]; then
-  error "File 2 does not exist: $file_2"
-fi
+# Check if file exists
+# $1 - filename (string)
+check_file_exists()
+{
+  local filename=$1
+  if [ ! -f "$filename" ]; then
+    error "File does not exist: $filename"
+  fi
+}
 
-file_1_hash=$(get_sha256sum "$file_1")
-file_2_hash=$(get_sha256sum "$file_2")
+# Main function
+main()
+{
+  local file_1=$1
+  local file_2=$2
 
-if [ "$file_1_hash" != "$file_2_hash" ]; then
-  error "Files do not match"
-else
-  msg "(*) Success: Files do match"
-  exit 0
-fi
+  validate_inputs "$file_1" "$file_2"
+  check_file_exists "$file_1"
+  check_file_exists "$file_2"
+
+  local file_1_hash
+  local file_2_hash
+
+  file_1_hash=$(get_sha256sum "$file_1")
+  file_2_hash=$(get_sha256sum "$file_2")
+
+  if [ "$file_1_hash" != "$file_2_hash" ]; then
+    error "Files do not match"
+  else
+    msg "(*) Success: Files do match"
+  fi
+}
+
+main "$@"

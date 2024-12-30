@@ -1,7 +1,5 @@
-blade-formatter
-corepack
-editorconfig-checker
-github-release-notes
-neovim
-stylelint-lsp
+# $NVM_DIR/default-packages
 
+yarn
+neovim
+corepack

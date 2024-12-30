@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Install Go packages
+# @description Install Go packages
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
-msg_run "Installing go packages"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-! x-have "go" && msg "go hasn't been installed yet." && exit 0
+msgr run "Installing go packages"
+
+! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
 
 packages=(
   # A shell parser, formatter, and interpreter with bash support; includes shfmt
@@ -29,29 +32,54 @@ packages=(
   github.com/rhysd/actionlint/cmd/actionlint@latest
   # simple terminal UI for git commands
   github.com/jesseduffield/lazygit@latest
+  # Cleans up your $HOME from those pesky dotfiles
+  github.com/doron-cohen/antidot@latest
 )
 
-for pkg in "${packages[@]}"; do
-  # Trim spaces
-  pkg=${pkg// /}
-  # Skip comments
-  if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+# Function to install go packages
+install_packages()
+{
+  for pkg in "${packages[@]}"; do
+    # Trim spaces
+    pkg=${pkg// /}
+    # Skip comments
+    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
-  msg_nested "Installing go package: $pkg"
-  go install "$pkg"
-  echo ""
-done
-
-msg_run "Installing completions for selected packages"
-
-x-have git-profile && {
-  git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
-    && msg_ok "Installed completions for git-profile"
+    msgr nested "Installing go package: $pkg"
+    go install "$pkg"
+    echo ""
+  done
 }
 
-echo ""
+# Function to install completions and run actions for selected packages
+post_install()
+{
+  msgr run "Installing completions for selected packages"
 
-msg_run "Clearing go cache"
-go clean -cache -modcache
+  if command -v git-profile &> /dev/null; then
+    git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
+      && msgr run_done "Installed completions for git-profile"
+  fi
 
-msg_ok "Done"
+  if command -v antidot &> /dev/null; then
+    antidot update \
+      && msgr run_done "Updated antidot database"
+  fi
+}
+
+# Function to clear go cache
+clear_go_cache()
+{
+  msgr run "Clearing go cache"
+  go clean -cache -modcache
+}
+
+main()
+{
+  install_packages
+  post_install
+  clear_go_cache
+  msgr run_done "Done"
+}
+
+main "$@"

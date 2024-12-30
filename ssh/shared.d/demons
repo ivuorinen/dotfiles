@@ -1,0 +1,22 @@
+# demons
+# vim: ft=sshconfig
+
+Host vine
+  User ubuntu
+  HostName vine.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa
+
+Host purson
+  User ubuntu
+  HostName purson.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa
+
+Host paimon
+  User ivuorinen
+  HostName paimon.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa
+
+Host baal
+  User ivuorinen
+  HostName baal.antiprocess.net
+  IdentityFile ~/.ssh/id_rsa

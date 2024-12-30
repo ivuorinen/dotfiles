@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Install PHP Package Manager Composer
+# @description Install PHP Package Manager Composer
 #
 # shellcheck source="shared.sh"
-source "$HOME/.dotfiles/scripts/shared.sh"
+source "$HOME/.dotfiles/config/shared.sh"
 
-! x-have "php" && msg_err "PHP Not Available, cannot install composer" && exit 0
+if ! command -v php &> /dev/null; then
+  msg_err "PHP Not Available, cannot install composer"
+  exit 0
+fi
 
 EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')"
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"

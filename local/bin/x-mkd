@@ -1,4 +1,50 @@
 #!/usr/bin/env bash
+#
 # Create a directory and cd into it
+# Usage: mkcd <dir>
 
-mkdir -p "$@" && cd "$@" || exit
+set -euo pipefail
+
+# Set verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
+
+# Function to print usage information
+usage()
+{
+  echo "Usage: $0 <dir>"
+  exit 1
+}
+
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
+
+# Function to create a directory and cd into it
+# $1 - directory to create and cd into (string)
+mkcd()
+{
+  local dir=$1
+
+  mkdir -p "$dir" && msg "Directory $dir created"
+
+  cd "$dir" || {
+    msg "Failed to cd into $dir"
+    exit 1
+  }
+  msg "Changed directory to $dir"
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  mkcd "$1"
+}
+
+main "$@"

@@ -1,0 +1,73 @@
+"" Source your .vimrc
+"source ~/.vimrc
+
+"" -- Suggested options --
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+
+"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+"" Map \r to the Reformat Code action
+"map \r <Action>(ReformatCode)
+
+"" Map <leader>d to start debug
+"map <leader>d <Action>(Debug)
+
+"" Map \b to toggle the breakpoint on the current line
+"map \b <Action>(ToggleLineBreakpoint)
+
+
+" Find more examples here: https://jb.gg/share-ideavimrc
+
+" https://github.com/ville6000/dotfiles/blob/main/vimrc
+set nocompatible                " disable compatibility mode with vi
+filetype off                    " disable filetype detection (but re-enable later, see below)
+
+set encoding=utf-8              " UTF-8
+set number                      " Show line numbers
+set laststatus=2                " Always show statusline (even with only single window)
+set showmatch                   " Highlight matching brace
+set visualbell                  " Use visual bell (no beeping)
+set hlsearch                    " Highlight all search results
+set smartcase                   " Enable smart-case search
+set ignorecase                  " Always case-insensitive
+set incsearch                   " Searches for strings incrementally
+set cindent                     " Use 'C' style program indenting
+set expandtab                   " Use spaces instead of tabs
+set shiftwidth=4                " Number of auto-indent spaces
+set smartindent                 " Enable smart-indent
+set smarttab                    " Enable smart-tabs
+set softtabstop=4               " Number of spaces per Tab
+set ruler                       " Show row and column ruler information
+set cursorline         		    " Highlight current line
+set undolevels=1000		        " Number of undo levels
+set backspace=indent,eol,start	" Backspace behaviour
+set so=5
+
+" move vertically by visual line (don't skip wrapped lines)
+nmap j gj
+nmap k gk
+
+syntax enable
+filetype plugin indent on
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'ayu-theme/ayu-vim'
+Plug 'ctrlpvim/ctrlp.vim'
+
+call plug#end()
+
+set termguicolors
+set background=dark
+let ayucolor="dark"
+colorscheme ayu
+
+if has('gui_running')
+    set macligatures
+    set guifont=JetBrainsMono:h14
+endif

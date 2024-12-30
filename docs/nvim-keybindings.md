@@ -1,220 +1,436 @@
 # nvim keybindings
 
+```txt
+
+x  <Space>     *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "<Space>"
+n  <Space>     *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "<Space>"
+x  "           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after """
+n  "           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after """
+x  '           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "'"
+n  '           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "'"
+x  `           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "`"
+n  `           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "`"
+x  g           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "g"
+n  g           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "g"
+x  z           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "z"
+n  z           *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "z"
+n  <C-W>       *@~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Query keys after "<C-W>"
+n  <Esc><Esc>  * :nohlsearch<CR>
+                 Clear Search Highlighting
+n  <Space>qQ   * :q!<CR>
+                 Force quit without saving
+n  <Space>qw   * :wq<CR>
+                 Write and quit
+n  <Space>qq   * :wq!<CR>
+                 Quit with force saving
+n  <Space>qf   * :q<CR>
+                 Quicker close split
+n  <Space>tn   * :Noice dismiss<CR>
+                 Noice: Dismiss Notification
+n  <Space>tl   * :lua vim.o.bg = vim.o.bg:get() == "light" and "dark" or "light"<CR>
+                 Toggle Light/Dark Mode
+n  <Space>te   * :Neotree toggle<CR>
+                 Toggle Neotree
+n  <Space>tc   * :CloakToggle<CR>
+                 Cloak: Toggle
+n  <Space>o    * ~/.config/nvim/lua/keymaps.lua
+                 Open repo in browser
+n  <Space>xx   * :Trouble diagnostics<CR>
+                 Trouble: Diagnostic
+n  <Space>xw   * :Trouble workspace_diagnostics<CR>
+                 Trouble: Workspace Diagnostics
+n  <Space>xq   * :Trouble quickfix<CR>
+                 Trouble: Quickfix
+n  <Space>xl   * :Trouble loclist<CR>
+                 Trouble: Location List
+n  <Space>xd   * :Trouble document_diagnostics<CR>
+                 Trouble: Document Diagnostics
+n  <Space>sx   * :Telescope import<CR>
+                 Telescope: Import
+n  <Space>sw   * :Telescope grep_string<CR>
+                 Grep String
+n  <Space>st   * :TodoTelescope<CR>
+                 Search Todos
+n  <Space>ss   * :Telescope treesitter<CR>
+                 Treesitter
+n  <Space>sq   * :Telescope quickfix<CR>
+                 Quickfix
+n  <Space>sp   * :lua require("telescope").extensions.lazy_plugins.lazy_plugins()<CR>
+                 Lazy Plugins
+n  <Space>so   * :Telescope oldfiles<CR>
+                 Old Files
+n  <Space>sl   * :Telescope luasnip<CR>
+                 Search LuaSnip
+n  <Space>sk   * :Telescope keymaps<CR>
+                 Search Keymaps
+n  <Space>sh   * :Telescope highlights<CR>
+                 List Highlights
+n  <Space>sg   * :Telescope live_grep<CR>
+                 Search by Grep
+n  <Space>sd   * :Telescope diagnostics<CR>
+                 Search Diagnostics
+n  <Space>sc   * :Telescope commands<CR>
+                 Commands
+n  <Space>/    * ~/.config/nvim/lua/keymaps.lua
+                 Fuzzily search in current buffer
+n  <Space>,    * :Telescope buffers<CR>
+                 Find existing buffers
+n  <Space>f    * :Telescope find_files<CR>
+                 Find Files
+n  <Space>cbt  * <Cmd>CBllline<CR>
+                 CB: Titled Line
+n  <Space>cbm  * <Cmd>CBllbox14<CR>
+                 CB: Marked
+n  <Space>cbl  * <Cmd>CBline<CR>
+                 CB: Simple Line
+n  <Space>cbd  * <Cmd>CBd<CR>
+                 CB: Remove a box
+n  <Space>cbb  * <Cmd>CBccbox<CR>
+                 CB: Box Title
+n  <Space>cw   * :Lspsaga diagnostic_jump_next<CR>
+                 Diagnostic Jump Next
+n  <Space>cv   * :Lspsaga diagnostic_jump_prev<CR>
+                 Diagnostic Jump Prev
+n  <Space>cu   * :Lspsaga preview_definition<CR>
+                 Preview Definition
+n  <Space>cT   * :Telescope lsp_type_definitions<CR>
+                 LSP Type Definitions
+n  <Space>ct   * :Lspsaga peek_type_definition<CR>
+                 Peek Type Definition
+n  <Space>cs   * :Telescope lsp_document_symbols<CR>
+                 LSP Document Symbols
+n  <Space>cR   * :Lspsaga rename ++project<CR>
+                 Rename Project wide
+n  <Space>cr   * :Lspsaga rename<CR>
+                 Rename
+n  <Space>cp   * :Lspsaga peek_definition<CR>
+                 Peek Definition
+n  <Space>cl   * :Lspsaga show_cursor_diagnostics<CR>
+                 Cursor Diagnostics
+n  <Space>ci   * :Lspsaga implement<CR>
+                 Implementations
+x  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cd   * :Lspsaga show_line_diagnostics<CR>
+                 Line Diagnostics
+n  <Space>cco  * :Lspsaga outgoing_calls<CR>
+                 Outgoing Calls
+n  <Space>cci  * :Lspsaga incoming_calls<CR>
+                 Incoming Calls
+n  <Space>ca   * :Lspsaga code_action<CR>
+                 Code Action
+n  <Space>cg   * :lua require("neogen").generate()<CR>
+                 Generate annotations
+n  <Space>bw   * :lua MiniBufremove.wipeout()<CR>
+                 Wipeout
+n  <Space>bl   * :bnext<CR>
+                 Next
+n  <Space>bk   * :blast<CR>
+                 Last
+n  <Space>bj   * :bfirst<CR>
+                 First
+n  <Space>bh   * :bprev<CR>
+                 Prev
+n  <Space>bd   * :lua MiniBufremove.delete()<CR>
+                 Delete
+x  #           * vim/_defaults.lua
+                 :help v_#-default
+o  %             <Plug>(MatchitOperationForward)
+x  %             <Plug>(MatchitVisualForward)
+n  %             <Plug>(MatchitNormalForward)
+n  &           * :&&<CR>
+                 :help &-default
+x  *           * vim/_defaults.lua
+                 :help v_star-default
+o  ;           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
+                 Repeat jump
+x  ;           * <Cmd>lua MiniJump.jump()<CR>
+                 Repeat jump
+n  ;           * <Cmd>lua MiniJump.jump()<CR>
+                 Repeat jump
+v  <           * <gv
+                 Indent Left
+n  <           * <gv
+                 Indent Left
+v  >           * >gv
+                 Indent Right
+n  >           * >gv
+                 Indent Right
+n  @           * ~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Execute macro without 'mini.clue' triggers
+x  @           * mode() == 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
+                 :help v_@-default
+o  F           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
+                 Jump backward
+x  F           * <Cmd>lua MiniJump.smart_jump(true, false)<CR>
+                 Jump backward
+n  F           * <Cmd>lua MiniJump.smart_jump(true, false)<CR>
+                 Jump backward
+n  K           * :Lspsaga hover_doc<CR>
+                 Hover Documentation
+n  Q           * ~/.local/share/nvim/lazy/mini.clue/lua/mini/clue.lua
+                 Execute macro without 'mini.clue' triggers
+x  Q           * mode() == 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
+                 :help v_Q-default
+o  T           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
+                 Jump backward till
+x  T           * <Cmd>lua MiniJump.smart_jump(true, true)<CR>
+                 Jump backward till
+n  T           * <Cmd>lua MiniJump.smart_jump(true, true)<CR>
+                 Jump backward till
+n  Y           * y$
+                 :help Y-default
+n  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash Treesitter
+x  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash Treesitter
+o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash Treesitter
+o  [%            <Plug>(MatchitOperationMultiBackward)
+x  [%            <Plug>(MatchitVisualMultiBackward)
+n  [%            <Plug>(MatchitNormalMultiBackward)
+o  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
+                 Go to indent scope top
+x  [i          * <Cmd>lua MiniIndentscope.operator('top')<CR>
+                 Go to indent scope top
+n  [i          * <Cmd>lua MiniIndentscope.operator('top', true)<CR>
+                 Go to indent scope top
+o  [h          * V<Cmd>lua MiniDiff.goto_hunk('prev')<CR>
+                 Previous hunk
+x  [h          * <Cmd>lua MiniDiff.goto_hunk('prev')<CR>
+                 Previous hunk
+n  [h          * <Cmd>lua MiniDiff.goto_hunk('prev')<CR>
+                 Previous hunk
+o  [H          * V<Cmd>lua MiniDiff.goto_hunk('first')<CR>
+                 First hunk
+x  [H          * <Cmd>lua MiniDiff.goto_hunk('first')<CR>
+                 First hunk
+n  [H          * <Cmd>lua MiniDiff.goto_hunk('first')<CR>
+                 First hunk
+n  [d          * vim/_defaults.lua
+                 Jump to the previous diagnostic
+o  ]%            <Plug>(MatchitOperationMultiForward)
+x  ]%            <Plug>(MatchitVisualMultiForward)
+n  ]%            <Plug>(MatchitNormalMultiForward)
+o  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
+                 Go to indent scope bottom
+x  ]i          * <Cmd>lua MiniIndentscope.operator('bottom')<CR>
+                 Go to indent scope bottom
+n  ]i          * <Cmd>lua MiniIndentscope.operator('bottom', true)<CR>
+                 Go to indent scope bottom
+o  ]H          * V<Cmd>lua MiniDiff.goto_hunk('last')<CR>
+                 Last hunk
+x  ]H          * <Cmd>lua MiniDiff.goto_hunk('last')<CR>
+                 Last hunk
+n  ]H          * <Cmd>lua MiniDiff.goto_hunk('last')<CR>
+                 Last hunk
+o  ]h          * V<Cmd>lua MiniDiff.goto_hunk('next')<CR>
+                 Next hunk
+x  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
+                 Next hunk
+n  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
+                 Next hunk
+n  ]d          * vim/_defaults.lua
+                 Jump to the next diagnostic
+x  a%            <Plug>(MatchitVisualTextObject)
+o  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
+                 Object scope with border
+x  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
+                 Object scope with border
+o  f           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
+                 Jump forward
+x  f           * <Cmd>lua MiniJump.smart_jump(false, false)<CR>
+                 Jump forward
+n  f           * <Cmd>lua MiniJump.smart_jump(false, false)<CR>
+                 Jump forward
+n  gR          * :RegexplainerToggle<CR>
+                 Toggle Regexplainer
+o  g%            <Plug>(MatchitOperationBackward)
+x  g%            <Plug>(MatchitVisualBackward)
+n  g%            <Plug>(MatchitNormalBackward)
+o  gh          * <Cmd>lua MiniDiff.textobject()<CR>
+                 Hunk range textobject
+x  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Reset hunks
+n  gH          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Reset hunks
+x  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Apply hunks
+n  gh          * ~/.local/share/nvim/lazy/mini.diff/lua/mini/diff.lua
+                 Apply hunks
+x  gs          * <Cmd>lua MiniOperators.sort('visual')<CR>
+                 Sort selection
+n  gss           ^gsg_
+                 Sort line
+n  gs          * v:lua.MiniOperators.sort()
+                 Sort operator
+x  gr          * <Cmd>lua MiniOperators.replace('visual')<CR>
+                 Replace selection
+n  grr           gr_
+                 Replace line
+n  gr          * v:lua.MiniOperators.replace()
+                 Replace operator
+x  gm          * <Cmd>lua MiniOperators.multiply('visual')<CR>
+                 Multiply selection
+n  gmm           gm_
+                 Multiply line
+n  gm          * v:lua.MiniOperators.multiply()
+                 Multiply operator
+n  gxx           gx_
+                 Exchange line
+x  g=          * <Cmd>lua MiniOperators.evaluate('visual')<CR>
+                 Evaluate selection
+n  g==           g=_
+                 Evaluate line
+n  g=          * v:lua.MiniOperators.evaluate()
+                 Evaluate operator
+x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
+                 Toggle arguments
+n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
+                 Toggle arguments
+o  gc          * <Cmd>lua MiniComment.textobject()<CR>
+                 Comment textobject
+n  gcc         * ~/.local/share/nvim/lazy/mini.comment/lua/mini/comment.lua
+                 Comment line
+x  gc          * ~/.local/share/nvim/lazy/mini.comment/lua/mini/comment.lua
+                 Comment selection
+n  gc          * ~/.local/share/nvim/lazy/mini.comment/lua/mini/comment.lua
+                 Comment
+x  gx          * <Cmd>lua MiniOperators.exchange('visual')<CR>
+                 Exchange selection
+n  gx          * v:lua.MiniOperators.exchange()
+                 Exchange operator
+o  ii          * <Cmd>lua MiniIndentscope.textobject(false)<CR>
+                 Object scope
+x  ii          * <Cmd>lua MiniIndentscope.textobject(false)<CR>
+                 Object scope
+n  j           * v:count == 0 ? 'gj' : 'j'
+                 Move down
+n  k           * v:count == 0 ? 'gk' : 'k'
+                 Move up
+n  shn         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Highlight next surrounding
+n  sFn         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find next left surrounding
+n  sfn         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find next right surrounding
+n  srn         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Replace next surrounding
+n  sdn         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Delete next surrounding
+n  shl         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Highlight previous surrounding
+n  sFl         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find previous left surrounding
+n  sfl         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find previous right surrounding
+n  srl         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Replace previous surrounding
+n  sdl         * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Delete previous surrounding
+x  sa          * :<C-U>lua MiniSurround.add('visual')<CR>
+                 Add surrounding to selection
+n  sn          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Update `MiniSurround.config.n_lines`
+n  sh          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Highlight surrounding
+n  sF          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find left surrounding
+n  sf          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Find right surrounding
+n  sr          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Replace surrounding
+n  sd          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Delete surrounding
+n  sa          * ~/.local/share/nvim/lazy/mini.surround/lua/mini/surround.lua
+                 Add surrounding
+o  t           * ~/.local/share/nvim/lazy/mini.jump/lua/mini/jump.lua
+                 Jump forward till
+x  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
+                 Jump forward till
+n  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
+                 Jump forward till
+x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
+n  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
+o  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
+n  <C-W>=      * <C-W>=
+                 Equal Size Splits
+n  <C-W>+      * :resize +5<CR>
+                 H Resize +
+n  <C-W>-      * :resize -5<CR>
+                 H Resize -
+n  <C-W>.      * :vertical resize +10<CR>
+                 V Resize +
+n  <C-W>,      * :vertical resize -10<CR>
+                 V Resize -
+v  <C-J>       * :m '>+1<CR>gv=gv
+                 Move Block Down
+n  <C-J>       * :m '>+1<CR>gv=gv
+                 Move Block Down
+v  <C-K>       * :m '<-2<CR>gv=gv
+                 Move Block Up
+n  <C-K>       * :m '<-2<CR>gv=gv
+                 Move Block Up
+n  <C-S>       * :w!<CR>
+                 Save
+n  <Down>      * :echo "Use j to move!!"<CR>
+n  <Up>        * :echo "Use k to move!!"<CR>
+n  <Right>     * :echo "Use l to move!!"<CR>
+n  <Left>      * :echo "Use h to move!!"<CR>
+x  <Plug>(MatchitVisualTextObject)   <Plug>(MatchitVisualMultiBackward)o<Plug>(MatchitVisualMultiForward)
+o  <Plug>(MatchitOperationMultiForward) * :<C-U>call matchit#MultiMatch("W",  "o")<CR>
+o  <Plug>(MatchitOperationMultiBackward) * :<C-U>call matchit#MultiMatch("bW", "o")<CR>
+x  <Plug>(MatchitVisualMultiForward) * :<C-U>call matchit#MultiMatch("W",  "n")<CR>m'gv``
+x  <Plug>(MatchitVisualMultiBackward) * :<C-U>call matchit#MultiMatch("bW", "n")<CR>m'gv``
+n  <Plug>(MatchitNormalMultiForward) * :<C-U>call matchit#MultiMatch("W",  "n")<CR>
+n  <Plug>(MatchitNormalMultiBackward) * :<C-U>call matchit#MultiMatch("bW", "n")<CR>
+o  <Plug>(MatchitOperationBackward) * :<C-U>call matchit#Match_wrapper('',0,'o')<CR>
+o  <Plug>(MatchitOperationForward) * :<C-U>call matchit#Match_wrapper('',1,'o')<CR>
+x  <Plug>(MatchitVisualBackward) * :<C-U>call matchit#Match_wrapper('',0,'v')<CR>m'gv``
+x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>:if col("''") != col("$") | exe ":normal! m'" | endif<CR>gv``
+n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
+n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
+n  <M-k>       * <Cmd>lua MiniMove.move_line('up')<CR>
+                 Move line up
+n  <M-j>       * <Cmd>lua MiniMove.move_line('down')<CR>
+                 Move line down
+n  <M-l>       * <Cmd>lua MiniMove.move_line('right')<CR>
+                 Move line right
+n  <M-h>       * <Cmd>lua MiniMove.move_line('left')<CR>
+                 Move line left
+x  <M-k>       * <Cmd>lua MiniMove.move_selection('up')<CR>
+                 Move up
+x  <M-j>       * <Cmd>lua MiniMove.move_selection('down')<CR>
+                 Move down
+x  <M-l>       * <Cmd>lua MiniMove.move_selection('right')<CR>
+                 Move right
+x  <M-h>       * <Cmd>lua MiniMove.move_selection('left')<CR>
+                 Move left
+n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
+n  <C-W><C-D>    <C-W>d
+                 Show diagnostics under the cursor
+n  <C-W>d      * vim/_defaults.lua
+                 Show diagnostics under the cursor
+n  <C-L>       * :lua vim.lsp.buf.signature_help()<CR>
+                 Signature
 ```
-n  !           * <Cmd>lua require("which-key").show("!", {mode = "n", auto = true})<CR>
-n  '           * <Cmd>lua require("which-key").show("'", {mode = "n", auto = true})<CR>
-n  "           * <Cmd>lua require("which-key").show("\"", {mode = "n", auto = true})<CR>
-n  [           * <Cmd>lua require("which-key").show("[", {mode = "n", auto = true})<CR>
-n  [b          * <Lua 246: ~/.config/nvim/lua/astronvim/mappings.lua:54> Previous buffer
-n  [g          * <Lua 277: ~/.config/nvim/lua/astronvim/mappings.lua:150> Previous Git hunk
-n  [t          * <Lua 281: ~/.config/nvim/lua/astronvim/mappings.lua:120> Previous tab
-n  ]           * <Cmd>lua require("which-key").show("]", {mode = "n", auto = true})<CR>
-n  ]b          * <Lua 250: ~/.config/nvim/lua/astronvim/mappings.lua:52> Next buffer
-n  ]g          * <Lua 278: ~/.config/nvim/lua/astronvim/mappings.lua:149> Next Git hunk
-n  ]t          * <Lua 282: ~/.config/nvim/lua/astronvim/mappings.lua:119> Next tab
-n  @           * <Cmd>lua require("which-key").show("@", {mode = "n", auto = true})<CR>
-n  \           * <Cmd>split<CR> Horizontal Split
-n  &           * :&&<CR> Nvim builtin
-n  `* <Cmd>lua require("which-key").show("`", {mode = "n", auto = true})<CR>
-n  <           * <Cmd>lua require("which-key").show("<", {mode = "n", auto = true})<CR>
-n  <b          * <Lua 297: ~/.config/nvim/lua/astronvim/mappings.lua:62> Move buffer tab left
-n  <C-'>       * <Cmd>ToggleTerm<CR> Toggle terminal
-n  <C-Down>    * <Lua 263: ~/.config/nvim/lua/astronvim/mappings.lua:213> Resize split down
-n  <C-H>       * <Lua 266: ~/.config/nvim/lua/astronvim/mappings.lua:208> Move to left split
-n  <C-J>       * <Lua 283: ~/.config/nvim/lua/astronvim/mappings.lua:209> Move to below split
-n  <C-K>       * <Lua 327: ~/.config/nvim/lua/astronvim/mappings.lua:210> Move to above split
-n  <C-L>       * <Lua 265: ~/.config/nvim/lua/astronvim/mappings.lua:211> Move to right split
-n  <C-Left>    * <Lua 262: ~/.config/nvim/lua/astronvim/mappings.lua:214> Resize split left
-n  <C-N>       * <Lua 79: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Goto next mark
-n  <C-P>       * <Lua 80: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Goto previous mark
-n  <C-Q>       * <Cmd>q!<CR> Force quit
-n  <C-Right>   * <Lua 261: ~/.config/nvim/lua/astronvim/mappings.lua:215> Resize split right
-n  <C-S>       * <Cmd>w!<CR> Force write
-n  <C-Up>      * <Lua 264: ~/.config/nvim/lua/astronvim/mappings.lua:212> Resize split up
-n  <C-W>       * <Cmd>lua require("which-key").show("\23", {mode = "n", auto = true})<CR>
-n  <CR>        *@<Lua 391: ~/.local/share/nvim/lazy/alpha-nvim/lua/alpha.lua:705>
-n  <F10>       * <Lua 348: ~/.config/nvim/lua/astronvim/mappings.lua:353> Debugger: Step Over
-n  <F11>       * <Lua 333: ~/.config/nvim/lua/astronvim/mappings.lua:354> Debugger: Step Into
-n  <F17>       * <Lua 344: ~/.config/nvim/lua/astronvim/mappings.lua:341> Debugger: Stop
-n  <F21>       * <Lua 342: ~/.config/nvim/lua/astronvim/mappings.lua:343> Debugger: Conditional Breakpoint
-n  <F23>       * <Lua 331: ~/.config/nvim/lua/astronvim/mappings.lua:355> Debugger: Step Out
-n  <F29>       * <Lua 334: ~/.config/nvim/lua/astronvim/mappings.lua:350> Debugger: Restart
-n  <F5>        * <Lua 341: ~/.config/nvim/lua/astronvim/mappings.lua:340> Debugger: Start
-n  <F6>        * <Lua 339: ~/.config/nvim/lua/astronvim/mappings.lua:351> Debugger: Pause
-n  <F7>        * <Cmd>ToggleTerm<CR> Toggle terminal
-n  <F9>        * <Lua 337: ~/.config/nvim/lua/astronvim/mappings.lua:352> Debugger: Toggle Breakpoint
-n  <M-CR>      *@<Lua 394: ~/.local/share/nvim/lazy/alpha-nvim/lua/alpha.lua:708>
-n  <Plug>PlenaryTestFile *:lua require('plenary.test_harness').test_directory(vim.fn.expand("%:p"))<CR>
-n  <Space>     * <Cmd>lua require("which-key").show(" ", {mode = "n", auto = true})<CR>
-n  <Space>/    * <Lua 279: ~/.config/nvim/lua/astronvim/mappings.lua:139> Comment line
-n  <Space><Space> * <Lua 49: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Harpoon
-n  <Space><Space>a * <Lua 81: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Add file
-n  <Space><Space>e * <Lua 82: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Toggle quick menu
-n  <Space><Space>j * <Lua 48: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Goto to TMUX tmux window
-n  <Space><Space>m * <Lua 83: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Show marks in Telescope
-n  <Space><Space>t * <Lua 84: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Goto to terminal window
-n  <Space>a    * <Lua 102: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Annotation
-n  <Space>a<CR> * <Lua 103: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Current
-n  <Space>ac   * <Lua 104: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Class
-n  <Space>af   * <Lua 105: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Function
-n  <Space>aF   * <Lua 96: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> File
-n  <Space>at   * <Lua 86: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Type
-n  <Space>b\   * <Lua 285: ~/.config/nvim/lua/astronvim/mappings.lua:100> Horizontal split buffer from tabline
-n  <Space>b|   * <Lua 284: ~/.config/nvim/lua/astronvim/mappings.lua:109> Vertical split buffer from tabline
-n  <Space>bb   * <Lua 294: ~/.config/nvim/lua/astronvim/mappings.lua:71> Select buffer from tabline
-n  <Space>bC   * <Lua 295: ~/.config/nvim/lua/astronvim/mappings.lua:69> Close all buffers
-n  <Space>bc   * <Lua 296: ~/.config/nvim/lua/astronvim/mappings.lua:68> Close all buffers except current
-n  <Space>bd   * <Lua 293: ~/.config/nvim/lua/astronvim/mappings.lua:77> Delete buffer from tabline
-n  <Space>bD   * <Lua 320: ~/.config/astronvim/lua/user/mappings.lua:13> Pick to close
-n  <Space>bl   * <Lua 292: ~/.config/nvim/lua/astronvim/mappings.lua:85> Close all buffers to the left
-n  <Space>bn   * <Cmd>tabnew<CR> New tab
-n  <Space>br   * <Lua 291: ~/.config/nvim/lua/astronvim/mappings.lua:87> Close all buffers to the right
-n  <Space>bse  * <Lua 290: ~/.config/nvim/lua/astronvim/mappings.lua:90> Sort by extension (buffers)
-n  <Space>bsi  * <Lua 287: ~/.config/nvim/lua/astronvim/mappings.lua:96> Sort by buffer number (buffers)
-n  <Space>bsm  * <Lua 286: ~/.config/nvim/lua/astronvim/mappings.lua:98> Sort by modification (buffers)
-n  <Space>bsp  * <Lua 288: ~/.config/nvim/lua/astronvim/mappings.lua:94> Sort by full path (buffers)
-n  <Space>bsr  * <Lua 289: ~/.config/nvim/lua/astronvim/mappings.lua:92> Sort by relative path (buffers)
-n  <Space>C    * <Lua 299: ~/.config/nvim/lua/astronvim/mappings.lua:50> Force close buffer
-n  <Space>c    * <Lua 300: ~/.config/nvim/lua/astronvim/mappings.lua:49> Close buffer
-n  <Space>dB   * <Lua 328: ~/.config/nvim/lua/astronvim/mappings.lua:357> Clear Breakpoints
-n  <Space>db   * <Lua 329: ~/.config/nvim/lua/astronvim/mappings.lua:356> Toggle Breakpoint (F9)
-n  <Space>dC   * <Lua 324: ~/.config/nvim/lua/astronvim/mappings.lua:360> Conditional Breakpoint (S-F9)
-n  <Space>dc   * <Lua 326: ~/.config/nvim/lua/astronvim/mappings.lua:358> Start/Continue (F5)
-n  <Space>dE   * <Lua 308: ~/.config/nvim/lua/astronvim/mappings.lua:379> Evaluate Input
-n  <Space>dh   * <Lua 305: ~/.config/nvim/lua/astronvim/mappings.lua:388> Debugger Hover
-n  <Space>di   * <Lua 323: ~/.config/nvim/lua/astronvim/mappings.lua:367> Step Into (F11)
-n  <Space>dO   * <Lua 321: ~/.config/nvim/lua/astronvim/mappings.lua:369> Step Out (S-F11)
-n  <Space>do   * <Lua 322: ~/.config/nvim/lua/astronvim/mappings.lua:368> Step Over (F10)
-n  <Space>dp   * <Lua 316: ~/.config/nvim/lua/astronvim/mappings.lua:372> Pause (F6)
-n  <Space>dQ   * <Lua 318: ~/.config/nvim/lua/astronvim/mappings.lua:371> Terminate Session (S-F5)
-n  <Space>dq   * <Lua 319: ~/.config/nvim/lua/astronvim/mappings.lua:370> Close Session
-n  <Space>dR   * <Lua 312: ~/.config/nvim/lua/astronvim/mappings.lua:374> Toggle REPL
-n  <Space>dr   * <Lua 314: ~/.config/nvim/lua/astronvim/mappings.lua:373> Restart (C-F5)
-n  <Space>ds   * <Lua 310: ~/.config/nvim/lua/astronvim/mappings.lua:375> Run To Cursor
-n  <Space>du   * <Lua 315: ~/.config/nvim/lua/astronvim/mappings.lua:387> Toggle Debugger UI
-n  <Space>e    * <Cmd>Neotree toggle<CR> Toggle Explorer
-n  <Space>f'   * <Lua 255: ~/.config/nvim/lua/astronvim/mappings.lua:241> Find marks
-n  <Space>f<CR> * <Lua 256: ~/.config/nvim/lua/astronvim/mappings.lua:240> Resume previous search
-n  <Space>fa   * <Lua 254: ~/.config/nvim/lua/astronvim/mappings.lua:243> Find AstroNvim config files
-n  <Space>fb   * <Lua 253: ~/.config/nvim/lua/astronvim/mappings.lua:263> Find buffers
-n  <Space>fC   * <Lua 251: ~/.config/nvim/lua/astronvim/mappings.lua:266> Find commands
-n  <Space>fc   * <Lua 252: ~/.config/nvim/lua/astronvim/mappings.lua:265> Find for word under cursor
-n  <Space>fF   * <Lua 248: ~/.config/nvim/lua/astronvim/mappings.lua:269> Find all files
-n  <Space>ff   * <Lua 249: ~/.config/nvim/lua/astronvim/mappings.lua:267> Find files
-n  <Space>fh   * <Lua 247: ~/.config/nvim/lua/astronvim/mappings.lua:272> Find help
-n  <Space>fk   * <Lua 245: ~/.config/nvim/lua/astronvim/mappings.lua:273> Find keymaps
-n  <Space>fm   * <Lua 309: ~/.config/nvim/lua/astronvim/mappings.lua:274> Find man
-n  <Space>fn   * <Lua 242: ~/.config/nvim/lua/astronvim/mappings.lua:277> Find notifications
-n  <Space>fo   * <Lua 240: ~/.config/nvim/lua/astronvim/mappings.lua:279> Find history
-n  <Space>fr   * <Lua 239: ~/.config/nvim/lua/astronvim/mappings.lua:280> Find registers
-n  <Space>ft   * <Lua 238: ~/.config/nvim/lua/astronvim/mappings.lua:282> Find themes
-n  <Space>fW   * <Lua 236: ~/.config/nvim/lua/astronvim/mappings.lua:285> Find words in all files
-n  <Space>fw   * <Lua 237: ~/.config/nvim/lua/astronvim/mappings.lua:283> Find words
-n  <Space>gb   * <Lua 259: ~/.config/nvim/lua/astronvim/mappings.lua:237> Git branches
-n  <Space>gc   * <Lua 258: ~/.config/nvim/lua/astronvim/mappings.lua:238> Git commits
-n  <Space>gd   * <Lua 268: ~/.config/nvim/lua/astronvim/mappings.lua:159> View Git diff
-n  <Space>gg   * <Lua 304: ~/.config/nvim/lua/astronvim/mappings.lua:312> ToggleTerm lazygit
-n  <Space>gh   * <Lua 273: ~/.config/nvim/lua/astronvim/mappings.lua:154> Reset Git hunk
-n  <Space>gL   * <Lua 275: ~/.config/nvim/lua/astronvim/mappings.lua:152> View full Git blame
-n  <Space>gl   * <Lua 276: ~/.config/nvim/lua/astronvim/mappings.lua:151> View Git blame
-n  <Space>gp   * <Lua 274: ~/.config/nvim/lua/astronvim/mappings.lua:153> Preview Git hunk
-n  <Space>gr   * <Lua 272: ~/.config/nvim/lua/astronvim/mappings.lua:155> Reset Git buffer
-n  <Space>gS   * <Lua 270: ~/.config/nvim/lua/astronvim/mappings.lua:157> Stage Git buffer
-n  <Space>gs   * <Lua 271: ~/.config/nvim/lua/astronvim/mappings.lua:156> Stage Git hunk
-n  <Space>gt   * <Lua 257: ~/.config/nvim/lua/astronvim/mappings.lua:239> Git status
-n  <Space>gu   * <Lua 269: ~/.config/nvim/lua/astronvim/mappings.lua:158> Unstage Git hunk
-n  <Space>h    * <Lua 280: ~/.config/nvim/lua/astronvim/mappings.lua:125> Home Screen
-n  <Space>lD   * <Lua 313: ~/.config/nvim/lua/astronvim/mappings.lua:293> Search diagnostics
-n  <Space>ls   * <Lua 235: ~/.config/nvim/lua/astronvim/mappings.lua:295> Search symbols
-n  <Space>lS   * <Lua 260: ~/.config/nvim/lua/astronvim/mappings.lua:230> Symbols outline
-n  <Space>n    * <Cmd>enew<CR> New File
-n  <Space>o    * <Lua 267: ~/.config/nvim/lua/astronvim/mappings.lua:166> Toggle Explorer Focus
-n  <Space>p    * <Cmd>lua require("which-key").show(" p", {mode = "n", auto = true})<CR>
-n  <Space>pA   * <Cmd>AstroUpdate<CR> AstroNvim Update
-n  <Space>pa   * <Cmd>AstroUpdatePackages<CR> Update Plugins and Mason
-n  <Space>pi   * <Lua 307: ~/.config/nvim/lua/astronvim/mappings.lua:36> Plugins Install
-n  <Space>pl   * <Cmd>AstroChangelog<CR> AstroNvim Changelog
-n  <Space>pm   * <Cmd>Mason<CR> Mason Installer
-n  <Space>pM   * <Cmd>MasonUpdateAll<CR> Mason Update
-n  <Space>pS   * <Lua 233: ~/.config/nvim/lua/astronvim/mappings.lua:38> Plugins Sync
-n  <Space>ps   * <Lua 234: ~/.config/nvim/lua/astronvim/mappings.lua:37> Plugins Status
-n  <Space>pU   * <Lua 229: ~/.config/nvim/lua/astronvim/mappings.lua:40> Plugins Update
-n  <Space>pu   * <Lua 231: ~/.config/nvim/lua/astronvim/mappings.lua:39> Plugins Check Updates
-n  <Space>pv   * <Cmd>AstroVersion<CR> AstroNvim Version
-n  <Space>q    * <Cmd>confirm q<CR> Quit
-n  <Space>s    * <Lua 45: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Search / Replace
-n  <Space>S.   * <Cmd>SessionManager! load_current_dir_session<CR> Load current directory session
-n  <Space>Sd   * <Cmd>SessionManager! delete_session<CR> Delete session
-n  <Space>Sf   * <Cmd>SessionManager! load_session<CR> Search sessions
-n  <Space>sf   * <Lua 36: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Spectre (current file)
-n  <Space>Sl   * <Cmd>SessionManager! load_last_session<CR> Load last session
-n  <Space>Ss   * <Cmd>SessionManager! save_current_session<CR> Save this session
-n  <Space>ss   * <Lua 35: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Spectre
-n  <Space>tf   * <Cmd>ToggleTerm direction=float<CR> ToggleTerm float
-n  <Space>th   * <Cmd>ToggleTerm size=10 direction=horizontal<CR> ToggleTerm horizontal split
-n  <Space>tl   * <Lua 232: ~/.config/nvim/lua/astronvim/mappings.lua:313> ToggleTerm lazygit
-n  <Space>tn   * <Lua 230: ~/.config/nvim/lua/astronvim/mappings.lua:316> ToggleTerm node
-n  <Space>tp   * <Lua 311: ~/.config/nvim/lua/astronvim/mappings.lua:325> ToggleTerm python
-n  <Space>tt   * <Lua 306: ~/.config/nvim/lua/astronvim/mappings.lua:322> ToggleTerm btm
-n  <Space>tu   * <Lua 355: ~/.config/nvim/lua/astronvim/mappings.lua:319> ToggleTerm gdu
-n  <Space>tv   * <Cmd>ToggleTerm size=80 direction=vertical<CR> ToggleTerm vertical split
-n  <Space>ua   * <Lua 350: ~/.config/nvim/lua/astronvim/utils/ui.lua:27> Toggle autopairs
-n  <Space>ub   * <Lua 303: ~/.config/nvim/lua/astronvim/utils/ui.lua:58> Toggle background
-n  <Space>uC   * <Cmd>ColorizerToggle<CR> Toggle color highlight
-n  <Space>uc   * <Lua 354: ~/.config/nvim/lua/astronvim/utils/ui.lua:64> Toggle autocompletion
-n  <Space>ud   * <Lua 353: ~/.config/nvim/lua/astronvim/utils/ui.lua:43> Toggle diagnostics
-n  <Space>ug   * <Lua 301: ~/.config/nvim/lua/astronvim/utils/ui.lua:134> Toggle signcolumn
-n  <Space>uh   * <Lua 352: ~/.config/nvim/lua/astronvim/utils/ui.lua:215> Toggle foldcolumn
-n  <Space>ui   * <Lua 325: ~/.config/nvim/lua/astronvim/utils/ui.lua:146> Change indent setting
-n  <Space>ul   * <Lua 330: ~/.config/nvim/lua/astronvim/utils/ui.lua:117> Toggle statusline
-n  <Space>uL   * <Lua 345: ~/.config/nvim/lua/astronvim/utils/ui.lua:98> Toggle CodeLens
-n  <Space>uN   * <Lua 340: ~/.config/nvim/lua/astronvim/utils/ui.lua:21> Toggle UI notifications
-n  <Space>un   * <Lua 343: ~/.config/nvim/lua/astronvim/utils/ui.lua:161> Change line numbering
-n  <Space>up   * <Lua 338: ~/.config/nvim/lua/astronvim/utils/ui.lua:183> Toggle paste mode
-n  <Space>uS   * <Lua 332: ~/.config/nvim/lua/astronvim/utils/ui.lua:111> Toggle conceal
-n  <Space>us   * <Lua 335: ~/.config/nvim/lua/astronvim/utils/ui.lua:177> Toggle spellcheck
-n  <Space>uT   * <Cmd>TransparentToggle<CR> Toggle transparency
-n  <Space>ut   * <Lua 302: ~/.config/nvim/lua/astronvim/utils/ui.lua:105> Toggle tabline
-n  <Space>uu   * <Lua 351: ~/.config/nvim/lua/astronvim/utils/ui.lua:208> Toggle URL highlight
-n  <Space>uw   * <Lua 349: ~/.config/nvim/lua/astronvim/utils/ui.lua:189> Toggle wrap
-n  <Space>uy   * <Lua 346: ~/.config/nvim/lua/astronvim/utils/ui.lua:195> Toggle syntax highlight
-n  <Space>w    * <Cmd>w<CR> Save
-n  <Space>x    * <Lua 126: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Trouble
-n  <Space>xl   * <Lua 171: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Location List (Trouble)
-n  <Space>xq   * <Lua 172: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Quickfix List (Trouble)
-n  <Space>xX   * <Lua 132: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Workspace Diagnostics (Trouble)
-n  <Space>xx   * <Lua 170: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Document Diagnostics (Trouble)
-n  >           * <Cmd>lua require("which-key").show(">", {mode = "n", auto = true})<CR>
-n  >b          * <Lua 298: ~/.config/nvim/lua/astronvim/mappings.lua:58> Move buffer tab right
-n  |           * <Cmd>vsplit<CR> Vertical Split
-n  c           * <Cmd>lua require("which-key").show("c", {mode = "n", auto = true})<CR>
-n  d           * <Cmd>lua require("which-key").show("d", {mode = "n", auto = true})<CR>
-n  g           * <Cmd>lua require("which-key").show("g", {mode = "n", auto = true})<CR>
-n  gb          * <Lua 123: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Comment toggle blockwise
-n  gc          * <Lua 107: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Comment toggle linewise
-n  gx          * <Lua 241: ~/.config/nvim/lua/astronvim/utils/init.lua:134> Open the file under cursor with system app
-n  j           * v:count == 0 ? 'gj' : 'j' Move cursor down
-n  k           * v:count == 0 ? 'gk' : 'k' Move cursor up
-n  v           * <Cmd>lua require("which-key").show("v", {mode = "n", auto = true})<CR>
-n  y           * <Cmd>lua require("which-key").show("y", {mode = "n", auto = true})<CR>
-n  Y           * y$ Nvim builtin
-n  z           * <Cmd>lua require("which-key").show("z", {mode = "n", auto = true})<CR>
-n  zM          * <Lua 244: ~/.config/nvim/lua/astronvim/mappings.lua:395> Close all folds
-n  zm          * <Lua 317: ~/.config/nvim/lua/astronvim/mappings.lua:397> Fold more
-n  zp          * <Lua 347: ~/.config/nvim/lua/astronvim/mappings.lua:398> Peek fold
-n  zr          * <Lua 243: ~/.config/nvim/lua/astronvim/mappings.lua:396> Fold less
-n  zR          * <Lua 336: ~/.config/nvim/lua/astronvim/mappings.lua:394> Open all folds
-v  <Tab>       * >gv indent line
-v  <S-Tab>     * <gv unindent line
-v  <Space>/    * <Esc><Cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR> Toggle comment line
-v  <Space>dE   * <Lua 228: ~/.config/nvim/lua/astronvim/mappings.lua:386> Evaluate Input
-v  gb          * <Lua 124: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Comment toggle blockwise
-v  gc          * <Lua 114: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Comment toggle linewise
-x  "           * <Cmd>lua require("which-key").show("\"", {mode = "v", auto = true})<CR>
-x  ** y/\V<C-R>"<CR> Nvim builtin
-x  #           * y?\V<C-R>"<CR> Nvim builtin
-x  <Space>     * <Cmd>lua require("which-key").show(" ", {mode = "v", auto = true})<CR>
-x  <Space>s    * <Lua 46: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Search / Replace
-x  <Space>sw   * <Lua 47: ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua:67> Spectre (current word)
-x  g           * <Cmd>lua require("which-key").show("g", {mode = "v", auto = true})<CR>
-```
+
+- Generated on Mon 9 Dec 2024 10:05:25 EET

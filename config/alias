@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck source="../scripts/shared.sh"
-# shellcheck disable=1091,2139
 
 # Color the grep output
 alias grep="grep --color"
@@ -18,6 +16,14 @@ alias ....="cd ../../.."
 
 # cd to git root directory
 alias cdgr='cd "$(git root)"'
+
+# interesting folders, and shortcuts
+alias .="cd $HOME"
+alias .b="cd $XDG_BIN_HOME"
+alias .c="cd $HOME/Code"
+alias .d="cd $DOTFILES"
+alias .dx="cd $DOTFILES;ks"
+alias .l="cd $HOME/.local"
 
 # Shortcuts for listing
 alias ll="ls -la"
@@ -48,14 +54,24 @@ alias flush="dscacheutil -flushcache"
 # Update locatedb
 alias updatedb="sudo /usr/libexec/locate.updatedb"
 
+# Date helpers
+alias isodate="date +'%Y-%m-%d'"
+alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
+alias x-timestamp="date +'%s'"
+
 # tmux: automatically attach or create session with name 'main'
-alias tmux='tmux new-session -A -s main'
+alias tm='command tmux new-session -A -s main'
 # tmux: attach or create new session
-alias ta='tmux attach || tmux'
+alias ta='command tmux attach || command tmux'
 
 # nvim
-alias nvim-ks='NVIM_APPNAME="nvim-kickstart" nvim'
-alias ks='NVIM_APPNAME="nvim-kickstart" nvim'
+alias c='nvim'
+alias ks='nvim'
+alias vi='nvim'
+alias vim='nvim'
+
+# xdg-ninja aliases for better experience
+alias xdg='xdg-ninja --skip-ok --skip-unsupported'
 
 # watch with: differences, precise, beep and color
 alias watchx='watch -dpbc'
@@ -109,62 +125,13 @@ if [[ $(uname) == 'Darwin' ]]; then
   # x-set-php-aliases
 fi
 
-# Alacritty preexec hook to update dynamic title
-preexec()
-{
-  print -Pn "\e]0;$1%~\a"
-}
-
-# Update dotfiles
-dfu()
-{
-  (
-    cd "$DOTFILES" && git pull --ff-only && ./install -q
-  )
-}
-
-# Weather in Tampere, or other city
-weather()
-{
-  # https://github.com/chubin/wttr.in#usage
-  local city="${1:-Tampere}"
-  curl "http://wttr.in/${city// /+}?2nFQM&lang=fi"
-}
-
-# Docker
-ssh-docker()
-{
-  docker exec -it "$@" bash
-}
-
-# Rector project to php version 8.2 by default.
-rector()
-{
-  local php="${1:-82}"
-  docker run -v "$(pwd)":/project rector/rector:latest process \
-    "/project/$1" \
-    --set "php${php}" \
-    --autoload-file /project/vendor/autoload.php
-}
-
-# Commit everything
-commit()
-{
-  commitMessage="$*"
-
-  if [ "$commitMessage" = "" ]; then
-    commitMessage="Automated commit"
-  fi
-
-  git add .
-  eval "git commit -a -m '${commitMessage}'"
-}
-
-scheduler()
-{
-  while :; do
-    php artisan schedule:run
-    echo "Sleeping 60 seconds..."
-    sleep 60
-  done
-}
+X_ALIAS_FILES=(
+  "$HOME/.config/alias-secret"
+  "$HOME/.config/alias-$(hostname)"
+  "$HOME/.config/alias-$(hostname)-secret"
+)
+for aliasFile in "${X_ALIAS_FILES[@]}"; do
+  # shellcheck source=$HOME/.config/alias-secret
+  [ -f "$aliasFile" ] && source "$aliasFile" && msgr ok "Sourced $aliasFile"
+done
+unset X_ALIAS_FILES

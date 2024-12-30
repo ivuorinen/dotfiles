@@ -19,3 +19,5 @@ wp_*.sh
 auth.json
 dfm.sh
 .scannerwork
+.phpactor.json
+.zsh_history

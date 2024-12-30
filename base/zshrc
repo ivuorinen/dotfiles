@@ -1,114 +1,62 @@
 # this is my zsh config. there are many like it, but this one is mine.
+# https://zsh.sourceforge.io/Intro/intro_3.html
 # shellcheck shell=bash
 
+# export VERBOSE=1
+# export DEBUG=1
+autoload -U promptinit; promptinit
+
 export DOTFILES="$HOME/.dotfiles"
+LOCAL_SHARE="$HOME/.local/share"
+export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim/mason/bin:$LOCAL_SHARE/bob/nvim-bin:$LOCAL_SHARE/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export SHARED_SCRIPTS_SOURCED=0
 
-# Explicitly set XDG folders
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
+source "$DOTFILES/config/shared.sh"
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
-# custom variables
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_RUNTIME_DIR="$HOME/.local/run"
+ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
-export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$HOME/.local/go/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+source "$DOTFILES/config/zsh/antidote.zsh"
+# source "$DOTFILES/config/zsh/prompt.zsh"
 
-x-load-configs
+# Function to source FZF configuration
+source_fzf_config()
+{
+  local fzf_config="${DOTFILES}/config/fzf/fzf.zsh"
+  if [[ -f "$fzf_config" ]]; then
+    # shellcheck source=config/fzf/fzf.zsh
+    source "$fzf_config"
+  fi
+}
 
-export COMPLETION_WAITING_DOTS=true
+# Function to set up tmux window name plugin if tmux is active
+setup_tmux_window_name_plugin()
+{
+  if [[ -n "$TMUX" ]]; then
+    local tmux_window_name_plugin="$TMUX_PLUGINS/tmux-window-name/scripts/rename_session_windows.py"
+    if [[ -f "$tmux_window_name_plugin" ]]; then
+      tmux_window_name()
+      {
+        ($tmux_window_name_plugin &)
+      }
+      add-zsh-hook chpwd tmux_window_name
+      tmux_window_name
+    fi
+  fi
+}
 
-if type brew &> /dev/null; then
-  eval "$(brew shellenv)"
-  FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:${FPATH}"
+if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
+  source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
 fi
 
-export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
-x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
+source_fzf_config
+setup_tmux_window_name_plugin
+x-have antidot && eval "$(antidot init)"
 
-# Add completion scripts to zsh path
-FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
+autoload -Uz compinit bashcompinit
+compinit -d $ZSH_COMPDUMP
+bashcompinit
 
-# Try to load antigen, if present
-ANTIGEN_ZSH_PATH="$XDG_BIN_HOME/antigen.zsh"
-# shellcheck source=../../.local/bin/antigen.zsh
-[[ -f "$ANTIGEN_ZSH_PATH" ]] && source "$ANTIGEN_ZSH_PATH"
-
-# antigen is present
-antigen use oh-my-zsh
-
-export ZSH_TMUX_AUTOSTART=true
-export ZSH_TMUX_CONFIG="$DOTFILES/config/tmux/tmux.conf"
-export ZSH_TMUX_UNICODE=true
-export ZSH_TMUX_AUTOQUIT=false
-export ZSH_TMUX_DEFAULT_SESSION_NAME=main
-
-export NVM_DIR="$XDG_CONFIG_HOME/nvm"
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
-
-# z, the zsh version
-export ZSHZ_DATA="$XDG_STATE_HOME/z"
-antigen bundle z
-
-# these should be always available
-antigen bundle tmux
-antigen bundle colored-man-pages
-antigen bundle command-not-found
-antigen bundle ssh-agent
-antigen bundle jreese/zsh-titles
-antigen bundle zsh-users/zsh-completions
-
-# these should be available if there's need
-x-have python && antigen bundle MichaelAquilina/zsh-autoswitch-virtualenv
-
-# nvm is a strange beast
-zstyle ':omz:plugins:nvm' autoload yes
-antigen bundle nvm
-
-# this needs to be the last item
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen apply
-
-# shellcheck source=../config/fzf/fzf.zsh
-[ -f "${DOTFILES}/config/fzf/fzf.zsh" ] \
-  && source "${DOTFILES}/config/fzf/fzf.zsh"
-
-x-have rbenv && {
-  eval "$(rbenv init - zsh)"
-}
-
-x-have pyenv && {
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
-}
-
-# Run only if tmux is active
-[[ -n "$TMUX" ]] && {
-  # Autoupdate tmux window name
-  TMUX_WINDOW_NAME_PLUGIN="$DOTFILES/config/tmux/plugins/tmux-window-name/scripts/rename_session_windows.py"
-  [ -f "$TMUX_WINDOW_NAME_PLUGIN" ] && {
-    tmux-window-name()
-    {
-      ($TMUX_WINDOW_NAME_PLUGIN &)
-    }
-    add-zsh-hook chpwd tmux-window-name
-    tmux-window-name
-  }
-}
-
-# eval "$(starship init zsh)"
-x-have oh-my-posh && {
-  eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/oh-my-posh.omp.json)"
-}
-source "$DOTFILES/config/alias"
-
-# Herd checks for a few environment variables to inject PHP binaries and configurations.
-# Herd injected PHP binary.
-# export PATH="/Users/ivuorinen/Library/Application Support/Herd/bin/":$PATH
-# Herd injected PHP 8.3 configuration.
-# export HERD_PHP_83_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/83/"
-# Herd injected PHP 7.4 configuration.
-# export HERD_PHP_74_INI_SCAN_DIR="/Users/ivuorinen/Library/Application Support/Herd/config/php/74/"
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+export P10K_CONFIG="$DOTFILES/config/zsh/p10k.zsh"
+[[ ! -f "$P10K_CONFIG" ]] || source "$P10K_CONFIG"

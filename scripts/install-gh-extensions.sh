@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# Install GitHub CLI extensions
+# @description Install GitHub CLI extensions
 #
 # shellcheck source="shared.sh"
-source "$HOME/.dotfiles/scripts/shared.sh"
+source "${DOTFILES}/config/shared.sh"
 
-msg_run "Installing gh (GitHub Client) extensions"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-! x-have "gh" \
-  && msg_err "gh (GitHub Client) could not be found, please install it first" \
-  && exit 0
+msgr run "Installing gh (GitHub Client) extensions"
+
+if ! command -v gh &> /dev/null; then
+  msgr err "gh (GitHub Client) could not be found, please install it first"
+  exit 0
+fi
 
 extensions=(
   # GitHub CLI extension for generating a report on repository dependencies.
@@ -30,15 +34,25 @@ extensions=(
   rsese/gh-actions-status
 )
 
-for ext in "${extensions[@]}"; do
-  # Trim spaces
-  ext=${ext// /}
-  # Skip comments
-  if [[ ${ext:0:1} == "#" ]]; then continue; fi
+# Function to install GitHub CLI extensions
+install_extensions()
+{
+  for ext in "${extensions[@]}"; do
+    # Trim spaces
+    ext=${ext// /}
+    # Skip comments
+    if [[ ${ext:0:1} == "#" ]]; then continue; fi
 
-  msg_nested "Installing $ext"
-  gh extensions install "$ext"
-  echo ""
-done
+    msgr nested "Installing $ext"
+    gh extension install "$ext"
+    echo ""
+  done
+}
 
-msg_ok "Done"
+main()
+{
+  install_extensions
+  msgr run_done "Done"
+}
+
+main "$@"

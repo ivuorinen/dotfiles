@@ -1,13 +1,16 @@
+---
 name: Update submodules
 on:
-  schedule: [{ cron: 0 3 * * * }]
+  schedule:
+    # At 04:00 on Monday and Thursday.
+    - cron: "0 4 * * 1,4"
   workflow_dispatch:
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
 jobs:
   update-submodules:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     runs-on: self-hosted
     steps:
       - name: Checkout repository

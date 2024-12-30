@@ -8,6 +8,12 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.md]
+max_line_length = 100
+
+[*.lua]
+max_line_length = 120
+
 [*.php]
 indent_size = 4
 
@@ -19,7 +25,9 @@ indent_size = 1
 indent_size = 1
 indent_style = tab
 
-[{local/bin/*,**/*.sh,**/zshrc,config/*}]
+[{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]
+indent_size        = 2
+tab_width          = 2
 shell_variant      = bash # --language-variant
 binary_next_line   = true
 switch_case_indent = true # --case-indent
@@ -27,3 +35,9 @@ space_redirects    = true
 keep_padding       = false
 function_next_line = true # --func-next-line
 
+# Ignore the entire "third_party" directory when calling shfmt on directories,
+# such as "shfmt -l -w .". When formatting files directly,
+# like "shfmt -w third_party/foo.sh" or "shfmt --filename=third_party/foo.sh",
+# the ignore logic is applied only when the --apply-ignore flag is given.
+[{tools/**,local/bin/asdf/**,config/cheat/cheatsheets/**,config/tmux/plugins/**}]
+ignore = true

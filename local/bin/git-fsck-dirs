@@ -6,18 +6,46 @@
 # Copyright 2023 Ismo Vuorinen. All Rights Reserved.
 # License: MIT <https://opensource.org/license/mit/>
 
-STARTING_PATH=${1:-$(pwd)}
+set -euo pipefail
 
-DIRS=$(find "$STARTING_PATH" -mindepth 1 -maxdepth 1 -type d)
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-for DIR in $DIRS; do
-  echo "-> Processing dir: $DIR"
-  cd "$DIR" || exit 1
-  if [ -d "$DIR/.git" ]; then
-    git fsck --no-dangling --full --no-progress
-    echo ""
-  fi
-done
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [ "$VERBOSE" -eq 1 ] && echo "$1"
+}
 
-echo ""
-echo "Done."
+# Function to perform git fsck on a repository
+# $1 - directory (string)
+fsck_repo()
+{
+  local dir=$1
+  msg "Processing dir: $dir"
+  (
+    cd "$dir" || exit 1
+    if [ -d ".git" ]; then
+      git fsck --no-dangling --full --no-progress
+      echo ""
+    fi
+  )
+}
+
+# Main function
+main()
+{
+  local starting_path=${1:-$(pwd)}
+  local dirs
+  dirs=$(find "$starting_path" -mindepth 1 -maxdepth 1 -type d)
+
+  for dir in $dirs; do
+    fsck_repo "$dir"
+  done
+
+  echo ""
+  echo "Done."
+}
+
+main "$@"

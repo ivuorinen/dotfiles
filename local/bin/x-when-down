@@ -10,23 +10,31 @@
 # ./when-down 1.2.3.4 ssh 1.2.3.4
 #
 
-#
-#  Ensure we received the correct number of arguments.
-#
-if [ $# -lt 2 ]; then
+# Ensure we received the correct number of arguments.
+if [ "$#" -lt 2 ]; then
   echo "Usage: $0 HOST COMMAND..."
   exit 1
 fi
 
-HOST=$1
+wait_for_host_down()
+{
+  local host=$1
 
-echo "Waiting for $HOST to get down..."
+  echo "Waiting for $host to go down..."
 
-true
-while [ $? -ne 1 ]; do
-  ping -c 1 -W 1 "$HOST" > /dev/null
-done
+  while ping -c 1 -W 1 "$host" > /dev/null 2>&1; do
+    sleep 1
+  done
+}
 
-shift
+main()
+{
+  local host=$1
+  shift
 
-"$@"
+  wait_for_host_down "$host"
+
+  "$@"
+}
+
+main "$@"

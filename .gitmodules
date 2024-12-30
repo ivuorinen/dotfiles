@@ -23,10 +23,6 @@
 	path = config/tmux/plugins/tmux-continuum
 	url = https://github.com/tmux-plugins/tmux-continuum
 	ignore = dirty
-[submodule "tmux/tmux-resurrect"]
-	path = config/tmux/plugins/tmux-resurrect
-	url = https://github.com/tmux-plugins/tmux-resurrect
-	ignore = dirty
 [submodule "tmux/tmux-sensible"]
 	path = config/tmux/plugins/tmux-sensible
 	url = https://github.com/tmux-plugins/tmux-sensible.git
@@ -58,6 +54,16 @@
 [submodule "cheat-tldr"]
 	path = config/cheat/cheatsheets/tldr
 	url = https://github.com/ivuorinen/cheatsheet-tldr.git
-[submodule "nvim-kickstart"]
-	path = config/nvim-kickstart
-	url = https://github.com/ivuorinen/kickstart.nvim
+[submodule "tmux/tmux-dark-notify"]
+	path = config/tmux/plugins/tmux-dark-notify
+	url = https://github.com/erikw/tmux-dark-notify.git
+[submodule "asdf"]
+	path = local/bin/asdf
+	url = https://github.com/asdf-vm/asdf.git
+[submodule "antidote"]
+	path = tools/antidote
+	url = https://github.com/mattmc3/antidote.git
+	shallow = true
+[submodule "dotbot-asdf"]
+	path = tools/dotbot-asdf
+	url = https://github.com/sobolevn/dotbot-asdf

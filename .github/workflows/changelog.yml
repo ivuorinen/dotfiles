@@ -1,3 +1,4 @@
+---
 name: Debug Changelog # Workflow name displayed on GitHub
 on:
   workflow_dispatch: # Trigger manually

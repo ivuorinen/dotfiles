@@ -1,0 +1,43 @@
+# This file is for Antidote plugins
+# https://getantidote.github.io/usage
+# vim: ft=ini
+
+# set up Zsh completions with plugins
+mattmc3/ez-compinit
+zsh-users/zsh-completions kind:fpath path:src
+
+# frameworks like oh-my-zsh are supported
+getantidote/use-omz        # handle OMZ dependencies
+ohmyzsh/ohmyzsh path:lib   # load OMZ's library
+
+# Theme
+# mafredri/zsh-async # for pure
+# sindresorhus/pure  # pure itself
+
+romkatv/powerlevel10k
+
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages
+ohmyzsh/ohmyzsh path:plugins/brew
+ohmyzsh/ohmyzsh path:plugins/extract
+ohmyzsh/ohmyzsh path:plugins/eza
+ohmyzsh/ohmyzsh path:plugins/fzf
+ohmyzsh/ohmyzsh path:plugins/git
+ohmyzsh/ohmyzsh path:plugins/golang
+ohmyzsh/ohmyzsh path:plugins/gpg-agent
+ohmyzsh/ohmyzsh path:plugins/nvm
+ohmyzsh/ohmyzsh path:plugins/python
+ohmyzsh/ohmyzsh path:plugins/tmux
+ohmyzsh/ohmyzsh path:plugins/z
+
+# Automatically activate nvm if .nvmrc file is present
+ivuorinen/nvm-auto-use
+
+# Add core plugins that make Zsh a bit more like Fish
+zdharma-continuum/fast-syntax-highlighting
+
+# Add some plugins that are not in OMZ
+jreese/zsh-titles
+yuki-ycino/tms
+
+# This needs to be last bundle
+# zsh-users/zsh-syntax-highlighting

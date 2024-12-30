@@ -1,0 +1,73 @@
+---
+tags: [printf, bash, zsh]
+---
+
+# printf
+
+The printf command accepts the following syntax:
+
+`printf [-v var] [format specifiers] [arguments]`
+
+- [-v var]
+  The optional -v flag assigns the output to the [var]
+  variable instead of printing it in standard output.
+
+- [format specifiers]
+  Format specifiers are strings that determine the methods of
+  formatting specifiers. The following section includes a
+  list of accepted specifiers.
+
+- [arguments]
+  Arguments can be any value or variable, and the [format specifiers]
+  point to the [arguments]. If there are more arguments than format
+  specifiers, the format string is reused until it interprets
+  the last argument.
+
+If there are fewer format specifiers than arguments, number formats
+are set to zero (0), while string formats are set to null (empty).
+
+## printf Specifiers
+
+Format      Description
+------      -----------
+%c          Treat the arguments as a single character.
+%d          Treat the input as a decimal (integer) number (base 10).
+%e          Treats the input as an exponential floating-point number.
+%f          Treat the input as a floating-point number.
+%i          Treat the input as an integer number (base 10).
+%o          Treats the input as an octal number (base 8).
+%s          Treat the input as a string of characters.
+%u          Treat the input as an unsigned decimal (integer) number.
+%x          Treats the input as a hexadecimal number (base 16).
+%%          Print a percent sign.
+%Wd         Print the W integer X digits wide.
+%(format)T  Outputs a date-time string resulting from using format as a
+            format string for strftime. The corresponding argument can
+            be the number of seconds since Epoch (January 1, 1970, 00:00),
+            -1 (the current time), or -2 (shell startup time).
+            Not specifying an argument uses the current time as the default value.
+\%          Print a percent sign.
+\n          Prints a newline character.
+\t          Print a tab character.
+
+Some format specifiers accept format modifiers that modify their actions.
+Enter the modifiers between the % character and the character that
+specifies the format.
+
+Available format modifiers are:
+
+<N>.        Enter a number that specifies a minimum field width.
+            If the output text is shorter, it's padded with spaces.
+            If the text is longer, the field expands.
+. (dot).    When used with a field width modifier, the field doesn't
+            expand for longer text. Instead, the text is truncated.
+-.          Left-aligns the printed text. The default alignment is right.
+0.          Pads the numbers with zeros instead of spaces.
+<space>.    Pads a positive number with a space, and a negative
+            number with a minus (-).
++.          Prints all numbers signed (+ for positive, - for negative).
+'.          For decimal conversions, applies the thousands grouping
+            separator to the integer portion of the output according
+            to the current LC_NUMERIC file.
+
+

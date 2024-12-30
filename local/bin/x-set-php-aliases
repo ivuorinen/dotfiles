@@ -1,50 +1,71 @@
 #!/usr/bin/env bash
-# Check which php versions are installed with brew, and create aliases for each installation.
+# Check which PHP versions are installed with brew, and create aliases for each installation.
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 
 set -euo pipefail
 
-# Set verbosity with VERBOSE=1 x-load-configs
-VERBOSE="${VERBOSE:=0}"
+# Set verbosity with VERBOSE=1 x-set-php-aliases
+VERBOSE="${VERBOSE:-0}"
 
-[ "$VERBOSE" = "2" ] && {
-  set -x
-}
+# Enable debugging if verbosity is set to 2
+[ "$VERBOSE" = "2" ] && set -x
 
-! x-have brew && {
+# Check if brew is installed, if not exit.
+if ! command -v brew &> /dev/null; then
   exit 0
+fi
+
+# Function to read installed PHP versions using brew
+get_php_versions()
+{
+  local versions=()
+  while IFS="" read -r line; do
+    versions+=("$line")
+  done < <(bkt -- brew list | grep '^php')
+  echo "${versions[@]}"
 }
 
-# Get installed php versions from brew and setup aliases
-php_versions=()
-while IFS="" read -r line; do php_versions+=("$line"); done < <(bkt -- brew list | grep '^php')
+# Function to create aliases for each PHP version
+create_aliases()
+{
+  local php_versions=("$@")
+  local php_error_reporting='-d error_reporting=22527'
 
-php_error_reporting='-d error_reporting=22527'
+  for version in "${php_versions[@]}"; do
+    [ "$VERBOSE" = "1" ] && echo "Setting aliases for $version"
 
-for version in "${php_versions[@]}"; do
-  [ "$VERBOSE" = "1" ] && echo "Setting aliases for $version"
-  # drop the dot from version (8.0 -> 80)
-  php_abbr="${version//\./}"
-  # replace "php@" with "p" so "php@80" becomes "p80"
-  php_alias="${php_abbr//php@/p}"
+    # Drop the dot from version (e.g., 8.0 -> 80)
+    local php_abbr="${version//\./}"
+    # Replace "php@" with "p" so "php@80" becomes "p80"
+    local php_alias="${php_abbr//php@/p}"
 
-  # Fetch the exec path once
-  php_exec="$HOMEBREW_PREFIX/opt/$version/bin/php"
+    # Fetch the exec path once
+    local php_exec="$HOMEBREW_PREFIX/opt/$version/bin/php"
 
-  [ -f "$php_exec" ] && {
-    [ "$VERBOSE" = "1" ] && echo "-> php_exec $php_exec"
+    if [ -f "$php_exec" ]; then
+      [ "$VERBOSE" = "1" ] && echo "-> php_exec $php_exec"
 
-    # Raw PHP without error_reporting flag.
-    # shellcheck disable=SC2139
-    alias "${php_alias}"r="$php_exec"
-    # PHP with error_reporting flag.
-    # shellcheck disable=SC2139,SC2140
-    alias "$php_alias"="$php_exec $php_error_reporting"
-    # Local PHP Server.
-    # shellcheck disable=SC2139,SC2140
-    alias "${php_alias}s"="$php_exec -S localhost:9000"
-    # Use composer with specific PHP and error_reporting flag on.
-    # shellcheck disable=SC2139,SC2140
-    alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
-  }
-done
+      # Raw PHP without error_reporting flag.
+      alias "${php_alias}r"="$php_exec"
+
+      # PHP with error_reporting flag.
+      alias "$php_alias"="$php_exec $php_error_reporting"
+
+      # Local PHP Server.
+      alias "${php_alias}s"="$php_exec -S localhost:9000"
+
+      # Use composer with specific PHP and error_reporting flag on.
+      alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
+    fi
+  done
+}
+
+# Main function
+main()
+{
+  local php_versions
+  php_versions=($(get_php_versions))
+  create_aliases "${php_versions[@]}"
+}
+
+main "$@"

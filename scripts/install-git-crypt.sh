@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
+# @description Install git-crypt
 #
-# Install git-crypt
 # NOTE: Experimental, wip
 #
 # shellcheck source=shared.sh
-source "$HOME/.dotfiles/scripts/shared.sh"
+source "${DOTFILES}/config/shared.sh"
 
-msg_run "Installing git-crypt"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-x-have "git-crypt" || {
+msgr run "Installing git-crypt"
 
+if ! command -v git-crypt &> /dev/null; then
   REPO_URL="https://github.com/AGWA/git-crypt.git"
   CHECK_PATH="${XDG_BIN_HOME}/git-crypt"
   BUILD_PATH="/tmp/git-crypt"
@@ -21,7 +23,8 @@ x-have "git-crypt" || {
     cd "$BUILD_PATH" || msg_err "$BUILD_PATH not found"
     make && make install PREFIX="$HOME/.local"
   else
-    msg_done "git-crypt ($CHECK_PATH) already installed"
+    msgr run_done "git-crypt ($CHECK_PATH) already installed"
   fi
-}
-msg_done "Done installing git-crypt"
+fi
+
+msgr run_done "Done installing git-crypt"

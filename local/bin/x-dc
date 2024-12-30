@@ -4,13 +4,49 @@
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 # Licensed under MIT License. http://www.opensource.org/licenses/mit-license.
 
-dir="$1"
+# Enable verbosity with VERBOSE=1
+VERBOSE="${VERBOSE:-0}"
 
-[ $# -eq 0 ] && {
+# Function to print usage information
+usage()
+{
   echo "Usage: $0 full/path/to/dir/to/create"
   exit 1
 }
 
-if [ ! -d "$dir" ]; then
-  mkdir -p "$dir" && exit 0
-fi
+# Function to print messages if VERBOSE is enabled
+# $1 - message (string)
+msg()
+{
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
+}
+
+# Function to create a directory if it doesn't exist
+# $1 - directory to create (string)
+create_directory()
+{
+  local dir=$1
+
+  if [ ! -d "$dir" ]; then
+    msg "Creating directory: $dir"
+    mkdir -p "$dir"
+    msg "Directory created: $dir"
+  else
+    msg "Directory already exists: $dir"
+  fi
+  return 0
+}
+
+# Main function
+main()
+{
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  create_directory "$1"
+  exit 0
+}
+
+main "$@"
