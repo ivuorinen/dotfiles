@@ -45,6 +45,7 @@ git submodule add --name tmux/tmux-dark-notify \
 
 # Takes submodules and sets them to ignore all changes
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
+  echo "Ignoring submodule changes for submodule.${MODULE}..."
   git config "submodule.${MODULE}.ignore" all
 done
 
