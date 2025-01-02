@@ -91,23 +91,19 @@ section_install()
 
   MENU=(
     "all:Installs everything in the correct order"
+    "asdf:Install asdf plugins"
     "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
-    "dotenv:Install dotenv-linter"
     "fonts:Install programming fonts"
     "gh:Install GitHub CLI Extensions"
     "go:Install Go Packages"
     "imagick:Install ImageMagick CLI"
     "macos:Setup nice macOS defaults"
-    "neofetch:Install neofetch"
-    "npm:Install NPM Packages"
+    "npm-packages:Install NPM Packages"
     "ntfy:Install ntfy"
     "nvm-latest:Install latest lts node using nvm"
     "nvm:Install Node Version Manager (nvm)"
-    "ohmybash:Install oh-my-bash"
-    "pip:Install pip/python packages"
-    "starship:Install starship.rs"
     "z:Install z"
   )
 
@@ -159,12 +155,6 @@ section_install()
       msgr run "Installing fonts..."
       bash "$DOTFILES/scripts/install-fonts.sh" \
         && msgr yay "Installed fonts!"
-      ;;
-
-    fzf)
-      msgr run "Installing fzf..."
-      bash "$DOTFILES/scripts/install-fzf.sh" \
-        && msgr yay "fzf installed!"
       ;;
 
     gh)
