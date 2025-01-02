@@ -39,7 +39,7 @@ o.termguicolors = true -- Enable GUI colors
 o.timeoutlen = 250 -- Decrease mapped sequence wait time
 o.updatetime = 250 -- 250 ms = 2,5 seconds
 o.sessionoptions =
-  'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
+  'buffers,curdir,folds,tabpages,winsize,winpos,terminal,localoptions'
 
 -- Enable the colorcolumn
 vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })

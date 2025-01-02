@@ -196,12 +196,16 @@ return {
             'goimports',
             'gotests',
             'phpcbf',
+            'phpmd',
+            'phpstan',
             'pint',
             'prettierd',
+            'semgrep',
             'shellcheck',
             'shfmt',
             'staticcheck',
             'stylua',
+            'trivy',
             'vint',
             'yamlfmt',
           },
@@ -284,6 +288,8 @@ return {
           validate = { enable = true },
         },
       }
+
+      -- end of junnplus/lsp-setup config
     end,
   },
 
@@ -317,6 +323,11 @@ return {
         else
           lsp_format_opt = 'fallback'
         end
+
+        -- Disable autoformat for files in a certain path
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname:match '/node_modules/' then return end
+
         return {
           timeout_ms = 500,
           lsp_format = lsp_format_opt,
@@ -326,6 +337,7 @@ return {
         lua = { 'stylua' },
         sh = { 'shfmt' },
         bash = { 'shfmt' },
+        php = { 'phpcbf' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -333,6 +345,10 @@ return {
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
       },
     },
+    init = function()
+      -- If you want the formatexpr, here is the place to set it
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
   },
   -- Automatically install formatters registered with conform.nvim via mason.nvim
   -- https://github.com/zapling/mason-conform.nvim
