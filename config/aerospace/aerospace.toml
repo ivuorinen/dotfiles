@@ -40,44 +40,52 @@ automatically-unhide-macos-hidden-apps = true
 # run = ['layout floating', 'move-node-to-workspace S']  # The callback itself
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'settings' # All settings
+run = ['layout floating']
+
+[[on-window-detected]]
 if.app-id = 'org.ferdium.ferdium-app' # Ferdium, has WhatsApp etc.
 run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.apple.finder' # Finder
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.apple.mail' # Mail
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.DanPristupov.Fork' # Fork
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.flexibits.fantastical2.mac' # Fantastical
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'org.whispersystems.signal-desktop' # Signal
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.tidal.desktop' # TIDAL
-run = ['layout floating', 'move-node-to-workspace 2']
+run = ['layout floating', 'move-node-to-workspace 2'] # Float and move to workspace 2
 
 [[on-window-detected]]
 if.app-id = 'com.apple.TV' # Apple TV app
-run = 'layout floating'
+run = ['layout floating']
 
 [[on-window-detected]]
-if.app-id = 'com.setapp.DesktopClient'
-run = 'layout floating'
+if.app-id = 'com.setapp.DesktopClient' # Setapp
+run = ['layout floating']
 
 [[on-window-detected]]
-if.app-id = 'com.electron.dockerdesktop'
-run = 'layout floating'
+if.app-id = 'com.electron.dockerdesktop' # Docker Desktop
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap' # Slack
+run = ['layout floating']
 
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -142,14 +150,16 @@ alt-l = 'focus right'
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 alt-shift-1 = 'workspace 1' # Main
 alt-shift-2 = 'workspace 2' # Media
+ctrl-shift-1 = 'move-node-to-workspace 1'
+ctrl-shift-2 = 'move-node-to-workspace 2'
 
-shift-tab = 'workspace-back-and-forth'
+alt-shift-tab = 'workspace-back-and-forth'
+ctrl-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 alt-a = 'mode apps'
 alt-s = 'mode service'
-alt-d = 'mode resize'
 alt-m = 'mode move'
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -170,35 +180,33 @@ shift-h = 'join-with left'
 shift-j = 'join-with down'
 shift-k = 'join-with up'
 shift-l = 'join-with right'
+# https://nikitabobko.github.io/AeroSpace/commands#resize
+ctrl-h = 'resize smart -70'
+ctrl-l = 'resize smart +70'
+shift-left = 'resize smart +70'
+shift-right = 'resize smart -70'
+# https://nikitabobko.github.io/AeroSpace/commands#flatten-workspace-tree
+r = ['flatten-workspace-tree', 'mode main'] # reset layout
 
 # ╭──────────────────────────────────────────────────────────╮
 # │                          alt-a                           │
 # ╰──────────────────────────────────────────────────────────╯
 [mode.apps.binding]
 esc = ['reload-config', 'mode main']
-b = ['exec-and-forget open -a /Applications/Brave Browser.app', 'mode main']
-c = ['exec-and-forget open -a /Applications/Ferdium.app', 'mode main']
-o = ['exec-and-forget open -a /Applications/Obsidian.app', 'mode main']
-s = ['exec-and-forget open -a /Applications/Slack.app', 'mode main']
-t = ['exec-and-forget open -a /Applications/TIDAL.app', 'mode main']
-w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main']
+b = ['exec-and-forget open -a /Applications/Brave Browser.app', 'mode main'] # Browser
+c = ['exec-and-forget open -a /Applications/Ferdium.app', 'mode main'] # Chat
+g = ['exec-and-forget open -a /Applications/Ghostty.app', 'mode main'] # Ghostty
+o = ['exec-and-forget open -a /Applications/Obsidian.app', 'mode main'] # Obsidian
+s = ['exec-and-forget open -a /Applications/Slack.app', 'mode main'] # Slack
+t = ['exec-and-forget open -a /Applications/TIDAL.app', 'mode main'] # Tidal
+w = ['exec-and-forget open -a /Applications/WezTerm.app', 'mode main'] # WezTerm
 
 # ╭──────────────────────────────────────────────────────────╮
 # │                          alt-s                           │
 # ╰──────────────────────────────────────────────────────────╯
 [mode.service.binding]
-esc = ['reload-config', 'mode main']
+esc = ['reload-config', 'mode main'] # reload config
 r = ['flatten-workspace-tree', 'mode main'] # reset layout
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
 f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
-
-# ╭──────────────────────────────────────────────────────────╮
-# │                          alt-d                           │
-# ╰──────────────────────────────────────────────────────────╯
-[mode.resize.binding]
-esc = ['reload-config', 'mode main']
-# See: https://nikitabobko.github.io/AeroSpace/commands#resize
-r = ['flatten-workspace-tree', 'mode main'] # reset layout
-h = 'resize smart -70'
-l = 'resize smart +70'
