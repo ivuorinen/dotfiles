@@ -23,7 +23,8 @@ generate_tmux_keybindings()
 {
   local tmux_keybindings_docs="$1"
 
-  local cb="\n\`\`\`\n"
+  local cb="\n\`\`\`txt\n"
+  local cbe="\n\`\`\`\n"
   local kb
   kb=$(tmux lsk -Tprefix -N | sed -e 's/^/    /;')
   local h="# tmux keybindings\n"
@@ -33,7 +34,7 @@ generate_tmux_keybindings()
   kb="${kb//$HOME/\$HOME}"
 
   msg "Outputting tmux keybindings to $tmux_keybindings_docs"
-  echo -e "${h}${l}${cb}${kb}${cb}" > "$tmux_keybindings_docs"
+  echo -e "${h}${l}${cb}${kb}${cbe}" > "$tmux_keybindings_docs"
   msg "Done!"
 }
 
