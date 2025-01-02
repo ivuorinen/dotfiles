@@ -52,8 +52,14 @@ require('lazy').setup(
       -- No need to notify about changes
       notify = false,
     },
+    dev = {
+      path = '~/Code/nvim', -- Load wip plugins from this path
+    },
     install = {
       colorscheme = { vim.g.colors_theme },
+    },
+    profiling = {
+      loader = true,
     },
   }
 )
