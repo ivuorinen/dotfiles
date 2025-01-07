@@ -16,12 +16,12 @@ alias ....="cd ../../.."
 alias cdgr='cd "$(git root)"'
 
 # interesting folders, and shortcuts
-alias .="cd $HOME"
-alias .b="cd $XDG_BIN_HOME"
-alias .c="cd $HOME/Code"
-alias .d="cd $DOTFILES"
-alias .dx="cd $DOTFILES;ks"
-alias .l="cd $HOME/.local"
+alias .='cd $HOME'
+alias .b='cd $XDG_BIN_HOME'
+alias .c='cd $HOME/Code'
+alias .d='cd $DOTFILES'
+alias .dx='cd $DOTFILES;nvim'
+alias .l='cd $HOME/.local'
 
 # Shortcuts for listing
 alias ll="ls -la"
@@ -31,13 +31,10 @@ alias l="ls -a"
 alias cd..="cd .."
 alias sl="ls"
 
-# List only directories
-alias lsd="ls -lF | grep '^d'"
-
 # IP addresses
 alias x-ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
-alias ips="ifconfig -a | grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' | sed -e 's/inet6* //'"
+alias ips="ifconfig -a | grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' | sed -e 's/inet6* //' | sort"
 
 # Show/hide hidden files in Finder
 alias show="defaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder"
@@ -57,14 +54,7 @@ alias isodate="date +'%Y-%m-%d'"
 alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
 alias x-timestamp="date +'%s'"
 
-# tmux: automatically attach or create session with name 'main'
-alias tm='command tmux new-session -A -s main'
-# tmux: attach or create new session
-alias ta='command tmux attach || command tmux'
-
-# nvim
-alias c='nvim'
-alias ks='nvim'
+# nvim aliases
 alias vi='nvim'
 alias vim='nvim'
 
@@ -86,6 +76,7 @@ alias mirror_site='wget -m -k -K -E -e robots=off'
 # Mirror stdout to stderr, useful for seeing data going through a pipe
 alias peek='tee >(cat 1>&2)'
 
+# Runs Gitlab code quality scanner
 alias code_scanner='docker run
   --env SOURCE_CODE="$PWD"
   --volume "${PWD}":/code
@@ -93,14 +84,16 @@ alias code_scanner='docker run
   registry.gitlab.com/gitlab-org/ci-cd/codequality:"${CODEQUALITY_VERSION:-latest}"
   /code'
 
+# Runs trivy container image scanner
 alias trivy_scan='docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy'
-
+# Opens dotfiles with $EDITOR
 alias zedit='$EDITOR ~/.dotfiles'
-
-alias irssi="irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi"
-
-alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
-alias svn="svn --config-dir $XDG_CONFIG_HOME/subversion"
+# Open irssi with my configurations
+alias irssi='irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi'
+# Configures wget to use correct wget-hsts file
+alias wget='wget --hsts-file=$XDG_DATA_HOME/wget-hsts'
+# Configures svn to use correct config directory
+alias svn='svn --config-dir $XDG_CONFIG_HOME/subversion'
 
 if [[ $(uname) == 'Darwin' ]]; then
 
