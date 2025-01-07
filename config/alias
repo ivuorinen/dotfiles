@@ -79,8 +79,6 @@ alias zapds='find . -name ".DS_Store" -print -delete'
 alias zappyc="find . -type f -name '*.pyc' -ls -delete"
 # Run all zaps
 alias zapall="zapds && zappyc"
-# tail with follow flag on
-alias t='tail -f'
 # directory usage, return only the total
 alias dn='du -chd1'
 # Mirror site with wget

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Credit to ThePrimeagen, jessarcher
+# https://github.com/jessarcher/dotfiles/blob/master/scripts/t
+#
+# Tweaks by Ismo Vuorinen <https://github.com/ivuorinen> 2025
+
+# Set environment variables for configuration with defaults
+T_ROOT="${T_ROOT:-$HOME/Code}"
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+# Function to print an error message and exit
+error_exit()
+{
+  echo "Error: $1" >&2
+  exit 1
+}
+
+# Select the directory
+if [[ $# -eq 1 ]]; then
+  selected="$1"
+else
+  items=$(find "$T_ROOT" -maxdepth 2 -mindepth 1 -type d)
+  items+="$(printf "\n%s" "$DOTFILES")"
+  items+="$(printf "\n/tmp")"
+  selected=$(echo -e "$items" | fzf) || exit 0 # Exit if no selection is made
+fi
+
+# Exit if no directory was selected
+[[ -z $selected ]] && error_exit "No directory selected."
+
+# Sanitize the session name
+dirname=$(basename "$selected" | tr '.' '_')
+
+# Try to switch to the tmux session
+if tmux switch-client -t "=$dirname" 2> /dev/null; then
+  exit 0
+fi
+
+# Create a new tmux session or attach to an existing one
+if tmux new-session -c "$selected" -d -s "$dirname" 2> /dev/null; then
+  tmux switch-client -t "$dirname"
+else
+  tmux new -c "$selected" -A -s "$dirname"
+fi
