@@ -3,8 +3,6 @@
 Leader: `<ctrl><space>`
 
 ```txt
-    Space   Select next layout
-    #       List all paste buffers
     $       Rename current session
     %       Split window horizontally
     &       Kill current window
@@ -27,7 +25,6 @@ Leader: `<ctrl><space>`
     ;       Move to the previously active pane
     =       Choose a paste buffer from a list
     ?       List key bindings
-    D       Choose and detach a client from a list
     E       Spread panes out evenly
     L       Switch to the last client
     M       Clear the marked pane
@@ -37,7 +34,6 @@ Leader: `<ctrl><space>`
     f       Search for a pane
     i       Display window information
     m       Toggle the marked pane
-    n       Select the next window
     o       Select the next pane
     q       Display pane numbers
     s       Choose a session from a list
