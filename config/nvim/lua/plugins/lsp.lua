@@ -26,7 +26,15 @@ local lsp_servers = {
     },
   },
   html = {},
-  intelephense = {},
+  intelephense = {
+    commands = {
+      IntelephenseIndex = {
+        function()
+          vim.lsp.buf.execute_command { command = 'intelephense.index.workspace' }
+        end,
+      },
+    },
+  },
   jsonls = {},
   lua_ls = {
     settings = {
@@ -236,12 +244,12 @@ return {
     config = function(_, opts)
       require('lazydev').setup()
       require('lsp-setup').setup(opts)
+      local cmp = require 'blink.cmp'
       local lspconfig = require 'lspconfig'
       for server, config in pairs(opts.servers) do
         -- passing config.capabilities to blink.cmp merges with the capabilities in your
         -- `opts[server].capabilities, if you've defined it
-        config.capabilities =
-          require('blink.cmp').get_lsp_capabilities(config.capabilities)
+        config.capabilities = cmp.get_lsp_capabilities(config.capabilities)
         lspconfig[server].setup(config)
       end
 
@@ -288,6 +296,32 @@ return {
           validate = { enable = true },
         },
       }
+
+      -- Diagnostic configuration
+      vim.diagnostic.config {
+        virtual_text = false,
+        float = {
+          source = true,
+        },
+      }
+
+      -- Sign configuration
+      vim.fn.sign_define(
+        'DiagnosticSignError',
+        { text = '', texthl = 'DiagnosticSignError' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignWarn',
+        { text = '', texthl = 'DiagnosticSignWarn' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignInfo',
+        { text = '', texthl = 'DiagnosticSignInfo' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignHint',
+        { text = '', texthl = 'DiagnosticSignHint' }
+      )
 
       -- end of junnplus/lsp-setup config
     end,

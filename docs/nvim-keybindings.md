@@ -60,8 +60,6 @@ n  <Space>sx   * :Telescope import<CR>
                  Telescope: Import
 n  <Space>sw   * :Telescope grep_string<CR>
                  Grep String
-n  <Space>st   * :TodoTelescope<CR>
-                 Search Todos
 n  <Space>ss   * :Telescope treesitter<CR>
                  Treesitter
 n  <Space>sq   * :Telescope quickfix<CR>
@@ -82,11 +80,19 @@ n  <Space>sd   * :Telescope diagnostics<CR>
                  Search Diagnostics
 n  <Space>sc   * :Telescope commands<CR>
                  Commands
+n  <Space>pt   * :PhpactorTransform<CR>
+                 PHPactor: Transform
+n  <Space>ps   * :PhpactorClassSearch<CR>
+                 PHPactor: Class Search
+n  <Space>pn   * :PhpactorClassNew<CR>
+                 PHPactor: Class New
+n  <Space>pm   * :PhpactorContextMenu<CR>
+                 PHPactor: Context Menu
 n  <Space>/    * ~/.config/nvim/lua/keymaps.lua
                  Fuzzily search in current buffer
 n  <Space>,    * :Telescope buffers<CR>
                  Find existing buffers
-n  <Space>f    * :Telescope find_files<CR>
+n  <Space>f    * :Telescope fd --hidden=true<CR>
                  Find Files
 n  <Space>cbt  * <Cmd>CBllline<CR>
                  CB: Titled Line
@@ -144,6 +150,16 @@ n  <Space>bd   * :lua MiniBufremove.delete()<CR>
                  Delete
 n  <Space>ba   * :%bd|e#|bd#<CR>
                  Close all except current
+n  <Space>av   * :silent TestVisit<CR>
+                 Test Visit
+n  <Space>al   * :silent TestLast<CR>
+                 Test Last
+n  <Space>as   * :silent TestSuite<CR>
+                 Test Suite
+n  <Space>af   * :silent TestFile<CR>
+                 Test File
+n  <Space>an   * :silent TestNearest<CR>
+                 Test Nearest
 n  <Space>o    * ~/.config/nvim/lua/keymaps.lua
                  Open repo in browser
 n  <Space>tmw  * <Cmd>setlocal wrap! wrap?<CR>
@@ -177,6 +193,10 @@ x  %             <Plug>(MatchitVisualForward)
 n  %             <Plug>(MatchitNormalForward)
 n  &           * :&&<CR>
                  :help &-default
+n  '?          & :<C-U>echo ":Start" dispatch#start_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
+n  '!          & <SNR>30_:.Start!
+n  '<Space>    & <SNR>30_:.Start<Space>
+n  '<CR>       & <SNR>30_:.Start<CR>
 x  *           * vim/_defaults.lua
                  :help v_star-default
 o  ;           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
@@ -195,7 +215,7 @@ n  >           * >gv
                  Indent Right
 n  @           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
-x  @           * mode() == 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
+x  @           * mode() ==# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
                  :help v_@-default
 o  F           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
                  Jump backward
@@ -207,7 +227,7 @@ n  K           * :Lspsaga hover_doc<CR>
                  Hover Documentation
 n  Q           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
-x  Q           * mode() == 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
+x  Q           * mode() ==# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
                  :help v_Q-default
 o  T           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
                  Jump backward till
@@ -269,7 +289,13 @@ n  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
                  Next hunk
 n  ]d          * vim/_defaults.lua
                  Jump to the next diagnostic
+n  `?          & <SNR>30_:.FocusDispatch<CR>
+n  `!          & <SNR>30_:.Dispatch!
+n  `<Space>    & <SNR>30_:.Dispatch<Space>
+n  `<CR>       & <SNR>30_:.Dispatch<CR>
 x  a%            <Plug>(MatchitVisualTextObject)
+o  ax            <Plug>(textobj-xmlattr-attr-a)
+x  ax            <Plug>(textobj-xmlattr-attr-a)
 o  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
                  Object scope with border
 x  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
@@ -285,6 +311,14 @@ n  gR          * :RegexplainerToggle<CR>
 o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
+n  g`?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
+n  g`!         & <SNR>30_:.Spawn!
+n  g`<Space>   & <SNR>30_:.Spawn<Space>
+n  g`<CR>      & <SNR>30_:.Spawn<CR>
+n  g'?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
+n  g'!         & <SNR>30_:.Spawn!
+n  g'<Space>   & <SNR>30_:.Spawn<Space>
+n  g'<CR>      & <SNR>30_:.Spawn<CR>
 x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
                  Toggle arguments
 n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
@@ -353,6 +387,8 @@ x  gx          * <Cmd>lua MiniOperators.exchange('visual')<CR>
                  Exchange selection
 n  gx          * v:lua.MiniOperators.exchange()
                  Exchange operator
+o  ix            <Plug>(textobj-xmlattr-attr-i)
+x  ix            <Plug>(textobj-xmlattr-attr-i)
 o  ii          * <Cmd>lua MiniIndentscope.textobject(false)<CR>
                  Object scope
 x  ii          * <Cmd>lua MiniIndentscope.textobject(false)<CR>
@@ -363,6 +399,10 @@ n  j           * v:count == 0 ? 'gj' : 'j'
 x  k           * v:count == 0 ? 'gk' : 'k'
 n  k           * v:count == 0 ? 'gk' : 'k'
                  Move up
+n  m?          & :<C-U>echo ":Dispatch" dispatch#make_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
+n  m!          & <SNR>30_:.Make!
+n  m<Space>    & <SNR>30_:.Make<Space>
+n  m<CR>       & <SNR>30_:.Make<CR>
 n  shn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
                  Highlight next surrounding
 n  sFn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
@@ -405,12 +445,14 @@ x  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
 n  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
                  Jump forward till
-x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
-                 Flash
 o  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+                 Flash
+x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
 n  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Flash
+n  <F1>        * :FloatermToggle<CR>
+                 Toggle Floaterm
 v  <C-J>       * :m '>+1<CR>gv=gv
                  Move Block Down
 n  <C-J>       * :m '>+1<CR>gv=gv
@@ -450,6 +492,13 @@ x  <Plug>(MatchitVisualBackward) * :<C-U>call matchit#Match_wrapper('',0,'v')<CR
 x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>:if col("''") != col("$") | exe ":normal! m'" | endif<CR>gv``
 n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
 n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
+n  <SNR>30_:.  & :<C-R>=getcmdline() =~ ',' ? "\0250" : ""<CR>
+o  <Plug>(textobj-xmlattr-attr-i) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-i) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","v")<CR>
+o  <Plug>(textobj-xmlattr-attr-a) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-a) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","v")<CR>
+n  <SNR>26_    * <SNR>26_
+   <SNR>26_(save-cursor-pos) * <SNR>26_save_cursor_pos()
 n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
 n  <M-k>       * <Cmd>lua MiniMove.move_line('up')<CR>
                  Move line up
@@ -479,4 +528,4 @@ n  <C-L>       * :lua vim.lsp.buf.signature_help()<CR>
                  Signature
 ```
 
-- Generated on Thu  2 Jan 2025 17:41:13 EET
+- Generated on Tue  7 Jan 2025 21:37:18 EET

@@ -24,13 +24,15 @@ g.loaded_java_provider = 0 -- Disable java provider
 -- vim.options
 -- Most of the good defaults are provided by `mini.basics`
 -- See: lua/plugins/mini.lua
+o.confirm = true -- Confirm before closing unsaved buffers
 o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
 o.number = true -- Show line numbers
 o.numberwidth = 3 -- Set the width of the number column
 o.relativenumber = true -- Show relative line numbers
-o.scrolloff = 15 -- Show context around cursor
-o.signcolumn = 'yes:3' -- Keep signcolumn on by default
+o.scrolloff = 8 -- Show context around cursor
+o.sidescrolloff = 8 -- Show context around cursor
+o.signcolumn = 'yes' -- Keep signcolumn on by default
 o.spell = true -- Enable spell checking
 o.spelllang = 'en_us' -- Set the spell checking language
 o.splitbelow = true -- split to the bottom
@@ -40,6 +42,8 @@ o.timeoutlen = 250 -- Decrease mapped sequence wait time
 o.updatetime = 250 -- 250 ms = 2,5 seconds
 o.sessionoptions =
   'buffers,curdir,folds,tabpages,winsize,winpos,terminal,localoptions'
+
+o.wildmode = 'longest:full,full' -- Command-line completion mode
 
 -- Enable the colorcolumn
 vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })

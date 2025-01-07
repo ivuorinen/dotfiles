@@ -42,6 +42,18 @@ K.nl('o', function() require('snacks').gitbrowse() end, 'Open repo in browser')
 K.n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 K.n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
+-- ── ToggleTerm ──────────────────────────────────────────────────────
+K.d('<F1>', 'n', ':FloatermToggle<CR>', 'Toggle Floaterm')
+K.d('<F1>', 'i', '<Esc>:FloatermToggle<CR>', 'Toggle Floaterm')
+K.d('<F1>', 't', '<C-\\><C-n>:FloatermToggle<CR>', 'Toggle Floaterm')
+
+-- ── Test operations ─────────────────────────────────────────────────
+K.nl('an', ':silent TestNearest<CR>', 'Test Nearest')
+K.nl('af', ':silent TestFile<CR>', 'Test File')
+K.nl('as', ':silent TestSuite<CR>', 'Test Suite')
+K.nl('al', ':silent TestLast<CR>', 'Test Last')
+K.nl('av', ':silent TestVisit<CR>', 'Test Visit')
+
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
@@ -90,7 +102,7 @@ K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 -- Mappings for Telescope operations like finding files, buffers, etc.
 -- Convention: All mappings start with 's' followed by the operation
 -- unless it's a generic operation like searching or finding buffers
-K.nl('f', ':Telescope find_files<cr>', 'Find Files')
+K.nl('f', ':Telescope fd --hidden=true<cr>', 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
 K.nl(
   '/',
@@ -104,6 +116,11 @@ K.nl(
   end,
   'Fuzzily search in current buffer'
 )
+
+K.nl('pm', ':PhpactorContextMenu<cr>', 'PHPactor: Context Menu')
+K.nl('pn', ':PhpactorClassNew<cr>', 'PHPactor: Class New')
+K.nl('ps', ':PhpactorClassSearch<cr>', 'PHPactor: Class Search')
+K.nl('pt', ':PhpactorTransform<cr>', 'PHPactor: Transform')
 
 K.nl('sc', ':Telescope commands<cr>', 'Commands')
 K.nl('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
@@ -119,7 +136,6 @@ K.nl(
 )
 K.nl('sq', ':Telescope quickfix<cr>', 'Quickfix')
 K.nl('ss', ':Telescope treesitter<cr>', 'Treesitter')
-K.nl('st', ':TodoTelescope<cr>', 'Search Todos')
 K.nl('sw', ':Telescope grep_string<cr>', 'Grep String')
 K.nl('sx', ':Telescope import<cr>', 'Telescope: Import')
 
