@@ -150,7 +150,6 @@ return {
   {
     'whatyouhide/vim-textobj-xmlattr',
     dependencies = { 'kana/vim-textobj-user' },
-    opts = {},
   },
 
   -- Describe the regexp under the cursor
