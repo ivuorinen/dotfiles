@@ -95,6 +95,7 @@ return {
       -- elsewhere in your config, without redefining it, via `opts_extend`
       sources = {
         default = {
+          'lazydev',
           'lsp',
           'snippets',
           'copilot',
@@ -105,6 +106,12 @@ return {
           copilot = {
             name = 'copilot',
             module = 'blink-cmp-copilot',
+          },
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            -- make lazydev completions top priority (see `:h blink.cmp`)
+            score_offset = 100,
           },
         },
       },
