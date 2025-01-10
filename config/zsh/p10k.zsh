@@ -6,7 +6,8 @@
 # transient_prompt, instant_prompt=verbose.
 # Type `p10k configure` to generate another config.
 #
-# Config file for Powerlevel10k with the style of Pure (https://github.com/sindresorhus/pure).
+# Config file for Powerlevel10k with the style of Pure
+# (https://github.com/sindresorhus/pure).
 #
 # Differences from Pure:
 #
@@ -14,13 +15,16 @@
 #     - `@c4d3ec2c` instead of something like `v1.4.0~11` when in detached HEAD state.
 #     - No automatic `git fetch` (the same as in Pure with `PURE_GIT_PULL=0`).
 #
-# Apart from the differences listed above, the replication of Pure prompt is exact. This includes
-# even the questionable parts. For example, just like in Pure, there is no indication of Git status
-# being stale; prompt symbol is the same in command, visual and overwrite vi modes; when prompt
-# doesn't fit on one line, it wraps around with no attempt to shorten it.
+# Apart from the differences listed above, the replication of Pure
+# prompt is exact. This includes even the questionable parts.
+# For example, just like in Pure, there is no indication of Git status
+# being stale; prompt symbol is the same in command, visual and overwrite
+# vi modes; when prompt doesn't fit on one line, it wraps around with
+# no attempt to shorten it.
 #
-# If you like the general style of Pure but not particularly attached to all its quirks, type
-# `p10k configure` and pick "Lean" style. This will give you slick minimalist prompt while taking
+# If you like the general style of Pure but not particularly attached
+# to all its quirks, type `p10k configure` and pick "Lean" style.
+# This will give you slick minimalist prompt while taking
 # advantage of Powerlevel10k features that aren't present in Pure.
 
 # Temporarily change options.
@@ -83,8 +87,9 @@
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=           # no segment icons
 
-  # Add an empty line before each prompt except the first. This doesn't emulate the bug
-  # in Pure that makes prompt drift down whenever you use the Alt-C binding from fzf or similar.
+  # Add an empty line before each prompt except the first. This doesn't
+  # emulate the bug in Pure that makes prompt drift down whenever you use
+  # the Alt-C binding from fzf or similar.
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
   # Magenta prompt symbol if the last command succeeded.
@@ -125,15 +130,17 @@
   # Yellow previous command duration.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=$yellow
 
-  # Grey Git prompt. This makes stale prompts indistinguishable from up-to-date ones.
+  # Grey Git prompt. This makes stale prompts indistinguishable
+  # from up-to-date ones.
   typeset -g POWERLEVEL9K_VCS_FOREGROUND=$grey
 
-  # Disable async loading indicator to make directories that aren't Git repositories
-  # indistinguishable from large Git repositories without known state.
+  # Disable async loading indicator to make directories that aren't
+  # Git repositories indistinguishable from large Git repositories
+  # without known state.
   typeset -g POWERLEVEL9K_VCS_LOADING_TEXT=
 
-  # Don't wait for Git status even for a millisecond, so that prompt always updates
-  # asynchronously when Git state changes.
+  # Don't wait for Git status even for a millisecond, so that
+  # prompt always updates asynchronously when Git state changes.
   typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0
 
   # Cyan ahead/behind arrows.
@@ -161,36 +168,42 @@
   typeset -g POWERLEVEL9K_TIME_FOREGROUND=$grey
   # Format for the current time: 09:51:02. See `man 3 strftime`.
   typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
-  # If set to true, time will update when you hit enter. This way prompts for the past
-  # commands will contain the start times of their commands rather than the end times of
-  # their preceding commands.
+
+  # If set to true, time will update when you hit enter. This way prompts
+  # for the past commands will contain the start times of their commands
+  # rather than the end times of their preceding commands.
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
 
-  # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
-  # when accepting a command line. Supported values:
+  # Transient prompt works similarly to the builtin transient_rprompt option.
+  # It trims down prompt when accepting a command line. Supported values:
   #
   #   - off:      Don't change prompt when accepting a command line.
   #   - always:   Trim down prompt when accepting a command line.
-  #   - same-dir: Trim down prompt when accepting a command line unless this is the first command
-  #               typed after changing current working directory.
+  #   - same-dir: Trim down prompt when accepting a command line
+  #               unless this is the first command typed after
+  #               changing current working directory.
   typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
 
   # Instant prompt mode.
   #
-  #   - off:     Disable instant prompt. Choose this if you've tried instant prompt and found
-  #              it incompatible with your zsh configuration files.
-  #   - quiet:   Enable instant prompt and don't print warnings when detecting console output
-  #              during zsh initialization. Choose this if you've read and understood
+  #   - off:     Disable instant prompt. Choose this if you've tried
+  #              instant prompt and found it incompatible with your
+  #              zsh configuration files.
+  #   - quiet:   Enable instant prompt and don't print warnings when
+  #              detecting console output during zsh initialization.
+  #              Choose this if you've read and understood
   #              https://github.com/romkatv/powerlevel10k#instant-prompt.
-  #   - verbose: Enable instant prompt and print a warning when detecting console output during
-  #              zsh initialization. Choose this if you've never tried instant prompt, haven't
-  #              seen the warning, or if you are unsure what this all means.
+  #   - verbose: Enable instant prompt and print a warning when detecting
+  #              console output during zsh initialization. Choose this
+  #              if you've never tried instant prompt, haven't seen the
+  #              warning, or if you are unsure what this all means.
   typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
-  # Hot reload allows you to change POWERLEVEL9K options after Powerlevel10k has been initialized.
-  # For example, you can type POWERLEVEL9K_BACKGROUND=red and see your prompt turn red. Hot reload
-  # can slow down prompt by 1-2 milliseconds, so it's better to keep it turned off unless you
-  # really need it.
+  # Hot reload allows you to change POWERLEVEL9K options after
+  # Powerlevel10k has been initialized. For example, you can type
+  # POWERLEVEL9K_BACKGROUND=red and see your prompt turn red.
+  # Hot reload can slow down prompt by 1-2 milliseconds, so it's
+  # better to keep it turned off unless you really need it.
   typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
 
   # If p10k is already loaded, reload configuration.
