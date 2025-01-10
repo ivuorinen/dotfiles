@@ -121,6 +121,9 @@
   # Don't show context unless root or in SSH.
   # typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION=
 
+  # aws, go and nvm versions colors.
+  typeset -g POWERLEVEL9K_{AWS,GO,NVM}_FOREGROUND=$grey
+
   # Show previous command duration only if it's >= 86400s = 24h.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=86400
   # Don't show fractional seconds. Thus, 7s rather than 7.3s.
