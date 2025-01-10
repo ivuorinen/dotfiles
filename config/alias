@@ -20,8 +20,8 @@ alias .='cd $HOME'
 alias .b='cd $XDG_BIN_HOME'
 alias .c='cd $HOME/Code'
 alias .d='cd $DOTFILES'
-alias .dx='cd $DOTFILES;nvim'
 alias .l='cd $HOME/.local'
+alias .o='cd $HOME/Code/ivuorinen/obsidian/'
 
 # Shortcuts for listing
 alias ll="ls -la"
