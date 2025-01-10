@@ -468,6 +468,7 @@ export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
 # tmux
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
+export TMUX_TMPDIR="$XDG_STATE_HOME/tmux"
 export TMUX_PLUGINS="$XDG_CONFIG_HOME/tmux/plugins"
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 ## These settings are for zsh-tmux
