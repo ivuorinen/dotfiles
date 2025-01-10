@@ -18,6 +18,8 @@ return {
         },
       },
 
+      { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+
       -- Set of preconfigured snippets for different languages.
       -- https://github.com/rafamadriz/friendly-snippets
       { 'rafamadriz/friendly-snippets' },
@@ -50,6 +52,7 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
+      snippets = { preset = 'luasnip' },
       -- 'default' for mappings similar to built-in completion
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
       -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
@@ -93,9 +96,9 @@ return {
       sources = {
         default = {
           'lsp',
+          'snippets',
           'copilot',
           'path',
-          'snippets',
           'buffer',
         },
         providers = {
@@ -105,9 +108,6 @@ return {
           },
         },
       },
-
-      -- experimental auto-brackets support
-      -- completion = { accept = { auto_brackets = { enabled = true } } }
 
       -- experimental signature help support
       signature = { enabled = true },
