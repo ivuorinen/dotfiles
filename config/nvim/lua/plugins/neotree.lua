@@ -31,9 +31,43 @@ return {
   cmd = 'Neotree',
   opts = {
     close_if_last_window = true,
+    hide_root_node = true,
     popup_border_style = 'rounded',
     enable_git_status = true,
     enable_diagnostics = true,
+    sources = {
+      'filesystem',
+      'buffers',
+      'document_symbols',
+    },
+    source_selector = {
+      winbar = true,
+      statusline = false,
+      separator = { left = '', right = '' },
+      show_separator_on_edge = true,
+      highlight_tab = 'SidebarTabInactive',
+      highlight_tab_active = 'SidebarTabActive',
+      highlight_background = 'StatusLine',
+      highlight_separator = 'SidebarTabInactiveSeparator',
+      highlight_separator_active = 'SidebarTabActiveSeparator',
+    },
+    event_handlers = {
+      {
+        event = 'file_opened',
+        handler = function(file_path)
+          require('neo-tree.command').execute { action = 'close' }
+        end,
+      },
+    },
+    default_component_configs = {
+      indent = {
+        padding = 0,
+      },
+      name = {
+        use_git_status_colors = true,
+        highlight_opened_files = true,
+      },
+    },
     git_status = {
       symbols = {
         -- Change type
@@ -54,59 +88,18 @@ return {
         mappings = {
           ['<Esc>'] = 'close_window',
           ['q'] = 'close_window',
+          ['<cr>'] = 'open_with_window_picker',
         },
       },
       filtered_items = {
-        hide_dotfiles = true,
-        hide_gitignored = true,
+        hide_dotfiles = false,
         hide_hidden = true, -- only works on Windows for hidden files/directories
         never_show = {
           '.DS_Store',
         },
         hide_by_name = {
           'node_modules',
-        },
-        always_show = {
-          '.actrc',
-          '.browserslistrc',
-          '.commitlintrc.json',
-          '.editorconfig',
-          '.env',
-          '.env.example',
-          '.envrc',
-          '.eslintrc.json',
-          '.github',
-          '.gitignore',
-          '.gitkeep',
-          '.ignore',
-          '.markdownlint.json',
-          '.markdownlint.yaml',
-          '.markdownlintignore',
-          '.nvmrc',
-          '.prettierignore',
-          '.prettierrc.js',
-          '.prettierrc.json',
-          '.prettierrc.yaml',
-          '.python-version',
-          '.releaserc.json',
-          '.shellcheckrc',
-          '.simple-git-hooks.json',
-          '.stylelintrc.json',
-          '.stylua.toml',
-          '.yamlignore',
-          '.yamllint.yaml',
-        },
-        always_show_by_pattern = {
-          '.*.json',
-          '.*.toml',
-          '.*.yaml',
-          '.*.yml',
-          '.*rc',
-          '.*rc.*',
-          '.env*',
-          '.prettierrc*',
-          '.markdownlint*',
-          '.stylua.*',
+          '.git',
         },
       },
     },

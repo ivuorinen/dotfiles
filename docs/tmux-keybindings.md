@@ -2,17 +2,11 @@
 
 Leader: `<ctrl><space>`
 
-```
-    C-o     Rotate through the panes
-    C-z     Suspend the current client
-    Space   Select next layout
-    #       List all paste buffers
+```txt
     $       Rename current session
     %       Split window horizontally
     &       Kill current window
     '       Prompt for window index to select
-    (       Switch to previous client
-    )       Switch to next client
     ,       Rename current window
     -       Delete the most recent paste buffer
     .       Move the current window
@@ -31,7 +25,6 @@ Leader: `<ctrl><space>`
     ;       Move to the previously active pane
     =       Choose a paste buffer from a list
     ?       List key bindings
-    D       Choose and detach a client from a list
     E       Spread panes out evenly
     L       Switch to the last client
     M       Clear the marked pane
@@ -41,7 +34,6 @@ Leader: `<ctrl><space>`
     f       Search for a pane
     i       Display window information
     m       Toggle the marked pane
-    n       Select the next window
     o       Select the next pane
     q       Display pane numbers
     s       Choose a session from a list
@@ -63,6 +55,8 @@ Leader: `<ctrl><space>`
     M-3     Set the main-horizontal layout
     M-4     Set the main-vertical layout
     M-5     Select the tiled layout
+    M-6     Set the main-horizontal-mirrored layout
+    M-7     Set the main-vertical-mirrored layout
     M-n     Select the next window with an alert
     M-o     Rotate through the panes in reverse
     M-p     Select the previous window with an alert
@@ -70,6 +64,8 @@ Leader: `<ctrl><space>`
     M-Down  Resize the pane down by 5
     M-Left  Resize the pane left by 5
     M-Right Resize the pane right by 5
+    C-o     Rotate through the panes
+    C-z     Suspend the current client
     C-Up    Resize the pane up
     C-Down  Resize the pane down
     C-Left  Resize the pane left

@@ -2,8 +2,6 @@
 - include: 'tools/dotbot-defaults.yaml'
 - shell:
     - echo "Configuring air"
-- brewfile:
-    - Brewfile
 - link:
     ~/:
       force: true

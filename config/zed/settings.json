@@ -1,4 +1,11 @@
 {
+  "assistant": {
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-4o"
+    },
+    "version": "2"
+  },
   "formatter": {
     "external": {
       "command": "node_modules/.bin/prettier",
@@ -9,12 +16,23 @@
     }
   },
   "languages": {
+    "JavaScript": {
+      "enable_language_server": true,
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
     "Lua": {
       "enable_language_server": true,
       "tab_size": 2
     }
   },
   "lsp": {
+    "eslint": {
+      "settings": {
+        "nodePath": "./node_modules/.bin"
+      }
+    },
     "gopls": {
       "initialization_options": {
         "hints": {

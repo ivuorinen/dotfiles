@@ -26,7 +26,15 @@ local lsp_servers = {
     },
   },
   html = {},
-  intelephense = {},
+  intelephense = {
+    commands = {
+      IntelephenseIndex = {
+        function()
+          vim.lsp.buf.execute_command { command = 'intelephense.index.workspace' }
+        end,
+      },
+    },
+  },
   jsonls = {},
   lua_ls = {
     settings = {
@@ -116,6 +124,9 @@ return {
       library = {
         -- Load luvit types when the `vim.uv` word is found
         { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        -- load assert and describe paths
+        { path = 'luassert/library', words = { 'assert' } },
+        { path = 'busted/library', words = { 'describe' } },
       },
     },
   },
@@ -196,12 +207,16 @@ return {
             'goimports',
             'gotests',
             'phpcbf',
+            'phpmd',
+            'phpstan',
             'pint',
             'prettierd',
+            'semgrep',
             'shellcheck',
             'shfmt',
             'staticcheck',
             'stylua',
+            'trivy',
             'vint',
             'yamlfmt',
           },
@@ -232,12 +247,12 @@ return {
     config = function(_, opts)
       require('lazydev').setup()
       require('lsp-setup').setup(opts)
+      local cmp = require 'blink.cmp'
       local lspconfig = require 'lspconfig'
       for server, config in pairs(opts.servers) do
         -- passing config.capabilities to blink.cmp merges with the capabilities in your
         -- `opts[server].capabilities, if you've defined it
-        config.capabilities =
-          require('blink.cmp').get_lsp_capabilities(config.capabilities)
+        config.capabilities = cmp.get_lsp_capabilities(config.capabilities)
         lspconfig[server].setup(config)
       end
 
@@ -284,6 +299,34 @@ return {
           validate = { enable = true },
         },
       }
+
+      -- Diagnostic configuration
+      vim.diagnostic.config {
+        virtual_text = false,
+        float = {
+          source = true,
+        },
+      }
+
+      -- Sign configuration
+      vim.fn.sign_define(
+        'DiagnosticSignError',
+        { text = '', texthl = 'DiagnosticSignError' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignWarn',
+        { text = '', texthl = 'DiagnosticSignWarn' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignInfo',
+        { text = '', texthl = 'DiagnosticSignInfo' }
+      )
+      vim.fn.sign_define(
+        'DiagnosticSignHint',
+        { text = '', texthl = 'DiagnosticSignHint' }
+      )
+
+      -- end of junnplus/lsp-setup config
     end,
   },
 
@@ -317,6 +360,11 @@ return {
         else
           lsp_format_opt = 'fallback'
         end
+
+        -- Disable autoformat for files in a certain path
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname:match '/node_modules/' then return end
+
         return {
           timeout_ms = 500,
           lsp_format = lsp_format_opt,
@@ -326,6 +374,7 @@ return {
         lua = { 'stylua' },
         sh = { 'shfmt' },
         bash = { 'shfmt' },
+        php = { 'phpcbf' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -333,6 +382,10 @@ return {
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
       },
     },
+    init = function()
+      -- If you want the formatexpr, here is the place to set it
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
   },
   -- Automatically install formatters registered with conform.nvim via mason.nvim
   -- https://github.com/zapling/mason-conform.nvim

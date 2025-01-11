@@ -333,14 +333,6 @@ export ANTIDOTE_DIR="$DOTFILES/tools/antidote"
 export ANTIDOTE_HOME="$XDG_CACHE_HOME/antidote"
 export ANTIDOTE_PLUGINS="$XDG_CONFIG_HOME/zsh/antidote_plugins"
 
-# Antigen configuration
-# https://github.com/zsh-users/antigen/wiki/Configuration
-msg "Setting up Antigen configuration"
-export ADOTDIR="$XDG_DATA_HOME/antigen"
-export ANTIGEN_CACHE="$XDG_CACHE_HOME/antigen"
-export ANTIGEN_SYSTEM_RECEIPT_F=".local/share/antigen/antigen_system_lastupdate"
-export ANTIGEN_PLUGIN_RECEIPT_F=".local/share/antigen/antigen_plugin_lastupdate"
-
 # Ansible configuration
 # https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 msg "Setting up Ansible configuration"
@@ -476,6 +468,7 @@ export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
 # tmux
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
+export TMUX_TMPDIR="$XDG_STATE_HOME/tmux"
 export TMUX_PLUGINS="$XDG_CONFIG_HOME/tmux/plugins"
 export TMUX_CONF="$XDG_CONFIG_HOME/tmux/tmux.conf"
 ## These settings are for zsh-tmux

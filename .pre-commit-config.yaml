@@ -26,7 +26,7 @@ repos:
     rev: v0.43.0
     hooks:
       - id: markdownlint
-        args: [-c, .markdownlint.yaml, --fix]
+        args: [-c, .markdownlint.json, --fix]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
@@ -44,12 +44,12 @@ repos:
       - id: shfmt
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.5
+    rev: v1.7.6
     hooks:
       - id: actionlint
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.86.0
+    rev: 39.96.2
     hooks:
       - id: renovate-config-validator
 
