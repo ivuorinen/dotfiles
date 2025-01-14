@@ -169,4 +169,13 @@ K.nl('qQ', function()
   end
 end, 'Force quit without saving')
 
+-- ── Flash.nvim keymaps ──────────────────────────────────────────────
+local nxo = { 'n', 'x', 'o' }
+local fj = function() return require('flash').jump() end
+local ft = function() return require('flash').treesitter() end
+local fx = function() return require('flash').toggle() end
+K.d('zk', nxo, fj, { desc = 'Flash' })
+K.d('Zk', nxo, ft, { desc = 'Flash Treesitter' })
+K.d('<m-s>', 'c', fx, { desc = 'Toggle Flash Search' })
+
 -- That concludes the keymaps section of the config.
