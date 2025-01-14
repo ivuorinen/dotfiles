@@ -36,6 +36,9 @@ return {
     local t = require 'telescope'
     local a = require 'telescope.actions'
 
+    local open_with_trouble = require('trouble.sources.telescope').open
+    local add_to_trouble = require('trouble.sources.telescope').add
+
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     t.setup {
@@ -52,6 +55,12 @@ return {
             ['<C-j>'] = a.move_selection_next,
             ['<C-k>'] = a.move_selection_previous,
             ['<C-d>'] = a.move_selection_previous,
+            ['<C-t>'] = open_with_trouble,
+            ['<C-q>'] = add_to_trouble,
+          },
+          n = {
+            ['<C-t>'] = open_with_trouble,
+            ['<C-q>'] = add_to_trouble,
           },
         },
       },

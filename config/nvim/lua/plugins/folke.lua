@@ -50,6 +50,37 @@ return {
       auto_fold = true,
       auto_close = true,
       use_lsp_diagnostic_signs = true,
+      keys = {
+        j = 'next',
+        k = 'prev',
+      },
+      modes = {
+        diagnostics = {
+          auto_open = true,
+        },
+        test = {
+          mode = 'diagnostics',
+          preview = {
+            type = 'split',
+            relative = 'win',
+            position = 'right',
+            size = 0.3,
+          },
+        },
+        cascade = {
+          mode = 'diagnostics', -- inherit from diagnostics mode
+          filter = function(items)
+            local severity = vim.diagnostic.severity.HINT
+            for _, item in ipairs(items) do
+              severity = math.min(severity, item.severity)
+            end
+            return vim.tbl_filter(
+              function(item) return item.severity == severity end,
+              items
+            )
+          end,
+        },
+      },
     },
   },
 
