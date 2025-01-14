@@ -1,4 +1,4 @@
--- vim: set ft=lua ts=2 sw=2 tw=0 et cc=120 :
+-- vim: set ft=lua ts=2 sw=2 tw=0 et cc=130 :
 
 require 'utils'
 
@@ -54,6 +54,12 @@ K.nl('as', ':silent TestSuite<CR>', 'Test Suite')
 K.nl('al', ':silent TestLast<CR>', 'Test Last')
 K.nl('av', ':silent TestVisit<CR>', 'Test Visit')
 
+-- ── PHPActor Operations ─────────────────────────────────────────────
+K.nl('apm', ':PhpactorContextMenu<cr>', 'PHPactor: Context Menu')
+K.nl('apn', ':PhpactorClassNew<cr>', 'PHPactor: Class New')
+K.nl('aps', ':PhpactorClassSearch<cr>', 'PHPactor: Class Search')
+K.nl('apt', ':PhpactorTransform<cr>', 'PHPactor: Transform')
+
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
@@ -69,25 +75,26 @@ K.nl('bw', ':lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 -- Mappings for code and LSP operations like code actions, formatting, etc.
 -- Convention: All mappings start with 'c' followed by the operation
 -- unless it's a generic operation like signature help or hover
+
+local b = function() return require 'telescope.builtin' end
+local lws = function() return b().lsp_workspace_symbols() end
+local ldws = function() return b().lsp_dynamic_workspace_symbols() end
+
 K.n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature' })
-K.n('K', ':Lspsaga hover_doc<cr>', { desc = 'Hover Documentation' })
-K.ld('ca', 'n', ':Lspsaga code_action<cr>', 'Code Action')
-K.ld('cci', 'n', ':Lspsaga incoming_calls<cr>', 'Incoming Calls')
-K.ld('cco', 'n', ':Lspsaga outgoing_calls<cr>', 'Outgoing Calls')
-K.ld('cd', 'n', ':Lspsaga show_line_diagnostics<cr>', 'Line Diagnostics')
--- K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
+K.n('K', ':lua vim.lsp.buf.hover()<CR>', { desc = 'Hover Documentation' })
+K.ld('ca', 'n', ':lua vim.lsp.buf.code_action()<CR>', 'Code Action')
+K.ld('cci', 'n', function() b().lsp_incoming_calls() end, 'Incoming calls')
+K.ld('cco', 'n', function() b().lsp_outgoing_calls() end, 'Outgoing calls')
+K.ld('cd', 'n', function() b().lsp_definitions() end, 'Definitions')
+K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
 K.ld('cg', 'n', ':lua require("neogen").generate()<CR>', 'Generate annotations')
-K.ld('ci', 'n', ':Lspsaga implement<cr>', 'Implementations')
-K.ld('cl', 'n', ':Lspsaga show_cursor_diagnostics<cr>', 'Cursor Diagnostics')
-K.ld('cp', 'n', ':Lspsaga peek_definition<cr>', 'Peek Definition')
-K.ld('cr', 'n', ':Lspsaga rename<cr>', 'Rename')
-K.ld('cR', 'n', ':Lspsaga rename ++project<cr>', 'Rename Project wide')
+K.ld('ci', 'n', function() b().lsp_implementations() end, 'Implementations')
+K.ld('cp', 'n', function() b().lsp_type_definitions() end, 'Type Definition')
+K.ld('cr', 'n', vim.lsp.buf.rename, 'Rename')
 K.ld('cs', 'n', ':Telescope lsp_document_symbols<CR>', 'LSP Document Symbols')
-K.ld('ct', 'n', ':Lspsaga peek_type_definition<cr>', 'Peek Type Definition')
-K.ld('cT', 'n', ':Telescope lsp_type_definitions<CR>', 'LSP Type Definitions')
-K.ld('cu', 'n', ':Lspsaga preview_definition<cr>', 'Preview Definition')
-K.ld('cv', 'n', ':Lspsaga diagnostic_jump_prev<cr>', 'Diagnostic Jump Prev')
-K.ld('cw', 'n', ':Lspsaga diagnostic_jump_next<cr>', 'Diagnostic Jump Next')
+K.ld('ct', 'n', function() b().treesitter() end, 'treesitter')
+K.ld('cws', 'n', function() lws() end, 'Workspace Symbols')
+K.ld('cwd', 'n', function() ldws() end, 'Dynamic Workspace Symbols')
 
 -- ── CommentBox operations ───────────────────────────────────────────
 -- Mappings for creating and managing comment boxes
@@ -102,25 +109,23 @@ K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 -- Mappings for Telescope operations like finding files, buffers, etc.
 -- Convention: All mappings start with 's' followed by the operation
 -- unless it's a generic operation like searching or finding buffers
+
+local fuzzy_search = function()
+  require('telescope.builtin').find_files(
+    require('telescope.themes').get_dropdown {
+      winblend = 20,
+      previewer = true,
+    }
+  )
+end
+
+local lazy_plugins = function()
+  return require('telescope').extensions.lazy_plugins.lazy_plugins()
+end
+
 K.nl('f', ':Telescope fd --hidden=true<cr>', 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
-K.nl(
-  '/',
-  function()
-    require('telescope.builtin').current_buffer_fuzzy_find(
-      require('telescope.themes').get_dropdown {
-        winblend = 20,
-        previewer = true,
-      }
-    )
-  end,
-  'Fuzzily search in current buffer'
-)
-
-K.nl('pm', ':PhpactorContextMenu<cr>', 'PHPactor: Context Menu')
-K.nl('pn', ':PhpactorClassNew<cr>', 'PHPactor: Class New')
-K.nl('ps', ':PhpactorClassSearch<cr>', 'PHPactor: Class Search')
-K.nl('pt', ':PhpactorTransform<cr>', 'PHPactor: Transform')
+K.nl('/', function() fuzzy_search() end, 'Fuzzily search in current buffer')
 
 K.nl('sc', ':Telescope commands<cr>', 'Commands')
 K.nl('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
@@ -129,11 +134,7 @@ K.nl('sh', ':Telescope help_tags<cr>', 'Help tags')
 K.nl('sk', ':Telescope keymaps<cr>', 'Search Keymaps')
 K.nl('sl', ':Telescope luasnip<CR>', 'Search LuaSnip')
 K.nl('so', ':Telescope oldfiles<CR>', 'Old Files')
-K.nl(
-  'sp',
-  ':lua require("telescope").extensions.lazy_plugins.lazy_plugins()<cr>',
-  'Lazy Plugins'
-)
+K.nl('sp', function() lazy_plugins() end, 'Lazy Plugins')
 K.nl('sq', ':Telescope quickfix<cr>', 'Quickfix')
 K.nl('ss', ':Telescope treesitter<cr>', 'Treesitter')
 K.nl('sw', ':Telescope grep_string<cr>', 'Grep String')
@@ -141,7 +142,7 @@ K.nl('sx', ':Telescope import<cr>', 'Telescope: Import')
 
 -- ── Trouble operations ──────────────────────────────────────────────
 -- Convention is 'x' followed by the operation
-K.nl('xd', ':Trouble document_diagnostics<cr>', 'Document Diagnostics')
+K.nl('xd', ':Trouble diagnostics<cr>', 'Document Diagnostics')
 K.nl('xl', ':Trouble loclist<cr>', 'Location List')
 K.nl('xq', ':Trouble quickfix<cr>', 'Quickfix')
 K.nl('xw', ':Trouble workspace_diagnostics<cr>', 'Workspace Diagnostics')
