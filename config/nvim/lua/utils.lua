@@ -1,6 +1,11 @@
 -- These are my utility functions
 -- I use to make my life bit easier
 
+local function file_exists(name)
+  if type(name) ~= 'string' then return false end
+  return os.rename(name, name) and true or false
+end
+
 -- ╭─────────────────────────────────────────────────────────╮
 -- │            Function shortcuts for keymap set            │
 -- ╰─────────────────────────────────────────────────────────╯
@@ -88,8 +93,11 @@ function ToggleBackground() vim.o.bg = vim.o.bg == 'light' and 'dark' or 'light'
 -- Get the license key for intelephense
 ---@return string|nil -- The license key for intelephense
 function GetIntelephenseLicense()
-  local f =
-    assert(io.open(os.getenv 'HOME' .. '/intelephense/license.txt', 'rb'))
+  local p = os.getenv 'HOME' .. '/intelephense/license.txt'
+
+  if not file_exists(p) then return nil end
+
+  local f = assert(io.open(p, 'rb'))
   local content = f:read '*a'
   f:close()
   return string.gsub(content, '%s+', '')[1] or nil
