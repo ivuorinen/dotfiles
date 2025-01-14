@@ -302,30 +302,39 @@ return {
       }
 
       -- Diagnostic configuration
-      vim.diagnostic.config {
-        virtual_text = false,
-        float = {
-          source = true,
-        },
+      local signs = {
+        { name = 'DiagnosticSignError', text = '' }, -- Error icon
+        { name = 'DiagnosticSignWarn', text = '' }, -- Warning icon
+        { name = 'DiagnosticSignHint', text = '' }, -- Hint icon
+        { name = 'DiagnosticSignInfo', text = '' }, -- Information icon
       }
 
-      -- Sign configuration
-      vim.fn.sign_define(
-        'DiagnosticSignError',
-        { text = '', texthl = 'DiagnosticSignError' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignWarn',
-        { text = '', texthl = 'DiagnosticSignWarn' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignInfo',
-        { text = '', texthl = 'DiagnosticSignInfo' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignHint',
-        { text = '', texthl = 'DiagnosticSignHint' }
-      )
+      local function ensure_sign_defined(name, sign_opts)
+        if vim.tbl_isempty(vim.fn.sign_getdefined(name)) then
+          vim.fn.sign_define(name, sign_opts)
+        end
+      end
+
+      for _, sign in ipairs(signs) do
+        ensure_sign_defined(sign.name, {
+          text = sign.text,
+          texthl = sign.texthl or sign.name,
+          numhl = sign.numhl or sign.name,
+        })
+      end
+
+      ---@type vim.diagnostic.Opts
+      local diagnostics_config = {
+        signs = {
+          active = signs, -- show signs
+        },
+        update_in_insert = false,
+        underline = true,
+        severity_sort = true,
+        virtual_text = true,
+      }
+
+      vim.diagnostic.config(diagnostics_config)
 
       -- end of junnplus/lsp-setup config
     end,
