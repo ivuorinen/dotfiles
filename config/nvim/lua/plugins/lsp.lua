@@ -2,6 +2,8 @@
 -- │               LSP Setup and configuration               │
 -- ╰─────────────────────────────────────────────────────────╯
 
+require 'utils'
+
 -- LSP Servers are installed and configured by lsp-setup.nvim
 -- Mason formatters Conform uses to format files
 -- These are automatically configured by zapling/mason-conform.nvim
@@ -27,12 +29,8 @@ local lsp_servers = {
   },
   html = {},
   intelephense = {
-    commands = {
-      IntelephenseIndex = {
-        function()
-          vim.lsp.buf.execute_command { command = 'intelephense.index.workspace' }
-        end,
-      },
+    init_options = {
+      licenceKey = GetIntelephenseLicense(),
     },
   },
   jsonls = {},
