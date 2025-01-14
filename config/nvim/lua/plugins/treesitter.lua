@@ -12,7 +12,6 @@ return {
     'nvim-treesitter/nvim-treesitter-context',
     'JoosepAlviste/nvim-ts-context-commentstring',
   },
-  ---@type TSConfig
   opts = {
     auto_install = true, -- Auto install the parser generators
     sync_install = false, -- Sync install the parser generators, install async

@@ -50,7 +50,6 @@ return {
       },
     },
     ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
     opts = {
       snippets = { preset = 'luasnip' },
       -- 'default' for mappings similar to built-in completion

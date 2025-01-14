@@ -5,7 +5,6 @@ return {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
-    ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
       gitbrowse = { enabled = true },
@@ -44,8 +43,8 @@ return {
   {
     'folke/trouble.nvim',
     lazy = false,
+    cmd = 'Trouble',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    ---@type trouble.Config
     opts = {
       auto_preview = true,
       auto_fold = true,
@@ -53,13 +52,13 @@ return {
       use_lsp_diagnostic_signs = true,
     },
   },
+
   -- Navigate your code with search labels, enhanced
   -- character motions and Treesitter integration
   -- https://github.com/folke/flash.nvim
   {
     'folke/flash.nvim',
     event = 'VeryLazy',
-    ---@type Flash.Config
     opts = {},
     keys = {
       {
