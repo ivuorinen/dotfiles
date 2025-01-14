@@ -106,10 +106,13 @@ alias wget='wget --hsts-file=$XDG_DATA_HOME/wget-hsts'
 # Configures svn to use correct config directory
 alias svn='svn --config-dir $XDG_CONFIG_HOME/subversion'
 
-if [[ $(uname) == 'Darwin' ]]; then
+# Laravel artisan shortcut
+alias art='[ -f artisan ] && php artisan || php vendor/bin/artisan'
 
-  # Laravel Sail shortcut
-  alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+# Laravel Sail shortcut
+alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+
+if [[ $(uname) == 'Darwin' ]]; then
 
   # Flush Directory Service cache
   alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
