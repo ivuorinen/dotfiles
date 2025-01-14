@@ -7,7 +7,6 @@ require 'utils'
 -- LSP Servers are installed and configured by lsp-setup.nvim
 -- Mason formatters Conform uses to format files
 -- These are automatically configured by zapling/mason-conform.nvim
-
 local lsp_servers = {
   bashls = {},
   -- csharp_ls = {},
@@ -111,6 +110,28 @@ local lsp_servers = {
   },
 }
 
+-- Mason tools to automatically install and configure.
+-- These are automatically configured by WhoIsSethDaniel/mason-tool-installer.nvim
+local mason_tools = {
+  'actionlint',
+  'editorconfig-checker',
+  'goimports',
+  'gotests',
+  'phpcbf',
+  'phpmd',
+  'phpstan',
+  'pint',
+  'prettierd',
+  'semgrep',
+  'shellcheck',
+  'shfmt',
+  'staticcheck',
+  'stylua',
+  'trivy',
+  'vint',
+  'yamlfmt',
+}
+
 return {
   -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
   -- used for completion, annotations and signatures of Neovim apis
@@ -199,25 +220,7 @@ return {
         opts = {
           auto_install = true,
           auto_update = true,
-          ensure_installed = {
-            'actionlint',
-            'editorconfig-checker',
-            'goimports',
-            'gotests',
-            'phpcbf',
-            'phpmd',
-            'phpstan',
-            'pint',
-            'prettierd',
-            'semgrep',
-            'shellcheck',
-            'shfmt',
-            'staticcheck',
-            'stylua',
-            'trivy',
-            'vint',
-            'yamlfmt',
-          },
+          ensure_installed = mason_tools,
         },
       },
 
