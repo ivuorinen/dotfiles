@@ -12,8 +12,19 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 
+# Get git repository root path
+get_git_root()
+{
+  # check that we are in a git repository
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    git rev-parse --show-toplevel
+  else
+    >&2 msgr err "Not in a git repository"
+  fi
+}
+
 # cd to git root directory
-alias cdgr='cd "$(git root)"'
+alias cdgr='cd "$(get_git_root)"'
 
 # interesting folders, and shortcuts
 alias .='cd $HOME'
