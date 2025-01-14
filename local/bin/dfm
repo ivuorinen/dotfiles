@@ -4,6 +4,7 @@
 # (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022
 # Licensed under MIT, see LICENSE
 #
+# vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 #
 # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
@@ -18,8 +19,7 @@ SCRIPT=$(basename "$0")
 source "$DOTFILES/config/shared.sh"
 source "${DOTFILES}/local/bin/msgr"
 
-# -- Menu builder -- #
-
+# Menu builder
 menu_builder()
 {
   local title=$1
@@ -34,54 +34,6 @@ menu_builder()
     local name=${cmd%%:*}
     local desc=${cmd#*:}
     printf "  %-20s %s\n" "$name" "$desc"
-  done
-  # printf "\n"
-}
-
-menu_section()
-{
-  LINE=$(printf '%-18s [ %-15s ]\n' "$1" "$2")
-  echo -e " $(__log_marker) $LINE"
-}
-menu_item()
-{
-  LINE=$(printf '%-15s %-30s\n' "$1" "$2")
-  echo -e "$(__log_indent)$(__log_marker) $LINE"
-}
-
-# Takes a bash array ("cow:moo", "dinosaur:roar") and loops
-# through the keys to build menu section listing.
-menu_usage_header()
-{
-  MENU_CMD="$1"
-  shift
-  MENU_ARRAY=("$@")
-
-  KEYS=""
-  for item in "${MENU_ARRAY[@]}"; do
-    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
-    KEYS+="${CMD} | "
-  done
-
-  # "???" removes 3 last characters, being " | " from the end
-  menu_section "$MENU_CMD" "${KEYS%???}"
-}
-
-# Takes the usage command "$0 dotfiles" and a
-# bash array ("cow:moo" "dinosaur:roar") and loops
-# through in building a menu for dfm command usage listing.
-menu_usage()
-{
-  MENU_CMD="$1"
-  shift
-  MENU_ARRAY=("$@")
-
-  msg "$MENU_CMD"
-
-  for item in "${MENU_ARRAY[@]}"; do
-    CMD=$(echo "${item}" | awk -F ":" '{print $1}')
-    DESC=$(echo "${item}" | awk -F ":" '{print $2}')
-    menu_item "$CMD" "$DESC"
   done
 }
 
@@ -480,7 +432,7 @@ section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
   MENU=(
-    "aliases:<shell> (bash, zsh) Show aliases for bash or zsh"
+    "aliases:<shell> (bash, zsh) Show aliases"
     "colors:Show colors"
     "env:Show environment variables"
     "functions:Show functions"
