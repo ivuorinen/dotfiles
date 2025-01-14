@@ -1,0 +1,226 @@
+#!/bin/bash
+#
+# List environment variables grouped by the first part before underscore
+# protecting environment variables that possibly contain sensitive information.
+#
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2025
+# License: MIT
+#
+# vim: ft=bash fileencoding=utf-8 sw=2 ts=2 sts=2 et tw=100
+
+# X_ENV_GROUPING is a file that contains custom groupings for environment variables.
+# The file should contain lines in the format "KEY:GROUP". One line per key.
+: "${X_ENV_GROUPING:=${XDG_CONFIG_HOME:-$HOME/.config}/zsh/env_list_grouping.yaml}"
+
+# Define protected keywords. Values of these keys are displayed as [protected value].
+# The keys are case-insensitive and are matched as substrings.
+PROTECTED_KEYS=("*TOKEN*" "*SECRET*" "DIRENV_DIFF" "DIRENV_WATCHES" "PATH" "FPATH")
+
+# Default grouping is based on the first part before underscore, but can be overridden
+# either by custom grouping file or by the get_custom_group function.
+# The following grouping is used by default and for example groups Golang environment variables
+# under the "GO" group. The keys BASH, COMMAND, FPATH, etc. are grouped under the "SHELL" group.
+DEFINED_GROUPS=(
+  "AUTOSWITCH_VIRTUAL_ENV_DIR=PYTHON"
+  "BASH=SHELL"
+  "COMMAND=SHELL"
+  "COMPLETION=SHELL"
+  "DISABLE_LS_COLORS=SHELL"
+  "FPATH=SHELL"
+  "GOBIN=GO"
+  "GOPATH=GO"
+  "GOROOT=GO"
+  "GREP=SHELL"
+  "HIST=SHELL"
+  "HISTCONTROL=SHELL"
+  "HISTFILE=SHELL"
+  "HISTIGNORE=SHELL"
+  "HISTORY=SHELL"
+  "HISTSIZE=SHELL"
+  "HOME=SHELL"
+  "INFOPATH=SHELL"
+  "LESS=SHELL"
+  "LESSHISTFILE=SHELL"
+  "LOGNAME=SHELL"
+  "MANPAGER=SHELL"
+  "PAGER=SHELL"
+  "PATH=SHELL"
+  "PWD=SHELL"
+  "PYENV_ROOT=PYTHON"
+  "PYENV_SHELL=PYTHON"
+  "PYTHONPATH=PYTHON"
+  "RUSTUP_HOME=RUST"
+  "RUST_WITHOUT=RUST"
+  "SHELL=SHELL"
+  "TMPDIR=SHELL"
+  "USER=SHELL"
+  "WORKON_HOME=PYTHON"
+  "ZSH=ZSH"
+  "_=SHELL"
+  "npm_config_cache=NPM"
+)
+
+CONFIG_FILE="$X_ENV_GROUPING"
+
+# If we have configuration file, run extra checks so we can process it.
+if [[ -f "$CONFIG_FILE" ]]; then
+
+  # Check if yq is installed
+  if ! command -v yq &> /dev/null; then
+    echo "Error: yq is not installed. Please install it to proceed." >&2
+    exit 1
+  fi
+
+  # Validate the YAML file
+  if ! yq '.' "$CONFIG_FILE" &> /dev/null; then
+    echo "Error: Invalid YAML structure in '$CONFIG_FILE'." >&2
+    exit 1
+  fi
+
+  # Check if required keys exist in the YAML structure
+  if ! yq '.custom_grouping, .protected_keys' "$CONFIG_FILE" &> /dev/null; then
+    echo "Error: Missing required keys ('custom_grouping' or 'protected_keys') in '$CONFIG_FILE'." >&2
+    exit 1
+  fi
+
+  # If X_ENV_GROUPING is set, it will be used as the file path for custom grouping, and
+  # protected keys will be read from the file. The values in the file will be appended to the
+  # processing algorithm.
+
+  CUSTOM_KEYS=$(yq '.protected_keys[]' "$CONFIG_FILE")
+  while IFS= read -r key; do
+    # Add to default_protected_keys
+    PROTECTED_KEYS+=("$key")
+  done <<< "$CUSTOM_KEYS"
+
+  CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
+  while IFS= read -r group; do
+    group_name=$(echo "$group" | yq 'keys[0]')
+    GROUP_KEYS=$(yq ".custom_grouping[] | .[\"$group_name\"][]" "$CONFIG_FILE")
+    while IFS= read -r key; do
+      # Add to default_custom_grouping in "GROUP=KEY" format
+      DEFINED_GROUPS+=("$group_name=$key")
+    done <<< "$GROUP_KEYS"
+  done <<< "$CUSTOM_GROUPS"
+fi
+
+if [[ -f "$X_ENV_GROUPING" ]]; then
+  while IFS=':' read -r key group; do
+    DEFINED_GROUPS+=("$key=$group")
+  done < "$X_ENV_GROUPING"
+fi
+
+# Check if the key is in the protected keywords list
+is_protected()
+{
+  local key=$1
+  for protected_key in "${PROTECTED_KEYS[@]}"; do
+    # Direct match
+    if [[ "$key" == "$protected_key" ]]; then
+      return 0
+    fi
+    # Wildcard match (protected_key contains '*')
+    if [[ "$protected_key" == *"*"* ]] && [[ "$key" == $protected_key ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Custom function to determine a custom group.
+#
+# If custom grouping file was found and was read,
+# the default grouping was already overridden.
+get_custom_group()
+{
+  local key=$1
+  for entry in "${DEFINED_GROUPS[@]}"; do
+    local mapping_key=${entry%%=*}
+    local mapping_group=${entry#*=}
+    if [[ $key == "$mapping_key" ]]; then
+      echo "$mapping_group"
+      return 0
+    fi
+  done
+  # Automatically create TOKENS group if the key contains "TOKEN".
+  if [[ $key == *TOKEN* ]]; then
+    echo "TOKENS"
+    return 0
+  fi
+  return 1
+}
+
+# Create arrays to store all groups, group data and max lengths for each group
+all_groups=()
+group_data=()
+group_max_lengths=()
+
+# Get environment variables and group them
+while IFS='=' read -r key value; do
+  # Check for custom group
+  group=$(get_custom_group "$key")
+
+  # If there is no custom group, use the default algorithm:
+  # 1) First part before underscore is used as the group name.
+  # 2) If the key starts with an underscore, the group is determined by the second part.
+  # 3) If the key does not contain an underscore, the group is the key itself.
+  if [[ -z $group ]]; then
+    if [[ $key == _* ]]; then
+      group="${key#_}"
+      group="${group%%_*}"
+      [[ -z $group ]] && group="Ungrouped"
+    else
+      group="${key%%_*}"
+      [[ -z $group ]] && group="Ungrouped"
+    fi
+  fi
+
+  # Hide values of protected keys
+  if is_protected "$key"; then
+    value="[protected value]"
+  fi
+
+  # Update group data
+  if [[ ! " ${all_groups[*]} " =~ " $group " ]]; then
+    all_groups+=("$group")
+  fi
+
+  group_data+=("$group|$key|$value")
+
+  key_length=${#key}
+  for i in "${!all_groups[@]}"; do
+    if [[ ${all_groups[$i]} == "$group" ]]; then
+      if [[ ${group_max_lengths[$i]:-0} -lt $key_length ]]; then
+        group_max_lengths[i]=$key_length
+      fi
+      break
+    fi
+  done
+
+done < <(env | sort | awk -F'=' '{print $1"="$2}')
+
+# Print groups in order, "Ungrouped" last
+sorted_groups=()
+while IFS= read -r line; do
+  sorted_groups+=("$line")
+done < <(printf "%s\n" "${all_groups[@]}" | grep -v "^Ungrouped$" | sort)
+sorted_groups+=("Ungrouped")
+
+for group in "${sorted_groups[@]}"; do
+  echo -e "\n# $group"
+
+  for i in "${!all_groups[@]}"; do
+    if [[ ${all_groups[$i]} == "$group" ]]; then
+      max_length=${group_max_lengths[$i]}
+      break
+    fi
+  done
+
+  for entry in "${group_data[@]}"; do
+    IFS='|' read -r g k v <<< "$entry"
+    if [[ $g == "$group" ]]; then
+      printf "%-*s = %s\n" "$max_length" "$k" "$v"
+    fi
+  done
+
+done
