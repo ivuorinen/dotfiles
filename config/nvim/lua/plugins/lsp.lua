@@ -2,10 +2,11 @@
 -- │               LSP Setup and configuration               │
 -- ╰─────────────────────────────────────────────────────────╯
 
+require 'utils'
+
 -- LSP Servers are installed and configured by lsp-setup.nvim
 -- Mason formatters Conform uses to format files
 -- These are automatically configured by zapling/mason-conform.nvim
-
 local lsp_servers = {
   bashls = {},
   -- csharp_ls = {},
@@ -27,12 +28,8 @@ local lsp_servers = {
   },
   html = {},
   intelephense = {
-    commands = {
-      IntelephenseIndex = {
-        function()
-          vim.lsp.buf.execute_command { command = 'intelephense.index.workspace' }
-        end,
-      },
+    init_options = {
+      licenceKey = GetIntelephenseLicense(),
     },
   },
   jsonls = {},
@@ -113,6 +110,28 @@ local lsp_servers = {
   },
 }
 
+-- Mason tools to automatically install and configure.
+-- These are automatically configured by WhoIsSethDaniel/mason-tool-installer.nvim
+local mason_tools = {
+  'actionlint',
+  'editorconfig-checker',
+  'goimports',
+  'gotests',
+  'phpcbf',
+  'phpmd',
+  'phpstan',
+  'pint',
+  'prettierd',
+  'semgrep',
+  'shellcheck',
+  'shfmt',
+  'staticcheck',
+  'stylua',
+  'trivy',
+  'vint',
+  'yamlfmt',
+}
+
 return {
   -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
   -- used for completion, annotations and signatures of Neovim apis
@@ -134,31 +153,6 @@ return {
   -- Meta type definitions for the Lua platform Luvit.
   -- https://github.com/Bilal2453/luvit-meta
   { 'Bilal2453/luvit-meta', lazy = true },
-
-  -- improve neovim lsp experience
-  -- https://github.com/nvimdev/lspsaga.nvim
-  -- https://nvimdev.github.io/lspsaga/
-  {
-    'nvimdev/lspsaga.nvim',
-    event = 'LspAttach',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-      'nvim-tree/nvim-web-devicons',
-    },
-    opts = {
-      code_action = {
-        show_server_name = true,
-        keys = {
-          quit = { 'q', '<ESC>' },
-        },
-      },
-      diagnostic = {
-        keys = {
-          quit = { 'q', '<ESC>' },
-        },
-      },
-    },
-  },
 
   -- A simple wrapper for nvim-lspconfig and mason-lspconfig
   -- to easily setup LSP servers.
@@ -201,25 +195,7 @@ return {
         opts = {
           auto_install = true,
           auto_update = true,
-          ensure_installed = {
-            'actionlint',
-            'editorconfig-checker',
-            'goimports',
-            'gotests',
-            'phpcbf',
-            'phpmd',
-            'phpstan',
-            'pint',
-            'prettierd',
-            'semgrep',
-            'shellcheck',
-            'shfmt',
-            'staticcheck',
-            'stylua',
-            'trivy',
-            'vint',
-            'yamlfmt',
-          },
+          ensure_installed = mason_tools,
         },
       },
 
@@ -301,30 +277,39 @@ return {
       }
 
       -- Diagnostic configuration
-      vim.diagnostic.config {
-        virtual_text = false,
-        float = {
-          source = true,
-        },
+      local signs = {
+        { name = 'DiagnosticSignError', text = '' }, -- Error icon
+        { name = 'DiagnosticSignWarn', text = '' }, -- Warning icon
+        { name = 'DiagnosticSignHint', text = '' }, -- Hint icon
+        { name = 'DiagnosticSignInfo', text = '' }, -- Information icon
       }
 
-      -- Sign configuration
-      vim.fn.sign_define(
-        'DiagnosticSignError',
-        { text = '', texthl = 'DiagnosticSignError' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignWarn',
-        { text = '', texthl = 'DiagnosticSignWarn' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignInfo',
-        { text = '', texthl = 'DiagnosticSignInfo' }
-      )
-      vim.fn.sign_define(
-        'DiagnosticSignHint',
-        { text = '', texthl = 'DiagnosticSignHint' }
-      )
+      local function ensure_sign_defined(name, sign_opts)
+        if vim.tbl_isempty(vim.fn.sign_getdefined(name)) then
+          vim.fn.sign_define(name, sign_opts)
+        end
+      end
+
+      for _, sign in ipairs(signs) do
+        ensure_sign_defined(sign.name, {
+          text = sign.text,
+          texthl = sign.texthl or sign.name,
+          numhl = sign.numhl or sign.name,
+        })
+      end
+
+      ---@type vim.diagnostic.Opts
+      local diagnostics_config = {
+        signs = {
+          active = signs, -- show signs
+        },
+        update_in_insert = false,
+        underline = true,
+        severity_sort = true,
+        virtual_text = true,
+      }
+
+      vim.diagnostic.config(diagnostics_config)
 
       -- end of junnplus/lsp-setup config
     end,

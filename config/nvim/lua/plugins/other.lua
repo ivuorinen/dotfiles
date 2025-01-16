@@ -3,8 +3,6 @@ return {
     'rmagatti/auto-session',
     lazy = false,
     version = '*',
-    ---@module "auto-session"
-    ---@type AutoSession.Config
     opts = {
       suppressed_dirs = {
         '/',

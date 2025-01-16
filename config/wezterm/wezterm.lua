@@ -4,18 +4,19 @@ local config = wezterm.config_builder()
 -- Font and font size
 config.font_size = 14.0
 config.font = wezterm.font_with_fallback {
-  'JetBrainsMonoNL Nerd Font Mono',
+  'JetBrainsMonoNL NFM Light',
   'JetBrains Mono',
-  'Noto Color Emoji',
   'Symbols Nerd Font Mono',
 }
+config.harfbuzz_features = { 'zero', 'ss01', 'cv05' }
 
 -- Make the window a bit transparent
-config.window_background_opacity = 0.97
+config.window_background_opacity = 0.98
 
 -- Don't show tab bar
 config.enable_tab_bar = false
 
+-- Fix alt on macOS
 config.send_composed_key_when_left_alt_is_pressed = true
 
 -- Function to detect the theme based on appearance

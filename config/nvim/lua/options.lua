@@ -7,6 +7,7 @@
 
 local g = vim.g -- A table to store global variables
 local o = vim.opt -- A table to store global options
+local a = vim.api -- A table to store API functions
 
 -- vim.global
 g.mapleader = ' ' -- Space as the leader key
@@ -27,6 +28,8 @@ g.loaded_java_provider = 0 -- Disable java provider
 o.confirm = true -- Confirm before closing unsaved buffers
 o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
+o.list = true -- Show invisible characters
+o.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 o.number = true -- Show line numbers
 o.numberwidth = 3 -- Set the width of the number column
 o.relativenumber = true -- Show relative line numbers
@@ -40,20 +43,24 @@ o.splitright = true -- vsplit to the right
 o.termguicolors = true -- Enable GUI colors
 o.timeoutlen = 250 -- Decrease mapped sequence wait time
 o.updatetime = 250 -- 250 ms = 2,5 seconds
-o.sessionoptions =
-  'buffers,curdir,folds,tabpages,winsize,winpos,terminal,localoptions'
+
+-- Session options
+-- This is a comma separated list of options that will be
+-- saved when a session ends.
+local so = 'buffers,curdir,folds,tabpages,winsize,winpos,terminal,localoptions'
+o.sessionoptions = so
 
 o.wildmode = 'longest:full,full' -- Command-line completion mode
 
 -- Enable the colorcolumn
-vim.api.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
+a.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  See `:help 'clipboard'`
 vim.schedule(function()
   local c = vim.env.SSH_TTY and '' or 'unnamedplus'
-  vim.opt.clipboard = c
+  o.clipboard = c
 end)
 
 -- vim: ts=2 sts=2 sw=2 et

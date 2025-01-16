@@ -5,15 +5,9 @@ return {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
-    ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
       gitbrowse = { enabled = true },
-      notifier = {
-        enabled = true,
-        timeout = 3000,
-      },
-      notify = { enabled = true },
       quickfile = { enabled = true },
       statuscolumn = {
         enabled = true,
@@ -37,6 +31,86 @@ return {
       },
     },
   },
+
+  -- Highly experimental plugin that completely
+  -- replaces the UI for messages, cmdline and the popupmenu.
+  -- https://github.com/folke/noice.nvim
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      lsp = {
+        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+        override = {
+          ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+          ['vim.lsp.util.stylize_markdown'] = true,
+          ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+        },
+      },
+      -- you can enable a preset for easier configuration
+      presets = {
+        bottom_search = true, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      },
+      routes = {
+        {
+          filter = {
+            event = 'msg_show',
+            kind = '',
+            find = 'written',
+          },
+          opts = { skip = true },
+        },
+        {
+          filter = {
+            event = 'msg_show',
+            any = {
+              { find = '%d+L, %d+B' },
+              { find = '; after #%d+' },
+              { find = '; before #%d+' },
+              { find = "' added to" },
+            },
+          },
+          view = 'mini',
+        },
+        {
+          filter = {
+            event = 'lsp',
+            kind = 'progress',
+            cond = function(message)
+              local client = vim.tbl_get(message.opts, 'progress', 'client')
+              return client == 'lua_ls'
+            end,
+          },
+          opts = { skip = true },
+        },
+      },
+      views = {
+        cmdline_popup = {
+          border = {
+            style = 'none',
+            padding = { 1, 2 },
+          },
+          filter_options = {},
+          win_options = {
+            winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder',
+          },
+        },
+      },
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      'rcarriga/nvim-notify',
+    },
+  },
+
   -- A pretty diagnostics, references, telescope results,
   -- quickfix and location list to help you solve all the
   -- trouble your code is causing.
@@ -44,42 +118,53 @@ return {
   {
     'folke/trouble.nvim',
     lazy = false,
+    cmd = 'Trouble',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    ---@type trouble.Config
     opts = {
       auto_preview = true,
       auto_fold = true,
       auto_close = true,
       use_lsp_diagnostic_signs = true,
+      keys = {
+        j = 'next',
+        k = 'prev',
+      },
+      modes = {
+        diagnostics = {
+          auto_open = true,
+        },
+        test = {
+          mode = 'diagnostics',
+          preview = {
+            type = 'split',
+            relative = 'win',
+            position = 'right',
+            size = 0.3,
+          },
+        },
+        cascade = {
+          mode = 'diagnostics', -- inherit from diagnostics mode
+          filter = function(items)
+            local severity = vim.diagnostic.severity.HINT
+            for _, item in ipairs(items) do
+              severity = math.min(severity, item.severity)
+            end
+            return vim.tbl_filter(
+              function(item) return item.severity == severity end,
+              items
+            )
+          end,
+        },
+      },
     },
   },
+
   -- Navigate your code with search labels, enhanced
   -- character motions and Treesitter integration
   -- https://github.com/folke/flash.nvim
   {
     'folke/flash.nvim',
     event = 'VeryLazy',
-    ---@type Flash.Config
     opts = {},
-    keys = {
-      {
-        'zk',
-        mode = { 'n', 'x', 'o' },
-        function() require('flash').jump() end,
-        desc = 'Flash',
-      },
-      {
-        'Zk',
-        mode = { 'n', 'x', 'o' },
-        function() require('flash').treesitter() end,
-        desc = 'Flash Treesitter',
-      },
-      {
-        '<m-s>',
-        mode = { 'c' },
-        function() require('flash').toggle() end,
-        desc = 'Toggle Flash Search',
-      },
-    },
   },
 }

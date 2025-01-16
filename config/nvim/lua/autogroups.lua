@@ -104,4 +104,8 @@ autocmd({ 'BufRead', 'BufNewFile' }, {
   command = 'set filetype=sshconfig',
 })
 
+autocmd('QuickFixCmdPost', {
+  callback = function() vim.cmd [[Trouble qflist open]] end,
+})
+
 -- vim: ts=2 sts=2 sw=2 et

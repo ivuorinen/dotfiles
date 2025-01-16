@@ -82,6 +82,7 @@ return {
           miniclue.gen_clues.registers(),
           miniclue.gen_clues.windows(),
           miniclue.gen_clues.z(),
+          { mode = 'n', keys = '<Leader>a', desc = '+Automation' },
           { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
           { mode = 'n', keys = '<Leader>c', desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
