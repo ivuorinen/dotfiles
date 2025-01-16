@@ -21,7 +21,26 @@ get_directories()
 {
   local dirs=''
   dirs+='# Directories\n'
-  dirs+=$(find "$T_ROOT" -maxdepth 2 -mindepth 1 -type d ! -name '.git' ! -name '.svn')
+  dirs+=$(
+    find "$T_ROOT" \
+      -maxdepth 3 \
+      -mindepth 1 \
+      -type d \
+      -not -path '*/dist/*' \
+      -not -path '*/dist' \
+      -not -path '*/node_modules/*' \
+      -not -path '*/node_modules' \
+      -not -path '*/vendor/*' \
+      -not -path '*/vendor' \
+      -not -path '*/.idea/*' \
+      -not -path '*/.idea' \
+      -not -path '*/.vscode/*' \
+      -not -path '*/.vscode' \
+      -not -path '*/.git/*' \
+      -not -path '*/.git' \
+      -not -path '*/.svn/*' \
+      -not -path '*/.svn'
+  )
   dirs+="$(printf "\n%s" "$DOTFILES")"
 
   echo "$dirs"
@@ -56,9 +75,9 @@ items=''
 if [[ $# -eq 1 ]]; then
   selected="$1"
 else
-  items+=$(get_sessions)
+  items+=$(get_sessions | sort)
   items+='\n'
-  items+=$(get_directories)
+  items+=$(get_directories | sort)
 
   selected=$(echo -e "$items" | fzf) || exit 0 # Exit if no selection is made
 fi
@@ -77,7 +96,11 @@ session_name=$(basename "$selected")
 session_name="${session_name//./}"
 
 # Try to switch to the tmux session
-if tmux switch-client -t "=$session_name" 2> /dev/null; then
+tmux switch-client -t "=$session_name"
+
+active_session=$(tmux display-message -p -F '#{session_name}' 2> /dev/null)
+# echo "active session: $active_session"
+if [ -n "$active_session" ] && [ "$active_session" == "$session_name" ]; then
   exit 0
 fi
 
