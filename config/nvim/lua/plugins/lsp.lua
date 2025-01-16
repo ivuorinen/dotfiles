@@ -42,12 +42,6 @@ local lsp_servers = {
         diagnostics = {
           globals = {
             'vim',
-            -- busted
-            'describe',
-            'it',
-            'before_each',
-            'after_each',
-            'assert',
           },
           disable = {
             -- Ignore lua_ls noisy `missing-fields` warnings
@@ -55,7 +49,7 @@ local lsp_servers = {
           },
         },
         hint = {
-          enable = false,
+          enable = true,
           arrayIndex = 'Auto',
           await = true,
           paramName = 'All',
