@@ -1,3 +1,5 @@
+# vim: ft=sshconfig
+
 Host t1
   User ubuntu
   HostName t1.home.antiprocess.net
@@ -14,4 +16,3 @@ Host t4
   User ubuntu
   HostName t4.home.antiprocess.net
   IdentityFile ~/.ssh/id_rsa
-
