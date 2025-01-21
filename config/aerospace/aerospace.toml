@@ -56,6 +56,10 @@ if.app-id = 'org.ferdium.ferdium-app' # Ferdium, has WhatsApp etc.
 run = ['layout floating']
 
 [[on-window-detected]]
+if.app-id = 'com.jetbrains.PhpStorm' # PhpStorm
+run = ['layout floating']
+
+[[on-window-detected]]
 if.app-id = 'com.apple.finder' # Finder
 run = ['layout floating']
 
