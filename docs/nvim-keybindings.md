@@ -54,7 +54,7 @@ n  <Space>xq   * :Trouble quickfix<CR>
                  Quickfix
 n  <Space>xl   * :Trouble loclist<CR>
                  Location List
-n  <Space>xd   * :Trouble document_diagnostics<CR>
+n  <Space>xd   * :Trouble diagnostics<CR>
                  Document Diagnostics
 n  <Space>sx   * :Telescope import<CR>
                  Telescope: Import
@@ -64,7 +64,7 @@ n  <Space>ss   * :Telescope treesitter<CR>
                  Treesitter
 n  <Space>sq   * :Telescope quickfix<CR>
                  Quickfix
-n  <Space>sp   * :lua require("telescope").extensions.lazy_plugins.lazy_plugins()<CR>
+n  <Space>sp   * ~/.config/nvim/lua/keymaps.lua
                  Lazy Plugins
 n  <Space>so   * :Telescope oldfiles<CR>
                  Old Files
@@ -80,14 +80,6 @@ n  <Space>sd   * :Telescope diagnostics<CR>
                  Search Diagnostics
 n  <Space>sc   * :Telescope commands<CR>
                  Commands
-n  <Space>pt   * :PhpactorTransform<CR>
-                 PHPactor: Transform
-n  <Space>ps   * :PhpactorClassSearch<CR>
-                 PHPactor: Class Search
-n  <Space>pn   * :PhpactorClassNew<CR>
-                 PHPactor: Class New
-n  <Space>pm   * :PhpactorContextMenu<CR>
-                 PHPactor: Context Menu
 n  <Space>/    * ~/.config/nvim/lua/keymaps.lua
                  Fuzzily search in current buffer
 n  <Space>,    * :Telescope buffers<CR>
@@ -104,37 +96,33 @@ n  <Space>cbd  * <Cmd>CBd<CR>
                  CB: Remove a box
 n  <Space>cbb  * <Cmd>CBccbox<CR>
                  CB: Box Title
-n  <Space>cw   * :Lspsaga diagnostic_jump_next<CR>
-                 Diagnostic Jump Next
-n  <Space>cv   * :Lspsaga diagnostic_jump_prev<CR>
-                 Diagnostic Jump Prev
-n  <Space>cu   * :Lspsaga preview_definition<CR>
-                 Preview Definition
-n  <Space>cT   * :Telescope lsp_type_definitions<CR>
-                 LSP Type Definitions
-n  <Space>ct   * :Lspsaga peek_type_definition<CR>
-                 Peek Type Definition
+n  <Space>cwd  * ~/.config/nvim/lua/keymaps.lua
+                 Dynamic Workspace Symbols
+n  <Space>cws  * ~/.config/nvim/lua/keymaps.lua
+                 Workspace Symbols
+n  <Space>ct   * ~/.config/nvim/lua/keymaps.lua
+                 treesitter
 n  <Space>cs   * :Telescope lsp_document_symbols<CR>
                  LSP Document Symbols
-n  <Space>cR   * :Lspsaga rename ++project<CR>
-                 Rename Project wide
-n  <Space>cr   * :Lspsaga rename<CR>
+n  <Space>cr   * ~/.local/share/bob/v0.10.2/nvim-macos-arm64/share/nvim/runtime/lua/vim/lsp/buf.lua
                  Rename
-n  <Space>cp   * :Lspsaga peek_definition<CR>
-                 Peek Definition
-n  <Space>cl   * :Lspsaga show_cursor_diagnostics<CR>
-                 Cursor Diagnostics
-n  <Space>ci   * :Lspsaga implement<CR>
+n  <Space>cp   * ~/.config/nvim/lua/keymaps.lua
+                 Type Definition
+n  <Space>ci   * ~/.config/nvim/lua/keymaps.lua
                  Implementations
 n  <Space>cg   * :lua require("neogen").generate()<CR>
                  Generate annotations
-n  <Space>cd   * :Lspsaga show_line_diagnostics<CR>
-                 Line Diagnostics
-n  <Space>cco  * :Lspsaga outgoing_calls<CR>
-                 Outgoing Calls
-n  <Space>cci  * :Lspsaga incoming_calls<CR>
-                 Incoming Calls
-n  <Space>ca   * :Lspsaga code_action<CR>
+x  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cf   * :lua vim.lsp.buf.format()<CR>
+                 Format
+n  <Space>cd   * ~/.config/nvim/lua/keymaps.lua
+                 Definitions
+n  <Space>cco  * ~/.config/nvim/lua/keymaps.lua
+                 Outgoing calls
+n  <Space>cci  * ~/.config/nvim/lua/keymaps.lua
+                 Incoming calls
+n  <Space>ca   * :lua vim.lsp.buf.code_action()<CR>
                  Code Action
 n  <Space>bw   * :lua MiniBufremove.wipeout()<CR>
                  Wipeout
@@ -150,6 +138,14 @@ n  <Space>bd   * :lua MiniBufremove.delete()<CR>
                  Delete
 n  <Space>ba   * :%bd|e#|bd#<CR>
                  Close all except current
+n  <Space>apt  * :PhpactorTransform<CR>
+                 PHPactor: Transform
+n  <Space>aps  * :PhpactorClassSearch<CR>
+                 PHPactor: Class Search
+n  <Space>apn  * :PhpactorClassNew<CR>
+                 PHPactor: Class New
+n  <Space>apm  * :PhpactorContextMenu<CR>
+                 PHPactor: Context Menu
 n  <Space>av   * :silent TestVisit<CR>
                  Test Visit
 n  <Space>al   * :silent TestLast<CR>
@@ -184,7 +180,7 @@ n  <Space>tmc  * <Cmd>setlocal cursorline! cursorline?<CR>
                  Toggle 'cursorline'
 n  <Space>tmb  * <Cmd>lua vim.o.bg = vim.o.bg == "dark" and "light" or "dark"; print(vim.o.bg)<CR>
                  Toggle 'background'
-   <Space>cf   * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+os <Space>cf   * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
                  Format buffer
 x  #           * vim/_defaults.lua
                  :help v_#-default
@@ -194,17 +190,11 @@ n  %             <Plug>(MatchitNormalForward)
 n  &           * :&&<CR>
                  :help &-default
 n  '?          & :<C-U>echo ":Start" dispatch#start_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  '!          & <SNR>30_:.Start!
-n  '<Space>    & <SNR>30_:.Start<Space>
-n  '<CR>       & <SNR>30_:.Start<CR>
+n  '!          & <SNR>10_:.Start!
+n  '<Space>    & <SNR>10_:.Start<Space>
+n  '<CR>       & <SNR>10_:.Start<CR>
 x  *           * vim/_defaults.lua
                  :help v_star-default
-o  ;           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
-                 Repeat jump
-x  ;           * <Cmd>lua MiniJump.jump()<CR>
-                 Repeat jump
-n  ;           * <Cmd>lua MiniJump.jump()<CR>
-                 Repeat jump
 v  <           * <gv
                  Indent Left
 n  <           * <gv
@@ -217,31 +207,19 @@ n  @           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
 x  @           * mode() ==# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'
                  :help v_@-default
-o  F           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
-                 Jump backward
-x  F           * <Cmd>lua MiniJump.smart_jump(true, false)<CR>
-                 Jump backward
-n  F           * <Cmd>lua MiniJump.smart_jump(true, false)<CR>
-                 Jump backward
-n  K           * :Lspsaga hover_doc<CR>
+n  K           * :lua vim.lsp.buf.hover()<CR>
                  Hover Documentation
 n  Q           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/clue.lua
                  Execute macro without 'mini.clue' triggers
 x  Q           * mode() ==# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'
                  :help v_Q-default
-o  T           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
-                 Jump backward till
-x  T           * <Cmd>lua MiniJump.smart_jump(true, true)<CR>
-                 Jump backward till
-n  T           * <Cmd>lua MiniJump.smart_jump(true, true)<CR>
-                 Jump backward till
 n  Y           * y$
                  :help Y-default
-n  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+o  Zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash Treesitter
-o  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+x  Zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash Treesitter
-x  Zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+n  Zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash Treesitter
 o  [%            <Plug>(MatchitOperationMultiBackward)
 x  [%            <Plug>(MatchitVisualMultiBackward)
@@ -289,10 +267,10 @@ n  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
                  Next hunk
 n  ]d          * vim/_defaults.lua
                  Jump to the next diagnostic
-n  `?          & <SNR>30_:.FocusDispatch<CR>
-n  `!          & <SNR>30_:.Dispatch!
-n  `<Space>    & <SNR>30_:.Dispatch<Space>
-n  `<CR>       & <SNR>30_:.Dispatch<CR>
+n  `?          & <SNR>10_:.FocusDispatch<CR>
+n  `!          & <SNR>10_:.Dispatch!
+n  `<Space>    & <SNR>10_:.Dispatch<Space>
+n  `<CR>       & <SNR>10_:.Dispatch<CR>
 x  a%            <Plug>(MatchitVisualTextObject)
 o  ax            <Plug>(textobj-xmlattr-attr-a)
 x  ax            <Plug>(textobj-xmlattr-attr-a)
@@ -300,25 +278,19 @@ o  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
                  Object scope with border
 x  ai          * <Cmd>lua MiniIndentscope.textobject(true)<CR>
                  Object scope with border
-o  f           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
-                 Jump forward
-x  f           * <Cmd>lua MiniJump.smart_jump(false, false)<CR>
-                 Jump forward
-n  f           * <Cmd>lua MiniJump.smart_jump(false, false)<CR>
-                 Jump forward
 n  gR          * :RegexplainerToggle<CR>
                  Toggle Regexplainer
 o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
 n  g`?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  g`!         & <SNR>30_:.Spawn!
-n  g`<Space>   & <SNR>30_:.Spawn<Space>
-n  g`<CR>      & <SNR>30_:.Spawn<CR>
+n  g`!         & <SNR>10_:.Spawn!
+n  g`<Space>   & <SNR>10_:.Spawn<Space>
+n  g`<CR>      & <SNR>10_:.Spawn<CR>
 n  g'?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  g'!         & <SNR>30_:.Spawn!
-n  g'<Space>   & <SNR>30_:.Spawn<Space>
-n  g'<CR>      & <SNR>30_:.Spawn<CR>
+n  g'!         & <SNR>10_:.Spawn!
+n  g'<Space>   & <SNR>10_:.Spawn<Space>
+n  g'<CR>      & <SNR>10_:.Spawn<CR>
 x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
                  Toggle arguments
 n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
@@ -400,9 +372,9 @@ x  k           * v:count == 0 ? 'gk' : 'k'
 n  k           * v:count == 0 ? 'gk' : 'k'
                  Move up
 n  m?          & :<C-U>echo ":Dispatch" dispatch#make_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  m!          & <SNR>30_:.Make!
-n  m<Space>    & <SNR>30_:.Make<Space>
-n  m<CR>       & <SNR>30_:.Make<CR>
+n  m!          & <SNR>10_:.Make!
+n  m<Space>    & <SNR>10_:.Make<Space>
+n  m<CR>       & <SNR>10_:.Make<CR>
 n  shn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
                  Highlight next surrounding
 n  sFn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
@@ -439,17 +411,11 @@ n  sd          * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
                  Delete surrounding
 n  sa          * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
                  Add surrounding
-o  t           * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/jump.lua
-                 Jump forward till
-x  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
-                 Jump forward till
-n  t           * <Cmd>lua MiniJump.smart_jump(false, true)<CR>
-                 Jump forward till
-o  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+o  zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash
-x  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+x  zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash
-n  zk          * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
+n  zk          * ~/.config/nvim/lua/keymaps.lua
                  Flash
 n  <F1>        * :FloatermToggle<CR>
                  Toggle Floaterm
@@ -492,30 +458,30 @@ x  <Plug>(MatchitVisualBackward) * :<C-U>call matchit#Match_wrapper('',0,'v')<CR
 x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>:if col("''") != col("$") | exe ":normal! m'" | endif<CR>gv``
 n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
 n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
-n  <SNR>30_:.  & :<C-R>=getcmdline() =~ ',' ? "\0250" : ""<CR>
-o  <Plug>(textobj-xmlattr-attr-i) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","o")<CR>
-v  <Plug>(textobj-xmlattr-attr-i) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","v")<CR>
-o  <Plug>(textobj-xmlattr-attr-a) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","o")<CR>
-v  <Plug>(textobj-xmlattr-attr-a) & <SNR>26_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","v")<CR>
-n  <SNR>26_    * <SNR>26_
-   <SNR>26_(save-cursor-pos) * <SNR>26_save_cursor_pos()
+s  <Plug>luasnip-jump-prev * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Jump to the previous node
+s  <Plug>luasnip-jump-next * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Jump to the next node
+s  <Plug>luasnip-prev-choice * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Change to the previous choice from the choiceNode
+s  <Plug>luasnip-next-choice * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Change to the next choice from the choiceNode
+s  <Plug>luasnip-expand-snippet * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Expand the current snippet
+s  <Plug>luasnip-expand-or-jump * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Expand or jump in the current snippet
+   <Plug>luasnip-expand-repeat * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Repeat last node expansion
+n  <Plug>luasnip-delete-check * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
+                 LuaSnip: Removes current snippet from jumplist
 n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
-n  <M-k>       * <Cmd>lua MiniMove.move_line('up')<CR>
-                 Move line up
-n  <M-j>       * <Cmd>lua MiniMove.move_line('down')<CR>
-                 Move line down
-n  <M-l>       * <Cmd>lua MiniMove.move_line('right')<CR>
-                 Move line right
-n  <M-h>       * <Cmd>lua MiniMove.move_line('left')<CR>
-                 Move line left
-x  <M-k>       * <Cmd>lua MiniMove.move_selection('up')<CR>
-                 Move up
-x  <M-j>       * <Cmd>lua MiniMove.move_selection('down')<CR>
-                 Move down
-x  <M-l>       * <Cmd>lua MiniMove.move_selection('right')<CR>
-                 Move right
-x  <M-h>       * <Cmd>lua MiniMove.move_selection('left')<CR>
-                 Move left
+o  <Plug>(textobj-xmlattr-attr-i) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-i) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","v")<CR>
+o  <Plug>(textobj-xmlattr-attr-a) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-a) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","v")<CR>
+n  <SNR>14_    * <SNR>14_
+   <SNR>14_(save-cursor-pos) * <SNR>14_save_cursor_pos()
+n  <SNR>10_:.  & :<C-R>=getcmdline() =~ ',' ? "\0250" : ""<CR>
 x  <C-S>       * <Esc><Cmd>silent! update | redraw<CR>
                  Save and go to Normal mode
 n  <C-S>       * :w!<CR>
@@ -528,4 +494,4 @@ n  <C-L>       * :lua vim.lsp.buf.signature_help()<CR>
                  Signature
 ```
 
-- Generated on Tue  7 Jan 2025 21:37:18 EET
+- Generated on Tue 21 Jan 2025 15:03:23 EET

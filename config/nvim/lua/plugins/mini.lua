@@ -165,20 +165,6 @@ return {
       -- Replaced lukas-reineke/indent-blankline.nvim
       require('mini.indentscope').setup()
 
-      -- Jump to next/previous single character
-      require('mini.jump').setup {
-        mappings = {
-          forward = 'f',
-          backward = 'F',
-          forward_till = 't',
-          backward_till = 'T',
-          repeat_jump = ';',
-        },
-      }
-
-      -- Move lines and blocks of text
-      require('mini.move').setup()
-
       -- Text edit operators
       -- g= - Evaluate text and replace with output
       -- gx - Exchange text regions
@@ -223,11 +209,11 @@ return {
         content = {
           active = function()
             local mode, mode_hl = sl.section_mode { trunc_width = 120 }
-            local git = sl.section_git { trunc_width = 75 }
-            local diagnostics = sl.section_diagnostics { trunc_width = 75 }
+            local git = sl.section_git { trunc_width = 9999 }
+            local diagnostics = sl.section_diagnostics { trunc_width = 9999 }
             local filename = sl.section_filename { trunc_width = 9999 }
-            local fileinfo = sl.section_fileinfo { trunc_width = 120 }
-            local location = sl.section_location { trunc_width = 75 }
+            local fileinfo = sl.section_fileinfo { trunc_width = 9999 }
+            local location = sl.section_location { trunc_width = 9999 }
             return sl.combine_groups {
               { hl = mode_hl, strings = { mode } },
               { hl = 'statuslineDevinfo', strings = { git, diagnostics } },
