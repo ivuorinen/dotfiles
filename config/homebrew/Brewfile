@@ -97,6 +97,8 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
+# Prevent cloud misconfigurations during build-time for IaC tools
+brew "checkov"
 # Human-friendly and fast alternative to cut and (sometimes) awk
 brew "choose-rust"
 # Cross-platform make
@@ -303,8 +305,6 @@ brew "shivammathur/php/php@7.4"
 brew "shivammathur/php/php@8.0", link: true
 # Find & fix known vulnerabilities in open-source dependencies
 brew "snyk/tap/snyk"
-# Command-line interface for 1Password
-cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
 # Text editor
