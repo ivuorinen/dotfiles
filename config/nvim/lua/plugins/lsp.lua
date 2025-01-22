@@ -148,70 +148,61 @@ return {
   -- https://github.com/Bilal2453/luvit-meta
   { 'Bilal2453/luvit-meta', lazy = true },
 
+  -- Quickstart configs for Nvim LSP
+  -- https://github.com/neovim/nvim-lspconfig
+  { 'neovim/nvim-lspconfig' },
+
+  -- Portable package manager for Neovim that runs everywhere Neovim runs.
+  -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
+  -- https://github.com/williamboman/mason.nvim
+  {
+    'williamboman/mason.nvim',
+    version = '*',
+    cmd = 'Mason',
+    run = ':MasonUpdate',
+    opts = {},
+  },
+
+  -- Extensible UI for Neovim notifications and LSP progress messages.
+  -- https://github.com/j-hui/fidget.nvim
+  {
+    'j-hui/fidget.nvim',
+    version = '*',
+    opts = {},
+  },
+
+  -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
+  -- https://github.com/williamboman/mason-lspconfig.nvim
+  { 'williamboman/mason-lspconfig.nvim' },
+
+  -- Install and upgrade third party tools automatically
+  -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
+  {
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    version = '*',
+    opts = {
+      auto_install = true,
+      auto_update = true,
+      ensure_installed = mason_tools,
+    },
+  },
+
+  -- JSON schemas for Neovim
+  -- https://github.com/b0o/SchemaStore.nvim
+  { 'b0o/schemastore.nvim' },
+
+  -- Performant, batteries-included completion plugin for Neovim
+  -- https://github.com/saghen/blink.cmp
+  -- See lua/plugins/blink.lua for configs
+  { 'saghen/blink.cmp' },
+
   -- A simple wrapper for nvim-lspconfig and mason-lspconfig
   -- to easily setup LSP servers.
   -- https://github.com/junnplus/lsp-setup.nvim
   {
     'junnplus/lsp-setup.nvim',
-    dependencies = {
-      -- Quickstart configs for Nvim LSP
-      -- https://github.com/neovim/nvim-lspconfig
-      { 'neovim/nvim-lspconfig' },
-
-      -- Portable package manager for Neovim that runs everywhere Neovim runs.
-      -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
-      -- https://github.com/williamboman/mason.nvim
-      {
-        'williamboman/mason.nvim',
-        version = '*',
-        cmd = 'Mason',
-        run = ':MasonUpdate',
-        opts = {},
-      },
-
-      -- Extensible UI for Neovim notifications and LSP progress messages.
-      -- https://github.com/j-hui/fidget.nvim
-      {
-        'j-hui/fidget.nvim',
-        version = '*',
-        opts = {},
-      },
-
-      -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
-      -- https://github.com/williamboman/mason-lspconfig.nvim
-      { 'williamboman/mason-lspconfig.nvim' },
-
-      -- Install and upgrade third party tools automatically
-      -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
-      {
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
-        version = '*',
-        opts = {
-          auto_install = true,
-          auto_update = true,
-          ensure_installed = mason_tools,
-        },
-      },
-
-      -- JSON schemas for Neovim
-      -- https://github.com/b0o/SchemaStore.nvim
-      { 'b0o/schemastore.nvim' },
-
-      -- Performant, batteries-included completion plugin for Neovim
-      -- https://github.com/saghen/blink.cmp
-      -- See lua/plugins/blink.lua for configs
-      { 'saghen/blink.cmp' },
-    },
     opts = {
       default_mappings = false,
-      mappings = {
-        gd = 'lua require"telescope.builtin".lsp_definitions()',
-        gi = 'lua require"telescope.builtin".lsp_implementations()',
-        gr = 'lua require"telescope.builtin".lsp_references()',
-      },
-      inlay_hints = {
-        enabled = true,
-      },
       servers = lsp_servers,
     },
     config = function(_, opts)
@@ -315,16 +306,6 @@ return {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader>cf',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = '',
-        desc = 'Format buffer',
-      },
-    },
     opts = {
       notify_on_error = false,
       ---@type nil|conform.FormatOpts|fun(bufnr: integer): nil|conform.FormatOpts
@@ -340,9 +321,9 @@ return {
           lsp_format_opt = 'fallback'
         end
 
-        -- Disable autoformat for files in a certain path
+        -- Disable autoformat for files in a certain paths
         local bufname = vim.api.nvim_buf_get_name(bufnr)
-        if bufname:match '/node_modules/' then return end
+        if bufname:match '/node_modules|vendor/' then return end
 
         return {
           timeout_ms = 500,

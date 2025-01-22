@@ -18,11 +18,14 @@ return {
         },
       },
 
-      { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+      { 'L3MON4D3/LuaSnip', version = 'v2.*', build = 'make install_jsregexp' },
 
       -- Set of preconfigured snippets for different languages.
       -- https://github.com/rafamadriz/friendly-snippets
-      { 'rafamadriz/friendly-snippets' },
+      {
+        'rafamadriz/friendly-snippets',
+        config = function() require('luasnip.loaders.from_vscode').lazy_load() end,
+      },
 
       -- Lua plugin to turn github copilot into a cmp source
       -- https://github.com/giuxtaposition/blink-cmp-copilot

@@ -180,8 +180,6 @@ n  <Space>tmc  * <Cmd>setlocal cursorline! cursorline?<CR>
                  Toggle 'cursorline'
 n  <Space>tmb  * <Cmd>lua vim.o.bg = vim.o.bg == "dark" and "light" or "dark"; print(vim.o.bg)<CR>
                  Toggle 'background'
-os <Space>cf   * ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/core/handler/keys.lua
-                 Format buffer
 x  #           * vim/_defaults.lua
                  :help v_#-default
 o  %             <Plug>(MatchitOperationForward)
@@ -190,9 +188,9 @@ n  %             <Plug>(MatchitNormalForward)
 n  &           * :&&<CR>
                  :help &-default
 n  '?          & :<C-U>echo ":Start" dispatch#start_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  '!          & <SNR>10_:.Start!
-n  '<Space>    & <SNR>10_:.Start<Space>
-n  '<CR>       & <SNR>10_:.Start<CR>
+n  '!          & <SNR>28_:.Start!
+n  '<Space>    & <SNR>28_:.Start<Space>
+n  '<CR>       & <SNR>28_:.Start<CR>
 x  *           * vim/_defaults.lua
                  :help v_star-default
 v  <           * <gv
@@ -267,10 +265,10 @@ n  ]h          * <Cmd>lua MiniDiff.goto_hunk('next')<CR>
                  Next hunk
 n  ]d          * vim/_defaults.lua
                  Jump to the next diagnostic
-n  `?          & <SNR>10_:.FocusDispatch<CR>
-n  `!          & <SNR>10_:.Dispatch!
-n  `<Space>    & <SNR>10_:.Dispatch<Space>
-n  `<CR>       & <SNR>10_:.Dispatch<CR>
+n  `?          & <SNR>28_:.FocusDispatch<CR>
+n  `!          & <SNR>28_:.Dispatch!
+n  `<Space>    & <SNR>28_:.Dispatch<Space>
+n  `<CR>       & <SNR>28_:.Dispatch<CR>
 x  a%            <Plug>(MatchitVisualTextObject)
 o  ax            <Plug>(textobj-xmlattr-attr-a)
 x  ax            <Plug>(textobj-xmlattr-attr-a)
@@ -284,13 +282,13 @@ o  g%            <Plug>(MatchitOperationBackward)
 x  g%            <Plug>(MatchitVisualBackward)
 n  g%            <Plug>(MatchitNormalBackward)
 n  g`?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  g`!         & <SNR>10_:.Spawn!
-n  g`<Space>   & <SNR>10_:.Spawn<Space>
-n  g`<CR>      & <SNR>10_:.Spawn<CR>
+n  g`!         & <SNR>28_:.Spawn!
+n  g`<Space>   & <SNR>28_:.Spawn<Space>
+n  g`<CR>      & <SNR>28_:.Spawn<CR>
 n  g'?         & :<C-U>echo ":Spawn" dispatch#spawn_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  g'!         & <SNR>10_:.Spawn!
-n  g'<Space>   & <SNR>10_:.Spawn<Space>
-n  g'<CR>      & <SNR>10_:.Spawn<CR>
+n  g'!         & <SNR>28_:.Spawn!
+n  g'<Space>   & <SNR>28_:.Spawn<Space>
+n  g'<CR>      & <SNR>28_:.Spawn<CR>
 x  gS          * :<C-U>lua MiniSplitjoin.toggle({ region = MiniSplitjoin.get_visual_region() })<CR>
                  Toggle arguments
 n  gS          * v:lua.MiniSplitjoin.operator("toggle") . " "
@@ -372,9 +370,9 @@ x  k           * v:count == 0 ? 'gk' : 'k'
 n  k           * v:count == 0 ? 'gk' : 'k'
                  Move up
 n  m?          & :<C-U>echo ":Dispatch" dispatch#make_focus(v:count > 1 ? 0 : v:count ? line(".") : -1)<CR>
-n  m!          & <SNR>10_:.Make!
-n  m<Space>    & <SNR>10_:.Make<Space>
-n  m<CR>       & <SNR>10_:.Make<CR>
+n  m!          & <SNR>28_:.Make!
+n  m<Space>    & <SNR>28_:.Make<Space>
+n  m<CR>       & <SNR>28_:.Make<CR>
 n  shn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
                  Highlight next surrounding
 n  sFn         * ~/.local/share/nvim/lazy/mini.nvim/lua/mini/surround.lua
@@ -458,6 +456,14 @@ x  <Plug>(MatchitVisualBackward) * :<C-U>call matchit#Match_wrapper('',0,'v')<CR
 x  <Plug>(MatchitVisualForward) * :<C-U>call matchit#Match_wrapper('',1,'v')<CR>:if col("''") != col("$") | exe ":normal! m'" | endif<CR>gv``
 n  <Plug>(MatchitNormalBackward) * :<C-U>call matchit#Match_wrapper('',0,'n')<CR>
 n  <Plug>(MatchitNormalForward) * :<C-U>call matchit#Match_wrapper('',1,'n')<CR>
+o  <Plug>(textobj-xmlattr-attr-i) & <SNR>34_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-i) & <SNR>34_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","v")<CR>
+o  <Plug>(textobj-xmlattr-attr-a) & <SNR>34_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","o")<CR>
+v  <Plug>(textobj-xmlattr-attr-a) & <SNR>34_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","v")<CR>
+n  <SNR>34_    * <SNR>34_
+   <SNR>34_(save-cursor-pos) * <SNR>34_save_cursor_pos()
+n  <SNR>28_:.  & :<C-R>=getcmdline() =~ ',' ? "\0250" : ""<CR>
+n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
 s  <Plug>luasnip-jump-prev * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
                  LuaSnip: Jump to the previous node
 s  <Plug>luasnip-jump-next * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
@@ -474,14 +480,6 @@ s  <Plug>luasnip-expand-or-jump * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasni
                  LuaSnip: Repeat last node expansion
 n  <Plug>luasnip-delete-check * ~/.local/share/nvim/lazy/LuaSnip/plugin/luasnip.lua
                  LuaSnip: Removes current snippet from jumplist
-n  <Plug>PlenaryTestFile * :lua require('plenary.test_harness').test_file(vim.fn.expand("%:p"))<CR>
-o  <Plug>(textobj-xmlattr-attr-i) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","o")<CR>
-v  <Plug>(textobj-xmlattr-attr-i) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-i","v")<CR>
-o  <Plug>(textobj-xmlattr-attr-a) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","o")<CR>
-v  <Plug>(textobj-xmlattr-attr-a) & <SNR>14_(save-cursor-pos):<C-U>call g:__textobj_xmlattr.do_by_pattern("select","attr-a","v")<CR>
-n  <SNR>14_    * <SNR>14_
-   <SNR>14_(save-cursor-pos) * <SNR>14_save_cursor_pos()
-n  <SNR>10_:.  & :<C-R>=getcmdline() =~ ',' ? "\0250" : ""<CR>
 x  <C-S>       * <Esc><Cmd>silent! update | redraw<CR>
                  Save and go to Normal mode
 n  <C-S>       * :w!<CR>
@@ -494,4 +492,4 @@ n  <C-L>       * :lua vim.lsp.buf.signature_help()<CR>
                  Signature
 ```
 
-- Generated on Tue 21 Jan 2025 15:03:23 EET
+- Generated on Tue 21 Jan 2025 15:24:13 EET
