@@ -61,30 +61,28 @@ brew "apr"
 brew "apr-util"
 # Password hashing library and CLI utility
 brew "argon2"
-# Automatic configure script builder
-brew "autoconf"
-# Tool for generating GNU Standards-compliant Makefiles
-brew "automake"
-# GNU multiple precision arithmetic library
-brew "gmp"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
-# Extendable version manager with support for Ruby, Node.js, Erlang & more
-brew "asdf"
 # Spell checker with better logic than ispell
 brew "aspell"
+# Automatic configure script builder
+brew "autoconf"
 # Collection of over 500 reusable autoconf macros
 brew "autoconf-archive"
+# GNU multiple precision arithmetic library
+brew "gmp"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
 # Automated text file generator
 brew "autogen"
+# Tool for generating GNU Standards-compliant Makefiles
+brew "automake"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
 # Bash Automated Testing System
 brew "bats-core"
 # Parser generator
@@ -151,8 +149,6 @@ brew "unbound"
 brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
-# Open source programming language to build simple/reliable/efficient software
-brew "go"
 # Library access to GnuPG
 brew "gpgme"
 # Manage your GnuPG keys with ease!
