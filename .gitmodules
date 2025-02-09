@@ -1,4 +1,4 @@
-# vim: set expandtab:
+# vim: noexpandtab filetype=gitconfig
 [submodule "dotbot"]
 	path = tools/dotbot
 	url = https://github.com/anishathalye/dotbot.git
@@ -23,47 +23,69 @@
 	path = config/tmux/plugins/tmux-continuum
 	url = https://github.com/tmux-plugins/tmux-continuum
 	ignore = dirty
+
 [submodule "tmux/tmux-sensible"]
 	path = config/tmux/plugins/tmux-sensible
 	url = https://github.com/tmux-plugins/tmux-sensible.git
 	ignore = dirty
+
 [submodule "tmux/tmux-sessionist"]
 	path = config/tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist.git
 	ignore = dirty
+
 [submodule "tmux/tmux-yank"]
 	path = config/tmux/plugins/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank.git
 	ignore = dirty
+
 [submodule "tmux/tmux-window-name"]
 	path = config/tmux/plugins/tmux-window-name
 	url = https://github.com/ivuorinen/tmux-window-name.git
 	ignore = dirty
+
 [submodule "dotbot-pip"]
 	path = tools/dotbot-pip
 	url = https://github.com/sobolevn/dotbot-pip.git
+	ignore = dirty
+
 [submodule "tmux/tmux-suspend"]
 	path = config/tmux/plugins/tmux-suspend
 	url = https://github.com/MunifTanjim/tmux-suspend.git
+	ignore = dirty
+
 [submodule "tmux/tmux-mode-indicator"]
 	path = config/tmux/plugins/tmux-mode-indicator
 	url = https://github.com/MunifTanjim/tmux-mode-indicator.git
+	ignore = dirty
+
 [submodule "tmux/tmux-current-pane-hostname"]
 	path = config/tmux/plugins/tmux-current-pane-hostname
 	url = https://github.com/soyuka/tmux-current-pane-hostname.git
+	ignore = dirty
+
 [submodule "cheat-tldr"]
 	path = config/cheat/cheatsheets/tldr
 	url = https://github.com/ivuorinen/cheatsheet-tldr.git
+	ignore = dirty
+
 [submodule "tmux/tmux-dark-notify"]
 	path = config/tmux/plugins/tmux-dark-notify
 	url = https://github.com/erikw/tmux-dark-notify.git
+	ignore = dirty
+
 [submodule "asdf"]
 	path = local/bin/asdf
 	url = https://github.com/asdf-vm/asdf.git
+	ignore = dirty
+
 [submodule "antidote"]
 	path = tools/antidote
 	url = https://github.com/mattmc3/antidote.git
 	shallow = true
+	ignore = dirty
+
 [submodule "dotbot-asdf"]
 	path = tools/dotbot-asdf
 	url = https://github.com/sobolevn/dotbot-asdf
+	ignore = dirty

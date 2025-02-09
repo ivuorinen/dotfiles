@@ -503,6 +503,69 @@ section_helpers()
   esac
 }
 
+section_apt()
+{
+  USAGE_PREFIX="$SCRIPT apt <command>"
+  MENU=(
+    "upkeep:Run update, upgrade, autoremove and clean"
+    'install:Install packages from $DOTFILES/tools/apt.txt'
+    "update:Update apt packages"
+    "upgrade:Upgrade apt packages"
+    "autoremove:Remove unused apt packages"
+    "clean:Clean apt cache"
+  )
+
+  x-have apt && {
+    case "$1" in
+      upkeep)
+        sudo apt update \
+          && sudo apt upgrade -y \
+          && sudo apt autoremove -y \
+          && sudo apt clean
+        ;;
+
+      install)
+        # if apt.txt is not found, exit
+        [ ! -f "$DOTFILES/tools/apt.txt" ] && msgr err "apt.txt not found" && exit 0
+
+        # Load apt.txt, remove comments (even if trailing comment) and empty lines.
+        #
+        # Ignoring "Quote this to prevent word splitting."
+        # shellcheck disable=SC2046
+        sudo apt install \
+          -y $(
+            grep -vE '^\s*#' "$DOTFILES/tools/apt.txt" \
+              | sed -e 's/#.*//' \
+              | tr '\n' ' '
+          )
+
+        # If there's a apt.txt file under hosts/$hostname/apt.txt,
+        # run install on those lines too.
+        HOSTNAME=$(hostname -s)
+        HOST_APT="$DOTFILES/hosts/$HOSTNAME/apt.txt"
+        [[ -f $HOST_APT ]] && {
+          # shellcheck disable=SC2046
+          sudo apt install -y $(
+            grep -vE '^\s*#' "$HOST_APT" \
+              | sed -e 's/#.*//' \
+              | tr '\n' ' '
+          )
+        }
+
+        # Try this for an alternative way to install packages
+        # xargs -a <(awk '! /^ *(#|$)/' "$packagelist") -r -- sudo apt-get install -y
+        ;;
+
+      update) sudo apt update ;;
+      upgrade) sudo apt upgrade -y ;;
+      autoremove) sudo apt autoremove -y ;;
+      clean) sudo apt clean ;;
+      *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    esac
+  }
+  ! x-have apt && menu_builder "$USAGE_PREFIX" "apt not available on this system"
+}
+
 section_docs()
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
@@ -713,6 +776,8 @@ usage()
   echo ""
   section_install
   echo ""
+  section_apt
+  echo ""
   section_asdf
   echo ""
   section_brew
@@ -735,6 +800,7 @@ main()
   # The main loop. The first keyword after $0 triggers section, or help.
   case "$SECTION" in
     install) section_install "$@" ;;
+    apt) section_apt "$@" ;;
     asdf) section_asdf "$@" ;;
     brew) section_brew "$@" ;;
     check) section_check "$@" ;;

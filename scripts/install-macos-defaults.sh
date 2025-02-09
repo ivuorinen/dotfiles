@@ -26,7 +26,7 @@ msgr nested "Change user shell to zsh if it is available and not the current"
 
 # Change user shell to zsh if not that already.
 if hash zsh 2> /dev/null; then
-  [[ "$SHELL" != $(which zsh) ]] && chsh -s "$(which zsh)"
+  [[ $SHELL != $(which zsh) ]] && chsh -s "$(which zsh)"
 fi
 
 ###############################################################################
@@ -150,7 +150,7 @@ msgr nested "Settings for Finder"
 # Set Desktop as the default location for new Finder windows
 # For other paths, use `PfLo` and `file:///full/path/here/`
 defaults write com.apple.finder NewWindowTarget -string "PfDe"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
 
 # Show icons for external hard drives, servers, and removable media on the desktop
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
@@ -200,6 +200,10 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
   General -bool true \
   OpenWith -bool true \
   Privileges -bool true
+
+# Move windows by dragging any part of the window
+# From https://nikitabobko.github.io/AeroSpace/goodies
+defaults write -g NSWindowShouldDragOnGesture -bool true
 
 ###############################################################################
 # Screenshots                                                                 #
