@@ -1,12 +1,92 @@
 #!/bin/sh
 #
-# About
-# -----
-# Repeat the command until it fails - always run at least once.
+# x-until-error: Repeatedly execute a command until it fails (non-zero exit status)
+#
+# Description:
+#   This script executes the given command repeatedly until it returns a non-zero
+#   exit status. It always runs the command at least once.
+#
+# This script is based on the original work by Steve Kemp.
+# Original work Copyright (c) 2013 by Steve Kemp.
+#
+# The code in the original repository may be modified and distributed under your choice of:
+#   * The Perl Artistic License (http://dev.perl.org/licenses/artistic.html) or
+#   * The GNU General Public License, version 2 or later (http://www.gnu.org/licenses/gpl2.txt).
+#
+# Modifications and enhancements by Ismo Vuorinen on 2025.
+#
+# Usage:
+#   x-until-error [--sleep SECONDS] command [arguments...]
+#
+# Options:
+#   --sleep SECONDS    Wait SECONDS (default: 1) between command executions.
+#   -h, --help         Display this help message.
+#
+# Example:
+#   x-until-error --sleep 2 ls -l
 
-"$@"
+# Default sleep interval between executions.
+SLEEP_INTERVAL=1
 
-# If the status code was zero then repeat.
-while [ $? -eq 0 ]; do
+# Function to display usage information.
+usage()
+{
+  cat << EOF
+Usage: $0 [--sleep SECONDS] command [arguments...]
+
+Repeats the given command until it fails (returns a non-zero exit status).
+
+Options:
+  --sleep SECONDS    Wait SECONDS (default: 1) between command executions.
+  -h, --help         Display this help message.
+
+Example:
+  $0 --sleep 2 ls -l
+EOF
+  exit 1
+}
+
+# Parse command-line options.
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --sleep)
+      shift
+      if [ $# -eq 0 ]; then
+        echo "Error: --sleep requires a numeric argument." >&2
+        exit 1
+      fi
+      SLEEP_INTERVAL="$1"
+      shift
+      ;;
+    -h | --help)
+      usage
+      ;;
+    --) # End of options marker.
+      shift
+      break
+      ;;
+    -*)
+      echo "Error: Unknown option: $1" >&2
+      usage
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+# Ensure a command is provided.
+if [ $# -eq 0 ]; then
+  echo "Error: No command specified." >&2
+  usage
+fi
+
+# Execute the command repeatedly until it fails.
+while true; do
   "$@"
+  status=$?
+  if [ $status -ne 0 ]; then
+    exit $status
+  fi
+  sleep "$SLEEP_INTERVAL"
 done

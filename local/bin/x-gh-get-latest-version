@@ -1,66 +1,190 @@
 #!/usr/bin/env bash
 #
-# Get latest release version from GitHub
+# Get latest release version, branch tag, or latest commit from GitHub
 # Usage: x-gh-get-latest-version <repo>
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 
 set -euo pipefail
 
-# Enable verbosity with VERBOSE=1
+# Environment variables, more under get_release_version() and get_latest_branch_tag()
+# functions. These can be overridden by the user.
+GITHUB_API_URL="${GITHUB_API_URL:-https://api.github.com/repos}"
 VERBOSE="${VERBOSE:-0}"
 
-# Function to print usage information
-usage()
-{
-  echo "Usage: $0 <repo> (e.g. ivuorinen/dotfiles)"
+# Prints a message if VERBOSE=1
+msg() {
+  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+}
+
+# Show usage information
+usage() {
+  cat <<EOF
+Usage: $0 <repo> (e.g. ivuorinen/dotfiles)
+
+Fetches the latest release version, latest branch tag, or latest commit SHA from GitHub.
+
+Options:
+  - INCLUDE_PRERELEASES=1  Include prerelease versions (default: only stable releases).
+  - OLDEST_RELEASE=1       Fetch the oldest release instead of the latest.
+  - BRANCH=<branch>        Fetch the latest tag from a specific branch (default: main).
+  - LATEST_COMMIT=1        Fetch the latest commit SHA from the specified branch.
+  - OUTPUT=json            Return output as JSON (default: plain text).
+  - GITHUB_API_URL=<url>   Override GitHub API URL (useful for GitHub Enterprise).
+  - GITHUB_TOKEN=<token>   Use GitHub API token to increase rate limits (default: unauthenticated).
+
+Requirements:
+  - curl
+  - jq (for JSON processing)
+
+Examples:
+  # Fetch the latest stable release
+  $0 ivuorinen/dotfiles
+
+  # Fetch the latest release including prereleases
+  INCLUDE_PRERELEASES=1 $0 ivuorinen/dotfiles
+
+  # Fetch the oldest release
+  OLDEST_RELEASE=1 $0 ivuorinen/dotfiles
+
+  # Fetch the latest tag from the 'develop' branch
+  BRANCH=develop $0 ivuorinen/dotfiles
+
+  # Fetch the latest commit SHA from 'main' branch
+  LATEST_COMMIT=1 $0 ivuorinen/dotfiles
+
+  # Output result in JSON format
+  OUTPUT=json $0 ivuorinen/dotfiles
+
+  # Use GitHub API token for higher rate limits
+  GITHUB_TOKEN="your_personal_access_token" $0 ivuorinen/dotfiles
+
+  # Use GitHub Enterprise API
+  GITHUB_API_URL="https://github.example.com/api/v3/repos" $0 ivuorinen/dotfiles
+EOF
   exit 1
 }
 
-# Function to print messages if VERBOSE is enabled
-# $1 - message (string)
-msg()
-{
-  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
-  return 0
+# Check that required dependencies are installed
+check_dependencies() {
+  for cmd in curl jq; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo "Error: '$cmd' is required but not installed." >&2
+      exit 1
+    fi
+  done
 }
 
-# Function to fetch the latest release version from GitHub
+# Fetches the latest release or the oldest if OLDEST_RELEASE=1
 # $1 - GitHub repository (string)
-get_latest_release()
-{
-  local repo=$1
+get_release_version() {
+  local repo="$1"
+  local include_prereleases="${INCLUDE_PRERELEASES:-0}"
+  local oldest_release="${OLDEST_RELEASE:-0}"
+  local api_url="${GITHUB_API_URL}/${repo}/releases"
+
+  local auth_header=()
+  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+  fi
+
+  msg "Fetching release data from: $api_url (Include prereleases: $include_prereleases, Oldest: $oldest_release)"
+
+  local json_response
+  json_response=$(curl -sSL "${auth_header[@]}" "$api_url")
+
+  # Check for API errors
+  if echo "$json_response" | jq -e 'has("message")' >/dev/null; then
+    msg "GitHub API error: $(echo "$json_response" | jq -r '.message')"
+    exit 1
+  fi
+
+  local filter='.[] | select(.tag_name)'
+  [[ "$include_prereleases" -eq 0 ]] && filter+='.prerelease == false'
 
   local version
-  version=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
-    | grep "tag_name" \
-    | awk -F '"' '{print $4}')
+  if [[ "$oldest_release" -eq 1 ]]; then
+    version=$(echo "$json_response" | jq -r "[${filter}] | last.tag_name // empty")
+  else
+    version=$(echo "$json_response" | jq -r "[${filter}] | first.tag_name // empty")
+  fi
 
-  if [ -z "$version" ]; then
-    msg "Failed to fetch the latest release version for repository: $repo"
-    echo ""
+  if [[ -z "$version" ]]; then
+    msg "Failed to fetch release version for repository: $repo"
     exit 1
   fi
 
   echo "$version"
-  return 0
+}
+
+# Fetches the latest tag from the specified branch
+get_latest_branch_tag() {
+  local repo="$1"
+  local branch="${BRANCH:-main}"
+  local api_url="${GITHUB_API_URL}/${repo}/git/refs/tags"
+
+  msg "Fetching latest tag for branch '$branch' from: $api_url"
+
+  local json_response
+  json_response=$(curl -sSL "$api_url")
+
+  local version
+  version=$(echo "$json_response" | jq -r "[.[] | select(.ref | contains(\"refs/tags/$branch\"))] | last.ref | sub(\"refs/tags/\"; \"\") // empty")
+
+  if [[ -z "$version" ]]; then
+    msg "Failed to fetch latest tag for branch: $branch"
+    exit 1
+  fi
+
+  echo "$version"
+}
+
+# Fetches the latest commit SHA from the specified branch
+get_latest_commit() {
+  local repo="$1"
+  local branch="${BRANCH:-main}"
+  local api_url="${GITHUB_API_URL}/${repo}/commits/$branch"
+
+  msg "Fetching latest commit SHA from: $api_url"
+
+  local json_response
+  json_response=$(curl -sSL "$api_url")
+
+  local sha
+  sha=$(echo "$json_response" | jq -r '.sha // empty')
+
+  if [[ -z "$sha" ]]; then
+    msg "Failed to fetch latest commit SHA for branch: $branch"
+    exit 1
+  fi
+
+  echo "$sha"
 }
 
 # Main function
-main()
-{
-  if [ "$#" -ne 1 ]; then
+# $1 - GitHub repository (string)
+main() {
+  if [[ $# -ne 1 ]]; then
     usage
   fi
 
-  local repo=$1
+  check_dependencies
 
-  msg "Fetching the latest release version for repository: $repo"
+  local repo="$1"
+  local result
 
-  local version
-  version=$(get_latest_release "$repo")
+  if [[ "${LATEST_COMMIT:-0}" -eq 1 ]]; then
+    result=$(get_latest_commit "$repo")
+  elif [[ -n "${BRANCH:-}" ]]; then
+    result=$(get_latest_branch_tag "$repo")
+  else
+    result=$(get_release_version "$repo")
+  fi
 
-  echo "$version"
-  return 0
+  if [[ "${OUTPUT:-text}" == "json" ]]; then
+    echo "{\"repository\": \"$repo\", \"result\": \"$result\"}"
+  else
+    echo "$result"
+  fi
 }
 
 main "$@"

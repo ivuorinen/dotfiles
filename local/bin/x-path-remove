@@ -1,29 +1,41 @@
 #!/usr/bin/env bash
 #
-# Remove a directory from the PATH
-# Usage: x-path-remove <dir>
+# Optimized script to remove directories from PATH.
+# For each specified directory, all occurrences are removed from PATH.
+#
+# Usage: x-path-remove <directory1> [<directory2> ...]
+#
+# Enable verbose output by setting the environment variable VERBOSE=1.
+#
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
+# License: MIT
 
-# Set verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-# Function to print messages if VERBOSE is enabled
-# $1 - message (string)
-msg()
-{
-  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+# Ensure that at least one directory is provided.
+[ "$#" -lt 1 ] && {
+  echo "Usage: $0 <directory> [<directory> ...]"
+  exit 1
 }
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <dir>"
-  exit 1
-fi
+for dir in "$@"; do
+  # Remove trailing slash if present, unless the directory is "/"
+  [ "$dir" != "/" ] && dir="${dir%/}"
 
-dir="$1"
+  # Check if the directory is present in PATH.
+  case ":$PATH:" in
+    *":$dir:"*)
+      # Remove all occurrences of the directory from PATH using parameter expansion.
+      PATH=":${PATH}:"
+      PATH="${PATH//:$dir:/:}"
+      PATH="${PATH#:}"
+      PATH="${PATH%:}"
+      [ "$VERBOSE" -eq 1 ] && echo "Removed '$dir' from PATH."
+      ;;
+    *)
+      [ "$VERBOSE" -eq 1 ] && echo "(?) '$dir' is not in PATH."
+      ;;
+  esac
+done
 
-if ! echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
-  msg "(?) Directory $dir is not in PATH"
-  exit 0
-fi
-
-export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$dir\"" | sed 's/:$//')
-msg "(!) Directory $dir has been removed from PATH"
+export PATH

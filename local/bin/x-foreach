@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # foreach <folder> <commands that should be run to each file>
+# foreach "ls -d */" "git status" # run git status in each folder
 #
 # Source: https://github.com/mvdan/dotfiles/blob/master/.bin/foreach
 
@@ -11,6 +12,7 @@ for dir in $($cmd); do
   (
     echo "$dir"
     cd "$dir" || exit 1
+    # shellcheck disable=SC2294,SC2034
     eval "$@" # allow multiple commands like "foo && bar"
   )
 done

@@ -15,7 +15,7 @@ COLOR_P='\033[1;36m'
 COLOR_S='\033[0;36m'
 RESET='\033[0m'
 
-# Print time-based personalized message, using figlet & lolcat if availible
+# Print time-based personalized message, using figlet & lolcat if available
 function welcome_greeting()
 {
   h=$(date +%H)
@@ -51,7 +51,7 @@ function welcome_sysinfo()
   fi
 }
 
-# Print todays info: Date, IP, weather, etc
+# Print today's info: Date, IP, weather, etc
 function welcome_today()
 {
   timeout=1

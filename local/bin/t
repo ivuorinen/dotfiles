@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Credit to ThePrimeagen, jessarcher
-# https://github.com/jessarcher/dotfiles/blob/master/scripts/t
+# Credit to ThePrimeagen, Jess Archer
+# See https://github.com/jessarcher/dotfiles/blob/master/scripts/t
 #
 # Tweaks by Ismo Vuorinen <https://github.com/ivuorinen> 2025
 # vim: ft=bash ts=2 sw=2 et
@@ -9,104 +9,135 @@
 # Set environment variables for configuration with defaults
 T_ROOT="${T_ROOT:-$HOME/Code}"
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+T_MAX_DEPTH="${T_MAX_DEPTH:-3}"
 
 # Function to print an error message and exit
-error_exit()
-{
+error_exit() {
   echo "Error: $1" >&2
   exit 1
 }
 
-get_directories()
-{
-  local dirs=''
-  dirs+='# Directories\n'
-  dirs+=$(
-    find "$T_ROOT" \
-      -maxdepth 3 \
-      -mindepth 1 \
-      -type d \
-      -not -path '*/dist/*' \
-      -not -path '*/dist' \
-      -not -path '*/node_modules/*' \
-      -not -path '*/node_modules' \
-      -not -path '*/vendor/*' \
-      -not -path '*/vendor' \
-      -not -path '*/.idea/*' \
-      -not -path '*/.idea' \
-      -not -path '*/.vscode/*' \
-      -not -path '*/.vscode' \
-      -not -path '*/.git/*' \
-      -not -path '*/.git' \
-      -not -path '*/.svn/*' \
-      -not -path '*/.svn'
-  )
-  dirs+="$(printf "\n%s" "$DOTFILES")"
+# Validate that T_ROOT exists
+if [[ ! -d "$T_ROOT" ]]; then
+  error_exit "T_ROOT directory '$T_ROOT' does not exist."
+fi
 
-  echo "$dirs"
+
+# Check for required dependencies
+check_dependencies() {
+  local T_DEPS=(tmux fzf find)
+  for cmd in "${T_DEPS[@]}"; do
+    if ! command -v "$cmd" &> /dev/null; then
+      error_exit "$cmd is not installed."
+    fi
+  done
 }
 
-check_tmux()
-{
+check_dependencies
+
+# Generate an array of '-not -path' rules for each exclusion pattern
+# without using namerefs.
+generate_exclude_rules() {
+  local result_var="$1"
+  shift
+  local arr=()
+  for pattern in "$@"; do
+    # Exclude both the directory and any subdirectories under it.
+    arr+=( -not -path "*/${pattern}" -not -path "*/${pattern}/*" )
+  done
+  # Use eval to assign the array to the variable whose name was passed.
+  eval "$result_var=(\"\${arr[@]}\")"
+}
+
+get_directories() {
+  local exclude_patterns=(
+    ".bzr" ".git" ".hg" ".idea" ".obsidian" ".run" ".svn" ".vscode"
+    "build" "dist" "node_modules" "out" "target" "vendor"
+  )
+  local exclude_rules=()
+  generate_exclude_rules exclude_rules "${exclude_patterns[@]}"
+
+  local dirs
+  # Use $'string' to correctly process escape sequences.
+  dirs=$'# Directories\n'
+  dirs+=$(find "$T_ROOT" \
+    -maxdepth "$T_MAX_DEPTH" \
+    -mindepth 1 \
+    -type d \
+    "${exclude_rules[@]}"
+  )
+  echo -e "$dirs"
+}
+
+check_tmux() {
   if ! command -v tmux &> /dev/null; then
     error_exit "tmux is not installed."
   fi
 
-  # check to see that tmux server is running
+  # Ensure tmux server is running
   if ! tmux info &> /dev/null; then
     tmux start-server
   fi
 }
 
-get_sessions()
-{
+get_sessions() {
   check_tmux
 
-  local sessions=''
-  sessions+='# Sessions\n'
-  sessions+=$(tmux list-sessions -F "#{session_name}" 2> /dev/null)
+  T_TMUX_SESSIONS=$(tmux list-sessions -F "#{session_name}" 2> /dev/null)
 
-  echo "$sessions"
+  if [[ -z "$T_TMUX_SESSIONS" ]]; then
+    echo ""
+    return
+  fi
+
+  echo -e "# Sessions\n$T_TMUX_SESSIONS"
 }
 
-items=''
-
-# Select the directory
+# Determine selection from command-line argument or interactive fzf menu
 if [[ $# -eq 1 ]]; then
   selected="$1"
 else
-  items+=$(get_sessions | sort)
-  items+='\n'
-  items+=$(get_directories | sort)
+  # Combine sessions and directories for selection
+  T_ITEMS="$(get_sessions | sort)
+$(get_directories | sort)"
 
-  selected=$(echo -e "$items" | fzf) || exit 0 # Exit if no selection is made
+  # Use sort to order the entries and fzf for interactive selection
+  selected=$(echo "$T_ITEMS" | fzf) || exit 0
 fi
 
-# If user selected a header, exit
-[[ ${selected:0:1} == "#" ]] && error_exit "You selected a header, why?"
+# Reject selection if it is a header line
+[[ ${selected:0:1} == "#" ]] && error_exit "Header selected. Please choose a valid session or directory."
 
-# Exit if no directory was selected
-[[ -z $selected ]] && error_exit "No directory selected."
+[[ -z "$selected" ]] && error_exit "No directory or session selected."
 
 # Sanitize the session name
 session_name=$(basename "$selected")
-# If we get nothing, we are dealing with a session
-[[ $session_name == "" ]] && session_name="$selected"
-# Remove dots from the session name as tmux doesn't like them
+if [[ -z "$session_name" ]]; then
+  session_name="$selected"
+fi
+# Remove dots since tmux dislikes them
 session_name="${session_name//./}"
 
-# Try to switch to the tmux session
-tmux switch-client -t "=$session_name"
+# Attempt to switch to an existing session
+tmux switch-client -t "=$session_name" 2>/dev/null
+active_session=$(tmux display-message -p -F '#{session_name}' 2>/dev/null)
 
-active_session=$(tmux display-message -p -F '#{session_name}' 2> /dev/null)
-# echo "active session: $active_session"
-if [ -n "$active_session" ] && [ "$active_session" == "$session_name" ]; then
+if [[ "$active_session" == "$session_name" ]]; then
   exit 0
 fi
 
-# Create a new tmux session or attach to an existing one
-if tmux new-session -c "$selected" -d -s "$session_name" 2> /dev/null; then
-  tmux switch-client -t "$session_name"
+# Create a new session (or attach to an existing one) based on the selection
+if [ -z "$TMUX" ]; then
+  # Not inside tmux: create (or attach to) the session and attach.
+  tmux new-session -A -s "$session_name" -c "$selected"
 else
-  tmux new -c "$selected" -A -s "$session_name"
+  # Inside tmux: check if the target session exists.
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    # Session exists; switch to it.
+    tmux switch-client -t "$session_name"
+  else
+    # Session does not exist; create it in detached mode and then switch.
+    tmux new-session -d -s "$session_name" -c "$selected"
+    tmux switch-client -t "$session_name"
+  fi
 fi

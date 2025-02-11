@@ -1,78 +1,112 @@
 #!/usr/bin/env bash
+#
 # x-sha256sum-matcher
 #
-# Check if two files are the same
+# Compare two files by computing their SHA256 hashes.
 #
 # Ismo Vuorinen <https://github.com/ivuorinen> 2023
 # MIT License
 
 set -euo pipefail
 
-# ENV Variables
-: "${VERBOSE:=0}" # VERBOSE=1 x-sha256sum-matcher file1 file2
+# Default settings
+VERBOSE=0
 
-# Return sha256sum for file
-# $1 - filename (string)
-get_sha256sum()
+# Print usage/help message
+usage()
 {
-  sha256sum "$1" | head -c 64
+  cat << EOF
+Usage: $0 [options] file1 file2
+
+Compare two files by computing their SHA256 hashes.
+
+Options:
+  -v          Enable verbose output.
+  -h, --help  Display this help message and exit.
+EOF
 }
 
-# Print message if VERBOSE is enabled
-# $1 - message (string)
-msg()
+# Check if a command exists
+command_exists()
 {
-  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  command -v "$1" > /dev/null 2>&1
 }
 
-# Print error message and exit
-# $1 - error message (string)
-error()
-{
-  msg "(!) ERROR: $1"
+# Ensure sha256sum is available
+if ! command_exists sha256sum; then
+  echo "Error: sha256sum command not found. Please install it." >&2
   exit 1
-}
+fi
 
-# Validate input arguments
-validate_inputs()
-{
-  if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 file1 file2"
+# Process command-line options
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -v)
+      VERBOSE=1
+      shift
+      ;;
+    -*)
+      echo "Error: Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+# Validate input arguments: expect exactly 2 files
+if [[ $# -ne 2 ]]; then
+  echo "Error: Two file arguments required." >&2
+  usage
+  exit 1
+fi
+
+file1="$1"
+file2="$2"
+
+# Check if files exist and are readable
+for file in "$file1" "$file2"; do
+  if [[ ! -f "$file" ]]; then
+    echo "Error: File does not exist: $file" >&2
+    exit 1
+  elif [[ ! -r "$file" ]]; then
+    echo "Error: File is not readable: $file" >&2
     exit 1
   fi
-}
+done
 
-# Check if file exists
-# $1 - filename (string)
-check_file_exists()
+# Print verbose messages if enabled
+msg()
 {
-  local filename=$1
-  if [ ! -f "$filename" ]; then
-    error "File does not exist: $filename"
+  if [[ "$VERBOSE" -eq 1 ]]; then
+    echo "$1"
   fi
 }
 
-# Main function
-main()
+# Compute SHA256 hash for a file using awk to extract the first field
+get_sha256sum()
 {
-  local file_1=$1
-  local file_2=$2
-
-  validate_inputs "$file_1" "$file_2"
-  check_file_exists "$file_1"
-  check_file_exists "$file_2"
-
-  local file_1_hash
-  local file_2_hash
-
-  file_1_hash=$(get_sha256sum "$file_1")
-  file_2_hash=$(get_sha256sum "$file_2")
-
-  if [ "$file_1_hash" != "$file_2_hash" ]; then
-    error "Files do not match"
-  else
-    msg "(*) Success: Files do match"
-  fi
+  sha256sum "$1" | awk '{print $1}'
 }
 
-main "$@"
+msg "Computing SHA256 for '$file1'..."
+hash1=$(get_sha256sum "$file1")
+msg "SHA256 for '$file1': $hash1"
+
+msg "Computing SHA256 for '$file2'..."
+hash2=$(get_sha256sum "$file2")
+msg "SHA256 for '$file2': $hash2"
+
+if [[ "$hash1" != "$hash2" ]]; then
+  echo "Files do not match." >&2
+  exit 1
+else
+  msg "Success: Files match."
+  exit 0
+fi

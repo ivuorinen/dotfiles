@@ -1,37 +1,141 @@
 #!/usr/bin/env bash
 #
-# List open (listened) ports, without the crud that
-# usually comes with `lsof -i`
+# List open (listened) ports in Markdown or JSON format.
 #
-# Modified by:     Ismo Vuorinen <https://github.com/ivuorinen> 2020
+# Modified by:     Ismo Vuorinen <https://github.com/ivuorinen> 2020, 2025
 # Originally from: https://www.commandlinefu.com/commands/view/8951
 # Original author: https://www.commandlinefu.com/commands/by/wickedcpj
 
 set -euo pipefail
 
-# Function to print the header
-print_header()
+FORMAT="markdown"
+
+# Function to print help message
+print_help()
 {
-  echo 'User:           Command:                  PID:     Port:'
-  echo '========================================================='
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+List open (listened) ports in a formatted table (Markdown) or JSON.
+
+Options:
+  --json       Output results in JSON format instead of Markdown
+  --help       Show this help message
+
+Examples:
+  $(basename "$0")         # List open ports as a Markdown table
+  $(basename "$0") --json  # List open ports in JSON format
+
+EOF
+  exit 0
 }
 
-# Function to list open ports
+# Function to print the Markdown table header
+print_header()
+{
+  echo "| User             | Command                    | PID      | Port    |"
+  echo "|------------------|----------------------------|----------|---------|"
+}
+
+# Function to list open ports using lsof
+list_open_ports_lsof()
+{
+  lsof -i -P -n -sTCP:LISTEN +c 0 2> /dev/null | awk '
+    NR > 1 {
+      port = $9
+      sub(/.*:/, "", port)  # Extract port number
+      printf "| %-16s | %-26s | %-8s | %-7s |\n", substr($3, 1, 16), substr($1, 1, 26), substr($2, 1, 8), port
+    }
+  ' | sort -k3,3n | uniq
+}
+
+# Function to list open ports using ss (alternative)
+list_open_ports_ss()
+{
+  ss -ltpn 2> /dev/null | awk '
+    NR > 1 {
+      split($5, addr, ":")
+      port = addr[length(addr)]
+      user = $1
+      cmd = $7
+      sub(/users:\(\(/, "", cmd)  # Cleanup command
+      sub(/\)\)/, "", cmd)
+      pid = "-"
+      match(cmd, /pid=([0-9]+)/, m)
+      if (m[1] != "") pid = m[1]
+      printf "| %-16s | %-26s | %-8s | %-7s |\n", substr(user, 1, 16), substr(cmd, 1, 26), substr(pid, 1, 8), port
+    }
+  ' | sort -k3,3n | uniq
+}
+
+# Function to print JSON output
+list_open_ports_json()
+{
+  if command -v lsof &> /dev/null; then
+    lsof -i -P -n -sTCP:LISTEN +c 0 2> /dev/null | awk '
+      NR > 1 {
+        port = $9
+        sub(/.*:/, "", port)  # Extract port number
+        printf "{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", $3, $1, $2, port
+      }
+    ' | sort -k3,3n | uniq | sed '$ s/,$//'
+  elif command -v ss &> /dev/null; then
+    ss -ltpn 2> /dev/null | awk '
+      NR > 1 {
+        split($5, addr, ":")
+        port = addr[length(addr)]
+        user = $1
+        cmd = $7
+        sub(/users:\(\(/, "", cmd)
+        sub(/\)\)/, "", cmd)
+        pid = "-"
+        match(cmd, /pid=([0-9]+)/, m)
+        if (m[1] != "") pid = m[1]
+        printf "{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", user, cmd, pid, port
+      }
+    ' | sort -k3,3n | uniq | sed '$ s/,$//'
+  else
+    echo "[]"
+  fi
+}
+
+# Function to determine available command
 list_open_ports()
 {
-  lsof -i 4 -P -n +c 0 \
-    | grep -i 'listen' \
-    | awk '{print $3, $1, $2, $9}' \
-    | sed 's/ [a-z0-9\.\*]*:/ /' \
-    | sort -k 3 -n \
-    | xargs printf '%-15s %-25s %-8s %-5s\n' \
-    | uniq
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "["
+    list_open_ports_json
+    echo "]"
+  else
+    print_header
+    if command -v lsof &> /dev/null; then
+      list_open_ports_lsof
+    elif command -v ss &> /dev/null; then
+      list_open_ports_ss
+    else
+      echo "**Error:** Neither 'lsof' nor 'ss' is available."
+      exit 1
+    fi
+  fi
 }
 
 # Main function
 main()
 {
-  print_header
+  case "${1:-}" in
+    --json)
+      FORMAT="json"
+      ;;
+    --help)
+      print_help
+      ;;
+    "") ;;
+    *)
+      echo "Unknown option: $1"
+      print_help
+      ;;
+  esac
+
   list_open_ports
   echo ""
 }

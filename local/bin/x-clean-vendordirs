@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# vim: ft=bash sw=2 ts=2 et
+#
+# Removes vendor and node_modules directories from the
+# current directory and all subdirectories.
+#
+# Author: Ismo Vuorinen 2025
+# License: MIT
+
+# Check if the user has provided a directory as an argument
+if [ "$1" ]; then
+  # Check if the directory exists
+  if [ -d "$1" ]; then
+    CLEANDIR="$1"
+  else
+    msgr err "Directory $1 does not exist."
+    exit 1
+  fi
+else
+  CLEANDIR="."
+fi
+
+# Function to remove node_modules and vendor folders
+remove_node_modules_vendor() {
+  local dir=$1
+
+  # If the directory is a symlink, skip it
+  if [ -L "$dir" ]; then
+    msgr msg "Skipping symlink $dir"
+    return
+  fi
+
+  # Check if the directory exists
+  if [ -d "$dir" ]; then
+    # If node_modules or vendor folder exists, remove it and all its contents
+    if [ -d "$dir/node_modules" ]; then
+      msgr run "Removing $dir/node_modules"
+      rm -rf "$dir/node_modules"
+    fi
+
+    if [ -d "$dir/vendor" ]; then
+      msgr run "Removing $dir/vendor"
+      rm -rf "$dir/vendor"
+    fi
+
+    # Recursively check subdirectories
+    for item in "$dir"/*; do
+      remove_node_modules_vendor "$item"
+    done
+  fi
+}
+
+# Start removing node_modules and vendor folders from the current working directory
+remove_node_modules_vendor "$CLEANDIR"
