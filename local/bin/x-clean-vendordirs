@@ -21,7 +21,8 @@ else
 fi
 
 # Function to remove node_modules and vendor folders
-remove_node_modules_vendor() {
+remove_node_modules_vendor()
+{
   local dir=$1
 
   # If the directory is a symlink, skip it

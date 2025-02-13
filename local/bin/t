@@ -12,7 +12,8 @@ DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 T_MAX_DEPTH="${T_MAX_DEPTH:-3}"
 
 # Function to print an error message and exit
-error_exit() {
+error_exit()
+{
   echo "Error: $1" >&2
   exit 1
 }
@@ -22,9 +23,9 @@ if [[ ! -d "$T_ROOT" ]]; then
   error_exit "T_ROOT directory '$T_ROOT' does not exist."
 fi
 
-
 # Check for required dependencies
-check_dependencies() {
+check_dependencies()
+{
   local T_DEPS=(tmux fzf find)
   for cmd in "${T_DEPS[@]}"; do
     if ! command -v "$cmd" &> /dev/null; then
@@ -37,19 +38,21 @@ check_dependencies
 
 # Generate an array of '-not -path' rules for each exclusion pattern
 # without using namerefs.
-generate_exclude_rules() {
+generate_exclude_rules()
+{
   local result_var="$1"
   shift
   local arr=()
   for pattern in "$@"; do
     # Exclude both the directory and any subdirectories under it.
-    arr+=( -not -path "*/${pattern}" -not -path "*/${pattern}/*" )
+    arr+=(-not -path "*/${pattern}" -not -path "*/${pattern}/*")
   done
   # Use eval to assign the array to the variable whose name was passed.
   eval "$result_var=(\"\${arr[@]}\")"
 }
 
-get_directories() {
+get_directories()
+{
   local exclude_patterns=(
     ".bzr" ".git" ".hg" ".idea" ".obsidian" ".run" ".svn" ".vscode"
     "build" "dist" "node_modules" "out" "target" "vendor"
@@ -60,16 +63,18 @@ get_directories() {
   local dirs
   # Use $'string' to correctly process escape sequences.
   dirs=$'# Directories\n'
-  dirs+=$(find "$T_ROOT" \
-    -maxdepth "$T_MAX_DEPTH" \
-    -mindepth 1 \
-    -type d \
-    "${exclude_rules[@]}"
+  dirs+=$(
+    find "$T_ROOT" \
+      -maxdepth "$T_MAX_DEPTH" \
+      -mindepth 1 \
+      -type d \
+      "${exclude_rules[@]}"
   )
   echo -e "$dirs"
 }
 
-check_tmux() {
+check_tmux()
+{
   if ! command -v tmux &> /dev/null; then
     error_exit "tmux is not installed."
   fi
@@ -80,7 +85,8 @@ check_tmux() {
   fi
 }
 
-get_sessions() {
+get_sessions()
+{
   check_tmux
 
   T_TMUX_SESSIONS=$(tmux list-sessions -F "#{session_name}" 2> /dev/null)
@@ -119,8 +125,8 @@ fi
 session_name="${session_name//./}"
 
 # Attempt to switch to an existing session
-tmux switch-client -t "=$session_name" 2>/dev/null
-active_session=$(tmux display-message -p -F '#{session_name}' 2>/dev/null)
+tmux switch-client -t "=$session_name" 2> /dev/null
+active_session=$(tmux display-message -p -F '#{session_name}' 2> /dev/null)
 
 if [[ "$active_session" == "$session_name" ]]; then
   exit 0
@@ -132,7 +138,7 @@ if [ -z "$TMUX" ]; then
   tmux new-session -A -s "$session_name" -c "$selected"
 else
   # Inside tmux: check if the target session exists.
-  if tmux has-session -t "$session_name" 2>/dev/null; then
+  if tmux has-session -t "$session_name" 2> /dev/null; then
     # Session exists; switch to it.
     tmux switch-client -t "$session_name"
   else

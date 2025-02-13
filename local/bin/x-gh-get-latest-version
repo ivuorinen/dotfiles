@@ -12,13 +12,15 @@ GITHUB_API_URL="${GITHUB_API_URL:-https://api.github.com/repos}"
 VERBOSE="${VERBOSE:-0}"
 
 # Prints a message if VERBOSE=1
-msg() {
+msg()
+{
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
 }
 
 # Show usage information
-usage() {
-  cat <<EOF
+usage()
+{
+  cat << EOF
 Usage: $0 <repo> (e.g. ivuorinen/dotfiles)
 
 Fetches the latest release version, latest branch tag, or latest commit SHA from GitHub.
@@ -65,9 +67,10 @@ EOF
 }
 
 # Check that required dependencies are installed
-check_dependencies() {
+check_dependencies()
+{
   for cmd in curl jq; do
-    if ! command -v "$cmd" &>/dev/null; then
+    if ! command -v "$cmd" &> /dev/null; then
       echo "Error: '$cmd' is required but not installed." >&2
       exit 1
     fi
@@ -76,7 +79,8 @@ check_dependencies() {
 
 # Fetches the latest release or the oldest if OLDEST_RELEASE=1
 # $1 - GitHub repository (string)
-get_release_version() {
+get_release_version()
+{
   local repo="$1"
   local include_prereleases="${INCLUDE_PRERELEASES:-0}"
   local oldest_release="${OLDEST_RELEASE:-0}"
@@ -93,7 +97,7 @@ get_release_version() {
   json_response=$(curl -sSL "${auth_header[@]}" "$api_url")
 
   # Check for API errors
-  if echo "$json_response" | jq -e 'has("message")' >/dev/null; then
+  if echo "$json_response" | jq -e 'has("message")' > /dev/null; then
     msg "GitHub API error: $(echo "$json_response" | jq -r '.message')"
     exit 1
   fi
@@ -117,7 +121,8 @@ get_release_version() {
 }
 
 # Fetches the latest tag from the specified branch
-get_latest_branch_tag() {
+get_latest_branch_tag()
+{
   local repo="$1"
   local branch="${BRANCH:-main}"
   local api_url="${GITHUB_API_URL}/${repo}/git/refs/tags"
@@ -139,7 +144,8 @@ get_latest_branch_tag() {
 }
 
 # Fetches the latest commit SHA from the specified branch
-get_latest_commit() {
+get_latest_commit()
+{
   local repo="$1"
   local branch="${BRANCH:-main}"
   local api_url="${GITHUB_API_URL}/${repo}/commits/$branch"
@@ -162,7 +168,8 @@ get_latest_commit() {
 
 # Main function
 # $1 - GitHub repository (string)
-main() {
+main()
+{
   if [[ $# -ne 1 ]]; then
     usage
   fi
