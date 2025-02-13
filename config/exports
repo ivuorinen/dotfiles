@@ -295,9 +295,9 @@ export SHORT_HOST=$(hostname -s)
 # https://github.com/asdf-vm/asdf
 msg "Setting up asdf configuration"
 export ASDF_DIR="${XDG_BIN_HOME}/asdf"
-if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
-  [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
+[[ -d $ASDF_DIR ]] && {
+  # [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
+  # [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
 
   export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
   export ASDF_DATA_DIR="${ASDF_DIR}"
@@ -318,7 +318,7 @@ if [[ -d $ASDF_DIR ]]; then
   export PATH="${ASDF_DIR}/bin:${PATH}"
 
   source "$ASDF_DIR/asdf.sh"
-fi
+}
 
 # Antidote configuration
 # https://getantidote.github.io/
@@ -368,8 +368,6 @@ export HOMEBREW_NO_ENV_HINTS=true
 export HOMEBREW_BUNDLE_MAS_SKIP=true
 export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/homebrew/Brewfile"
 x-have brew && {
-  # Add brew autocompletion to fpath
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
   eval "$(brew shellenv)"
 }
 
@@ -487,13 +485,8 @@ export ZSHZ_DATA="$XDG_STATE_HOME/z"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
-X_EXPORTS_FILES=(
-  "$HOME/.config/exports-secret"
-  "$HOME/.config/exports-$(hostname)"
-  "$HOME/.config/exports-$(hostname)-secret"
-)
-for exportFile in "${X_EXPORTS_FILES[@]}"; do
-  # shellcheck source=$HOME/.config/exports-secret
-  [ -f "$exportFile" ] && source "$exportFile" && msg "Sourced $exportFile"
-done
-unset X_EXPORTS_FILES
+[ -f "$XDG_CONFIG_HOME/exports-secret" ] && source "$XDG_CONFIG_HOME/exports-secret"
+[ -f "$XDG_CONFIG_HOME/exports-local" ] && source "$XDG_CONFIG_HOME/exports-local"
+[ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)"
+[ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"
+
