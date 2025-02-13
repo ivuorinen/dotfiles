@@ -29,8 +29,6 @@ brew "age"
 brew "ca-certificates"
 # Mozilla CA bundle for Python
 brew "certifi"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # YAML Parser
@@ -49,6 +47,8 @@ brew "highway"
 brew "imath"
 # JPEG image codec that aids compression and decompression
 brew "jpeg-turbo"
+# Library for manipulating PNG images
+brew "libpng"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
 # New file format for still image compression
@@ -105,12 +105,18 @@ brew "cmake"
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
+# .NET Core
+brew "dotnet@8", link: true
 # Spellchecker wrapping library
 brew "enchant"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
+# Text-based UI library
+brew "ncurses"
+# User-friendly command-line shell for UNIX-like operating systems
+brew "fish"
 # Lock file during command
 brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
@@ -151,6 +157,8 @@ brew "gnutls"
 brew "gnupg"
 # Library access to GnuPG
 brew "gpgme"
+# Open source suite of directory software
+brew "openldap"
 # Manage your GnuPG keys with ease!
 brew "gpg-tui"
 # Image manipulation
@@ -163,8 +171,6 @@ brew "graphviz"
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
-# Text-based UI library
-brew "ncurses"
 # Improved top (interactive process viewer)
 brew "htop"
 # Portable abstraction of the hierarchical topology of modern architectures
@@ -197,6 +203,8 @@ brew "libressl"
 brew "libuv"
 # GNOME XML library
 brew "libxml2"
+# C library for reading, creating, and modifying zip archives
+brew "libzip"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
@@ -213,18 +221,10 @@ brew "nginx"
 brew "nmap"
 # Libraries for security-enabled client and server applications
 brew "nss"
-# Open source suite of directory software
-brew "openldap"
 # Cryptography and SSL/TLS Toolkit
 brew "openssl@1.1"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
-# General-purpose scripting language
-brew "php"
-# General-purpose scripting language
-brew "php@8.2"
-# General-purpose scripting language
-brew "php@8.3"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
@@ -273,12 +273,8 @@ brew "cormacrelf/tap/dark-notify"
 brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
-# Terminus is Pantheon's Command-line Interface (CLI)
-brew "pantheon-systems/external/terminus"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
 brew "reviewdog/tap/reviewdog"
-# Igbinary PHP extension
-brew "shivammathur/extensions/igbinary@8.3"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.3"
 # Mcrypt PHP extension
@@ -294,13 +290,13 @@ brew "shivammathur/extensions/uuid@8.3"
 # Yaml PHP extension
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
+brew "shivammathur/php/php"
+# General-purpose scripting language
 brew "shivammathur/php/php-debug"
-# General-purpose scripting language
-brew "shivammathur/php/php@7.4"
-# General-purpose scripting language
-brew "shivammathur/php/php@8.0", link: true
 # Find & fix known vulnerabilities in open-source dependencies
 brew "snyk/tap/snyk"
+# Command-line interface for 1Password
+cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
 # Text editor
