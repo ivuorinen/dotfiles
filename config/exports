@@ -14,13 +14,7 @@
 # if DOTFILES is not set, set it to the default location
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
 
-# zsh completions directory
-[ -z "$ZSH_COMPLETIONS" ] && export ZSH_COMPLETIONS="$XDG_CONFIG_HOME/zsh/completion"
-
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-# Add zsh completions to FPATH, compinit will be called later
-FPATH="$ZSH_COMPLETIONS:$FPATH"
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled

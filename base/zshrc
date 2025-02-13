@@ -14,6 +14,12 @@ export SHARED_SCRIPTS_SOURCED=0
 source "$DOTFILES/config/shared.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
+# zsh completions directory
+[ -z "$ZSH_COMPLETIONS" ] && export ZSH_COMPLETIONS="$XDG_CONFIG_HOME/zsh/completion"
+
+# Add zsh completions to FPATH, compinit will be called later
+FPATH="$ZSH_COMPLETIONS:$FPATH"
+
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
 source "$DOTFILES/config/zsh/antidote.zsh"
