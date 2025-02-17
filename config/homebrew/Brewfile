@@ -29,6 +29,8 @@ brew "age"
 brew "ca-certificates"
 # Mozilla CA bundle for Python
 brew "certifi"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # YAML Parser
@@ -47,8 +49,6 @@ brew "highway"
 brew "imath"
 # JPEG image codec that aids compression and decompression
 brew "jpeg-turbo"
-# Library for manipulating PNG images
-brew "libpng"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
 # New file format for still image compression
@@ -113,8 +113,6 @@ brew "enchant"
 brew "exiftool"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
-# Text-based UI library
-brew "ncurses"
 # User-friendly command-line shell for UNIX-like operating systems
 brew "fish"
 # Lock file during command
@@ -157,8 +155,6 @@ brew "gnutls"
 brew "gnupg"
 # Library access to GnuPG
 brew "gpgme"
-# Open source suite of directory software
-brew "openldap"
 # Manage your GnuPG keys with ease!
 brew "gpg-tui"
 # Image manipulation
@@ -195,16 +191,12 @@ brew "legitify"
 brew "libedit"
 # Conversion library
 brew "libiconv"
-# Postgres C API library
-brew "libpq"
 # Version of the SSL/TLS protocol forked from OpenSSL
 brew "libressl"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
 # GNOME XML library
 brew "libxml2"
-# C library for reading, creating, and modifying zip archives
-brew "libzip"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
@@ -221,10 +213,14 @@ brew "nginx"
 brew "nmap"
 # Libraries for security-enabled client and server applications
 brew "nss"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@1.1"
+# Open source suite of directory software
+brew "openldap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
+# General-purpose scripting language
+brew "php@8.2"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
@@ -275,6 +271,8 @@ brew "doron-cohen/tap/antidot"
 brew "gesquive/tap/git-user"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
 brew "reviewdog/tap/reviewdog"
+# Igbinary PHP extension
+brew "shivammathur/extensions/igbinary@8.3"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.3"
 # Mcrypt PHP extension
@@ -293,20 +291,18 @@ brew "shivammathur/extensions/yaml@8.3"
 brew "shivammathur/php/php"
 # General-purpose scripting language
 brew "shivammathur/php/php-debug"
-# Find & fix known vulnerabilities in open-source dependencies
-brew "snyk/tap/snyk"
 # Command-line interface for 1Password
 cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
-# Text editor
-cask "coda"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Database version management tool
 cask "dbngin"
 # App to build and share containerised applications and microservices
 cask "docker"
+# Calendar software
+cask "fantastical"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-open-sans"
@@ -326,8 +322,6 @@ cask "ngrok"
 cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Display image info and preview unsupported formats in QuickLook
-cask "qlimagesize"
 # Quick Look generator for Markdown files
 cask "qlmarkdown"
 # Quick Look plugin for plaintext files without an extension
