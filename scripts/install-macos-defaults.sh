@@ -22,11 +22,14 @@ while true; do
   kill -0 "$$" || exit
 done 2> /dev/null &
 
-msgr nested "Change user shell to zsh if it is available and not the current"
+# Skip when shell is fish
+if [[ $SHELL != $(which fish) ]]; then
+  msgr nested "Change user shell to zsh if it is available and not the current"
 
-# Change user shell to zsh if not that already.
-if hash zsh 2> /dev/null; then
-  [[ $SHELL != $(which zsh) ]] && chsh -s "$(which zsh)"
+  # Change user shell to zsh if not that already.
+  if hash zsh 2> /dev/null; then
+    [[ $SHELL != $(which zsh) ]] && chsh -s "$(which zsh)"
+  fi
 fi
 
 ###############################################################################
