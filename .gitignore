@@ -33,3 +33,4 @@ lock
 node_modules
 ssh/local.d/*
 !ssh/local.d/.gitkeep
+config/fish/fish_variables
