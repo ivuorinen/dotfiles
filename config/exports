@@ -465,7 +465,7 @@ export TMUX_CONF_DIR="$XDG_CONFIG_HOME/tmux"
 export TMUX_PLUGINS="$TMUX_CONF_DIR/plugins"
 export TMUX_CONF="$TMUX_CONF_DIR/tmux.conf"
 ## These settings are for zsh-tmux
-export ZSH_TMUX_AUTOSTART=false
+export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_CONFIG="$TMUX_CONF"
 export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false
