@@ -1,40 +1,44 @@
 #!/usr/bin/env bash
 #
-# Add a directory to the beginning of the PATH if it's not already there.
-# Usage: x-path-append <dir>
+# Optimized script to append directories to PATH.
+# For each given directory, it removes all duplicate occurrences from PATH
+# and then appends it if the directory exists.
+#
+# Usage: x-path-append <directory1> [<directory2> ...]
+#
+# Enable verbose output by setting the environment variable VERBOSE=1.
+#
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
+# License: MIT
 
-# Set verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-# Function to print messages if VERBOSE is enabled
-# $1 - message (string)
-msg()
-{
-  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+# Ensure that at least one directory is provided.
+[ "$#" -lt 1 ] && {
+  echo "Usage: $0 <directory> [<directory> ...]"
+  exit 1
 }
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <dir>"
-  exit 1
-fi
+for dir in "$@"; do
+  # Check if the specified directory exists.
+  if [ ! -d "$dir" ]; then
+    [ "$VERBOSE" -eq 1 ] && echo "(?) Directory '$dir' does not exist. Skipping."
+    continue
+  fi
 
-dir="$1"
+  # Remove all duplicate occurrences of the directory from PATH.
+  case ":$PATH:" in
+    *":$dir:"*)
+      PATH=":${PATH}:"
+      PATH="${PATH//:$dir:/:}"
+      PATH="${PATH#:}"
+      PATH="${PATH%:}"
+      [ "$VERBOSE" -eq 1 ] && echo "Removed previous occurrences of '$dir' from PATH."
+      ;;
+    *) ;;
+  esac
 
-if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
-  export PATH=$(echo -n "$PATH" | awk -v RS=: -v ORS=: "\$0 != \"$dir\"" | sed 's/:$//')
-  msg "Directory $dir has been removed from PATH"
-else
-  msg "Directory $dir is not in PATH"
-fi
-
-if [ ! -d "$dir" ]; then
-  msg "(?) Directory $dir does not exist"
-  exit 0
-fi
-
-if echo "$PATH" | grep -qE "(^|:)$dir($|:)"; then
-  msg "(!) Directory $dir is already in PATH"
-else
+  # Append the directory to PATH.
   export PATH="${PATH:+"$PATH:"}$dir"
-  msg "(!) Directory $dir has been added to the end of PATH"
-fi
+  [ "$VERBOSE" -eq 1 ] && echo "Appended '$dir' to PATH."
+done

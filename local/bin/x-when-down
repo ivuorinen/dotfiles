@@ -1,7 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Wait until a given host is down (determined by ping) then execute the
 # given command
+#
+# This script is based on the original work by Steve Kemp.
+# Original work Copyright (c) 2013 by Steve Kemp.
+#
+# The code in the original repository may be modified and distributed under your choice of:
+#   * The Perl Artistic License (http://dev.perl.org/licenses/artistic.html) or
+#   * The GNU General Public License, version 2 or later (http://www.gnu.org/licenses/gpl2.txt).
+#
+# Modifications and enhancements by Ismo Vuorinen on 2025.
 #
 # Usage:
 # ./when-down HOST COMMAND...

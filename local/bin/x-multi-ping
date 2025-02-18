@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# x-multi-ping: Multi-protocol ping wrapper in Bash
+#
+# Description:
+# This script pings a list of hostnames using both IPv4 and IPv6 protocols.
+# It uses the 'dig' command to resolve the hostnames and then pings each IP
+# address found. The script can run once or loop indefinitely with a sleep
+# interval between iterations.
+#
+# This script is based on the original work by Steve Kemp.
+# Original work Copyright (c) 2014 by Steve Kemp.
+#
+# The code in the original repository may be modified and distributed under your choice of:
+#   * The Perl Artistic License (http://dev.perl.org/licenses/artistic.html) or
+#   * The GNU General Public License, version 2 or later (http://www.gnu.org/licenses/gpl2.txt).
+#
+# Modifications and enhancements by Ismo Vuorinen on 2025.
+#
+# Usage:
+# x-multi-ping [--loop|--forever] [--sleep=N] hostname1 hostname2 ...
+#
+# Options:
+#   --help             Display this help message.
+#   --verbose          Enable verbose output.
+#   --loop, --forever  Loop indefinitely.
+#   --sleep=N          Sleep N seconds between iterations (default: 1).
+#
+# Examples:
+#   x-multi-ping example.com
+#   x-multi-ping --loop --sleep=5 example.com
+#   x-multi-ping --forever example.com example.org
+#
+# Dependencies:
+#   - dig (DNS lookup utility)
+#   - ping (ICMP ping utility)
+#   - ping6 (IPv6 ping utility) or ping -6 (alternative)
+#
+
+# Defaults
+LOOP=0
+SLEEP=1
+VERBOSE=0
+TIMEOUT=5
+
+usage()
+{
+  echo "Usage: $0 [--loop|--forever] [--sleep=N] hostname1 hostname2 ..."
+  echo "Options:"
+  echo "  --help           Display this help message."
+  echo "  --verbose        Enable verbose output."
+  echo "  --loop, --forever  Loop indefinitely."
+  echo "  --sleep=N        Sleep N seconds between iterations (default: 1)."
+}
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --help)
+      usage
+      exit 0
+      ;;
+    --verbose)
+      # shellcheck disable=SC2034
+      VERBOSE=1
+      shift
+      ;;
+    --loop | --forever)
+      LOOP=1
+      shift
+      ;;
+    --sleep=*)
+      SLEEP="${1#*=}"
+      shift
+      ;;
+    --sleep)
+      if [[ -n "$2" ]]; then
+        SLEEP="$2"
+        shift 2
+      else
+        echo "Error: --sleep requires a numeric value."
+        exit 1
+      fi
+      ;;
+    --*)
+      echo "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+# Check for required hostnames
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 1
+fi
+
+# Dependency check for dig and ping
+if ! command -v dig > /dev/null 2>&1; then
+  echo "The required 'dig' command is missing. Aborting."
+  exit 1
+fi
+
+if ! command -v ping > /dev/null 2>&1; then
+  echo "The required 'ping' command is missing. Aborting."
+  exit 1
+fi
+
+# Determine how to invoke IPv6 ping
+if command -v ping6 > /dev/null 2>&1; then
+  PING6="ping6"
+elif ping -6 -c1 ::1 > /dev/null 2>&1; then
+  PING6="ping -6"
+else
+  echo "The required IPv6 ping command (ping6 or ping -6) is missing. Aborting."
+  exit 1
+fi
+
+# Function to remove any URI scheme and port from the hostname.
+strip_hostname()
+{
+  local host="$1"
+  # Remove leading scheme (e.g., http://) if present.
+  if [[ "$host" =~ ^[a-z]+://([^/]+)/? ]]; then
+    host="${BASH_REMATCH[1]}"
+  fi
+  # Remove a port if specified (e.g., example.com:80).
+  if [[ "$host" =~ ^([^:]+):[0-9]+$ ]]; then
+    host="${BASH_REMATCH[1]}"
+  fi
+  echo "$host"
+}
+
+# Function to ping a given host based on DNS lookups.
+pingHost()
+{
+  local original_host="$1"
+  local host
+  host=$(strip_hostname "$original_host")
+
+  for type in A AAAA; do
+    # Look up the DNS records for the host.
+    ips=$(dig +short "$host" "$type")
+    if [[ -z "$ips" ]]; then
+      echo "WARNING: Failed to resolve $host [$type]"
+    else
+      # For each IP address found, perform the appropriate ping.
+      while IFS= read -r ip; do
+        if [[ "$type" == "A" ]]; then
+          ping_binary="ping"
+        else
+          ping_binary="$PING6"
+        fi
+
+        # Execute ping with one packet and a timeout.
+        $ping_binary -c1 -w"$TIMEOUT" -W"$TIMEOUT" "$host" > /dev/null 2>&1
+        # shellcheck disable=SC2181
+        if [[ $? -eq 0 ]]; then
+          echo "Host $host - $ip - alive"
+        else
+          echo "Host $host - $ip - FAILED"
+        fi
+      done <<< "$ips"
+    fi
+  done
+}
+
+# Main loop: run once or forever based on the options.
+if [[ $LOOP -eq 1 ]]; then
+  while true; do
+    for host in "$@"; do
+      pingHost "$host"
+    done
+    sleep "$SLEEP"
+  done
+else
+  for host in "$@"; do
+    pingHost "$host"
+  done
+fi

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Fetch the latest release version of a GitHub repository in tar.gz format (e.g. v1.0.0.tar.gz)
-# Usage: x-gh-get-latest-release-targ <repo> [--get]
+# Usage: x-gh-get-latest-release-targz <repo> [--get]
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 
 set -euo pipefail

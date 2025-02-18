@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Quota usage
  * Show quota usage
@@ -10,6 +11,7 @@
  * @license MIT
  * @author Ismo Vuorinen <https://github.com/ivuorinen>
  */
+
 error_reporting(E_ALL);
 
 $debug = false;

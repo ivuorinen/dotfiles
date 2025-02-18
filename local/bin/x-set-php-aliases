@@ -1,71 +1,137 @@
 #!/usr/bin/env bash
-# Check which PHP versions are installed with brew, and create aliases for each installation.
-# Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
+# -----------------------------------------------------------------------------
+# This script caches the list of PHP installations via Homebrew and generates
+# shell aliases for each installation. Both the brew list and the generated
+# alias definitions are stored in the XDG cache directory.
+#
+# If the brew list cache is invalid (older than CACHE_TTL), then both caches are
+# regenerated. Otherwise, if only the alias cache is stale, it is regenerated
+# from the brew list cache.
+#
+# Usage:
+#   source x-set-php-aliases.sh
+#
+# (C) 2023, 2025 Ismo Vuorinen. All Rights Reserved.
+# -----------------------------------------------------------------------------
 
 set -euo pipefail
 
-# Set verbosity with VERBOSE=1 x-set-php-aliases
+# Set verbosity level (0 by default; set to 1 or 2 for more detail)
 VERBOSE="${VERBOSE:-0}"
-
-# Enable debugging if verbosity is set to 2
 [ "$VERBOSE" = "2" ] && set -x
 
-# Check if brew is installed, if not exit.
+# Exit early if Homebrew is not installed.
 if ! command -v brew &> /dev/null; then
+  echo "Homebrew is not installed. Exiting."
   exit 0
 fi
 
-# Function to read installed PHP versions using brew
-get_php_versions()
+# Determine Homebrew's prefix.
+HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix)}"
+
+# Determine the XDG cache directory (default to ~/.cache).
+XDG_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}"
+CACHE_DIR="${XDG_CACHE}/x-set-php-aliases"
+mkdir -p "$CACHE_DIR"
+
+# Define cache file paths.
+BREW_LIST_CACHE="${CACHE_DIR}/brew_list.cache"
+ALIASES_CACHE="${CACHE_DIR}/aliases.cache"
+
+# Cache time-to-live in seconds (here 300 seconds = 5 minutes).
+CACHE_TTL=300
+
+# -----------------------------------------------------------------------------
+# Function: cache_is_valid
+#   Returns 0 if the file exists and its modification time is within TTL.
+# -----------------------------------------------------------------------------
+cache_is_valid()
 {
-  local versions=()
-  while IFS="" read -r line; do
-    versions+=("$line")
-  done < <(bkt -- brew list | grep '^php')
-  echo "${versions[@]}"
+  local file="$1"
+  local ttl="$2"
+  if [[ -f "$file" ]]; then
+    local mod_time
+    if stat --version &> /dev/null; then
+      mod_time=$(stat -c %Y "$file")
+    else
+      mod_time=$(stat -f %m "$file")
+    fi
+    local current_time
+    current_time=$(date +%s)
+    if ((current_time - mod_time < ttl)); then
+      return 0
+    fi
+  fi
+  return 1
 }
 
-# Function to create aliases for each PHP version
-create_aliases()
+# -----------------------------------------------------------------------------
+# Function: generate_aliases
+#   Reads PHP formulas (one per line) from the specified file and prints out
+#   alias definitions for each valid PHP installation.
+#
+#   The following aliases are created (assuming the formula is "php@80"):
+#
+#     p80r  : Raw PHP (executable only)
+#     p80   : PHP with an error reporting flag enabled
+#     p80s  : Launches a PHP local server at localhost:9000
+#     p80c  : Runs composer (if found) using this PHP and error reporting flag
+# -----------------------------------------------------------------------------
+generate_aliases()
 {
-  local php_versions=("$@")
+  local brew_file="$1"
   local php_error_reporting='-d error_reporting=22527'
+  local composer_path
+  composer_path=$(command -v composer 2> /dev/null || true)
 
-  for version in "${php_versions[@]}"; do
-    [ "$VERBOSE" = "1" ] && echo "Setting aliases for $version"
+  while IFS= read -r version || [[ -n "$version" ]]; do
+    # Remove any leading/trailing whitespace.
+    version=$(echo "$version" | xargs)
+    [[ -z "$version" ]] && continue
 
-    # Drop the dot from version (e.g., 8.0 -> 80)
+    # Compute an alias name: remove dots and replace "php@" with "p"
     local php_abbr="${version//\./}"
-    # Replace "php@" with "p" so "php@80" becomes "p80"
     local php_alias="${php_abbr//php@/p}"
 
-    # Fetch the exec path once
-    local php_exec="$HOMEBREW_PREFIX/opt/$version/bin/php"
-
-    if [ -f "$php_exec" ]; then
-      [ "$VERBOSE" = "1" ] && echo "-> php_exec $php_exec"
-
-      # Raw PHP without error_reporting flag.
-      alias "${php_alias}r"="$php_exec"
-
-      # PHP with error_reporting flag.
-      alias "$php_alias"="$php_exec $php_error_reporting"
-
-      # Local PHP Server.
-      alias "${php_alias}s"="$php_exec -S localhost:9000"
-
-      # Use composer with specific PHP and error_reporting flag on.
-      alias "${php_alias}c"="$php_exec $php_error_reporting $(which composer)"
+    local php_exec="${HOMEBREW_PREFIX}/opt/${version}/bin/php"
+    if [[ -x "$php_exec" ]]; then
+      echo "alias ${php_alias}r='$php_exec'"
+      echo "alias $php_alias='$php_exec $php_error_reporting'"
+      echo "alias ${php_alias}s='$php_exec -S localhost:9000'"
+      if [[ -n "$composer_path" ]]; then
+        echo "alias ${php_alias}c='$php_exec $php_error_reporting $composer_path'"
+      fi
+    else
+      [[ "$VERBOSE" -ge 1 ]] && echo "Executable not found: $php_exec (skipping alias for $version)"
     fi
-  done
+  done < "$brew_file"
 }
 
-# Main function
-main()
-{
-  local php_versions
-  php_versions=($(get_php_versions))
-  create_aliases "${php_versions[@]}"
-}
+# -----------------------------------------------------------------------------
+# Main Cache Update Logic
+#
+# If the brew list cache is stale (or missing), regenerate it and the aliases.
+# If only the alias cache is stale, regenerate just the alias cache.
+# -----------------------------------------------------------------------------
+if ! cache_is_valid "$BREW_LIST_CACHE" "$CACHE_TTL"; then
+  [[ "$VERBOSE" -ge 1 ]] && echo "Brew list cache is stale or missing. Regenerating brew list and aliases."
+  # Regenerate the brew list cache (filtering only PHP formulas).
+  brew list | grep '^php' > "$BREW_LIST_CACHE"
+  # Generate the aliases cache from the new brew list.
+  generate_aliases "$BREW_LIST_CACHE" > "$ALIASES_CACHE"
+else
+  [[ "$VERBOSE" -ge 1 ]] && echo "Using cached brew list from $BREW_LIST_CACHE."
+  if ! cache_is_valid "$ALIASES_CACHE" "$CACHE_TTL"; then
+    [[ "$VERBOSE" -ge 1 ]] && echo "Alias cache is stale or missing. Regenerating aliases."
+    generate_aliases "$BREW_LIST_CACHE" > "$ALIASES_CACHE"
+  fi
+fi
 
-main "$@"
+# Source the cached alias definitions.
+if [[ -f "$ALIASES_CACHE" ]]; then
+  # shellcheck source=/dev/null
+  source "$ALIASES_CACHE"
+  [[ "$VERBOSE" -ge 1 ]] && echo "Aliases loaded from cache."
+else
+  [[ "$VERBOSE" -ge 1 ]] && echo "No alias cache found; no aliases were loaded."
+fi

@@ -1,69 +1,192 @@
 #!/usr/bin/env bash
-# Generate thumbnails using ImageMagick (magick)
+#
+# Generate thumbnails using ImageMagick (magick) with MIME type filtering.
 # https://imagemagick.org/script/download.php
 #
-# Defaults to current directory creating thumbnails with 1000x1000
-# dimensions and 200px white borders around the original image.
+# This script recursively processes images in a given directory (and its subdirectories)
+# by using the `mimetype` command to detect file types. Files with MIME types that are not
+# supported by ImageMagick (as defined in the ALLOWED_MIMETYPES array) are skipped.
 #
-# Defaults can be overridden with ENV variables like this:
-# $ THMB_BACKGROUND=black x-thumbgen ~/images/
+# Defaults (can be overridden by environment variables or command-line options):
+#   THUMB_SOURCE: Directory with images (provided as a positional argument)
+#   THUMB_OUTPUT: Directory to store thumbnails (default: same as THUMB_SOURCE)
+#   THUMB_BACKGROUND: Background color (default: white)
+#   THUMB_RESIZE: Resize dimensions (default: 800x800)
+#   THUMB_EXTENT: Canvas dimensions (default: 1000x1000)
+#   THUMB_SUFFIX: Suffix appended to filename (default: _thumb)
 #
-# Created by: Ismo Vuorinen <https://github.com/ivuorinen> 2015
+# Options:
+#   -o output_directory  Specify the output directory for thumbnails (default: same as source).
+#   -s suffix            Specify a custom suffix for thumbnail filenames (default: _thumb).
+#   -h, --help           Display this help message and exit.
+#
+# Example:
+#   THUMB_BACKGROUND=black x-thumbgen.sh -o ~/thumbnails ~/images/
+#
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2015
+# Improved in 2025
 
 set -euo pipefail
 
-# Default values
-: "${THMB_SOURCE:=${1:-}}"
-: "${THMB_BACKGROUND:=white}"
-: "${THMB_RESIZE:=800x800}"
-: "${THMB_EXTENT:=1000x1000}"
-
-# Print usage information
 usage()
 {
-  echo "Usage: $0 /full/path/to/image/folder"
+  cat << EOF
+Usage: $0 [options] source_directory
+
+Options:
+  -o output_directory  Specify the output directory for thumbnails (default: same as source).
+  -s suffix            Specify a custom suffix for thumbnail filenames (default: _thumb).
+  -h, --help           Display this help message and exit.
+EOF
   exit 1
 }
 
-# Check if ImageMagick is installed
+# Default values (can be overridden by ENV variables)
+THUMB_SOURCE=""
+THUMB_OUTPUT=""
+THUMB_BACKGROUND="${THUMB_BACKGROUND:-white}"
+THUMB_RESIZE="${THUMB_RESIZE:-800x800}"
+THUMB_EXTENT="${THUMB_EXTENT:-1000x1000}"
+THUMB_SUFFIX="${THUMB_SUFFIX:-_thumb}"
+
+# List of MIME types supported by ImageMagick (adjust as needed)
+ALLOWED_MIMETYPES=("image/jpeg" "image/png" "image/gif" "image/bmp" "image/tiff" "image/webp")
+
 check_magick_installed()
 {
   if ! command -v magick &> /dev/null; then
-    echo "magick not found in PATH, https://imagemagick.org/script/download.php"
+    echo "Error: 'magick' command not found. Please install ImageMagick from https://imagemagick.org/script/download.php" >&2
     exit 1
   fi
 }
 
-# Generate thumbnails
-generate_thumbnails()
+check_mimetype_installed()
 {
-  local source=$1
-
-  magick \
-    "${source}/*" \
-    -resize "$THMB_RESIZE" \
-    -background "$THMB_BACKGROUND" \
-    -gravity center \
-    -extent "$THMB_EXTENT" \
-    -set filename:fname '%t_thumb.%e' +adjoin '%[filename:fname]'
+  if ! command -v mimetype &> /dev/null; then
+    echo "Error: 'mimetype' command not found. Please install it (e.g. via 'sudo apt install libfile-mimeinfo-perl' on Debian/Ubuntu)." >&2
+    exit 1
+  fi
 }
 
-# Main function
-main()
+# Helper function to check if a given MIME type is allowed
+is_supported_mimetype()
 {
-  # Validate input
-  if [ -z "$THMB_SOURCE" ]; then
+  local mt=$1
+  for allowed in "${ALLOWED_MIMETYPES[@]}"; do
+    if [[ "$mt" == "$allowed" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Parse command-line options using getopts
+parse_options()
+{
+  while getopts ":o:s:h-:" opt; do
+    case $opt in
+      o)
+        THUMB_OUTPUT="$OPTARG"
+        ;;
+      s)
+        THUMB_SUFFIX="$OPTARG"
+        ;;
+      h)
+        usage
+        ;;
+      -)
+        if [[ "$OPTARG" == "help" ]]; then
+          usage
+        else
+          echo "Error: Unknown option --$OPTARG" >&2
+          usage
+        fi
+        ;;
+      \?)
+        echo "Error: Invalid option -$OPTARG" >&2
+        usage
+        ;;
+      :)
+        echo "Error: Option -$OPTARG requires an argument." >&2
+        usage
+        ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  # The remaining argument should be the source directory.
+  if [ $# -lt 1 ]; then
+    echo "Error: Source directory is required." >&2
     usage
   fi
 
-  # Check if the source directory is valid
-  if [ ! -d "$THMB_SOURCE" ]; then
-    echo "Invalid directory: $THMB_SOURCE"
+  THUMB_SOURCE="$1"
+}
+
+# Generate thumbnails recursively using find and filtering by MIME type
+generate_thumbnails()
+{
+  local source_dir=$1
+  local output_dir=$2
+
+  # Ensure the output directory exists (create if necessary)
+  if [ ! -d "$output_dir" ]; then
+    mkdir -p "$output_dir"
+  fi
+
+  # Recursively find all files.
+  while IFS= read -r -d '' file; do
+    # Use mimetype to determine the file's MIME type.
+    file_mimetype=$(mimetype -b "$file")
+    if ! is_supported_mimetype "$file_mimetype"; then
+      echo "Skipping unsupported MIME type '$file_mimetype' for file: $file" >&2
+      continue
+    fi
+
+    # Determine the relative path with respect to the source directory.
+    rel_path="${file#$source_dir/}"
+    dir="$(dirname "$rel_path")"
+    base="$(basename "$rel_path")"
+    filename="${base%.*}"
+    ext="${base##*.}"
+
+    # Create corresponding output subdirectory
+    out_dir="${output_dir}/${dir}"
+    mkdir -p "$out_dir"
+    outfile="${out_dir}/${filename}${THUMB_SUFFIX}.${ext}"
+
+    echo "Processing '$file' -> '$outfile'..."
+    magick "$file" \
+      -resize "$THUMB_RESIZE" \
+      -background "$THUMB_BACKGROUND" \
+      -gravity center \
+      -extent "$THUMB_EXTENT" \
+      "$outfile"
+  done < <(find "$source_dir" -type f -print0)
+}
+
+main()
+{
+  parse_options "$@"
+
+  if [ -z "$THUMB_SOURCE" ]; then
+    echo "Error: Source directory not specified." >&2
+    usage
+  fi
+
+  if [ ! -d "$THUMB_SOURCE" ]; then
+    echo "Error: Source directory '$THUMB_SOURCE' does not exist or is not accessible." >&2
     exit 1
   fi
 
+  # If output directory is not specified, default to the source directory.
+  if [ -z "$THUMB_OUTPUT" ]; then
+    THUMB_OUTPUT="$THUMB_SOURCE"
+  fi
+
   check_magick_installed
-  generate_thumbnails "$THMB_SOURCE"
+  check_mimetype_installed
+  generate_thumbnails "$THUMB_SOURCE" "$THUMB_OUTPUT"
 }
 
 main "$@"

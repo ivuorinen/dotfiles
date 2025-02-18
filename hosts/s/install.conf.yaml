@@ -1,0 +1,14 @@
+---
+- include: 'tools/dotbot-defaults.yaml'
+- shell:
+    - echo "Configuring s"
+- link:
+    ~/:
+      force: true
+      glob: true
+      path: hosts/s/base/**
+      prefix: '.'
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/s/config/**

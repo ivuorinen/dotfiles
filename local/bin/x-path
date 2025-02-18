@@ -1,0 +1,281 @@
+#!/usr/bin/env bash
+#
+# x-path: A unified script to manipulate the PATH variable.
+#
+# This script supports four subcommands:
+#   - append (or a): Remove duplicates and append one or more directories.
+#   - prepend (or p): Remove duplicates and prepend one or more directories.
+#   - remove: Remove one or more directories from PATH.
+#   - check:  Check if the directories (or all directories in PATH if none provided) are valid.
+#
+# All directory arguments are normalized (trailing slashes removed, except for "/"),
+# and the current PATH is normalized before any operations.
+#
+# Usage:
+#   x-path <command> <directory1> [<directory2> ...]
+#
+# Examples:
+#   x-path append /usr/local/bin /opt/bin
+#   x-path p /home/user/bin
+#   x-path remove /usr/local/bin
+#   x-path check            # Check all directories in PATH
+#   x-path check /usr/local/bin /bin
+#
+# Enable verbose output by setting:
+#   export VERBOSE=1
+
+VERBOSE="${VERBOSE:-0}"
+
+#######################################
+# Normalize a directory by removing a trailing slash (unless the directory is "/").
+# Globals:
+#   None
+# Arguments:
+#   $1 - Directory path to normalize
+# Returns:
+#   Echoes the normalized directory.
+#######################################
+normalize_dir()
+{
+  local d="$1"
+  if [ "$d" != "/" ]; then
+    d="${d%/}"
+  fi
+  echo "$d"
+}
+
+#######################################
+# Normalize the PATH variable by normalizing each of its components.
+# Globals:
+#   PATH
+# Arguments:
+#   None
+# Returns:
+#   Updates and exports PATH.
+#######################################
+normalize_path_var()
+{
+  local new_path=""
+  local d
+  IFS=':' read -r -a arr <<< "$PATH"
+  for d in "${arr[@]}"; do
+    d=$(normalize_dir "$d")
+    if [ -z "$new_path" ]; then
+      new_path="$d"
+    else
+      new_path="$new_path:$d"
+    fi
+  done
+  PATH="$new_path"
+  export PATH
+}
+
+#######################################
+# Remove all occurrences of a normalized directory from PATH.
+# Globals:
+#   PATH
+# Arguments:
+#   $1 - Normalized directory to remove from PATH.
+# Returns:
+#   Updates PATH.
+#######################################
+remove_from_path()
+{
+  local d="$1"
+  PATH=":${PATH}:"
+  PATH="${PATH//:$d:/:}"
+  PATH="${PATH#:}"
+  PATH="${PATH%:}"
+}
+
+#######################################
+# Append one or more directories to PATH.
+# Globals:
+#   PATH, VERBOSE
+# Arguments:
+#   One or more directory paths.
+# Returns:
+#   Updates PATH.
+#######################################
+do_append()
+{
+  local processed=""
+  local d
+  for arg in "$@"; do
+    d=$(normalize_dir "$arg")
+    if [[ " $processed " == *" $d "* ]]; then
+      continue
+    else
+      processed="$processed $d"
+    fi
+
+    if [ ! -d "$d" ]; then
+      [ "$VERBOSE" -eq 1 ] && echo "(?) Directory '$d' does not exist. Skipping."
+      continue
+    fi
+
+    remove_from_path "$d"
+    PATH="${PATH:+"$PATH:"}$d"
+    [ "$VERBOSE" -eq 1 ] && echo "Appended '$d' to PATH."
+  done
+  export PATH
+}
+
+#######################################
+# Prepend one or more directories to PATH.
+# Directories are processed in reverse order so that the first argument ends up leftmost.
+# Globals:
+#   PATH, VERBOSE
+# Arguments:
+#   One or more directory paths.
+# Returns:
+#   Updates PATH.
+#######################################
+do_prepend()
+{
+  local processed=""
+  local d
+  local -a arr=("$@")
+  local i
+  for ((i = ${#arr[@]} - 1; i >= 0; i--)); do
+    d=$(normalize_dir "${arr[i]}")
+    if [[ " $processed " == *" $d "* ]]; then
+      continue
+    else
+      processed="$processed $d"
+    fi
+
+    if [ ! -d "$d" ]; then
+      [ "$VERBOSE" -eq 1 ] && echo "(?) Directory '$d' does not exist. Skipping."
+      continue
+    fi
+
+    remove_from_path "$d"
+    PATH="$d${PATH:+":$PATH"}"
+    [ "$VERBOSE" -eq 1 ] && echo "Prepended '$d' to PATH."
+  done
+  export PATH
+}
+
+#######################################
+# Remove one or more directories from PATH.
+# Globals:
+#   PATH, VERBOSE
+# Arguments:
+#   One or more directory paths.
+# Returns:
+#   Updates PATH.
+#######################################
+do_remove()
+{
+  local processed=""
+  local d
+  for arg in "$@"; do
+    d=$(normalize_dir "$arg")
+    if [[ " $processed " == *" $d "* ]]; then
+      continue
+    else
+      processed="$processed $d"
+    fi
+
+    case ":$PATH:" in
+      *":$d:"*)
+        remove_from_path "$d"
+        [ "$VERBOSE" -eq 1 ] && echo "Removed '$d' from PATH."
+        ;;
+      *)
+        [ "$VERBOSE" -eq 1 ] && echo "(?) '$d' is not in PATH."
+        ;;
+    esac
+  done
+  export PATH
+}
+
+#######################################
+# Check the validity of directories.
+# If arguments are provided, check those directories; otherwise, check all directories in PATH.
+# Globals:
+#   PATH
+# Arguments:
+#   Zero or more directory paths.
+# Returns:
+#   Outputs the validity status of each directory.
+#######################################
+do_check()
+{
+  local d
+  if [ "$#" -eq 0 ]; then
+    echo "Checking all directories in PATH:"
+    IFS=':' read -r -a arr <<< "$PATH"
+    for d in "${arr[@]}"; do
+      d=$(normalize_dir "$d")
+      if [ -d "$d" ]; then
+        echo "Valid:   $d"
+      else
+        echo "Invalid: $d"
+      fi
+    done
+  else
+    for arg in "$@"; do
+      d=$(normalize_dir "$arg")
+      if [ -d "$d" ]; then
+        echo "Valid:   $d"
+      else
+        echo "Invalid: $d"
+      fi
+    done
+  fi
+}
+
+#######################################
+# Main routine: Parse subcommand and arguments, normalize PATH,
+# and dispatch to the appropriate functionality.
+#######################################
+if [ "$#" -lt 1 ]; then
+  echo "Usage: $0 <command> <directory1> [<directory2> ...]"
+  echo "Commands:"
+  echo "  append (or a)   - Append directories to PATH"
+  echo "  prepend (or p)  - Prepend directories to PATH"
+  echo "  remove          - Remove directories from PATH"
+  echo "  check           - Check validity of directories (or all in PATH if none given)"
+  exit 1
+fi
+
+cmd="$1"
+shift
+
+# Normalize the current PATH variable.
+normalize_path_var
+
+case "$cmd" in
+  append | a)
+    [ "$#" -ge 1 ] || {
+      echo "Usage: $0 append <directory1> [<directory2> ...]"
+      exit 1
+    }
+    do_append "$@"
+    ;;
+  prepend | p)
+    [ "$#" -ge 1 ] || {
+      echo "Usage: $0 prepend <directory1> [<directory2> ...]"
+      exit 1
+    }
+    do_prepend "$@"
+    ;;
+  remove)
+    [ "$#" -ge 1 ] || {
+      echo "Usage: $0 remove <directory1> [<directory2> ...]"
+      exit 1
+    }
+    do_remove "$@"
+    ;;
+  check)
+    # If no directories are provided, check all directories in PATH.
+    do_check "$@"
+    ;;
+  *)
+    echo "Unknown command: $cmd"
+    echo "Usage: $0 <command> <directory1> [<directory2> ...]"
+    exit 1
+    ;;
+esac

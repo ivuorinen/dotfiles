@@ -14,13 +14,7 @@
 # if DOTFILES is not set, set it to the default location
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
 
-# zsh completions directory
-[ -z "$ZSH_COMPLETIONS" ] && export ZSH_COMPLETIONS="$XDG_CONFIG_HOME/zsh/completion"
-
 export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-# Add zsh completions to FPATH, compinit will be called later
-FPATH="$ZSH_COMPLETIONS:$FPATH"
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
@@ -300,10 +294,10 @@ export SHORT_HOST=$(hostname -s)
 # asdf
 # https://github.com/asdf-vm/asdf
 msg "Setting up asdf configuration"
-export ASDF_DIR="${XDG_BIN_HOME}/asdf"
-if [[ -d $ASDF_DIR ]]; then
-  [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
-  [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
+export ASDF_DIR="${HOME}/.local/asdf"
+[[ -d $ASDF_DIR ]] && {
+  # [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
+  # [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
 
   export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
   export ASDF_DATA_DIR="${ASDF_DIR}"
@@ -324,7 +318,7 @@ if [[ -d $ASDF_DIR ]]; then
   export PATH="${ASDF_DIR}/bin:${PATH}"
 
   source "$ASDF_DIR/asdf.sh"
-fi
+}
 
 # Antidote configuration
 # https://getantidote.github.io/
@@ -374,8 +368,6 @@ export HOMEBREW_NO_ENV_HINTS=true
 export HOMEBREW_BUNDLE_MAS_SKIP=true
 export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/homebrew/Brewfile"
 x-have brew && {
-  # Add brew autocompletion to fpath
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
   eval "$(brew shellenv)"
 }
 
@@ -473,7 +465,7 @@ export TMUX_CONF_DIR="$XDG_CONFIG_HOME/tmux"
 export TMUX_PLUGINS="$TMUX_CONF_DIR/plugins"
 export TMUX_CONF="$TMUX_CONF_DIR/tmux.conf"
 ## These settings are for zsh-tmux
-export ZSH_TMUX_AUTOSTART=false
+export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_CONFIG="$TMUX_CONF"
 export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false
@@ -493,13 +485,8 @@ export ZSHZ_DATA="$XDG_STATE_HOME/z"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
-X_EXPORTS_FILES=(
-  "$HOME/.config/exports-secret"
-  "$HOME/.config/exports-$(hostname)"
-  "$HOME/.config/exports-$(hostname)-secret"
-)
-for exportFile in "${X_EXPORTS_FILES[@]}"; do
-  # shellcheck source=$HOME/.config/exports-secret
-  [ -f "$exportFile" ] && source "$exportFile" && msg "Sourced $exportFile"
-done
-unset X_EXPORTS_FILES
+[ -f "$XDG_CONFIG_HOME/exports-secret" ] && source "$XDG_CONFIG_HOME/exports-secret"
+[ -f "$XDG_CONFIG_HOME/exports-local" ] && source "$XDG_CONFIG_HOME/exports-local"
+[ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)"
+[ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"
+

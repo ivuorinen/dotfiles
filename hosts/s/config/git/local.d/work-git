@@ -1,0 +1,2 @@
+Host tfs.ia.corp.svea.com
+  IdentityFile ~/.ssh/id_rsa

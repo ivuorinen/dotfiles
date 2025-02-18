@@ -40,6 +40,9 @@
       relink: true
       path: config/*
       exclude: [config/nvm, config/fzf]
+    ~/.local/asdf:
+      glob: true
+      path: local/asdf/*
     ~/.local/bin:
       glob: true
       path: local/bin/*

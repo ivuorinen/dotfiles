@@ -105,12 +105,16 @@ brew "cmake"
 brew "curl"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
+# .NET Core
+brew "dotnet@8", link: true
 # Spellchecker wrapping library
 brew "enchant"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
+# User-friendly command-line shell for UNIX-like operating systems
+brew "fish"
 # Lock file during command
 brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
@@ -163,8 +167,6 @@ brew "graphviz"
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
-# Text-based UI library
-brew "ncurses"
 # Improved top (interactive process viewer)
 brew "htop"
 # Portable abstraction of the hierarchical topology of modern architectures
@@ -189,8 +191,6 @@ brew "legitify"
 brew "libedit"
 # Conversion library
 brew "libiconv"
-# Postgres C API library
-brew "libpq"
 # Version of the SSL/TLS protocol forked from OpenSSL
 brew "libressl"
 # Multi-platform support library with a focus on asynchronous I/O
@@ -215,16 +215,12 @@ brew "nmap"
 brew "nss"
 # Open source suite of directory software
 brew "openldap"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@1.1"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
 # General-purpose scripting language
-brew "php"
-# General-purpose scripting language
 brew "php@8.2"
-# General-purpose scripting language
-brew "php@8.3"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
@@ -273,8 +269,6 @@ brew "cormacrelf/tap/dark-notify"
 brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
-# Terminus is Pantheon's Command-line Interface (CLI)
-brew "pantheon-systems/external/terminus"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
 brew "reviewdog/tap/reviewdog"
 # Igbinary PHP extension
@@ -294,23 +288,21 @@ brew "shivammathur/extensions/uuid@8.3"
 # Yaml PHP extension
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
+brew "shivammathur/php/php"
+# General-purpose scripting language
 brew "shivammathur/php/php-debug"
-# General-purpose scripting language
-brew "shivammathur/php/php@7.4"
-# General-purpose scripting language
-brew "shivammathur/php/php@8.0", link: true
-# Find & fix known vulnerabilities in open-source dependencies
-brew "snyk/tap/snyk"
+# Command-line interface for 1Password
+cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
-# Text editor
-cask "coda"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Database version management tool
 cask "dbngin"
 # App to build and share containerised applications and microservices
 cask "docker"
+# Calendar software
+cask "fantastical"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-open-sans"
@@ -330,8 +322,6 @@ cask "ngrok"
 cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Display image info and preview unsupported formats in QuickLook
-cask "qlimagesize"
 # Quick Look generator for Markdown files
 cask "qlmarkdown"
 # Quick Look plugin for plaintext files without an extension

@@ -9,13 +9,13 @@ $dotfiles_env = getenv("DOTFILES") ?? '~/.dotfiles';
 $dest = "$dotfiles_env/docs/aerospace-keybindings.md";
 
 exec("aerospace config --get mode --json", $output);
-$output = join(' ', $output);
+$output = implode(' ', $output);
 $config = json_decode($output, true);
 
 $main = $config['main'];
 unset($config['main']);
 
-function process_section(string $title, array $array)
+function process_section(string $title, array $array): string
 {
     $bindings = $array['binding'] ?? [];
     ksort($bindings);

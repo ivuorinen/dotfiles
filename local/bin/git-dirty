@@ -23,8 +23,8 @@
 VERBOSE="${VERBOSE:-0}"
 
 # UTF-8 ftw
-GITDIRTY="❌ "
-GITCLEAN="✅ "
+GIT_DIRTY="❌ "
+GIT_CLEAN="✅ "
 
 # Function to print messages if VERBOSE is enabled
 # $1 - message (string)
@@ -41,7 +41,7 @@ catch()
 
 # Function to check the git status of a directory
 # $1 - directory (string)
-gitdirty()
+git_dirty()
 {
   local d="$1"
   trap 'catch $? $LINENO' ERR
@@ -58,15 +58,15 @@ gitdirty()
 
         # If we have `.git` folder, check it.
         if [[ -d ".git" ]]; then
-          ISDIRTY=$(git diff --shortstat 2> /dev/null | tail -n1)
-          ICON="$GITCLEAN"
+          GIT_IS_DIRTY=$(git diff --shortstat 2> /dev/null | tail -n1)
+          ICON="$GIT_CLEAN"
 
-          [[ $ISDIRTY != "" ]] && ICON="$GITDIRTY"
+          [[ $GIT_IS_DIRTY != "" ]] && ICON="$GIT_DIRTY"
 
           printf " %s %s\n" "$ICON" "$(pwd)"
         else
           # If it wasn't git repository, check subdirectories.
-          gitdirtyrepos ./*
+          git_dirty_repos ./*
         fi
         cd - > /dev/null || exit
       fi
@@ -76,10 +76,10 @@ gitdirty()
 
 # Function to check git status for multiple directories
 # $@ - directories
-gitdirtyrepos()
+git_dirty_repos()
 {
   for x in "$@"; do
-    gitdirty "$x"
+    git_dirty "$x"
   done
 }
 
@@ -96,7 +96,7 @@ main()
             11) echo "segfault occurred";;
           esac' EXIT
 
-  gitdirtyrepos "$GIT_DIRTY_DIR"
+  git_dirty_repos "$GIT_DIRTY_DIR"
 }
 
 main "$@"
