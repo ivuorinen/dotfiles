@@ -1,56 +1,202 @@
 "" Source your .vimrc
 "source ~/.vimrc
 
-"" -- Suggested options --
-" Show a few lines of context around the cursor. Note that this makes the
-" text scroll if you mouse-click near the start or end of the window.
-set scrolloff=5
+" https://github.com/ville6000/dotfiles/blob/main/vimrc
+" To get a list of Actions run `:actionlist `
+let mapleader = "\<SPACE>"
+
+set so=10
+set showmode
+set showcmd
+set smartcase
+set incsearch
+set hlsearch
+set relativenumber number
+
+set clipboard+=unnamed
+
+set ideajoin
+set ideamarks
+set idearefactormode=normal
+
+" Map esc to :noh
+map <esc> :noh<cr>
+
+nnoremap <leader>n :noh<return>
+
+nmap j gj
+nmap k gk
+
+nmap <leader>j :tabnext<CR>
+nmap <leader>k :tabprevious<CR>
+
+nmap <leader>l b #<CR>
+:nmap <c-o> <Action>(Back)
+:nmap <c-i> <Action>(Forward)
+:map <leader>H <Action>(MethodUp)
+:map <leader>L <Action>(MethodDown)
+:map <leader>o <Action>(FileStructurePopup)
+:map <leader>m <Action>(ShowIntentionActions)
+
+nmap <leader>ss <Action>(GotoSymbol)
+
+" File management and navigation commands
+nmap <leader>fl <Action>(RecentLocations)
+nmap <leader>fc <Action>(FindInPath)
+nmap <leader>fr <Action>(RecentFiles)
+nmap <leader>fe :NERDTreeToggle<CR>
+nmap <Leader>fu :action FindUsages<CR>
+nmap <Leader>ff :action GotoFile<CR>
+nmap <leader>fi <Action>(SelectIn)
+nmap <leader>fp <Action>(ReplaceInPath)
+nmap <leader>fo <Action>(OpenFile)
+nmap <leader>fs <Action>(ManageRecentProjects)
+nmap <leader>fw <Action>(CloseActiveTab)
+
+nmap <Leader>sr :action RecentFiles<CR>
+nmap <Leader>se :action SearchEverywhere<CR>
+nmap <leader>st <Action>(TextSearchAction)
+nmap <leader>ss <Action>(GotoSymbol)
+nmap <leader>sa <Action>(GotoAction)
+
+" Find text
+nmap <Leader>ft :action FindText<CR>
+
+nmap <leader>dx <Action>(Debug)
+nmap <leader>dc <Action>(ContextDebug)
+nmap <leader>dv <Action>(ViewBreakpoints)
+nmap <leader>de <Action>(EditBreakpoint)
+nmap <leader>dm <Action>(XDebugger.MuteBreakpoints)
+nmap <leader>dt <Action>(ToggleLineBreakpoint)
+nmap <leader>dC <Action>(RunToCursor)
+nmap <leader>di <Action>(StepInto)
+nmap <leader>do <Action>(StepOver)
+nmap <leader>dr <Action>(Resume)
+nmap <leader>dR <Action>(EvaluateExpression)
+nmap <leader>dw <Action>(ActivateDebugToolWindow)
+
+nmap <leader>gd <Action>(GotoDeclaration)
+nmap <leader>go <Action>(GotoSuperMethod)
+nmap <leader>gD <Action>(GotoTypeDeclaration)
+nmap <leader>gi <Action>(GotoImplementation)
+nmap <leader>gT <Action>(GotoTest)
+nmap <leader>gp :action VcsShowPrevChangeMarker<CR>
+nmap <leader>gn :action VcsShowNextChangeMarker<CR>
+
+" Trigger tests
+map <Leader>tt <Action>(RiderUnitTestRunContextAction)
+let g:WhichKeyDesc_tests = "<leader>t Tests"
+let g:WhichKeyDesc_tests_run = "<leader>tt Run Tests"
+
+nmap <Leader>cc :action CommentByLineComment<CR>
+
+nmap <leader>lf <Action>(ReformatCode)
+nmap <leader>li <Action>(InspectCode)
+:map <leader>lr <Action>(RenameElement)
+nmap <leader>ll <Action>(Refactorings.QuickListPopupAction)
+
+nmap <leader>Gc <Action>(Vcs.Show.Local.Changes)
+nmap <leader>Ga <Action>(Annotate)
+
+:map <leader>gh <Action>(ShowHoverInfo)
+
+nmap <Leader>vv :vsplit<CR>
+nmap <Leader>vs :split<CR>
+
+nmap <Leader>ww :action HideAllWindows<CR>
+nmap <Leader>wt :action ActivateTerminalToolWindow<CR>
+nmap <Leader>wd :action ActivateDatabaseToolWindow<CR>
+
+" Open project tree window
+nmap <Leader>e :action ActivateProjectToolWindow<CR>
+
+nnoremap <leader>cf :action ReformatCode<CR>
+
+" Bookmarks
+nmap <leader>bm <Action>(Bookmarks)
+nmap <leader>bs <Action>(ShowBookmarks)
+nmap <leader>bt <Action>(ActivateBookmarksToolWindow)
+nmap <leader>bb <Action>(ToggleBookmark)
+nmap <leader>be <Action>(EditBookmark)
+nmap <leader>bp <Action>(GotoPreviousBookmark)
+nmap <leader>bn <Action>(GotoNextBookmark)
+
+nnoremap ge :action GotoNextError<CR>
+nnoremap gE :action GotoPreviousError<CR>
+
+" Turn off Copilot
+nmap <leader>cp :action Copilot.Toggle<CR>
+
+" Disable timeout for which-key
+set notimeout
+
+" Navigate back
+nmap <leader> <C-o>
+
+" mark as a global mark/
+nnoremap ma mA
+nnoremap mb mB
+nnoremap mc mC
+nnoremap md mD
+nnoremap me mE
+nnoremap mf mG
+nnoremap mh mH
+nnoremap mi mI
+nnoremap mj mJ
+nnoremap mk mK
+nnoremap ml mL
+nnoremap mm mM
+nnoremap mn mN
+nnoremap mo mO
+nnoremap mp mP
+nnoremap mq mQ
+nnoremap mr mR
+nnoremap ms mS
+nnoremap mt mT
+nnoremap mu mU
+nnoremap mv mV
+nnoremap mw mW
+nnoremap mx mX
+nnoremap my mY
+nnoremap mz mZ
+
+" go to global marks
+nnoremap 'a `A
+nnoremap 'b `B
+nnoremap 'c `C
+nnoremap 'd `D
+nnoremap 'e `E
+nnoremap 'f `G
+nnoremap 'h `H
+nnoremap 'i `I
+nnoremap 'j `J
+nnoremap 'k `K
+nnoremap 'l `L
+nnoremap 'm `M
+nnoremap 'n `N
+nnoremap 'o `O
+nnoremap 'p `P
+nnoremap 'q `Q
+nnoremap 'r `R
+nnoremap 's `S
+nnoremap 't `T
+nnoremap 'u `U
+nnoremap 'v `V
+nnoremap 'w `W
+nnoremap 'x `X
+nnoremap 'y `Y
+nnoremap 'z `Z
+
+" ---
+
+set cursorline         		    " Highlight current line
+set nocompatible                " disable compatibility mode with vi
+filetype off                    " disable filetype detection (but re-enable later, see below)
+set undolevels=1000		        " Number of undo levels
+set backspace=indent,eol,start	" Backspace behaviour
 
 " Don't use Ex mode, use Q for formatting.
 map Q gq
-
-
-"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
-"" Map \r to the Reformat Code action
-"map \r <Action>(ReformatCode)
-
-"" Map <leader>d to start debug
-"map <leader>d <Action>(Debug)
-
-"" Map \b to toggle the breakpoint on the current line
-"map \b <Action>(ToggleLineBreakpoint)
-
-
-" Find more examples here: https://jb.gg/share-ideavimrc
-
-" https://github.com/ville6000/dotfiles/blob/main/vimrc
-set nocompatible                " disable compatibility mode with vi
-filetype off                    " disable filetype detection (but re-enable later, see below)
-
-set encoding=utf-8              " UTF-8
-set number                      " Show line numbers
-set laststatus=2                " Always show statusline (even with only single window)
-set showmatch                   " Highlight matching brace
-set visualbell                  " Use visual bell (no beeping)
-set hlsearch                    " Highlight all search results
-set smartcase                   " Enable smart-case search
-set ignorecase                  " Always case-insensitive
-set incsearch                   " Searches for strings incrementally
-set cindent                     " Use 'C' style program indenting
-set expandtab                   " Use spaces instead of tabs
-set shiftwidth=4                " Number of auto-indent spaces
-set smartindent                 " Enable smart-indent
-set smarttab                    " Enable smart-tabs
-set softtabstop=4               " Number of spaces per Tab
-set ruler                       " Show row and column ruler information
-set cursorline         		    " Highlight current line
-set undolevels=1000		        " Number of undo levels
-set backspace=indent,eol,start	" Backspace behaviour
-set so=5
-
-" move vertically by visual line (don't skip wrapped lines)
-nmap j gj
-nmap k gk
 
 syntax enable
 filetype plugin indent on
@@ -63,9 +209,6 @@ Plug 'ctrlpvim/ctrlp.vim'
 call plug#end()
 
 set termguicolors
-set background=dark
-let ayucolor="dark"
-colorscheme ayu
 
 if has('gui_running')
     set macligatures
