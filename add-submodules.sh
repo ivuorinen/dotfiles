@@ -18,7 +18,7 @@ git submodule add --name cheat-community \
 git submodule add --name cheat-tldr \
   -f https://github.com/ivuorinen/cheatsheet-tldr.git config/cheat/cheatsheets/tldr
 git submodule add --name asdf \
-  -f https://github.com/asdf-vm/asdf.git local/bin/asdf
+  -f https://github.com/asdf-vm/asdf.git local/asdf
 git submodule add --name antidote \
   --depth 1 \
   -f https://github.com/mattmc3/antidote.git tools/antidote
@@ -53,10 +53,19 @@ done
 git config -f .gitmodules submodule.antidote.shallow true
 
 # remove old submodules
-[ -d "config/tmux/plugins/tpm" ] && rm -rf config/tmux/plugins/tpm
-[ -d "config/tmux/plugins/tmux" ] && rm -rf config/tmux/plugins/tmux
-[ -d "config/tmux/plugins/tmux-menus" ] && rm -rf config/tmux/plugins/tmux-menus
-[ -d "config/tmux/plugins/tmux-resurrect" ] && rm -rf config/tmux/plugins/tmux-resurrect
-[ -d "tools/dotbot-crontab" ] && rm -rf tools/dotbot-crontab
-[ -d "tools/dotbot-snap" ] && rm -rf tools/dotbot-snap
-[ -d "config/nvim-kickstart" ] && rm -rf config/nvim-kickstart
+folders=(
+    "config/tmux/plugins/tpm"
+    "config/tmux/plugins/tmux"
+    "config/tmux/plugins/tmux-menus"
+    "config/tmux/plugins/tmux-resurrect"
+    "tools/dotbot-crontab"
+    "tools/dotbot-snap"
+    "config/nvim-kickstart"
+    "local/bin/asdf"
+)
+
+for folder in "${folders[@]}"; do
+    [ -d "$folder" ] && \
+      rm -rf "$folder" && \
+      msgr run_done "Removed old submodule $folder"
+done
