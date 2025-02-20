@@ -489,4 +489,3 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 [ -f "$XDG_CONFIG_HOME/exports-local" ] && source "$XDG_CONFIG_HOME/exports-local"
 [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)"
 [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"
-

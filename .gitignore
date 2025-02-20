@@ -34,3 +34,5 @@ node_modules
 ssh/local.d/*
 !ssh/local.d/.gitkeep
 config/fish/fish_variables
+**/exports-secret.fish
+config/fish/completions/asdf.fish
