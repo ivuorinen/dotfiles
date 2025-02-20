@@ -31,7 +31,7 @@ clone_or_update_repo()
     msg_run "Starting to update $PBB_GIT"
     git -C "$PBB_TEMP_DIR" reset --hard origin/master
     git -C "$PBB_TEMP_DIR" pull -q \
-      && msg_yay "Updated $PBB_GIT"
+      && msgr yay "Updated $PBB_GIT"
   fi
 }
 
