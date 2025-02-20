@@ -11,30 +11,22 @@ msgr run "Installing go packages"
 
 ! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
 
-packages=(
-  # A shell parser, formatter, and interpreter with bash support; includes shfmt
-  mvdan.cc/sh/v3/cmd/shfmt@latest
-  # sysadmin/scripting utilities, distributed as a single binary
-  github.com/skx/sysbox@latest
-  # Git Profile allows you to switch between user profiles in git repos
-  github.com/dotzero/git-profile@latest
-  # An extensible command line tool or library to format yaml files.
-  github.com/google/yamlfmt/cmd/yamlfmt@latest
-  # Parsing HTML at the command line
-  github.com/ericchiang/pup@latest
-  # HTML to Markdown converter
-  github.com/suntong/html2md@latest
-  # cheat allows you to create and view interactive cheatsheets on the cli.
-  github.com/cheat/cheat/cmd/cheat@latest
-  # Render markdown on the CLI, with pizzazz! 💅
-  github.com/charmbracelet/glow@latest
-  # Static checker for GitHub Actions workflow files
-  github.com/rhysd/actionlint/cmd/actionlint@latest
-  # simple terminal UI for git commands
-  github.com/jesseduffield/lazygit@latest
-  # Cleans up your $HOME from those pesky dotfiles
-  github.com/doron-cohen/antidot@latest
-)
+[[ -z "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]] && \
+  ASDF_GOLANG_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/golang-packages"
+
+# Packages are defined in $DOTFILES/config/asdf/golang-packages, one per line
+# Skip comments and empty lines
+packages=()
+if [[ -f "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]]; then
+  while IFS= read -r line; do
+    # Skip comments
+    if [[ ${line:0:1} == "#" ]]; then continue; fi
+    if [[ ${line:0:1} == "/" ]]; then continue; fi
+    # Skip empty lines
+    if [[ -z "$line" ]]; then continue; fi
+    packages+=("$line")
+  done < "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE"
+fi
 
 # Function to install go packages
 install_packages()

@@ -15,29 +15,20 @@ if command -v cargo-install-update &> /dev/null; then
   msgr run_done "Done with cargo install-update"
 fi
 
-packages=(
-  # A cargo subcommand for checking and applying
-  # updates to installed executables
-  "cargo-update"
-  # Cargo cache management utility
-  "cargo-cache"
-  # An incremental parsing system for programming tools
-  "tree-sitter-cli"
-  # a subprocess caching utility
-  "bkt"
-  # a structural diff that understands syntax
-  "difftastic"
-  # a modern replacement for ls.
-  "eza"
-  # A simple, fast and user-friendly alternative to 'find'
-  "fd-find"
-  # recursively searches directories for a
-  # regex pattern while respecting your gitignore
-  "ripgrep"
-  # A version manager for neovim
-  "bob-nvim"
-  "bottom"
-)
+[[ -z "$ASDF_CRATE_DEFAULT_PACKAGES_FILE" ]] && \
+  ASDF_CRATE_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/cargo-packages"
+
+# Packages are defined in $DOTFILES/config/asdf/cargo-packages, one per line
+# Skip comments and empty lines
+packages=()
+while IFS= read -r line; do
+  # Skip comments
+  if [[ ${line:0:1} == "#" ]]; then continue; fi
+  if [[ ${line:0:1} == "/" ]]; then continue; fi
+  # Skip empty lines
+  if [[ -z "$line" ]]; then continue; fi
+  packages+=("$line")
+done < "$ASDF_CRATE_DEFAULT_PACKAGES_FILE"
 
 # Number of jobs to run in parallel, this helps to keep the system responsive
 BUILD_JOBS=$(nproc --ignore=2)
