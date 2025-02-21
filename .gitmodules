@@ -75,7 +75,7 @@
 	ignore = dirty
 
 [submodule "asdf"]
-	path = local/bin/asdf
+	path = local/asdf
 	url = https://github.com/asdf-vm/asdf.git
 	ignore = dirty
 
