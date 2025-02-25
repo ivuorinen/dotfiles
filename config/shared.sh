@@ -6,7 +6,8 @@
 
 # Defaults
 [ -z "$DOTFILES" ] && export DOTFILES="$HOME/.dotfiles"
-export DOTFILES_CURRENT_SHELL=$(basename "$SHELL")
+DOTFILES_CURRENT_SHELL=$(basename "$SHELL")
+export DOTFILES_CURRENT_SHELL
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
