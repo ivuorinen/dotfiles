@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 # @description Install cargo/rust packages.
-#
-# shellcheck source=shared.sh
-source "$HOME/.dotfiles/config/shared.sh"
 
 msgr run "Starting to install rust/cargo packages"
-
-source "$CARGO_HOME/env"
 
 # If we have cargo install-update, use it first
 if command -v cargo-install-update &> /dev/null; then
@@ -15,8 +10,8 @@ if command -v cargo-install-update &> /dev/null; then
   msgr run_done "Done with cargo install-update"
 fi
 
-[[ -z "$ASDF_CRATE_DEFAULT_PACKAGES_FILE" ]] && \
-  ASDF_CRATE_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/cargo-packages"
+[[ -z "$ASDF_CRATE_DEFAULT_PACKAGES_FILE" ]] \
+  && ASDF_CRATE_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/cargo-packages"
 
 # Packages are defined in $DOTFILES/config/asdf/cargo-packages, one per line
 # Skip comments and empty lines
@@ -31,7 +26,7 @@ while IFS= read -r line; do
 done < "$ASDF_CRATE_DEFAULT_PACKAGES_FILE"
 
 # Number of jobs to run in parallel, this helps to keep the system responsive
-BUILD_JOBS=$(nproc --ignore=2)
+BUILD_JOBS=$(nproc --ignore=2 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 1)
 
 # Function to install cargo packages
 install_packages()
@@ -61,13 +56,13 @@ post_install_steps()
 
   msgr run "Removing cargo cache"
   cargo cache --autoclean
-  msg_done "Done removing cargo cache"
+  msgr done "Done removing cargo cache"
 }
 
 main()
 {
   install_packages
-  msg_done "Installed cargo packages!"
+  msgr done "Installed cargo packages!"
   post_install_steps
 }
 
