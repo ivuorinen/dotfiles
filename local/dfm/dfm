@@ -4,18 +4,22 @@
 set -euo pipefail
 
 # define default variables
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly CMD_DIR="${SCRIPT_DIR}/cmd"
-readonly LIB_DIR="${SCRIPT_DIR}/lib"
-readonly DEFAULT_CONFIG_PATH="$HOME/.config"
-readonly MAX_RETRIES=3
-export DEFAULT_INSTALL_DIR="$HOME/.local"
-export DEFAULT_VERBOSE=0
-export TEMP_DIR=$(mktemp -d)
+DFM_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly DFM_SCRIPT_DIR
+readonly DFM_CMD_DIR="${DFM_SCRIPT_DIR}/cmd"
+readonly DFM_LIB_DIR="${DFM_SCRIPT_DIR}/lib"
+readonly DFM_DEFAULT_CONFIG_PATH="$HOME/.config"
+export DFM_DEFAULT_CONFIG_PATH
+readonly DFM_MAX_RETRIES=3
+export DFM_MAX_RETRIES
+export DFM_DEFAULT_INSTALL_DIR="$HOME/.local"
+export DFM_DEFAULT_VERBOSE=0
+TEMP_DIR=$(mktemp -d)
+export TEMP_DIR
 
 # Load the common and utility functions from the lib directory.
-source "${LIB_DIR}/common.sh"
-source "${LIB_DIR}/utils.sh"
+source "${DFM_LIB_DIR}/common.sh"
+source "${DFM_LIB_DIR}/utils.sh"
 
 # Main function for the dfm script.
 #
@@ -37,8 +41,8 @@ main()
   shift
 
   if [[ $# -eq 0 ]]; then
-    # Näytä komennon saatavilla olevat funktiot
-    local cmd_file="${CMD_DIR}/${cmd}.sh"
+    # Show the available functions for the command
+    local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
     if [[ -f "$cmd_file" ]]; then
       list::print_group "Available functions for '$cmd'"
       list::loop_functions "$cmd_file"
