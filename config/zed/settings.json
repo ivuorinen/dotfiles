@@ -11,7 +11,7 @@
   },
   "formatter": {
     "external": {
-      "command": "node_modules/.bin/prettier",
+      "command": "prettier",
       "arguments": [
         "--stdin-filepath",
         "{buffer_path}"
@@ -69,7 +69,7 @@
   "buffer_font_fallbacks": [
     "JetBrainsMono Nerd Font"
   ],
-  "inline_completions": {
+  "edit_predictions": {
     "disabled_globs": [
       ".env"
     ]
