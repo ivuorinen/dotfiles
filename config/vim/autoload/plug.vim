@@ -2418,11 +2418,40 @@ function! s:git_validate(spec, check_branch)
 endfunction
 
 function! s:rm_rf(dir)
-  if isdirectory(a:dir)
-    return s:system(s:is_win
-    \ ? 'rmdir /S /Q '.plug#shellescape(a:dir)
-    \ : ['rm', '-rf', a:dir])
+  if !isdirectory(a:dir)
+    return
   endif
+
+  " Get absolute paths
+  let dir = fnamemodify(a:dir, ':p')
+  let plug_home = fnamemodify(g:plug_home, ':p')
+
+  " Ensure directory is within plug_home
+  if stridx(dir, plug_home) != 0
+    call s:err('Cannot remove directory outside plug_home: ' . dir)
+    return
+  endif
+
+  " Check for symlinks
+  if getftype(dir) ==# 'link'
+    call s:err('Cannot remove symlink: ' . dir)
+    return
+  endif
+
+  " Ask for confirmation
+  echohl WarningMsg
+  echo 'Remove directory and all contents?'
+  echo dir
+  echohl None
+
+  if s:ask('Proceed? (y/N) ') != 1
+    echo 'Cancelled.'
+    return
+  endif
+
+  return s:system(s:is_win
+    \ ? 'rmdir /S /Q ' . plug#shellescape(dir)
+    \ : ['rm', '-rf', dir])
 endfunction
 
 function! s:clean(force)
