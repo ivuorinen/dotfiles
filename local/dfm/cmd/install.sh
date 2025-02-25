@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Installation functions for dfm, the dotfile manager
 #
 # @author Ismo Vuorinen <https://github.com/ivuorinen>
@@ -9,7 +10,7 @@ function all()
   lib::log "Installing all packages..."
   fonts
   brew
-  asdf
+  cargo
 }
 
 # @description Install fonts
@@ -19,15 +20,6 @@ function fonts()
   # implement fonts installation
 }
 
-# Install asdf and set it up.
-#
-# @description Install asdf
-function asdf()
-{
-  lib::log "Installing asdf..."
-  # implement asdf installation
-}
-
 # Install Homebrew and set it up.
 #
 # @description Installs Homebrew
@@ -35,4 +27,11 @@ function brew()
 {
   lib::log "Installing Homebrew..."
   # implement Homebrew installation
+}
+
+# @description Install Rust and cargo packages.
+function cargo()
+{
+  lib::log "Installing Rust and cargo packages..."
+  # implement Rust and cargo packages installation
 }

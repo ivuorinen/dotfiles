@@ -65,16 +65,16 @@ lib::error::handle()
   local command=$2
 
   case $exit_code in
-    ${ERROR_CODES[INVALID_ARGUMENT]})
+    "${ERROR_CODES[INVALID_ARGUMENT]}")
       lib::error "Invalid argument at line $line_no in command '$command'"
       ;;
-    ${ERROR_CODES[COMMAND_NOT_FOUND]})
+    "${ERROR_CODES[COMMAND_NOT_FOUND]}")
       lib::error "Command not found at line $line_no"
       ;;
-    ${ERROR_CODES[FUNCTION_NOT_FOUND]})
+    "${ERROR_CODES[FUNCTION_NOT_FOUND]}")
       lib::error "Function not found at line $line_no in command '$command'"
       ;;
-    ${ERROR_CODES[EXECUTION_FAILED]})
+    "${ERROR_CODES[EXECUTION_FAILED]}")
       lib::error "Execution failed at line $line_no in command '$command'"
       ;;
     *)
