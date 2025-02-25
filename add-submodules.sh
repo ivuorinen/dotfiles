@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+git submodule sync --recursive
+
 # dotbot and plugins
 git submodule add --name dotbot \
   -f https://github.com/anishathalye/dotbot.git tools/dotbot
@@ -17,8 +19,6 @@ git submodule add --name cheat-community \
   -f https://github.com/cheat/cheatsheets.git config/cheat/cheatsheets/community
 git submodule add --name cheat-tldr \
   -f https://github.com/ivuorinen/cheatsheet-tldr.git config/cheat/cheatsheets/tldr
-git submodule add --name asdf \
-  -f https://github.com/asdf-vm/asdf.git local/asdf
 git submodule add --name antidote \
   --depth 1 \
   -f https://github.com/mattmc3/antidote.git tools/antidote
@@ -54,18 +54,20 @@ git config -f .gitmodules submodule.antidote.shallow true
 
 # remove old submodules
 folders=(
-    "config/tmux/plugins/tpm"
-    "config/tmux/plugins/tmux"
-    "config/tmux/plugins/tmux-menus"
-    "config/tmux/plugins/tmux-resurrect"
-    "tools/dotbot-crontab"
-    "tools/dotbot-snap"
-    "config/nvim-kickstart"
-    "local/bin/asdf"
+  "config/tmux/plugins/tpm"
+  "config/tmux/plugins/tmux"
+  "config/tmux/plugins/tmux-menus"
+  "config/tmux/plugins/tmux-resurrect"
+  "tools/dotbot-crontab"
+  "tools/dotbot-snap"
+  "config/nvim-kickstart"
+  "local/bin/asdf"
+  "local/asdf"
+  "tools/dotbot-asdf"
 )
 
 for folder in "${folders[@]}"; do
-    [ -d "$folder" ] && \
-      rm -rf "$folder" && \
-      msgr run_done "Removed old submodule $folder"
+  [ -d "$folder" ] \
+    && rm -rf "$folder" \
+    && msgr run_done "Removed old submodule $folder"
 done

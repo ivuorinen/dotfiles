@@ -40,9 +40,6 @@
       relink: true
       path: config/*
       exclude: [config/nvm, config/fzf]
-    ~/.local/asdf:
-      glob: true
-      path: local/asdf/*
     ~/.local/bin:
       glob: true
       path: local/bin/*
@@ -64,46 +61,6 @@
 - shell:
     - bash add-submodules.sh || true
     - git submodule update --init --recursive --force
-
-- asdf:
-    - plugin: 1password-cli
-      url: https://github.com/NeoHsu/asdf-1password-cli.git
-    - plugin: age
-      url: https://github.com/threkk/asdf-age.git
-    - plugin: direnv
-      url: https://github.com/asdf-community/asdf-direnv.git
-    - plugin: dotenv-linter
-      url: https://github.com/wesleimp/asdf-dotenv-linter.git
-    - plugin: editorconfig-checker
-      url: https://github.com/gabitchov/asdf-editorconfig-checker.git
-    - plugin: fd
-      url: https://gitlab.com/wt0f/asdf-fd.git
-    - plugin: github-cli
-      url: https://github.com/bartlomiejdanek/asdf-github-cli.git
-    - plugin: golang
-      url: https://github.com/asdf-community/asdf-golang.git
-    - plugin: hadolint
-      url: https://github.com/devlincashman/asdf-hadolint.git
-    - plugin: kubectl
-      url: https://github.com/asdf-community/asdf-kubectl.git
-    - plugin: pre-commit
-      url: https://github.com/jonathanmorley/asdf-pre-commit.git
-    - plugin: ripgrep
-      url: https://gitlab.com/wt0f/asdf-ripgrep.git
-    - plugin: rust
-      url: https://github.com/code-lever/asdf-rust.git
-    - plugin: shellcheck
-      url: https://github.com/luizm/asdf-shellcheck.git
-    - plugin: shfmt
-      url: https://github.com/luizm/asdf-shfmt.git
-    - plugin: terragrunt
-      url: https://github.com/ohmer/asdf-terragrunt.git
-    - plugin: tf-summarize
-      url: https://github.com/adamcrews/asdf-tf-summarize.git
-    - plugin: yamllint
-      url: https://github.com/ericcornelissen/asdf-yamllint.git
-    - plugin: yq
-      url: https://github.com/sudermanjr/asdf-yq.git
 
 - shell:
     - bash local/bin/dfm install all

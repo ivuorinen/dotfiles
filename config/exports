@@ -291,35 +291,6 @@ hash shopt 2> /dev/null && shopt -s checkwinsize
 # shellcheck disable=SC2155
 export SHORT_HOST=$(hostname -s)
 
-# asdf
-# https://github.com/asdf-vm/asdf
-msg "Setting up asdf configuration"
-export ASDF_DIR="${HOME}/.local/asdf"
-[[ -d $ASDF_DIR ]] && {
-  # [[ -d $ASDF_DIR/completions ]] && FPATH="$ASDF_DIR/completions:$FPATH"
-  # [[ -d $ASDF_DIR/plugins ]] && FPATH="$ASDF_DIR/plugins:$FPATH"
-
-  export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
-  export ASDF_DATA_DIR="${ASDF_DIR}"
-  export ASDF_PLUGIN_MANAGER_PLUGIN_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/asdf/plugin-versions"
-  export ASDF_LOG_FILE="${XDG_CACHE_HOME}/asdf/asdf.log"
-  export ASDF_FORCE_PREPEND=yes
-  ## Default package files
-  export ASDF_CRATE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/cargo-packages"
-  export ASDF_GEM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/gem-packages"
-  export ASDF_GOLANG_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/golang-packages"
-  export ASDF_NPM_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/npm-packages"
-  export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/asdf/python-packages"
-  ## Plugin configuration
-  export ASDF_DIRENV_IGNORE_MISSING_PLUGINS=1
-  export ASDF_GOLANG_MOD_VERSION_ENABLED=true
-  export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY="latest_available"
-  ## Add asdf to path
-  export PATH="${ASDF_DIR}/bin:${PATH}"
-
-  source "$ASDF_DIR/asdf.sh"
-}
-
 # Antidote configuration
 # https://getantidote.github.io/
 msg "Setting up Antidote configuration"

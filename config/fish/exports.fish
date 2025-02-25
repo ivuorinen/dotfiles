@@ -31,39 +31,6 @@ fish_add_path "$YARN_GLOBAL_FOLDER/bin"
 test -z "$MASON_HOME" && set -x MASON_HOME "$XDG_DATA_HOME/nvim/mason"
 fish_add_path "$MASON_HOME/bin"
 
-# Set ASDF environment variables
-test -z "$ASDF_DATA_DIR" && set -x ASDF_DATA_DIR "$XDG_DATA_HOME/asdf"
-test -z "$ASDF_LOG_PATH" && set -x ASDF_LOG_PATH "$XDG_STATE_HOME/asdf/log"
-test -z "$ASDF_CONFIG_DIR" && set -x ASDF_CONFIG_DIR "$XDG_CONFIG_HOME/asdf"
-test -z "$ASDF_CONFIG_FILE" && set -x ASDF_CONFIG_FILE "$ASDF_CONFIG_DIR/asdfrc"
-
-## Default package files
-test -z "$ASDF_CRATE_DEFAULT_PACKAGES_FILE" && set -x ASDF_CRATE_DEFAULT_PACKAGES_FILE "$ASDF_CONFIG_DIR/cargo-packages"
-test -z "$ASDF_GEM_DEFAULT_PACKAGES_FILE" && set -x ASDF_GEM_DEFAULT_PACKAGES_FILE "$ASDF_CONFIG_DIR/gem-packages"
-test -z "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" && set -x ASDF_GOLANG_DEFAULT_PACKAGES_FILE "$ASDF_CONFIG_DIR/golang-packages"
-test -z "$ASDF_NPM_DEFAULT_PACKAGES_FILE" && set -x ASDF_NPM_DEFAULT_PACKAGES_FILE "$ASDF_CONFIG_DIR/npm-packages"
-test -z "$ASDF_PYTHON_DEFAULT_PACKAGES_FILE" && set -x ASDF_PYTHON_DEFAULT_PACKAGES_FILE "$ASDF_CONFIG_DIR/python-packages"
-
-## Plugin configuration
-set -x ASDF_DIRENV_IGNORE_MISSING_PLUGINS "1"
-set -x ASDF_GOLANG_MOD_VERSION_ENABLED "true"
-set -x ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY "latest_available"
-test -z "$ASDF_GOLANG_MOD_VERSION_ENABLED" && set -x ASDF_GOLANG_MOD_VERSION_ENABLED "true"
-
-## Load ASDF, if it exists
-test -f "$HOME/.local/asdf/asdf.fish" &&
-  source "$HOME/.local/asdf/asdf.fish" &&
-  asdf reshim &&
-  fish_add_path "$ASDF_DIR/shims"
-## If $HOME/.local/asdf/asdf.fish does not exist, show error message
-test -e "$HOME/.local/asdf/asdf.fish" || echo "ASDF not found"
-
-# Load ASDF completions
-test -d "$XDG_CONFIG_HOME/fish/completions" ||
-  mkdir -p "$XDG_CONFIG_HOME/fish/completions";
-test -e "$XDG_CONFIG_HOME/fish/completions/asdf.fish" ||
-  and ln -s "$ASDF_DIR/completions/asdf.fish" "$XDG_CONFIG_HOME/fish/completions/asdf.fish"
-
 # Set Neovim environment variables
 test -z "$NVIM_STATE" && set -x NVIM_STATE "$XDG_STATE_HOME/nvim"
 test -z "$NVIM_CONFIG_HOME" && set -x NVIM_CONFIG_HOME "$XDG_CONFIG_HOME/nvim"

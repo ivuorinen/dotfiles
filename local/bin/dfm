@@ -43,7 +43,6 @@ section_install()
 
   MENU=(
     "all:Installs everything in the correct order"
-    "asdf:Install asdf plugins"
     "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
@@ -65,7 +64,6 @@ section_install()
       $0 install macos
       $0 install fonts
       $0 brew install
-      $0 install asdf
       $0 install composer
       $0 install fzf
       $0 install cheat-databases
@@ -75,12 +73,6 @@ section_install()
       msgr msg "Reloading configurations again..."
       source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
-      ;;
-
-    asdf)
-      msgr run "Installing asdf..."
-      $0 asdf plugins-install \
-        && msgr yay "asdf plugins installed!"
       ;;
 
     cargo)
@@ -268,164 +260,6 @@ section_brew()
   }
 
   ! x-have brew && menu_builder "$USAGE_PREFIX" "brew not available on this system"
-}
-
-section_asdf()
-{
-  USAGE_PREFIX="$SCRIPT asdf <command>"
-  MENU=(
-    "current:Show asdf current versions"
-    "global:Show asdf global versions"
-    "installed:Show asdf installed versions"
-    "plugins-update:Update all asdf plugins"
-    "plugins-install:Install plugins from configuration"
-    "plugins-remove:Remove installed plugins"
-    "reset:Reset asdf plugins"
-    "fix-tool-versions:Remove uninstalled plugins from .tool-versions"
-    "versions:Show asdf versions"
-    "where:Show asdf where"
-    "which:Show asdf which"
-  )
-
-  case "$1" in
-    plugins-update)
-      msgr run "Updating all asdf plugins"
-      asdf plugin update --all
-      msgr run_done "Updated all plugins"
-      ;;
-
-    plugins-install)
-      msgr run "Installing plugins from configuration"
-
-      # First install direnv if it's not installed
-      if ! asdf plugin list | grep -q "^direnv$"; then
-        msgr nested "Installing direnv plugin"
-        asdf plugin add direnv https://github.com/asdf-community/asdf-direnv.git
-
-        # Install latest direnv
-        local latest_direnv
-        latest_direnv=$(asdf latest direnv)
-        asdf install direnv "$latest_direnv"
-        asdf global direnv "$latest_direnv"
-      fi
-
-      # Check that all plugins are installed
-      local installed_plugins
-      installed_plugins=$(asdf plugin list)
-
-      while IFS= read -r line; do
-        # Skip empty lines and comments
-        [[ -z $line || $line =~ ^# ]] && continue
-
-        local plugin
-        plugin=$(echo "$line" | awk '{print $1}')
-
-        # Skip direnv, it's already installed
-        [[ $plugin == "direnv" ]] && continue
-
-        if ! echo "$installed_plugins" | grep -q "^${plugin}$"; then
-          msgr nested "Installing $plugin plugin"
-          asdf plugin add "$plugin"
-        fi
-      done < "$DOTFILES/base/tool-versions"
-
-      msgr run_done "All plugins installed"
-      ;;
-
-    plugins-remove)
-      msgr run "Remove installed plugins"
-      local installed_plugins
-      installed_plugins=$(asdf plugin list | grep -v "^direnv$")
-
-      for plugin in $installed_plugins; do
-        msgr nested "Removing $plugin"
-        asdf plugin remove "$plugin"
-      done
-
-      msgr run_done "Remove plugins done!"
-      ;;
-
-    reset)
-      msgr run "Resetting asdf environment"
-      $0 asdf plugins-remove
-      $0 asdf plugins-install
-      asdf reshim
-      msgr yay "Reset asdf plugins done!"
-      ;;
-
-    fix-tool-versions)
-      local tool_versions_file="$DOTFILES/base/tool-versions"
-      local temp_file
-      temp_file=$(mktemp)
-
-      msgr run "Fixing tool-versions file"
-
-      # Check that .tool-versions file exists
-      if [[ ! -f $tool_versions_file ]]; then
-        msgr error "tool-versions file not found: $tool_versions_file"
-        rm -f "$temp_file"
-        return 1
-      fi
-
-      # Check that asdf can be found in the path
-      if ! command -v asdf > /dev/null; then
-        msgr error "asdf not found"
-        rm -f "$temp_file"
-        return 1
-      fi
-
-      # Read installed plugins
-      msgr nested "Reading installed plugins"
-      local installed_plugins
-      installed_plugins=$(asdf plugin list | sort)
-
-      # Compare .tool-versions and installed plugins,
-      # remove unknown plugins from .tool-versions
-      msgr nested "Updating tool-versions file"
-      while IFS= read -r line; do
-        # Keep comments and empty lines
-        if [[ -z $line || $line =~ ^[[:space:]]*# ]]; then
-          echo "$line" >> "$temp_file"
-          continue
-        fi
-
-        local plugin
-        plugin=$(echo "$line" | awk '{print $1}')
-
-        if echo "$installed_plugins" | grep -q "^${plugin}$"; then
-          echo "$line" >> "$temp_file"
-        else
-          msgr nested "Removing $plugin - not installed"
-        fi
-      done < "$tool_versions_file"
-
-      # Check that the temp file is valid
-      if [[ ! -s $temp_file ]] || ! grep -v '^[[:space:]]*#' "$temp_file" | grep -q .; then
-        msgr error "Generated file is empty or contains only comments, keeping original"
-        rm -f "$temp_file"
-        return 1
-      fi
-
-      # Backup the original .tool-versions
-      cp "$tool_versions_file" "${tool_versions_file}.bak"
-
-      # Overwrite .tool-versions with the generated file
-      mv "$temp_file" "$tool_versions_file"
-
-      msgr run_done "Updated $tool_versions_file"
-      msgr nested "Backup saved as ${tool_versions_file}.bak"
-
-      return 0
-      ;;
-
-    current) asdf current ;;
-    global) asdf global ;;
-    installed) asdf list ;;
-    versions) asdf list all ;;
-    where) asdf where ;;
-    which) asdf which ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
-  esac
 }
 
 section_helpers()
@@ -647,7 +481,7 @@ section_dotfiles()
       fd --full-path "$DOTFILES" -tx \
         --hidden \
         -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
-        -E 'test' -E '**/bin/asdf/**' -E '**/tldr/*' \
+        -E 'test' -E '**/tldr/*' \
         -x shfmt \
         --language-dialect bash \
         --func-next-line --list --write \
@@ -778,8 +612,6 @@ usage()
   echo ""
   section_apt
   echo ""
-  section_asdf
-  echo ""
   section_brew
   echo ""
   section_check
@@ -801,7 +633,6 @@ main()
   case "$SECTION" in
     install) section_install "$@" ;;
     apt) section_apt "$@" ;;
-    asdf) section_asdf "$@" ;;
     brew) section_brew "$@" ;;
     check) section_check "$@" ;;
     dotfiles) section_dotfiles "$@" ;;

@@ -12,7 +12,6 @@ export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$LOCAL_SHARE/nvim/mason/bin:$L
 export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
-source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
 # zsh completions directory
 [ -z "$ZSH_COMPLETIONS" ] && export ZSH_COMPLETIONS="$XDG_CONFIG_HOME/zsh/completion"
@@ -50,10 +49,6 @@ setup_tmux_window_name_plugin()
     fi
   fi
 }
-
-if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
-  source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
-fi
 
 source_fzf_config
 setup_tmux_window_name_plugin
