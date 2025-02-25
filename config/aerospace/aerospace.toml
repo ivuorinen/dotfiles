@@ -115,6 +115,9 @@ run = ['layout floating']
 if.app-id = 'com.apple.backup.launcher' # TimeMachine
 run = ['layout floating']
 
+[[on-window-detected]]
+if.app-id = 'com.philipyoungg.session-setapp' # Session app (Setapp)
+run = ['layout floating']
 
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
