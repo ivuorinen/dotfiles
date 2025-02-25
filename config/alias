@@ -7,6 +7,8 @@ x-have eza && {
   alias ls="eza -h -s=type --git --icons --group-directories-first"
 }
 
+alias vim='vim -u "$XDG_CONFIG_HOME/vim/vimrc"'
+
 # Easier navigation: .., ..., ....
 alias ..="cd .."
 alias ...="cd ../.."

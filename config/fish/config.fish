@@ -2,6 +2,9 @@
 # │                     fish/config.fish                     │
 # ╰──────────────────────────────────────────────────────────╯
 
+test -e "$HOME/.config/fish/alias.fish" &&
+  source "$HOME/.config/fish/alias.fish"
+
 test -e "$HOME/.config/fish/exports.fish" &&
   source "$HOME/.config/fish/exports.fish"
 
