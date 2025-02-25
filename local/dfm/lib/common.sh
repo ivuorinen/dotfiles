@@ -107,7 +107,7 @@ lib::error::throw()
   local message=$*
 
   lib::error "$message"
-  return "${ERROR_CODES[$code_name]}"
+  cleanup "${ERROR_CODES[$code_name]}"
 }
 
 # Logs a message to the console if the current log level is set so that the
