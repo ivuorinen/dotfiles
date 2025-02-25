@@ -118,6 +118,7 @@ set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
 set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
 fish_add_path "$CARGO_BIN_HOME"
+fish_add_path "$CARGO_HOME/bin"
 fish_add_path "$XDG_SHARE_HOME/bob/nvim-bin"
 
 # screen configuration
