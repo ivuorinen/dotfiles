@@ -14,7 +14,7 @@
 
 # Define protected keywords. Values of these keys are displayed as [protected value].
 # The keys are case-insensitive and are matched as substrings.
-PROTECTED_KEYS=("*TOKEN*" "*SECRET*" "DIRENV_DIFF" "DIRENV_WATCHES" "PATH" "FPATH")
+PROTECTED_KEYS=("*TOKEN*" "*SECRET*" "DIRENV_DIFF" "DIRENV_WATCHES")
 
 # Default grouping is based on the first part before underscore, but can be overridden
 # either by custom grouping file or by the get_custom_group function.
@@ -49,15 +49,48 @@ DEFINED_GROUPS=(
   "PYENV_ROOT=PYTHON"
   "PYENV_SHELL=PYTHON"
   "PYTHONPATH=PYTHON"
+  "POETRY_HOME=PYTHON"
   "RUSTUP_HOME=RUST"
   "RUST_WITHOUT=RUST"
   "SHELL=SHELL"
   "TMPDIR=SHELL"
   "USER=SHELL"
+  "SECURITYSESSIONID=SHELL"
+  "SHLVL=SHELL"
   "WORKON_HOME=PYTHON"
   "ZSH=ZSH"
+  "LANG=SHELL"
+  "EDITOR=SHELL"
+  "VISUAL=SHELL"
+  "COMMAND_MODE=SHELL"
+  "COLORTERM=SHELL"
+  "CARGO_BIN_HOME=RUST"
+  "CARGO_HOME=RUST"
+  "LaunchInstanceID=SHELL"
+  "SECURITYSESSIONID=SHELL"
+  "TERM=SHELL"
+  "TERM_PROGRAM=SHELL"
+  "TERM_PROGRAM_VERSION=SHELL"
+  "XPC_FLAGS=SHELL"
+  "XPC_SERVICE_NAME=SHELL"
+  "NPM_CONFIG_PREFIX=NODE"
+  "YARN_GLOBAL_FOLDER=NODE"
+  "MASON_HOME=NVIM"
+  "asdf_data_dir=ASDF"
+  "nvm_current_version=NODE"
+  "NVM_NODE_BIN_DIR=NODE"
   "_=SHELL"
   "npm_config_cache=NPM"
+)
+
+SKIPPED_KEYS=(
+  "_tide*"
+  "__FISH_*"
+  "___paths_plugin_colors"
+  "__CFBundleIdentifier"
+  "__CF_USER_TEXT_ENCODING"
+  "PATH"
+  "FPATH"
 )
 
 CONFIG_FILE="$X_ENV_GROUPING"
@@ -92,6 +125,12 @@ if [[ -f "$CONFIG_FILE" ]]; then
     # Add to default_protected_keys
     PROTECTED_KEYS+=("$key")
   done <<< "$CUSTOM_KEYS"
+
+  SKIPPED+=("$(yq '.skipped_keys[]' "$CONFIG_FILE")")
+  while IFS= read -r key; do
+    # Add to default_skipped_keys
+    SKIPPED_KEYS+=("$key")
+  done <<< "$SKIPPED"
 
   CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
   while IFS= read -r group; do
@@ -150,6 +189,22 @@ get_custom_group()
   return 1
 }
 
+is_skipped()
+{
+  local key=$1
+  for skipped_key in "${SKIPPED_KEYS[@]}"; do
+    # Direct match
+    if [[ "$key" == "$skipped_key" ]]; then
+      return 0
+    fi
+    # Wildcard match (skipped_key contains '*')
+    if [[ "$skipped_key" == *"*"* ]] && [[ "$key" == $skipped_key ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Create arrays to store all groups, group data and max lengths for each group
 all_groups=()
 group_data=()
@@ -157,6 +212,15 @@ group_max_lengths=()
 
 # Get environment variables and group them
 while IFS='=' read -r key value; do
+  # Skip keys that are in the skipped list
+  if is_skipped "$key"; then
+    continue
+  fi
+
+  if is_skipped "$value"; then
+    continue
+  fi
+
   # Check for custom group
   group=$(get_custom_group "$key")
 
