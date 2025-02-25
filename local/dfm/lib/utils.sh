@@ -109,6 +109,7 @@ list::print_subcommand()
 
 list::loop_functions()
 {
+  local cmd_file="$1"
   while IFS= read -r func; do
     # Get the function description from the function definition in the
     # command file. If no description is found, print only the function name.
@@ -282,7 +283,7 @@ main::find_commands()
   local cmd_files=()
   while IFS= read -r -d '' file; do
     cmd_files+=("$file")
-  done < <(find "$CMD_DIR" -type f -name "*.sh" -print0)
+  done < <(find "$DFM_CMD_DIR" -type f -name "*.sh" -print0)
   echo "${cmd_files[@]}"
 }
 
@@ -297,7 +298,7 @@ main::find_commands()
 main::get_command_functions()
 {
   local cmd_file="$1"
-  # Etsitään funktiomäärittelyt (function xxx() tai xxx())
+  # Find function definitions (function xxx() or xxx())
   grep -E '^[[:space:]]*(function[[:space:]]+)?[a-zA-Z0-9_]+\(\)[[:space:]]*{' "$cmd_file" \
     | sed -E 's/^[[:space:]]*(function[[:space:]]+)?([a-zA-Z0-9_]+).*/\2/'
 }
@@ -360,9 +361,21 @@ main::execute_command()
   local func="$1"
   shift
 
-  local cmd_file="${CMD_DIR}/${cmd}.sh"
-  if [[ ! -f "$cmd_file" ]]; then
+  # Validate input
+  if [[ ! "$cmd" =~ ^[a-zA-Z0-9_-]+$ ]] || [[ ! "$func" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    lib::error "Invalid command or function name"
+    return 1
+  fi
+
+  local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
+  if [[ ! -f "$cmd_file" ]] || [[ ! -r "$cmd_file" ]]; then
     lib::error "Command '$cmd' not found"
+    return 1
+  fi
+
+  # Validate command file
+  if ! bash -n "$cmd_file"; then
+    lib::error "Command file '$cmd' contains syntax errors"
     return 1
   fi
 
