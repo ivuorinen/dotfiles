@@ -6,8 +6,11 @@ set -euo pipefail
 # define default variables
 DFM_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly DFM_SCRIPT_DIR
+export DFM_SCRIPT_DIR
 readonly DFM_CMD_DIR="${DFM_SCRIPT_DIR}/cmd"
+export DFM_CMD_DIR
 readonly DFM_LIB_DIR="${DFM_SCRIPT_DIR}/lib"
+export DFM_LIB_DIR
 readonly DFM_DEFAULT_CONFIG_PATH="$HOME/.config"
 export DFM_DEFAULT_CONFIG_PATH
 readonly DFM_MAX_RETRIES=3
@@ -17,9 +20,42 @@ export DFM_DEFAULT_VERBOSE=0
 TEMP_DIR=$(mktemp -d)
 export TEMP_DIR
 
+# Clean up temporary directory on exit
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
 # Load the common and utility functions from the lib directory.
+[[ -f "${DFM_LIB_DIR}/common.sh" ]] || {
+  echo "Error: Required file ${DFM_LIB_DIR}/common.sh not found"
+  exit 1
+}
+[[ -f "${DFM_LIB_DIR}/utils.sh" ]] || {
+  echo "Error: Required file ${DFM_LIB_DIR}/utils.sh not found"
+  exit 1
+}
 source "${DFM_LIB_DIR}/common.sh"
 source "${DFM_LIB_DIR}/utils.sh"
+
+# Display help information
+#
+# @return None
+main::show_help()
+{
+  cat << EOF
+Usage: dfm [command] [function] [arguments]
+
+dotfiles manager utility for installing and configuring dotfiles.
+
+If no arguments are provided, lists all available commands.
+If only a command is provided, lists available functions for that command.
+If a command and function are provided, executes the specified function.
+
+Examples:
+  dfm                    # List all available commands
+  dfm install            # List available functions for the install command
+  dfm install all        # Execute the 'all' function from the install command
+
+EOF
+}
 
 # Main function for the dfm script.
 #
@@ -39,6 +75,11 @@ main()
 
   local cmd="$1"
   shift
+
+  if [[ "$cmd" == "-h" || "$cmd" == "--help" ]]; then
+    main::show_help
+    return 0
+  fi
 
   if [[ $# -eq 0 ]]; then
     # Show the available functions for the command
