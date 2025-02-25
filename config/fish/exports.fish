@@ -1,34 +1,34 @@
 #!/usr/bin/env fish
 
-# Set XDG environment variables
-test -z "$XDG_CONFIG_HOME" && set -x XDG_CONFIG_HOME "$HOME/.config"
-test -z "$XDG_DATA_HOME" && set -x XDG_DATA_HOME "$HOME/.local/share"
-test -z "$XDG_CACHE_HOME" && set -x XDG_CACHE_HOME "$HOME/.cache"
-test -z "$XDG_STATE_HOME" && set -x XDG_STATE_HOME "$HOME/.local/state"
-test -z "$XDG_BIN_HOME" && set -x XDG_BIN_HOME "$HOME/.local/bin"
-test -z "$XDG_RUNTIME_DIR" && set -x XDG_RUNTIME_DIR "$HOME/.local/run"
+# XDG Base Directory Specification
+set -q XDG_CONFIG_HOME; or set -x XDG_CONFIG_HOME "$HOME/.config"
+set -q XDG_DATA_HOME; or set -x XDG_DATA_HOME "$HOME/.local/share"
+set -q XDG_CACHE_HOME; or set -x XDG_CACHE_HOME "$HOME/.cache"
+set -q XDG_STATE_HOME; or set -x XDG_STATE_HOME "$HOME/.local/state"
+set -q XDG_BIN_HOME; or set -x XDG_BIN_HOME "$HOME/.local/bin"
+set -q XDG_RUNTIME_DIR; or set -x XDG_RUNTIME_DIR "$HOME/.local/run"
 
-# Set dotfiles directory
-test -z "$DOTFILES" && set -x DOTFILES "$HOME/.dotfiles"
+# Dotfiles directory
+set -q DOTFILES; or set -x DOTFILES "$HOME/.dotfiles"
 
-# Set other environment variables
-test -z "$EDITOR" && set -x EDITOR "nvim"
-test -z "$VISUAL" && set -x VISUAL "code"
-test -z "$HOSTNAME" && set -x HOSTNAME (hostname -s)
+# Editor settings
+set -q EDITOR; or set -x EDITOR "nvim"
+set -q VISUAL; or set -x VISUAL "code"
+set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 
 # Add local bin to path
 fish_add_path "$XDG_BIN_HOME"
 
-# Set npm environment variables
-test -z "$NPM_CONFIG_PREFIX" && set -x NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
+# NPM configuration
+set -q NPM_CONFIG_PREFIX; or set -x NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
 fish_add_path "$NPM_CONFIG_PREFIX/bin"
 
-# Set yarn environment variables
-test -z "$YARN_GLOBAL_FOLDER" && set -x YARN_GLOBAL_FOLDER "$XDG_DATA_HOME/yarn"
+# Yarn configuration
+set -q YARN_GLOBAL_FOLDER; or set -x YARN_GLOBAL_FOLDER "$XDG_DATA_HOME/yarn"
 fish_add_path "$YARN_GLOBAL_FOLDER/bin"
 
-# Set mason environment variables
-test -z "$MASON_HOME" && set -x MASON_HOME "$XDG_DATA_HOME/nvim/mason"
+# Mason configuration
+set -q MASON_HOME; or set -x MASON_HOME "$XDG_DATA_HOME/nvim/mason"
 fish_add_path "$MASON_HOME/bin"
 
 # Set Neovim environment variables
@@ -42,136 +42,129 @@ test -z "$NVIM_SHADA_PATH" && set -x NVIM_SHADA_PATH "$NVIM_STATE/shada"
 test -z "$NVIM_UNDO_PATH" && set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
 
 # Ansible configuration
-# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
-test -z "$ANSIBLE_HOME" && set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
-test -z "$ANSIBLE_CONFIG" && set -x ANSIBLE_CONFIG "$ANSIBLE_HOME/ansible.cfg"
-test -z "$ANSIBLE_GALAXY_CACHE_DIR" && set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_HOME/ansible/galaxy_cache"
+set -q ANSIBLE_HOME; or set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
+set -q ANSIBLE_CONFIG; or set -x ANSIBLE_CONFIG "$ANSIBLE_HOME/ansible.cfg"
+set -q ANSIBLE_GALAXY_CACHE_DIR; or set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_HOME/ansible/galaxy_cache"
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
 # AWS configuration
-test -z "$AWS_CONFIG_FILE" && set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
-test -z "$AWS_SHARED_CREDENTIALS_FILE" && set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
-test -z "$AWS_SESSION_TOKEN" && set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
-test -z "$AWS_DATA_PATH" && set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
-test -z "$AWS_DEFAULT_OUTPUT" && set -x AWS_DEFAULT_OUTPUT "table"
-test -z "$AWS_CONFIGURE_KEYS" && set -x AWS_CONFIGURE_KEYS "true"
-test -z "$AWS_CONFIGURE_SESSION" && set -x AWS_CONFIGURE_SESSION "true"
-test -z "$AWS_CONFIGURE_SESSION_DURATION" && set -x AWS_CONFIGURE_SESSION_DURATION "7200"
-test -z "$AWS_CONFIGURE_SESSION_MFA" && set -x AWS_CONFIGURE_SESSION_MFA "true"
-test -z "$AWS_CONFIGURE_PROFILE" && set -x AWS_CONFIGURE_PROFILE "true"
-test -z "$AWS_CONFIGURE_PROMPT" && set -x AWS_CONFIGURE_PROMPT "true"
-test -z "$AWS_CONFIGURE_PROMPT_DEFAULT" && set -x AWS_CONFIGURE_PROMPT_DEFAULT "true"
+set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
+set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
+set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
+set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
+set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT "table"
+set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS "true"
+set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION "true"
+set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION "7200"
+set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA "true"
+set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE "true"
+set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT "true"
+set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT "true"
 
 # Brew configuration
-test -z "$HOMEBREW_NO_ANALYTICS" && set -x HOMEBREW_NO_ANALYTICS "true"
-test -z "$HOMEBREW_NO_ENV_HINTS" && set -x HOMEBREW_NO_ENV_HINTS "true"
-test -z "$HOMEBREW_BUNDLE_MAS_SKIP" && set -x HOMEBREW_BUNDLE_MAS_SKIP "true"
-test -z "$HOMEBREW_BUNDLE_FILE" && set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/homebrew/Brewfile"
+set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS "true"
+set -q HOMEBREW_NO_ENV_HINTS; or set -x HOMEBREW_NO_ENV_HINTS "true"
+set -q HOMEBREW_BUNDLE_MAS_SKIP; or set -x HOMEBREW_BUNDLE_MAS_SKIP "true"
+set -q HOMEBREW_BUNDLE_FILE; or set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/homebrew/Brewfile"
 
-# Set composer environment variables
-test -z "$COMPOSER_HOME" && set -x COMPOSER_HOME "$XDG_STATE_HOME/composer"
-test -z "$COMPOSER_BIN" && set -x COMPOSER_BIN "$COMPOSER_HOME/vendor/bin"
+# Composer configuration
+set -q COMPOSER_HOME; or set -x COMPOSER_HOME "$XDG_STATE_HOME/composer"
+set -q COMPOSER_BIN; or set -x COMPOSER_BIN "$COMPOSER_HOME/vendor/bin"
 fish_add_path "$COMPOSER_BIN"
 
-# direnv, https://direnv.net/
-# https://direnv.net/docs/hook.html
-# Set the hook to show the direnv message in a different color
-# export DIRENV_LOG_FORMAT=$'\033[2mdirenv: %s\033[0m'
-test -z "$DIRENV_LOG_FORMAT" && set -x DIRENV_LOG_FORMAT ''
+# direnv configuration
+set -q DIRENV_LOG_FORMAT; or set -x DIRENV_LOG_FORMAT ''
 
-# docker, https://docs.docker.com/engine/reference/commandline/cli/
-test -z "$DOCKER_CONFIG" && set -x DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
+# Docker configuration
+set -q DOCKER_CONFIG; or set -x DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
 x-dc "$DOCKER_CONFIG"
-test -z "$DOCKER_HIDE_LEGACY_COMMANDS" && set -x DOCKER_HIDE_LEGACY_COMMANDS "true"
-# Docke: Disable snyk ad
-test -z "$DOCKER_SCAN_SUGGEST" && set -x DOCKER_SCAN_SUGGEST "false"
+set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS "true"
+set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST "false"
 
-# fzf
-test -z "$FZF_BASE" && set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
-test -z "$FZF_DEFAULT_OPTS" && set -x FZF_DEFAULT_OPTS '--height 40% --tmux bottom,40% --layout reverse --border top'
+# fzf configuration
+set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
+set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS '--height 40% --tmux bottom,40% --layout reverse --border top'
 
-# GnuPG
-# https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
-test -z "$GNUPGHOME" && set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
+# GnuPG configuration
+set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
-# Go
-test -z "$GOPATH" && set -x GOPATH "$XDG_DATA_HOME/go"
-test -z "$GOBIN" && set -x GOBIN "$XDG_BIN_HOME"
+# Go configuration
+set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
+set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
 fish_add_path "$GOBIN"
 
 # NPM: Add npm packages to path
 if x-have node;
-  set -x NVM_NODE_BIN_DIR $(dirname $(which node))
+  set -x NVM_NODE_BIN_DIR (dirname (which node))
   fish_add_path "$NVM_NODE_BIN_DIR"
 end
 
-# 1Password
-test -z "$OP_CACHE" && set -x OP_CACHE "$XDG_STATE_HOME/1password"
+# 1Password configuration
+set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 
-# Python
-test -z "$WORKON_HOME" && set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
-test -z "$PYENV_ROOT" && set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
+# Python configuration
+set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
+set -q PYENV_ROOT; or set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 fish_add_path "$PYENV_ROOT/bin"
 
-## Set poetry environment variables
-test -z "$POETRY_HOME" && set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
+# Poetry configuration
+set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
 fish_add_path "$POETRY_HOME/bin"
 
-# Rust / cargo
-test -z "$CARGO_HOME" && set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
-test -z "$CARGO_BIN_HOME" && set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
-test -z "$RUSTUP_HOME" && set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
+# Rust / cargo configuration
+set -q CARGO_HOME; or set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
+set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
+set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
 fish_add_path "$CARGO_BIN_HOME"
 fish_add_path "$XDG_SHARE_HOME/bob/nvim-bin"
 
-# screen
-# https://www.gnu.org/software/screen/manual/screen.html
-test -z "$SCREENRC" && set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"
+# screen configuration
+set -q SCREENRC; or set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"
 
-# Sonarlint
-test -z "$SONARLINT_HOME" && set -x SONARLINT_HOME "$XDG_DATA_HOME/sonarlint"
-test -z "$SONARLINT_BIN" && set -x SONARLINT_BIN "$XDG_BIN_HOME"
-test -z "$SONARLINT_USER_HOME" && set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
+# Sonarlint configuration
+set -q SONARLINT_HOME; or set -x SONARLINT_HOME "$XDG_DATA_HOME/sonarlint"
+set -q SONARLINT_BIN; or set -x SONARLINT_BIN "$XDG_BIN_HOME"
+set -q SONARLINT_USER_HOME; or set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
 
-# Terraform
-test -z "$TF_DATA_DIR" && set -x TF_DATA_DIR "$XDG_STATE_HOME/terraform"
-test -z "$TF_CLI_CONFIG_FILE" && set -x TF_CLI_CONFIG_FILE "$XDG_CONFIG_HOME/terraform/terraformrc"
-test -z "$TF_PLUGIN_CACHE_DIR" && set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
+# Terraform configuration
+set -q TF_DATA_DIR; or set -x TF_DATA_DIR "$XDG_STATE_HOME/terraform"
+set -q TF_CLI_CONFIG_FILE; or set -x TF_CLI_CONFIG_FILE "$XDG_CONFIG_HOME/terraform/terraformrc"
+set -q TF_PLUGIN_CACHE_DIR; or set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
 
-# tmux
-# https://tmux.github.io/
-test -z "$TMUX_TMPDIR" && set -x TMUX_TMPDIR "$XDG_STATE_HOME/tmux"
-test -z "$TMUX_CONF_DIR" && set -x TMUX_CONF_DIR "$XDG_CONFIG_HOME/tmux"
-test -z "$TMUX_PLUGINS" && set -x TMUX_PLUGINS "$TMUX_CONF_DIR/plugins"
-test -z "$TMUX_CONF" && set -x TMUX_CONF "$TMUX_CONF_DIR/tmux.conf"
-test -z "$TMUX_PLUGIN_MANAGER_PATH" && set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
+# tmux configuration
+set -q TMUX_TMPDIR; or set -x TMUX_TMPDIR "$XDG_STATE_HOME/tmux"
+set -q TMUX_CONF_DIR; or set -x TMUX_CONF_DIR "$XDG_CONFIG_HOME/tmux"
+set -q TMUX_PLUGINS; or set -x TMUX_PLUGINS "$TMUX_CONF_DIR/plugins"
+set -q TMUX_CONF; or set -x TMUX_CONF "$TMUX_CONF_DIR/tmux.conf"
+set -q TMUX_PLUGIN_MANAGER_PATH; or set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
 
-# tms
-# https://github.com/jrmoulton/tmux-sessionizer
-test -z "$TMS_CONFIG_FILE" && set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
+# Source tmux theme activation script for Fish shell
+if test -f "$DOTFILES/config/tmux/theme-activate.fish"
+  source "$DOTFILES/config/tmux/theme-activate.fish"
+end
 
-# wakatime
-# https://github.com/wakatime/wakatime-cli
-test -z "$WAKATIME_HOME" && set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"
+# tms configuration
+set -q TMS_CONFIG_FILE; or set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
+
+# wakatime configuration
+set -q WAKATIME_HOME; or set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
 
-# misc
-test -z "$CHEAT_USE_FZF" && set -x CHEAT_USE_FZF "true"
-test -z "$SQLITE_HISTORY" && set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
+# Miscellaneous configuration
+set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF "true"
+set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
 
-# Source exports-secret.fish if it exists
+# Source additional configuration files if they exist
 if test -f "$DOTFILES/config/fish/exports-secret.fish"
   source "$DOTFILES/config/fish/exports-secret.fish"
 end
 
-# Source $DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish if it exists
 if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
   source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
 end
 
-# Source $DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish if it exists
 if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
   source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
 end
