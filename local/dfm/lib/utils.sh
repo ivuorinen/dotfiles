@@ -23,6 +23,52 @@ readonly MAGENTA="\033[35m"
 readonly CYAN="\033[36m"
 readonly WHITE="\033[37m"
 
+clr::black()
+{
+  printf "${BLACK}%s${RESET}" "$*"
+}
+clr::red()
+{
+  printf "${RED}%s${RESET}" "$*"
+}
+clr::green()
+{
+  printf "${GREEN}%s${RESET}" "$*"
+}
+clr::yellow()
+{
+  printf "${YELLOW}%s${RESET}" "$*"
+}
+clr::blue()
+{
+  printf "${BLUE}%s${RESET}" "$*"
+}
+clr::magenta()
+{
+  printf "${MAGENTA}%s${RESET}" "$*"
+}
+clr::white()
+{
+  printf "${WHITE}%s${RESET}" "$*"
+}
+
+style::bold()
+{
+  printf "${BOLD}%s${RESET}" "$*"
+}
+style::dim()
+{
+  printf "${DIM}%s${RESET}" "$*"
+}
+style::italic()
+{
+  printf "${ITALIC}%s${RESET}" "$*"
+}
+style::underline()
+{
+  printf "${UNDERLINE}%s${RESET}" "$*"
+}
+
 # Function to print formatted line
 list::print_formatted()
 {
@@ -321,6 +367,7 @@ main::execute_command()
   fi
 
   # Source the command file
+  # shellcheck source=/dev/null
   source "$cmd_file"
 
   # Check if the function exists
