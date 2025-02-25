@@ -80,6 +80,3 @@
 	shallow = true
 	ignore = dirty
 
-[submodule "dotbot-asdf"]
-	path = tools/dotbot-asdf
-	url = https://github.com/sobolevn/dotbot-asdf
