@@ -119,6 +119,10 @@ run = ['layout floating']
 if.app-id = 'com.philipyoungg.session-setapp' # Session app (Setapp)
 run = ['layout floating']
 
+[[on-window-detected]]
+if.app-id = 'com.microsoft.rdc.macos' # Remote Desktop
+run = ['layout floating']
+
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 [key-mapping]
