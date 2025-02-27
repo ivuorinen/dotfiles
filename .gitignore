@@ -22,6 +22,8 @@ config/npm/npmrc
 config/nvim/lazy-lock.json
 config/nvim/spell/*
 !config/nvim/spell/.gitkeep
+config/git/local.d/*
+!config/git/local.d/.gitkeep
 config/zed/*
 !config/zed/settings.json
 config/zsh/.zcompdump
