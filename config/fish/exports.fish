@@ -19,6 +19,9 @@ set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 # Add local bin to path
 fish_add_path "$XDG_BIN_HOME"
 
+# Add cargo bin to path
+fish_add_path "$XDG_SHARE_HOME/cargo/bin"
+
 # NPM configuration
 set -q NPM_CONFIG_PREFIX; or set -x NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
 fish_add_path "$NPM_CONFIG_PREFIX/bin"
@@ -107,6 +110,9 @@ set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 set -q PYENV_ROOT; or set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 fish_add_path "$PYENV_ROOT/bin"
+if x-have pyenv; and not functions -q pyenv
+  status --is-interactive; and source (pyenv init - | psub)
+end
 
 # Poetry configuration
 set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
