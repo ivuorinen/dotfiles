@@ -7,12 +7,10 @@ set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
 set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
 let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
 
-set v=$XDG_CONFIG_HOME/vim
-
 "*****************************************************************************
 "" Vim-Plug core
 "*****************************************************************************
-let vimplug_exists=expand(v . '/autoload/plug.vim')
+let vimplug_exists=expand('$HOME/.config/autoload/plug.vim')
 if has('win32')&&!has('win64')
   let curl_exists=expand('C:\Windows\Sysnative\curl.exe')
 else
@@ -38,7 +36,7 @@ if !filereadable(vimplug_exists)
 endif
 
 " Required:
-call plug#begin(expand(v . '/plugged'))
+call plug#begin(expand('$HOME/.config/vim/plugged'))
 
 "*****************************************************************************
 "" Plug install packages
@@ -246,7 +244,7 @@ endif
 "" Disable the blinking cursor.
 set gcr=a:blinkon0
 
-set scrolloff=3
+set scrolloff=10
 
 
 "" Status bar

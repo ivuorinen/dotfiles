@@ -36,3 +36,4 @@ ssh/local.d/*
 config/fish/fish_variables
 **/exports-secret.fish
 config/fish/completions/asdf.fish
+config/vim/.netrwhist
