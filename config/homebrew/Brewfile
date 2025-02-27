@@ -217,8 +217,6 @@ brew "nss"
 brew "openldap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
-# General-purpose scripting language
-brew "php@8.2"
 # Execute binaries from Python packages in isolated environments
 brew "pipx"
 # Python version management
@@ -235,6 +233,8 @@ brew "ruby-build"
 brew "rbenv"
 # Generate C-based recognizers from regular expressions
 brew "re2c"
+# Rust toolchain installer
+brew "rustup"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Send macOS User Notifications from the command-line
@@ -288,9 +288,11 @@ brew "shivammathur/extensions/uuid@8.3"
 # Yaml PHP extension
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
-brew "shivammathur/php/php"
-# General-purpose scripting language
 brew "shivammathur/php/php-debug"
+# General-purpose scripting language
+brew "shivammathur/php/php@8.2", link: true
+# General-purpose scripting language
+brew "shivammathur/php/php@8.2-debug"
 # Command-line interface for 1Password
 cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
