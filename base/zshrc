@@ -22,7 +22,6 @@ FPATH="$ZSH_COMPLETIONS:$FPATH"
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
 source "$DOTFILES/config/zsh/antidote.zsh"
-# source "$DOTFILES/config/zsh/prompt.zsh"
 
 # Function to source FZF configuration
 source_fzf_config()
@@ -61,3 +60,6 @@ bashcompinit
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 export P10K_CONFIG="$DOTFILES/config/zsh/p10k.zsh"
 [[ ! -f "$P10K_CONFIG" ]] || source "$P10K_CONFIG"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:$HOME/.lmstudio/bin"

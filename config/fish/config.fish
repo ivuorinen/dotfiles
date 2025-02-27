@@ -14,3 +14,6 @@ if status is-interactive
   # Start tmux if not already running and not in SSH
   open-tmux # defined in functions/open-tmux.fish
 end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH $HOME/.lmstudio/bin

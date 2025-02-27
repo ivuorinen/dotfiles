@@ -25,3 +25,6 @@ x-have antidot && {
 PROMPT_DIRTRIM=3
 PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)'
 PS1='\[\e[95m\]\u\[\e[0m\]@\[\e[38;5;22;2m\]\h\[\e[0m\] \[\e[38;5;33m\]\w\[\e[0m\] \[\e[92;2m\]${PS1_CMD1}\n\[\e[39m\]➜\[\e[0m\] '
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:$HOME/.lmstudio/bin"
