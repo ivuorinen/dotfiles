@@ -24,6 +24,8 @@ config/nvim/spell/*
 !config/nvim/spell/.gitkeep
 config/git/local.d/*
 !config/git/local.d/.gitkeep
+config/vim/fzf
+config/vim/plugged/*
 config/zed/*
 !config/zed/settings.json
 config/zsh/.zcompdump
@@ -39,3 +41,4 @@ config/fish/fish_variables
 **/exports-secret.fish
 config/fish/completions/asdf.fish
 config/vim/.netrwhist
+*.swp
