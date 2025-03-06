@@ -29,3 +29,26 @@ if type -q eza > /dev/null
     eza_git $argv
   end
 end
+
+# Edit fish alias file
+function .a --wraps='nvim ~/.dotfiles/config/fish/alias.fish' --description 'alias .a=nvim ~/.dotfiles/config/fish/alias.fish'
+  nvim ~/.dotfiles/config/fish/alias.fish $argv
+
+end
+
+# Go to the directory where my projects are stored
+function .c --wraps='cd ~/Code' --description 'cd ~/Code'
+  cd ~/Code $argv
+
+end
+
+# Go to the directory where the dotfiles are stored
+function .d --wraps='cd ~/.dotfiles' --description 'cd ~/.dotfiles'
+  cd ~/.dotfiles $argv
+
+end
+
+function .s --wraps='cd ~/Code/s' --description 'cd ~/Code/s'
+  cd ~/Code/s $argv
+
+end
