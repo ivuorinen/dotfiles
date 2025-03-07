@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+# yabai configuration file
+# https://github.com/koekeishiya/yabai
+
+## load scripting additions
+# sudo yabai --load-sa
+# yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+# automatically balance windows when they are created or destroyed
+yabai -m config auto_balance on
+
+# layout to use, default is bsp (binary space partitioning)
+# bsp or float (default: float)
+yabai -m config layout bsp
+
+# padding between windows and screen edge
+yabai -m config top_padding 0
+yabai -m config bottom_padding 0
+yabai -m config left_padding 0
+yabai -m config right_padding 0
+yabai -m config window_gap 4
+
+# apps to not manage (ignore)
+# TODO: add apps from aerospace config to here
+yabai -m rule --add app="System Settings" manage=off
+yabai -m rule --add app="^Logi Options$" manage=off
+yabai -m rule --add app="^Slack$" manage=off
+yabai -m rule --add app="1Password" manage=off
+yabai -m rule --add app="Fork" manage=off
+yabai -m rule --add app="^Microsoft Teams$" manage=off
+
+# apply rules
+yabai -m rule --apply

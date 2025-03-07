@@ -1,0 +1,96 @@
+# skhd configuration file
+# https://github.com/koekeishiya/skhd
+
+# Reserved keys
+# ---------------------------
+# shift + cmd
+#   m    = restart yabai
+#   q    = quit yabai
+#   <cr> = open wezterm
+# alt
+#   h = focus west
+#   j = focus south
+#   k = focus north
+#   l = focus east
+#   e = toggle split
+#   y = toggle float, center window medium size
+#   u = move window to left
+#   i = move window to center
+#   o = move window to right
+# ctrl + alt
+#   h = resize window left
+#   j = resize window down
+#   k = resize window up
+#   l = resize window right
+# alt + shift
+#   t = toggle float, center window medium size
+#   y = toggle float, center window large size
+#   h = swap window left
+#   j = swap window down
+#   k = swap window up
+#   l = swap window right
+
+# Control applications
+## Yabai
+shift + cmd - m : yabai --restart-service # restart yabai
+shift + cmd - q : yabai --quit # quit yabai
+
+## wezterm
+shift + cmd - return : wezterm
+
+# Floating windows
+
+# float / unfloat window and center on screen medium size
+alt - t : yabai -m window --toggle float;\
+          yabai -m window --grid 9:16:1:1:14:7
+
+# float / unfloat window and center on screen large size
+shift + alt - t : yabai -m window --toggle float;\
+          yabai -m window --grid 90:160:5:5:150:80
+
+# make floating window fill screen
+alt - y : yabai -m window --toggle float;\
+          yabai -m window --grid 1:1:0:0:1:1
+
+# toggle float window and center on screen medium size
+shift + alt - y : yabai -m window --toggle float \
+  && yabai -m window --resize \
+    abs:$(($(yabai -m query --displays --display | jq .frame.w) / 2)):$(($(yabai -m query --displays --display | jq .frame.h) * 4 / 5)) \
+  && yabai -m window --move \
+    abs:$(($(yabai -m query --displays --display | jq .frame.x) + $(($(yabai -m query --displays --display | jq .frame.w) / 4)))):$(($(yabai -m query --displays --display | jq .frame.y) + $(($(yabai -m query --displays --display | jq .frame.h) / 10))))
+
+# toggle window split type
+alt - e : yabai -m window --toggle split
+
+
+# Focusing, resizing and moving windows
+
+## focus window
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
+
+## move windows to predefined places
+alt - y : yabai -m window --grid 1:4:1:0:2:1 # 2/4 centered
+alt - u : yabai -m window --grid 1:3:0:0:1:1 # 1/3 left
+alt - i : yabai -m window --grid 1:3:1:0:1:1 # 1/3 center
+alt - o : yabai -m window --grid 1:3:2:0:1:1 # 1/3 right
+ctrl + alt - h : yabai -m window --grid 1:2:0:0:1:1 # 1/2 left
+ctrl + alt - l : yabai -m window --grid 1:2:1:0:1:1 # 1/2 right
+
+## swap windows
+shift + alt - h : yabai -m window --swap west
+shift + alt - j : yabai -m window --swap south
+shift + alt - k : yabai -m window --swap north
+shift + alt - l : yabai -m window --swap east
+
+## resize windows
+ctrl + alt - h : yabai -m window --resize left:-50:0; \
+                 yabai -m window --resize right:-50:0
+ctrl + alt - j : yabai -m window --resize bottom:0:50; \
+                 yabai -m window --resize top:0:50
+ctrl + alt - k : yabai -m window --resize top:0:-50; \
+                 yabai -m window --resize bottom:0:-50
+ctrl + alt - l : yabai -m window --resize right:50:0; \
+                 yabai -m window --resize left:50:0
