@@ -3,6 +3,8 @@
 *.bak
 *.log
 *.socket
+*.swp
+*.old
 *cache
 .env
 .idea
@@ -41,4 +43,5 @@ config/fish/fish_variables
 **/exports-secret.fish
 config/fish/completions/asdf.fish
 config/vim/.netrwhist
-*.swp
+config/vim/autoload/plug.vim
+config/vim/extra/*

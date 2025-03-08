@@ -1,11 +1,13 @@
-" This is my vimrc 
+" This is my vimrc
+" There are many like it but this will eventually be mine
 "
-"
+" vim: ts=2 sw=2 expandtab
+" vint: +ProhibitAbbreviationOption +ProhibitSetNoCompatible
 "*****************************************************************************
 "" Vim-Plug core
 "*****************************************************************************
 let vimplug_exists=expand('$HOME/.config/autoload/plug.vim')
-if has('win32')&&!has('win64')
+if has('win32') && !has('win64')
   let curl_exists=expand('C:\Windows\Sysnative\curl.exe')
 else
   let curl_exists=expand('curl')
@@ -13,7 +15,7 @@ endif
 
 let g:vim_bootstrap_langs = "go,html,javascript,lua,php,python,typescript"
 let g:vim_bootstrap_editor = "vim" " nvim or vim
-let g:vim_bootstrap_theme = "minimalist"
+let g:vim_bootstrap_theme = "iceberg"
 let g:vim_bootstrap_frams = "vuejs"
 
 if !filereadable(vimplug_exists)
@@ -29,131 +31,185 @@ if !filereadable(vimplug_exists)
   autocmd VimEnter * PlugInstall
 endif
 
-" Required:
 call plug#begin(expand('$HOME/.config/vim/plugged'))
 
-Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-Plug 'vim-scripts/grep.vim'
-Plug 'vim-scripts/CSApprox'
-Plug 'Raimondi/delimitMate'
-Plug 'majutsushi/tagbar'
-Plug 'dense-analysis/ale'
-Plug 'Yggdroot/indentLine'
-Plug 'editor-bootstrap/vim-bootstrap-updater'
-Plug 'tpope/vim-rhubarb' " required by fugitive to :GBrowse
-Plug 'dikiaap/minimalist'
-Plug 'liuchengxu/vim-which-key'
+  " coc.nvim - Intellisense engine
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  " editorconfig-vim - EditorConfig plugin
+  Plug 'editorconfig/editorconfig-vim'
+  " nerdtree - File system explorer
+  Plug 'scrooloose/nerdtree'
+  Plug 'jistr/vim-nerdtree-tabs'
+  " vim-commentary - Commenting plugin
+  Plug 'tpope/vim-commentary'
+  " vim-fugitive - Git wrapper
+  Plug 'tpope/vim-fugitive'
+  " vim-gitgutter - Git diff in the gutter
+  Plug 'airblade/vim-gitgutter'
+  " grep.vim - Grep plugin
+  Plug 'vim-scripts/grep.vim'
+  " CSApprox - Approximate color scheme
+  Plug 'vim-scripts/CSApprox'
+  " tagbar - Tag list
+  Plug 'majutsushi/tagbar'
+  " ale - Asynchronous Lint Engine
+  Plug 'dense-analysis/ale'
+  " indentLine - Show indent lines
+  Plug 'Yggdroot/indentLine'
+  " vim-bootstrap-updater - Update vim-bootstrap
+  Plug 'editor-bootstrap/vim-bootstrap-updater'
+  " vim-rhubarb - Fugitive extension
+  Plug 'tpope/vim-rhubarb' " required by fugitive to :GBrowse
 
-if isdirectory('~/.config/vim/extra/fzf')
-  Plug '~/.local/bin/fzf' | Plug 'junegunn/fzf.vim'
-else
-  Plug 'junegunn/fzf', { 'dir': '~/.config/vim/fzf', 'do': './install --bin' }
-  Plug 'junegunn/fzf.vim'
-endif
-let g:make = 'gmake'
-if exists('make')
-  let g:make = 'make'
-endif
-Plug 'Shougo/vimproc.vim', {'do': g:make}
+  " vim-airline
+  Plug 'vim-airline/vim-airline'
 
-"" Vim-Session
-Plug 'xolox/vim-misc'
-Plug 'xolox/vim-session'
+  " iceberg.vim - Iceberg color scheme
+  Plug 'cocopon/iceberg.vim'
 
-" go
-"" Go Lang Bundle
-Plug 'fatih/vim-go', {'do': ':GoInstallBinaries'}
+  " fzf.vim - Fuzzy finder
+  if isdirectory('~/.config/vim/extra/fzf')
+    Plug '~/.config/vim/extra/fzf' | Plug 'junegunn/fzf.vim'
+  else
+    Plug 'junegunn/fzf', { 'dir': '~/.config/vim/extra/fzf', 'do': './install --bin' }
+    Plug 'junegunn/fzf.vim'
+  endif
 
-" html
-"" HTML Bundle
-Plug 'hail2u/vim-css3-syntax'
-Plug 'gko/vim-coloresque'
-Plug 'tpope/vim-haml'
-Plug 'mattn/emmet-vim'
+  let g:make = 'gmake'
+  if exists('make')
+    let g:make = 'make'
+  endif
 
-" javascript
-"" Javascript Bundle
-Plug 'jelera/vim-javascript-syntax'
+  " vimproc.vim - Asynchronous execution
+  Plug 'Shougo/vimproc.vim', {'do': g:make}
 
-" lua
-"" Lua Bundle
-Plug 'xolox/vim-lua-ftplugin'
-Plug 'xolox/vim-lua-inspect'
+  " Vim-Session
+  Plug 'xolox/vim-misc'
+  Plug 'xolox/vim-session'
 
-" php
-"" PHP Bundle
-Plug 'phpactor/phpactor', {'for': 'php', 'do': 'composer install --no-dev -o'}
-Plug 'stephpy/vim-php-cs-fixer'
+  " go
+  Plug 'fatih/vim-go', {'do': ':GoInstallBinaries'}
 
-" python
-"" Python Bundle
-Plug 'davidhalter/jedi-vim'
-Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
+  " html
+  Plug 'hail2u/vim-css3-syntax'
+  Plug 'gko/vim-coloresque'
+  Plug 'tpope/vim-haml'
+  Plug 'mattn/emmet-vim'
 
-" typescript
-Plug 'leafgarland/typescript-vim'
-Plug 'HerringtonDarkholme/yats.vim'
+  " javascript
+  Plug 'jelera/vim-javascript-syntax'
 
-" vuejs
-Plug 'posva/vim-vue'
-Plug 'leafOfTree/vim-vue-plugin'
+  " lua
+  Plug 'xolox/vim-lua-ftplugin'
+  Plug 'xolox/vim-lua-inspect'
 
-"*****************************************************************************
-"*****************************************************************************
+  " php
+  Plug 'phpactor/phpactor', {'for': 'php', 'do': 'composer install --no-dev -o'}
+  Plug 'stephpy/vim-php-cs-fixer'
 
-set nocompatible               " disable compatibility mode with vi
-filetype off                   " disable filetype detection (but re-enable later, see below)
+  " python
+  Plug 'davidhalter/jedi-vim'
+  Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
 
-set encoding=utf-8             " UTF-8
-set number                     " Show line numbers
-set relativenumber             " Show relative line numbers
-set laststatus=2               " Always show statusline (even with only single window)
-set showmatch                  " Highlight matching brace
-set visualbell                 " Use visual bell (no beeping)
+  " typescript
+  Plug 'leafgarland/typescript-vim'
+  Plug 'HerringtonDarkholme/yats.vim'
 
-set backspace=indent,eol,start " Backspace behaviour
-set cindent                    " Use 'C' style program indenting
-set cursorline                 " Highlight current line
-set expandtab                  " Use spaces instead of tabs
-set fileformats=unix,dos,mac
-set ignorecase                 " Always case-insensitive
-set incsearch                  " Searches for strings incrementally
-set linespace=3
-set modeline
-set modelines=3
-set mouse=a
-set mousemodel=popup
-set ruler                      " Show row and column ruler information
-set scrolloff=5
-set shiftwidth=4               " Number of auto-indent spaces
-set smartcase                  " Enable smart-case search
-set smartindent                " Enable smart-indent
-set smarttab                   " Enable smart-tabs
-set softtabstop=4              " Number of spaces per Tab
-set termguicolors
-set undolevels=1000            " Number of undo levels
-set wildmenu
+  " vimrc
+  Plug 'Vimjas/vint'
+
+  " vuejs
+  Plug 'posva/vim-vue'
+  Plug 'leafOfTree/vim-vue-plugin'
 
 call plug#end()
 
-" Required:
-filetype plugin indent on
+let mapleader=' '                 " Map leader to <space>
+filetype off                      " disable filetype detection (but re-enable later, see below)
 
-"" Map leader to <space>
-let mapleader=' '
+set backspace=indent,eol,start    " Backspace behaviour
+set cindent                       " Use 'C' style program indenting
+set cursorline                    " Highlight current line
+set encoding=utf-8                " UTF-8
+set expandtab                     " Use spaces instead of tabs
+set fileformats=unix,dos,mac      " File formats
+set guioptions=egmrti             " GUI options
+set hidden                        " Enable hidden buffers
+set ignorecase                    " Always case-insensitive
+set incsearch                     " Searches for strings incrementally
+set laststatus=2                  " Always show statusline (even with only single window)
+set linespace=3                   " Set line spacing
+set modeline                      " Enable modelines
+set modelines=3                   " Number of lines to check for modelines
+set mouse=a                       " Enable mouse support
+set mousemodel=popup              " Enable mouse support
+set nobackup                      " Disable backup files
+set nocompatible                  " disable compatibility mode with vi
+set nowritebackup                 " Disable backup files
+set number                        " Show line numbers
+set relativenumber                " Show relative line numbers
+set ruler                         " Show row and column ruler information
+set scrolloff=5                   " Minimum number of lines to keep above and below the cursor
+set shiftwidth=4                  " Number of auto-indent spaces
+set shortmess+=A                  " Don't show autocommand messages
+set shortmess+=F                  " Avoid showing the "file-info" message
+set shortmess+=I                  " Don't show intro message
+set shortmess+=O                  " Avoid showing the "file-read" message
+set shortmess+=O                  " Don't show overlength messages
+set shortmess+=T                  " Don't show title messages
+set shortmess+=W                  " Don't show "written" messages
+set shortmess+=a                  " Avoid showing the "ATTENTION" message
+set shortmess+=c                  " Avoid showing the "ins-completion-menu" message
+set shortmess+=c                  " Don't pass messages to |ins-completion-menu|
+set shortmess+=o                  " Avoid showing the "overlength" message
+set shortmess+=t                  " Avoid showing the "trailing whitespace" message
+set showmatch                     " Highlight matching brace
+set smartcase                     " Enable smart-case search
+set smartindent                   " Enable smart-indent
+set smarttab                      " Enable smart-tabs
+set softtabstop=4                 " Number of spaces per Tab
+set t_Co=256                      " 256 colors
+set termguicolors                 " Enable 24-bit RGB color in the terminal
+set timeoutlen=500                " By default timeoutlen=1000 (ms)
+set ttimeoutlen=0                 " By default ttimeoutlen=-1 (ms)
+set undolevels=1000               " Number of undo levels
+set visualbell                    " Use visual bell (no beeping)
+set wildmenu                      " Enable wildmenu
+set wildmode=longest,list:longest " Command-line completion mode
+set wrap                          " Wrap lines
+set wrapscan                      " Searches wrap around the end of the file
 
-"" Enable hidden buffers
-set hidden
+set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor " Ignore these files in wildmenu
 
+colorscheme iceberg               " Set the color scheme
+filetype plugin indent on         " enable filetype detection, plugins and indenting
+
+" Set the shell
 if exists('$SHELL')
-    set shell=$SHELL
+  set shell=$SHELL
 else
-    set shell=/bin/sh
+  set shell=/bin/sh
 endif
+
+" COC
+let g:coc_global_extensions = [
+      \ '@yaegassy/coc-intelephense',
+      \ '@yaegassy/coc-laravel',
+      \ '@yaegassy/coc-phpstan',
+      \ 'coc-blade',
+      \ 'coc-git',
+      \ 'coc-json',
+      \ 'coc-php-cs-fixer',
+      \ 'coc-phpls',
+      \ 'coc-prettier',
+      \ 'coc-sh',
+      \ 'coc-toml',
+      \ 'coc-tsserver',
+      \ 'coc-vimlsp',
+      \ 'coc-yaml',
+      \ 'coc-yank',
+      \ 'coc-marketplace'
+      \ ]
 
 " session management
 let g:session_directory = "~/.local/state/vim/session"
@@ -161,12 +217,7 @@ let g:session_autoload = "yes"
 let g:session_autosave = "yes"
 let g:session_command_aliases = 1
 
-syntax on
-
-set mousemodel=popup
-set t_Co=256
-set guioptions=egmrti
-
+" GUI settings
 if has("gui_running")
   if has("gui_mac") || has("gui_macvim")
     set macligatures
@@ -189,24 +240,29 @@ else
       set term=xterm-256color
     endif
   endif
-
 endif
 
+" if terminal supports 256 colors, disable t_ut
 if &term =~ '256color'
   set t_ut=
 endif
 
+" set the title of the terminal to the file name
 set title
 set titleold="Terminal"
 set titlestring=%F
 
-set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L)| 
+syntax on
+
+" set statusline to show the file name
+" set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L)|
 
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
+" if fugitive is installed, add the statusline
 if exists("*fugitive#statusline")
   set statusline+=%{fugitive#statusline()}
 endif
@@ -218,24 +274,24 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme = 'minimalist'
+let g:airline_theme = 'iceberg'
 
 "*****************************************************************************
 "" Abbreviations
 "*****************************************************************************
 "" no one is really happy until you have this shortcuts
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
-cnoreabbrev Qall qall
+cnoreabbrev W! w!       " force write
+cnoreabbrev Q! q!       " force quit
+cnoreabbrev Qall! qall! " force quit all
+cnoreabbrev Wq wq       " write and quit
+cnoreabbrev Wa wa       " write all
+cnoreabbrev wQ wq       " write and quit
+cnoreabbrev WQ wq       " write and quit
+cnoreabbrev W w         " write
+cnoreabbrev Q q         " quit
+cnoreabbrev Qall qall   " quit all
 
-"" NERDTree configuration
+" NERDTree configuration
 let g:NERDTreeChDirMode=2
 let g:NERDTreeIgnore=['node_modules', 'vendor', '\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
 let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
@@ -245,20 +301,15 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 50
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*node_modules/,*vendor/
 nnoremap <silent> <F2> :NERDTreeFind<CR>
-nnoremap <silent> <leader>q :NERDTreeToggle<CR>
+nnoremap <silent> <leader>t :NERDTreeToggle<CR>
 
-" grep.vim
+" grep.vim configuration
 nnoremap <silent> <leader>f :Rgrep<CR>
 let Grep_Default_Options = '-IR'
 let Grep_Skip_Files = '*.log *.db .DS_Store'
 let Grep_Skip_Dirs = '.git node_modules vendor plugged'
 
-" terminal emulation
-nnoremap <silent> <leader>sh :terminal<CR>
-
-" vim-which-key config
-nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
-set timeoutlen=500 " By default timeoutlen=1000 (ms)
+nnoremap <silent> <leader>sh :terminal<CR>         " open a new terminal
 
 "*****************************************************************************
 "" Commands
@@ -271,6 +322,7 @@ command! FixWhitespace :%s/\s\+$//e
 "" Functions
 "*****************************************************************************
 
+" setup wrapping function
 if !exists('*s:setupWrapping')
   function s:setupWrapping()
     set wrap
@@ -279,20 +331,42 @@ if !exists('*s:setupWrapping')
   endfunction
 endif
 
+function! ChangeColorScheme(channel, msg)
+  let time = trim(a:msg)
+  if time ==# "Dark"
+    set background="dark"
+  else
+    set background="light"
+  endif
+endfunction
+
+function! CheckStatus(timer)
+  if executable("default")
+    let job = job_start(
+          \ ["default", "read", "-g", "AppleInterfaceStyle"],
+          \ {"out_cb": "ChangeColorScheme"}
+          \ )
+  else
+    set background="dark"
+  endif
+endfunction
+
+function! AutoDarkModeSetup()
+  let timer = timer_start(3000, 'CheckStatus', {'repeat': -1})
+  call CheckStatus(timer) " Initial call to setup the theme
+endfunction
+
+call AutoDarkModeSetup()
+
 "*****************************************************************************
 "" Autocmd Rules
 "*****************************************************************************
 
-"" The PC is fast enough, do syntax highlight syncing from start unless 200 lines
+"" The PC is fast enough, do syntax highlight
+"" syncing from start 6nless 200 lines
 augroup vimrc-sync-fromstart
   autocmd!
-  autocmd BufEnter * :syntax sync maxlines=200
-augroup END
-
-"" Remember cursor position
-augroup vimrc-remember-cursor-position
-  autocmd!
-  " autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd BufEnter * :syntax sync maxlines=600
 augroup END
 
 "" txt
@@ -314,11 +388,13 @@ set autoread
 "" Mappings
 "*****************************************************************************
 
-"" Split
-noremap <Leader>h :<C-u>split<CR>
-noremap <Leader>v :<C-u>vsplit<CR>
+noremap <C-s> :w<CR>               " save buffer
 
-"" Git
+"" Split
+noremap <Leader>h :<C-u>split<CR>  " horizontal split
+noremap <Leader>v :<C-u>vsplit<CR> " vertical split
+
+" Git
 noremap <Leader>ga :Gwrite<CR>
 noremap <Leader>gc :Git commit --verbose<CR>
 noremap <Leader>gsh :Git push<CR>
@@ -334,43 +410,37 @@ nnoremap <leader>ss :SaveSession<Space>
 nnoremap <leader>sd :DeleteSession<CR>
 nnoremap <leader>sc :CloseSession<CR>
 
-"" Tabs
-nnoremap <Tab> gt
-nnoremap <S-Tab> gT
-nnoremap <silent> <S-t> :tabnew<CR>
+" Tabs
+nnoremap <Tab> gt                   " next tab
+nnoremap <S-Tab> gT                 " previous tab
+nnoremap <silent> <S-t> :tabnew<CR> " new tab
 
-"" Set working directory
-nnoremap <leader>. :lcd %:p:h<CR>
+nnoremap <leader>. :lcd %:p:h<CR>   " set working directory to the current file
 
 "" Opens an edit command with the path of the currently edited file filled in
 noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 
 "" Opens a tab edit command with the path of the currently edited file filled
-noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+noremap <Leader>r :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
 "" fzf.vim
-set wildmode=list:longest,list:full
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
-let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'vendor/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
-
-" ripgrep
-if executable('rg')
-  let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
-  set grepprg=rg\ --vimgrep
-  command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-endif
+let $FZF_DEFAULT_COMMAND = "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'vendor/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <silent> <leader>b :Buffers<CR>
 nnoremap <silent> <leader>e :FZF -m<CR>
-"Recovery commands from history through FZF
+" Recovery commands from history through FZF
 nmap <leader>y :History:<CR>
 
 " ale
-let g:ale_linters = {}
+let g:ale_linters = {
+      \ "vim": [ "vint" ]
+      \}
+let g:ale_fixers = {
+      \}
 
 " Tagbar
-nmap <silent> <F4> :TagbarToggle<CR>
+nmap <silent> <F4> :TagbarToggle<CR> " open tagbar
 let g:tagbar_autofocus = 1
 
 " Disable visualbell
@@ -384,45 +454,38 @@ if has('unnamedplus')
   set clipboard=unnamed,unnamedplus
 endif
 
-noremap YY "+y<CR>
-noremap <leader>p "+gP<CR>
-noremap XX "+x<CR>
+noremap YY "+y<CR>         " copy line
+noremap <leader>p "+gP<CR> " paste
+noremap XX "+x<CR>         " cut
 
 if has('macunix')
   " pbcopy for OSX copy/paste
-  vmap <C-x> :!pbcopy<CR>
-  vmap <C-c> :w !pbcopy<CR><CR>
-  vmap <C-v> :!pbpaste<CR>
+  vmap <C-x> :!pbcopy<CR>       " copy
+  vmap <C-c> :w !pbcopy<CR><CR> " cut
+  vmap <C-v> :!pbpaste<CR>      " paste
 endif
 
 "" Buffer nav
-noremap <leader>z :bp<CR>
-noremap <leader>q :bp<CR>
-noremap <leader>x :bn<CR>
-noremap <leader>w :bn<CR>
+noremap <leader>z :bp<CR> " previous buffer
+noremap <leader>x :bn<CR> " next buffer
+noremap <leader>bq :bp<CR> " previous buffer
+noremap <leader>bw :bn<CR> " next buffer
+noremap <leader>bd :bd<CR> " close buffer
 
-"" Close buffer
-noremap <leader>c :bd<CR>
-
-"" Clean search (highlight)
-nnoremap <silent> <leader><space> :noh<cr>
+nnoremap <silent> <esc><esc> :noh<cr> " clean search
 
 "" Switching windows
-noremap <C-j> <C-w>j
-noremap <C-k> <C-w>k
-noremap <C-l> <C-w>l
-noremap <C-h> <C-w>h
+noremap <C-j> <C-w>j " move to window below
+noremap <C-k> <C-w>k " move to window above
+noremap <C-l> <C-w>l " move to window right
+noremap <C-h> <C-w>h " move to window left
 
-"" Vmap for maintain Visual Mode after shifting > and <
-vmap < <gv
-vmap > >gv
+vmap < <gv                  " move visual block left, keep selection
+vmap > >gv                  " move visual block right, keep selection
+vnoremap J :m '>+1<CR>gv=gv " move visual block down, keep selection
+vnoremap K :m '<-2<CR>gv=gv " move visual block up, keep selection
 
-"" Move visual block
-vnoremap J :m '>+1<CR>gv=gv
-vnoremap K :m '<-2<CR>gv=gv
-
-"" Open current line on GitHub
-nnoremap <Leader>o :.GBrowse<CR>
+nnoremap <Leader>o :.GBrowse<CR> " open current line on GitHub
 
 "*****************************************************************************
 "" Custom configs
@@ -466,8 +529,8 @@ augroup completion_preview_close
   endif
 augroup END
 
+" for go files
 augroup go
-
   au!
   au Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
   au Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
@@ -488,10 +551,9 @@ augroup go
   au FileType go imap <C-g> <esc>:<C-u>GoDecls<cr>
   au FileType go imap <leader>dr <esc>:<C-u>GoDeclsDir<cr>
   au FileType go nmap <leader>rb :<C-u>call <SID>build_go_files()<CR>
-
 augroup END
 
-" ale
+"" ale
 :call extend(g:ale_linters, {"go": [ 'golint', 'go vet' ]})
 
 " html
@@ -533,6 +595,9 @@ vmap <silent><Leader>ee :<C-U>call phpactor#ExtractExpression(v:true)<CR>
 " Extract method from selection
 vmap <silent><Leader>em :<C-U>call phpactor#ExtractMethod()<CR>
 
+au FileType php,blade let b:coc_root_patterns = ['.git', '.env', 'composer.json', 'artisan']
+au FileType php,blade nmap <silent> ga <Plug>(coc-codeaction-line)
+au FileType php,blade nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 " python
 " vim-python
@@ -541,7 +606,7 @@ augroup vimrc-python
   autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=8 colorcolumn=79 formatoptions+=croq softtabstop=4 cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 augroup END
 
-" jedi-vim
+"" jedi-vim for python
 let g:jedi#popup_on_dot = 0
 let g:jedi#goto_assignments_command = "<leader>g"
 let g:jedi#goto_definitions_command = "<leader>d"
@@ -553,7 +618,18 @@ let g:jedi#completions_command = "<C-Space>"
 let g:jedi#smart_auto_mappings = 0
 
 " ale
-:call extend(g:ale_linters, { 'python': [ 'flake8' ] })
+:call extend(g:ale_linters, {
+            \ 'python': [ 'flake8' ],
+            \ })
+:call extend(g:ale_fixers, {
+            \ '*': ['remove_trailing_lines', 'trim_whitespace']
+            \ })
+let g:ale_sign_column_always = 1
+let g:ale_fix_on_save = 1
+
+" editorconfig
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+au FileType gitcommit let b:EditorConfig_disable = 1
 
 " Syntax highlight
 let python_highlight_all = 1
@@ -566,4 +642,3 @@ let g:yats_host_keyword = 1
 let g:vue_disable_pre_processors=1
 " vim vue plugin
 let g:vim_vue_plugin_load_full_syntax = 1
-
