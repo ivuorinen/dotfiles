@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: https://json.schemastore.org/github-workflow.json
 name: Semantic PR
 
 on:
