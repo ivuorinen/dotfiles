@@ -15,10 +15,14 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions: read-all
+
 jobs:
   SyncLabels:
+    runs-on: ubuntu-latest
+
     permissions:
       issues: write
-    runs-on: ubuntu-latest
+
     steps:
       - uses: ivuorinen/actions/sync-labels@main

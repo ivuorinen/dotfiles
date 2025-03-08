@@ -4,15 +4,15 @@ name: reviewdog
 
 on: [push]
 
+permissions: read-all
+
 jobs:
   linters:
     name: Linters
 
     runs-on: self-hosted
 
-    permissions:
-      contents: write
-      workflows: write
+    permissions: write-all
 
     steps:
       - uses: actions/checkout@v4

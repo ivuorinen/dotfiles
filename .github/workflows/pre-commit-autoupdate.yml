@@ -1,21 +1,30 @@
 ---
 # yaml-language-server: https://json.schemastore.org/github-workflow.json
 name: Pre-commit autoupdate
+
 on:
   schedule:
     # At 04:00 on Monday and Thursday.
     - cron: "0 4 * * 1,4"
   workflow_dispatch:
+
+permissions: read-all
+
 jobs:
   auto-update:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5.4.0
+
       - run: pip install pre-commit && pre-commit autoupdate
+
       - uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,29 +1,35 @@
 ---
 # yaml-language-server: https://json.schemastore.org/github-workflow.json
 name: Update submodules
+
 on:
   schedule:
     # At 04:00 on Monday and Thursday.
     - cron: "0 4 * * 1,4"
   workflow_dispatch:
+
+permissions: read-all
+
 jobs:
   update-submodules:
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
     runs-on: self-hosted
+
+    permissions: write-all
+
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 2
           token: ${{secrets.GITHUB_TOKEN}}
+
       - name: Config Git User
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
       - name: Update submodules
         run: |
           git submodule sync

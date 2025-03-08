@@ -1,19 +1,28 @@
 ---
 # yaml-language-server: https://json.schemastore.org/github-workflow.json
 name: Debug Changelog # Workflow name displayed on GitHub
+
 on:
   workflow_dispatch: # Trigger manually
+
+permissions: read-all
+
 jobs:
   debug-changelog:
     runs-on: self-hosted
+
+    permissions: write-all
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Create changelog text
         id: changelog
         uses: loopwerk/tag-changelog@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
+
       - name: 'Echo results'
         id: output-changelog
         run: |

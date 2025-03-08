@@ -13,11 +13,7 @@ jobs:
   new-daily-release:
     runs-on: self-hosted
 
-    permissions:
-      contents: write
-      pull-request: write
-      release: write
-      workflows: write
+    permissions: write-all
 
     outputs:
       created: ${{ steps.daily-version.outputs.created }}
