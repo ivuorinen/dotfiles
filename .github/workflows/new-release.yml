@@ -17,6 +17,7 @@ jobs:
       contents: write
       pull-request: write
       release: write
+      workflows: write
 
     outputs:
       created: ${{ steps.daily-version.outputs.created }}
