@@ -23,13 +23,13 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
 
       - run: pip install pre-commit && pre-commit autoupdate
 
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update/pre-commit-hooks

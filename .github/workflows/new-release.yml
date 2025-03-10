@@ -24,23 +24,23 @@ jobs:
       version: ${{ steps.daily-version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Create tag if necessary
-        uses: fregante/daily-version-action@v2
+        uses: fregante/daily-version-action@fb1a60b7c4daf1410cd755e360ebec3901e58588 # v2
         id: daily-version
 
       - name: Create changelog text
         if: steps.daily-version.outputs.created
         id: changelog
-        uses: loopwerk/tag-changelog@v1
+        uses: loopwerk/tag-changelog@941366edb8920e2071eae0449031830984b9f26e # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
 
       - name: Create release
         if: steps.daily-version.outputs.created
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ steps.daily-version.outputs.version }}
