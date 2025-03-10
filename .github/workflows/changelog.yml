@@ -5,6 +5,10 @@ name: Debug Changelog # Workflow name displayed on GitHub
 on:
   workflow_dispatch: # Trigger manually
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: read-all
 
 jobs:
