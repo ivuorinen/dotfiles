@@ -19,10 +19,10 @@ jobs:
     permissions: write-all
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: GitHub Actions
-        uses: reviewdog/action-actionlint@v1
+        uses: reviewdog/action-actionlint@db58217885f9a6570da9c71be4e40ec33fe44a1f # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
@@ -34,13 +34,13 @@ jobs:
           reporter: github-pr-review
 
       - name: markdownlint
-        uses: reviewdog/action-markdownlint@v0
+        uses: reviewdog/action-markdownlint@f901468edf9a3634dd39b35ba26cad0aad1a0bfd # v0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
 
       - name: shfmt
-        uses: reviewdog/action-shfmt@v1
+        uses: reviewdog/action-shfmt@f59386f08bd9a24ac1a746e69f026ddc2ed06710 # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           shfmt_flags: |

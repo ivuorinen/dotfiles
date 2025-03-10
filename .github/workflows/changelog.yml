@@ -18,11 +18,11 @@ jobs:
     permissions: write-all
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Create changelog text
         id: changelog
-        uses: loopwerk/tag-changelog@v1
+        uses: loopwerk/tag-changelog@941366edb8920e2071eae0449031830984b9f26e # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
