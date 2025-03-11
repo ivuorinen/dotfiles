@@ -43,5 +43,4 @@ config/fish/fish_variables
 **/exports-secret.fish
 config/fish/completions/asdf.fish
 config/vim/.netrwhist
-config/vim/autoload/plug.vim
 config/vim/extra/*
