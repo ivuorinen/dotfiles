@@ -5,7 +5,7 @@ name: Update submodules
 on:
   schedule:
     # At 04:00 on Monday and Thursday.
-    - cron: "0 4 * * 1,4"
+    - cron: "0 4 * * 1"
   workflow_dispatch:
 
 concurrency:
@@ -21,6 +21,16 @@ jobs:
     permissions: write-all
 
     steps:
+
+      - name: Clean up previous checkouts
+        shell: bash
+        run: |
+          rm -rf ${{ github.workspace }}
+
+      - name: Reset file permissions
+        shell: bash
+        run: |
+          sudo chown -R $(whoami) ${{ github.workspace }}
 
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
