@@ -314,6 +314,7 @@ main::get_command_functions()
 main::get_function_description()
 {
   local cmd_file="$1"
+  local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
   local func="$2"
 
   grep -B1 "^[[:space:]]*\(function[[:space:]]*\)\{0,1\}$func().*{" "$cmd_file" \
