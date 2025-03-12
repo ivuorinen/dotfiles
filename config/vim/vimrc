@@ -31,6 +31,7 @@ if !filereadable(vimplug_exists)
   autocmd VimEnter * PlugInstall
 endif
 
+" {{{
 call plug#begin(expand('$HOME/.config/vim/plugged'))
 
   " coc.nvim - Intellisense engine
@@ -60,6 +61,8 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
   Plug 'editor-bootstrap/vim-bootstrap-updater'
   " vim-rhubarb - Fugitive extension
   Plug 'tpope/vim-rhubarb' " required by fugitive to :GBrowse
+  " ctrlp.vim - Fuzzy file finder
+  Plug 'ctrlpvim/ctrlp.vim'
 
   " vim-airline
   Plug 'vim-airline/vim-airline'
@@ -79,6 +82,9 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
   if exists('make')
     let g:make = 'make'
   endif
+
+  " vim-wordy - Uncover usage problems in your writing
+  Plug 'preservim/vim-wordy'
 
   " vimproc.vim - Asynchronous execution
   Plug 'Shougo/vimproc.vim', {'do': g:make}
@@ -123,22 +129,36 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
   Plug 'leafOfTree/vim-vue-plugin'
 
 call plug#end()
+" }}}
 
 let mapleader=' '                 " Map leader to <space>
 filetype off                      " disable filetype detection (but re-enable later, see below)
 
-set backspace=indent,eol,start    " Backspace behaviour
+" find matching tags in html/xml documents using matchit
+filetype plugin on
+packadd! matchit
+" disable super buggy netrw
+let g:loaded_netrw=1
+let g:netrw_loaded_netrwPlugin=1
+" show JSDoc highlight colors
+let g:javascript_plugin_jsdoc=1
+
+set backspace=indent,eol,start    " Backspace behavior
 set cindent                       " Use 'C' style program indenting
 set cursorline                    " Highlight current line
 set encoding=utf-8                " UTF-8
 set expandtab                     " Use spaces instead of tabs
 set fileformats=unix,dos,mac      " File formats
+set foldmethod=indent             " Fold based on indent
+set foldlevel=99                  " Open all folds
 set guioptions=egmrti             " GUI options
 set hidden                        " Enable hidden buffers
 set ignorecase                    " Always case-insensitive
 set incsearch                     " Searches for strings incrementally
 set laststatus=2                  " Always show statusline (even with only single window)
 set linespace=3                   " Set line spacing
+set list                          " Show invisible characters
+set listchars=tab:⌴\ ,trail:◼,nbsp:•,extends:…,precedes:… " Invisible characters
 set modeline                      " Enable modelines
 set modelines=3                   " Number of lines to check for modelines
 set mouse=a                       " Enable mouse support
@@ -149,7 +169,7 @@ set nowritebackup                 " Disable backup files
 set number                        " Show line numbers
 set relativenumber                " Show relative line numbers
 set ruler                         " Show row and column ruler information
-set scrolloff=5                   " Minimum number of lines to keep above and below the cursor
+set scrolloff=8                   " Minimum number of lines to keep above and below the cursor
 set shiftwidth=4                  " Number of auto-indent spaces
 set shortmess+=A                  " Don't show autocommand messages
 set shortmess+=F                  " Avoid showing the "file-info" message
@@ -163,11 +183,15 @@ set shortmess+=c                  " Avoid showing the "ins-completion-menu" mess
 set shortmess+=c                  " Don't pass messages to |ins-completion-menu|
 set shortmess+=o                  " Avoid showing the "overlength" message
 set shortmess+=t                  " Avoid showing the "trailing whitespace" message
+set showcmd                       " Show command in status line
 set showmatch                     " Highlight matching brace
+set signcolumn=yes                " Show sign column
 set smartcase                     " Enable smart-case search
 set smartindent                   " Enable smart-indent
 set smarttab                      " Enable smart-tabs
 set softtabstop=4                 " Number of spaces per Tab
+set spelllang=fi,en               " Set the spell language
+set spellsuggest=double           " Suggest the first word when spell checking
 set t_Co=256                      " 256 colors
 set termguicolors                 " Enable 24-bit RGB color in the terminal
 set timeoutlen=500                " By default timeoutlen=1000 (ms)
@@ -179,7 +203,8 @@ set wildmode=longest,list:longest " Command-line completion mode
 set wrap                          " Wrap lines
 set wrapscan                      " Searches wrap around the end of the file
 
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor " Ignore these files in wildmenu
+" Ignore these files in wildmenu
+set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
 
 colorscheme iceberg               " Set the color scheme
 filetype plugin indent on         " enable filetype detection, plugins and indenting
@@ -310,6 +335,85 @@ let Grep_Skip_Files = '*.log *.db .DS_Store'
 let Grep_Skip_Dirs = '.git node_modules vendor plugged'
 
 nnoremap <silent> <leader>sh :terminal<CR>         " open a new terminal
+
+" CoC (code suggestions, diagnostics and refactoring)
+" find or update definitions
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gn <Plug>(coc-rename)
+" autoformat code based on linter
+function! s:auto_format()
+    " eslint is no longer exposed as a proper linter to coc
+    if index(['js', 'jsx', 'javascript', 'javascriptreact', 'ts', 'typescript', 'typescriptcommon', 'typescriptreact'], &filetype) >= 0
+        silent! CocCommand eslint.executeAutofix
+    else
+        call CocActionAsync('format')
+    endif
+endfunction
+noremap <silent> <leader>f :call <SID>auto_format()<cr>
+" jump to diagnostics or the documentation
+nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
+nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
+function! s:show_documentation()
+    if index(['vim','help'], &filetype) >= 0
+        execute 'h '.expand('<cword>')
+    else
+        call CocActionAsync('doHover')
+    endif
+endfunction
+noremap <silent> K :call <SID>show_documentation()<cr>
+" scroll popup windows
+function s:find_cursor_popup(...)
+  let radius = 50
+  let srow = screenrow()
+  let scol = screencol()
+  for r in range(srow - radius, srow + radius)
+    for c in range(scol - radius, scol + radius)
+      let winid = popup_locate(r, c)
+      if winid != 0
+        return winid
+      endif
+    endfor
+  endfor
+  return 0
+endfunction
+function s:scroll_cursor_popup(down)
+  let winid = <SID>find_cursor_popup()
+  if winid == 0
+    return 0
+  endif
+  let pp = popup_getpos(winid)
+  call popup_setoptions(winid, {'firstline': pp.firstline + a:down})
+  return 1
+endfunction
+imap <expr> <C-f> <SID>scroll_cursor_popup(1) ? '' : ''
+imap <expr> <C-b> <SID>scroll_cursor_popup(-1) ? '' : ''
+" expand snippets, completion or copilot with tab key based on selection
+imap <silent> <S-Tab> <Nop>
+let g:copilot_no_tab_map = v:true
+inoremap <silent><expr> <Tab>
+      \ coc#pum#has_item_selected() ? coc#_select_confirm() :
+      \ exists('b:_copilot.suggestions') ? copilot#Accept("\<CR>") : ""
+" automatically fix diagnostics and/or refactor
+noremap <silent> <leader>d :CocList diagnostics<cr>
+nmap <leader>c <Plug>(coc-codeaction)
+xmap <leader>c <Plug>(coc-codeaction-selected)
+
+let g:wordy#ring = [
+    \ 'weak',
+    \ ['being', 'passive-voice', ],
+    \ 'business-jargon',
+    \ 'weasel',
+    \ 'puffery',
+    \ ['problematic', 'redundant', ],
+    \ ['colloquial', 'idiomatic', 'similies', ],
+    \ 'art-jargon',
+    \ ['contractions', 'opinion', 'vague-time', 'said-synonyms', ],
+    \ 'adjectives',
+    \ 'adverbs',
+    \ ]
 
 "*****************************************************************************
 "" Commands

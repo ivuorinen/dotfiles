@@ -1,17 +1,9 @@
 "" Source your .vimrc
-"source ~/.vimrc
+source ~/.dotfiles/config/vim/vimrc
 
 " https://github.com/ville6000/dotfiles/blob/main/vimrc
 " To get a list of Actions run `:actionlist `
 let mapleader = "\<SPACE>"
-
-set so=10
-set showmode
-set showcmd
-set smartcase
-set incsearch
-set hlsearch
-set relativenumber number
 
 set clipboard+=unnamed
 
@@ -21,11 +13,6 @@ set idearefactormode=normal
 
 " Map esc to :noh
 map <esc> :noh<cr>
-
-nnoremap <leader>n :noh<return>
-
-nmap j gj
-nmap k gk
 
 nmap <leader>j :tabnext<CR>
 nmap <leader>k :tabprevious<CR>
@@ -85,9 +72,6 @@ nmap <leader>gn :action VcsShowNextChangeMarker<CR>
 
 " Trigger tests
 map <Leader>tt <Action>(RiderUnitTestRunContextAction)
-let g:WhichKeyDesc_tests = "<leader>t Tests"
-let g:WhichKeyDesc_tests_run = "<leader>tt Run Tests"
-
 nmap <Leader>cc :action CommentByLineComment<CR>
 
 nmap <leader>lf <Action>(ReformatCode)
@@ -108,7 +92,7 @@ nmap <Leader>wt :action ActivateTerminalToolWindow<CR>
 nmap <Leader>wd :action ActivateDatabaseToolWindow<CR>
 
 " Open project tree window
-nmap <Leader>e :action ActivateProjectToolWindow<CR>
+nmap <Leader>t :action ActivateProjectToolWindow<CR>
 
 nnoremap <leader>cf :action ReformatCode<CR>
 
@@ -126,9 +110,6 @@ nnoremap gE :action GotoPreviousError<CR>
 
 " Turn off Copilot
 nmap <leader>cp :action Copilot.Toggle<CR>
-
-" Disable timeout for which-key
-set notimeout
 
 " Navigate back
 nmap <leader> <C-o>
@@ -201,12 +182,9 @@ map Q gq
 syntax enable
 filetype plugin indent on
 
-call plug#begin('~/.vim/plugged')
-
-Plug 'ayu-theme/ayu-vim'
-Plug 'ctrlpvim/ctrlp.vim'
-
-call plug#end()
+" call plug#begin('~/.config/vim/plugged')
+" Plug 'ayu-theme/ayu-vim'
+" call plug#end()
 
 set termguicolors
 
