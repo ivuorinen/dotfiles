@@ -341,9 +341,9 @@ function! ChangeColorScheme(channel, msg)
 endfunction
 
 function! CheckStatus(timer)
-  if executable("default")
+  if executable("defaults")
     let job = job_start(
-          \ ["default", "read", "-g", "AppleInterfaceStyle"],
+          \ ["defaults", "read", "-g", "AppleInterfaceStyle"],
           \ {"out_cb": "ChangeColorScheme"}
           \ )
   else
