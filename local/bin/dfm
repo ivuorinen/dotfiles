@@ -64,8 +64,9 @@ section_install()
       $0 install macos
       $0 install fonts
       $0 brew install
+      $0 install cargo
+      $0 install go
       $0 install composer
-      $0 install fzf
       $0 install cheat-databases
       $0 install nvm
       $0 install npm-packages
