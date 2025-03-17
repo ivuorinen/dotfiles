@@ -41,9 +41,6 @@ msgr nested "Setting General UI/UX settings"
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
 
-# Menu bar: disable transparency
-#defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
-
 # Set sidebar icon size to small
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
 
@@ -339,8 +336,7 @@ msgr nested "Restarting applications to apply changes"
 ###############################################################################
 
 for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
-  "Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer" \
-  "Terminal" "Transmission" "iCal"; do
+  "Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer"; do
   killall "${app}" > /dev/null 2>&1
 done
 
