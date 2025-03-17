@@ -52,3 +52,21 @@ function .s --wraps='cd ~/Code/s' --description 'cd ~/Code/s'
   cd ~/Code/s $argv
 
 end
+
+# shortcut to commit with a message
+function commit --wraps='git commit -a -m "chore: automated commit"' --description 'commit shortcut'
+  set -l commitMessage $argv
+  git add .
+
+  if test -z "$commitMessage"
+    if type -q aicommits
+      aicommits --type conventional
+    else
+      git commit -a -m "chore: automated commit"
+    end
+    return
+  end
+
+  git commit -a -m "$commitMessage"
+ end
+
