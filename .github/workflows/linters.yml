@@ -41,7 +41,7 @@ jobs:
           reporter: github-pr-review
 
       - name: shfmt
-        uses: reviewdog/action-shfmt@f59386f08bd9a24ac1a746e69f026ddc2ed06710 # v1.0.2
+        uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           shfmt_flags: |
