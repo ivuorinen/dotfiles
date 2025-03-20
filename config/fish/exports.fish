@@ -22,6 +22,12 @@ fish_add_path "$XDG_BIN_HOME"
 # Add cargo bin to path
 fish_add_path "$XDG_SHARE_HOME/cargo/bin"
 
+# Set Aqua configuration
+set -q AQUA_BIN; or set -x AQUA_BIN "$XDG_DATA_HOME/aquaproj-aqua/bin"
+set -q AQUA_CONFIG; or set -x AQUA_CONFIG "$XDG_CONFIG_HOME/aqua/aqua.yaml"
+set -gx PATH $AQUA_BIN $PATH
+
+
 # NPM configuration
 set -q NPM_CONFIG_PREFIX; or set -x NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
 fish_add_path "$NPM_CONFIG_PREFIX/bin"
