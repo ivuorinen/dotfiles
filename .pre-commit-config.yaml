@@ -29,7 +29,7 @@ repos:
         args: [-c, .markdownlint.json, --fix]
 
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.36.1
+    rev: v1.36.2
     hooks:
       - id: yamllint
 
