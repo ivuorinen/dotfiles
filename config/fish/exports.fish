@@ -12,8 +12,8 @@ set -q XDG_RUNTIME_DIR; or set -x XDG_RUNTIME_DIR "$HOME/.local/run"
 set -q DOTFILES; or set -x DOTFILES "$HOME/.dotfiles"
 
 # Editor settings
-set -q EDITOR; or set -x EDITOR "nvim"
-set -q VISUAL; or set -x VISUAL "code"
+set -q EDITOR; or set -x EDITOR nvim
+set -q VISUAL; or set -x VISUAL code
 set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 
 # Add local bin to path
@@ -58,19 +58,19 @@ set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
 set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
 set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
 set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
-set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT "table"
-set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS "true"
-set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION "true"
-set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION "7200"
-set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA "true"
-set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE "true"
-set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT "true"
-set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT "true"
+set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
+set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
+set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
+set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION 7200
+set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA true
+set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE true
+set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT true
+set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT true
 
 # Brew configuration
-set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS "true"
-set -q HOMEBREW_NO_ENV_HINTS; or set -x HOMEBREW_NO_ENV_HINTS "true"
-set -q HOMEBREW_BUNDLE_MAS_SKIP; or set -x HOMEBREW_BUNDLE_MAS_SKIP "true"
+set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS true
+set -q HOMEBREW_NO_ENV_HINTS; or set -x HOMEBREW_NO_ENV_HINTS true
+set -q HOMEBREW_BUNDLE_MAS_SKIP; or set -x HOMEBREW_BUNDLE_MAS_SKIP true
 set -q HOMEBREW_BUNDLE_FILE; or set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/homebrew/Brewfile"
 
 # Composer configuration
@@ -84,8 +84,8 @@ set -q DIRENV_LOG_FORMAT; or set -x DIRENV_LOG_FORMAT ''
 # Docker configuration
 set -q DOCKER_CONFIG; or set -x DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
 x-dc "$DOCKER_CONFIG"
-set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS "true"
-set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST "false"
+set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
+set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
 # fzf configuration
 set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
@@ -113,7 +113,7 @@ set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 set -q PYENV_ROOT; or set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
 fish_add_path "$PYENV_ROOT/bin"
 if x-have pyenv; and not functions -q pyenv
-  status --is-interactive; and source (pyenv init - | psub)
+    status --is-interactive; and source (pyenv init - | psub)
 end
 
 # Poetry configuration
@@ -151,7 +151,7 @@ set -q TMUX_PLUGIN_MANAGER_PATH; or set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGI
 
 # Source tmux theme activation script for Fish shell
 if test -f "$DOTFILES/config/tmux/theme-activate.fish"
-  source "$DOTFILES/config/tmux/theme-activate.fish"
+    source "$DOTFILES/config/tmux/theme-activate.fish"
 end
 
 # tms configuration
@@ -162,20 +162,20 @@ set -q WAKATIME_HOME; or set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
 
 # Miscellaneous configuration
-set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF "true"
+set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
 set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
 
 # Source additional configuration files if they exist
 if test -f "$DOTFILES/config/fish/exports-secret.fish"
-  source "$DOTFILES/config/fish/exports-secret.fish"
+    source "$DOTFILES/config/fish/exports-secret.fish"
 end
 
 if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
-  source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
+    source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
 end
 
 if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
-  source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
+    source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
 end
 
 # Configure tide prompt

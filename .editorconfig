@@ -14,7 +14,7 @@ max_line_length = 100
 [*.lua]
 max_line_length = 120
 
-[*.php]
+[*.{php,fish}]
 indent_size = 4
 
 [.git{ignore,modules}]
