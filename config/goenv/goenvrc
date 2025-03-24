@@ -1,3 +1,6 @@
-GOENV_PATH_ORDER=front
-GOENV_PREPEND_GOPATH=true
-GOENV_AUTO_INSTALL=true
+# Detect shell
+if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+  export GOENV_PATH_ORDER=front
+  export GOENV_PREPEND_GOPATH=true
+  export GOENV_AUTO_INSTALL=true
+fi

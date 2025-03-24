@@ -112,7 +112,7 @@ set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
 fish_add_path "$GOBIN"
 
 set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
-set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc"
+set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
 
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
