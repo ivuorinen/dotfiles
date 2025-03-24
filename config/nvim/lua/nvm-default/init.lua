@@ -71,7 +71,7 @@ function M.setup(opts)
   local nvm_path = options.nvm_path
   local node_version = run_command(
     string.format('. %s/nvm.sh && nvm version default', nvm_path)
-  ) or run_command(string.format('. %s/nvm.sh && nvm version node', nvm_path))
+  ) or run_command(string.format('. %s/nvm.sh && nvm version node', nvm_path)) or nil
 
   if node_version and node_version:match '^v' then
     -- Set vim.g.node_host_prog and vim.g.copilot_node_command
