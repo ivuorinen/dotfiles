@@ -33,7 +33,8 @@ endif
 
 " {{{
 call plug#begin(expand('$HOME/.config/vim/plugged'))
-
+  " vim-sensible
+  Plug 'tpope/vim-sensible'
   " coc.nvim - Intellisense engine
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   " editorconfig-vim - EditorConfig plugin
@@ -131,91 +132,6 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
 call plug#end()
 " }}}
 
-let mapleader=' '                 " Map leader to <space>
-filetype off                      " disable filetype detection (but re-enable later, see below)
-
-" find matching tags in html/xml documents using matchit
-filetype plugin on
-packadd! matchit
-" disable super buggy netrw
-let g:loaded_netrw=1
-let g:netrw_loaded_netrwPlugin=1
-" show JSDoc highlight colors
-let g:javascript_plugin_jsdoc=1
-
-set backspace=indent,eol,start    " Backspace behavior
-set cindent                       " Use 'C' style program indenting
-set cursorline                    " Highlight current line
-set encoding=utf-8                " UTF-8
-set expandtab                     " Use spaces instead of tabs
-set fileformats=unix,dos,mac      " File formats
-set foldmethod=indent             " Fold based on indent
-set foldlevel=99                  " Open all folds
-set guioptions=egmrti             " GUI options
-set hidden                        " Enable hidden buffers
-set ignorecase                    " Always case-insensitive
-set incsearch                     " Searches for strings incrementally
-set laststatus=2                  " Always show statusline (even with only single window)
-set linespace=3                   " Set line spacing
-set list                          " Show invisible characters
-set listchars=tab:⌴\ ,trail:◼,nbsp:•,extends:…,precedes:… " Invisible characters
-set modeline                      " Enable modelines
-set modelines=3                   " Number of lines to check for modelines
-set mouse=a                       " Enable mouse support
-set mousemodel=popup              " Enable mouse support
-set nobackup                      " Disable backup files
-set nocompatible                  " disable compatibility mode with vi
-set nowritebackup                 " Disable backup files
-set number                        " Show line numbers
-set relativenumber                " Show relative line numbers
-set ruler                         " Show row and column ruler information
-set scrolloff=8                   " Minimum number of lines to keep above and below the cursor
-set shiftwidth=4                  " Number of auto-indent spaces
-set shortmess+=A                  " Don't show autocommand messages
-set shortmess+=F                  " Avoid showing the "file-info" message
-set shortmess+=I                  " Don't show intro message
-set shortmess+=O                  " Avoid showing the "file-read" message
-set shortmess+=O                  " Don't show overlength messages
-set shortmess+=T                  " Don't show title messages
-set shortmess+=W                  " Don't show "written" messages
-set shortmess+=a                  " Avoid showing the "ATTENTION" message
-set shortmess+=c                  " Avoid showing the "ins-completion-menu" message
-set shortmess+=c                  " Don't pass messages to |ins-completion-menu|
-set shortmess+=o                  " Avoid showing the "overlength" message
-set shortmess+=t                  " Avoid showing the "trailing whitespace" message
-set showcmd                       " Show command in status line
-set showmatch                     " Highlight matching brace
-set signcolumn=yes                " Show sign column
-set smartcase                     " Enable smart-case search
-set smartindent                   " Enable smart-indent
-set smarttab                      " Enable smart-tabs
-set softtabstop=4                 " Number of spaces per Tab
-set spelllang=fi,en               " Set the spell language
-set spellsuggest=double           " Suggest the first word when spell checking
-set t_Co=256                      " 256 colors
-set termguicolors                 " Enable 24-bit RGB color in the terminal
-set timeoutlen=500                " By default timeoutlen=1000 (ms)
-set ttimeoutlen=0                 " By default ttimeoutlen=-1 (ms)
-set undolevels=1000               " Number of undo levels
-set visualbell                    " Use visual bell (no beeping)
-set wildmenu                      " Enable wildmenu
-set wildmode=longest,list:longest " Command-line completion mode
-set wrap                          " Wrap lines
-set wrapscan                      " Searches wrap around the end of the file
-
-" Ignore these files in wildmenu
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
-
-colorscheme iceberg               " Set the color scheme
-filetype plugin indent on         " enable filetype detection, plugins and indenting
-
-" Set the shell
-if exists('$SHELL')
-  set shell=$SHELL
-else
-  set shell=/bin/sh
-endif
-
 " COC
 let g:coc_global_extensions = [
       \ '@yaegassy/coc-intelephense',
@@ -242,41 +158,6 @@ let g:session_autoload = "yes"
 let g:session_autosave = "yes"
 let g:session_command_aliases = 1
 
-" GUI settings
-if has("gui_running")
-  if has("gui_mac") || has("gui_macvim")
-    set macligatures
-    set guifont=JetBrains\ Mono:h14
-    set transparency=7
-  endif
-else
-  let g:CSApprox_loaded = 1
-
-  " IndentLine
-  let g:indentLine_enabled = 1
-  let g:indentLine_concealcursor = ''
-  let g:indentLine_char = '┆'
-  let g:indentLine_faster = 1
-
-  if $COLORTERM == 'gnome-terminal'
-    set term=gnome-256color
-  else
-    if $TERM == 'xterm'
-      set term=xterm-256color
-    endif
-  endif
-endif
-
-" if terminal supports 256 colors, disable t_ut
-if &term =~ '256color'
-  set t_ut=
-endif
-
-" set the title of the terminal to the file name
-set title
-set titleold="Terminal"
-set titlestring=%F
-
 syntax on
 
 " set statusline to show the file name
@@ -301,21 +182,6 @@ let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
 let g:airline_theme = 'iceberg'
 
-"*****************************************************************************
-"" Abbreviations
-"*****************************************************************************
-"" no one is really happy until you have this shortcuts
-cnoreabbrev W! w!       " force write
-cnoreabbrev Q! q!       " force quit
-cnoreabbrev Qall! qall! " force quit all
-cnoreabbrev Wq wq       " write and quit
-cnoreabbrev Wa wa       " write all
-cnoreabbrev wQ wq       " write and quit
-cnoreabbrev WQ wq       " write and quit
-cnoreabbrev W w         " write
-cnoreabbrev Q q         " quit
-cnoreabbrev Qall qall   " quit all
-
 " NERDTree configuration
 let g:NERDTreeChDirMode=2
 let g:NERDTreeIgnore=['node_modules', 'vendor', '\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
@@ -333,8 +199,6 @@ nnoremap <silent> <leader>f :Rgrep<CR>
 let Grep_Default_Options = '-IR'
 let Grep_Skip_Files = '*.log *.db .DS_Store'
 let Grep_Skip_Dirs = '.git node_modules vendor plugged'
-
-nnoremap <silent> <leader>sh :terminal<CR>         " open a new terminal
 
 " CoC (code suggestions, diagnostics and refactoring)
 " find or update definitions
@@ -435,106 +299,9 @@ if !exists('*s:setupWrapping')
   endfunction
 endif
 
-function! ChangeColorScheme(channel, msg)
-  let time = trim(a:msg)
-  if time ==# "Dark"
-    set background="dark"
-  else
-    set background="light"
-  endif
-endfunction
-
-function! CheckStatus(timer)
-  if executable("defaults")
-    let job = job_start(
-          \ ["defaults", "read", "-g", "AppleInterfaceStyle"],
-          \ {"out_cb": "ChangeColorScheme"}
-          \ )
-  else
-    set background="dark"
-  endif
-endfunction
-
-function! AutoDarkModeSetup()
-  let timer = timer_start(3000, 'CheckStatus', {'repeat': -1})
-  call CheckStatus(timer) " Initial call to setup the theme
-endfunction
-
-call AutoDarkModeSetup()
-
 "*****************************************************************************
-"" Autocmd Rules
+"" Custom configs
 "*****************************************************************************
-
-"" The PC is fast enough, do syntax highlight
-"" syncing from start 6nless 200 lines
-augroup vimrc-sync-fromstart
-  autocmd!
-  autocmd BufEnter * :syntax sync maxlines=600
-augroup END
-
-"" txt
-augroup vimrc-wrapping
-  autocmd!
-  autocmd BufRead,BufNewFile *.txt call s:setupWrapping()
-augroup END
-
-"" make/cmake
-augroup vimrc-make-cmake
-  autocmd!
-  autocmd FileType make setlocal noexpandtab
-  autocmd BufNewFile,BufRead CMakeLists.txt setlocal filetype=cmake
-augroup END
-
-set autoread
-
-"*****************************************************************************
-"" Mappings
-"*****************************************************************************
-
-noremap <C-s> :w<CR>               " save buffer
-
-"" Split
-noremap <Leader>h :<C-u>split<CR>  " horizontal split
-noremap <Leader>v :<C-u>vsplit<CR> " vertical split
-
-" Git
-noremap <Leader>ga :Gwrite<CR>
-noremap <Leader>gc :Git commit --verbose<CR>
-noremap <Leader>gsh :Git push<CR>
-noremap <Leader>gll :Git pull<CR>
-noremap <Leader>gs :Git<CR>
-noremap <Leader>gb :Git blame<CR>
-noremap <Leader>gd :Gvdiffsplit<CR>
-noremap <Leader>gr :GRemove<CR>
-
-" session management
-nnoremap <leader>so :OpenSession<Space>
-nnoremap <leader>ss :SaveSession<Space>
-nnoremap <leader>sd :DeleteSession<CR>
-nnoremap <leader>sc :CloseSession<CR>
-
-" Tabs
-nnoremap <Tab> gt                   " next tab
-nnoremap <S-Tab> gT                 " previous tab
-nnoremap <silent> <S-t> :tabnew<CR> " new tab
-
-nnoremap <leader>. :lcd %:p:h<CR>   " set working directory to the current file
-
-"" Opens an edit command with the path of the currently edited file filled in
-noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
-
-"" Opens a tab edit command with the path of the currently edited file filled
-noremap <Leader>r :tabe <C-R>=expand("%:p:h") . "/" <CR>
-
-"" fzf.vim
-let $FZF_DEFAULT_COMMAND = "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'vendor/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
-
-cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <silent> <leader>b :Buffers<CR>
-nnoremap <silent> <leader>e :FZF -m<CR>
-" Recovery commands from history through FZF
-nmap <leader>y :History:<CR>
 
 " ale
 let g:ale_linters = {
@@ -542,127 +309,6 @@ let g:ale_linters = {
       \}
 let g:ale_fixers = {
       \}
-
-" Tagbar
-nmap <silent> <F4> :TagbarToggle<CR> " open tagbar
-let g:tagbar_autofocus = 1
-
-" Disable visualbell
-set noerrorbells visualbell t_vb=
-if has('autocmd')
-  autocmd GUIEnter * set visualbell t_vb=
-endif
-
-"" Copy/Paste/Cut
-if has('unnamedplus')
-  set clipboard=unnamed,unnamedplus
-endif
-
-noremap YY "+y<CR>         " copy line
-noremap <leader>p "+gP<CR> " paste
-noremap XX "+x<CR>         " cut
-
-if has('macunix')
-  " pbcopy for OSX copy/paste
-  vmap <C-x> :!pbcopy<CR>       " copy
-  vmap <C-c> :w !pbcopy<CR><CR> " cut
-  vmap <C-v> :!pbpaste<CR>      " paste
-endif
-
-"" Buffer nav
-noremap <leader>z :bp<CR> " previous buffer
-noremap <leader>x :bn<CR> " next buffer
-noremap <leader>bq :bp<CR> " previous buffer
-noremap <leader>bw :bn<CR> " next buffer
-noremap <leader>bd :bd<CR> " close buffer
-
-nnoremap <silent> <esc><esc> :noh<cr> " clean search
-
-"" Switching windows
-noremap <C-j> <C-w>j " move to window below
-noremap <C-k> <C-w>k " move to window above
-noremap <C-l> <C-w>l " move to window right
-noremap <C-h> <C-w>h " move to window left
-
-vmap < <gv                  " move visual block left, keep selection
-vmap > >gv                  " move visual block right, keep selection
-vnoremap J :m '>+1<CR>gv=gv " move visual block down, keep selection
-vnoremap K :m '<-2<CR>gv=gv " move visual block up, keep selection
-
-nnoremap <Leader>o :.GBrowse<CR> " open current line on GitHub
-
-"*****************************************************************************
-"" Custom configs
-"*****************************************************************************
-
-" go
-" vim-go
-" run :GoBuild or :GoTestCompile based on the go file
-function! s:build_go_files()
-  let l:file = expand('%')
-  if l:file =~# '^\f\+_test\.go$'
-    call go#test#Test(0, 1)
-  elseif l:file =~# '^\f\+\.go$'
-    call go#cmd#Build(0)
-  endif
-endfunction
-
-let g:go_list_type = "quickfix"
-let g:go_fmt_command = "goimports"
-let g:go_fmt_fail_silently = 1
-
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_generate_tags = 1
-let g:go_highlight_space_tab_error = 0
-let g:go_highlight_array_whitespace_error = 0
-let g:go_highlight_trailing_whitespace_error = 0
-let g:go_highlight_extra_types = 1
-
-autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4 softtabstop=4
-
-augroup completion_preview_close
-  autocmd!
-  if v:version > 703 || v:version == 703 && has('patch598')
-    autocmd CompleteDone * if !&previewwindow && &completeopt =~ 'preview' | silent! pclose | endif
-  endif
-augroup END
-
-" for go files
-augroup go
-  au!
-  au Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-  au Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-  au Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-  au Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
-
-  au FileType go nmap <Leader>dd <Plug>(go-def-vertical)
-  au FileType go nmap <Leader>dv <Plug>(go-doc-vertical)
-  au FileType go nmap <Leader>db <Plug>(go-doc-browser)
-
-  au FileType go nmap <leader>r  <Plug>(go-run)
-  au FileType go nmap <leader>t  <Plug>(go-test)
-  au FileType go nmap <Leader>gt <Plug>(go-coverage-toggle)
-  au FileType go nmap <Leader>i <Plug>(go-info)
-  au FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
-  au FileType go nmap <C-g> :GoDecls<cr>
-  au FileType go nmap <leader>dr :GoDeclsDir<cr>
-  au FileType go imap <C-g> <esc>:<C-u>GoDecls<cr>
-  au FileType go imap <leader>dr <esc>:<C-u>GoDeclsDir<cr>
-  au FileType go nmap <leader>rb :<C-u>call <SID>build_go_files()<CR>
-augroup END
-
-"" ale
-:call extend(g:ale_linters, {"go": [ 'golint', 'go vet' ]})
-
-" html
-" for html files, 2 spaces
-autocmd Filetype html setlocal ts=2 sw=2 expandtab
 
 " javascript
 let g:javascript_enable_domhtmlcss = 1
@@ -672,36 +318,6 @@ augroup vimrc-javascript
   autocmd!
   autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
 augroup END
-
-" php
-" Phpactor plugin
-" Include use statement
-nmap <Leader>u :call phpactor#UseAdd()<CR>
-" Invoke the context menu
-nmap <Leader>mm :call phpactor#ContextMenu()<CR>
-" Invoke the navigation menu
-nmap <Leader>nn :call phpactor#Navigate()<CR>
-" Goto definition of class or class member under the cursor
-nmap <Leader>oo :call phpactor#GotoDefinition()<CR>
-nmap <Leader>oh :call phpactor#GotoDefinition('hsplit')<CR>
-nmap <Leader>ov :call phpactor#GotoDefinition('vsplit')<CR>
-nmap <Leader>ot :call phpactor#GotoDefinition('tabnew')<CR>
-" Show brief information about the symbol under the cursor
-nmap <Leader>K :call phpactor#Hover()<CR>
-" Transform the classes in the current file
-nmap <Leader>tt :call phpactor#Transform()<CR>
-" Generate a new class (replacing the current file)
-nmap <Leader>cc :call phpactor#ClassNew()<CR>
-" Extract expression (normal mode)
-nmap <silent><Leader>ee :call phpactor#ExtractExpression(v:false)<CR>
-" Extract expression from selection
-vmap <silent><Leader>ee :<C-U>call phpactor#ExtractExpression(v:true)<CR>
-" Extract method from selection
-vmap <silent><Leader>em :<C-U>call phpactor#ExtractMethod()<CR>
-
-au FileType php,blade let b:coc_root_patterns = ['.git', '.env', 'composer.json', 'artisan']
-au FileType php,blade nmap <silent> ga <Plug>(coc-codeaction-line)
-au FileType php,blade nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 " python
 " vim-python

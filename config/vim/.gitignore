@@ -1,1 +1,3 @@
 plugged
+extra/*
+!extra/.gitkeep
