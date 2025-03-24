@@ -17,3 +17,9 @@ end
 
 # Added by LM Studio CLI (lms)
 set -gx PATH $PATH $HOME/.lmstudio/bin
+
+type -q rbenv; and source (rbenv init -|psub)
+type -q pyenv; and source (pyenv init -|psub)
+type -q goenv; and source (goenv init -|psub)
+type -q fnm; and source (fnm env|psub)
+
