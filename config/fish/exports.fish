@@ -28,10 +28,6 @@ set -q AQUA_CONFIG; or set -x AQUA_CONFIG "$XDG_CONFIG_HOME/aqua/aqua.yaml"
 set -gx PATH $AQUA_BIN $PATH
 
 
-# NPM configuration
-set -q NPM_CONFIG_PREFIX; or set -x NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
-fish_add_path "$NPM_CONFIG_PREFIX/bin"
-
 # Yarn configuration
 set -q YARN_GLOBAL_FOLDER; or set -x YARN_GLOBAL_FOLDER "$XDG_DATA_HOME/yarn"
 fish_add_path "$YARN_GLOBAL_FOLDER/bin"
@@ -181,3 +177,12 @@ end
 if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
   source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
 end
+
+# Configure tide prompt
+set -gx tide_prompt_transient_enabled true
+set -gx tide_prompt_add_newline_before true
+set -gx tide_prompt_min_cols 34
+set -gx tide_prompt_pad_items false
+set -gx tide_left_prompt_items context pwd git node python rustc java php pulumi ruby go gcloud kubectl distrobox toolbox terraform aws nix_shell crystal elixir zig newline character
+set -gx tide_right_prompt_items status jobs direnv
+set -gx tide_context_hostname_parts 1
