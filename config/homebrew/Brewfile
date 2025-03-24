@@ -6,12 +6,14 @@ tap "dm3ch/tap"
 tap "doron-cohen/tap"
 tap "gesquive/tap"
 tap "github/gh"
+tap "golangci/tap"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "k8sgpt-ai/k8sgpt"
 tap "keith/formulae"
+tap "koekeishiya/formulae"
 tap "mongodb/brew"
 tap "nikitabobko/tap"
 tap "pantheon-systems/external"
@@ -95,6 +97,8 @@ brew "fontconfig"
 brew "gettext"
 # Core application library for C
 brew "glib"
+# Binary installation for rust projects
+brew "cargo-binstall"
 # Prevent cloud misconfigurations during build-time for IaC tools
 brew "checkov"
 # Human-friendly and fast alternative to cut and (sometimes) awk
@@ -117,6 +121,8 @@ brew "figlet"
 brew "fish"
 # Lock file during command
 brew "flock"
+# Fast and simple Node.js version manager
+brew "fnm"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
 # Monitor a directory for changes and run a shell command
@@ -153,6 +159,8 @@ brew "unbound"
 brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
+# Go version management
+brew "goenv"
 # Library access to GnuPG
 brew "gpgme"
 # Manage your GnuPG keys with ease!
@@ -211,12 +219,22 @@ brew "ncdu"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
+# Platform built on V8 to build network applications
+brew "node"
 # Libraries for security-enabled client and server applications
 brew "nss"
+# Command-line Git information tool
+brew "onefetch"
 # Open source suite of directory software
 brew "openldap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
+# General-purpose scripting language
+brew "php@8.2", link: true
+# General-purpose scripting language
+brew "php@8.3"
+# Pins GitHub Actions to full hashes and versions
+brew "pinact"
 # Execute binaries from Python packages in isolated environments
 brew "pipx"
 # Python version management
@@ -269,6 +287,8 @@ brew "cormacrelf/tap/dark-notify"
 brew "doron-cohen/tap/antidot"
 # lets you quickly switch between multiple git user profiles
 brew "gesquive/tap/git-user"
+# Simple hotkey-daemon for macOS.
+brew "koekeishiya/formulae/skhd"
 # Automated code review tool integrated with any code analysis tools regardless of programming language.
 brew "reviewdog/tap/reviewdog"
 # Igbinary PHP extension
@@ -289,8 +309,6 @@ brew "shivammathur/extensions/uuid@8.3"
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
 brew "shivammathur/php/php-debug"
-# General-purpose scripting language
-brew "shivammathur/php/php@8.2", link: true
 # General-purpose scripting language
 brew "shivammathur/php/php@8.2-debug"
 # Command-line interface for 1Password
