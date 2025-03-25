@@ -64,7 +64,7 @@ require('lazy').setup(
   }
 )
 
-require('nvm-default').setup()
+-- require('nvm-default').setup()
 
 require 'keymaps'
 

@@ -1,13 +1,12 @@
 return {
-  -- Theme of choice, tokyonight
-  -- https://github.com/folke/tokyonight.nvim
+  -- https://github.com/preservim/vim-colors-pencil
   {
-    'folke/tokyonight.nvim',
+    'preservim/vim-colors-pencil',
     priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function() vim.cmd.colorscheme(vim.g.colors_theme) end,
-    opts = {
-      transparent = true,
-    },
+    config = function()
+      vim.cmd 'colorscheme pencil'
+      vim.api.nvim_set_option_value('pencil_terminal_italics', 1, {})
+    end,
   },
 
   -- Automatic dark mode
@@ -18,11 +17,11 @@ return {
       update_interval = 1000,
       set_dark_mode = function()
         vim.api.nvim_set_option_value('background', 'dark', {})
-        vim.cmd.colorscheme(vim.g.colors_variant_dark)
+        -- vim.cmd.colorscheme(vim.g.colors_variant_dark)
       end,
       set_light_mode = function()
         vim.api.nvim_set_option_value('background', 'light', {})
-        vim.cmd.colorscheme(vim.g.colors_variant_light)
+        -- vim.cmd.colorscheme(vim.g.colors_variant_light)
       end,
     },
   },

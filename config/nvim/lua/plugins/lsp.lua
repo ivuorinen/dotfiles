@@ -335,6 +335,7 @@ return {
         sh = { 'shfmt' },
         bash = { 'shfmt' },
         php = { 'phpcbf' },
+        python = { 'isort', 'black' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --

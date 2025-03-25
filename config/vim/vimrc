@@ -15,8 +15,12 @@ endif
 
 let g:vim_bootstrap_langs = "go,html,javascript,lua,php,python,typescript"
 let g:vim_bootstrap_editor = "vim" " nvim or vim
-let g:vim_bootstrap_theme = "iceberg"
+let g:vim_bootstrap_theme = "pencil"
 let g:vim_bootstrap_frams = "vuejs"
+
+" ale
+let g:ale_fixers = {}
+let g:ale_linters = { "python": [ "flake8" ] }
 
 if !filereadable(vimplug_exists)
   if !executable(curl_exists)
@@ -67,9 +71,6 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
 
   " vim-airline
   Plug 'vim-airline/vim-airline'
-
-  " iceberg.vim - Iceberg color scheme
-  Plug 'cocopon/iceberg.vim'
 
   " fzf.vim - Fuzzy finder
   if isdirectory('~/.config/vim/extra/fzf')
@@ -132,6 +133,92 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
 call plug#end()
 " }}}
 
+let mapleader=' '                 " Map leader to <space>
+filetype off                      " disable filetype detection (but re-enable later, see below)
+
+" find matching tags in html/xml documents using matchit
+filetype plugin on
+packadd! matchit
+" disable super buggy netrw
+let g:loaded_netrw=1
+let g:netrw_loaded_netrwPlugin=1
+" show JSDoc highlight colors
+let g:javascript_plugin_jsdoc=1
+
+set backspace=indent,eol,start    " Backspace behavior
+set cindent                       " Use 'C' style program indenting
+set cursorline                    " Highlight current line
+set encoding=utf-8                " UTF-8
+set expandtab                     " Use spaces instead of tabs
+set fileformats=unix,dos,mac      " File formats
+set foldmethod=indent             " Fold based on indent
+set foldlevel=99                  " Open all folds
+set guioptions=egmrti             " GUI options
+set hidden                        " Enable hidden buffers
+set ignorecase                    " Always case-insensitive
+set incsearch                     " Searches for strings incrementally
+set laststatus=2                  " Always show statusline (even with only single window)
+set linespace=3                   " Set line spacing
+set list                          " Show invisible characters
+set listchars=tab:⌴\ ,trail:◼,nbsp:•,extends:…,precedes:… " Invisible characters
+set modeline                      " Enable modelines
+set modelines=3                   " Number of lines to check for modelines
+set mouse=a                       " Enable mouse support
+set mousemodel=popup              " Enable mouse support
+set nobackup                      " Disable backup files
+set nocompatible                  " disable compatibility mode with vi
+set nowritebackup                 " Disable backup files
+set number                        " Show line numbers
+set relativenumber                " Show relative line numbers
+set ruler                         " Show row and column ruler information
+set scrolloff=8                   " Minimum number of lines to keep above and below the cursor
+set shiftwidth=4                  " Number of auto-indent spaces
+set shortmess+=A                  " Don't show autocommand messages
+set shortmess+=F                  " Avoid showing the "file-info" message
+set shortmess+=I                  " Don't show intro message
+set shortmess+=O                  " Avoid showing the "file-read" message
+set shortmess+=O                  " Don't show overlength messages
+set shortmess+=T                  " Don't show title messages
+set shortmess+=W                  " Don't show "written" messages
+set shortmess+=a                  " Avoid showing the "ATTENTION" message
+set shortmess+=c                  " Avoid showing the "ins-completion-menu" message
+set shortmess+=c                  " Don't pass messages to |ins-completion-menu|
+set shortmess+=o                  " Avoid showing the "overlength" message
+set shortmess+=t                  " Avoid showing the "trailing whitespace" message
+set showcmd                       " Show command in status line
+set showmatch                     " Highlight matching brace
+set signcolumn=yes                " Show sign column
+set smartcase                     " Enable smart-case search
+set smartindent                   " Enable smart-indent
+set smarttab                      " Enable smart-tabs
+set softtabstop=4                 " Number of spaces per Tab
+set spelllang=fi,en               " Set the spell language
+set spellsuggest=double           " Suggest the first word when spell checking
+set t_Co=256                      " 256 colors
+set termguicolors                 " Enable 24-bit RGB color in the terminal
+set timeoutlen=500                " By default timeoutlen=1000 (ms)
+set ttimeoutlen=0                 " By default ttimeoutlen=-1 (ms)
+set undolevels=1000               " Number of undo levels
+set visualbell                    " Use visual bell (no beeping)
+set wildmenu                      " Enable wildmenu
+set wildmode=longest,list:longest " Command-line completion mode
+set wrap                          " Wrap lines
+set wrapscan                      " Searches wrap around the end of the file
+
+" Ignore these files in wildmenu
+set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
+
+colorscheme pencil                " Set the color scheme
+filetype plugin indent on         " enable filetype detection, plugins and indenting
+
+" Set the shell
+if exists('$SHELL')
+  set shell=$SHELL
+else
+  set shell=/bin/sh
+endif
+
+
 " COC
 let g:coc_global_extensions = [
       \ '@yaegassy/coc-intelephense',
@@ -160,9 +247,6 @@ let g:session_command_aliases = 1
 
 syntax on
 
-" set statusline to show the file name
-" set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L)|
-
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
 nnoremap n nzzzv
@@ -180,14 +264,14 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme = 'iceberg'
+let g:airline_theme = 'pencil'
 
 " NERDTree configuration
 let g:NERDTreeChDirMode=2
-let g:NERDTreeIgnore=['node_modules', 'vendor', '\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
-let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
-let g:NERDTreeShowBookmarks=1
-let g:nerdtree_tabs_focus_on_files=1
+let g:NERDTreeIgnore = [ 'node_modules', 'vendor', '\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__' ]
+let g:NERDTreeSortOrder = [ '^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$' ]
+let g:NERDTreeShowBookmarks = 1
+let g:nerdtree_tabs_focus_on_files = 1
 let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 50
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*node_modules/,*vendor/
@@ -267,14 +351,14 @@ xmap <leader>c <Plug>(coc-codeaction-selected)
 
 let g:wordy#ring = [
     \ 'weak',
-    \ ['being', 'passive-voice', ],
+    \ [ 'being', 'passive-voice', ],
     \ 'business-jargon',
     \ 'weasel',
     \ 'puffery',
-    \ ['problematic', 'redundant', ],
-    \ ['colloquial', 'idiomatic', 'similies', ],
+    \ [ 'problematic', 'redundant', ],
+    \ [ 'colloquial', 'idiomatic', 'similies', ],
     \ 'art-jargon',
-    \ ['contractions', 'opinion', 'vague-time', 'said-synonyms', ],
+    \ [ 'contractions', 'opinion', 'vague-time', 'said-synonyms', ],
     \ 'adjectives',
     \ 'adverbs',
     \ ]
@@ -302,13 +386,6 @@ endif
 "*****************************************************************************
 "" Custom configs
 "*****************************************************************************
-
-" ale
-let g:ale_linters = {
-      \ "vim": [ "vint" ]
-      \}
-let g:ale_fixers = {
-      \}
 
 " javascript
 let g:javascript_enable_domhtmlcss = 1
@@ -339,11 +416,14 @@ let g:jedi#smart_auto_mappings = 0
 
 " ale
 :call extend(g:ale_linters, {
-            \ 'python': [ 'flake8' ],
+            \ 'python': [ 'black' ],
             \ })
+
 :call extend(g:ale_fixers, {
-            \ '*': ['remove_trailing_lines', 'trim_whitespace']
+            \ '*': [ 'remove_trailing_lines', 'trim_whitespace' ],
+            \ 'python': [ 'autopep8', 'isort' ],
             \ })
+
 let g:ale_sign_column_always = 1
 let g:ale_fix_on_save = 1
 
