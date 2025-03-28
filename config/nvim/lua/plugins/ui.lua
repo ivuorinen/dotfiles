@@ -4,8 +4,8 @@ return {
     'preservim/vim-colors-pencil',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
+      -- set the theme
       vim.cmd 'colorscheme pencil'
-      vim.api.nvim_set_option_value('pencil_terminal_italics', 1, {})
     end,
   },
 
