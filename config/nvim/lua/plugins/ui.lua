@@ -1,12 +1,15 @@
 return {
-  -- https://github.com/preservim/vim-colors-pencil
+  -- https://github.com/rmehri01/onenord.nvim
   {
-    'preservim/vim-colors-pencil',
+    'rmehri01/onenord.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      -- set the theme
-      vim.cmd 'colorscheme pencil'
-    end,
+    opts = {
+      borders = true,
+      fade_nc = true,
+      disable = {
+        float_background = true,
+      },
+    },
   },
 
   -- Automatic dark mode

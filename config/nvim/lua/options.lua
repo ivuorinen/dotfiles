@@ -26,6 +26,7 @@ g.loaded_java_provider = 0 -- Disable java provider
 -- Most of the good defaults are provided by `mini.basics`
 -- See: lua/plugins/mini.lua
 o.confirm = true -- Confirm before closing unsaved buffers
+o.dictionary = '/usr/share/dict/words' -- Add system dictionary
 o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
 o.list = true -- Show invisible characters
@@ -37,7 +38,7 @@ o.scrolloff = 8 -- Show context around cursor
 o.sidescrolloff = 8 -- Show context around cursor
 o.signcolumn = 'yes' -- Keep signcolumn on by default
 o.spell = true -- Enable spell checking
-o.spelllang = 'en_us' -- Set the spell checking language
+o.spelllang = 'fi,en_us' -- Set the spell checking language
 o.splitbelow = true -- split to the bottom
 o.splitright = true -- vsplit to the right
 o.termguicolors = true -- Enable GUI colors

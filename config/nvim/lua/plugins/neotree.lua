@@ -41,7 +41,7 @@ return {
       'document_symbols',
     },
     source_selector = {
-      winbar = true,
+      winbar = false,
       statusline = false,
       separator = { left = '', right = '' },
       show_separator_on_edge = true,

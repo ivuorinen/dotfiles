@@ -108,17 +108,25 @@ local lsp_servers = {
 -- These are automatically configured by WhoIsSethDaniel/mason-tool-installer.nvim
 local mason_tools = {
   'actionlint',
+  'ast-grep',
+  'black',
   'editorconfig-checker',
   'goimports',
+  'golangci-lint',
+  'golines',
+  'gopls',
   'gotests',
+  'isort',
   'phpcbf',
   'phpmd',
   'phpstan',
   'pint',
   'prettierd',
+  'revive',
   'semgrep',
   'shellcheck',
   'shfmt',
+  'sonarlint-language-server',
   'staticcheck',
   'stylua',
   'trivy',
@@ -323,7 +331,7 @@ return {
 
         -- Disable autoformat for files in a certain paths
         local bufname = vim.api.nvim_buf_get_name(bufnr)
-        if bufname:match '/node_modules|vendor/' then return end
+        if bufname:match '/dist|node_modules|vendor/' then return end
 
         return {
           timeout_ms = 500,
