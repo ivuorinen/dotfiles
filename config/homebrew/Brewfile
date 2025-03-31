@@ -107,6 +107,10 @@ brew "choose-rust"
 brew "cmake"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
+# OpenType text shaping engine
+brew "harfbuzz"
+# OWASP dependency-check
+brew "dependency-check"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
 # .NET Core
@@ -121,8 +125,6 @@ brew "figlet"
 brew "fish"
 # Lock file during command
 brew "flock"
-# Fast and simple Node.js version manager
-brew "fnm"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
 # Monitor a directory for changes and run a shell command
@@ -135,8 +137,6 @@ brew "gd"
 brew "gdu"
 # GitHub command-line tool
 brew "gh"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Secure hashing function
 brew "libb2"
 # Framework for layout and rendering of i18n text
@@ -193,6 +193,8 @@ brew "jq"
 brew "json-c"
 # Network authentication protocol
 brew "krb5"
+# Style and grammar checker
+brew "languagetool"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
 brew "legitify"
 # BSD-style licensed readline alternative
@@ -230,7 +232,9 @@ brew "openldap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
 # General-purpose scripting language
-brew "php@8.2", link: true
+brew "php"
+# General-purpose scripting language
+brew "php@8.2"
 # General-purpose scripting language
 brew "php@8.3"
 # Pins GitHub Actions to full hashes and versions
@@ -336,6 +340,8 @@ cask "jetbrains-toolbox"
 cask "keybase"
 # Kubernetes IDE
 cask "lens"
+# Neovim Client
+cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Simple application that will prevent iTunes or Apple Music from launching
