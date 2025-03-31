@@ -1,12 +1,16 @@
 local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
+config.set_environment_variables = {
+  COLORTERM = 'truecolor',
+}
+
 -- Font and font size
 config.font_size = 14.0
 config.font = wezterm.font_with_fallback {
   {
     family = 'Operator Mono',
-    weight = 'Light',
+    weight = 'Book',
   },
   'Operator Mono',
   'JetBrainsMonoNL NFM Light',
