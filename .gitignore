@@ -45,3 +45,4 @@ config/fish/completions/asdf.fish
 config/vim/.netrwhist
 config/vim/extra/*
 config/gh/hosts.yml
+dependency-check-report.html

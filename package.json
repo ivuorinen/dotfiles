@@ -27,7 +27,8 @@
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/base-configs": "^2.0.0"
+    "@ivuorinen/base-configs": "^2.0.0",
+    "bundle-audit": "^0.1.0"
   },
   "packageManager": "yarn@1.22.22"
 }
