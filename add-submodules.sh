@@ -26,6 +26,8 @@ git submodule add --name tmux/tmux-continuum \
   -f https://github.com/tmux-plugins/tmux-continuum config/tmux/plugins/tmux-continuum
 git submodule add --name tmux/tmux-mode-indicator \
   -f https://github.com/MunifTanjim/tmux-mode-indicator.git config/tmux/plugins/tmux-mode-indicator
+git submodule add --name tmux/tmux-resurrect \
+  -f https://github.com/tmux-plugins/tmux-resurrect.git config/tmux/plugins/tmux-resurrect
 git submodule add --name tmux/tmux-sensible \
   -f https://github.com/tmux-plugins/tmux-sensible.git config/tmux/plugins/tmux-sensible
 git submodule add --name tmux/tmux-sessionist \
@@ -55,7 +57,6 @@ folders=(
   "config/tmux/plugins/tpm"
   "config/tmux/plugins/tmux"
   "config/tmux/plugins/tmux-menus"
-  "config/tmux/plugins/tmux-resurrect"
   "tools/dotbot-crontab"
   "tools/dotbot-snap"
   "config/nvim-kickstart"

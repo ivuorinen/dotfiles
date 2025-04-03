@@ -80,3 +80,6 @@
 	shallow = true
 	ignore = dirty
 
+[submodule "tmux/tmux-resurrect"]
+	path = config/tmux/plugins/tmux-resurrect
+	url = https://github.com/tmux-plugins/tmux-resurrect.git
