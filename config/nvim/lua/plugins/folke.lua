@@ -5,12 +5,13 @@ return {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
-    ---@diagnostic disable-next-line: undefined-doc-name
     ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
-      input = {
+      input = { enabled = true },
+      notifier = {
         enabled = true,
+        timeout = 3000,
       },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
@@ -43,6 +44,11 @@ return {
   {
     'folke/noice.nvim',
     event = 'VeryLazy',
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      'rcarriga/nvim-notify',
+    },
     opts = {
       lsp = {
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
@@ -65,7 +71,10 @@ return {
           filter = {
             event = 'msg_show',
             kind = '',
-            find = 'written',
+            any = {
+              { find = 'written' },
+              { find = '%d of %d --%d%--' },
+            },
           },
           opts = { skip = true },
         },
@@ -106,14 +115,6 @@ return {
         },
       },
     },
-    dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-      'MunifTanjim/nui.nvim',
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      'rcarriga/nvim-notify',
-    },
   },
 
   -- A pretty diagnostics, references, telescope results,
@@ -136,7 +137,7 @@ return {
       },
       modes = {
         diagnostics = {
-          auto_open = true,
+          auto_open = false,
         },
         test = {
           mode = 'diagnostics',
@@ -144,7 +145,7 @@ return {
             type = 'split',
             relative = 'win',
             position = 'right',
-            size = 0.3,
+            size = 0.25,
           },
         },
         cascade = {
@@ -162,14 +163,5 @@ return {
         },
       },
     },
-  },
-
-  -- Navigate your code with search labels, enhanced
-  -- character motions and Treesitter integration
-  -- https://github.com/folke/flash.nvim
-  {
-    'folke/flash.nvim',
-    event = 'VeryLazy',
-    opts = {},
   },
 }
