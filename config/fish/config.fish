@@ -22,4 +22,5 @@ type -q rbenv; and source (rbenv init -|psub)
 type -q pyenv; and source (pyenv init -|psub)
 type -q goenv; and source (goenv init -|psub)
 type -q fnm; and fnm env --use-on-cd --shell fish | source
+type -q load_nvm; and load_nvm > /dev/stderr
 
