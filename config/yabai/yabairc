@@ -7,7 +7,6 @@
 # yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
 yabai -m config \
-  active_window_border_color 0xff775759 \
   auto_balance on \
   layout bsp \
   top_padding 0 \
