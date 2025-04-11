@@ -1,5 +1,5 @@
 "" Source your .vimrc
-source ~/.dotfiles/config/vim/vimrc
+source $HOME/.dotfiles/config/vim/vimrc
 
 " https://github.com/ville6000/dotfiles/blob/main/vimrc
 " To get a list of Actions run `:actionlist `
