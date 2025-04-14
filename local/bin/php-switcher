@@ -1,0 +1,443 @@
+#!/usr/bin/env bash
+#
+# Brew PHP Switcher
+#
+# Use to switch between PHP versions installed via Homebrew.
+#
+# Usage: php-switcher <version> [--help|--installed|--current|--auto]
+# Example: php-switcher 7.4
+# Example: php-switcher 8.0
+# Example: php-switcher latest
+# Example: php-switcher --auto
+#
+# Created by Ismo Vuorinen <https://github.com/ivuorinen> (2025)
+# Licensed under the MIT License (https://opensource.org/licenses/MIT)
+
+set -euo pipefail # Add error handling
+
+# Configuration
+LATEST_VERSION_FORMULA="php"    # The formula name for latest PHP version
+PHP_VERSION_FILE=".php-version" # File name to look for when auto-switching
+
+# Switch brew php version
+function check_dependencies()
+{
+  if ! command -v brew > /dev/null 2>&1; then
+    echo "Error: Homebrew is not installed"
+    exit 1
+  fi
+}
+
+function usage()
+{
+  echo "Brew PHP Switcher - Switch between PHP versions installed via Homebrew"
+  echo ""
+  echo "Usage: php-switcher <version> [options]"
+  echo ""
+  echo "Options:"
+  echo "  --help        Show this help message"
+  echo "  --installed   List installed PHP versions"
+  echo "  --current     Show currently active PHP version"
+  echo "  --auto        Auto-switch based on .php-version file in current directory"
+  echo ""
+  echo "Examples:"
+  echo "  php-switcher 7.4"
+  echo "  php-switcher 8.0"
+  echo "  php-switcher latest"
+  echo "  php-switcher --auto"
+  echo ""
+  echo "Auto-switching:"
+  echo "  Create a .php-version file in your project directory with a PHP version"
+  echo "  Example .php-version content: 8.1"
+  echo ""
+  exit 0
+}
+
+function list_php_versions()
+{
+  # Check Homebrew's installation path for PHP versions
+  local brew_cellar
+  brew_cellar="$(brew --cellar)"
+  local php_paths=()
+  local versions=()
+  local formulas=()
+  local active=()
+
+  # Look for all PHP installations in Homebrew Cellar
+  if [[ -d "$brew_cellar/php" ]]; then
+    php_paths+=("$brew_cellar/php")
+  fi
+
+  # Look for versioned PHP installations
+  while IFS= read -r dir; do
+    if [[ -d $dir ]]; then
+      php_paths+=("$dir")
+    fi
+  done < <(find "$brew_cellar" \
+    -maxdepth 1 -name 'php@*' \
+    -type d 2> /dev/null || echo "")
+
+  if [[ ${#php_paths[@]} -eq 0 ]]; then
+    echo "No PHP versions installed through Homebrew."
+    return 1
+  fi
+
+  # Find which version is currently linked
+  local current_bin
+  current_bin=$(readlink -f \
+    "$(command -v php 2> /dev/null)" \
+    2> /dev/null || echo "")
+
+  # Collect data for each installed PHP version
+  for path in "${php_paths[@]}"; do
+    local formula
+    formula=$(basename "$path")
+    local version_label
+
+    if [[ $formula == "php" ]]; then
+      version_label="latest"
+    else
+      version_label="${formula#php@}"
+    fi
+
+    # Find the actual version from the directory structure
+    local version_dir
+    version_dir=$(find "$path" -maxdepth 1 -type d \
+      | grep -v "^$path$" | sort -V | tail -1)
+
+    if [[ -n $version_dir && -d "$version_dir/bin" ]]; then
+      local full_version
+      full_version=$("$version_dir/bin/php" -v 2> /dev/null \
+        | grep -oE 'PHP [0-9]+\.[0-9]+\.[0-9]+' \
+        | head -1 \
+        | cut -d' ' -f2 \
+        || echo "$version_label.x")
+
+      # Determine if this is the active version
+      local is_active="No"
+      if [[ -n $current_bin && $current_bin == "$version_dir/bin/php" ]]; then
+        is_active="Yes"
+      fi
+
+      # Handle the 'latest' case - replace with actual version number
+      local display_version
+      if [[ $version_label == "latest" ]]; then
+        display_version="${full_version%.*}" # Get major.minor version
+      else
+        display_version="$version_label"
+      fi
+
+      # Store data for table display
+      versions+=("$display_version")
+      formulas+=("$formula")
+      active+=("$is_active")
+    fi
+  done
+
+  # Calculate maximum column widths
+  local max_version_width=7 # "Version" header length
+  local max_formula_width=7 # "Formula" header length
+  local max_active_width=6  # "Active" header length
+
+  local count=${#versions[@]}
+  for ((i = 0; i < count; i++)); do
+    # Update max widths if needed
+    if [[ ${#versions[i]} -gt $max_version_width ]]; then
+      max_version_width=${#versions[i]}
+    fi
+    if [[ ${#formulas[i]} -gt $max_formula_width ]]; then
+      max_formula_width=${#formulas[i]}
+    fi
+  done
+
+  # Build header with correct widths
+  local header_format="| %-${max_version_width}s | %-${max_formula_width}s | "
+  header_format+="%-${max_active_width}s |"
+
+  local separator_line="|"
+  for ((i = 0; i < max_version_width + 2; i++)); do
+    separator_line="${separator_line}-"
+  done
+  separator_line="${separator_line}|"
+
+  for ((i = 0; i < max_formula_width + 2; i++)); do
+    separator_line="${separator_line}-"
+  done
+  separator_line="${separator_line}|"
+
+  for ((i = 0; i < max_active_width + 2; i++)); do
+    separator_line="${separator_line}-"
+  done
+  separator_line="${separator_line}|"
+
+  # Print table header
+  # shellcheck disable=SC2059
+  printf "$header_format\n" "Version" "Formula" "Active"
+  echo "$separator_line"
+
+  # Print table rows
+  local row_format="| %-${max_version_width}s | %-${max_formula_width}s | "
+  row_format+="%-${max_active_width}s |"
+
+  for ((i = 0; i < count; i++)); do
+    # shellcheck disable=SC2059
+    printf "$row_format\n" "${versions[i]}" "${formulas[i]}" "${active[i]}"
+  done
+}
+
+function get_php_formula_for_version()
+{
+  local version="$1"
+
+  # Handle "latest" as a special case
+  if [[ $version == "latest" ]]; then
+    echo "$LATEST_VERSION_FORMULA"
+    return 0
+  fi
+
+  # The regular version case (e.g., 7.4, 8.1)
+  echo "php@$version"
+}
+
+function check_formula_installed()
+{
+  local formula="$1"
+  local brew_cellar
+  brew_cellar="$(brew --cellar)"
+
+  if [[ $formula == "php" ]]; then
+    if [[ -d "$brew_cellar/php" ]]; then
+      return 0
+    fi
+  elif [[ -d "$brew_cellar/$formula" ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
+function unlink_current_php()
+{
+  local current_formula=""
+
+  # Find formulas more safely
+  while IFS= read -r formula; do
+    if [[ -n $formula ]]; then
+      local linked
+      linked=$(brew info --json=v1 "$formula" \
+        | grep -o '"linked_keg":"[^"]*"' \
+        | grep -v ':"null"')
+      if [[ -n $linked ]]; then
+        current_formula="$formula"
+        break
+      fi
+    fi
+  done < <(brew list --formula | grep -E '^php(@[0-9]+\.[0-9]+)?$' || echo "")
+
+  # If we found a linked formula, unlink it
+  if [[ -n $current_formula ]]; then
+    echo "Unlinking current PHP version ($current_formula)..."
+    brew unlink "$current_formula" > /dev/null 2>&1 || true
+  fi
+}
+
+function link_php_version()
+{
+  local formula="$1"
+
+  if ! check_formula_installed "$formula"; then
+    echo "Error: PHP formula '$formula' is not installed"
+    echo "Available versions:"
+    list_php_versions
+    exit 1
+  fi
+
+  echo "Linking $formula..."
+  if ! brew link --force --overwrite "$formula" > /dev/null 2>&1; then
+    echo "Error: Failed to link $formula. Try running manually:"
+    echo "  brew link --force --overwrite $formula"
+    exit 1
+  fi
+
+  # Verify the switch worked
+  if ! command -v php > /dev/null 2>&1; then
+    echo "Warning: PHP was linked but may not be working correctly"
+  fi
+}
+
+function get_current_version()
+{
+  if ! command -v php > /dev/null 2>&1; then
+    echo "No PHP currently linked"
+    return 1
+  fi
+
+  local version
+  version=$(php -v 2> /dev/null \
+    | grep -oE 'PHP [0-9]+\.[0-9]+\.[0-9]+' \
+    | head -1)
+
+  if [[ -z $version ]]; then
+    echo "Unable to determine PHP version"
+    return 1
+  fi
+
+  # Find the corresponding formula
+  local current_version
+  current_version=$(echo "$version" | cut -d' ' -f2)
+  local major_minor
+  major_minor=$(echo "$current_version" | cut -d'.' -f1,2)
+
+  # Check if it's the latest version
+  if check_formula_installed "php" \
+    && brew info --json=v1 php \
+    | grep -o '"linked_keg":"[^"]*"' \
+      | grep -v ':"null"' \
+      | grep -q .; then
+    echo "Current PHP version: $current_version (latest)"
+  else
+    echo "Current PHP version: $current_version (php@$major_minor)"
+  fi
+}
+
+function validate_version()
+{
+  local version="$1"
+
+  # Valid formats: x.y or latest
+  if [[ ! $version =~ ^([0-9]+\.[0-9]+|latest)$ ]]; then
+    echo "Error: Invalid PHP version format. Use x.y format (e.g., 7.4) or"
+    echo "       'latest'"
+    exit 1
+  fi
+}
+
+function find_php_version_file()
+{
+  local dir="$PWD"
+
+  # Look for .php-version file in current directory and all parent directories
+  while [[ $dir != "/" ]]; do
+    if [[ -f "$dir/$PHP_VERSION_FILE" ]]; then
+      echo "$dir/$PHP_VERSION_FILE"
+      return 0
+    fi
+    dir=$(dirname "$dir")
+  done
+
+  # Check the root directory as well
+  if [[ -f "/$PHP_VERSION_FILE" ]]; then
+    echo "/$PHP_VERSION_FILE"
+    return 0
+  fi
+
+  return 1
+}
+
+function auto_switch_php_version()
+{
+  local version_file
+
+  # Try to find a .php-version file
+  version_file=$(find_php_version_file) || {
+    echo "No .php-version file found in current directory or any parent"
+    echo "directory. Create a $PHP_VERSION_FILE file with your desired"
+    echo "PHP version (e.g., 8.1)"
+    exit 1
+  }
+
+  # Read the version from the file
+  local version
+  version=$(tr -d '[:space:]' < "$version_file")
+
+  echo "Found $PHP_VERSION_FILE file at: $version_file"
+  echo "Requested PHP version: $version"
+
+  # Validate the version
+  validate_version "$version"
+
+  # Switch to the specified version
+  switch_php_version "$version"
+}
+
+function switch_php_version()
+{
+  local version="$1"
+
+  # Get the formula name for the version
+  local formula
+  formula=$(get_php_formula_for_version "$version")
+
+  # Check if the requested PHP version is installed
+  if ! check_formula_installed "$formula"; then
+    echo "Error: PHP version $version is not installed"
+    echo ""
+    list_php_versions
+    exit 1
+  fi
+
+  # Get the current version info for comparison
+  local current_info
+  current_info=$(get_current_version 2> /dev/null || echo "None")
+
+  # Skip if we're already on the requested version
+  if [[ $current_info == *"$version"* ]]; then
+    echo "PHP version $version is already active"
+    exit 0
+  fi
+
+  # Perform the switch
+  unlink_current_php
+  link_php_version "$formula"
+
+  # Verify the switch
+  echo ""
+  echo "Switched to:"
+  get_current_version
+  echo ""
+  echo "PHP executable: $(command -v php)"
+}
+
+function main()
+{
+  local version=""
+
+  # Parse arguments
+  case "${1:-}" in
+    --help)
+      usage
+      ;;
+    --installed)
+      list_php_versions
+      exit 0
+      ;;
+    --current)
+      get_current_version
+      exit 0
+      ;;
+    --auto)
+      auto_switch_php_version
+      exit 0
+      ;;
+    "")
+      usage
+      ;;
+    *)
+      version="$1"
+      ;;
+  esac
+
+  # Validate and switch to the specified version
+  validate_version "$version"
+  switch_php_version "$version"
+}
+
+# Run the script
+check_dependencies
+if [[ ${#@} -eq 0 ]]; then
+  usage
+else
+  main "$@"
+fi
+
+# vim: ft=bash sw=4 ts=4 et tw=80 cc=80 :
