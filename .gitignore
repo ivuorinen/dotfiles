@@ -46,3 +46,5 @@ config/vim/.netrwhist
 config/vim/extra/*
 config/gh/hosts.yml
 dependency-check-report.html
+local/bin/yabai
+local/man/yabai.1
