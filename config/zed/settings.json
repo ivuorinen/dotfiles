@@ -5,20 +5,14 @@
   "assistant": {
     "default_model": {
       "provider": "copilot_chat",
-      "model": "claude-3-5-sonnet"
+      "model": "claude-3-7-sonnet"
     },
     "version": "2"
   },
-  "formatter": {
-    "external": {
-      "command": "prettier",
-      "arguments": [
-        "--stdin-filepath",
-        "{buffer_path}"
-      ]
-    }
-  },
   "languages": {
+    "Shell Script": {
+      "enable_language_server": true
+    },
     "JavaScript": {
       "enable_language_server": true,
       "code_actions_on_format": {
