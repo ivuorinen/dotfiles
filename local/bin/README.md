@@ -6,8 +6,15 @@ Some problematic code has been fixed per `shellcheck` suggestions.
 ## Homegrown
 
 - dfm
+- git-dirty (based on git-extra-tools)
+- git-fsck-dirs
+- git-update-dirs
+- php-switcher
+- x-backup-folder
 - x-backup-mysql-with-prefix
 - x-check-git-attributes
+- x-clean-vendordirs
+- x-env-list
 - x-open-ports
 
 ## Sourced
@@ -25,9 +32,15 @@ Some problematic code has been fixed per `shellcheck` suggestions.
 | `x-when-up`             | skx/sysadmin-util |
 
 - Sources:
-  - [skx/sysadmin-utils](https://github.com/skx/sysadmin-util/)
+  - [skx/sysadmin-utils][skx]
     - Tools for Linux/Unix sysadmins.
-    - [Licence](https://github.com/skx/sysadmin-util/blob/master/LICENSE)
-  - [onnimonni](https://github.com/onnimonni)
-    - [validate_sha256sum](https://gist.github.com/onnimonni/b49779ebc96216771a6be3de46449fa1)
-  - [mvdan/dotfiles](https://github.com/mvdan/dotfiles)
+    - [Licence][skx-license]
+  - [onnimonni][onnimonni]
+    - [validate_sha256sum][onnimonni-gist]
+  - [mvdan/dotfiles][mvdan]
+
+[onnimonni]: https://github.com/onnimonni
+[onnimonni-gist]: https://gist.github.com/onnimonni/b49779ebc96216771a6be3de46449fa1
+[skx]: https://github.com/skx/sysadmin-util
+[skx-license]: https://github.com/skx/sysadmin-util/blob/master/LICENSE
+[mvdan]: https://github.com/mvdan/dotfiles
