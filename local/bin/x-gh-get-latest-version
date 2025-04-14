@@ -1,38 +1,66 @@
 #!/usr/bin/env bash
 #
 # Get latest release version, branch tag, or latest commit from GitHub
-# Usage: x-gh-get-latest-version <repo>
+# Usage: x-gh-get-latest-version <repo> [options]
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 
 set -euo pipefail
 
-# Environment variables, more under get_release_version() and get_latest_branch_tag()
-# functions. These can be overridden by the user.
+# Environment variables, can be overridden by command line arguments
 GITHUB_API_URL="${GITHUB_API_URL:-https://api.github.com/repos}"
 VERBOSE="${VERBOSE:-0}"
+INCLUDE_PRERELEASES="${INCLUDE_PRERELEASES:-0}"
+OLDEST_RELEASE="${OLDEST_RELEASE:-0}"
+BRANCH=""
+LATEST_COMMIT="${LATEST_COMMIT:-0}"
+LATEST_TAG="${LATEST_TAG:-0}"
+OUTPUT="${OUTPUT:-text}"
+SHOW_HELP=0
+REPOSITORY=""
+COMBINED=0
+
+BIN=$(basename "$0")
 
 # Prints a message if VERBOSE=1
 msg()
 {
-  [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  if [[ $VERBOSE -eq 1 ]]; then
+    echo "$1" >&2
+  fi
 }
 
 # Show usage information
 usage()
 {
   cat << EOF
-Usage: $0 <repo> (e.g. ivuorinen/dotfiles)
+Usage: $BIN <repo> [options]
 
 Fetches the latest release version, latest branch tag, or latest commit SHA from GitHub.
 
+Arguments:
+  <repo>                   Repository in format 'owner/repo' (e.g. ivuorinen/dotfiles)
+
 Options:
-  - INCLUDE_PRERELEASES=1  Include prerelease versions (default: only stable releases).
-  - OLDEST_RELEASE=1       Fetch the oldest release instead of the latest.
-  - BRANCH=<branch>        Fetch the latest tag from a specific branch (default: main).
-  - LATEST_COMMIT=1        Fetch the latest commit SHA from the specified branch.
-  - OUTPUT=json            Return output as JSON (default: plain text).
-  - GITHUB_API_URL=<url>   Override GitHub API URL (useful for GitHub Enterprise).
-  - GITHUB_TOKEN=<token>   Use GitHub API token to increase rate limits (default: unauthenticated).
+  -h, --help               Show this help message and exit
+  -v, --verbose            Enable verbose output
+  -p, --prereleases        Include prerelease versions (default: only stable releases)
+  -o, --oldest             Fetch the oldest release instead of the latest
+  -b, --branch <branch>    Fetch the latest tag from a specific branch (default: main)
+  -c, --commit             Fetch the latest commit SHA from the specified branch
+  -t, --tag                Fetch the latest Git tag (any branch)
+  -j, --json               Return output as JSON (default: plain text)
+  -a, --all                Fetch all information types in a combined output
+
+Environment Variables (can be used instead of command line options):
+  - INCLUDE_PRERELEASES=1  Same as --prereleases
+  - OLDEST_RELEASE=1       Same as --oldest
+  - BRANCH=<branch>        Same as --branch <branch>
+  - LATEST_COMMIT=1        Same as --commit
+  - LATEST_TAG=1           Same as --tag
+  - OUTPUT=json            Same as --json
+  - GITHUB_API_URL=<url>   Override GitHub API URL (useful for GitHub Enterprise)
+  - GITHUB_TOKEN=<token>   Use GitHub API token to increase rate limits (default: unauthenticated)
+  - VERBOSE=1              Same as --verbose
 
 Requirements:
   - curl
@@ -40,28 +68,34 @@ Requirements:
 
 Examples:
   # Fetch the latest stable release
-  $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles
 
   # Fetch the latest release including prereleases
-  INCLUDE_PRERELEASES=1 $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles --prereleases
 
   # Fetch the oldest release
-  OLDEST_RELEASE=1 $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles --oldest
 
   # Fetch the latest tag from the 'develop' branch
-  BRANCH=develop $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles --branch develop
 
   # Fetch the latest commit SHA from 'main' branch
-  LATEST_COMMIT=1 $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles --commit
+
+  # Fetch the latest Git tag (any branch)
+  $BIN ivuorinen/dotfiles --tag
+
+  # Fetch all information types in a combined output
+  $BIN ivuorinen/dotfiles --all
 
   # Output result in JSON format
-  OUTPUT=json $0 ivuorinen/dotfiles
+  $BIN ivuorinen/dotfiles --json
 
   # Use GitHub API token for higher rate limits
-  GITHUB_TOKEN="your_personal_access_token" $0 ivuorinen/dotfiles
+  GITHUB_TOKEN="your_personal_access_token" $BIN ivuorinen/dotfiles
 
   # Use GitHub Enterprise API
-  GITHUB_API_URL="https://github.example.com/api/v3/repos" $0 ivuorinen/dotfiles
+  GITHUB_API_URL="https://github.example.com/api/v3/repos" $BIN ivuorinen/dotfiles
 EOF
   exit 1
 }
@@ -77,6 +111,140 @@ check_dependencies()
   done
 }
 
+# Check GitHub API rate limits and warn if they're getting low
+check_rate_limits()
+{
+  local auth_status="unauthenticated"
+  local auth_header=()
+
+  if [[ -n ${GITHUB_TOKEN:-} ]]; then
+    auth_status="authenticated"
+    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+  fi
+
+  msg "Making $auth_status GitHub API requests"
+
+  local rate_limit_info
+  rate_limit_info=$(curl -sSL "${auth_header[@]}" "https://api.github.com/rate_limit")
+
+  local remaining
+  local reset_timestamp
+  local reset_time
+
+  remaining=$(echo "$rate_limit_info" | jq -r '.resources.core.remaining')
+  reset_timestamp=$(echo "$rate_limit_info" | jq -r '.resources.core.reset')
+
+  # Handle date command differences between Linux and macOS
+  if date --version > /dev/null 2>&1; then
+    # GNU date (Linux)
+    reset_time=$(date -d "@$reset_timestamp" "+%H:%M:%S %Z" 2> /dev/null)
+  else
+    # BSD date (macOS)
+    reset_time=$(date -r "$reset_timestamp" "+%H:%M:%S %Z" 2> /dev/null)
+  fi
+
+  msg "Rate limit status: $remaining requests remaining, reset at $reset_time"
+
+  if [[ $remaining -le 5 ]]; then
+    echo "Warning: GitHub API rate limit nearly reached ($remaining requests left)" >&2
+    echo "Rate limits will reset at: $reset_time" >&2
+
+    if [[ $auth_status == "unauthenticated" ]]; then
+      echo "Tip: Set GITHUB_TOKEN to increase your rate limits (60 → 5000 requests/hour)" >&2
+    fi
+  fi
+}
+
+# Make a GitHub API request with proper error handling
+api_request()
+{
+  local url="$1"
+  local auth_header=()
+
+  if [[ -n ${GITHUB_TOKEN:-} ]]; then
+    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+  fi
+
+  local response
+  local status_code
+
+  # Use a temporary file to capture both headers and body
+  local tmp_file
+  tmp_file=$(mktemp)
+
+  msg "Making API request to: $url"
+
+  status_code=$(curl -sSL -w "%{http_code}" -o "$tmp_file" "${auth_header[@]}" "$url")
+  response=$(< "$tmp_file")
+  rm -f "$tmp_file"
+
+  # Check for HTTP errors
+  if [[ $status_code -ge 400 ]]; then
+    local error_msg
+    error_msg=$(echo "$response" | jq -r '.message // "Unknown error"')
+
+    if [[ $status_code -eq 403 && $error_msg == *"API rate limit exceeded"* ]]; then
+      # Extract rate limit reset info
+      local reset_timestamp
+      reset_timestamp=$(echo "$response" | jq -r '.rate.reset // empty')
+
+      local reset_time
+      if date --version > /dev/null 2>&1; then
+        # GNU date (Linux)
+        reset_time=$(date -d "@$reset_timestamp" "+%H:%M:%S %Z" 2> /dev/null \
+          || echo "unknown time")
+      else
+        # BSD date (macOS)
+        reset_time=$(date -r "$reset_timestamp" "+%H:%M:%S %Z" 2> /dev/null \
+          || echo "unknown time")
+      fi
+
+      echo "Error: GitHub API rate limit exceeded" >&2
+      echo "Rate limit will reset at: $reset_time" >&2
+
+      if [[ -z ${GITHUB_TOKEN:-} ]]; then
+        echo "Tip: Set GITHUB_TOKEN to increase your rate limits (60 → 5000 requests/hour)" >&2
+      else
+        echo "You've exceeded even authenticated rate limits (5000 requests/hour)" >&2
+      fi
+
+      exit 3
+    elif [[ $status_code -eq 404 ]]; then
+      echo "Error: Repository not found or no access permission: $url" >&2
+      exit 2
+    else
+      echo "GitHub API error ($status_code): $error_msg" >&2
+      exit 1
+    fi
+  fi
+
+  echo "$response"
+}
+
+# Check if repository exists before proceeding
+check_repository()
+{
+  local repo="$1"
+  local api_url="${GITHUB_API_URL}/${repo}"
+
+  msg "Checking if repository exists: $api_url"
+
+  local response
+  response=$(api_request "$api_url")
+
+  # If we got here, the repository exists (otherwise api_request would have exited)
+  msg "Repository found: $(echo "$response" | jq -r '.full_name')"
+
+  # Get default branch if no branch is specified
+  if [[ -z ${BRANCH} ]]; then
+    BRANCH=$(echo "$response" | jq -r '.default_branch')
+    msg "Using default branch: $BRANCH"
+  fi
+
+  # Return the repository full name (in case it differs from input due to redirects)
+  echo "$response" | jq -r '.full_name'
+}
+
 # Fetches the latest release or the oldest if OLDEST_RELEASE=1
 # $1 - GitHub repository (string)
 get_release_version()
@@ -86,38 +254,55 @@ get_release_version()
   local oldest_release="${OLDEST_RELEASE:-0}"
   local api_url="${GITHUB_API_URL}/${repo}/releases"
 
-  local auth_header=()
-  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
-  fi
-
-  msg "Fetching release data from: $api_url (Include prereleases: $include_prereleases, Oldest: $oldest_release)"
+  msg "Fetching release data from: $api_url " + \
+    "(Include prereleases: $include_prereleases, Oldest: $oldest_release)"
 
   local json_response
-  json_response=$(curl -sSL "${auth_header[@]}" "$api_url")
+  json_response=$(api_request "$api_url")
 
-  # Check for API errors
-  if echo "$json_response" | jq -e 'has("message")' > /dev/null; then
-    msg "GitHub API error: $(echo "$json_response" | jq -r '.message')"
-    exit 1
-  fi
+  local version=""
+  local prerelease_version=""
 
-  local filter='.[] | select(.tag_name)'
-  [[ "$include_prereleases" -eq 0 ]] && filter+='.prerelease == false'
-
-  local version
-  if [[ "$oldest_release" -eq 1 ]]; then
-    version=$(echo "$json_response" | jq -r "[${filter}] | last.tag_name // empty")
+  # Get stable release version
+  if [[ $oldest_release -eq 1 ]]; then
+    version=$(echo "$json_response" \
+      | jq -r '[.[] | select(.tag_name != null and .prerelease == false)] | sort_by(.created_at) | first.tag_name // empty')
   else
-    version=$(echo "$json_response" | jq -r "[${filter}] | first.tag_name // empty")
+    version=$(echo "$json_response" \
+      | jq -r '[.[] | select(.tag_name != null and .prerelease == false)] | sort_by(.created_at) | reverse | first.tag_name // empty')
   fi
 
-  if [[ -z "$version" ]]; then
-    msg "Failed to fetch release version for repository: $repo"
+  # Get prerelease version if requested
+  if [[ $include_prereleases -eq 1 ]]; then
+    if [[ $oldest_release -eq 1 ]]; then
+      prerelease_version=$(echo "$json_response" \
+        | jq -r '[.[] | select(.tag_name != null and .prerelease == true)] | sort_by(.created_at) | first.tag_name // empty')
+    else
+      prerelease_version=$(echo "$json_response" \
+        | jq -r '[.[] | select(.tag_name != null and .prerelease == true)] | sort_by(.created_at) | reverse | first.tag_name // empty')
+    fi
+  fi
+
+  # Error if no releases found and we're not in combined mode
+  if [[ -z $version && -z $prerelease_version && $COMBINED -eq 0 ]]; then
+    echo "No releases found for repository: $repo" >&2
     exit 1
   fi
 
-  echo "$version"
+  # Return both values for combined output
+  if [[ $COMBINED -eq 1 ]]; then
+    echo "$version"
+    echo "$prerelease_version"
+  else
+    # Return prerelease if specifically requested, otherwise stable
+    if [[ $include_prereleases -eq 1 && -n $prerelease_version ]]; then
+      msg "Found prerelease version: $prerelease_version"
+      echo "$prerelease_version"
+    else
+      msg "Found stable release version: $version"
+      echo "$version"
+    fi
+  fi
 }
 
 # Fetches the latest tag from the specified branch
@@ -130,16 +315,42 @@ get_latest_branch_tag()
   msg "Fetching latest tag for branch '$branch' from: $api_url"
 
   local json_response
-  json_response=$(curl -sSL "$api_url")
+  json_response=$(api_request "$api_url")
 
   local version
-  version=$(echo "$json_response" | jq -r "[.[] | select(.ref | contains(\"refs/tags/$branch\"))] | last.ref | sub(\"refs/tags/\"; \"\") // empty")
+  version=$(echo "$json_response" \
+    | jq -r "[.[] | select(.ref | contains(\"refs/tags/$branch\"))] | sort_by(.ref) | reverse | first.ref | sub(\"refs/tags/\"; \"\") // empty")
 
-  if [[ -z "$version" ]]; then
-    msg "Failed to fetch latest tag for branch: $branch"
+  if [[ -z $version && $COMBINED -eq 0 ]]; then
+    echo "No tags found for branch: $branch in repository: $repo" >&2
     exit 1
   fi
 
+  msg "Found branch tag: $version"
+  echo "$version"
+}
+
+# Fetches the latest Git tag (regardless of branch)
+get_latest_git_tag()
+{
+  local repo="$1"
+  local api_url="${GITHUB_API_URL}/${repo}/git/refs/tags"
+
+  msg "Fetching latest Git tag from: $api_url"
+
+  local json_response
+  json_response=$(api_request "$api_url")
+
+  local version
+  version=$(echo "$json_response" \
+    | jq -r '[.[] | select(.ref | startswith("refs/tags/"))] | sort_by(.ref) | reverse | first.ref | sub("refs/tags/"; "") // empty')
+
+  if [[ -z $version && $COMBINED -eq 0 ]]; then
+    echo "No Git tags found in repository: $repo" >&2
+    exit 1
+  fi
+
+  msg "Found Git tag: $version"
   echo "$version"
 }
 
@@ -153,42 +364,240 @@ get_latest_commit()
   msg "Fetching latest commit SHA from: $api_url"
 
   local json_response
-  json_response=$(curl -sSL "$api_url")
+  json_response=$(api_request "$api_url")
 
   local sha
   sha=$(echo "$json_response" | jq -r '.sha // empty')
 
-  if [[ -z "$sha" ]]; then
-    msg "Failed to fetch latest commit SHA for branch: $branch"
+  if [[ -z $sha && $COMBINED -eq 0 ]]; then
+    echo "Failed to fetch latest commit SHA for branch: $branch in repository: $repo" >&2
     exit 1
   fi
 
+  msg "Found commit SHA: $sha"
   echo "$sha"
 }
 
+# Format combined text output
+format_combined_text()
+{
+  local repo="$1"
+  local branch="$2"
+  local tag="$3"
+  local commit="$4"
+  local release="$5"
+  local prerelease="$6"
+
+  echo "Repository: $repo"
+
+  if [[ -n $branch ]]; then
+    echo "Branch:     $branch"
+  fi
+
+  if [[ -n $tag ]]; then
+    echo "Git Tag:    $tag"
+  fi
+
+  if [[ -n $commit ]]; then
+    echo "Commit:     $commit"
+  fi
+
+  if [[ -n $prerelease ]]; then
+    echo "Prerelease: $prerelease"
+  fi
+
+  if [[ -n $release ]]; then
+    echo "Release:    $release"
+  fi
+}
+
+# Format combined JSON output
+format_combined_json()
+{
+  local repo="$1"
+  local branch="$2"
+  local tag="$3"
+  local commit="$4"
+  local release="$5"
+  local prerelease="$6"
+
+  local json="{"
+  json+="\"repository\":\"$repo\""
+
+  if [[ -n $branch ]]; then
+    json+=",\"branch\":\"$branch\""
+  fi
+
+  if [[ -n $tag ]]; then
+    json+=",\"tag\":\"$tag\""
+  fi
+
+  if [[ -n $commit ]]; then
+    json+=",\"commit\":\"$commit\""
+  fi
+
+  if [[ -n $prerelease ]]; then
+    json+=",\"prerelease\":\"$prerelease\""
+  fi
+
+  if [[ -n $release ]]; then
+    json+=",\"release\":\"$release\""
+  fi
+
+  json+="}"
+
+  echo "$json"
+}
+
+# Parse command line arguments
+parse_arguments()
+{
+  # If no arguments provided, show usage
+  if [[ $# -eq 0 ]]; then
+    usage
+  fi
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help)
+        SHOW_HELP=1
+        shift
+        ;;
+      -v | --verbose)
+        VERBOSE=1
+        shift
+        ;;
+      -p | --prereleases)
+        INCLUDE_PRERELEASES=1
+        shift
+        ;;
+      -o | --oldest)
+        OLDEST_RELEASE=1
+        shift
+        ;;
+      -b | --branch)
+        if [[ $# -lt 2 ]]; then
+          echo "Error: --branch option requires a branch name" >&2
+          exit 1
+        fi
+        BRANCH="$2"
+        shift 2
+        ;;
+      -c | --commit)
+        LATEST_COMMIT=1
+        shift
+        ;;
+      -t | --tag)
+        LATEST_TAG=1
+        shift
+        ;;
+      -j | --json)
+        OUTPUT="json"
+        shift
+        ;;
+      -a | --all)
+        COMBINED=1
+        shift
+        ;;
+      -*)
+        echo "Error: Unknown option: $1" >&2
+        usage
+        ;;
+      *)
+        # If repository is already set, this is an error
+        if [[ -n $REPOSITORY ]]; then
+          echo "Error: Unexpected argument: $1" >&2
+          usage
+        fi
+        REPOSITORY="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate that we have a repository
+  if [[ -z $REPOSITORY && $SHOW_HELP -eq 0 ]]; then
+    echo "Error: Repository argument is required" >&2
+    usage
+  fi
+}
+
 # Main function
-# $1 - GitHub repository (string)
 main()
 {
-  if [[ $# -ne 1 ]]; then
+  # Parse command line arguments
+  parse_arguments "$@"
+
+  # Show help if requested
+  if [[ $SHOW_HELP -eq 1 ]]; then
     usage
   fi
 
   check_dependencies
 
-  local repo="$1"
-  local result
+  # Check rate limits before making other API calls
+  check_rate_limits
 
-  if [[ "${LATEST_COMMIT:-0}" -eq 1 ]]; then
-    result=$(get_latest_commit "$repo")
-  elif [[ -n "${BRANCH:-}" ]]; then
-    result=$(get_latest_branch_tag "$repo")
-  else
-    result=$(get_release_version "$repo")
+  # Validate repository existence and get normalized repository name
+  local repo_fullname
+  repo_fullname=$(check_repository "$REPOSITORY")
+
+  # If --all specified, get all information types
+  if [[ $COMBINED -eq 1 ]]; then
+    local branch="${BRANCH:-main}"
+    local git_tag=""
+    local commit_sha=""
+    local release_version=""
+    local prerelease_version=""
+
+    # Get Git tag if requested
+    git_tag=$(get_latest_git_tag "$repo_fullname")
+
+    # Get commit SHA
+    commit_sha=$(get_latest_commit "$repo_fullname")
+
+    # Get release versions (stable and prerelease)
+    read -r release_version prerelease_version < <(get_release_version "$repo_fullname")
+
+    # Format output based on selected format
+    if [[ $OUTPUT == "json" ]]; then
+      format_combined_json \
+        "$repo_fullname" \
+        "$branch" \
+        "$git_tag" \
+        "$commit_sha" \
+        "$release_version" \
+        "$prerelease_version"
+    else
+      format_combined_text \
+        "$repo_fullname" \
+        "$branch" \
+        "$git_tag" \
+        "$commit_sha" \
+        "$release_version" \
+        "$prerelease_version"
+    fi
+
+    exit 0
   fi
 
-  if [[ "${OUTPUT:-text}" == "json" ]]; then
-    echo "{\"repository\": \"$repo\", \"result\": \"$result\"}"
+  # Not combined mode - get only the requested information type
+  local result=""
+
+  if [[ $LATEST_COMMIT -eq 1 ]]; then
+    result=$(get_latest_commit "$repo_fullname")
+  elif [[ $LATEST_TAG -eq 1 ]]; then
+    result=$(get_latest_git_tag "$repo_fullname")
+  elif [[ -n $BRANCH ]]; then
+    result=$(get_latest_branch_tag "$repo_fullname")
+  else
+    result=$(get_release_version "$repo_fullname")
+  fi
+
+  # Output the result in the requested format
+  if [[ $OUTPUT == "json" ]]; then
+    echo "{\"repository\": \"$repo_fullname\", \"result\": \"$result\"}"
   else
     echo "$result"
   fi
