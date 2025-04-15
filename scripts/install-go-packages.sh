@@ -11,8 +11,8 @@ msgr run "Installing go packages"
 
 ! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
 
-[[ -z "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]] && \
-  ASDF_GOLANG_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/golang-packages"
+[[ -z "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]] \
+  && ASDF_GOLANG_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/golang-packages"
 
 # Packages are defined in $DOTFILES/config/asdf/golang-packages, one per line
 # Skip comments and empty lines
