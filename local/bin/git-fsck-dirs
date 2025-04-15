@@ -10,42 +10,116 @@ set -euo pipefail
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
+DEBUG="${DEBUG:-0}"
+
+if [ "$DEBUG" -eq 1 ]; then
+  set -x
+fi
 
 # Function to print messages if VERBOSE is enabled
 # $1 - message (string)
 msg()
 {
-  [ "$VERBOSE" -eq 1 ] && echo "$1"
+  if [ "$VERBOSE" -eq 1 ]; then
+    echo "$1"
+  fi
+  return 0
+}
+
+# Show red error message
+# $1 - message (string)
+msg_err()
+{
+  echo "$(tput setaf 1)Error: $1$(tput sgr0)"
 }
 
 # Function to perform git fsck on a repository
 # $1 - directory (string)
 fsck_repo()
 {
-  local dir=$1
-  msg "Processing dir: $dir"
-  (
-    cd "$dir" || exit 1
-    if [ -d ".git" ]; then
-      git fsck --no-dangling --full --no-progress
-      echo ""
-    fi
-  )
+  local dir dirs collected_errors collected_repos
+  dir="$(realpath "$1")"
+  collected_errors="$2"
+  collected_repos="$3"
+
+  msg "Processing: $dir"
+
+  if [ ! -d "$dir/.git" ]; then
+    echo "$dir" >> "$collected_errors"
+    msg "  (!) Skipping (no .git)"
+    return
+  fi
+
+  echo "$dir" >> "$collected_repos"
+
+  if ! git -C "$dir" fsck --no-dangling --full --no-progress 2>&1 | grep -vE '^notice:'; then
+    echo "$dir" >> "$collected_errors"
+    msg "  (!) Issues found in: $dir"
+  fi
 }
 
 # Main function
 main()
 {
-  local starting_path=${1:-$(pwd)}
-  local dirs
+  local starting_path errors_file repo_count_file dirs dirs_count REPO_COUNT ERROR_COUNT
+
+  starting_path=${1:-$(pwd)}
+  errors_file="${2:-/tmp/git-fsck-errors.txt}"
+  repo_count_file="${3:-/tmp/git-fsck-repo-count.txt}"
+
+  # If starting_point=. or starting_point=.., set it to the current directory
+  if [ "$starting_path" = "." ]; then
+    starting_path="$(pwd)"
+  elif [ "$starting_path" = ".." ]; then
+    starting_path="$(dirname "$(pwd)")"
+  fi
+
+  # Check if starting_path exists
+  if [ ! -d "$starting_path" ]; then
+    msg_err "Error: Directory '$starting_path' not found."
+    return 1
+  fi
+
+  # Collect the directories
   dirs=$(find "$starting_path" -mindepth 1 -maxdepth 1 -type d)
+  # Filter out unwanted directories
+  dirs=$(echo "$dirs" \
+    | grep -vE '^\./\.git$' \
+    | grep -vE '^\./\.svn$' \
+    | grep -vE '^\./\.hg$' \
+    | grep -vE '^\./\.bzr$')
+  # Count the directories for reporting and processing
+  dirs_count=$(echo "$dirs" | wc -l | tr -d ' ')
+
+  # If dirs_count is 0, exit early
+  if [ "$dirs_count" -eq 0 ]; then
+    msg_err "No directories found in $starting_path."
+    return 0
+  fi
+
+  echo "Checking $dirs_count directories in $starting_path..."
 
   for dir in $dirs; do
-    fsck_repo "$dir"
+    fsck_repo "$dir" "$errors_file" "$repo_count_file"
   done
 
+  # Collect the results and trim the output
+  REPO_COUNT=$(wc -l < "$repo_count_file" | tr -d ' ')
+  ERROR_COUNT=$(wc -l < "$errors_file" | tr -d ' ')
+
+  rm -f "$errors_file" "$repo_count_file"
+
   echo ""
-  echo "Done."
+  echo "Summary:"
+  echo "Checked $REPO_COUNT repositories from $dirs_count directories."
+  if [ "$ERROR_COUNT" -gt 0 ]; then
+    echo "Found issues in $ERROR_COUNT repositories."
+    return 1
+  else
+    echo "All repositories passed."
+    return 0
+  fi
 }
 
 main "$@"
+exit $?
