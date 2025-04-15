@@ -15,88 +15,1068 @@
 # The script automatically skips folders:
 #   node_modules, vendor
 #
+# Copyright Ismo Vuorinen (2023)
+# Licensed under the MIT License
+
+# More robust error handling
+set -o pipefail # Fail if any command in a pipe fails
+
 # SET Defaults:
 # Default dir to check, can be overridden in env (.bashrc, .zshrc, ...)
 : "${GIT_DIRTY_DIR:=$HOME/Code}"
+: "${VERBOSE:=0}"                                                            # Enable verbosity with VERBOSE=1
+: "${PARALLEL:=0}"                                                           # Enable parallel processing with PARALLEL=1
+: "${GIT_DIRTY_DEPTH:=5}"                                                    # How deep to show non-git directories
+: "${GIT_DIRTY_MAXDEPTH:=15}"                                                # Maximum recursion depth
+: "${GIT_DIRTY_CHECK_STASH:=0}"                                              # Whether to check if there are stashed changes
+: "${GIT_DIRTY_CHECK_UNTRACKED:=1}"                                          # Whether to report untracked files
+: "${GIT_DIRTY_EXCLUDE:=node_modules vendor .cache build dist .tests .test}" # Directories to exclude
+: "${GIT_DIRTY_COLOR:=1}"                                                    # Enable colorized output (0 to disable)
+: "${GIT_DIRTY_TRUNCATE:=1}"                                                 # Truncate paths to be relative to base dir
+: "${GIT_DIRTY_SHOW_BRANCH:=1}"                                              # Show current branch name after directory
+: "${GIT_DIRTY_MAIN_BRANCHES:=main master trunk}"                            # List of main branches, don't show names
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
+# Load configuration from file
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}/git-dirty/config"
+if [[ -f $config_file ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+fi
 
-# UTF-8 ftw
-GIT_DIRTY="❌ "
-GIT_CLEAN="✅ "
-
-# Function to print messages if VERBOSE is enabled
-# $1 - message (string)
-msg()
+# Check if colors should be enabled
+use_color()
 {
-  [ "$VERBOSE" -eq 1 ] && echo "$1"
+  [[ $GIT_DIRTY_COLOR -eq 1 && -t 1 ]]
 }
 
-# Function to handle errors
-catch()
+# Color printing function
+print_color()
 {
-  echo "Error $1 occurred on $2"
+  local color text
+  color="$1"
+  text="$2"
+
+  if use_color; then
+    printf "\033[%sm%s\033[0m" "$color" "$text"
+  else
+    printf "%s" "$text"
+  fi
+}
+
+# Define colored icons
+if use_color; then
+  GIT_CLEAN=$(print_color "32" "✅") # Green check mark
+  GIT_DIRTY=$(print_color "31" "❌") # Red X
+  NOT_GIT=$(print_color "33" "⚠️")  # Yellow warning
+  BRANCH_COLOR="35"                 # Purple for branch names
+  STATUS_COLOR="33"                 # Yellow for status codes
+else
+  GIT_CLEAN="✅"
+  GIT_DIRTY="❌"
+  NOT_GIT="⚠️"
+  BRANCH_COLOR=""
+  STATUS_COLOR=""
+fi
+
+# Global base directory (used for path truncation)
+BASE_DIR=""
+
+# Temporary file for storing results when not using parallel mode
+RESULTS_FILE=""
+
+# Keep track of directories that contain git repos
+declare -A DIR_HAS_REPOS
+
+# Record start time
+START_TIME=$(date +%s)
+
+# Logging functions
+log_error()
+{
+  print_color "31" "ERROR:" >&2
+  echo " $*" >&2
+}
+
+log_info()
+{
+  if [[ $VERBOSE -eq 1 ]]; then
+    print_color "36" "INFO:"
+    echo " $*"
+  fi
+}
+
+log_warn()
+{
+  print_color "33" "WARNING:" >&2
+  echo " $*" >&2
+}
+
+# Truncate a path to be relative to base directory
+truncate_path()
+{
+  local path
+  path="$1"
+
+  if [[ $GIT_DIRTY_TRUNCATE -eq 1 && -n $BASE_DIR && $path == "$BASE_DIR"* ]]; then
+    # First show the base dir only for the root
+    if [[ $path == "$BASE_DIR" ]]; then
+      echo "$path"
+    else
+      # For other paths, make them relative to base dir
+      echo "${path#"$BASE_DIR"/}"
+    fi
+  else
+    # If truncation is disabled, show full paths
+    echo "$path"
+  fi
+}
+
+# Check if a branch is a main branch
+is_main_branch()
+{
+  local branch
+  branch="$1"
+  for main in $GIT_DIRTY_MAIN_BRANCHES; do
+    if [[ $branch == "$main" ]]; then
+      return 0 # It's a main branch (exit code 0 means true in bash)
+    fi
+  done
+  return 1 # Not a main branch (exit code 1 means false in bash)
+}
+
+# Error handling function
+handle_error()
+{
+  local exit_code line_no
+  exit_code=$1
+  line_no=$2
+
+  case $exit_code in
+    1) log_error "General error at line $line_no" ;;
+    126) log_error "Command not executable at line $line_no" ;;
+    127) log_error "Command not found at line $line_no" ;;
+    128) log_error "Invalid argument to exit at line $line_no" ;;
+    130) log_info "Script terminated by Ctrl+C" ;;
+    139 | 11) log_error "Segmentation fault occurred at line $line_no" ;;
+    *) log_error "Unknown error $exit_code at line $line_no" ;;
+  esac
+}
+
+# Get current branch name
+get_branch_name()
+{
+  git symbolic-ref --short HEAD 2> /dev/null \
+    || git describe --tags --exact-match 2> /dev/null \
+    || git rev-parse --short HEAD 2> /dev/null \
+    || echo "detached"
+}
+
+# More comprehensive git status check
+check_git_status()
+{
+  local repo_path status branch
+  repo_path="$1"
+  status=""
+
+  # Check for dirty files (modified/staged)
+  git -C "$repo_path" diff --no-ext-diff --quiet 2> /dev/null || status+="M"
+  git -C "$repo_path" diff --no-ext-diff --cached --quiet 2> /dev/null || status+="S"
+
+  # Check for untracked files if enabled
+  if [[ $GIT_DIRTY_CHECK_UNTRACKED -eq 1 ]]; then
+    [[ -n $(git -C "$repo_path" ls-files --others --exclude-standard 2> /dev/null) ]] && status+="?"
+  fi
+
+  # Check for stashed changes if enabled
+  if [[ $GIT_DIRTY_CHECK_STASH -eq 1 ]]; then
+    [[ -f "$(git -C "$repo_path" rev-parse --git-dir 2> /dev/null)/refs/stash" ]] && status+="$"
+  fi
+
+  # Check for unpushed commits
+  branch=$(git -C "$repo_path" symbolic-ref --short HEAD 2> /dev/null)
+  if [[ -n $branch ]]; then
+    git -C "$repo_path" rev-list "@{u}".. --count 2> /dev/null \
+      | grep -q '^0$' 2> /dev/null \
+      || status+="↑"
+  fi
+
+  # Return the status
+  echo "$status"
+}
+
+# Function to check if a directory should be excluded
+should_exclude()
+{
+  local dir basename
+  dir="$1"
+  basename="${dir##*/}"
+
+  # Quick path for node_modules and vendor which are common
+  [[ $basename == "node_modules" || $basename == "vendor" ]] && return 0
+
+  # Check explicit exclude list
+  for exclude in $GIT_DIRTY_EXCLUDE; do
+    [[ $basename == "$exclude" ]] && return 0
+  done
+
+  # Check for ignore file - only if we're not already checking exclude patterns
+  [[ -e "$dir/.ignore" ]] && return 0
+
+  return 1
+}
+
+# Format a path for sorting to maintain tree structure
+# Add a special suffix to directory entries to ensure they appear first
+format_path_for_sorting()
+{
+  local path is_dir normalized
+
+  path="$1"
+  is_dir="$2" # 1 for directory, 0 for file/git repo
+
+  # Normalize path to use / separator and remove trailing slashes
+  normalized=$(echo "$path" | tr -s '/' | sed 's:/*$::')
+
+  # Add a suffix to control sort order - directories first
+  if [[ $is_dir -eq 1 ]]; then
+    echo "${normalized}/0" # Make directories come first in sort by adding '/0'
+  else
+    echo "${normalized}/1" # Regular git repos get '/1' suffix
+  fi
+}
+
+# Extract the basename of a path
+get_basename()
+{
+  local path
+  path="$1"
+  basename "$path"
+}
+
+# Format time duration in a human-readable way
+format_duration()
+{
+  local seconds minutes remaining_seconds
+  seconds=$1
+  minutes=$((seconds / 60))
+  remaining_seconds=$((seconds % 60))
+
+  if [[ $minutes -gt 0 ]]; then
+    echo "${minutes}m ${remaining_seconds}s"
+  else
+    echo "${seconds}s"
+  fi
+}
+
+# Mark a directory and all its parents as containing git repos
+mark_directory_with_repos()
+{
+  local dir path
+  dir="$1"
+  path="$dir"
+
+  while [[ $path != "$BASE_DIR" && $path != "/" && -n $path ]]; do
+    DIR_HAS_REPOS["$path"]=1
+    path=$(dirname "$path")
+  done
+
+  # Mark the base directory too
+  DIR_HAS_REPOS["$BASE_DIR"]=1
+}
+
+# Better output formatting with tree-like structure and saving to file
+print_result()
+{
+  local depth path icon status branch indent \
+    is_dir display_path basename_path sort_path \
+    output_line status_display
+
+  depth=$1
+  path=$2
+  icon=$3
+  status=$4
+  branch=$5
+  indent=$(printf "%*s" $((depth * 2)) "")
+  is_dir=0
+
+  # Only continue if this is a git repository or a container directory
+  if [[ $icon == "$NOT_GIT" && $VERBOSE -eq 0 && -z ${DIR_HAS_REPOS["$path"]} ]]; then
+    return
+  fi
+
+  # Mark as directory if it's not a git repo
+  if [[ $icon == "$NOT_GIT" ]]; then
+    is_dir=1
+  fi
+
+  # Truncate path if enabled
+  display_path=$(truncate_path "$path")
+
+  # For display, we only want the basename of the path
+  basename_path=$(get_basename "$display_path")
+
+  # For root node, use the full path
+  if [[ $path == "$BASE_DIR" ]]; then
+    basename_path="$display_path"
+  fi
+
+  # Format path for sorting - directories first
+  sort_path=$(format_path_for_sorting "$display_path" "$is_dir")
+
+  # Format output with status, branch name if available and enabled
+  if [[ $icon == "$NOT_GIT" ]]; then
+    # Non-git directory
+    output_line=$(printf "%s %s %s" "$indent" "$icon" "$basename_path")
+  elif [[ -z $status ]]; then
+    # Clean git repo
+    if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+      # Only show branch if it's not a main branch
+      if is_main_branch "$branch"; then
+        output_line=$(printf "%s %s %s" "$indent" "$icon" "$basename_path")
+      else
+        output_line=$(printf "%s %s %s %s" "$indent" "$icon" "$basename_path" "$(print_color "$BRANCH_COLOR" "($branch)")")
+      fi
+    else
+      output_line=$(printf "%s %s %s" "$indent" "$icon" "$basename_path")
+    fi
+  else
+    # Dirty git repo
+    status_display="$(print_color "$STATUS_COLOR" "[$status]")"
+    if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+      # Only show branch if it's not a main branch
+      if is_main_branch "$branch"; then
+        output_line=$(printf "%s %s %s %s" "$indent" "$icon" "$basename_path" "$status_display")
+      else
+        output_line=$(printf "%s %s %s %s %s" "$indent" "$icon" "$basename_path" "$status_display" "$(print_color "$BRANCH_COLOR" "($branch)")")
+      fi
+    else
+      output_line=$(printf "%s %s %s %s" "$indent" "$icon" "$basename_path" "$status_display")
+    fi
+  fi
+
+  # If we're collecting results for sorting, add to file with a path-based sorting key
+  if [[ -n $RESULTS_FILE ]]; then
+    echo "$sort_path:$output_line" >> "$RESULTS_FILE"
+  else
+    # Direct output
+    echo "$output_line"
+  fi
+}
+
+# Display sorted results from the results file
+display_sorted_results()
+{
+  if [[ -n $RESULTS_FILE && -f $RESULTS_FILE ]]; then
+    # Sort by path for proper tree hierarchy, with our special suffix ensuring directories come first
+    LC_ALL=C sort "$RESULTS_FILE" | cut -d: -f2- | sed 's/^://'
+    rm -f "$RESULTS_FILE"
+  fi
 }
 
 # Function to check the git status of a directory
 # $1 - directory (string)
+# $2 - depth (number, optional)
 git_dirty()
 {
-  local d="$1"
-  trap 'catch $? $LINENO' ERR
+  local d depth orig_dir status_text branch_name icon elapsed_time rate has_git_repos
 
-  if [[ -d "$d" ]]; then
-    if [[ -e "$d/.ignore" ]]; then
-      msg "Skipping ignored directory: $d"
-    else
-      # Check that $d is not '--', 'vendor', or 'node_modules'
-      if [[ "${d:0:2}" == "--" ]] || [[ "$d" == "vendor" ]] || [[ "$d" == "node_modules" ]]; then
-        msg "Skipping excluded directory: $d"
-      else
-        cd "$d" || exit
+  d="$1"
+  depth="${2:-0}"
+  orig_dir=$(pwd)
 
-        # If we have `.git` folder, check it.
-        if [[ -d ".git" ]]; then
-          GIT_IS_DIRTY=$(git diff --shortstat 2> /dev/null | tail -n1)
-          ICON="$GIT_CLEAN"
+  # Initialize a global counter for git repos if at root level
+  if [[ $depth -eq 0 ]]; then
+    GIT_REPO_COUNT=0
+    echo "Finding git repositories..."
 
-          [[ $GIT_IS_DIRTY != "" ]] && ICON="$GIT_DIRTY"
-
-          printf " %s %s\n" "$ICON" "$(pwd)"
-        else
-          # If it wasn't git repository, check subdirectories.
-          git_dirty_repos ./*
-        fi
-        cd - > /dev/null || exit
-      fi
+    # Create a temporary file for results if needed
+    if [[ -z $RESULTS_FILE ]]; then
+      RESULTS_FILE=$(mktemp)
     fi
+
+    # Reset the directory tracking
+    declare -g -A DIR_HAS_REPOS=()
+  fi
+
+  if [[ ! -d $d ]]; then
+    return
+  fi
+
+  # Check if directory should be excluded
+  if should_exclude "$d"; then
+    log_info "Skipping excluded directory: $d"
+    return
+  fi
+
+  # Check depth limit
+  if [[ $depth -gt $GIT_DIRTY_MAXDEPTH ]]; then
+    log_info "Max depth reached at $d"
+    return
+  fi
+
+  cd "$d" 2> /dev/null || {
+    log_warn "Cannot access $d"
+    return
+  }
+
+  # If we have `.git` folder, check it
+  if [[ -d ".git" ]]; then
+    GIT_REPO_COUNT=$((GIT_REPO_COUNT + 1))
+
+    # Mark this directory and all parent directories as containing repos
+    mark_directory_with_repos "$d"
+
+    # Get status and branch information
+    status_text=$(check_git_status "$d")
+    branch_name=$(get_branch_name)
+
+    # Determine icon based on status
+    if [[ -z $status_text ]]; then
+      icon="$GIT_CLEAN"
+    else
+      icon="$GIT_DIRTY"
+    fi
+
+    # Add to results
+    print_result "$depth" "$(pwd)" "$icon" "$status_text" "$branch_name"
+
+    # Show count when the repo count changes
+    if [[ $depth -eq 0 || $((GIT_REPO_COUNT % 5)) -eq 0 ]]; then
+      elapsed_time=$(($(date +%s) - START_TIME))
+      rate=$((GIT_REPO_COUNT > 0 && elapsed_time > 0 ? GIT_REPO_COUNT / elapsed_time : 0))
+      echo -ne "Found $GIT_REPO_COUNT git repositories... (${rate} repos/sec)\r"
+    fi
+  else
+    # Process all subdirectories recursively (sorted)
+    local subdirs=()
+    while IFS= read -r subdir; do
+      if [[ -d $subdir && ! -L $subdir ]]; then # Not a symlink
+        subdirs+=("$subdir")
+      fi
+    done < <(find . -mindepth 1 -maxdepth 1 -type d 2> /dev/null | LC_ALL=C sort)
+
+    # Process each subdirectory
+    has_git_repos=0
+    for subdir in "${subdirs[@]}"; do
+      local full_path
+      full_path="$d/${subdir#./}"
+      git_dirty "$full_path" $((depth + 1))
+
+      # Check if this subdirectory contains git repos
+      if [[ -n ${DIR_HAS_REPOS["$full_path"]} ]]; then
+        has_git_repos=1
+      fi
+    done
+
+    # After processing subdirectories, check if this directory contains repos
+    if [[ $has_git_repos -eq 1 || -n ${DIR_HAS_REPOS["$d"]} ]]; then
+      # This is a non-git directory but contains git repos - print it
+      print_result "$depth" "$d" "$NOT_GIT" "" ""
+    fi
+  fi
+
+  # Print final count when done with root scan
+  if [[ $depth -eq 0 ]]; then
+    echo -ne "                                                         \r" # Clear the progress line
+
+    # Display sorted results
+    display_sorted_results
+
+    local end_time elapsed_time formatted_time
+
+    # Calculate and display elapsed time
+    end_time=$(date +%s)
+    elapsed_time=$((end_time - START_TIME))
+    formatted_time=$(format_duration $elapsed_time)
+
+    # Show summary
+    echo -e "\nFound $GIT_REPO_COUNT git repositories in $formatted_time"
+  fi
+
+  cd "$orig_dir" || {
+    log_error "Failed to return to original directory"
+    exit 1
+  }
+}
+
+# Function to process directories in parallel
+process_in_parallel()
+{
+  local base_dir search_start_time
+  base_dir="$1"
+  search_start_time=$(date +%s)
+
+  echo "Finding git repositories..."
+
+  # Find all git repositories efficiently
+  local repos=()
+  declare -A repo_parents=()
+
+  while IFS= read -r repo; do
+    if [[ -d $repo ]]; then
+      repos+=("$repo")
+
+      # Track the parent directories for each repo
+      local parent
+      parent=$(dirname "$repo")
+      while [[ $parent != "$base_dir" && $parent != "/" ]]; do
+        repo_parents["$parent"]=1
+        parent=$(dirname "$parent")
+      done
+    fi
+  done < <(find "$base_dir" -type d -name ".git" -prune 2> /dev/null | sed 's/\/\.git$//')
+
+  local total search_time
+  total=${#repos[@]}
+  search_time=$(($(date +%s) - search_start_time))
+  echo "Found $total git repositories in $(format_duration $search_time)"
+
+  if [[ $total -eq 0 ]]; then
+    echo "No git repositories found in $base_dir"
+    return
+  fi
+
+  # Check if we have GNU parallel specifically
+  local have_gnu_parallel
+  have_gnu_parallel=0
+  if command -v parallel &> /dev/null; then
+    if parallel --version 2> /dev/null | grep -q "GNU parallel"; then
+      have_gnu_parallel=1
+      echo "Processing $total repositories using GNU parallel..."
+    else
+      echo "Non-GNU parallel detected (moreutils). Using manual parallelization..."
+    fi
+  else
+    echo "Parallel not found. Using manual parallelization..."
+  fi
+
+  local cores max_jobs processing_start_time
+
+  # Use max CPU cores but not more than 8
+  cores=$(sysctl -n hw.ncpu 2> /dev/null || nproc 2> /dev/null || echo 4)
+  max_jobs=$((cores > 8 ? 8 : cores))
+
+  processing_start_time=$(date +%s)
+
+  if [[ $have_gnu_parallel -eq 1 ]]; then
+    # GNU parallel approach
+    export -f check_git_status truncate_path print_color \
+      get_branch_name format_path_for_sorting get_basename is_main_branch
+    export GIT_DIRTY_TRUNCATE BASE_DIR GIT_CLEAN GIT_DIRTY \
+      GIT_DIRTY_CHECK_STASH GIT_DIRTY_CHECK_UNTRACKED \
+      GIT_DIRTY_SHOW_BRANCH GIT_DIRTY_MAIN_BRANCHES BRANCH_COLOR STATUS_COLOR
+
+    # Create a temporary file for results
+    local parallel_results
+    parallel_results=$(mktemp)
+
+    # Create a shell function for parallel to use
+    process_repo()
+    {
+      local repo
+      repo=$1
+      cd "$repo" 2> /dev/null || return
+
+      local status_text display_path basename_path branch rel_path depth indent
+      status_text=$(check_git_status "$repo")
+      display_path=$(truncate_path "$repo")
+      basename_path=$(get_basename "$display_path")
+      branch=$(get_branch_name)
+
+      # Calculate depth for proper indentation
+      rel_path="${repo#"$BASE_DIR"/}"
+      depth=$(echo "$rel_path" | tr -cd '/' | wc -c)
+      indent=$(printf "%*s" $((depth * 2)) "")
+
+      # Determine icon based on status
+      local icon
+      if [[ -z $status_text ]]; then
+        icon="$GIT_CLEAN"
+      else
+        icon="$GIT_DIRTY"
+      fi
+
+      # Format output with status and branch name if needed
+      local output
+      if [[ -z $status_text ]]; then
+        # Clean git repo
+        if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+          # Only show branch if it's not a main branch
+          if is_main_branch "$branch"; then
+            output="$indent $icon $basename_path"
+          else
+            output="$indent $icon $basename_path $(print_color "$BRANCH_COLOR" "($branch)")"
+          fi
+        else
+          output="$indent $icon $basename_path"
+        fi
+      else
+        # Dirty git repo
+        local status_display
+        status_display="$(print_color "$STATUS_COLOR" "[$status_text]")"
+        if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+          # Only show branch if it's not a main branch
+          if is_main_branch "$branch"; then
+            output="$indent $icon $basename_path $status_display"
+          else
+            output="$indent $icon $basename_path $status_display $(print_color "$BRANCH_COLOR" "($branch)")"
+          fi
+        else
+          output="$indent $icon $basename_path $status_display"
+        fi
+      fi
+
+      # Path-based sorting key for proper tree structure - append '/1' to make git repos come after directories
+      echo "$rel_path/1:$output"
+    }
+    export -f process_repo
+
+    parallel --bar -j "$max_jobs" process_repo ::: "${repos[@]}" > "$parallel_results"
+
+    # Process parent directories to ensure tree structure
+    for parent in "${!repo_parents[@]}"; do
+      local rel_path depth basename indent
+      rel_path="${parent#"$BASE_DIR"/}"
+      depth=$(echo "$rel_path" | tr -cd '/' | wc -c)
+      basename=$(get_basename "$parent")
+      indent=$(printf "%*s" $((depth * 2)) "")
+      # Append '/0' to make directories come before their contents
+      echo "$rel_path/0:$indent $NOT_GIT $basename" >> "$parallel_results"
+    done
+
+    # Also add the root directory (with empty sort key to put it first)
+    echo "/0:$NOT_GIT $BASE_DIR" >> "$parallel_results"
+
+    # Sort and display results - path-based sort for proper tree structure
+    LC_ALL=C sort "$parallel_results" | cut -d: -f2- | sed 's/^://'
+    rm -f "$parallel_results"
+  else
+    local temp_output progress_file running_file temp_files job_count
+
+    # Manual parallelization with progress bar
+    echo "Using $max_jobs parallel jobs..."
+
+    # Use temp files to collect results and track progress
+    temp_output=$(mktemp)
+    progress_file=$(mktemp)
+    echo "0" > "$progress_file" # Initialize progress counter
+
+    # To track if we're running or should stop
+    running_file=$(mktemp)
+    echo "1" > "$running_file" # 1 means running, 0 means stop
+
+    # Store temp files for cleanup in trap
+    temp_files=("$temp_output" "$progress_file" "$running_file")
+
+    # Cleanup function
+    cleanup()
+    {
+      echo -e "\nCleaning up..."
+      echo "0" > "$running_file" # Signal progress bar to stop
+
+      # Kill all background processes in our process group
+      # We use SIGTERM to allow processes to clean up
+      pkill -P $$ TERM 2> /dev/null || true
+
+      # Clean up temp files
+      for file in "${temp_files[@]}"; do
+        [[ -f $file ]] && rm -f "$file"
+      done
+
+      # Clear the line and restore cursor
+      echo -ne "\r\033[K"
+
+      exit 1
+    }
+
+    # Set up trap to catch CTRL+C and other termination signals
+    trap cleanup INT TERM HUP
+
+    # Progress bar function
+    update_progress()
+    {
+      local current total width percent completed elapsed rate eta
+
+      current=$1
+      total=$2
+      width=50 # width of the progress bar
+      percent=$((current * 100 / total))
+      completed=$((width * current / total))
+      elapsed=$(($(date +%s) - processing_start_time))
+      rate=$((current > 0 && elapsed > 0 ? current / elapsed : 0))
+      eta=$((rate > 0 ? (total - current) / rate : 0))
+
+      # Create the progress bar
+      local bar="["
+      for ((i = 0; i < completed; i++)); do bar+="="; done
+      if [[ $completed -lt $width ]]; then bar+=">" && ((completed++)); fi
+      for ((i = completed; i < width; i++)); do bar+=" "; done
+      bar+="]"
+
+      # Print the progress bar with ETA
+      printf "\r%s %d/%d (%d%%) %d repos/s ETA: %s" \
+        "$bar" "$current" "$total" "$percent" "$rate" "$(format_duration $eta)"
+    }
+
+    # Process repositories with progress tracking
+    job_count=0
+
+    # Start a background process to update the progress bar
+    (
+      while true; do
+        sleep 0.2 # Update every 0.2 seconds
+        # Check if we should continue running
+        if [[ -f $running_file && "$(cat "$running_file")" == "1" ]]; then
+          if [[ -f $progress_file ]]; then
+            local progress
+            progress=$(cat "$progress_file")
+            update_progress "$progress" "$total"
+
+            # Exit when we reach the total
+            if [[ $progress -ge $total ]]; then
+              break
+            fi
+          fi
+        else
+          # Stop if signaled to do so
+          break
+        fi
+      done
+
+      # Clear the line when done
+      echo -ne "\r\033[K"
+
+      # Show completion message only if we finished normally
+      if [[ -f $progress_file ]]; then
+        local final_progress
+        final_progress=$(cat "$progress_file")
+        if [[ $final_progress -ge $total ]]; then
+          echo "Processing complete!"
+        fi
+      fi
+    ) &
+    local progress_pid
+    progress_pid=$!
+
+    # Process repositories
+    for repo in "${repos[@]}"; do
+      # Check if we should continue
+      if [[ "$(cat "$running_file")" != "1" ]]; then
+        break
+      fi
+
+      (
+        cd "$repo" 2> /dev/null || exit
+
+        local status_text branch icon display_path depth indent basename_path
+
+        # Get status and branch information
+        status_text=""
+
+        # Check for modified files
+        git diff --quiet 2> /dev/null || status_text+="M"
+
+        # Check for staged changes
+        git diff --cached --quiet 2> /dev/null || status_text+="S"
+
+        # Check for untracked files
+        if [[ $GIT_DIRTY_CHECK_UNTRACKED -eq 1 ]]; then
+          [[ -n $(git ls-files --others --exclude-standard 2> /dev/null | head -1) ]] && status_text+="?"
+        fi
+
+        # Check for stashed changes
+        if [[ $GIT_DIRTY_CHECK_STASH -eq 1 ]]; then
+          [[ -f "$(git rev-parse --git-dir 2> /dev/null)/refs/stash" ]] && status_text+="$"
+        fi
+
+        # Check for unpushed commits
+        eval "git rev-list @{u}.. --count" 2> /dev/null \
+          | grep -q '^0$' 2> /dev/null || status_text+="↑"
+
+        # Get branch name
+        branch=$(get_branch_name)
+
+        # Determine icon based on status
+        if [[ -z $status_text ]]; then
+          icon="$GIT_CLEAN"
+        else
+          icon="$GIT_DIRTY"
+        fi
+
+        # Get path for display
+        if [[ $GIT_DIRTY_TRUNCATE -eq 1 ]]; then
+          display_path="${repo#"$BASE_DIR"/}"
+        else
+          display_path="$repo"
+        fi
+
+        # Calculate depth for indentation
+        depth=$(echo "$display_path" | tr -cd '/' | wc -c)
+        indent=$(printf "%*s" $((depth * 2)) "")
+
+        # Get basename for display
+        basename_path=$(get_basename "$display_path")
+
+        # Generate output with branch info if enabled
+        if [[ -z $status_text ]]; then
+          # Clean repo
+          if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+            # Only show branch if it's not a main branch
+            if is_main_branch "$branch"; then
+              echo "$display_path/1:$indent $icon $basename_path" >> "$temp_output"
+            else
+              echo "$display_path/1:$indent $icon $basename_path $(print_color "$BRANCH_COLOR" "($branch)")" >> "$temp_output"
+            fi
+          else
+            echo "$display_path/1:$indent $icon $basename_path" >> "$temp_output"
+          fi
+        else
+          # Dirty repo with status
+          local status_display
+          status_display="$(print_color "$STATUS_COLOR" "[$status_text]")"
+          if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 && -n $branch ]]; then
+            # Only show branch if it's not a main branch
+            if is_main_branch "$branch"; then
+              echo "$display_path/1:$indent $icon $basename_path $status_display" \
+                >> "$temp_output"
+            else
+              local b
+              b=$(print_color "$BRANCH_COLOR" "($branch)")
+              echo "$display_path/1:$indent $icon $basename_path $status_display $b" \
+                >> "$temp_output"
+            fi
+          else
+            echo "$display_path/1:$indent $icon $basename_path $status_display" \
+              >> "$temp_output"
+          fi
+        fi
+
+        # Update progress atomically
+        local current_progress
+        current_progress=$(cat "$progress_file")
+        echo $((current_progress + 1)) > "$progress_file"
+      ) &
+
+      # Control the number of parallel jobs
+      ((job_count++))
+      if ((job_count >= max_jobs)); then
+        wait -n
+        ((job_count--))
+      fi
+    done
+
+    # Wait for all remaining jobs to finish
+    wait
+
+    # Signal progress bar to stop and wait for it to finish
+    echo "0" > "$running_file"
+    wait $progress_pid 2> /dev/null
+
+    # Add parent directories to the output for tree structure
+    for parent in "${!repo_parents[@]}"; do
+      local rel_path depth indent basename_path
+
+      rel_path="${parent#"$BASE_DIR"/}"
+      depth=$(echo "$rel_path" | tr -cd '/' | wc -c)
+      indent=$(printf "%*s" $((depth * 2)) "")
+      basename_path=$(get_basename "$rel_path")
+      echo "$rel_path/0:$indent $NOT_GIT $basename_path" >> "$temp_output"
+    done
+
+    # Add root directory (with special path to ensure it comes first)
+    echo "/0:$NOT_GIT $BASE_DIR" >> "$temp_output"
+
+    # Display the results in sorted order
+    if [[ -f $temp_output ]]; then
+      LC_ALL=C sort "$temp_output" | cut -d: -f2-
+    fi
+
+    # Clean up temp files
+    for file in "${temp_files[@]}"; do
+      [[ -f $file ]] && rm -f "$file"
+    done
+
+    # Remove the trap since we're done
+    trap - INT TERM HUP
+  fi
+
+  # Calculate and show total processing time
+  local total_time processing_time dur runtime
+
+  total_time=$(($(date +%s) - START_TIME))
+  processing_time=$(($(date +%s) - processing_start_time))
+  dur=$(format_duration $processing_time)
+  runtime=$(format_duration $total_time)
+
+  echo -e "\nProcessed $total repositories in $dur (Total runtime: $runtime)"
+}
+
+check_directory_with_progress()
+{
+  local dir
+  dir="$1"
+  # Simple forward to git_dirty which will count as it goes
+  git_dirty "$dir" 0
+}
+
+# Cleanup function to remove temporary files
+cleanup_temp_files()
+{
+  if [[ -n $RESULTS_FILE && -f $RESULTS_FILE ]]; then
+    rm -f "$RESULTS_FILE"
   fi
 }
 
-# Function to check git status for multiple directories
-# $@ - directories
-git_dirty_repos()
+# Show help
+show_help()
 {
-  for x in "$@"; do
-    git_dirty "$x"
-  done
+  local bin
+  bin=$(basename "$0")
+  cat << EOF
+Usage: $bin [OPTIONS] [DIRECTORY]
+
+Recursively check git repository status
+
+Options:
+  -h           Show this help message and exit
+  -d NUM       Set maximum depth for showing non-git directories (default: $GIT_DIRTY_DEPTH)
+  -p           Process directories in parallel (requires 'parallel' command)
+  -v           Enable verbose output
+  -a           Show all status details (stash, untracked, etc.)
+  -e PATTERNS  Additional patterns to exclude (comma separated)
+  -m NUM       Set maximum recursion depth (default: $GIT_DIRTY_MAXDEPTH)
+  -c           Toggle colorized output (currently: $(use_color && echo "on" || echo "off"))
+  -t           Toggle path truncation (currently: $([[ $GIT_DIRTY_TRUNCATE -eq 1 ]] && echo "on" || echo "off"))
+  -b           Toggle branch name display (currently: $([[ $GIT_DIRTY_SHOW_BRANCH -eq 1 ]] && echo "on" || echo "off"))
+
+Status indicators:
+  M = Modified files
+  S = Staged changes
+  ? = Untracked files (with -a)
+  $ = Stashed changes (with -a)
+  ↑ = Unpushed commits
+
+Example:
+  $bin ~/Projects
+  $bin -d 3 -e 'build,dist' ~/Code
+EOF
 }
 
 # Main function
 main()
 {
-  # If user has provided folder as a first argument, use it.
-  if [ "${1:-}" != "" ]; then
+  # Set up trap for error handling
+  trap 'handle_error $? $LINENO' ERR
+  trap 'cleanup_temp_files' EXIT
+
+  # Parse command line options - cross-platform way
+  while getopts "hvpacbd:e:m:t" opt; do
+    case $opt in
+      h)
+        show_help
+        exit 0
+        ;;
+      v)
+        VERBOSE=1
+        ;;
+      p)
+        PARALLEL=1
+        ;;
+      a)
+        GIT_DIRTY_CHECK_STASH=1
+        GIT_DIRTY_CHECK_UNTRACKED=1
+        ;;
+      c)
+        # Toggle color
+        [[ $GIT_DIRTY_COLOR -eq 1 ]] && GIT_DIRTY_COLOR=0 || GIT_DIRTY_COLOR=1
+        ;;
+      b)
+        # Toggle branch display
+        [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 ]] && GIT_DIRTY_SHOW_BRANCH=0 || GIT_DIRTY_SHOW_BRANCH=1
+        ;;
+      t)
+        # Toggle truncation
+        [[ $GIT_DIRTY_TRUNCATE -eq 1 ]] && GIT_DIRTY_TRUNCATE=0 || GIT_DIRTY_TRUNCATE=1
+        ;;
+      d)
+        GIT_DIRTY_DEPTH="$OPTARG"
+        ;;
+      m)
+        GIT_DIRTY_MAXDEPTH="$OPTARG"
+        ;;
+      e)
+        IFS=',' read -ra EXCLUDE_ARRAY <<< "$OPTARG"
+        for item in "${EXCLUDE_ARRAY[@]}"; do
+          GIT_DIRTY_EXCLUDE="$GIT_DIRTY_EXCLUDE $item"
+        done
+        ;;
+      \?)
+        log_error "Invalid option: -$OPTARG"
+        show_help
+        exit 1
+        ;;
+      :)
+        log_error "Option -$OPTARG requires an argument."
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+
+  # Remove processed options
+  shift $((OPTIND - 1))
+
+  # If user has provided folder as a first argument, use it
+  if [[ -n $1 ]]; then
     GIT_DIRTY_DIR="$1"
   fi
 
-  trap 'case $? in
-            139) echo "segfault occurred";;
-            11) echo "segfault occurred";;
-          esac' EXIT
+  if [[ $GIT_DIRTY_DIR == "." ]]; then
+    GIT_DIRTY_DIR="$(pwd)"
+  fi
 
-  git_dirty_repos "$GIT_DIRTY_DIR"
+  # Expand path if it contains tilde
+  GIT_DIRTY_DIR="${GIT_DIRTY_DIR/#\~/$HOME}"
+
+  # Set base directory for path truncation
+  BASE_DIR="$(cd "$GIT_DIRTY_DIR" && pwd)"
+
+  # Verify the directory exists
+  if [[ ! -d $GIT_DIRTY_DIR ]]; then
+    log_error "Directory does not exist: $GIT_DIRTY_DIR"
+    exit 1
+  fi
+
+  # Update color variables after possible toggle
+  if use_color; then
+    GIT_CLEAN=$(print_color "32" "✅")
+    GIT_DIRTY=$(print_color "31" "❌")
+    NOT_GIT=$(print_color "33" "⚠️")
+    BRANCH_COLOR="35"
+    STATUS_COLOR="33"
+  else
+    GIT_CLEAN="✅"
+    GIT_DIRTY="❌"
+    NOT_GIT="⚠️"
+    BRANCH_COLOR=""
+    STATUS_COLOR=""
+  fi
+
+  echo "Checking repositories in: $GIT_DIRTY_DIR"
+  echo "Legend: $GIT_CLEAN Clean repo | $GIT_DIRTY Dirty repo"
+  if [[ $GIT_DIRTY_SHOW_BRANCH -eq 1 ]]; then
+    echo "Showing non-standard branches (hiding ${GIT_DIRTY_MAIN_BRANCHES})"
+  fi
+  echo "---------------------------------------------------------"
+
+  # Use parallel processing if enabled and available
+  if [[ $PARALLEL -eq 1 ]]; then
+    process_in_parallel "$GIT_DIRTY_DIR"
+  else
+    # Use progress indicator for large directories
+    check_directory_with_progress "$GIT_DIRTY_DIR"
+  fi
 }
 
+# Run the main function
 main "$@"
