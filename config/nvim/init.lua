@@ -28,10 +28,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- ── Add ~/.local/bin to the PATH ────────────────────────────────────
-vim.fn.setenv(
-  'PATH',
-  vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH'
-)
+vim.fn.setenv('PATH', vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH')
 
 require 'options'
 require 'autogroups'
@@ -68,4 +65,4 @@ require('lazy').setup(
 
 require 'keymaps'
 
--- vim: ts=2 sts=2 sw=2 et
+-- vim: set ts=2 sts=2 sw=2 wrap et :

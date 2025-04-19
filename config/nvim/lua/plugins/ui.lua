@@ -1,17 +1,8 @@
 return {
-  -- https://github.com/rmehri01/onenord.nvim
   {
     'rmehri01/onenord.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    opts = {
-      borders = true,
-      fade_nc = true,
-      disable = {
-        float_background = true,
-      },
-    },
+    opts = {},
   },
-
   -- Automatic dark mode
   -- https://github.com/f-person/auto-dark-mode.nvim
   {
@@ -33,6 +24,7 @@ return {
   -- https://github.com/catgoose/nvim-colorizer.lua
   {
     'catgoose/nvim-colorizer.lua',
+    event = 'BufReadPre',
     opts = {
       user_default_options = {
         names = false,
@@ -40,13 +32,27 @@ return {
     },
   },
 
-  -- A neovim plugin that shows colorcolumn dynamically
-  -- https://github.com/Bekaboo/deadcolumn.nvim
-  { 'Bekaboo/deadcolumn.nvim' },
-
   -- Remove all background colors to make nvim transparent
   -- https://github.com/xiyaowong/nvim-transparent
-  { 'xiyaowong/nvim-transparent', opts = {} },
+  {
+    'xiyaowong/nvim-transparent',
+    lazy = false,
+    config = function()
+      local t = require 'transparent'
+      t.setup {
+        extra_groups = {
+          'NormalNC',
+          'NormalFloat',
+          'FloatBorder',
+          'TelescopeBorder',
+          'TelescopePromptBorder',
+          'TelescopeResultsBorder',
+          'TelescopePreviewBorder',
+        },
+      }
+      t.clear_prefix 'NeoTree'
+    end,
+  },
 
   -- Display a character as the colorcolumn
   -- https://github.com/lukas-reineke/virt-column.nvim

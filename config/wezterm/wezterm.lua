@@ -6,7 +6,7 @@ config.set_environment_variables = {
 }
 
 -- Font and font size
-config.font_size = 14.0
+config.font_size = 14.5
 config.font = wezterm.font_with_fallback {
   {
     family = 'Operator Mono',
@@ -20,7 +20,7 @@ config.font = wezterm.font_with_fallback {
 config.harfbuzz_features = { 'zero', 'ss01', 'cv05' }
 
 -- Make the window a bit transparent
-config.window_background_opacity = 0.98
+config.window_background_opacity = 0.96
 
 -- Don't show tab bar
 config.enable_tab_bar = false

@@ -77,10 +77,8 @@ function M.setup(opts)
     -- Set vim.g.node_host_prog and vim.g.copilot_node_command
     local current_nvm_version_path =
       string.format('%s/versions/node/%s', nvm_path, node_version)
-    local current_nvm_node_bin_path =
-      string.format('%s/bin', current_nvm_version_path)
-    local current_nvm_node_bin =
-      string.format('%s/node', current_nvm_node_bin_path)
+    local current_nvm_node_bin_path = string.format('%s/bin', current_nvm_version_path)
+    local current_nvm_node_bin = string.format('%s/node', current_nvm_node_bin_path)
     local neovim_node_host_bin_path =
       string.format('%s/neovim-node-host', current_nvm_node_bin_path)
 

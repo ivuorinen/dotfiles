@@ -40,6 +40,7 @@ node_modules
 ssh/local.d/*
 !ssh/local.d/.gitkeep
 config/fish/fish_variables
+**/exports.secret.fish
 **/exports-secret.fish
 config/fish/completions/asdf.fish
 config/vim/.netrwhist

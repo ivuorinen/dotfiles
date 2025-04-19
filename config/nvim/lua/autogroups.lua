@@ -21,9 +21,7 @@ autocmd({ 'BufEnter', 'BufWinEnter', 'TabEnter' }, {
   callback = function()
     local max_line_count = vim.fn.line '$'
     -- Only adjust if the file is large enough to matter
-    if max_line_count > 99 then
-      vim.opt.numberwidth = #tostring(max_line_count) + 1
-    end
+    if max_line_count > 99 then vim.opt.numberwidth = #tostring(max_line_count) + 1 end
   end,
 })
 
@@ -104,5 +102,3 @@ autocmd({ 'BufRead', 'BufNewFile' }, {
   },
   command = 'set filetype=sshconfig',
 })
-
--- vim: ts=2 sts=2 sw=2 et

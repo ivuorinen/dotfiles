@@ -1,5 +1,3 @@
--- vim: set ft=lua ts=2 sw=2 tw=0 et cc=130 :
-
 require 'utils'
 
 -- ╭─────────────────────────────────────────────────────────╮
@@ -20,16 +18,8 @@ K.n('<C-w>+', ':resize +10<CR>', { desc = 'H Resize +' })
 K.n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- ── Deal with word wrap ─────────────────────────────────────────────
-K.n(
-  'k',
-  "v:count == 0 ? 'gk' : 'k'",
-  { desc = 'Move up', noremap = true, expr = true }
-)
-K.n(
-  'j',
-  "v:count == 0 ? 'gj' : 'j'",
-  { desc = 'Move down', noremap = true, expr = true }
-)
+K.n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
+K.n('j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Move down', noremap = true, expr = true })
 
 -- ── Text manipulation ───────────────────────────────────────────────
 K.d('<', { 'n', 'v' }, '<gv', 'Indent Left')
@@ -111,12 +101,10 @@ K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 -- unless it's a generic operation like searching or finding buffers
 
 local fuzzy_search = function()
-  require('telescope.builtin').find_files(
-    require('telescope.themes').get_dropdown {
-      winblend = 20,
-      previewer = true,
-    }
-  )
+  require('telescope.builtin').find_files(require('telescope.themes').get_dropdown {
+    winblend = 20,
+    previewer = true,
+  })
 end
 
 local lazy_plugins = function()
@@ -159,9 +147,7 @@ K.nl('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 -- Convention is 'q' followed by the operation
 K.nl('qf', ':q<CR>', 'Quicker close split')
 K.nl('qq', function()
-  if vim.fn.confirm('Force save and quit?', '&Yes\n&No', 2) == 1 then
-    vim.cmd 'wq!'
-  end
+  if vim.fn.confirm('Force save and quit?', '&Yes\n&No', 2) == 1 then vim.cmd 'wq!' end
 end, 'Quit with force saving')
 K.nl('qw', ':wq<CR>', 'Write and quit')
 K.nl('qQ', function()

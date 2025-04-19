@@ -3,7 +3,8 @@ return {
   -- https://github.com/nvim-telescope/telescope.nvim
   'nvim-telescope/telescope.nvim',
   version = '*',
-  lazy = false,
+  lazy = true,
+  cmd = 'Telescope',
   dependencies = {
     { 'nvim-lua/plenary.nvim' },
     { 'nvim-telescope/telescope-symbols.nvim' },
@@ -16,10 +17,6 @@ return {
     -- https://github.com/polirritmico/telescope-lazy-plugins.nvim
     { 'polirritmico/telescope-lazy-plugins.nvim' },
 
-    -- Neovim plugin. Telescope.nvim extension that adds LuaSnip integration.
-    -- https://github.com/benfowler/telescope-luasnip.nvim
-    { 'benfowler/telescope-luasnip.nvim' },
-
     -- Fuzzy Finder Algorithm which requires local dependencies to be built.
     -- Only load if `make` is available
     {
@@ -27,26 +24,44 @@ return {
       build = 'make',
       cond = vim.fn.executable 'make' == 1,
     },
-
-    -- Import modules with ease
-    -- https://github.com/piersolenski/telescope-import.nvim
-    { 'piersolenski/telescope-import.nvim' },
   },
   config = function()
     local t = require 'telescope'
     local a = require 'telescope.actions'
+    local c = require 'telescope.config'
 
     local open_with_trouble = require('trouble.sources.telescope').open
     local add_to_trouble = require('trouble.sources.telescope').add
+
+    -- Clone the default Telescope configuration
+    local vimgrep_arguments = { unpack(c.values.vimgrep_arguments) }
+
+    -- I want to search in hidden/dot files.
+    table.insert(vimgrep_arguments, '--hidden')
+    -- I don't want to search in the `.git` directory.
+    table.insert(vimgrep_arguments, '--glob')
+    table.insert(vimgrep_arguments, '!**/.git/*')
 
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     t.setup {
       defaults = {
+        -- `hidden = true` is not supported in text grep commands.
+        vimgrep_arguments = vimgrep_arguments,
+
         layout_strategy = 'horizontal',
         pickers = {
           find_files = {
+            -- `hidden = true` will still show the inside of `.git/` as
+            -- it's not `.gitignore`d.
+            find_command = { 'rg', '--files', '--hidden', '--glob', '!**/.git/*' },
             theme = 'dropdown',
+          },
+          mappings = {
+            i = {
+              ['<C-s>'] = a.cycle_previewers_next,
+              ['<C-a>'] = a.cycle_previewers_prev,
+            },
           },
         },
         mappings = {
@@ -64,27 +79,27 @@ return {
           },
         },
       },
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+      },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = '<CR>',
+          node_incremental = '<CR>',
+          scope_incremental = '<TAB>',
+          node_decremental = '<S-TAB>',
+        },
+      },
+      context_commentstring = {
+        enable = true,
+        enable_autocmd = false,
+      },
       extensions = {
         lazy_plugins = {
           -- Must be a valid path to the file containing the lazy spec and setup() call.
           lazy_config = vim.fn.stdpath 'config' .. '/init.lua',
-        },
-        import = {
-          -- Imports can be added at a specified line whilst keeping the cursor in place
-          insert_at_top = true,
-          -- Optionally support additional languages or modify existing languages...
-          custom_languages = {
-            {
-              -- The filetypes that ripgrep supports (find these via `rg --type-list`)
-              extensions = { 'js', 'ts' },
-              -- The Vim filetypes
-              filetypes = { 'vue' },
-              -- Optionally set a line other than 1
-              insert_at_line = 2, ---@type function|number
-              -- The regex pattern for the import statement
-              regex = [[^(?:import(?:[\"'\s]*([\w*{}\n, ]+)from\s*)?[\"'\s](.*?)[\"'\s].*)]],
-            },
-          },
         },
       },
     }

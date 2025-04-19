@@ -4,359 +4,296 @@
 
 require 'utils'
 
--- LSP Servers are installed and configured by lsp-setup.nvim
--- Mason formatters Conform uses to format files
--- These are automatically configured by zapling/mason-conform.nvim
-local lsp_servers = {
-  bashls = {},
-  -- csharp_ls = {},
-  diagnosticls = {},
-  gopls = {
-    settings = {
-      gopls = {
-        hints = {
-          rangeVariableTypes = true,
-          parameterNames = true,
-          constantValues = true,
-          assignVariableTypes = true,
-          compositeLiteralFields = true,
-          compositeLiteralTypes = true,
-          functionTypeParameters = true,
-        },
-      },
-    },
-  },
-  html = {},
-  intelephense = {
-    init_options = {
-      licenceKey = GetIntelephenseLicense(),
-    },
-  },
-  jsonls = {},
-  lua_ls = {
-    settings = {
-      Lua = {
-        completion = {
-          callSnippet = 'Replace',
-        },
-        diagnostics = {
-          globals = {
-            'vim',
-          },
-          disable = {
-            -- Ignore lua_ls noisy `missing-fields` warnings
-            'missing-fields',
-          },
-        },
-        hint = {
-          enable = true,
-          arrayIndex = 'Auto',
-          await = true,
-          paramName = 'All',
-          paramType = true,
-          semicolon = 'SameLine',
-          setType = false,
-        },
-      },
-    },
-  },
-  tailwindcss = {},
-  ts_ls = {
-    settings = {
-      typescript = {
-        inlayHints = {
-          includeInlayParameterNameHints = 'all',
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayVariableTypeHints = true,
-          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayEnumMemberValueHints = true,
-        },
-      },
-    },
-  },
-  vimls = {},
-  volar = {
-    settings = {
-      typescript = {
-        inlayHints = {
-          enumMemberValues = {
-            enabled = true,
-          },
-          functionLikeReturnTypes = {
-            enabled = true,
-          },
-          propertyDeclarationTypes = {
-            enabled = true,
-          },
-          parameterTypes = {
-            enabled = true,
-            suppressWhenArgumentMatchesName = true,
-          },
-          variableTypes = {
-            enabled = true,
-          },
-        },
-      },
-    },
-  },
-}
-
--- Mason tools to automatically install and configure.
--- These are automatically configured by WhoIsSethDaniel/mason-tool-installer.nvim
-local mason_tools = {
-  'actionlint',
-  'ast-grep',
-  'black',
-  'editorconfig-checker',
-  'goimports',
-  'golangci-lint',
-  'golines',
-  'gopls',
-  'gotests',
-  'isort',
-  'phpcbf',
-  'phpmd',
-  'phpstan',
-  'pint',
-  'prettierd',
-  'revive',
-  'semgrep',
-  'shellcheck',
-  'shfmt',
-  'sonarlint-language-server',
-  'staticcheck',
-  'stylua',
-  'trivy',
-  'vint',
-  'yamlfmt',
-}
-
 return {
-  -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-  -- used for completion, annotations and signatures of Neovim apis
-  -- https://github.com/folke/lazydev.nvim
   {
-    'folke/lazydev.nvim',
-    ft = 'lua',
-    opts = {
-      library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
-        -- load assert and describe paths
-        { path = 'luassert/library', words = { 'assert' } },
-        { path = 'busted/library', words = { 'describe' } },
-      },
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      { 'williamboman/mason.nvim', opts = {} },
+      'williamboman/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
+
+      'folke/lazydev.nvim',
+      'zapling/mason-conform.nvim',
+
+      -- Allows extra capabilities provided by blink.cmp
+      'saghen/blink.cmp',
     },
-  },
+    config = function()
+      local lazydev = require 'lazydev'
 
-  -- Meta type definitions for the Lua platform Luvit.
-  -- https://github.com/Bilal2453/luvit-meta
-  { 'Bilal2453/luvit-meta', lazy = true },
-
-  -- Quickstart configs for Nvim LSP
-  -- https://github.com/neovim/nvim-lspconfig
-  { 'neovim/nvim-lspconfig' },
-
-  -- Portable package manager for Neovim that runs everywhere Neovim runs.
-  -- Easily install and manage LSP servers, DAP servers, linters, and formatters.
-  -- https://github.com/williamboman/mason.nvim
-  {
-    'williamboman/mason.nvim',
-    version = '*',
-    cmd = 'Mason',
-    run = ':MasonUpdate',
-    opts = {},
-  },
-
-  -- Extensible UI for Neovim notifications and LSP progress messages.
-  -- https://github.com/j-hui/fidget.nvim
-  {
-    'j-hui/fidget.nvim',
-    version = '*',
-    opts = {},
-  },
-
-  -- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
-  -- https://github.com/williamboman/mason-lspconfig.nvim
-  { 'williamboman/mason-lspconfig.nvim' },
-
-  -- Install and upgrade third party tools automatically
-  -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
-  {
-    'WhoIsSethDaniel/mason-tool-installer.nvim',
-    version = '*',
-    opts = {
-      auto_install = true,
-      auto_update = true,
-      ensure_installed = mason_tools,
-    },
-  },
-
-  -- JSON schemas for Neovim
-  -- https://github.com/b0o/SchemaStore.nvim
-  { 'b0o/schemastore.nvim' },
-
-  -- Performant, batteries-included completion plugin for Neovim
-  -- https://github.com/saghen/blink.cmp
-  -- See lua/plugins/blink.lua for configs
-  { 'saghen/blink.cmp' },
-
-  -- A simple wrapper for nvim-lspconfig and mason-lspconfig
-  -- to easily setup LSP servers.
-  -- https://github.com/junnplus/lsp-setup.nvim
-  {
-    'junnplus/lsp-setup.nvim',
-    opts = {
-      default_mappings = false,
-      servers = lsp_servers,
-    },
-    config = function(_, opts)
-      require('lazydev').setup()
-      require('lsp-setup').setup(opts)
-      local cmp = require 'blink.cmp'
-      local lspconfig = require 'lspconfig'
-      for server, config in pairs(opts.servers) do
-        -- passing config.capabilities to blink.cmp merges with the capabilities in your
-        -- `opts[server].capabilities, if you've defined it
-        config.capabilities = cmp.get_lsp_capabilities(config.capabilities)
-        lspconfig[server].setup(config)
-      end
-
-      lspconfig.lua_ls.on_init = function(client)
-        if client.workspace_folders then
-          local path = client.workspace_folders[1].name
-          if
-            vim.loop.fs_stat(path .. '/.luarc.json')
-            or vim.loop.fs_stat(path .. '/.luarc.jsonc')
-          then
-            return
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(
+              mode,
+              keys,
+              func,
+              { buffer = event.buf, desc = 'LSP: ' .. desc }
+            )
           end
-        end
-        client.config.settings.Lua =
-          vim.tbl_deep_extend('force', client.config.settings.Lua, {
-            runtime = {
-              -- Tell the language server which version of Lua you're using
-              -- (most likely LuaJIT in the case of Neovim)
-              version = 'LuaJIT',
-            },
-            -- Make the server aware of Neovim runtime files
-            workspace = {
-              checkThirdParty = false,
-              library = {
-                vim.env.VIMRUNTIME,
+
+          local tsb = require 'telescope.builtin'
+
+          -- Rename the variable under your cursor.
+          --  Most Language Servers support renaming across files, etc.
+          map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+
+          -- Execute a code action, usually your cursor needs to be on top of an error
+          -- or a suggestion from your LSP for this to activate.
+          map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+
+          -- Find references for the word under your cursor.
+          map('grr', tsb.lsp_references, '[G]oto [R]eferences')
+
+          -- Jump to the implementation of the word under your cursor.
+          --  Useful when your language has ways of declaring types without
+          --  an actual implementation.
+          map('gri', tsb.lsp_implementations, '[G]oto [I]mplementation')
+
+          -- Jump to the definition of the word under your cursor.
+          --  This is where a variable was first declared, or where a function is
+          --  defined, etc. To jump back, press <C-t>.
+          map('grd', tsb.lsp_definitions, '[G]oto [D]efinition')
+
+          -- WARN: This is not Goto Definition, this is Goto Declaration.
+          --  For example, in C this would take you to the header.
+          map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- Fuzzy find all the symbols in your current document.
+          --  Symbols are things like variables, functions, types, etc.
+          map('gO', tsb.lsp_document_symbols, 'Open Document Symbols')
+
+          -- Fuzzy find all the symbols in your current workspace.
+          --  Similar to document symbols, except searches over your entire project.
+          map('gW', tsb.lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
+
+          -- Jump to the type of the word under your cursor.
+          --  Useful when you're not sure what type a variable is and you want to see
+          --  the definition of its *type*, not where it was *defined*.
+          map('grt', tsb.lsp_type_definitions, '[G]oto [T]ype Definition')
+
+          -- This function resolves a difference between neovim nightly
+          -- (version 0.11) and stable (version 0.10)
+          ---@param client vim.lsp.Client
+          ---@param method vim.lsp.protocol.Method
+          ---@param bufnr? integer some lsp support methods only in specific files
+          ---@return boolean
+          local function client_supports_method(client, method, bufnr)
+            if vim.fn.has 'nvim-0.11' == 1 then
+              return client:supports_method(method, bufnr)
+            else
+              ---@diagnostic disable-next-line: param-type-mismatch
+              return client.supports_method(method, { bufnr = bufnr })
+            end
+          end
+
+          -- The following two autocommands are used to highlight references of the
+          -- word under your cursor when your cursor rests there for a little while.
+          --    See `:help CursorHold` for information about when this is executed
+          --
+          -- When you move your cursor, the highlights will be cleared
+          -- (the second autocommand).
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if
+            client
+            and client_supports_method(
+              client,
+              vim.lsp.protocol.Methods.textDocument_documentHighlight,
+              event.buf
+            )
+          then
+            local highlight_augroup =
+              vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+              group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+              callback = function(event2)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds {
+                  group = 'lsp-highlight',
+                  buffer = event2.buf,
+                }
+              end,
+            })
+          end
+        end,
+      })
+
+      -- Diagnostic Config
+      -- See :help vim.diagnostic.Opts
+      vim.diagnostic.config {
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.WARN] = '󰀪 ',
+            [vim.diagnostic.severity.INFO] = '󰋽 ',
+            [vim.diagnostic.severity.HINT] = '󰌶 ',
+          },
+        } or {},
+        virtual_text = {
+          source = 'if_many',
+          spacing = 2,
+          format = function(diagnostic)
+            local diagnostic_message = {
+              [vim.diagnostic.severity.ERROR] = diagnostic.message,
+              [vim.diagnostic.severity.WARN] = diagnostic.message,
+              [vim.diagnostic.severity.INFO] = diagnostic.message,
+              [vim.diagnostic.severity.HINT] = diagnostic.message,
+            }
+            return diagnostic_message[diagnostic.severity]
+          end,
+        },
+      }
+
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
+
+      local servers = {
+        ansiblels = {},
+        ast_grep = {},
+        bashls = {},
+        cssls = {},
+        dockerls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
               },
             },
-          })
-      end
-      lspconfig.jsonls.settings = {
-        json = {
-          schemas = require('schemastore').json.schemas(),
-          validate = { enable = true },
-        },
-        yaml = {
-          schemaStore = {
-            -- You must disable built-in SchemaStore support if you want to use
-            -- this plugin and its advanced options like `ignore`.
-            enable = false,
-            -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-            url = '',
           },
-          schemas = require('schemastore').yaml.schemas(),
-          validate = { enable = true },
+        },
+        html = {},
+        intelephense = {
+          init_options = {
+            licenceKey = vim.env.INTELEPHENSE_LICENSE or GetIntelephenseLicense() or nil,
+          },
+        },
+        jsonls = {},
+        lua_ls = {
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = { 'vim' },
+                disable = { 'missing-fields' },
+              },
+              completion = { callSnippet = 'Replace' },
+              workspace = { checkThirdParty = true },
+              hint = {
+                enable = true,
+                arrayIndex = 'Auto',
+                await = true,
+                paramName = 'All',
+                paramType = true,
+                semicolon = 'SameLine',
+                setType = false,
+              },
+            },
+          },
+          on_init = function(client)
+            client.config.settings.Lua.workspace.library = {
+              vim.env.VIMRUNTIME,
+            }
+            client.config.settings.Lua.runtime = { version = 'LuaJIT' }
+            client.notify(
+              'workspace/didChangeConfiguration',
+              { settings = client.config.settings }
+            )
+          end,
+        },
+        omnisharp = {}, -- C# OmniSharp (will respect EditorConfig for formatting)
+        pyright = {},
+        tailwindcss = {},
+        terraformls = {},
+        ts_ls = {},
+        volar = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+              },
+            },
+          },
+        },
+        vimls = {},
+        eslint = {},
+        yamlls = {
+          settings = {
+            yaml = {
+              keyOrdering = false, -- don't auto-sort YAML keys on format
+              schemaStore = { enable = true }, -- use JSON Schema Store for validation
+            },
+          },
         },
       }
 
-      -- Diagnostic configuration
-      local signs = {
-        { name = 'DiagnosticSignError', text = '' }, -- Error icon
-        { name = 'DiagnosticSignWarn', text = '' }, -- Warning icon
-        { name = 'DiagnosticSignHint', text = '' }, -- Hint icon
-        { name = 'DiagnosticSignInfo', text = '' }, -- Information icon
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, {
+        'actionlint', -- GitHub Actions linter
+        'shfmt', -- Shell formatter
+        'stylua', -- Lua formatter
+        'shellcheck', -- Shell linter
+      })
+
+      require('mason-tool-installer').setup {
+        auto_install = true,
+        auto_update = true,
+        ensure_installed = ensure_installed,
       }
 
-      local function ensure_sign_defined(name, sign_opts)
-        if vim.tbl_isempty(vim.fn.sign_getdefined(name)) then
-          vim.fn.sign_define(name, sign_opts)
-        end
-      end
+      require('mason-conform').setup {
+        ensure_installed = ensure_installed,
+      }
 
-      for _, sign in ipairs(signs) do
-        ensure_sign_defined(sign.name, {
-          text = sign.text,
-          texthl = sign.texthl or sign.name,
-          numhl = sign.numhl or sign.name,
-        })
-      end
-
-      ---@type vim.diagnostic.Opts
-      local diagnostics_config = {
-        signs = {
-          active = signs, -- show signs
+      require('mason-lspconfig').setup {
+        ensure_installed = {}, -- explicitly set to an empty table
+        automatic_installation = false,
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            server.capabilities =
+              vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
         },
-        update_in_insert = false,
-        underline = true,
-        severity_sort = true,
-        virtual_text = true,
       }
 
-      vim.diagnostic.config(diagnostics_config)
-
-      -- end of junnplus/lsp-setup config
+      lazydev.setup {
+        ---@type boolean|(fun(root:string):boolean?)
+        enabled = true,
+        debug = false,
+        runtime = vim.env.VIMRUNTIME --[[@as string]],
+        library = {
+          { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        },
+        integrations = {
+          lspconfig = true,
+          cmp = true,
+        },
+      }
     end,
   },
-
-  -- Lightweight yet powerful formatter plugin for Neovim
-  -- https://github.com/stevearc/conform.nvim
-  {
-    'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    opts = {
-      notify_on_error = false,
-      ---@type nil|conform.FormatOpts|fun(bufnr: integer): nil|conform.FormatOpts
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        local lsp_format_opt
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          lsp_format_opt = 'never'
-        else
-          lsp_format_opt = 'fallback'
-        end
-
-        -- Disable autoformat for files in a certain paths
-        local bufname = vim.api.nvim_buf_get_name(bufnr)
-        if bufname:match '/dist|node_modules|vendor/' then return end
-
-        return {
-          timeout_ms = 500,
-          lsp_format = lsp_format_opt,
-        }
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        sh = { 'shfmt' },
-        bash = { 'shfmt' },
-        php = { 'phpcbf' },
-        python = { 'isort', 'black' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
-    init = function()
-      -- If you want the formatexpr, here is the place to set it
-      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-    end,
-  },
-  -- Automatically install formatters registered with conform.nvim via mason.nvim
-  -- https://github.com/zapling/mason-conform.nvim
-  { 'zapling/mason-conform.nvim', opts = {} },
 }

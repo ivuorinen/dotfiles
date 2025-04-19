@@ -64,4 +64,7 @@ vim.schedule(function()
   o.clipboard = c
 end)
 
+-- xiyaowong/transparent.nvim
+vim.g.transparent_enabled = true
+
 -- vim: ts=2 sts=2 sw=2 et
