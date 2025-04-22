@@ -2,6 +2,7 @@ return {
   -- A collection of small QoL plugins for Neovim
   -- https://github.com/folke/snacks.nvim
   {
+    ---@module 'snacks'
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
@@ -42,6 +43,7 @@ return {
   -- replaces the UI for messages, cmdline and the popupmenu.
   -- https://github.com/folke/noice.nvim
   {
+    ---@module 'noice'
     'folke/noice.nvim',
     event = 'VeryLazy',
     dependencies = {
@@ -122,10 +124,12 @@ return {
   -- trouble your code is causing.
   -- https://github.com/folke/trouble.nvim
   {
+    ---@module 'trouble'
     'folke/trouble.nvim',
     lazy = false,
     cmd = 'Trouble',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    ---@type trouble.Config
     opts = {
       auto_preview = true,
       auto_fold = true,

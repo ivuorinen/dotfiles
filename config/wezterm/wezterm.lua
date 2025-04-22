@@ -17,16 +17,31 @@ config.font = wezterm.font_with_fallback {
   'JetBrains Mono',
   'Symbols Nerd Font Mono',
 }
-config.harfbuzz_features = { 'zero', 'ss01', 'cv05' }
+config.font_shaper = 'Harfbuzz'
+config.harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1' }
 
--- Make the window a bit transparent
-config.window_background_opacity = 0.96
+config.selection_word_boundary = ' \t\n{[}]()"\'`,;:'
+
+-- Window configuration
+config.window_background_opacity = 0.95
+config.window_decorations = 'RESIZE'
+config.macos_window_background_blur = 10
+config.window_padding = {
+  left = 5,
+  right = 5,
+  top = 5,
+  bottom = 5,
+}
 
 -- Don't show tab bar
 config.enable_tab_bar = false
 
 -- Fix alt on macOS
 config.send_composed_key_when_left_alt_is_pressed = true
+config.send_composed_key_when_right_alt_is_pressed = true
+
+-- Scrolling deactivated, using tmux for that
+config.scrollback_lines = 0
 
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
