@@ -1,4 +1,4 @@
-## GITATTRIBUTES FOR WEB PROJECTS
+## GITATTRIBUTES
 #
 # These settings are for any web project.
 #
@@ -20,20 +20,23 @@
 *.bat             text eol=crlf
 *.cmd             text eol=crlf
 *.coffee          text
-*.css             text diff=css
-*.htm             text diff=html
-*.html            text diff=html
+*.css             text diff=css eol=lf
+*.fish            text diff=shell eol=lf
+*.htm             text diff=html eol=lf
+*.html            text diff=html eol=lf
 *.inc             text
 *.ini             text
 *.js              text
 *.json            text
 *.jsx             text
 *.less            text
+*.lua             text diff=lua eol=lf
 *.ls              text
 *.map             text -diff
 *.od              text
 *.onlydata        text
 *.php             text diff=php
+*.plist           text eol=lf
 *.pl              text
 *.ps1             text eol=crlf
 *.py              text diff=python
@@ -41,15 +44,18 @@
 *.sass            text
 *.scm             text
 *.scss            text diff=css
-*.sh              text eol=lf
+*.sh              text eol=lf diff=shell
 .husky/*          text eol=lf
 *.sql             text
 *.styl            text
 *.tag             text
+*.tmux            text eol=lf diff=tmux
 *.ts              text
 *.tsx             text
+*.vim             text eol=lf
 *.xml             text
 *.xhtml           text diff=html
+*.zsh             text diff=zsh eol=lf
 
 # Docker
 Dockerfile        text
@@ -68,6 +74,7 @@ Dockerfile        text
 AUTHORS           text
 CHANGELOG         text
 CHANGES           text
+CODEOWNERS        text
 CONTRIBUTING      text
 COPYING           text
 copyright         text
@@ -105,6 +112,8 @@ TODO              text
 *.config          text
 .editorconfig     text
 .env              text
+*.env             text
+*.env.*           text
 .gitattributes    text
 .gitconfig        text
 .htaccess         text
@@ -208,15 +217,37 @@ Procfile          text
 
 *.gitignore       text
 *.gitkeep         text
-.gitattributes export-ignore
+.gitattributes    text export-ignore
+*.gitattributes   text export-ignore
+.gitmodules       text export-ignore
+*.gitmodules      text export-ignore
 **/.gitignore     export-ignore
 **/.gitkeep       export-ignore
 
 # Repo specials
-local/bin/*        text eol=lf
+local/bin/*        text eol=lf diff=shell
+local/bin/*.md     text eol=lf diff=markdown
 config/antigen.zsh text
 git/*              text
 **/git/*           text
 **/alias           text
 ssh/*              text
+ssh/shared.d/*     text
+ssh/local.d/*      text
 
+# Auto-generated rules - 2025-04-16 10:28:04
+# Shell scripts detected by content
+install              text eol=lf diff=shell
+
+# File extension-based rules
+*.1                  text eol=lf
+*.applescript        text eol=lf
+*.d/work-git         text eol=lf
+*.dirs               text eol=lf
+*.example            text eol=lf
+*.itermcolors        text eol=lf
+*.locale             text eol=lf
+*.python-version     text eol=lf
+*.snippets           text eol=lf
+*.theme              text eol=lf
+*.yamlfmt            text eol=lf

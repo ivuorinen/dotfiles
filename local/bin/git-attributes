@@ -1,0 +1,675 @@
+#!/usr/bin/env bash
+#
+# Check git repo's files .gitattributes and ensure all of them are mapped.
+#
+# Author: Ismo Vuorinen <https://github.com/ivuorinen> 2022
+# License: MIT
+
+set -euo pipefail
+
+# Default configuration
+VERBOSE=0
+CHECK_PATTERN="text: auto"
+EXIT_ON_MISSING=0
+SUGGEST_RULES=1  # Suggestions enabled by default
+WRITE_RULES=0    # Writing to file is opt-in
+FORMAT_WIDTH=0   # Auto-width by default (0 means auto)
+MIN_FORMAT_WIDTH=20  # Minimum format width
+
+DEBUG="${DEBUG:-0}"
+
+if [ "$DEBUG" -eq 1 ]; then
+  set -x
+fi
+
+# Output functions
+msg_err() {
+  echo -e "\e[31m$@\e[0m" >&2
+}
+
+msg_success() {
+  echo -e "\e[32m$@\e[0m"
+}
+
+msg_warn() {
+  echo -e "\e[33m$@\e[0m" >&2
+}
+
+msg_info() {
+  echo -e "\e[36m$@\e[0m"
+}
+
+msg_debug() {
+  [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$@\e[0m"
+}
+
+show_help() {
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Check if all git-tracked files have corresponding rules in .gitattributes
+
+Options:
+  -h, --help          Display this help message
+  -v, --verbose       Enable verbose output
+  -e, --exit          Exit with error code if missing attributes found
+  -p, --pattern       Pattern to check (default: "text: auto")
+  -n, --no-suggest    Don't suggest .gitattributes rules (suggestions are on by default)
+  -w, --write         Write suggested rules to .gitattributes file
+  -f, --format-width  Specify width for formatting rule patterns (default: auto, min: $MIN_FORMAT_WIDTH)
+
+EOF
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -v|--verbose)
+      VERBOSE=1
+      shift
+      ;;
+    -e|--exit)
+      EXIT_ON_MISSING=1
+      shift
+      ;;
+    -p|--pattern)
+      CHECK_PATTERN="$2"
+      shift 2
+      ;;
+    -n|--no-suggest)
+      SUGGEST_RULES=0
+      shift
+      ;;
+    -w|--write)
+      WRITE_RULES=1
+      shift
+      ;;
+    -f|--format-width)
+      if [[ $2 =~ ^[0-9]+$ ]]; then
+        FORMAT_WIDTH=$2
+        shift 2
+      else
+        msg_err "Error: --format-width requires a numeric argument"
+        exit 1
+      fi
+      ;;
+    *)
+      msg_err "Unknown option: $1"
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
+# Function to check if git is installed
+check_git_installed() {
+  if ! command -v git &> /dev/null; then
+    msg_err "git could not be found, please install it first"
+    exit 1
+  fi
+}
+
+# Check if we're in a git repository
+check_git_repo() {
+  if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+    msg_err "Not inside a git repository"
+    exit 1
+  fi
+}
+
+# Check if we're in the git root directory
+check_git_root() {
+  local git_root
+  git_root=$(git rev-parse --show-toplevel)
+  local current_dir
+  current_dir=$(pwd)
+
+  if [[ "$git_root" != "$current_dir" ]]; then
+    msg_err "Not in git repository root directory"
+    msg_warn "Please run this command from: $git_root"
+    exit 1
+  fi
+}
+
+# Check if .gitattributes exists
+check_gitattributes_exists() {
+  if [[ ! -f ".gitattributes" ]]; then
+    msg_err ".gitattributes file not found in the repository root"
+    msg_warn "Create a .gitattributes file before running this command"
+    exit 1
+  fi
+}
+
+# Format rule with proper alignment
+format_rule() {
+  local pattern="$1"
+  local attributes="$2"
+  local width="$3"
+
+  # If pattern starts with "#", it's a comment, don't format
+  if [[ "$pattern" == "#"* ]]; then
+    echo "$pattern"
+    return
+  fi
+
+  # If pattern is empty, return empty
+  if [[ -z "$pattern" ]]; then
+    echo ""
+    return
+  fi
+
+  printf "%-${width}s %s\n" "$pattern" "$attributes"
+}
+
+# Get the file extension properly, handling special cases
+get_file_extension() {
+  local file="$1"
+  local basename=$(basename "$file")
+  local extension=""
+
+  # Check if file has no extension or is a dotfile
+  if [[ "$basename" == .* && ! "$basename" =~ \..+$ ]]; then
+    # It's a dotfile without extension (like .gitignore)
+    extension="$basename"
+  elif [[ "$basename" =~ \..+$ ]]; then
+    # Normal file with extension
+    extension="${basename##*.}"
+
+    # Check for special cases like .d/ directories
+    if [[ "$extension" == "d" ]]; then
+      # This is likely a .d directory - use the full filename as pattern
+      if [[ -f "$file" ]]; then
+        # For files in .d directories, use the complete path as pattern
+        extension=$(basename "$file")
+      else
+        # For .d directory itself, use *.d
+        extension="d"
+      fi
+    fi
+  else
+    # No extension at all
+    extension="$basename"
+  fi
+
+  echo "$extension"
+}
+
+# Suggest appropriate gitattributes rules based on file extension
+suggest_rule() {
+  local file="$1"
+  local extension=""
+  local pattern=""
+  local attributes=""
+
+  msg_debug "Checking file: $file"
+
+  # Skip directories
+  if [[ -d "$file" ]]; then
+    return
+  fi
+
+  # Get proper file extension
+  extension=$(get_file_extension "$file")
+
+  # If file path contains .d/ pattern, we need special handling
+  if [[ "$file" =~ \.d/ ]]; then
+    # Extract the pattern part that includes the .d/ directory
+    local dir_part=$(dirname "$file")
+    local base_name=$(basename "$file")
+
+    # Check if it's a config directory pattern worth capturing
+    if [[ "$dir_part" =~ /(\.d|[^/]+\.d)$ ]]; then
+      pattern="$dir_part/*"
+      msg_debug "Detected .d directory pattern: $pattern"
+    else
+      # Use standard extension pattern
+      pattern="*.${extension}"
+    fi
+  else
+    # Standard file with extension
+    pattern="*.${extension}"
+  fi
+
+  # Common text files
+  case "$extension" in
+    # Shell scripts
+    sh|bash|zsh|fish)
+      attributes="text eol=lf diff=shell"
+      ;;
+
+    # Web development
+    html|htm|xhtml|css|scss|sass|less)
+      attributes="text eol=lf diff=html"
+      ;;
+    js|jsx|ts|tsx|json|json5)
+      attributes="text eol=lf diff=javascript"
+      ;;
+
+    # Programming languages
+    php)
+      attributes="text eol=lf diff=php"
+      ;;
+    py)
+      attributes="text eol=lf diff=python"
+      ;;
+    rb)
+      attributes="text eol=lf diff=ruby"
+      ;;
+    go)
+      attributes="text eol=lf diff=golang"
+      ;;
+    java|kt|scala)
+      attributes="text eol=lf diff=java"
+      ;;
+    c|cpp|h|hpp)
+      attributes="text eol=lf diff=cpp"
+      ;;
+
+    # Documentation
+    md|markdown|txt)
+      attributes="text eol=lf"
+      ;;
+
+    # Configuration files
+    yml|yaml|toml|ini|cfg|conf)
+      attributes="text eol=lf"
+      ;;
+
+    # Git config files and similar patterns
+    git)
+      attributes="text eol=lf"
+      ;;
+    gitignore|gitattributes)
+      attributes="text eol=lf"
+      ;;
+
+    # Binary files
+    png|jpg|jpeg|gif|ico|svg|webp|avif)
+      attributes="binary"
+      ;;
+    pdf|doc|docx|xls|xlsx|ppt|pptx)
+      attributes="binary"
+      ;;
+    zip|tar|gz|7z|rar)
+      attributes="binary"
+      ;;
+    mp3|mp4|avi|mov|wav|ogg)
+      attributes="binary"
+      ;;
+    ttf|otf|woff|woff2|eot)
+      attributes="binary"
+      ;;
+
+    # Default for unknown extensions
+    *)
+      # Try to guess if it's text by checking if it contains null bytes
+      if file "$file" | grep -q text; then
+        attributes="text eol=lf"
+      else
+        attributes="binary"
+      fi
+      ;;
+  esac
+
+  msg_debug "...suggesting $pattern $attributes"
+
+  echo "$pattern:$attributes"
+}
+
+# Function to check for missing .gitattributes
+check_gitattributes() {
+  local missing_attributes
+  msg_info "Checking for pattern: $CHECK_PATTERN"
+
+  missing_attributes=$(git ls-files | git check-attr -a --stdin | grep "$CHECK_PATTERN" || true)
+
+  if [[ -n "$missing_attributes" ]]; then
+    msg_warn "Missing .gitattributes rules detected"
+
+    if [[ $SUGGEST_RULES -eq 1 ]]; then
+      # Generate suggestions
+      local suggestions
+
+      # Generate the suggestions
+      suggestions=$(suggest_gitattributes "$missing_attributes")
+
+      # Display the suggestions
+      echo ""
+      echo "$suggestions"
+      echo ""
+
+      if [[ $WRITE_RULES -eq 1 ]]; then
+        msg_debug "...writing to .gitattributes"
+        write_to_gitattributes "$suggestions"
+      fi
+    else
+      msg_err ".gitattributes rule missing for the following files:"
+      echo "$missing_attributes"
+    fi
+
+    if [[ $EXIT_ON_MISSING -eq 1 ]]; then
+      return 1
+    fi
+  else
+    msg_success "All files have a corresponding rule in .gitattributes"
+  fi
+
+  return 0
+}
+
+# Parse rule string and extract pattern and attributes
+parse_rule() {
+  local rule="$1"
+
+  if [[ "$rule" == "#"* ]]; then
+    # This is a comment line
+    echo "$rule::"
+    return
+  fi
+
+  if [[ "$rule" =~ ^([^[:space:]]+)[[:space:]]+(.*)$ ]]; then
+    echo "${BASH_REMATCH[1]}:${BASH_REMATCH[2]}"
+  else
+    echo "$rule::"
+  fi
+}
+
+# Check shell scripts by name regardless of extension
+detect_shell_scripts() {
+  msg_debug "Detecting shell scripts by name regardless of extension..."
+
+  local shell_scripts_rules=""
+  local shell_scripts_found=0
+  local patterns=()
+  local attributes=()
+
+  # Get already defined rules in .gitattributes
+  local existing_rules
+  existing_rules=$(grep -v "^#" .gitattributes || true)
+
+  # Get all shell scripts regardless of extension
+  local shell_scripts
+  shell_scripts=$(git ls-files | xargs file | grep "shell script" | cut -d: -f1)
+
+  if [[ -n "$shell_scripts" ]]; then
+    shell_scripts_found=$(echo "$shell_scripts" | wc -l | tr -d ' ')
+    msg_debug "Found $shell_scripts_found potential shell scripts."
+
+    # Track scripts that need rules
+    declare -A scripts_by_dir=()
+    local need_rule_count=0
+
+    # Process each script
+    while IFS= read -r script; do
+      local rel_path="${script#./}"
+
+      # Skip if exact path already in .gitattributes
+      if grep -q "^${rel_path} " <<< "$existing_rules"; then
+        msg_debug "Script already in .gitattributes: $rel_path"
+        continue
+      fi
+
+      # Skip if file extension already covered
+      local extension=$(get_file_extension "$rel_path")
+      if [[ "$extension" != "$rel_path" ]] && grep -q "^\*\.$extension " <<< "$existing_rules"; then
+        msg_debug "Script covered by extension rule: $rel_path (*.$extension)"
+        continue
+      fi
+
+      # Check if any parent directory is already covered
+      local is_covered=0
+      local dir_path="$rel_path"
+      while [[ "$dir_path" != "." && "$dir_path" != "/" ]]; do
+        dir_path=$(dirname "$dir_path")
+        if [[ "$dir_path" == "." ]]; then
+          break
+        fi
+
+        # Check if directory or any of its contents are covered
+        if grep -q "^${dir_path}/\?" <<< "$existing_rules" || grep -q "^${dir_path}/\*" <<< "$existing_rules"; then
+          msg_debug "Script covered by directory rule: $rel_path (${dir_path})"
+          is_covered=1
+          break
+        fi
+      done
+
+      if [[ $is_covered -eq 1 ]]; then
+        continue
+      fi
+
+      # Group by directory
+      local dir=$(dirname "$rel_path")
+      if [[ "$dir" == "." ]]; then
+        dir="root"
+      fi
+
+      # Add to appropriate group
+      if [[ -z "${scripts_by_dir[$dir]:-}" ]]; then
+        scripts_by_dir[$dir]="$rel_path"
+      else
+        scripts_by_dir[$dir]="${scripts_by_dir[$dir]}\n$rel_path"
+      fi
+
+      ((need_rule_count++))
+    done <<< "$shell_scripts"
+
+    # Output grouped results
+    if [[ $need_rule_count -gt 0 ]]; then
+      patterns+=("# Shell scripts detected by content")
+      attributes+=("")
+
+      # Check if we can use directory-based rules instead of individual files
+      for dir in "${!scripts_by_dir[@]}"; do
+        local files_in_dir=$(echo -e "${scripts_by_dir[$dir]}" | wc -l)
+        local dir_path="$dir"
+
+        if [[ "$dir" == "root" ]]; then
+          # For root directory files, list each individually
+          while IFS= read -r file; do
+            patterns+=("$file")
+            attributes+=("text eol=lf diff=shell")
+          done <<< "$(echo -e "${scripts_by_dir[$dir]}")"
+        elif [[ $files_in_dir -gt 2 ]]; then
+          # If directory has multiple scripts, suggest a directory pattern
+          patterns+=("# Found $files_in_dir scripts in $dir_path")
+          attributes+=("")
+
+          # Special handling for .d directories
+          if [[ "$dir_path" =~ \.d$ || "$dir_path" =~ \.d/ ]]; then
+            patterns+=("$dir_path/*")
+          else
+            patterns+=("$dir_path/*")
+          fi
+          attributes+=("text eol=lf diff=shell")
+
+          # List the files as comments for reference
+          while IFS= read -r file; do
+            patterns+=("# - ${file}")
+            attributes+=("")
+          done <<< "$(echo -e "${scripts_by_dir[$dir]}" | sort)"
+        else
+          # For directories with few scripts, list them individually
+          while IFS= read -r file; do
+            patterns+=("$file")
+            attributes+=("text eol=lf diff=shell")
+          done <<< "$(echo -e "${scripts_by_dir[$dir]}")"
+        fi
+      done
+
+      msg_debug "Adding $need_rule_count shell scripts to suggestions (grouped by directory)."
+    else
+      msg_debug "All detected shell scripts already have rules."
+    fi
+  else
+    msg_debug "No shell scripts detected."
+  fi
+
+  # Return the formatted arrays
+  local rules_count=${#patterns[@]}
+  for ((i=0; i<rules_count; i++)); do
+    echo "${patterns[$i]}:${attributes[$i]}"
+  done
+}
+
+# Function to suggest gitattributes rules
+suggest_gitattributes() {
+  local missing_attributes="$1"
+  local files
+  local extension_suggestions=()
+  local formatted_suggestions=""
+  local all_patterns=()
+  local all_attributes=()
+  local max_pattern_length=0
+
+  # Add header to suggestions
+  all_patterns+=("# Auto-generated rules - $(date +"%Y-%m-%d %H:%M:%S")")
+  all_attributes+=("")
+
+  msg_info "Suggested .gitattributes rules:"
+
+  # First, detect shell scripts and add them to suggestions
+  msg_info "Detecting shell scripts by content..."
+  local shell_scripts_rules
+  shell_scripts_rules=$(detect_shell_scripts)
+
+  # Add shell script rules to patterns and attributes arrays
+  if [[ -n "$shell_scripts_rules" ]]; then
+    while IFS=':' read -r pattern attributes; do
+      if [[ -n "$pattern" ]]; then
+        all_patterns+=("$pattern")
+        all_attributes+=("$attributes")
+
+        # Update max pattern length (skip comments)
+        if [[ "$pattern" != "#"* ]] && [[ ${#pattern} -gt $max_pattern_length ]]; then
+          max_pattern_length=${#pattern}
+        fi
+      fi
+    done <<< "$shell_scripts_rules"
+  fi
+
+  # Extract filenames from git check-attr output
+  files=$(echo "$missing_attributes" | awk -F': ' '{print $1}')
+
+  # Get suggestions for each file
+  declare -A seen_patterns=()
+
+  while IFS= read -r file; do
+    local suggestion=$(suggest_rule "$file")
+    if [[ -n "$suggestion" ]]; then
+      IFS=':' read -r pattern attributes <<< "$suggestion"
+
+      # Only add each pattern once
+      if [[ -z "${seen_patterns[$pattern]:-}" ]]; then
+        extension_suggestions+=("$suggestion")
+        seen_patterns[$pattern]=1
+      fi
+    fi
+  done <<< "$files"
+
+  # Remove duplicates and sort
+  local unique_extensions=()
+  mapfile -t unique_extensions < <(printf '%s\n' "${extension_suggestions[@]}" | sort -u)
+
+  # Add extension-based suggestions header if we have any
+  if [[ ${#unique_extensions[@]} -gt 0 ]]; then
+    all_patterns+=("")
+    all_attributes+=("")
+
+    all_patterns+=("# File extension-based rules")
+    all_attributes+=("")
+
+    # Add extension rules to patterns and attributes arrays
+    for suggestion in "${unique_extensions[@]}"; do
+      IFS=':' read -r pattern attributes <<< "$suggestion"
+
+      all_patterns+=("$pattern")
+      all_attributes+=("$attributes")
+
+      # Update max pattern length
+      if [[ ${#pattern} -gt $max_pattern_length ]]; then
+        max_pattern_length=${#pattern}
+      fi
+    done
+  fi
+
+  # Use user-specified format width if provided, otherwise use max_pattern_length
+  # But ensure it's at least MIN_FORMAT_WIDTH
+  local format_width=$max_pattern_length
+  if [[ $FORMAT_WIDTH -gt 0 ]]; then
+    format_width=$FORMAT_WIDTH
+  fi
+
+  # Ensure minimum width
+  if [[ $format_width -lt $MIN_FORMAT_WIDTH ]]; then
+    format_width=$MIN_FORMAT_WIDTH
+  fi
+
+  msg_debug "Using format width: $format_width"
+
+  # Format and output all suggestions with proper alignment
+  local rule_count=${#all_patterns[@]}
+
+  for ((i=0; i<rule_count; i++)); do
+    local pattern="${all_patterns[$i]}"
+    local attributes="${all_attributes[$i]}"
+
+    # Handle comments separately
+    if [[ "$pattern" == "#"* ]] || [[ -z "$attributes" ]]; then
+      formatted_suggestions+="$pattern\n"
+      echo "$pattern"
+    else
+      local formatted_rule=$(printf "%-${format_width}s %s\n" "$pattern" "$attributes")
+      formatted_suggestions+="$formatted_rule\n"
+      echo "$formatted_rule"
+    fi
+  done
+
+  # Add final message
+  echo ""
+  msg_info "Add these rules to your .gitattributes file to resolve missing attributes."
+
+  # Return the full suggestion text so it can be both displayed and written to file
+  echo -e "$formatted_suggestions"
+}
+
+# Write suggestions to .gitattributes file
+write_to_gitattributes() {
+  local suggestions="$1"
+  local gitattributes=".gitattributes"
+
+  # Check if file exists and is writable
+  if [[ ! -w "$gitattributes" ]]; then
+    msg_err "Cannot write to $gitattributes. Check permissions."
+    return 1
+  fi
+
+  # Add a newline at the end of the file if it doesn't have one
+  if [[ -s "$gitattributes" ]] && [[ $(tail -c 1 "$gitattributes" | wc -l) -eq 0 ]]; then
+    echo "" >> "$gitattributes"
+  fi
+
+  # Append suggestions to the file
+  echo -e "$suggestions" >> "$gitattributes"
+
+  msg_success "Added suggested rules to $gitattributes"
+
+  # Remind to check the file
+  msg_warn "Please review the changes to ensure they're appropriate for your project."
+
+  return 0
+}
+
+# Main function
+main() {
+  check_git_installed
+  check_git_repo
+  check_git_root
+  check_gitattributes_exists
+  check_gitattributes
+}
+
+main "$@"
