@@ -49,12 +49,12 @@ repos:
       - id: actionlint
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.252.0
+    rev: 39.257.3
     hooks:
       - id: renovate-config-validator
 
   - repo: https://github.com/JohnnyMorganz/StyLua
-    rev: v2.0.2
+    rev: v2.1.0
     hooks:
       - id: stylua # or stylua-system / stylua-github
 
