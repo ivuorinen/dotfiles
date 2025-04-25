@@ -8,9 +8,6 @@ test -e "$HOME/.config/fish/alias.fish" &&
 test -e "$HOME/.config/fish/exports.fish" &&
     source "$HOME/.config/fish/exports.fish"
 
-test -e "$HOME/.config/fish/exports.secret.fish" &&
-    source "$HOME/.config/fish/exports.secret.fish"
-
 test -e "$HOME/.dotfiles/config/fzf/key-bindings.fish" &&
     source "$HOME/.dotfiles/config/fzf/key-bindings.fish"
 

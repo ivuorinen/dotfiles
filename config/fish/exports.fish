@@ -22,11 +22,6 @@ fish_add_path "$XDG_BIN_HOME"
 # Add cargo bin to path
 fish_add_path "$XDG_SHARE_HOME/cargo/bin"
 
-# Set Aqua configuration
-set -q AQUA_BIN; or set -gx AQUA_BIN "$XDG_DATA_HOME/aquaproj-aqua/bin"
-set -q AQUA_CONFIG; or set -gx AQUA_CONFIG "$XDG_CONFIG_HOME/aqua/aqua.yaml"
-set -gx PATH $AQUA_BIN $PATH
-
 # NPM/NVM configuration
 set -q NVM_DIR; or set -x NVM_DIR "$XDG_DATA_HOME/nvm"
 fish_add_path "$NVM_DIR/bin"
@@ -109,7 +104,6 @@ set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 # Go configuration
 # set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
 set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
-fish_add_path "$GOBIN"
 
 set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
 set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
@@ -131,7 +125,6 @@ set -q CARGO_HOME; or set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
 set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
-fish_add_path "$CARGO_BIN_HOME"
 fish_add_path "$CARGO_HOME/bin"
 fish_add_path "$XDG_SHARE_HOME/bob/nvim-bin"
 
