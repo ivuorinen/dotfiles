@@ -89,6 +89,8 @@ brew "coreutils"
 brew "bats-core"
 # Parser generator
 brew "bison"
+# Freely available high-quality data compressor
+brew "bzip2"
 # Software library to render fonts
 brew "freetype"
 # XML-based font configuration API for X Windows
@@ -222,7 +224,7 @@ brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
 # Platform built on V8 to build network applications
-brew "node"
+brew "node", link: false
 # Libraries for security-enabled client and server applications
 brew "nss"
 # Command-line Git information tool
@@ -232,9 +234,9 @@ brew "openldap"
 # ISO-C API and CLI for generating UUIDs
 brew "ossp-uuid"
 # General-purpose scripting language
-brew "php"
+brew "php", link: false
 # General-purpose scripting language
-brew "php@8.2"
+brew "php@8.2", link: true
 # General-purpose scripting language
 brew "php@8.3"
 # Pins GitHub Actions to full hashes and versions
@@ -259,6 +261,8 @@ brew "re2c"
 brew "rustup"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
+# User interface to the TELNET protocol
+brew "telnet"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
@@ -317,8 +321,6 @@ brew "shivammathur/php/php-debug"
 brew "shivammathur/php/php@8.2-debug"
 # Command-line interface for 1Password
 cask "1password-cli"
-# AeroSpace is an i3-like tiling window manager for macOS
-cask "aerospace"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Database version management tool
@@ -340,8 +342,6 @@ cask "jetbrains-toolbox"
 cask "keybase"
 # Kubernetes IDE
 cask "lens"
-# Neovim Client
-cask "neovide"
 # Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
 # Simple application that will prevent iTunes or Apple Music from launching
