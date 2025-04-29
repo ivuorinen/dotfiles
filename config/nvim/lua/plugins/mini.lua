@@ -12,6 +12,42 @@ return {
     version = '*',
     priority = 1001,
     config = function()
+      -- ╭─────────────────────────────────────────────────────────╮
+      -- │                      Text editing                       │
+      -- ╰─────────────────────────────────────────────────────────╯
+
+      -- Better Around/Inside textobjects
+      -- Examples:
+      --  - va)  - [V]isually select [A]round [)]paren
+      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
+      --  - ci'  - [C]hange [I]nside [']quote
+      require('mini.ai').setup { n_lines = 500 }
+
+      -- Comment lines
+      require('mini.comment').setup()
+
+      -- Text edit operators
+      -- g= - Evaluate text and replace with output
+      -- gx - Exchange text regions
+      -- gm - Multiply (duplicate) text
+      -- gr - Replace text with register
+      -- gs - Sort text
+      require('mini.operators').setup()
+
+      -- Split and join arguments, lists, and other sequences
+      require('mini.splitjoin').setup()
+
+      -- Fast and feature-rich surround actions
+      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+      -- - sd'   - [S]urround [D]elete [']quotes
+      -- - sr)'  - [S]urround [R]eplace [)] [']
+      -- - sff   - find right (`sf`) part of surrounding function call (`f`)
+      require('mini.surround').setup()
+
+      -- ╭─────────────────────────────────────────────────────────╮
+      -- │                    General workflow                     │
+      -- ╰─────────────────────────────────────────────────────────╯
+
       -- Presets for common options and mappings
       -- h: MiniBasics.config
       require('mini.basics').setup {
@@ -25,25 +61,12 @@ return {
         },
       }
 
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
-
-      -- Animate common Neovim actions
-      -- Replaced anuvyklack/windows.nvim
-      require('mini.animate').setup()
-
       -- Buffer removing (unshow, delete, wipeout), which saves window layout
-      -- Replaced famiu/bufdelete.nvim
       require('mini.bufremove').setup()
 
       -- Show next key clues
-      -- Replaced folke/which-key.nvim
       local miniclue = require 'mini.clue'
+      ---@modules mini.clue
       miniclue.setup {
         window = {
           config = {
@@ -108,22 +131,30 @@ return {
         },
       }
 
-      -- Comment lines
-      -- Replaced numToStr/Comment.nvim
-      require('mini.comment').setup()
-
-      -- Highlight cursor word and its matches
-      require('mini.cursorword').setup()
-
       -- Work with diff hunks
-      -- Replaced lewis6991/gitsigns.nvim
       require('mini.diff').setup()
 
       -- Git integration
       require('mini.git').setup()
 
+      -- Session management (read, write, delete)
+      require('mini.sessions').setup {
+        autowrite = true,
+        directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
+        file = '',
+      }
+
+      -- ╭─────────────────────────────────────────────────────────╮
+      -- │                       Appearance                        │
+      -- ╰─────────────────────────────────────────────────────────╯
+
+      -- Animate common Neovim actions
+      require('mini.animate').setup()
+
+      -- Highlight cursor word and its matches
+      require('mini.cursorword').setup()
+
       -- Highlight patterns in text
-      -- Replaced folke/todo-comments.nvim
       local hp = require 'mini.hipatterns'
       hp.setup {
         highlighters = {
@@ -170,36 +201,16 @@ return {
       }
 
       -- Visualize and work with indent scope
-      -- Replaced lukas-reineke/indent-blankline.nvim
       require('mini.indentscope').setup()
 
-      -- Text edit operators
-      -- g= - Evaluate text and replace with output
-      -- gx - Exchange text regions
-      -- gm - Multiply (duplicate) text
-      -- gr - Replace text with register
-      -- gs - Sort text
-      require('mini.operators').setup()
-
-      -- Session management (read, write, delete)
-      require('mini.sessions').setup {
-        autowrite = true,
-        directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
-        file = '',
-      }
-
-      -- Split and join arguments, lists, and other sequences
-      -- Replaced Wansmer/treesj
-      require('mini.splitjoin').setup()
-
       -- Fast and flexible start screen
-      -- Replaced glepnir/dashboard-nvim
       local starter = require 'mini.starter'
+      ---@modules mini.starter
       starter.setup {
         items = {
           starter.sections.telescope(),
           starter.sections.builtin_actions(),
-          starter.sections.sessions(5, true),
+          starter.sections.recent_files(5),
         },
         content_hooks = {
           starter.gen_hook.adding_bullet(),
@@ -209,38 +220,44 @@ return {
       }
 
       -- Minimal and fast statusline module with opinionated default look
-      -- Replaced nvim-lualine/lualine.nvim
       local sl = require 'mini.statusline'
+      ---@modules mini.statusline
       sl.setup {
         use_icons = true,
         set_vim_settings = true,
         content = {
           active = function()
-            local mode, mode_hl = sl.section_mode { trunc_width = 120 }
-            local git = sl.section_git { trunc_width = 9999 }
-            local diagnostics = sl.section_diagnostics { trunc_width = 9999 }
-            local filename = sl.section_filename { trunc_width = 9999 }
+            local mode, mode_hl = sl.section_mode { trunc_width = 100 }
+            local git = sl.section_git { trunc_width = 40 }
+            local diagnostics = sl.section_diagnostics {
+              trunc_width = 75,
+              signs = {
+                ERROR = 'E ',
+                WARN = 'W ',
+                INFO = 'I ',
+                HINT = 'H ',
+              },
+            }
+            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+            local filename = sl.section_filename { trunc_width = 140 }
             local fileinfo = sl.section_fileinfo { trunc_width = 9999 }
             local location = sl.section_location { trunc_width = 9999 }
             return sl.combine_groups {
               { hl = mode_hl, strings = { mode } },
-              { hl = 'statuslineDevinfo', strings = { git, diagnostics } },
+              {
+                hl = 'MiniStatuslineDevinfo',
+                strings = { git, lsp },
+              },
               '%<', -- Mark general truncate point
               { hl = 'statuslineFilename', strings = { filename } },
               '%=', -- End left alignment
+              { hl = 'statuslineFileinfo', strings = { diagnostics } },
               { hl = 'statuslineFileinfo', strings = { fileinfo } },
               { hl = mode_hl, strings = { location } },
             }
           end,
         },
       }
-
-      -- Fast and feature-rich surround actions
-      -- Replaced kylechui/nvim-surround
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
 
       -- Work with trailing whitespace
       require('mini.trailspace').setup()
