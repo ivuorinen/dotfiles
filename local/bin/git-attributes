@@ -11,10 +11,10 @@ set -euo pipefail
 VERBOSE=0
 CHECK_PATTERN="text: auto"
 EXIT_ON_MISSING=0
-SUGGEST_RULES=1  # Suggestions enabled by default
-WRITE_RULES=0    # Writing to file is opt-in
-FORMAT_WIDTH=0   # Auto-width by default (0 means auto)
-MIN_FORMAT_WIDTH=20  # Minimum format width
+SUGGEST_RULES=1     # Suggestions enabled by default
+WRITE_RULES=0       # Writing to file is opt-in
+FORMAT_WIDTH=0      # Auto-width by default (0 means auto)
+MIN_FORMAT_WIDTH=20 # Minimum format width
 
 DEBUG="${DEBUG:-0}"
 
@@ -23,27 +23,33 @@ if [ "$DEBUG" -eq 1 ]; then
 fi
 
 # Output functions
-msg_err() {
+msg_err()
+{
   echo -e "\e[31m$@\e[0m" >&2
 }
 
-msg_success() {
+msg_success()
+{
   echo -e "\e[32m$@\e[0m"
 }
 
-msg_warn() {
+msg_warn()
+{
   echo -e "\e[33m$@\e[0m" >&2
 }
 
-msg_info() {
+msg_info()
+{
   echo -e "\e[36m$@\e[0m"
 }
 
-msg_debug() {
+msg_debug()
+{
   [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$@\e[0m"
 }
 
-show_help() {
+show_help()
+{
   cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
@@ -64,31 +70,31 @@ EOF
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -h|--help)
+    -h | --help)
       show_help
       exit 0
       ;;
-    -v|--verbose)
+    -v | --verbose)
       VERBOSE=1
       shift
       ;;
-    -e|--exit)
+    -e | --exit)
       EXIT_ON_MISSING=1
       shift
       ;;
-    -p|--pattern)
+    -p | --pattern)
       CHECK_PATTERN="$2"
       shift 2
       ;;
-    -n|--no-suggest)
+    -n | --no-suggest)
       SUGGEST_RULES=0
       shift
       ;;
-    -w|--write)
+    -w | --write)
       WRITE_RULES=1
       shift
       ;;
-    -f|--format-width)
+    -f | --format-width)
       if [[ $2 =~ ^[0-9]+$ ]]; then
         FORMAT_WIDTH=$2
         shift 2
@@ -106,7 +112,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Function to check if git is installed
-check_git_installed() {
+check_git_installed()
+{
   if ! command -v git &> /dev/null; then
     msg_err "git could not be found, please install it first"
     exit 1
@@ -114,15 +121,17 @@ check_git_installed() {
 }
 
 # Check if we're in a git repository
-check_git_repo() {
-  if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+check_git_repo()
+{
+  if ! git rev-parse --is-inside-work-tree &> /dev/null; then
     msg_err "Not inside a git repository"
     exit 1
   fi
 }
 
 # Check if we're in the git root directory
-check_git_root() {
+check_git_root()
+{
   local git_root
   git_root=$(git rev-parse --show-toplevel)
   local current_dir
@@ -136,7 +145,8 @@ check_git_root() {
 }
 
 # Check if .gitattributes exists
-check_gitattributes_exists() {
+check_gitattributes_exists()
+{
   if [[ ! -f ".gitattributes" ]]; then
     msg_err ".gitattributes file not found in the repository root"
     msg_warn "Create a .gitattributes file before running this command"
@@ -145,7 +155,8 @@ check_gitattributes_exists() {
 }
 
 # Format rule with proper alignment
-format_rule() {
+format_rule()
+{
   local pattern="$1"
   local attributes="$2"
   local width="$3"
@@ -166,7 +177,8 @@ format_rule() {
 }
 
 # Get the file extension properly, handling special cases
-get_file_extension() {
+get_file_extension()
+{
   local file="$1"
   local basename=$(basename "$file")
   local extension=""
@@ -199,7 +211,8 @@ get_file_extension() {
 }
 
 # Suggest appropriate gitattributes rules based on file extension
-suggest_rule() {
+suggest_rule()
+{
   local file="$1"
   local extension=""
   local pattern=""
@@ -237,15 +250,15 @@ suggest_rule() {
   # Common text files
   case "$extension" in
     # Shell scripts
-    sh|bash|zsh|fish)
+    sh | bash | zsh | fish)
       attributes="text eol=lf diff=shell"
       ;;
 
     # Web development
-    html|htm|xhtml|css|scss|sass|less)
+    html | htm | xhtml | css | scss | sass | less)
       attributes="text eol=lf diff=html"
       ;;
-    js|jsx|ts|tsx|json|json5)
+    js | jsx | ts | tsx | json | json5)
       attributes="text eol=lf diff=javascript"
       ;;
 
@@ -262,20 +275,20 @@ suggest_rule() {
     go)
       attributes="text eol=lf diff=golang"
       ;;
-    java|kt|scala)
+    java | kt | scala)
       attributes="text eol=lf diff=java"
       ;;
-    c|cpp|h|hpp)
+    c | cpp | h | hpp)
       attributes="text eol=lf diff=cpp"
       ;;
 
     # Documentation
-    md|markdown|txt)
+    md | markdown | txt)
       attributes="text eol=lf"
       ;;
 
     # Configuration files
-    yml|yaml|toml|ini|cfg|conf)
+    yml | yaml | toml | ini | cfg | conf)
       attributes="text eol=lf"
       ;;
 
@@ -283,24 +296,24 @@ suggest_rule() {
     git)
       attributes="text eol=lf"
       ;;
-    gitignore|gitattributes)
+    gitignore | gitattributes)
       attributes="text eol=lf"
       ;;
 
     # Binary files
-    png|jpg|jpeg|gif|ico|svg|webp|avif)
+    png | jpg | jpeg | gif | ico | svg | webp | avif)
       attributes="binary"
       ;;
-    pdf|doc|docx|xls|xlsx|ppt|pptx)
+    pdf | doc | docx | xls | xlsx | ppt | pptx)
       attributes="binary"
       ;;
-    zip|tar|gz|7z|rar)
+    zip | tar | gz | 7z | rar)
       attributes="binary"
       ;;
-    mp3|mp4|avi|mov|wav|ogg)
+    mp3 | mp4 | avi | mov | wav | ogg)
       attributes="binary"
       ;;
-    ttf|otf|woff|woff2|eot)
+    ttf | otf | woff | woff2 | eot)
       attributes="binary"
       ;;
 
@@ -321,7 +334,8 @@ suggest_rule() {
 }
 
 # Function to check for missing .gitattributes
-check_gitattributes() {
+check_gitattributes()
+{
   local missing_attributes
   msg_info "Checking for pattern: $CHECK_PATTERN"
 
@@ -362,7 +376,8 @@ check_gitattributes() {
 }
 
 # Parse rule string and extract pattern and attributes
-parse_rule() {
+parse_rule()
+{
   local rule="$1"
 
   if [[ "$rule" == "#"* ]]; then
@@ -379,7 +394,8 @@ parse_rule() {
 }
 
 # Check shell scripts by name regardless of extension
-detect_shell_scripts() {
+detect_shell_scripts()
+{
   msg_debug "Detecting shell scripts by name regardless of extension..."
 
   local shell_scripts_rules=""
@@ -510,13 +526,14 @@ detect_shell_scripts() {
 
   # Return the formatted arrays
   local rules_count=${#patterns[@]}
-  for ((i=0; i<rules_count; i++)); do
+  for ((i = 0; i < rules_count; i++)); do
     echo "${patterns[$i]}:${attributes[$i]}"
   done
 }
 
 # Function to suggest gitattributes rules
-suggest_gitattributes() {
+suggest_gitattributes()
+{
   local missing_attributes="$1"
   local files
   local extension_suggestions=()
@@ -613,7 +630,7 @@ suggest_gitattributes() {
   # Format and output all suggestions with proper alignment
   local rule_count=${#all_patterns[@]}
 
-  for ((i=0; i<rule_count; i++)); do
+  for ((i = 0; i < rule_count; i++)); do
     local pattern="${all_patterns[$i]}"
     local attributes="${all_attributes[$i]}"
 
@@ -637,7 +654,8 @@ suggest_gitattributes() {
 }
 
 # Write suggestions to .gitattributes file
-write_to_gitattributes() {
+write_to_gitattributes()
+{
   local suggestions="$1"
   local gitattributes=".gitattributes"
 
@@ -664,7 +682,8 @@ write_to_gitattributes() {
 }
 
 # Main function
-main() {
+main()
+{
   check_git_installed
   check_git_repo
   check_git_root
