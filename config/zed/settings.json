@@ -10,6 +10,11 @@
     "version": "2"
   },
   "languages": {
+    "Python": {
+      "enable_language_server": true,
+      "allow_rewrap": "anywhere",
+      "auto_indent_on_paste": true
+    },
     "Shell Script": {
       "enable_language_server": true
     },
@@ -60,13 +65,9 @@
   },
   "ui_font_size": 16,
   "buffer_font_size": 16,
-  "buffer_font_fallbacks": [
-    "JetBrainsMono Nerd Font"
-  ],
+  "buffer_font_fallbacks": ["JetBrainsMono Nerd Font"],
   "edit_predictions": {
-    "disabled_globs": [
-      ".env"
-    ]
+    "disabled_globs": [".env"]
   },
   "hour_format": "hour24"
 }
