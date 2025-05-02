@@ -17,7 +17,7 @@ cnoreabbrev Qall qall   " quit all
 "" Mappings
 "*****************************************************************************
 
-noremap <C-S> :w<CR>               " save buffer
+noremap <C-s> :w<CR>               " save buffer
 
 " Split
 noremap <Leader>h :<C-u>split<CR>  " horizontal split
@@ -57,7 +57,7 @@ noremap <Leader>r :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " fzf.vim
 let $FZF_DEFAULT_COMMAND = "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'vendor/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
-cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
+cnoremap <C-p> <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <silent> <leader>b :Buffers<CR>
 nnoremap <silent> <leader>e :FZF -m<CR>
 " Recovery commands from history through FZF
