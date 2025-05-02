@@ -17,13 +17,53 @@ DEBUG="${DEBUG:-0}"
 # Enable debugging with DEBUG=1
 [ "${DEBUG:-0}" -eq 1 ] && set -x
 
+# Detect the current shell
+CURRENT_SHELL=$(ps -p $$ -ocomm= | awk -F/ '{print $NF}')
+
+# Function to prepend a path to PATH based on the shell
+x-path-prepend()
+{
+  local dir=$1
+  case "$CURRENT_SHELL" in
+    fish)
+      set -U fish_user_paths "$dir" $fish_user_paths
+      ;;
+    sh | bash | zsh)
+      PATH="$dir:$PATH"
+      ;;
+    *)
+      echo "Unsupported shell: $CURRENT_SHELL"
+      exit 1
+      ;;
+  esac
+}
+
+# Function to set environment variables based on the shell
+x-set-env()
+{
+  local var=$1
+  local value=$2
+  case "$CURRENT_SHELL" in
+    fish)
+      set -x "$var" "$value"
+      ;;
+    sh | bash | zsh)
+      export "$var=$value"
+      ;;
+    *)
+      echo "Unsupported shell: $CURRENT_SHELL"
+      exit 1
+      ;;
+  esac
+}
+
 # Explicitly set XDG folders, if not already set
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-[ -z "$XDG_CONFIG_HOME" ] && export XDG_CONFIG_HOME="$HOME/.config"
-[ -z "$XDG_DATA_HOME" ] && export XDG_DATA_HOME="$HOME/.local/share"
-[ -z "$XDG_CACHE_HOME" ] && export XDG_CACHE_HOME="$HOME/.cache"
-[ -z "$XDG_STATE_HOME" ] && export XDG_STATE_HOME="$HOME/.local/state"
-[ -z "$XDG_BIN_HOME" ] && export XDG_BIN_HOME="$HOME/.local/bin"
+x-set-env XDG_CONFIG_HOME "$HOME/.config"
+x-set-env XDG_DATA_HOME "$HOME/.local/share"
+x-set-env XDG_CACHE_HOME "$HOME/.cache"
+x-set-env XDG_STATE_HOME "$HOME/.local/state"
+x-set-env XDG_BIN_HOME "$HOME/.local/bin"
 
 # Paths
 x-path-prepend "/usr/local/bin"

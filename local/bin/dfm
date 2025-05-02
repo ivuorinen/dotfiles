@@ -15,9 +15,35 @@
 
 SCRIPT=$(basename "$0")
 
-# Loads configs for better installation experience
-source "$DOTFILES/config/shared.sh"
-source "${DOTFILES}/local/bin/msgr"
+# Detect the current shell
+CURRENT_SHELL=$(ps -p $$ -ocomm= | awk -F/ '{print $NF}')
+
+# Function to source files based on the shell
+source_file()
+{
+  local file=$1
+  case "$CURRENT_SHELL" in
+    fish)
+      if [[ -f "$file.fish" ]]; then
+        source "$file.fish"
+      else
+        echo "Fish shell file not found: $file.fish"
+        exit 1
+      fi
+      ;;
+    sh | bash | zsh)
+      source "$file"
+      ;;
+    *)
+      echo "Unsupported shell: $CURRENT_SHELL"
+      exit 1
+      ;;
+  esac
+}
+
+# Modify the source commands to use the new function
+source_file "$DOTFILES/config/shared.sh"
+source_file "${DOTFILES}/local/bin/msgr"
 
 # Menu builder
 menu_builder()
@@ -267,7 +293,7 @@ section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
   MENU=(
-    "aliases:<shell> (bash, zsh) Show aliases"
+    "aliases:<shell> (bash, zsh, fish) Show aliases"
     "colors:Show colors"
     "env:Show environment variables"
     "functions:Show functions"
@@ -297,8 +323,11 @@ section_helpers()
         "bash")
           bash -ixc : 2>&1 | grep -E '> alias' | sed "s|$HOME|~|" | grep -v "(eval)"
           ;;
+        "fish")
+          fish -ic "alias" | sed "s|$HOME|~|"
+          ;;
         *)
-          echo "$SCRIPT helpers aliases <shell> (bash, zsh)"
+          echo "$SCRIPT helpers aliases <shell> (bash, zsh, fish)"
           ;;
       esac
       ;;
