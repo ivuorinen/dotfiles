@@ -54,8 +54,8 @@
   "vim_mode": true,
   "theme": {
     "mode": "system",
-    "light": "Iceberg",
-    "dark": "Iceberg"
+    "light": "Tokyo Night Light",
+    "dark": "Tokyo Night Storm"
   },
   "inlay_hints": {
     "enabled": true,
@@ -65,9 +65,13 @@
   },
   "ui_font_size": 16,
   "buffer_font_size": 16,
-  "buffer_font_fallbacks": ["JetBrainsMono Nerd Font"],
+  "buffer_font_fallbacks": [
+    "JetBrainsMono Nerd Font"
+  ],
   "edit_predictions": {
-    "disabled_globs": [".env"]
+    "disabled_globs": [
+      ".env"
+    ]
   },
   "hour_format": "hour24"
 }
