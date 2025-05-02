@@ -201,7 +201,7 @@ process_args()
   # Initialize log file if specified
   if [[ -n "$LOG_FILE" ]]; then
     # Create log directory if it doesn't exist
-    mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+    mkdir -p "$(dirname "$LOG_FILE")" 2> /dev/null || true
     # Initialize log file
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] [INFO] Started git-update-dirs version $VERSION" > "$LOG_FILE"
   fi
@@ -375,7 +375,7 @@ cleanup_branches()
   local cleaned=0
   local current_branch output
 
-  current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  current_branch=$(git symbolic-ref --short HEAD 2> /dev/null)
 
   # Skip branch cleanup if we're not on a main branch
   if [[ ! "$current_branch" =~ ^(master|main|develop)$ ]]; then
@@ -397,7 +397,7 @@ cleanup_branches()
     # Delete branches
     for branch in $output; do
       if [[ -n "$branch" ]]; then
-        if git branch -d "$branch" &>/dev/null; then
+        if git branch -d "$branch" &> /dev/null; then
           ((cleaned++))
           log "INFO" "Deleted merged branch $branch in $(pwd)"
         else
@@ -426,7 +426,7 @@ update_repo()
   # Show progress before starting the operation
   show_progress "$PROCESSED" "$TOTAL" "${dir%/}"
 
-  cd "$dir" 2>/dev/null || {
+  cd "$dir" 2> /dev/null || {
     log "ERROR" "Could not enter directory $dir"
     echo -e "\n${RED}Error: Could not enter directory $dir${NC}" >&2
     ((FAILED++))
@@ -438,37 +438,37 @@ update_repo()
     log "INFO" "Skipping directory with no remotes: $dir"
     msg "Skipping directory with no remotes: $dir"
     ((SKIPPED++))
-    cd - >/dev/null || true
+    cd - > /dev/null || true
     return 1
   fi
 
   # Get current branch name
-  current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  current_branch=$(git symbolic-ref --short HEAD 2> /dev/null)
   if [[ -z "$current_branch" ]]; then
     log "INFO" "Skipping repository in detached HEAD state: $dir"
     msg "Skipping repository in detached HEAD state: $dir"
     ((SKIPPED++))
-    cd - >/dev/null || true
+    cd - > /dev/null || true
     return 1
   fi
 
   # Check if current branch has tracking information
-  eval "git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null" &>/dev/null || {
+  eval "git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null" &> /dev/null || {
     log "INFO" "Skipping branch '$current_branch' without tracking info in $dir"
     msg "Skipping branch '$current_branch' without tracking info in $dir"
     ((SKIPPED++))
-    cd - >/dev/null || true
+    cd - > /dev/null || true
     return 1
   }
 
   # Check if remote is accessible
   remote_name=$(git config --get branch."$current_branch".remote)
   if [[ -n "$remote_name" ]]; then
-    if ! git ls-remote --exit-code "$remote_name" &>/dev/null; then
+    if ! git ls-remote --exit-code "$remote_name" &> /dev/null; then
       log "WARNING" "Skipping repository with inaccessible remote '$remote_name': $dir"
       msg "Skipping repository with inaccessible remote: $dir"
       ((SKIPPED++))
-      cd - >/dev/null || true
+      cd - > /dev/null || true
       return 1
     fi
   fi
@@ -478,7 +478,7 @@ update_repo()
     log "WARNING" "Skipping repository with unmerged files: $dir"
     msg "Skipping repository with unmerged files: $dir"
     ((UNMERGED++))
-    cd - >/dev/null || true
+    cd - > /dev/null || true
     return 1
   fi
 
@@ -579,7 +579,7 @@ update_repo()
   fi
 
   # Return to original directory
-  cd - >/dev/null || true
+  cd - > /dev/null || true
 
   # Show progress after completion
   show_progress "$PROCESSED" "$TOTAL" "${dir%/} - Done"
