@@ -29,7 +29,20 @@ LOG_LEVEL="${LOG_LEVEL:-INFO}"
 #
 # @description Log a message to the console
 # @param $* Message to log
-# @return void
+# Logs a message with a timestamp.
+#
+# Description:
+#   Outputs the provided message(s) to standard output, prepended with the current date and
+#   time in the format [YYYY-MM-DD HH:MM:SS]. This timestamp helps in tracking log events.
+#
+# Arguments:
+#   One or more strings that form the log message.
+#
+# Outputs:
+#   Writes the timestamped log message to standard output.
+#
+# Example:
+#   lib::log "Server started"   # Outputs: [2025-02-28 09:45:00] Server started
 lib::log()
 {
   printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"
@@ -42,7 +55,19 @@ lib::log()
 #
 # @description Log an error message to the console
 # @param $* Error message
-# @return void
+# Logs an error message with a timestamp to standard error.
+#
+# This function formats the provided message(s) by prefixing it with the current date
+# and time along with an "ERROR:" label, then outputs the result to STDERR.
+#
+# Arguments:
+#   $* - The error message or messages to be logged.
+#
+# Outputs:
+#   Writes the formatted error message to STDERR.
+#
+# Example:
+#   lib::error "Failed to read the configuration file."
 lib::error()
 {
   printf '[%s] ERROR: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >&2
@@ -57,7 +82,30 @@ lib::error()
 # @description Handle an error
 # @param $1 Line number
 # @param $2 Command
-# @return void
+# Logs an error message based on the previous command's exit code and the provided context.
+#
+# This function captures the exit code from the last executed command and, using the provided
+# line number and command string, determines the appropriate error message to log based on
+# predefined error codes stored in the ERROR_CODES associative array.
+#
+# Globals:
+#   ERROR_CODES - An associative array mapping error code names to numeric values.
+#   lib::error  - Logs error messages to STDERR.
+#
+# Arguments:
+#   line_no  - The line number in the script where the error occurred.
+#   command  - The command that was executed when the error occurred.
+#
+# Outputs:
+#   Writes a descriptive error message to STDERR.
+#
+# Returns:
+#   The exit code of the failed command.
+#
+# Example:
+#   # If a command fails with an exit code corresponding to an invalid argument:
+#   lib::error::handle 42 "some_command"
+#   # This logs: "Invalid argument at line 42 in command 'some_command'" (if the exit code matches ERROR_CODES[INVALID_ARGUMENT])
 lib::error::handle()
 {
   local exit_code=$?
@@ -99,7 +147,23 @@ lib::error::handle()
 # @description Throw an error
 # @param $1 Error code name
 # @param $* Error message
-# @return void
+# Logs an error message and terminates the script by performing cleanup with a specified error code.
+#
+# Globals:
+#   ERROR_CODES - Associative array mapping error code names to numeric exit values.
+#
+# Arguments:
+#   code_name - The key to retrieve the error code from the ERROR_CODES array.
+#   message   - The error message to log, constructed from all subsequent arguments.
+#
+# Outputs:
+#   Logs the error message to standard error.
+#
+# Returns:
+#   Exits the script via the cleanup function; does not return.
+#
+# Example:
+#   lib::error::throw "FILE_NOT_FOUND" "Required file not found: /path/to/file"
 lib::error::throw()
 {
   local code_name=$1
@@ -125,7 +189,21 @@ lib::error::throw()
 # @description Log a message to the console based on the log level setting.
 # @param $1 Log level
 # @param $2 Message
-# @return void
+# Logs a message if its severity meets or exceeds the global log level.
+#
+# Globals:
+#   LOG_LEVELS - Associative array mapping log level names to severity values.
+#   LOG_LEVEL  - The current log level threshold.
+#
+# Arguments:
+#   level: A string representing the log severity (e.g., DEBUG, INFO, WARN, ERROR).
+#   msg:   The message to log.
+#
+# Outputs:
+#   Prints a formatted log message with a timestamp to STDERR when the specified level qualifies.
+#
+# Example:
+#   logger::log INFO "Initialization complete"
 logger::log()
 {
   local level=$1
@@ -146,7 +224,14 @@ logger::log()
 #
 # @description Log a debug message to the console
 # @param $* Message
-# @return void
+# Logs a debug-level message.
+#
+# This function logs a message at the DEBUG level by delegating to logger::log.
+# It accepts one or more arguments that form the debug message, which are passed along
+# to the underlying logger::log function.
+#
+# Example:
+#   logger::debug "Debug info for variable x:" "$x"
 logger::debug()
 {
   logger::log "DEBUG" "$@"
@@ -161,7 +246,20 @@ logger::debug()
 #
 # @description Log an info message to the console
 # @param $* Message
-# @return void
+# Logs an informational message to the console.
+#
+# Description:
+#   This function wraps the logger::log function to log messages at the "INFO" level. All provided arguments are
+#   forwarded to logger::log, where the message is formatted and output based on the current logging configuration.
+#
+# Arguments:
+#   A message string followed by optional additional parameters used to format the message.
+#
+# Outputs:
+#   The formatted informational message is written to STDOUT if the INFO log level is enabled.
+#
+# Example:
+#   logger::info "Service started successfully on port" 8080
 logger::info()
 {
   logger::log "INFO" "$@"
@@ -176,7 +274,19 @@ logger::info()
 #
 # @description Log a warning message to the console
 # @param $* Message
-# @return void
+# Logs a warning message.
+#
+# This function acts as a wrapper around `logger::log` by setting the log level to "WARN"
+# for all provided message arguments. It forwards the given messages to the logger for output.
+#
+# Arguments:
+#   A variable list of strings representing the warning message.
+#
+# Outputs:
+#   Writes a formatted warning message to the console.
+#
+# Example:
+#   logger::warn "Low disk space" "Free up some space to avoid issues"
 logger::warn()
 {
   logger::log "WARN" "$@"
@@ -191,7 +301,16 @@ logger::warn()
 #
 # @description Log an error message to the console
 # @param $* Message
-# @return void
+# Logs an error message at the ERROR level.
+#
+# This function wraps the generic logging mechanism to record error messages by automatically
+# specifying the ERROR severity level. It passes all provided arguments to the underlying logging function.
+#
+# Arguments:
+#   Error message(s) – One or more strings that describe the error.
+#
+# Example:
+#   logger::error "Unable to open file" "/path/to/file"
 logger::error()
 {
   logger::log "ERROR" "$@"
@@ -202,7 +321,16 @@ logger::error()
 # The function is registered with the `EXIT` trap.
 #
 # @description Remove temporary files and directories
-# @return void
+# Cleans up temporary resources before exiting.
+#
+# Globals:
+#   TEMP_DIR - Path to the temporary directory to be removed if it exists.
+#
+# Returns:
+#   Exits the script with the original exit code.
+#
+# Example:
+#   trap cleanup EXIT
 cleanup()
 {
   local exit_code=$?
@@ -225,7 +353,22 @@ trap cleanup EXIT
 #
 # @description Handle an error
 # @param $1 Line number
-# @return void
+# Handles an error event by logging the line number and corresponding exit code.
+#
+# Globals:
+#   $? - The exit code of the last executed command.
+#
+# Arguments:
+#   $1 - The line number where the error occurred.
+#
+# Outputs:
+#   Logs an error message to STDERR via logger::error.
+#
+# Returns:
+#   None
+#
+# Example:
+#   handle_error ${LINENO}
 handle_error()
 {
   local exit_code=$?
