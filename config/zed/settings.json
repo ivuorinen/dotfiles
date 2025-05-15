@@ -3,9 +3,10 @@
     "metrics": false
   },
   "assistant": {
+    "always_allow_tool_actions": false,
     "default_model": {
       "provider": "copilot_chat",
-      "model": "claude-3.7-sonnet-thought"
+      "model": "gpt-4o"
     },
     "version": "2"
   },
@@ -65,13 +66,9 @@
   },
   "ui_font_size": 16,
   "buffer_font_size": 16,
-  "buffer_font_fallbacks": [
-    "JetBrainsMono Nerd Font"
-  ],
+  "buffer_font_fallbacks": ["JetBrainsMono Nerd Font"],
   "edit_predictions": {
-    "disabled_globs": [
-      ".env"
-    ]
+    "disabled_globs": [".env", ".env.*"]
   },
   "hour_format": "hour24"
 }
