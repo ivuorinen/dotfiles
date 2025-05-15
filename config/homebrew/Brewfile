@@ -115,10 +115,10 @@ brew "harfbuzz"
 brew "dependency-check"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
-# .NET Core
-brew "dotnet@8", link: true
 # Spellchecker wrapping library
 brew "enchant"
+# Command-line tool to interact with exercism.io
+brew "exercism"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Banner-like program prints strings as ASCII art
