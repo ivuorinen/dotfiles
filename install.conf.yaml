@@ -45,9 +45,9 @@
     ~/.config/op/plugins.sh:
       relink: true
       path: config/op/plugins.sh
-    ~/.config/op/plugins/*:
+    ~/.config/op/plugins:
       relink: true
-      path: config/op/plugins/*
+      path: config/op/plugins
     # Scripts
     ~/.local/bin:
       glob: true
