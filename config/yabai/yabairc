@@ -22,16 +22,19 @@ yabai -m config \
 # apps to not manage (ignore)
 # TODO: add apps from aerospace config to here
 # list active apps:
-# > yabai -m query --windows | jq .[].app
+# > yabai -m query --windows | jq .[].app | sort | uniq
 yabai -m rule --add app="1Password" manage=off
 yabai -m rule --add app="Fork" manage=off
+yabai -m rule --add app="JetBrains Rider" manage=off
+yabai -m rule --add app="Logi Options" manage=off
+yabai -m rule --add app="MSTeams" manage=off
+yabai -m rule --add app="Microsoft Teams" manage=off
+yabai -m rule --add app="PhpStorm" manage=off
+yabai -m rule --add app="Slack" manage=off
 yabai -m rule --add app="System Settings" manage=off
-yabai -m rule --add app="^Logi Options$" manage=off
-yabai -m rule --add app="^Microsoft Teams$" manage=off
-yabai -m rule --add app="^PhpStorm$" manage=off
-yabai -m rule --add app="^Slack$" manage=off
-yabai -m rule --add app="^TIDAL$" manage=off
-yabai -m rule --add app="^Windows App$" manage=off
+yabai -m rule --add app="TIDAL" manage=off
+yabai -m rule --add app="Windows App" manage=off
+yabai -m rule --add app="Zoom" manage=off
 
 # apply rules
 yabai -m rule --apply
