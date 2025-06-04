@@ -46,8 +46,24 @@ def test():
     assert vercmp("2.4 >= 2.4")
     assert vercmp("2.5 >= 2.4")
     assert vercmp("3 >= 2.999")
-    assert vercmp("2.9 < 2.9a")
+    assert vercmp("2.9a < 2.9")
     assert vercmp("2.9a >= 2.8")
+
+    # multiple comparisons in a single expression
+    assert vercmp("1.0 < 2.0 <= 2.0")
+    assert not vercmp("1.0 > 2.0 < 3.0")
+
+    # mixed major/minor version comparisons
+    assert vercmp("2 >= 1.5")
+    assert not vercmp("1 < 1.0")
+
+    # invalid operator should raise an error
+    try:
+        vercmp("1.0 <> 2.0")
+    except KeyError:
+        pass
+    else:
+        assert False, "invalid operator did not raise"
 
 
 if __name__ == "__main__":
