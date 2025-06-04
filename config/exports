@@ -213,7 +213,7 @@ get_sha256sum()
 # $2 - filename (string)
 #
 # Returns 1 when replaceable, 0 when not replaceable.
-replacable()
+replaceable()
 {
   FILE1="$1"
   FILE2="$2"

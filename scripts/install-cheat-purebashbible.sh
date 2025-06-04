@@ -59,7 +59,7 @@ process_chapters()
     header=$(grep -e '^[#] ' "$f" | head -1 | awk '{print tolower($2)}')
     cheat_file="$cheat_dest/$header"
 
-    if ! replacable "$f" "$cheat_file"; then
+    if ! replaceable "$f" "$cheat_file"; then
       cp "$f" "$cheat_file" && msg_run "Updated: $cheat_file"
     fi
 
