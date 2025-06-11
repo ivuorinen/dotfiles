@@ -22,6 +22,10 @@ declare -A LOG_LEVELS=(
   [ERROR]=3
 )
 LOG_LEVEL="${LOG_LEVEL:-INFO}"
+if [[ -z "${LOG_LEVELS[$LOG_LEVEL]+_}" ]]; then
+  lib::error "Invalid LOG_LEVEL: $LOG_LEVEL"
+  exit "${ERROR_CODES[INVALID_ARGUMENT]}"
+fi
 
 # Simple logging function
 #
@@ -171,6 +175,11 @@ lib::error::throw()
   shift
   local message=$*
 
+  if [[ -z "${ERROR_CODES[$code_name]+_}" ]]; then
+    lib::error "Unknown error code: $code_name"
+    cleanup "${ERROR_CODES[INVALID_ARGUMENT]}"
+  fi
+
   lib::error "$message"
   cleanup "${ERROR_CODES[$code_name]}"
 }
@@ -214,7 +223,7 @@ logger::log()
   fi
 
   shift
-  local msg=$1
+  local msg="$*"
 
   if [[ ${LOG_LEVELS[$level]} -ge ${LOG_LEVELS[$LOG_LEVEL]} ]]; then
     printf '[%s] [%s]: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$level" "$msg" >&2
