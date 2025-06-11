@@ -14,4 +14,3 @@ run_with_dfm() {
       set +e
       eval "$cmd"' bash "$cmd"
 }
-

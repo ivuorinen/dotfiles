@@ -208,6 +208,11 @@ lib::error::throw()
 logger::log()
 {
   local level=$1
+  if [[ -z "${LOG_LEVELS[$level]:-}" ]]; then
+    lib::error "Invalid log level: $level"
+    return 1
+  fi
+
   shift
   local msg=$1
 
