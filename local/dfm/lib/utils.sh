@@ -683,7 +683,7 @@ main::get_function_description()
 
   [[ -f "$cmd_file" ]] || return 1
 
-  grep -B3 -E "^[[:space:]]*(function[[:space:]]*)?${func}\(\)[[:space:]]*(\{)?" "$cmd_file" \
+  grep -B5 -E "^[[:space:]]*(function[[:space:]]*)?${func}\(\)[[:space:]]*(\{)?" "$cmd_file" \
     | grep "@description" \
     | sed -E 's/^[[:space:]]*#[[:space:]]*@description[[:space:]]*//'
 }

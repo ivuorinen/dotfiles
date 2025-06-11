@@ -4,6 +4,8 @@ set -euo pipefail
 # Default paths can be overridden via environment variables
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
+: "${TEMP_DIR:=$(mktemp -d)}"
+: "${DFM_MAX_RETRIES:=3}"
 # Installation functions for dfm, the dotfile manager
 #
 # @author Ismo Vuorinen <https://github.com/ivuorinen>
