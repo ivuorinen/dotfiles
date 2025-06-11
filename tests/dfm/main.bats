@@ -40,6 +40,14 @@ teardown() {
   [ "$status" -eq 1 ]
 }
 
+@test "install all respects skip options" {
+  run_with_dfm "main::execute_command install all --no-brew --no-cargo --no-automation"
+  [ "$status" -eq 0 ]
+  echo "$output" | grep -q "Installing fonts"
+  ! echo "$output" | grep -q "Installing Homebrew"
+  ! echo "$output" | grep -q "Rust and cargo packages"
+}
+
 @test "get_function_description returns description" {
   run_with_dfm "main::get_function_description $PROJECT_ROOT/local/dfm/cmd/install.sh fonts"
   [ "$status" -eq 0 ]

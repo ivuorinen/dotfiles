@@ -8,9 +8,10 @@ run_with_dfm() {
     NO_AUTOMATION="${NO_AUTOMATION:-1}" \
     TEMP_DIR="$TEMP_DIR" \
     bash -c 'set -e
+      cmd="$1"
       source "$PROJECT_ROOT/local/dfm/lib/common.sh"
       source "$PROJECT_ROOT/local/dfm/lib/utils.sh"
       set +e
-      eval "$1"' bash "$cmd"
+      eval "$cmd"' bash "$cmd"
 }
 
