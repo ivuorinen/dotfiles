@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Default paths can be overridden via environment variables
+: "${DOTFILES:=$HOME/.dotfiles}"
+: "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
 # Installation functions for dfm, the dotfile manager
 #
 # @author Ismo Vuorinen <https://github.com/ivuorinen>
@@ -26,6 +30,9 @@ set -euo pipefail
 #
 # Example:
 #   all
+#
+# @description
+#   Parse command line options controlling installation steps.
 parse_options()
 {
   NO_AUTOMATION=0
@@ -56,8 +63,10 @@ parse_options()
   done
 }
 
-function all()
-{
+# @description
+#   Install all configured components by calling each individual
+#   installation routine unless skipped via options.
+function all() {
   parse_options "$@"
 
   lib::log "Installing all packages..."
@@ -91,8 +100,12 @@ function all()
 #
 # Example:
 #   fonts
-function fonts()
-{
+#
+# @description Install all configured fonts from helper script, prompting the user unless automation is disabled.
+function fonts() {
+
+  : "${SKIP_FONTS:=0}"
+  : "${NO_AUTOMATION:=0}"
 
   if [[ $SKIP_FONTS -eq 1 ]]; then
     lib::log "Skipping fonts installation"
@@ -126,8 +139,12 @@ function fonts()
 #
 # Example:
 #   brew
-function brew()
-{
+#
+# @description Install Homebrew and declared packages using the Brewfile.
+function brew() {
+
+  : "${SKIP_BREW:=0}"
+  : "${NO_AUTOMATION:=0}"
 
 
   if [[ $SKIP_BREW -eq 1 ]]; then
@@ -170,8 +187,12 @@ function brew()
 #
 # Example:
 #   cargo
-function cargo()
-{
+#
+# @description Install Rust tooling and cargo packages using helper scripts.
+function cargo() {
+
+  : "${SKIP_CARGO:=0}"
+  : "${NO_AUTOMATION:=0}"
 
 
   if [[ $SKIP_CARGO -eq 1 ]]; then
