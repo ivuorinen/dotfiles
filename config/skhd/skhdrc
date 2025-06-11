@@ -80,10 +80,12 @@ ctrl + alt - h : yabai -m window --grid 1:2:0:0:1:1 # 1/2 left
 ctrl + alt - l : yabai -m window --grid 1:2:1:0:1:1 # 1/2 right
 
 ## swap windows
-shift + alt - h : yabai -m window --swap west
+#shift + alt - h : yabai -m window --swap west
 shift + alt - j : yabai -m window --swap south
 shift + alt - k : yabai -m window --swap north
-shift + alt - l : yabai -m window --swap east
+#shift + alt - l : yabai -m window --swap east
+alt + shift - l : ~/.config/skhd/move.sh east
+alt + shift - h : ~/.config/skhd/move.sh west
 
 ## resize windows
 ctrl + alt - h : yabai -m window --resize left:-50:0; \
