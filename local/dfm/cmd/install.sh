@@ -6,6 +6,10 @@ set -euo pipefail
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
 : "${TEMP_DIR:=$(mktemp -d)}"
 : "${DFM_MAX_RETRIES:=3}"
+
+# Remove temp folder on exit
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
 # Installation functions for dfm, the dotfile manager
 #
 # @author Ismo Vuorinen <https://github.com/ivuorinen>
@@ -15,7 +19,7 @@ set -euo pipefail
 #
 # Description:
 #   Orchestrates the installation process for the dotfile manager by sequentially invoking
-#   the installation routines for fonts, Homebrew, and Rust (cargo). It logs the start of the 
+#   the installation routines for fonts, Homebrew, and Rust (cargo). It logs the start of the
 #   overall installation process before calling each respective function.
 #
 # Globals:
