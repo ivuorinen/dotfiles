@@ -684,7 +684,10 @@ main::get_function_description()
 
   [[ -f "$cmd_file" ]] || return 1
 
-  grep -B5 -E "^[[:space:]]*(function[[:space:]]*)?${func}\(\)[[:space:]]*(\{)?" "$cmd_file" \
+  local escaped_func
+  escaped_func=$(printf '%s' "$func" | sed 's/[][\\.^$*+?(){}|]/\\&/g')
+
+  grep -B5 -E "^[[:space:]]*(function[[:space:]]*)?${escaped_func}[[:space:]]*\\(\\)[[:space:]]*(\\{)?[[:space:]]*$" "$cmd_file" \
     | grep "@description" \
     | sed -E 's/^[[:space:]]*#[[:space:]]*@description[[:space:]]*//'
 }
