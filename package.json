@@ -10,7 +10,7 @@
     "fix:markdown": "npx markdownlint -df .",
     "lint:prettier": "npx prettier . --check",
     "fix:prettier": "npx prettier . --write",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "bats tests/dfm"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
     "@ivuorinen/base-configs": "^2.0.0",
+    "bats": "^1.12.0",
     "bundle-audit": "^0.1.0"
   },
   "packageManager": "yarn@1.22.22"
