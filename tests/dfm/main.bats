@@ -1,13 +1,14 @@
 load "$BATS_TEST_DIRNAME/helpers.bash"
 
 setup() {
+  set -euo pipefail
   PROJECT_ROOT="$BATS_TEST_DIRNAME/../.."
   TEMP_DIR="$(mktemp -d)"
   export TEMP_DIR
 }
 
 teardown() {
-  rm -rf "$TEMP_DIR"
+  [[ -n "${TEMP_DIR:-}" ]] && rm -rf "$TEMP_DIR"
 }
 
 @test "list_available_commands shows commands" {
@@ -18,13 +19,13 @@ teardown() {
 }
 
 @test "interactive confirm returns 0 on yes" {
-  run_with_dfm "utils::interactive::confirm \"Proceed?\" <<< \"y\"; echo \$?"
+  run_with_dfm 'utils::interactive::confirm "Proceed?" <<< "y"; echo $?'
   [ "$status" -eq 0 ]
   [ "${lines[-1]}" = "0" ]
 }
 
 @test "interactive confirm returns 1 on no" {
-  run_with_dfm "utils::interactive::confirm \"Proceed?\" <<< \"n\"; echo \$?"
+  run_with_dfm 'utils::interactive::confirm "Proceed?" <<< "n"; echo $?'
   [ "$status" -eq 0 ]
   [ "${lines[-1]}" = "1" ]
 }
@@ -49,7 +50,7 @@ teardown() {
 }
 
 @test "get_function_description returns description" {
-  run_with_dfm "main::get_function_description $PROJECT_ROOT/local/dfm/cmd/install.sh fonts"
+  run_with_dfm "main::get_function_description \"$PROJECT_ROOT/local/dfm/cmd/install.sh\" fonts"
   [ "$status" -eq 0 ]
   echo "$output" | grep -q "Install all configured fonts"
 }
