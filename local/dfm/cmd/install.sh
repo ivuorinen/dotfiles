@@ -25,12 +25,53 @@
 #
 # Example:
 #   all
+parse_options()
+{
+  NO_AUTOMATION=0
+  SKIP_FONTS=0
+  SKIP_BREW=0
+  SKIP_CARGO=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-automation)
+        NO_AUTOMATION=1
+        ;;
+      --no-fonts)
+        SKIP_FONTS=1
+        ;;
+      --no-brew)
+        SKIP_BREW=1
+        ;;
+      --no-cargo)
+        SKIP_CARGO=1
+        ;;
+      *)
+        lib::error "Unknown option: $1"
+        return 1
+        ;;
+    esac
+    shift
+  done
+}
+
 function all()
 {
+  parse_options "$@"
+
   lib::log "Installing all packages..."
-  fonts
-  brew
-  cargo
+
+  if [[ $SKIP_FONTS -eq 0 ]]; then
+    fonts "$@"
+  fi
+
+  if [[ $SKIP_BREW -eq 0 ]]; then
+    brew "$@"
+  fi
+
+  if [[ $SKIP_CARGO -eq 0 ]]; then
+    cargo "$@"
+  fi
 }
 
 # Installs fonts required by the dotfile manager.
@@ -51,8 +92,26 @@ function all()
 #   fonts
 function fonts()
 {
+  parse_options "$@"
+
+  if [[ $SKIP_FONTS -eq 1 ]]; then
+    lib::log "Skipping fonts installation"
+    return 0
+  fi
+
+  if [[ $NO_AUTOMATION -eq 0 ]]; then
+    utils::interactive::confirm "Install fonts?" || return 0
+  fi
+
   lib::log "Installing fonts..."
-  # implement fonts installation
+  local script="${DOTFILES}/scripts/install-fonts.sh"
+
+  if [[ ! -x "$script" ]]; then
+    lib::error "Font installation script not found: $script"
+    return 1
+  fi
+
+  bash "$script"
 }
 
 # Install Homebrew and set it up.
@@ -69,8 +128,35 @@ function fonts()
 #   brew
 function brew()
 {
+  parse_options "$@"
+
+  if [[ $SKIP_BREW -eq 1 ]]; then
+    lib::log "Skipping Homebrew installation"
+    return 0
+  fi
+
+  if [[ $NO_AUTOMATION -eq 0 ]]; then
+    utils::interactive::confirm "Install Homebrew packages?" || return 0
+  fi
+
   lib::log "Installing Homebrew..."
-  # implement Homebrew installation
+  if ! utils::is_installed brew; then
+    lib::log "Homebrew not found, installing..."
+
+    local installer="$TEMP_DIR/homebrew-install.sh"
+    utils::retry "$DFM_MAX_RETRIES" \
+      curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh \
+      -o "$installer"
+
+    NONINTERACTIVE=1 bash "$installer"
+  fi
+
+  if utils::is_installed brew; then
+    brew bundle install --file="$BREWFILE" --force --quiet
+  else
+    lib::error "Homebrew installation failed"
+    return 1
+  fi
 }
 
 # Installs Rust and cargo packages.
@@ -86,6 +172,33 @@ function brew()
 #   cargo
 function cargo()
 {
+  parse_options "$@"
+
+  if [[ $SKIP_CARGO -eq 1 ]]; then
+    lib::log "Skipping Rust and cargo installation"
+    return 0
+  fi
+
+  if [[ $NO_AUTOMATION -eq 0 ]]; then
+    utils::interactive::confirm "Install Rust and cargo packages?" || return 0
+  fi
+
   lib::log "Installing Rust and cargo packages..."
-  # implement Rust and cargo packages installation
+  if ! utils::is_installed cargo; then
+    lib::log "Rust not found, installing rustup..."
+
+    local installer="$TEMP_DIR/rustup-init.sh"
+    utils::retry "$DFM_MAX_RETRIES" \
+      curl https://sh.rustup.rs -sSf -o "$installer"
+    sh "$installer" -y
+    source "$HOME/.cargo/env"
+  fi
+
+  local script="${DOTFILES}/scripts/install-cargo-packages.sh"
+  if [[ -x "$script" ]]; then
+    bash "$script"
+  else
+    lib::error "Cargo packages script not found: $script"
+    return 1
+  fi
 }
