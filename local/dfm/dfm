@@ -3,25 +3,26 @@
 
 set -euo pipefail
 
-# define default variables
-DFM_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# allow overriding core directories
+DFM_SCRIPT_DIR="${DFM_SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 readonly DFM_SCRIPT_DIR
 export DFM_SCRIPT_DIR
-readonly DFM_CMD_DIR="${DFM_SCRIPT_DIR}/cmd"
+DFM_CMD_DIR="${DFM_CMD_DIR:-${DFM_SCRIPT_DIR}/cmd}"
+readonly DFM_CMD_DIR
 export DFM_CMD_DIR
-readonly DFM_LIB_DIR="${DFM_SCRIPT_DIR}/lib"
+DFM_LIB_DIR="${DFM_LIB_DIR:-${DFM_SCRIPT_DIR}/lib}"
+readonly DFM_LIB_DIR
 export DFM_LIB_DIR
-readonly DFM_DEFAULT_CONFIG_PATH="$HOME/.config"
+DFM_DEFAULT_CONFIG_PATH="${DFM_DEFAULT_CONFIG_PATH:-$HOME/.config}"
+readonly DFM_DEFAULT_CONFIG_PATH
 export DFM_DEFAULT_CONFIG_PATH
-readonly DFM_MAX_RETRIES=3
+DFM_MAX_RETRIES="${DFM_MAX_RETRIES:-3}"
+readonly DFM_MAX_RETRIES
 export DFM_MAX_RETRIES
-export DFM_DEFAULT_INSTALL_DIR="$HOME/.local"
-export DFM_DEFAULT_VERBOSE=0
-TEMP_DIR=$(mktemp -d)
+export DFM_DEFAULT_INSTALL_DIR="${DFM_DEFAULT_INSTALL_DIR:-$HOME/.local}"
+export DFM_DEFAULT_VERBOSE="${DFM_DEFAULT_VERBOSE:-0}"
+TEMP_DIR="${TEMP_DIR:-$(mktemp -d)}"
 export TEMP_DIR
-
-# Clean up temporary directory on exit
-trap 'rm -rf "$TEMP_DIR"' EXIT
 
 # Load the common and utility functions from the lib directory.
 [[ -f "${DFM_LIB_DIR}/common.sh" ]] || {

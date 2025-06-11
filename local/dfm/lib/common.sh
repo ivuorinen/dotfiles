@@ -331,49 +331,22 @@ logger::error()
 #
 # Example:
 #   trap cleanup EXIT
-cleanup()
-{
-  local exit_code=$?
-  [ -d "$TEMP_DIR" ] && rm -rf "$TEMP_DIR"
-  exit $exit_code
+cleanup() {
+  local exit_code=${1:-$?}
+  if [[ -n ${TEMP_DIR:-} && -d $TEMP_DIR ]]; then
+    rm -rf "$TEMP_DIR"
+  fi
+  exit "$exit_code"
 }
 
 # Register the cleanup function to run on EXIT signal.
-#
-# This will ensure that temporary files and directories are removed
-# when the script exits or is interrupted by a signal (e.g. Ctrl+C).
-# The cleanup function is defined above.
+# This ensures temporary files and directories are removed
+# when the script exits or is interrupted.
 trap cleanup EXIT
 
 # Handle errors by logging an error message to the console.
-#
-# The function is registered with the `ERR` trap.
-# The line number where the error occurred is passed as an argument to the function.
-# The function is defined above.
-#
-# @description Handle an error
-# @param $1 Line number
-# Handles an error event by logging the line number and corresponding exit code.
-#
-# Globals:
-#   $? - The exit code of the last executed command.
-#
-# Arguments:
-#   $1 - The line number where the error occurred.
-#
-# Outputs:
-#   Logs an error message to STDERR via logger::error.
-#
-# Returns:
-#   None
+# The `ERR` trap passes the line number and command to lib::error::handle.
 #
 # Example:
-#   handle_error ${LINENO}
-handle_error()
-{
-  local exit_code=$?
-  local line_no=$1
-  logger::error "Failed at line ${line_no} with exit code ${exit_code}"
-}
-
-trap 'handle_error ${LINENO}' ERR
+#   lib::error::handle ${LINENO} "$BASH_COMMAND"
+trap 'lib::error::handle ${LINENO} "$BASH_COMMAND"' ERR

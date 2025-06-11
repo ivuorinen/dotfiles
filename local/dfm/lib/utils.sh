@@ -673,19 +673,21 @@ main::get_command_functions()
 #   desc=$(main::get_function_description "install" "my_function")
 main::get_function_description()
 {
-  local cmd="$1"
+  local cmd_file="$1"
   local func="$2"
-  local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
-
-  if [[ ! -f "$cmd_file" && -f "$cmd" ]]; then
-    cmd_file="$cmd"
-  fi
 
   if [[ ! -f "$cmd_file" ]]; then
-    return 1
+    [[ -n ${DFM_CMD_DIR:-} ]] || return 1
+    cmd_file="${DFM_CMD_DIR}/${cmd_file}"
+    [[ "$cmd_file" == *.sh ]] || cmd_file="${cmd_file}.sh"
   fi
 
-  grep -B1 "^[[:space:]]*\(function[[:space:]]*\)\{0,1\}$func().*{" "$cmd_file" \
+  [[ -f "$cmd_file" ]] || return 1
+
+  local escaped_func
+  escaped_func=$(printf '%s' "$func" | sed 's/[][\\.^$*+?(){}|]/\\&/g')
+
+  grep -B5 -E "^[[:space:]]*(function[[:space:]]*)?${escaped_func}[[:space:]]*\\(\\)[[:space:]]*(\\{)?[[:space:]]*$" "$cmd_file" \
     | grep "@description" \
     | sed -E 's/^[[:space:]]*#[[:space:]]*@description[[:space:]]*//'
 }
