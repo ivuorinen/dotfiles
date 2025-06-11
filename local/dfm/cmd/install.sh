@@ -172,8 +172,6 @@ function brew()
 #   cargo
 function cargo()
 {
-  parse_options "$@"
-
   if [[ $SKIP_CARGO -eq 1 ]]; then
     lib::log "Skipping Rust and cargo installation"
     return 0
