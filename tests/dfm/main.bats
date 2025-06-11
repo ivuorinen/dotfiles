@@ -44,8 +44,8 @@ teardown() {
   run_with_dfm "main::execute_command install all --no-brew --no-cargo --no-automation"
   [ "$status" -eq 0 ]
   echo "$output" | grep -q "Installing fonts"
-  ! echo "$output" | grep -q "Installing Homebrew"
-  ! echo "$output" | grep -q "Rust and cargo packages"
+  [[ "$output" != *"Installing Homebrew"* ]]
+  [[ "$output" != *"Rust and cargo packages"* ]]
 }
 
 @test "get_function_description returns description" {

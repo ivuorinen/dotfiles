@@ -678,7 +678,8 @@ main::get_function_description()
 
   if [[ ! -f "$cmd_file" ]]; then
     [[ -n ${DFM_CMD_DIR:-} ]] || return 1
-    cmd_file="${DFM_CMD_DIR}/${cmd_file}.sh"
+    cmd_file="${DFM_CMD_DIR}/${cmd_file}"
+    [[ "$cmd_file" == *.sh ]] || cmd_file="${cmd_file}.sh"
   fi
 
   [[ -f "$cmd_file" ]] || return 1
