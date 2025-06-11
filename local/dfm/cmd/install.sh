@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # Installation functions for dfm, the dotfile manager
 #
 # @author Ismo Vuorinen <https://github.com/ivuorinen>
@@ -62,15 +63,15 @@ function all()
   lib::log "Installing all packages..."
 
   if [[ $SKIP_FONTS -eq 0 ]]; then
-    fonts "$@"
+    fonts
   fi
 
   if [[ $SKIP_BREW -eq 0 ]]; then
-    brew "$@"
+    brew
   fi
 
   if [[ $SKIP_CARGO -eq 0 ]]; then
-    cargo "$@"
+    cargo
   fi
 }
 
@@ -92,8 +93,6 @@ function all()
 #   fonts
 function fonts()
 {
-  # Parse options only when called directly
-  [[ -z ${SKIP_FONTS+x} ]] && parse_options "$@"
 
   if [[ $SKIP_FONTS -eq 1 ]]; then
     lib::log "Skipping fonts installation"
@@ -129,8 +128,7 @@ function fonts()
 #   brew
 function brew()
 {
-  # Parse options only when called directly
-  [[ -z ${SKIP_BREW+x} ]] && parse_options "$@"
+
 
   if [[ $SKIP_BREW -eq 1 ]]; then
     lib::log "Skipping Homebrew installation"
@@ -174,8 +172,7 @@ function brew()
 #   cargo
 function cargo()
 {
-  # Parse options only when called directly
-  [[ -z ${SKIP_CARGO+x} ]] && parse_options "$@"
+
 
   if [[ $SKIP_CARGO -eq 1 ]]; then
     lib::log "Skipping Rust and cargo installation"
