@@ -663,19 +663,27 @@ main::get_command_functions()
 # the description text. If no description is found, nothing is printed.
 #
 # Arguments:
-#   cmd_file - Path to the file containing the function definitions.
-#   func     - Name of the function whose description is to be extracted.
+#   cmd  - Command name or path to the file containing the function definitions.
+#   func - Name of the function whose description is to be extracted.
 #
 # Outputs:
 #   The extracted description text is printed to STDOUT.
 #
 # Example:
-#   desc=$(main::get_function_description "/path/to/commands.sh" "my_function")
+#   desc=$(main::get_function_description "install" "my_function")
 main::get_function_description()
 {
-  local cmd_file="$1"
-  local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
+  local cmd="$1"
   local func="$2"
+  local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
+
+  if [[ ! -f "$cmd_file" && -f "$cmd" ]]; then
+    cmd_file="$cmd"
+  fi
+
+  if [[ ! -f "$cmd_file" ]]; then
+    return 1
+  fi
 
   grep -B1 "^[[:space:]]*\(function[[:space:]]*\)\{0,1\}$func().*{" "$cmd_file" \
     | grep "@description" \
