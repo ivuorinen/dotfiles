@@ -168,6 +168,22 @@ nnoremap 'x `X
 nnoremap 'y `Y
 nnoremap 'z `Z
 
+" Harpoon
+nmap <leader><C-1> :action SetHarpoon1<cr>
+nmap <leader><C-2> :action SetHarpoon2<cr>
+nmap <leader><C-3> :action SetHarpoon3<cr>
+nmap <leader><C-4> :action SetHarpoon4<cr>
+nmap <leader><C-5> :action SetHarpoon5<cr>
+nmap <leader><C-6> :action SetHarpoon6<cr>
+nmap <C-1> :action GotoHarpoon1<cr>
+nmap <C-2> :action GotoHarpoon2<cr>
+nmap <C-3> :action GotoHarpoon3<cr>
+nmap <C-4> :action GotoHarpoon4<cr>
+nmap <C-5> :action GotoHarpoon5<cr>
+nmap <C-6> :action GotoHarpoon6<cr>
+nmap <C-e> :action ShowHarpoon<cr>
+nmap <C-a> :action AddToHarpoon<cr>
+
 " ---
 
 set cursorline         		    " Highlight current line
@@ -182,9 +198,9 @@ map Q gq
 syntax enable
 filetype plugin indent on
 
-" call plug#begin('~/.config/vim/plugged')
+call plug#begin('~/.config/vim/plugged')
 " Plug 'ayu-theme/ayu-vim'
-" call plug#end()
+call plug#end()
 
 set termguicolors
 
