@@ -28,7 +28,8 @@
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
     "@ivuorinen/base-configs": "^2.0.0",
-    "bundle-audit": "^0.1.0"
+    "@types/node": "^24.0.1",
+    "typescript": "^5.8.3"
   },
   "packageManager": "yarn@1.22.22"
 }
