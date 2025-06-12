@@ -277,4 +277,4 @@ Mouse: alt_screen
 
 ```
 
-- Generated on Thu  2 Jan 2025 17:41:13 EET
+- Generated on Thu 2 Jan 2025 17:41:13 EET
