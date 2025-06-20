@@ -72,21 +72,22 @@ parse_options()
 # @description
 #   Install all configured components by calling each individual
 #   installation routine unless skipped via options.
-function all() {
+install_all()
+{
   parse_options "$@"
 
   lib::log "Installing all packages..."
 
   if [[ $SKIP_FONTS -eq 0 ]]; then
-    fonts
+    install_fonts
   fi
 
   if [[ $SKIP_BREW -eq 0 ]]; then
-    brew
+    install_brew
   fi
 
   if [[ $SKIP_CARGO -eq 0 ]]; then
-    cargo
+    install_cargo
   fi
 }
 
@@ -105,10 +106,11 @@ function all() {
 #   None.
 #
 # Example:
-#   fonts
+#   install_fonts
 #
 # @description Install all configured fonts from helper script, prompting the user unless automation is disabled.
-function fonts() {
+install_fonts()
+{
 
   : "${SKIP_FONTS:=0}"
   : "${NO_AUTOMATION:=0}"
@@ -144,10 +146,11 @@ function fonts() {
 #   Logs a message indicating the start of the Homebrew installation process.
 #
 # Example:
-#   brew
+#   install_brew
 #
 # @description Install Homebrew and declared packages using the Brewfile.
-function brew() {
+install_brew()
+{
 
   : "${SKIP_BREW:=0}"
   : "${NO_AUTOMATION:=0}"
@@ -192,10 +195,11 @@ function brew() {
 #   Uses lib::log for logging the installation process.
 #
 # Example:
-#   cargo
+#   install_cargo
 #
 # @description Install Rust tooling and cargo packages using helper scripts.
-function cargo() {
+install_cargo()
+{
 
   : "${SKIP_CARGO:=0}"
   : "${NO_AUTOMATION:=0}"
