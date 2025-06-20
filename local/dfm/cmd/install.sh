@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source core dfm libraries
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/common.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib/utils.sh"
+
 # Default paths can be overridden via environment variables
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
