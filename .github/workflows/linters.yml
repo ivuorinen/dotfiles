@@ -55,3 +55,12 @@ jobs:
             --case-indent
             --space-redirects
             --func-next-line
+
+      - name: Setup Bats
+        id: setup-bats
+        uses: bats-core/bats-action@3.0.1
+
+      - name: Run tests
+        run: ./test-all.sh
+        env:
+          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
