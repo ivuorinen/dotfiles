@@ -16,9 +16,11 @@ see what interesting stuff you've done with it. Sharing is caring.
 ### First time setup
 
 1. Clone this repository to `$HOME/.dotfiles`
-2. `./install`
-3. ???
-4. Profit
+2. Install [shellcheck](https://github.com/koalaman/shellcheck) and [pre-commit](https://pre-commit.com/)
+3. Run `pre-commit install` to enable Git hooks
+4. `./install`
+5. ???
+6. Profit
 
 ### Updates
 
