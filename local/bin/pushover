@@ -56,13 +56,22 @@ __pushover_send_message()
 
   response="$(eval "${curl_cmd}")"
   printf "%s\n" "$response"
-  # TODO: Parse response
-  r="${?}"
-  if [ "${r}" -ne 0 ]; then
-    printf "%s: Failed to send message\n" "${0}" >&2
+
+  # Parse response status. Expect JSON like: {"status":1,"request":"..."}
+  if echo "$response" | grep -q '"status"[[:space:]]*:[[:space:]]*1'; then
+    r=0
+  else
+    r=1
   fi
 
-  return "${r}"
+  if [ "$r" -ne 0 ]; then
+    # Extract possible error message from JSON
+    err=$(echo "$response" | grep -o '"errors".*' | sed 's/"errors"[:,\[]//g' | tr -d '[]"')
+    [ -n "$err" ] && printf "%s: %s\n" "$0" "$err" >&2
+    printf "%s: Failed to send message\n" "$0" >&2
+  fi
+
+  return "$r"
 }
 
 CURL="$(which curl)"

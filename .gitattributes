@@ -85,6 +85,7 @@ LICENSE           text
 NEWS              text
 readme            text
 *README*          text
+# Files literally named "TODO", not a todo list item
 TODO              text
 
 # Templates
