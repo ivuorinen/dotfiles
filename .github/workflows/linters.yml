@@ -61,6 +61,8 @@ jobs:
         uses: bats-core/bats-action@3.0.1
 
       - name: Run tests
+        shell: bash
         run: ./test-all.sh
         env:
+          TERM: xterm
           BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
