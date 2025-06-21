@@ -6,4 +6,5 @@ if ! command -v bats &> /dev/null; then
   exit 1
 fi
 
-bats $(git ls-files '*.bats')
+readarray -t tests < <(git ls-files '*.bats')
+bats "${tests[@]}"
