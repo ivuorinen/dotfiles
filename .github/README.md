@@ -113,6 +113,12 @@ The helper script `add-submodules.sh` documents how each submodule is added and
 configured. Submodules are automatically updated by the
 [update-submodules.yml](.github/workflows/update-submodules.yml) workflow.
 
+## Testing
+
+Shell scripts under `local/bin` are validated with [Bats](https://github.com/bats-core/bats-core).
+Run `./test-all.sh` to execute every test file. The script checks that `bats`
+is available and prints installation hints if not.
+
 [dfm]: https://github.com/ivuorinen/dotfiles/blob/main/local/bin/dfm
 [docs-folders]: https://github.com/ivuorinen/dotfiles/blob/main/docs/folders.md
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
