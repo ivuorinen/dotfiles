@@ -5,7 +5,9 @@ These instructions help language models work with this repository.
 ## Setup
 
 1. Run `npm install` to get linting tools.
-2. Ensure `bats` is installed if tests will run.
+2. Ensure `bats` is installed if tests will run. Install with
+   `sudo apt-get install bats` or `brew install bats-core`.
+   GitHub Actions installs Bats automatically for CI runs.
 
 ## Formatting
 
