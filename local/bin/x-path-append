@@ -39,6 +39,6 @@ for dir in "$@"; do
   esac
 
   # Append the directory to PATH.
-  export PATH="${PATH:+"$PATH:"}$dir"
+  export PATH="${PATH:+$PATH:}$dir"
   [ "$VERBOSE" -eq 1 ] && echo "Appended '$dir' to PATH."
 done
