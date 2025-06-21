@@ -447,18 +447,18 @@ utils::is_installed()
   command -v "$1" > /dev/null 2>&1
 }
 
-# Check if a directory exists in the current env PATH and return 0 if it does.
-# Otherwise, return 1.
+# Check if an executable exists in one of the directories listed in PATH and
+# return 0 if it does. Otherwise, return 1.
 #
 # @example
-# if utils::in_path /usr/local/bin; then
-#   echo "/usr/local/bin is in PATH"
+# if utils::in_path ls; then
+#    echo "ls is available in PATH"
 # else
-#  echo "/usr/local/bin is not in PATH"
+#   echo "ls is not available in PATH"
 # fi
 #
-# @description Check if a directory is in PATH
-# @param $1 Directory to check
+# @description Check if an executable is in PATH
+# @param $1 Command to check
 # Checks if a specified executable is available in one of the directories in the PATH.
 #
 # Globals:
