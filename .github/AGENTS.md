@@ -5,9 +5,8 @@ These instructions help language models work with this repository.
 ## Setup
 
 1. Run `npm install` to get linting tools.
-2. Ensure `bats` is installed if tests will run. Install with
-   `sudo apt-get install bats` or `brew install bats-core`.
-   GitHub Actions installs Bats automatically for CI runs.
+2. Install `bats` or make sure Docker is available. `test-all.sh` uses Docker
+   automatically when `bats` is missing.
 
 ## Formatting
 
@@ -22,7 +21,8 @@ npm run fix:markdown
 
 ## Testing
 
-- When code changes, run `./test-all.sh` to execute Bats tests.
+- When code changes, run `./test-all.sh` to execute Bats tests. The script
+  falls back to a Docker image if the `bats` binary is not available.
 - If only comments or documentation change, tests may be skipped.
 
 ## Commits and PRs

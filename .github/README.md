@@ -116,8 +116,8 @@ configured. Submodules are automatically updated by the
 ## Testing
 
 Shell scripts under `local/bin` are validated with [Bats](https://github.com/bats-core/bats-core).
-Run `./test-all.sh` to execute every test file. The script checks that `bats`
-is available and prints installation hints if not.
+Run `./test-all.sh` to execute every test file. The script runs the local `bats`
+binary when available and falls back to the official Docker image otherwise.
 
 [dfm]: https://github.com/ivuorinen/dotfiles/blob/main/local/bin/dfm
 [docs-folders]: https://github.com/ivuorinen/dotfiles/blob/main/docs/folders.md

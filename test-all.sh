@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Run all bats tests
 
-if ! command -v bats &> /dev/null; then
-  echo "bats is not installed. Install via 'brew install bats-core' or 'apt-get install bats'" >&2
-  exit 1
+if command -v bats >/dev/null; then
+  bats $(git ls-files '*.bats')
+else
+  echo "bats not installed, running via Docker" >&2
+  docker run --rm -v "$PWD":/work -w /work bats/bats:latest \
+    $(git ls-files '*.bats')
 fi
-
-readarray -t tests < <(git ls-files '*.bats')
 bats "${tests[@]}"

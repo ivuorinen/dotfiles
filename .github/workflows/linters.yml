@@ -56,13 +56,9 @@ jobs:
             --space-redirects
             --func-next-line
 
-      - name: Setup Bats
-        id: setup-bats
-        uses: bats-core/bats-action@3.0.1
-
-      - name: Run tests
-        shell: bash
-        run: ./test-all.sh
-        env:
+      - name: Run Bats tests
+        run: |
+          docker run --rm -v "$PWD":/work -w /work bats/bats:latest \
+            $(git ls-files '*.bats')
           TERM: xterm
           BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
