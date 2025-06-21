@@ -21,11 +21,6 @@ declare -A LOG_LEVELS=(
   [WARN]=2
   [ERROR]=3
 )
-LOG_LEVEL="${LOG_LEVEL:-INFO}"
-if [[ -z "${LOG_LEVELS[$LOG_LEVEL]+_}" ]]; then
-  lib::error "Invalid LOG_LEVEL: $LOG_LEVEL"
-  exit "${ERROR_CODES[INVALID_ARGUMENT]}"
-fi
 
 # Simple logging function
 #
@@ -77,6 +72,12 @@ lib::error()
 {
   printf '[%s] ERROR: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >&2
 }
+
+LOG_LEVEL="${LOG_LEVEL:-INFO}"
+if [[ -z "${LOG_LEVELS[$LOG_LEVEL]+_}" ]]; then
+  lib::error "Invalid LOG_LEVEL: $LOG_LEVEL"
+  exit "${ERROR_CODES[INVALID_ARGUMENT]}"
+fi
 
 # Handle an error by logging an error message to the console
 # and exiting with an error code based on the error type.
