@@ -8,8 +8,8 @@
 #   supported_envs:
 #   - all
 registries:
-- type: standard
-  ref: v4.346.0 # renovate: depName=aquaproj/aqua-registry
+  - type: standard
+    ref: v4.346.0 # renovate: depName=aquaproj/aqua-registry
 packages:
-- name: cli/cli
-  version: 'v2.69.0'
+  - name: cli/cli
+    version: 'v2.69.0'

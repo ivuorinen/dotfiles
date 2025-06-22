@@ -10,6 +10,7 @@
 [ -z "$SHARED_SCRIPTS_SOURCED" ] && {
 
   source "${DOTFILES}/config/shared.sh"
+  # Warn the user if the shared configuration hasn't been loaded yet
   msgr warn "(!) shared.sh not sourced"
 
   # Set variable that checks if the shared.sh script has been
