@@ -1,8 +1,13 @@
 {
+  "context_servers": {
+    "github-activity-summarizer": {
+      "settings": {}
+    }
+  },
   "telemetry": {
     "metrics": false
   },
-  "assistant": {
+  "agent": {
     "always_allow_tool_actions": false,
     "default_model": {
       "provider": "copilot_chat",

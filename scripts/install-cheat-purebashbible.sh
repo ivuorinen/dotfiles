@@ -47,6 +47,22 @@ prepare_cheat_dest()
   echo "$cheat_dest"
 }
 
+# Processes chapter files from the pure-bash-bible repository and generates or updates corresponding cheat sheets.
+#
+# For each chapter file, creates or updates a cheat sheet in the appropriate destination directory, removes chapter end markers, and ensures required metadata is present.
+#
+# Globals:
+# * PBB_TEMP_DIR: Directory containing the cloned pure-bash-bible repository.
+# * PBB_SYNTAX, PBB_TAGS, PBB_SOURCE: Metadata strings for cheat sheets.
+#
+# Outputs:
+# * Writes or updates cheat sheet files in the determined cheat sheet directory.
+#
+# Example:
+#
+# ```bash
+# process_chapters
+# ```
 process_chapters()
 {
   local cheat_dest
@@ -59,7 +75,7 @@ process_chapters()
     header=$(grep -e '^[#] ' "$f" | head -1 | awk '{print tolower($2)}')
     cheat_file="$cheat_dest/$header"
 
-    if ! replacable "$f" "$cheat_file"; then
+    if ! replaceable "$f" "$cheat_file"; then
       cp "$f" "$cheat_file" && msg_run "Updated: $cheat_file"
     fi
 

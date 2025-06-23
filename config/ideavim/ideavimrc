@@ -6,10 +6,41 @@ source $HOME/.dotfiles/config/vim/vimrc
 let mapleader = "\<SPACE>"
 
 set clipboard+=unnamed
+set cursorline                  " Highlight current line
+set nocompatible                " disable compatibility mode with vi
+filetype off                    " disable filetype detection (but re-enable later, see below)
+set undolevels=1000             " Number of undo levels
+set backspace=indent,eol,start  " Backspace behaviour
+
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Do incremental searching.
+set incsearch
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+call plug#begin('~/.config/vim/plugged')
+" Plug 'ayu-theme/ayu-vim'
+call plug#end()
 
 set ideajoin
+set ideastatusicon=gray
 set ideamarks
 set idearefactormode=normal
+set which-key
+set mini-ai
+
+" which-key settings
+" https://github.com/TheBlob42/idea-which-key
+let g:WhichKey_ShowVimActions = "true"
+let g:WhichKey_DefaultDelay = 600 " make the popup appear much slower
+let g:WhichKey_PrefixStyle = "bold"
+
+" disable the timeout option
+set notimeout
 
 " Map esc to :noh
 map <esc> :noh<cr>
@@ -31,7 +62,6 @@ nmap <leader>ss <Action>(GotoSymbol)
 nmap <leader>fl <Action>(RecentLocations)
 nmap <leader>fc <Action>(FindInPath)
 nmap <leader>fr <Action>(RecentFiles)
-nmap <leader>fe :NERDTreeToggle<CR>
 nmap <Leader>fu :action FindUsages<CR>
 nmap <Leader>ff :action GotoFile<CR>
 nmap <leader>fi <Action>(SelectIn)
@@ -168,23 +198,26 @@ nnoremap 'x `X
 nnoremap 'y `Y
 nnoremap 'z `Z
 
+" Harpoon
+nmap <leader><C-1> :action SetHarpoon1<cr>
+nmap <leader><C-2> :action SetHarpoon2<cr>
+nmap <leader><C-3> :action SetHarpoon3<cr>
+nmap <leader><C-4> :action SetHarpoon4<cr>
+nmap <leader><C-5> :action SetHarpoon5<cr>
+nmap <leader><C-6> :action SetHarpoon6<cr>
+nmap <C-1> :action GotoHarpoon1<cr>
+nmap <C-2> :action GotoHarpoon2<cr>
+nmap <C-3> :action GotoHarpoon3<cr>
+nmap <C-4> :action GotoHarpoon4<cr>
+nmap <C-5> :action GotoHarpoon5<cr>
+nmap <C-6> :action GotoHarpoon6<cr>
+nmap <C-e> :action ShowHarpoon<cr>
+nmap <C-a> :action AddToHarpoon<cr>
+
 " ---
-
-set cursorline         		    " Highlight current line
-set nocompatible                " disable compatibility mode with vi
-filetype off                    " disable filetype detection (but re-enable later, see below)
-set undolevels=1000		        " Number of undo levels
-set backspace=indent,eol,start	" Backspace behaviour
-
-" Don't use Ex mode, use Q for formatting.
-map Q gq
 
 syntax enable
 filetype plugin indent on
-
-" call plug#begin('~/.config/vim/plugged')
-" Plug 'ayu-theme/ayu-vim'
-" call plug#end()
 
 set termguicolors
 
@@ -192,3 +225,5 @@ if has('gui_running')
     set macligatures
     set guifont=JetBrainsMono:h14
 endif
+
+" vim: set filetype=vim :

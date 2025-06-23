@@ -61,4 +61,13 @@ return {
   -- Neovim plugin for locking a buffer to a window
   -- https://github.com/stevearc/stickybuf.nvim
   { 'stevearc/stickybuf.nvim', opts = {} },
+
+  -- Break bad habits, master Vim motions
+  -- https://github.com/m4xshen/hardtime.nvim
+  {
+    'm4xshen/hardtime.nvim',
+    lazy = false,
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {},
+  },
 }
