@@ -14,8 +14,8 @@ Options:
 - `-s STR` – suffix for thumbnails
 - `-h` – show help
 
-Environment variables like `THUMB_BACKGROUND` control the image
-dimensions.
+Environment variables like `THUMB_BACKGROUND` control the background
+color.
 
 ### Example
 
