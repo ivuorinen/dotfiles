@@ -74,13 +74,13 @@ __pushover_send_message()
   return "$r"
 }
 
-CURL="$(which curl)"
+CURL="$(command -v curl)"
 PUSHOVER_URL="https://api.pushover.net/1/messages.json"
 TOKEN=$PUSHOVER_TOKEN
 USER=$PUSHOVER_USER
 CURL_OPTS=""
-devices="${devices} ${device}"
-optstring="c:d:D:e:f:p:r:t:T:s:u:U:a:h"
+devices=""
+optstring="c:d:D:e:p:r:t:T:s:u:U:a:h"
 
 OPTIND=1
 while getopts ${optstring} c; do
@@ -106,7 +106,7 @@ while getopts ${optstring} c; do
     t)
       title="${OPTARG}"
       ;;
-    k)
+    T)
       TOKEN="${OPTARG}"
       ;;
     s)
