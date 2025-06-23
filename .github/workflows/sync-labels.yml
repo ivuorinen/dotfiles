@@ -23,7 +23,7 @@ permissions: read-all
 
 jobs:
   SyncLabels:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     permissions:
       issues: write

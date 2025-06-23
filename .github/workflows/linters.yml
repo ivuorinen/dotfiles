@@ -1,8 +1,12 @@
 ---
-# yaml-language-server: https://json.schemastore.org/github-workflow.json
-name: Reviewdog
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Lint Code Base
 
-on: [push]
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,45 +20,10 @@ jobs:
 
     runs-on: self-hosted
 
+    timeout-minutes: 15
     permissions: write-all
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-
-      - name: GitHub Actions
-        uses: reviewdog/action-actionlint@a5524e1c19e62881d79c1f1b9b6f09f16356e281 # v1.65.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-
-      - name: detect-secrets
-        uses: reviewdog/action-detect-secrets@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-
-      - name: markdownlint
-        uses: reviewdog/action-markdownlint@3667398db9118d7e78f7a63d10e26ce454ba5f58 # v0.26.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-
-      - name: shfmt
-        uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          shfmt_flags: |
-            --find
-            --list
-            --write
-            --diff
-            --simplify
-            --language-dialect bash
-            --indent 2
-            --binary-next-line
-            --case-indent
-            --space-redirects
-            --func-next-line
+      - name: Run Linters
+        # https://github.com/ivuorinen/actions
+        uses: ivuorinen/actions/pr-lint@05cd983353b4e6d3213389801daf0f9ec2af7a77 # 25.6.17
