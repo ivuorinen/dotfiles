@@ -1,6 +1,7 @@
 # only care about files that are directly under our control
 config/cheat/cheatsheets/community/*
 config/cheat/cheatsheets/tldr/*
+config/op/plugins/used_plugins/*
 config/tmux/plugins/*
 local/bin/asdf/*
 tools/*
