@@ -26,4 +26,4 @@ jobs:
     steps:
       - name: Run Linters
         # https://github.com/ivuorinen/actions
-        uses: ivuorinen/actions/pr-lint@05cd983353b4e6d3213389801daf0f9ec2af7a77 # 25.6.17
+        uses: ivuorinen/actions/pr-lint@99f3911475dbb5b8d43d314b24c0882997433868 # 25.6.23
