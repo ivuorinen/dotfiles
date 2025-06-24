@@ -16,6 +16,9 @@
     "version": "2"
   },
   "languages": {
+    "PHP": {
+      "language_servers": ["intelephense", "phpactor"]
+    },
     "Python": {
       "enable_language_server": true,
       "allow_rewrap": "anywhere",
@@ -28,6 +31,13 @@
       "enable_language_server": true,
       "code_actions_on_format": {
         "source.fixAll.eslint": true
+      }
+    },
+    "Markdown": {
+      "enable_language_server": true,
+      "preferred_line_length": 160,
+      "prettier": {
+        "allowed": true
       }
     },
     "Lua": {
@@ -55,13 +65,32 @@
       }
     }
   },
+  "diagnostics": {
+    "button": true,
+    "include_warnings": true,
+    "lsp_pull_diagnostics": {
+      "enabled": true,
+      "debounce_ms": 50
+    },
+    "inline": {
+      "enabled": true,
+      "update_debounce_ms": 150
+    }
+  },
+  "multi_cursor_modifier": "cmd_or_ctrl", // alias: "cmd", "ctrl"
+  "indent_guides": {
+    "enabled": true,
+    "coloring": "indent_aware"
+  },
   "preferred_line_length": 100,
+  "soft_wrap": "bounded",
+  "wrap_guides": [100, 120, 160, 200],
   "format_on_save": "on",
   "vim_mode": true,
   "theme": {
     "mode": "system",
-    "light": "Tokyo Night Light",
-    "dark": "Tokyo Night Storm"
+    "light": "Tomorrow",
+    "dark": "Tomorrow at Midnight"
   },
   "inlay_hints": {
     "enabled": true,
@@ -72,8 +101,44 @@
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "buffer_font_fallbacks": ["JetBrainsMono Nerd Font"],
-  "edit_predictions": {
-    "disabled_globs": [".env", ".env.*"]
-  },
-  "hour_format": "hour24"
+  "use_autoclose": false,
+  "hour_format": "hour24",
+  "auto_install_extensions": {
+    "angular": true,
+    "ansible": true,
+    "basher": true,
+    "biome": true,
+    "blade": true,
+    "csharp": true,
+    "css-modules-kit": true,
+    "dockerfile": true,
+    "git-firefly": true,
+    "github-activity-summarizer": true,
+    "golangci-lint": true,
+    "gosum": true,
+    "go-snippets": true,
+    "html": true,
+    "ini": true,
+    "json": true,
+    "json5": true,
+    "just": true,
+    "just-ls": true,
+    "lua": true,
+    "make": true,
+    "php": true,
+    "python-snippets": true,
+    "python-requirements": true,
+    "ruff": true,
+    "scss": true,
+    "sieve": true,
+    "stylelint": true,
+    "sql": true,
+    "toml": true,
+    "vue": true,
+    "vue-snippets": true,
+    "wakatime": true,
+    "xcode-themes": true,
+    "yaml": true,
+    "tomorrow-theme": true
+  }
 }
