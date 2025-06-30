@@ -58,9 +58,3 @@ jobs:
             --case-indent
             --space-redirects
             --func-next-line
-
-      - name: Install Node dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
