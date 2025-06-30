@@ -85,6 +85,7 @@ LICENSE           text
 NEWS              text
 readme            text
 *README*          text
+# Files literally named "TODO", not a todo list item
 TODO              text
 
 # Templates
@@ -122,7 +123,8 @@ package.json      text eol=lf
 package-lock.json text eol=lf -diff
 pnpm-lock.yaml    text eol=lf -diff
 .prettierrc       text
-yarn.lock         text -diff
+# Ensure yarn.lock shows textual diffs
+yarn.lock         text eol=lf
 *.toml            text
 *.yaml            text
 *.yml             text
@@ -251,3 +253,4 @@ install              text eol=lf diff=shell
 *.snippets           text eol=lf
 *.theme              text eol=lf
 *.yamlfmt            text eol=lf
+*.bats              text eol=lf diff=shell
