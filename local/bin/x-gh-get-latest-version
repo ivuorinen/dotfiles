@@ -97,7 +97,7 @@ Examples:
   # Use GitHub Enterprise API
   GITHUB_API_URL="https://github.example.com/api/v3/repos" $BIN ivuorinen/dotfiles
 EOF
-  exit 1
+  exit 0
 }
 
 # Check that required dependencies are installed

@@ -20,3 +20,9 @@
   VERBOSE=1 source local/bin/x-path-remove "$BATS_TMPDIR/dir"
   [ "$PATH" = "/usr/bin" ]
 }
+
+@test "x-path-append skips missing directory" {
+  PATH="/usr/bin"
+  VERBOSE=1 source local/bin/x-path-append "$BATS_TMPDIR/no-such"
+  [ "$PATH" = "/usr/bin" ]
+}

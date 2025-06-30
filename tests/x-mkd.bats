@@ -6,3 +6,9 @@
   [ "$status" -eq 0 ]
   [ -d "$dir" ]
 }
+
+@test "x-mkd with no args shows usage" {
+  run bash local/bin/x-mkd
+  [ "$status" -eq 1 ]
+  [[ "$output" == "Usage:"* ]]
+}
