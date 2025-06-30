@@ -19,7 +19,6 @@ jobs:
     permissions: write-all
 
     steps:
-  
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: GitHub Actions
@@ -56,3 +55,9 @@ jobs:
             --case-indent
             --space-redirects
             --func-next-line
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
