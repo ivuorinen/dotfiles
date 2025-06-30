@@ -1,0 +1,29 @@
+---
+# Configuration file for MegaLinter
+# See all available variables at
+# https://megalinter.io/configuration/ and in linters documentation
+
+APPLY_FIXES: all
+SHOW_ELAPSED_TIME: false # Show elapsed time at the end of MegaLinter run
+PARALLEL: true
+VALIDATE_ALL_CODEBASE: true
+FILEIO_REPORTER: false # Generate file.io report
+GITHUB_STATUS_REPORTER: true # Generate GitHub status report
+IGNORE_GENERATED_FILES: true # Ignore generated files
+JAVASCRIPT_DEFAULT_STYLE: prettier # Default style for JavaScript
+PRINT_ALPACA: false # Print Alpaca logo in console
+SARIF_REPORTER: true # Generate SARIF report
+SHOW_SKIPPED_LINTERS: false # Show skipped linters in MegaLinter log
+TYPESCRIPT_DEFAULT_STYLE: prettier # Default style for TypeScript
+
+DISABLE_LINTERS:
+  - REPOSITORY_DEVSKIM
+
+YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.json
+JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+
+FILTER_REGEX_EXCLUDE: >
+  (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/fzf|config/zsh|config/tmux/plugins)
+
