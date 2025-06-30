@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Create a directory and cd into it
-# Usage: mkcd <dir>
+# Usage: x-mkd <dir>
 
 set -euo pipefail
 
