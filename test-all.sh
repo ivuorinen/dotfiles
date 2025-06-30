@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run all bats tests
 
-set -e
+set -euo pipefail
 
 if [ -x "node_modules/bats/bin/bats" ]; then
   git ls-files '*.bats' -z | xargs -0 node_modules/bats/bin/bats
