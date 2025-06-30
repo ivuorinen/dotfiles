@@ -116,8 +116,8 @@ configured. Submodules are automatically updated by the
 ## Testing
 
 Shell scripts under `local/bin` are validated with [Bats](https://github.com/bats-core/bats-core).
-Run `npm test` to execute every test file. Bats is installed as a development
-dependency, so run `npm install` first if needed.
+Run `yarn test` to execute every test file. Bats is installed as a development
+dependency, so run `yarn install` first if needed.
 
 [dfm]: https://github.com/ivuorinen/dotfiles/blob/main/local/bin/dfm
 [docs-folders]: https://github.com/ivuorinen/dotfiles/blob/main/docs/folders.md
