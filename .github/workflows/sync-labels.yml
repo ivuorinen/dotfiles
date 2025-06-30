@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: https://json.schemastore.org/github-workflow.json
+# $schema: "https://json.schemastore.org/github-workflow.json"
 name: Sync labels
 
 # yamllint disable-line rule:truthy
@@ -23,10 +23,10 @@ permissions: read-all
 
 jobs:
   SyncLabels:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     permissions:
       issues: write
 
     steps:
-      - uses: ivuorinen/actions/sync-labels@main
+      - uses: ivuorinen/actions/sync-labels@99f3911475dbb5b8d43d314b24c0882997433868 # 25.6.23
