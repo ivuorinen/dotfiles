@@ -28,7 +28,7 @@ indent_size = 1
 indent_size = 1
 indent_style = tab
 
-[{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]
+[{local/bin/*,local/dfm/*,**/*.sh,**/zshrc,config/*,scripts/*}]
 indent_size        = 2
 tab_width          = 2
 shell_variant      = bash # --language-variant

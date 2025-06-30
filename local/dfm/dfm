@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# dfm - dotfiles manager
+
+set -euo pipefail
+
+# allow overriding core directories
+DFM_SCRIPT_DIR="${DFM_SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+readonly DFM_SCRIPT_DIR
+export DFM_SCRIPT_DIR
+DFM_CMD_DIR="${DFM_CMD_DIR:-${DFM_SCRIPT_DIR}/cmd}"
+readonly DFM_CMD_DIR
+export DFM_CMD_DIR
+DFM_LIB_DIR="${DFM_LIB_DIR:-${DFM_SCRIPT_DIR}/lib}"
+readonly DFM_LIB_DIR
+export DFM_LIB_DIR
+DFM_DEFAULT_CONFIG_PATH="${DFM_DEFAULT_CONFIG_PATH:-$HOME/.config}"
+readonly DFM_DEFAULT_CONFIG_PATH
+export DFM_DEFAULT_CONFIG_PATH
+DFM_MAX_RETRIES="${DFM_MAX_RETRIES:-3}"
+readonly DFM_MAX_RETRIES
+export DFM_MAX_RETRIES
+export DFM_DEFAULT_INSTALL_DIR="${DFM_DEFAULT_INSTALL_DIR:-$HOME/.local}"
+export DFM_DEFAULT_VERBOSE="${DFM_DEFAULT_VERBOSE:-0}"
+TEMP_DIR="${TEMP_DIR:-$(mktemp -d)}"
+export TEMP_DIR
+
+# Load the common and utility functions from the lib directory.
+[[ -f "${DFM_LIB_DIR}/common.sh" ]] || {
+  echo "Error: Required file ${DFM_LIB_DIR}/common.sh not found"
+  exit 1
+}
+[[ -f "${DFM_LIB_DIR}/utils.sh" ]] || {
+  echo "Error: Required file ${DFM_LIB_DIR}/utils.sh not found"
+  exit 1
+}
+source "${DFM_LIB_DIR}/common.sh"
+source "${DFM_LIB_DIR}/utils.sh"
+
+# Display help information
+#
+# @return None
+main::show_help()
+{
+  cat << EOF
+Usage: dfm [command] [function] [arguments]
+
+dotfiles manager utility for installing and configuring dotfiles.
+
+If no arguments are provided, lists all available commands.
+If only a command is provided, lists available functions for that command.
+If a command and function are provided, executes the specified function.
+
+Examples:
+  dfm                    # List all available commands
+  dfm install            # List available functions for the install command
+  dfm install all        # Execute the 'all' function from the install command
+
+EOF
+}
+
+# Main function for the dfm script.
+#
+# The function checks if any arguments were provided. If no arguments are
+# provided, it lists all available commands. If a command name is provided,
+# it lists the available functions for that command. If a command and function
+# name are provided, it executes the function with the provided arguments.
+#
+# @param args The command-line arguments.
+# @return None
+main()
+{
+  if [[ $# -eq 0 ]]; then
+    main::list_available_commands
+    return 0
+  fi
+
+  local cmd="$1"
+  shift
+
+  if [[ "$cmd" == "-h" || "$cmd" == "--help" ]]; then
+    main::show_help
+    return 0
+  fi
+
+  if [[ $# -eq 0 ]]; then
+    # Show the available functions for the command
+    local cmd_file="${DFM_CMD_DIR}/${cmd}.sh"
+    if [[ -f "$cmd_file" ]]; then
+      list::print_group "Available functions for '$cmd'"
+      list::loop_functions "$cmd_file"
+    else
+      lib::error "Command '$cmd' not found"
+      return 1
+    fi
+    return 0
+  fi
+
+  local func="$1"
+  shift
+
+  main::execute_command "$cmd" "$func" "$@"
+}
+
+main "$@"
