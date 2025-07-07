@@ -85,6 +85,42 @@ return {
     'm4xshen/hardtime.nvim',
     lazy = false,
     dependencies = { 'MunifTanjim/nui.nvim' },
-    opts = {},
+    opts = {
+      restriction_mode = 'hint',
+      disabled_keys = {
+        ['<Up>'] = { '', 'n' },
+        ['<Down>'] = { '', 'n' },
+        ['<Left>'] = { '', 'n' },
+        ['<Right>'] = { '', 'n' },
+        ['<C-Up>'] = { '', 'n' },
+        ['<C-Down>'] = { '', 'n' },
+        ['<C-Left>'] = { '', 'n' },
+        ['<C-Right>'] = { '', 'n' },
+      },
+      disabled_filetypes = {
+        'TelescopePrompt',
+        'Trouble',
+        'lazy',
+        'mason',
+        'help',
+        'notify',
+        'dashboard',
+        'alpha',
+      },
+      hints = {
+        ['[dcyvV][ia][%(%)]'] = {
+          message = function(keys)
+            return 'Use ' .. keys:sub(1, 2) .. 'b instead of ' .. keys
+          end,
+          length = 3,
+        },
+        ['[dcyvV][ia][%{%}]'] = {
+          message = function(keys)
+            return 'Use ' .. keys:sub(1, 2) .. 'B instead of ' .. keys
+          end,
+          length = 3,
+        },
+      },
+    },
   },
 }
