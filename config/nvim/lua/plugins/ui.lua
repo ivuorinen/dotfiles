@@ -1,7 +1,22 @@
 return {
   {
-    'rmehri01/onenord.nvim',
-    opts = {},
+    'rose-pine/neovim',
+    name = 'rose-pine',
+    opts = {
+      dim_inactive_windows = false,
+      extend_background_behind_borders = true,
+      styles = {
+        bold = true,
+        italic = true,
+        transparency = true,
+      },
+      enable = {
+        terminal = true,
+        legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
+        migrations = true, -- Handle deprecated options automatically
+      },
+    },
+    config = function() vim.cmd 'colorscheme rose-pine' end,
   },
   -- Automatic dark mode
   -- https://github.com/f-person/auto-dark-mode.nvim
@@ -12,10 +27,12 @@ return {
       set_dark_mode = function()
         vim.api.nvim_set_option_value('background', 'dark', {})
         -- vim.cmd.colorscheme(vim.g.colors_variant_dark)
+        vim.cmd 'colorscheme rose-pine'
       end,
       set_light_mode = function()
         vim.api.nvim_set_option_value('background', 'light', {})
         -- vim.cmd.colorscheme(vim.g.colors_variant_light)
+        vim.cmd 'colorscheme rose-pine-dawn'
       end,
     },
   },
