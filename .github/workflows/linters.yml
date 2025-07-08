@@ -33,4 +33,4 @@ jobs:
 
       - name: Run PR Lint
         # https://github.com/ivuorinen/actions
-        uses: ivuorinen/actions/pr-lint@c0f919957eb60743682a6e0cd6d454fd4b142ac9 # 25.6.30
+        uses: ivuorinen/actions/pr-lint@625c37446b1c7e219755a40807f825c9283f6e05 # 25.7.7
