@@ -135,6 +135,7 @@
     "sieve": true,
     "sql": true,
     "stylelint": true,
+    "templ": true,
     "toml": true,
     "vue": true,
     "vue-snippets": true,

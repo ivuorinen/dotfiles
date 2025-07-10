@@ -21,3 +21,8 @@ github.com/rhysd/actionlint/cmd/actionlint@v1.7.1
 github.com/doron-cohen/antidot@v0.6.3
 // FZF is a general-purpose command-line fuzzy finder.
 github.com/junegunn/fzf@latest
+// gopls, the Go language server
+golang.org/x/tools/gopls@latest
+// A language for writing HTML user interfaces in Go.
+github.com/a-h/templ/cmd/templ@latest
+
