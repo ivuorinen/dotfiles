@@ -9,7 +9,7 @@ VERBOSE="${VERBOSE:-0}"
 
 # Check if ntfy is already installed
 if x-have "ntfy"; then
-  msgr done "ntfy already installed"
+  msgr "done" "ntfy already installed"
   exit 0
 fi
 
@@ -50,7 +50,7 @@ install_ntfy()
 main()
 {
   install_ntfy
-  msgr done "ntfy installation complete"
+  msgr "done" "ntfy installation complete"
 }
 
 main "$@"
