@@ -1,6 +1,7 @@
 {
   "context_servers": {
     "github-activity-summarizer": {
+      "source": "extension",
       "settings": {}
     }
   },
@@ -8,12 +9,13 @@
     "metrics": false
   },
   "agent": {
-    "always_allow_tool_actions": false,
+    "always_allow_tool_actions": true,
+    "default_profile": "ask",
     "default_model": {
       "provider": "copilot_chat",
       "model": "gpt-4.1"
     },
-    "version": "2"
+    "play_sound_when_agent_done": true
   },
   "languages": {
     "PHP": {
@@ -77,7 +79,7 @@
       "update_debounce_ms": 150
     }
   },
-  "multi_cursor_modifier": "cmd_or_ctrl", // alias: "cmd", "ctrl"
+  "multi_cursor_modifier": "cmd_or_ctrl",
   "indent_guides": {
     "enabled": true,
     "coloring": "indent_aware"
@@ -89,8 +91,8 @@
   "vim_mode": true,
   "theme": {
     "mode": "system",
-    "light": "Tomorrow",
-    "dark": "Tomorrow at Midnight"
+    "light": "Rosé Pine Dawn",
+    "dark": "Rosé Pine"
   },
   "inlay_hints": {
     "enabled": true,
@@ -102,7 +104,6 @@
   "buffer_font_size": 16,
   "buffer_font_fallbacks": ["JetBrainsMono Nerd Font"],
   "use_autoclose": false,
-  "hour_format": "hour24",
   "auto_install_extensions": {
     "angular": true,
     "ansible": true,
@@ -114,9 +115,9 @@
     "dockerfile": true,
     "git-firefly": true,
     "github-activity-summarizer": true,
+    "go-snippets": true,
     "golangci-lint": true,
     "gosum": true,
-    "go-snippets": true,
     "html": true,
     "ini": true,
     "json": true,
@@ -126,19 +127,19 @@
     "lua": true,
     "make": true,
     "php": true,
-    "python-snippets": true,
     "python-requirements": true,
+    "python-snippets": true,
+    "rose-pine-theme": true,
     "ruff": true,
     "scss": true,
     "sieve": true,
-    "stylelint": true,
     "sql": true,
+    "stylelint": true,
     "toml": true,
     "vue": true,
     "vue-snippets": true,
     "wakatime": true,
     "xcode-themes": true,
-    "yaml": true,
-    "tomorrow-theme": true
+    "yaml": true
   }
 }
