@@ -25,6 +25,7 @@ yabai -m config \
 # > yabai -m query --windows | jq .[].app | sort | uniq
 yabai -m rule --add app="1Password" manage=off
 yabai -m rule --add app="Fork" manage=off
+yabai -m rule --add app="GoLand" manage=off
 yabai -m rule --add app="JetBrains Rider" manage=off
 yabai -m rule --add app="Logi Options" manage=off
 yabai -m rule --add app="MSTeams" manage=off
