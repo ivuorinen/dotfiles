@@ -1,8 +1,6 @@
 // These are golang packages I use,
 // so they should be available with all versions
 
-// Aqua is a package manager like asdf, or Brew
-github.com/aquaproj/aqua/v2/cmd/aqua@latest
 // Git Profile allows you to switch between user profiles in git repos
 github.com/dotzero/git-profile@v1.4.0
 // An extensible command line tool or library to format yaml files.
