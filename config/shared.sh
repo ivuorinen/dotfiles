@@ -26,7 +26,7 @@ x-path-prepend()
   local dir=$1
   case "$CURRENT_SHELL" in
     fish)
-      set -U fish_user_paths "$dir" $fish_user_paths
+      set -U fish_user_paths "$dir" "$fish_user_paths"
       ;;
     sh | bash | zsh)
       PATH="$dir:$PATH"
@@ -106,7 +106,7 @@ if ! declare -f msg_done > /dev/null; then
   # $1 - message (string)
   msg_done()
   {
-    msgr done "$1"
+    msgr "done" "$1"
     return 0
   }
 fi

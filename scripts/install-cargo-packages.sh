@@ -38,7 +38,7 @@ install_packages()
     if [[ ${pkg:0:1} == "#" ]]; then continue; fi
 
     msgr run "Installing cargo package $pkg"
-    cargo install --jobs $BUILD_JOBS "$pkg"
+    cargo install --jobs "$BUILD_JOBS" "$pkg"
     msgr run_done "Done installing $pkg"
     echo ""
   done
@@ -56,13 +56,13 @@ post_install_steps()
 
   msgr run "Removing cargo cache"
   cargo cache --autoclean
-  msgr done "Done removing cargo cache"
+  msgr "done" "Done removing cargo cache"
 }
 
 main()
 {
   install_packages
-  msgr done "Installed cargo packages!"
+  msgr "done" "Installed cargo packages!"
   post_install_steps
 }
 
