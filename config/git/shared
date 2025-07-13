@@ -3,7 +3,7 @@
   helper = cache --timeout 30000
 
 [core]
-  excludesfile = ~/.config/git/gitignore
+  excludesfile = ~/.config/git/ignore
 
 [init]
   defaultBranch = main

@@ -21,3 +21,5 @@ dfm.sh
 .scannerwork
 .phpactor.json
 .zsh_history
+**/.claude/settings.local.json
+
