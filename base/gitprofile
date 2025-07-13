@@ -20,6 +20,16 @@
         "value": "Ismo Vuorinen"
       }
     ],
+    "masf": [
+      {
+        "key": "user.email",
+        "value": "ismo@masf.fi"
+      },
+      {
+        "key": "user.name",
+        "value": "Ismo Vuorinen"
+      }
+    ],
     "work": [
       {
         "key": "user.email",
