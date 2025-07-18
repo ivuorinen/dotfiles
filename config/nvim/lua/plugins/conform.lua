@@ -1,13 +1,18 @@
 return {
   {
     'stevearc/conform.nvim',
-    event = 'BufWritePre',
+    event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local conform = require 'conform'
 
       conform.setup {
         formatters_by_ft = {
+          bash = { 'shfmt' },
+          go = { 'golangci-lint' },
           lua = { 'stylua' },
+          sh = { 'shfmt' },
+          ansible = { 'ansible-lint' },
+          docker = { 'hadolint' },
         },
         format_on_save = function(bufnr)
           -- Disable autoformat for files in a certain paths
@@ -20,6 +25,7 @@ return {
           }
           return {
             lsp_fallback = not disable_lsp[vim.bo[bufnr].filetype],
+            async = false,
             timeout_ms = 500,
           }
         end,
@@ -62,5 +68,9 @@ return {
         return vim.g.autoformat_enabled and '[ fmt:on]' or '[ fmt:off]'
       end
     end,
+  },
+  {
+    'gpanders/editorconfig.nvim',
+    lazy = false,
   },
 }

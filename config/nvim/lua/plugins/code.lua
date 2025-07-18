@@ -11,6 +11,13 @@ return {
     end,
   },
 
+  -- Go development plugin for Vim
+  -- https://github.com/fatih/vim-go
+  {
+    'fatih/vim-go',
+    config = function() end,
+  },
+
   -- Run your tests at the speed of thought
   -- https://github.com/vim-test/vim-test
   {
