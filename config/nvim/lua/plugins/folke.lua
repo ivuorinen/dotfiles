@@ -9,7 +9,10 @@ return {
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       'MunifTanjim/nui.nvim',
-      'rcarriga/nvim-notify',
+      {
+        'rcarriga/nvim-notify',
+        opts = { background_colour = '#000000' },
+      },
     },
     opts = {
       lsp = {
@@ -29,6 +32,10 @@ return {
         lsp_doc_border = false, -- add a border to hover docs and signature help
       },
       routes = {
+        {
+          view = 'notify',
+          filter = { event = 'msg_showmode' },
+        },
         {
           filter = {
             event = 'msg_show',
@@ -66,13 +73,31 @@ return {
       },
       views = {
         cmdline_popup = {
-          border = {
-            style = 'none',
-            padding = { 1, 2 },
+          position = {
+            row = 5,
+            col = '50%',
           },
-          filter_options = {},
+          size = {
+            width = 60,
+            height = 'auto',
+          },
+        },
+        popupmenu = {
+          relative = 'editor',
+          position = {
+            row = 8,
+            col = '50%',
+          },
+          size = {
+            width = 60,
+            height = 10,
+          },
+          border = {
+            style = 'rounded',
+            padding = { 0, 1 },
+          },
           win_options = {
-            winhighlight = 'NormalFloat:NormalFloat,FloatBorder:FloatBorder',
+            winhighlight = { Normal = 'Normal', FloatBorder = 'DiagnosticInfo' },
           },
         },
       },

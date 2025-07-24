@@ -17,6 +17,8 @@ return {
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
+
+      { 'j-hui/fidget.nvim', opts = {} },
     },
     config = function()
       local lazydev = require 'lazydev'
