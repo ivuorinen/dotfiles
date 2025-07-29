@@ -1,10 +1,11 @@
 default_session = "main"
+display_full_path = true
 
 [[search_dirs]]
 path = "~/Code"
 depth = 3
 
 [picker_colors]
-highlight_color = "#21202e"
-highlight_text_color = "#86e1fc"
-border_color = "#524f67"
+highlight_color = "#21202E"
+highlight_text_color = "#86E1FC"
+border_color = "#524F67"

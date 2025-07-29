@@ -10,10 +10,10 @@
   },
   "agent": {
     "always_allow_tool_actions": true,
-    "default_profile": "ask",
+    "default_profile": "write",
     "default_model": {
       "provider": "copilot_chat",
-      "model": "gpt-4.1"
+      "model": "claude-3.7-sonnet"
     },
     "play_sound_when_agent_done": true
   },
@@ -37,14 +37,15 @@
     },
     "Markdown": {
       "enable_language_server": true,
-      "preferred_line_length": 160,
-      "prettier": {
-        "allowed": true
-      }
+      "preferred_line_length": 120,
+      "formatter": "language_server"
     },
     "Lua": {
       "enable_language_server": true,
       "tab_size": 2
+    },
+    "Go": {
+      "language_servers": ["gopls", "golangci-lint"]
     }
   },
   "lsp": {
