@@ -19,7 +19,8 @@
   },
   "languages": {
     "PHP": {
-      "language_servers": ["intelephense", "phpactor"]
+      "language_servers": ["intelephense", "phpactor"],
+      "formatter": "language_server"
     },
     "Python": {
       "enable_language_server": true,
