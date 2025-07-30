@@ -6,6 +6,6 @@ path = "~/Code"
 depth = 3
 
 [picker_colors]
-highlight_color = "#21202E"
-highlight_text_color = "#86E1FC"
+highlight_color = "#31748f"
+highlight_text_color = "#e0def4"
 border_color = "#524F67"
