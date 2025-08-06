@@ -37,15 +37,18 @@ return {
     local vimgrep_arguments = { unpack(c.values.vimgrep_arguments) }
 
     -- I want to search in hidden/dot files.
-    table.insert(vimgrep_arguments, '--hidden')
-    -- I don't want to search in the `.git` directory.
+    table.insert(vimgrep_arguments, '--hidden=true')
     table.insert(vimgrep_arguments, '--glob')
+    -- I don't want to search in the `.git` directory.
     table.insert(vimgrep_arguments, '!**/.git/*')
 
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     t.setup {
       defaults = {
+        preview = {
+          filesize_limit = 0.1, -- MB
+        },
         -- `hidden = true` is not supported in text grep commands.
         vimgrep_arguments = vimgrep_arguments,
 

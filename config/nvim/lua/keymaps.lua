@@ -111,7 +111,7 @@ local lazy_plugins = function()
   return require('telescope').extensions.lazy_plugins.lazy_plugins()
 end
 
-K.nl('f', ':Telescope fd --hidden=true<cr>', 'Find Files')
+K.nl('f', ':Telescope find_files<cr>', 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
 K.nl('/', function() fuzzy_search() end, 'Fuzzily search in current buffer')
 
