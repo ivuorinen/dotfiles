@@ -6,11 +6,12 @@
     "doc": "docs"
   },
   "scripts": {
-    "lint:markdown": "npx markdownlint -d .",
-    "fix:markdown": "npx markdownlint -df .",
-    "lint:prettier": "npx prettier . --check",
-    "fix:prettier": "npx prettier . --write",
-    "test": "bash test-all.sh"
+    "lint:markdown": "markdownlint -d .",
+    "fix:markdown": "markdownlint -df .",
+    "lint:prettier": "prettier . --check",
+    "fix:prettier": "prettier . --write",
+    "test": "bash test-all.sh",
+    "lint:ec": "ec"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,9 @@
     "@types/node": "^24.0.1",
     "bats": "^1.12.0",
     "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "yarn": ">=1"
   },
   "packageManager": "yarn@1.22.22"
 }
