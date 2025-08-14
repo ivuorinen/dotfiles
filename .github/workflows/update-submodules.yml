@@ -39,10 +39,10 @@ jobs:
         run: |
           git submodule sync
           git submodule foreach --quiet "
-            tag="$(git describe --tags --abbrev=0 origin/HEAD)"
-            if [ "$(git describe --tags)" != "$tag" ]; then
-              git checkout --quiet "$tag"
-              echo "$name updated to $tag"
+            tag=\"$(git describe --tags --abbrev=0 origin/HEAD)\"
+            if [ \"$(git describe --tags)\" != \"$tag\" ]; then
+              git checkout --quiet \"$tag\"
+              echo \"$name updated to $tag\"
             fi
           "
 
