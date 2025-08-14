@@ -1,5 +1,4 @@
 {
-  "Version": "v3.4.0",
   "Verbose": false,
   "Debug": false,
   "IgnoreDefaults": false,
@@ -7,15 +6,15 @@
   "NoColor": false,
   "Exclude": [
     "base/plan",
-    "config/fish/completions/*",
-    "config/fish/conf.d/*",
-    "config/fish/functions/*",
+    "config/fish/completions/.*",
+    "config/fish/conf.d/.*",
+    "config/fish/functions/.*",
     "config/fzf/key-bindings.fish",
-    "config/irssi/scripts/autorun/*",
-    "config/vim/autoload/*",
-    "docs/*",
-    "local/man/*",
-    "local/share/*"
+    "config/irssi/scripts/autorun/.*",
+    "config/vim/autoload/.*",
+    "docs/.*",
+    "local/man/.*",
+    "local/share/.*"
   ],
   "AllowedContentTypes": [],
   "PassedFiles": [],
