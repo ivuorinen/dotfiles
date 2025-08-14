@@ -29,20 +29,22 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
 
       - name: Config Git User
+        shell: bash
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Update submodules
+        shell: bash
         run: |
           git submodule sync
-          git submodule foreach --quiet '
+          git submodule foreach --quiet "
             tag="$(git describe --tags --abbrev=0 origin/HEAD)"
             if [ "$(git describe --tags)" != "$tag" ]; then
               git checkout --quiet "$tag"
               echo "$name updated to $tag"
             fi
-          '
+          "
 
           if git diff --quiet; then
             echo "No updates for submodules."
