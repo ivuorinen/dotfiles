@@ -23,4 +23,3 @@ JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
 TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/fzf|config/zsh|config/tmux/plugins)
-
