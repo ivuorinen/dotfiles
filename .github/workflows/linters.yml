@@ -2,6 +2,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Lint Code Base
 
+# yamllint disable-line
 on:
   pull_request:
     branches: [master, main]
@@ -18,9 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      statuses: write
       contents: read
+      issues: write
       packages: read
+      pull-requests: write
+      statuses: write
 
     steps:
       - name: Checkout
@@ -32,5 +35,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run PR Lint
-        # https://github.com/ivuorinen/actions
         uses: ivuorinen/actions/pr-lint@fa0232d3c4ba16d087b606296435354a69c01756 # 25.8.11

@@ -6,4 +6,4 @@ config/tmux/plugins/*
 local/bin/asdf/*
 tools/*
 node_modules/*
-
+.git/*

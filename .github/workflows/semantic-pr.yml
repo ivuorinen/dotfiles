@@ -2,8 +2,9 @@
 # $schema: "https://json.schemastore.org/github-workflow.json"
 name: Semantic PR
 
+# yamllint disable-line
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited

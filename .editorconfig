@@ -12,7 +12,7 @@ trim_trailing_whitespace = true
 max_line_length = 80
 
 [*.md]
-max_line_length = 100
+max_line_length = 120
 
 [*.lua]
 max_line_length = 90
@@ -37,6 +37,9 @@ switch_case_indent = true # --case-indent
 space_redirects    = true
 keep_padding       = false
 function_next_line = true # --func-next-line
+
+[config/git/config]
+indent_style = tab
 
 # Ignore the entire "third_party" directory when calling shfmt on directories,
 # such as "shfmt -l -w .". When formatting files directly,

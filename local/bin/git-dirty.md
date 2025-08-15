@@ -1,12 +1,14 @@
 # git-dirty
 
-A powerful tool to recursively check Git repository status across multiple directories.
+A powerful tool to recursively check Git repository status across
+multiple directories.
 
 ## Overview
 
-`git-dirty` scans directories to identify Git repositories and reports their status.
-It quickly shows which repositories have uncommitted changes, untracked files, or need
-to be pushed, making it easy to maintain clean workspaces across multiple projects.
+`git-dirty` scans directories to identify Git repositories and reports their
+status. It quickly shows which repositories have uncommitted changes,
+untracked files, or need to be pushed, making it easy to maintain clean
+workspaces across multiple projects.
 
 ## Features
 
@@ -95,9 +97,10 @@ The script uses the following status indicators:
 
 ## Branch Display
 
-The script shows branch names for repositories not on main branches. This helps identify
-repositories where work is happening on feature branches. Main branches (configurable as
-`main`, `master`, and `trunk` by default) are hidden to reduce output clutter.
+The script shows branch names for repositories not on main branches.
+This helps identify repositories where work is happening on feature branches.
+Main branches (configurable as `main`, `master`, and `trunk` by default) are
+hidden to reduce output clutter.
 
 ## Configuration
 
@@ -132,41 +135,44 @@ GIT_DIRTY_EXCLUDE="node_modules vendor .cache build dist tmp"
 
 ## Skip Directories from Checking
 
-If you want to skip a directory from being checked, add a `.ignore` file next to the `.git` folder.
-You can add `.ignore` to your global `.gitignore` file to avoid committing these files.
+If you want to skip a directory from being checked, add a `.ignore` file next
+to the `.git` folder. You can add `.ignore` to your global `.gitignore` file
+to avoid committing these files.
 
 ## Performance Features
 
-- **Parallel processing**: Significant speed improvements when using the `-p` flag
+- **Parallel processing**: Significant speed improvements when
+  using the `-p` flag
 - **Progress bars**: Real-time feedback on scanning progress with ETA
 - **Rate limiting**: Controls parallel jobs to prevent system overloading
-- **Smart directory traversal**: Skips excluded directories for faster processing
+- **Smart directory traversal**: Skips excluded directories for
+  faster processing
 
 ## Tips
 
-1. **Add an alias**: Create an alias in your shell configuration:
+Add an alias: Create an alias in your shell configuration:
 
-   ```bash
-   alias gd='git-dirty'
-   ```
+```bash
+alias gd='git-dirty'
+```
 
-2. **Use it with specific directories**:
+Use it with specific directories:
 
-   ```bash
-   git-dirty ~/specific/project
-   ```
+```bash
+git-dirty ~/specific/project
+```
 
-3. **Run in parallel mode for large codebases**:
+Run in parallel mode for large codebases:
 
-   ```bash
-   git-dirty -p ~/huge-monorepo
-   ```
+```bash
+git-dirty -p ~/huge-monorepo
+```
 
-4. **Turn off branch display for cleaner output**:
+Turn off branch display for cleaner output:
 
-   ```bash
-   git-dirty -b
-   ```
+```bash
+git-dirty -b
+```
 
 ## Requirements
 

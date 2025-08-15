@@ -180,7 +180,7 @@ swap-main:
 # Move focus to the n-th screen in the list; e.g.,
 # focus-screen-3 will move mouse focus to the 3rd screen.
 # Note that the main window in the given screen will be focused.
-#focus-screen-n:
+# focus-screen-n:
 # focus-screen-<screen-number>:
 #   mod: mod1
 #   key: y
@@ -197,12 +197,12 @@ swap-main:
 #   key: i
 
 # Select tall layout
-#select-tall-layout:
-# mod: mod1
-# key: a
+# select-tall-layout:
+#  mod: mod1
+#  key: a
 
 # Select wide layout
-#select-wide-layout:
+# select-wide-layout:
 #  mod: mod1
 #  key: s
 

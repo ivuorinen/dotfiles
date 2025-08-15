@@ -1,11 +1,21 @@
 {
-  "Version": "v3.3.0",
   "Verbose": false,
   "Debug": false,
   "IgnoreDefaults": false,
   "SpacesAfterTabs": false,
   "NoColor": false,
-  "Exclude": [],
+  "Exclude": [
+    "base/plan",
+    "config/fish/completions/.*",
+    "config/fish/conf.d/.*",
+    "config/fish/functions/.*",
+    "config/fzf/key-bindings.fish",
+    "config/irssi/scripts/autorun/.*",
+    "config/vim/autoload/.*",
+    "docs/.*",
+    "local/man/.*",
+    "local/share/.*"
+  ],
   "AllowedContentTypes": [],
   "PassedFiles": [],
   "Disable": {
