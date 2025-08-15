@@ -21,5 +21,6 @@ YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.json
 JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
 TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+REPOSITORY_GIT_DIFF_DISABLE_ERRORS: false
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/fzf|config/zsh|config/tmux/plugins)
