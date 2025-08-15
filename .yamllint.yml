@@ -1,0 +1,21 @@
+---
+extends: default
+
+ignore: |
+  node_modules
+  tools
+  config/tmux/plugins
+
+rules:
+  empty-lines:
+    level: warning
+    max: 1
+  line-length:
+    max: 200
+    level: warning
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  trailing-spaces:
+    level: warning

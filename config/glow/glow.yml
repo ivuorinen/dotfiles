@@ -1,3 +1,4 @@
+---
 # mouse support (TUI-mode only)
 mouse: false
 # use pager to display markdown
