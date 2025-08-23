@@ -35,4 +35,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run PR Lint
-        uses: ivuorinen/actions/pr-lint@e3b436adb3d9871b9cc27e19d13ba7f50cbac62e # 25.8.18
+        uses: ivuorinen/actions/pr-lint@05e171c506876dce80fc8eb00f6c0e628e2586b5 # 25.8.21
