@@ -229,7 +229,6 @@ return {
             )
           end,
         },
-        omnisharp = {}, -- C# OmniSharp (will respect EditorConfig for formatting)
         pyright = {},
         tailwindcss = {},
         terraformls = {},

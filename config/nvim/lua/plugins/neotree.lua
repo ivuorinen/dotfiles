@@ -12,7 +12,7 @@ return {
       -- the window id of the picked window
       -- https://github.com/s1n7ax/nvim-window-picker
       's1n7ax/nvim-window-picker',
-      version = '2.*',
+      version = '3.*',
       opts = {
         filter_rules = {
           include_current_win = false,
