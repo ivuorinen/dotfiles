@@ -22,4 +22,4 @@ dfm.sh
 .phpactor.json
 .zsh_history
 **/.claude/settings.local.json
-
+**/.serena/cache

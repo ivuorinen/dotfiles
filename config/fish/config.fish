@@ -35,3 +35,6 @@ set -gx PATH $PATH $HOME/.lmstudio/bin
 # End of LM Studio CLI section
 
 # vim: ft=fish ts=4 sw=4 et:
+
+# opencode
+fish_add_path /Users/ivuorinen/.opencode/bin

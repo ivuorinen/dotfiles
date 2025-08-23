@@ -21,7 +21,7 @@
     "default_profile": "write",
     "default_model": {
       "provider": "copilot_chat",
-      "model": "claude-3.7-sonnet"
+      "model": "claude-sonnet-4"
     },
     "play_sound_when_agent_done": true
   },
@@ -101,8 +101,8 @@
   "vim_mode": true,
   "theme": {
     "mode": "system",
-    "light": "Rosé Pine Dawn",
-    "dark": "Rosé Pine"
+    "light": "Everforest Dark Soft",
+    "dark": "Everforest Dark Hard"
   },
   "inlay_hints": {
     "enabled": true,
