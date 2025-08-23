@@ -2,21 +2,21 @@
 // so they should be available with all versions
 
 // Git Profile allows you to switch between user profiles in git repos
-github.com/dotzero/git-profile@v1.4.0
+github.com/dotzero/git-profile@latest
 // An extensible command line tool or library to format yaml files.
-github.com/google/yamlfmt/cmd/yamlfmt@v0.13.0
+github.com/google/yamlfmt/cmd/yamlfmt@latest
 // Parsing HTML at the command line
-github.com/ericchiang/pup@v0.4.0
+github.com/ericchiang/pup@latest
 // HTML to Markdown converter
-github.com/suntong/html2md@v1.5.0
+github.com/suntong/html2md@latest
 // cheat allows you to create and view interactive cheatsheets on the cli.
-github.com/cheat/cheat/cmd/cheat@4.4.2
+github.com/cheat/cheat/cmd/cheat@latest
 // Render markdown on the CLI, with pizzazz! 💅
-github.com/charmbracelet/glow@v1.5.1
+github.com/charmbracelet/glow@latest
 // Static checker for GitHub Actions workflow files
-github.com/rhysd/actionlint/cmd/actionlint@v1.7.1
+github.com/rhysd/actionlint/cmd/actionlint@latest
 // Cleans up your $HOME from those pesky dotfiles
-github.com/doron-cohen/antidot@v0.6.3
+github.com/doron-cohen/antidot@latest
 // FZF is a general-purpose command-line fuzzy finder.
 github.com/junegunn/fzf@latest
 // gopls, the Go language server
