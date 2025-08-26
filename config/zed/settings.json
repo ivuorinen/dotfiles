@@ -1,8 +1,16 @@
 {
+  "features": {
+    "edit_prediction_provider": "copilot"
+  },
   "context_servers": {
     "github-activity-summarizer": {
       "source": "extension",
       "settings": {}
+    },
+    "mcp-server-time": {
+      "source": "custom",
+      "command": "uvx",
+      "args": ["mcp-server-time"]
     }
   },
   "telemetry": {
