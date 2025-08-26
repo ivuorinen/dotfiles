@@ -106,3 +106,6 @@ abbr --add .n npm
 abbr --add .nt npm test --if-present
 abbr --add .nb npm run build --if-present
 abbr --add .ns npm run start --if-present
+
+# Random abbreviations
+abbr --add stats onefetch --nerd-fonts --true-color never
