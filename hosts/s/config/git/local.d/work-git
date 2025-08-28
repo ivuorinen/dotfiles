@@ -1,2 +1,4 @@
+# vim: ft=gitconfig ai noexpandtab
+
 Host tfs.ia.corp.svea.com
-  IdentityFile ~/.ssh/id_rsa
+	IdentityFile ~/.ssh/id_rsa

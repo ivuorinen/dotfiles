@@ -1,18 +1,19 @@
+# vim: ft=gitconfig ai noexpandtab
 [include]
-  path = ~/.dotfiles/config/git/shared
+	path = ~/.dotfiles/config/git/shared
 
 [user]
-  name = Ismo Vuorinen
-  email = ismo@ivuorinen.net
+	name = Ismo Vuorinen
+	email = ismo@ivuorinen.net
 
 [github]
-  user = ivuorinen
+	user = ivuorinen
 
 [include]
-  path = ~/.config/git/overrides/config
+	path = ~/.config/git/overrides/config
 
 [advice]
-  detachedHead = false
+	detachedHead = false
 [column]
 	ui = auto
 [branch]

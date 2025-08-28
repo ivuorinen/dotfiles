@@ -1,26 +1,26 @@
-# vim: ft=gitconfig sw=2 ts=2 et
+# vim: ft=gitconfig ai noexpandtab
 [include]
-  path = ~/.dotfiles/config/git/shared
+	path = ~/.dotfiles/config/git/shared
 
 [gpg]
-  format = ssh
+	format = ssh
 
 [user]
-  name = Ismo Vuorinen
-  email = ismo.vuorinen@svea.com
-  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMmEaS/pitd8TzLNaXf0ojTydEyFp2TWoDctuqTEF8Aw
+	name = Ismo Vuorinen
+	email = ismo.vuorinen@svea.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMmEaS/pitd8TzLNaXf0ojTydEyFp2TWoDctuqTEF8Aw
 
 [gpg "ssh"]
-  program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
-  allowedSignersFile = ~/.ssh/allowed_signers
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
-  gpgsign = true
+	gpgsign = true
 
 [credential "https://github.com"]
-  helper =
-  helper = !/opt/homebrew/bin/gh auth git-credential
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [credential "https://gist.github.com"]
-  helper =
-  helper = !/opt/homebrew/bin/gh auth git-credential
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential

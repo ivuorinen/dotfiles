@@ -1,2 +1,3 @@
+# vim: ft=gitconfig ai noexpandtab
 [submodule]
-  recurse = false
+	recurse = false
