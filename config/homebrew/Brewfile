@@ -21,6 +21,7 @@ tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
 tap "snyk/tap"
+tap "tabbyml/tabby"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
 # Run your GitHub Actions locally
@@ -79,6 +80,8 @@ brew "autogen"
 brew "automake"
 # Official Amazon AWS command-line interface
 brew "awscli"
+# GNU internationalization (i18n) and localization (l10n) library
+brew "gettext"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -95,12 +98,18 @@ brew "bzip2"
 brew "freetype"
 # XML-based font configuration API for X Windows
 brew "fontconfig"
-# GNU internationalization (i18n) and localization (l10n) library
-brew "gettext"
 # Core application library for C
 brew "glib"
 # Binary installation for rust projects
 brew "cargo-binstall"
+# Multi-platform support library with a focus on asynchronous I/O
+brew "libuv"
+# Platform built on V8 to build network applications
+brew "node", link: false
+# CLI tool for analyzing Claude Code usage from local JSONL files
+brew "ccusage"
+# JSON Schema CLI
+brew "check-jsonschema"
 # Prevent cloud misconfigurations during build-time for IaC tools
 brew "checkov"
 # Human-friendly and fast alternative to cut and (sometimes) awk
@@ -109,6 +118,8 @@ brew "choose-rust"
 brew "cmake"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
+# Network authentication protocol
+brew "krb5"
 # OpenType text shaping engine
 brew "harfbuzz"
 # OWASP dependency-check
@@ -121,6 +132,16 @@ brew "enchant"
 brew "exercism"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
+# Validating, recursive, caching DNS resolver
+brew "unbound"
+# GNU Transport Layer Security (TLS) Library
+brew "gnutls"
+# Secure hashing function
+brew "libb2"
+# Framework for layout and rendering of i18n text
+brew "pango"
+# Play, record, convert, and stream audio and video
+brew "ffmpeg"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
 # User-friendly command-line shell for UNIX-like operating systems
@@ -139,26 +160,18 @@ brew "gd"
 brew "gdu"
 # GitHub command-line tool
 brew "gh"
-# Secure hashing function
-brew "libb2"
-# Framework for layout and rendering of i18n text
-brew "pango"
 # Distributed revision control system
 brew "git"
 # Enable transparent encryption/decryption of files in a git repo
 brew "git-crypt"
 # Small git utilities
 brew "git-extras"
-# See your latest local git branches, formatted real fancy
+# Browse your latest git branches, formatted real fancy
 brew "git-recent"
 # Render markdown on the CLI
 brew "glow"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
-# Validating, recursive, caching DNS resolver
-brew "unbound"
-# GNU Transport Layer Security (TLS) Library
-brew "gnutls"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
 # Go version management
@@ -175,6 +188,8 @@ brew "librsvg"
 brew "graphviz"
 # GNU grep, egrep and fgrep
 brew "grep"
+# Vulnerability scanner for container images and filesystems
+brew "grype"
 # Popular GNU data compression program
 brew "gzip"
 # Improved top (interactive process viewer)
@@ -193,8 +208,8 @@ brew "jpeg"
 brew "jq"
 # JSON parser for C
 brew "json-c"
-# Network authentication protocol
-brew "krb5"
+# Crawling and spidering framework
+brew "katana"
 # Style and grammar checker
 brew "languagetool"
 # Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
@@ -205,8 +220,8 @@ brew "libedit"
 brew "libiconv"
 # Version of the SSL/TLS protocol forked from OpenSSL
 brew "libressl"
-# Multi-platform support library with a focus on asynchronous I/O
-brew "libuv"
+# Linguistic software and Finnish dictionary
+brew "libvoikko"
 # GNOME XML library
 brew "libxml2"
 # Package manager for the Lua programming language
@@ -223,12 +238,12 @@ brew "ncdu"
 brew "nginx"
 # Port scanning utility for large networks
 brew "nmap"
-# Platform built on V8 to build network applications
-brew "node", link: false
 # Libraries for security-enabled client and server applications
 brew "nss"
 # Command-line Git information tool
 brew "onefetch"
+# General-purpose speech recognition model
+brew "openai-whisper"
 # Open source suite of directory software
 brew "openldap"
 # ISO-C API and CLI for generating UUIDs
@@ -319,14 +334,16 @@ brew "shivammathur/extensions/yaml@8.3"
 brew "shivammathur/php/php-debug"
 # General-purpose scripting language
 brew "shivammathur/php/php@8.2-debug"
+# Find & fix known vulnerabilities in open-source dependencies
+brew "snyk/tap/snyk"
+# Tabby: AI Coding Assistant
+brew "tabbyml/tabby/tabby"
 # Command-line interface for 1Password
 cask "1password-cli"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Database version management tool
 cask "dbngin"
-# App to build and share containerised applications and microservices
-cask "docker"
 # Calendar software
 cask "fantastical"
 cask "font-jetbrains-mono"
@@ -377,7 +394,7 @@ cask "syntax-highlight"
 # Python IDE for beginners
 cask "thonny"
 # To-do list
-cask "todoist"
+cask "todoist-app"
 # Configuration application for the Ultimate Hacking Keyboard
 cask "uhk-agent"
 # Open-source code editor
