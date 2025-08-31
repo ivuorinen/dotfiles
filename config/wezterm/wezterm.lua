@@ -6,7 +6,7 @@ config.set_environment_variables = {
 }
 
 -- Font and font size
-config.font_size = 14.5
+config.font_size = 16
 config.font = wezterm.font_with_fallback {
   {
     family = 'Operator Mono',
@@ -23,7 +23,7 @@ config.harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1' }
 config.selection_word_boundary = ' \t\n{[}]()"\'`,;:'
 
 -- Window configuration
-config.window_background_opacity = 0.95
+config.window_background_opacity = 0.97
 config.window_decorations = 'RESIZE'
 config.macos_window_background_blur = 10
 config.window_padding = {
@@ -40,8 +40,7 @@ config.enable_tab_bar = false
 config.send_composed_key_when_left_alt_is_pressed = true
 config.send_composed_key_when_right_alt_is_pressed = true
 
--- Scrolling deactivated, using tmux for that
-config.scrollback_lines = 0
+config.scrollback_lines = 3000
 
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
