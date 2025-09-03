@@ -5,6 +5,10 @@ config.set_environment_variables = {
   COLORTERM = 'truecolor',
 }
 
+config.color_scheme_dirs = {
+  '~/.config/wezterm/colors',
+}
+
 -- Font and font size
 config.font_size = 16
 config.font = wezterm.font_with_fallback {
@@ -45,9 +49,9 @@ config.scrollback_lines = 3000
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
   if appearance:find 'Dark' then
-    return 'Tokyo Night Storm'
+    return 'Everforest Dark (Medium)'
   else
-    return 'Tokyo Night Day'
+    return 'Everforest Light (Medium)'
   end
 end
 

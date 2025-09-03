@@ -13,7 +13,7 @@ local a = vim.api -- A table to store API functions
 g.mapleader = ' ' -- Space as the leader key
 g.maplocalleader = ' ' -- Space as the local leader key
 
-g.colors_theme = 'onedark' -- Set the colorscheme
+-- g.colors_theme = 'onedark' -- Set the colorscheme
 -- g.colors_variant_light = 'tokyonight-day' -- Set the light variant
 -- g.colors_variant_dark = 'tokyonight-storm' -- Set the dark variant
 
@@ -65,6 +65,6 @@ vim.schedule(function()
 end)
 
 -- xiyaowong/transparent.nvim
-vim.g.transparent_enabled = true
+-- vim.g.transparent_enabled = true
 
 -- vim: ts=2 sts=2 sw=2 et
