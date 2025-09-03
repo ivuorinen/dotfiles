@@ -1,10 +1,11 @@
 **/__pycache__/**
+*.pyc
 .git/**
 config/cheat/cheatsheets/community/**
 config/tmux/plugins/**
+config/vim/plugged/**
 node_modules
 tools/antidote/**
 tools/dotbot-brew/**
 tools/dotbot-include/**
 tools/dotbot/**
-*.pyc

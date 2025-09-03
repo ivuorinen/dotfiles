@@ -1,9 +1,10 @@
 # only care about files that are directly under our control
+.git/*
 config/cheat/cheatsheets/community/*
 config/cheat/cheatsheets/tldr/*
 config/op/plugins/used_plugins/*
 config/tmux/plugins/*
+config/vim/*
 local/bin/asdf/*
-tools/*
 node_modules/*
-.git/*
+tools/*
