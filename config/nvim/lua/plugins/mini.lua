@@ -2,14 +2,14 @@ return {
   -- Library of 40+ independent Lua modules improving overall Neovim
   -- (version 0.8 and higher) experience with minimal effort
   --
-  -- https://github.com/echasnovski/mini.nvim
-  -- https://github.com/echasnovski/mini.nvim/tree/main?tab=readme-ov-file#modules
+  -- https://github.com/nvim-mini/mini.nvim
+  -- https://github.com/nvim-mini/mini.nvim?tab=readme-ov-file#modules
   --
   -- YouTube: Text editing with 'mini.nvim' - Neovimconf 2024 - Evgeni Chasnovski
   -- https://www.youtube.com/watch?v=cNK5kYJ7mrs
   {
-    'echasnovski/mini.nvim',
-    version = '*',
+    'nvim-mini/mini.nvim',
+    version = false,
     priority = 1001,
     config = function()
       -- ╭─────────────────────────────────────────────────────────╮
@@ -21,7 +21,7 @@ return {
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      require('mini.ai').setup { n_lines = 750 }
 
       -- Comment lines
       require('mini.comment').setup()
