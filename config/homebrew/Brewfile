@@ -348,6 +348,7 @@ cask "dbngin"
 cask "fantastical"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
+cask "font-monaspace"
 cask "font-open-sans"
 # GIT client
 cask "fork"
@@ -365,6 +366,8 @@ cask "ngrok"
 cask "notunes"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
+# Replacement for Docker Desktop
+cask "orbstack"
 # Quick Look generator for Markdown files
 cask "qlmarkdown"
 # Quick Look plugin for plaintext files without an extension
