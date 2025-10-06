@@ -79,4 +79,3 @@ taskd.ca=$XDG_DATA_HOME/task/ca.cert.pem
 taskd.server=inthe.am:53589
 taskd.credentials=inthe_am/ivuorinen/b99a4970-94fb-4fb8-b9fe-e1a8140dd44d
 taskd.trust=strict
-

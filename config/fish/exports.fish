@@ -96,7 +96,7 @@ set -q FNM_RESOLVE_ENGINES; or set -x FNM_RESOLVE_ENGINES true
 
 # fzf configuration
 set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
-set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS '--height 40% --tmux bottom,40% --layout reverse --border top'
+set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS '--height 40% --tmux bottom,70% --layout reverse --border top'
 
 # GnuPG configuration
 set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
@@ -160,6 +160,10 @@ set -q TMS_CONFIG_FILE; or set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.t
 set -q WAKATIME_HOME; or set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
 
+# Zoxide configuration
+set -q _ZO_DATA_DIR; or set -x _ZO_DATA_DIR "$XDG_DATA_HOME/zoxide"
+set -q _ZO_EXCLUDE_DIRS; or set -x _ZO_EXCLUDE_DIRS "$XDG_DATA_HOME"
+
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
 set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
@@ -182,6 +186,6 @@ set -gx tide_prompt_transient_enabled true
 set -gx tide_prompt_add_newline_before true
 set -gx tide_prompt_min_cols 34
 set -gx tide_prompt_pad_items false
-set -gx tide_left_prompt_items context pwd git node python rustc java php pulumi ruby go gcloud kubectl distrobox toolbox terraform aws nix_shell crystal elixir zig newline character
+set -gx tide_left_prompt_items context pwd git node python rustc java php pulumi ruby go gcloud newline character
 set -gx tide_right_prompt_items status jobs direnv
 set -gx tide_context_hostname_parts 1

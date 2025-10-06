@@ -84,28 +84,5 @@ function configure_tide --description 'Configure tide with the lean style and my
         --transient=Yes
 end
 
-# Abbreviations for git
-abbr --add gau git add -u
-abbr --add gaa git add -A
-abbr --add gcv git commit -v
-
-# Abbreviations for composer
-abbr --add c composer
-abbr --add cu composer update
-abbr --add ci composer install
-
-# Abbreviations for php artisan
-abbr --add .pa php artisan
-abbr --add .paf php artisan fresh
-abbr --add .pam php artisan migrate
-abbr --add .pams php artisan migrate --seed
-abbr --add .pat php artisan test
-
-# Abbreviations for npm
-abbr --add .n npm
-abbr --add .nt npm test --if-present
-abbr --add .nb npm run build --if-present
-abbr --add .ns npm run start --if-present
-
 # Random abbreviations
 abbr --add stats onefetch --nerd-fonts --true-color never

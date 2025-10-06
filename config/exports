@@ -458,5 +458,7 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
 [ -f "$XDG_CONFIG_HOME/exports-secret" ] && source "$XDG_CONFIG_HOME/exports-secret"
 [ -f "$XDG_CONFIG_HOME/exports-local" ] && source "$XDG_CONFIG_HOME/exports-local"
+# shellcheck source=./exports-lakka
 [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)"
+# shellcheck source=./exports-lakka-secret
 [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ] && source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"

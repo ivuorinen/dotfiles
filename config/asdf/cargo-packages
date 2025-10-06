@@ -23,3 +23,5 @@ bottom
 eza
 // Tmux Sessionizer: A tool for opening git repositories as tmux sessions
 tmux-sessionizer
+// zoxide, a smarter cd command
+zoxide
