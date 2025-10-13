@@ -1,0 +1,59 @@
+#
+# ███████╗███████╗███████╗██╗  ██╗     ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
+# ██╔════╝██╔════╝██╔════╝██║  ██║    ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
+# ███████╗█████╗  ███████╗███████║    ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+# ╚════██║██╔══╝  ╚════██║██╔══██║    ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+# ███████║███████╗███████║██║  ██║    ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+# ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝     ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+#
+# Smart session manager for the terminal
+# https://github.com/joshmedeski/sesh
+
+strict_mode = false
+
+# [marker]
+# inactivity_threshold = 10    # Seconds before alerts start
+# alert_level_1_time = 60      # Light alert duration
+# alert_level_2_time = 300     # Medium alert duration
+# alert_level_3_time = 600     # Urgent alert duration
+
+blacklist = [
+  "^scratch$",
+  "^_"
+]
+
+[[session]]
+name = "home (~)"
+path = "~"
+disable_startup_command = true
+# startup_command = "l"
+
+[[session]]
+name = "dotfiles"
+path = "~/.dotfiles"
+
+[[session]]
+name = "neovim config"
+path = "~/.dotfiles/config/nvim"
+
+[[session]]
+name = "sesh config"
+path = "~/.dotfiles/config/sesh"
+startup_command = "nvim sesh.toml"
+preview_command = "bat --language=toml --style=snip --color=always ~/.dotfiles/config/sesh/sesh.toml"
+
+[[session]]
+name = "my custom binaries"
+path = "~/.dotfiles/local/bin"
+
+[[session]]
+name = "code"
+path = "~/Code/"
+disable_startup_command = true
+# startup_command = "l"
+
+[[session]]
+name = "Downloads"
+path = "~/Downloads"
+startup_command = "lsa"
+

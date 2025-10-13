@@ -50,3 +50,4 @@ dependency-check-report.html
 local/bin/yabai
 local/man/yabai.1
 config/op/plugins/used_items/gh.json
+config/zed/settings.json
