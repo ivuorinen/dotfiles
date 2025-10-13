@@ -1,0 +1,230 @@
+#!/bin/sh
+# x-codeql: CodeQL security scanning wrapper
+# POSIX-compatible shell script
+
+set -e
+
+VERSION="1.0.0"
+
+# Language mappings: extension -> codeql language
+LANG_MAP="c:.c,.h|cpp:.cpp,.cc,.cxx,.hpp,.hxx|csharp:.cs|go:.go|java:.java|
+javascript:.js,.jsx,.mjs,.ts,.tsx|python:.py|ruby:.rb|swift:.swift"
+
+usage()
+{
+  cat << EOF
+Usage: $0 [OPTIONS]
+
+Options:
+  --path PATH        Source path to analyze (default: current directory)
+  --parallel         Run language analyses in parallel
+  -h, --help         Show this help message
+  -v, --version      Show version
+EOF
+  exit "${1:-0}"
+}
+
+log()
+{
+  printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*" >&2
+}
+err()
+{
+  log "ERROR: $*"
+  exit 1
+}
+
+check_codeql()
+{
+  command -v codeql > /dev/null 2>&1 || err "codeql binary not found in PATH"
+  log "Found codeql: $(codeql version --format=terse)"
+}
+
+get_cache_dir()
+{
+  cache="${XDG_CACHE_HOME:-$HOME/.cache}/codeql"
+  mkdir -p "$cache" || err "Cannot create cache directory: $cache"
+  printf '%s' "$cache"
+}
+
+detect_languages()
+{
+  src_path="$1"
+  detected=""
+
+  # Check for GitHub Actions workflows
+  if [ -d "$src_path/.github/workflows" ] \
+    && find "$src_path/.github/workflows" -name '*.yml' -o -name '*.yaml' \
+      2> /dev/null | grep -q .; then
+    detected="actions"
+  fi
+
+  # Scan for language files
+  IFS='|'
+  for mapping in $LANG_MAP; do
+    lang="${mapping%%:*}"
+    exts="${mapping#*:}"
+    found=0
+
+    IFS=','
+    for ext in $exts; do
+      if find "$src_path" -type f -name "*$ext" -print -quit 2> /dev/null \
+        | grep -q .; then
+        found=1
+        break
+      fi
+    done
+
+    [ "$found" -eq 1 ] && detected="$detected $lang"
+    IFS='|'
+  done
+
+  [ -z "$detected" ] && err "No supported languages detected in $src_path"
+
+  # Remove duplicates and trim whitespace
+  printf '%s' "$detected" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/ $//'
+}
+
+create_database()
+{
+  lang="$1"
+  src_path="$2"
+  db_path="$3"
+
+  log "Creating $lang database..."
+  codeql database create "$db_path" \
+    --language="$lang" \
+    --source-root="$src_path" \
+    --overwrite
+}
+
+show_results_stats()
+{
+  sarif_file="$1"
+  lang="$2"
+
+  if ! command -v jq > /dev/null 2>&1; then
+    # No jq, basic check only
+    if [ ! -s "$sarif_file" ] || ! grep -q '"results"' "$sarif_file"; then
+      return 1
+    fi
+    return 0
+  fi
+
+  result_count=$(jq -r '.runs[0].results | length' "$sarif_file" 2> /dev/null || echo "0")
+
+  if [ "$result_count" -eq 0 ]; then
+    return 1
+  fi
+
+  log "Found $result_count result(s) for $lang"
+  jq -r '.runs[0].results[] | "\(.ruleId): \(.message.text)"' "$sarif_file" \
+    2> /dev/null | head -5 | while read -r line; do
+    log "  - $line"
+  done
+  [ "$result_count" -gt 5 ] && log "  ... and $((result_count - 5)) more"
+  return 0
+}
+
+analyze_language()
+{
+  lang="$1"
+  src_path="$2"
+  cache_dir="$3"
+  output_dir="$4"
+
+  # Extract last 2 path components for unique DB name
+  path_suffix="$(printf '%s' "$src_path" | awk -F/ '{print $(NF-1)"-"$NF}')"
+  db_path="$cache_dir/db-$path_suffix-$lang"
+  sarif_file="$output_dir/codeql-$lang.sarif"
+
+  create_database "$lang" "$src_path" "$db_path"
+
+  log "Analyzing $lang with security-and-quality suite..."
+
+  # Try security-and-quality suite, fall back to default if not found
+  if ! codeql database analyze "$db_path" \
+    --format=sarif-latest \
+    --output="$sarif_file" \
+    --sarif-category="$lang" \
+    --download \
+    "codeql/$lang-queries:codeql-suites/$lang-security-and-quality.qls" \
+    2> /dev/null; then
+
+    log "Suite not found, trying default pack for $lang..."
+    codeql database analyze "$db_path" \
+      --format=sarif-latest \
+      --output="$sarif_file" \
+      --sarif-category="$lang" \
+      --download \
+      "codeql/$lang-queries"
+  fi
+
+  # Check results and clean up if empty
+  if [ -f "$sarif_file" ]; then
+    if ! show_results_stats "$sarif_file" "$lang"; then
+      log "No results found for $lang, removing empty SARIF file"
+      rm -f "$sarif_file"
+    fi
+  fi
+
+  # Cleanup database
+  rm -rf "$db_path"
+}
+
+main()
+{
+  src_path="."
+  parallel=0
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --path)
+        src_path="${2:?--path requires an argument}"
+        shift 2
+        ;;
+      --parallel)
+        parallel=1
+        shift
+        ;;
+      -v | --version)
+        printf 'x-codeql %s\n' "$VERSION"
+        exit 0
+        ;;
+      -h | --help)
+        usage 0
+        ;;
+      *)
+        err "Unknown option: $1"
+        ;;
+    esac
+  done
+
+  [ -d "$src_path" ] || err "Path does not exist: $src_path"
+  src_path="$(cd "$src_path" && pwd)"
+
+  check_codeql
+  cache="$(get_cache_dir)"
+
+  log "Detecting languages in $src_path..."
+  languages="$(detect_languages "$src_path")"
+  log "Found languages: $languages"
+
+  output_dir="$(pwd)"
+
+  if [ "$parallel" -eq 1 ]; then
+    log "Running analyses in parallel..."
+    for lang in $languages; do
+      analyze_language "$lang" "$src_path" "$cache" "$output_dir" &
+    done
+    wait
+  else
+    for lang in $languages; do
+      analyze_language "$lang" "$src_path" "$cache" "$output_dir"
+    done
+  fi
+
+  log "Analysis complete. SARIF files in $output_dir"
+}
+
+main "$@"
