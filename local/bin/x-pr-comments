@@ -1,0 +1,357 @@
+#!/usr/bin/env bash
+
+# x-pr-comments - Fetch GitHub Pull Request comments and review suggestions
+# Copyright (c) 2025 - Licensed under MIT
+#
+# Usage:
+#   x-pr-comments <pr-number>                    # When run inside a git repository
+#   x-pr-comments <github-pr-url>                # Direct GitHub PR URL
+#   x-pr-comments -h|--help                      # Show this help
+#
+# Examples:
+#   x-pr-comments 1                              # PR #1 in current repo
+#   x-pr-comments https://github.com/user/repo/pull/1
+#
+# Requirements:
+#   - gh CLI tool installed and authenticated
+#   - Internet connection for GitHub API access
+#
+# Output:
+#   Structured list of PR comments and file change requests with LLM processing directions
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Show usage information
+show_usage()
+{
+  sed -n '3,20p' "$0" | sed 's/^# //' | sed 's/^#//'
+}
+
+# Log functions
+log_error()
+{
+  echo -e "${RED}ERROR:${NC} $1" >&2
+}
+log_warn()
+{
+  echo -e "${YELLOW}WARN:${NC} $1" >&2
+}
+log_info()
+{
+  if [[ "${INFO:-0}" == "1" ]]; then
+    echo -e "${GREEN}INFO:${NC} $1" >&2
+  fi
+}
+log_debug()
+{
+  if [[ "${DEBUG:-0}" == "1" ]]; then
+    echo -e "${BLUE}DEBUG:${NC} $1" >&2
+  fi
+}
+
+# Filter out CodeRabbit comments containing "Addressed in commit"
+filter_coderabbit_addressed_comments()
+{
+  local input_data="$1"
+  local is_wrapped="$2"  # true for {comments: [...]}, false for [...]
+
+  local jq_filter='select(
+    (.user.login | contains("coderabbit") | not) or
+    (.body | contains("Addressed in commit") | not)
+  )'
+
+  if [[ "$is_wrapped" == "true" ]]; then
+    echo "$input_data" | jq "{comments: [.comments[] | $jq_filter]}" 2>/dev/null || echo "$input_data"
+  else
+    echo "$input_data" | jq "[.[] | $jq_filter]" 2>/dev/null || echo "$input_data"
+  fi
+}
+
+# Fetch and filter API data with consistent logging
+fetch_and_filter_data()
+{
+  local endpoint="$1"
+  local data_name="$2"
+  local is_wrapped="$3"  # true/false
+
+  local data
+  data=$(gh api "$endpoint" 2>/dev/null || echo "[]")
+
+  if [[ "$is_wrapped" == "true" ]]; then
+    data=$(echo "$data" | jq '{comments: .}' 2>/dev/null || echo '{"comments":[]}')
+  fi
+
+  data=$(filter_coderabbit_addressed_comments "$data" "$is_wrapped")
+
+  local count_field="length"
+  [[ "$is_wrapped" == "true" ]] && count_field=".comments | length"
+
+  local count
+  count=$(echo "$data" | jq -r "$count_field" 2>/dev/null || echo "0")
+  log_debug "$data_name count: $count"
+
+  echo "$data"
+}
+
+
+
+# Format file-specific comments grouped by review
+format_grouped_review_comments()
+{
+  local review_comments="$1"
+  local reviews="$2"
+  local repo="$3"
+
+  local count
+  count=$(echo "$review_comments" | jq -r 'length' 2>/dev/null || echo "0")
+
+  if [[ "$count" -eq 0 ]]; then
+    echo "No file-specific comments found."
+    return
+  fi
+
+  # Group comments by review ID and format them
+  echo "$review_comments" | jq -r --argjson reviews "$reviews" '
+    group_by(.pull_request_review_id) | .[] |
+    . as $comments |
+    ($reviews[] | select(.id == $comments[0].pull_request_review_id)) as $review |
+    "### Review by \($review.user.login) (\($review.submitted_at)) [\($review.state)]
+
+Review ID: \($review.id) - API: gh api /repos/'"$repo"'/pulls/1/reviews/\($review.id)
+
+" + ([.[] | "
+#### Comment ID: \(.id)
+
+- **File:** \(.path)
+- **Commit:** \(.commit_id)
+- **Author:** \(.user.login) (\(.user.type))
+- **Lines:** \(if .start_line then "\(.start_line)-\(.line // "N/A")" else "\(.line // "N/A")" end) (original: \(.original_line // "N/A"))
+- **Position:** \(.position // "N/A") (original: \(.original_position // "N/A"))
+- **Subject Type:** \(.subject_type // "N/A")
+- **API:** gh api /repos/'"$repo"'/pulls/comments/\(.id)
+
+**Body:**
+\(.body)
+
+"] | join("")) + "
+---
+"
+  ' 2>/dev/null || {
+    log_debug "Error grouping review comments by review ID"
+    echo "Error parsing grouped review comments."
+  }
+}
+
+# Check if gh CLI is available
+check_dependencies()
+{
+  if ! command -v gh &> /dev/null; then
+    log_error "GitHub CLI (gh) is not installed. Please install it first:"
+    log_error "  https://cli.github.com/"
+    exit 1
+  fi
+
+  if ! gh auth status &> /dev/null; then
+    log_error "GitHub CLI is not authenticated. Run: gh auth login"
+    exit 1
+  fi
+}
+
+# Get repository info from git remote
+get_repo_info()
+{
+  if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+    log_error "Not inside a git repository"
+    return 1
+  fi
+
+  local remote_url
+  remote_url=$(git remote get-url origin 2> /dev/null || echo "")
+
+  if [[ -z "$remote_url" ]]; then
+    log_error "No origin remote found"
+    return 1
+  fi
+
+  # Parse GitHub URL (both HTTPS and SSH formats)
+  if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+    local repo_name="${BASH_REMATCH[2]}"
+    # Remove .git suffix if present
+    repo_name="${repo_name%.git}"
+    echo "${BASH_REMATCH[1]}/${repo_name}"
+  else
+    log_error "Remote URL is not a GitHub repository: $remote_url"
+    return 1
+  fi
+}
+
+# Parse GitHub PR URL to extract owner/repo/pr-number
+parse_github_url()
+{
+  local url="$1"
+
+  if [[ "$url" =~ github\.com/([^/]+)/([^/]+)/pull/([0-9]+) ]]; then
+    echo "${BASH_REMATCH[1]}/${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}"
+  else
+    log_error "Invalid GitHub PR URL format: $url"
+    return 1
+  fi
+}
+
+# Format output with LLM directions
+format_output()
+{
+  local repo="$1"
+  local pr_number="$2"
+  local pr_info="$3"
+  local review_comments="$4"
+  local reviews="$5"
+
+  # Header and instructions
+  cat << EOF
+# GitHub PR Comments Analysis Report
+
+## LLM Processing Instructions
+
+You are analyzing review comments and change requests from GitHub Pull Request #$pr_number in repository $repo.
+
+**Your tasks:**
+1. **Review Analysis**: For each review, understand the reviewer's overall feedback and concerns
+2. **Change Request Validation**: Check if each file-specific comment is still relevant to the current codebase
+3. **Priority Assessment**: Rank change requests by importance and impact on code quality
+4. **Implementation Planning**: Create actionable tasks for addressing valid change requests
+5. **Pattern Recognition**: Identify recurring issues across different reviews
+
+**Tools to use:**
+- \`find\`, \`cat\`, \`rg\` commands and available tools to examine current codebase
+- File system tools to verify mentioned files exist and check current state
+- \`gh pr diff $pr_number\` to see what changes are being reviewed
+
+## Pull Request Information
+
+EOF
+
+  # PR information
+  echo "$pr_info" | jq -r '"**Title:** \(.title)
+**State:** \(.state)
+**URL:** \(.url)
+**Number:** '"$pr_number"'
+**Repository:** '"$repo"'
+"' 2>/dev/null || {
+    echo "**Error:** Could not parse PR information"
+    return 1
+  }
+
+  # Review Comments Section
+  echo -e "\n## Review Comments and Change Requests\n"
+
+  format_grouped_review_comments "$review_comments" "$reviews" "$repo"
+
+  # Footer
+  cat << EOF
+
+## Next Steps for LLM Analysis
+
+1. **Analyze and verify all comments, including nitpick**
+  - Consider all comments from code reviewers as change requests
+  - Analyze all "Outside diff range comments" as change requests
+  - All Copilot and CodeRabbit comments and change requests MUST BE analyzed
+  - Do not trust blindly the comments, validate them against current codebase
+
+2. **Validate change requests:**
+  - Check if mentioned files exist and match current state
+  - Verify if suggestions are still applicable
+  - Identify any already-addressed issues
+
+3. **Generate actionable implementation plan:**
+  - Prioritized list of valid change requests
+  - Grouped by file/area for efficient implementation
+  - Clear next steps for addressing reviewer feedback
+  - All valid change requests MUST BE handled, even if low priority
+
+4. **Use todo lists and memory tools to track progress*
+  - All valid change requests MUST BE handled
+  - Keep handling them until each of them are handled
+
+5. **Identify patterns and recurring issues:**
+  - Highlight common themes across reviews
+  - Suggest broader improvements to code quality and practices
+  - Suggest LLM instructions to avoid similar issues in future
+EOF
+}
+
+# Fetch and display PR data directly
+fetch_and_display_pr_data()
+{
+  local repo="$1"
+  local pr_number="$2"
+
+  log_info "Fetching PR #$pr_number from $repo..."
+
+  # Get PR basic info
+  local pr_info
+  pr_info=$(gh pr view "$pr_number" --repo "$repo" --json title,state,url 2> /dev/null) || {
+    log_error "Failed to fetch PR #$pr_number from $repo"
+    return 1
+  }
+
+  # Fetch review data using helper function
+  local review_comments reviews
+  review_comments=$(fetch_and_filter_data "/repos/$repo/pulls/$pr_number/comments" "Review comments" "false")
+  reviews=$(fetch_and_filter_data "/repos/$repo/pulls/$pr_number/reviews" "Reviews" "false")
+
+  # Display formatted output
+  format_output "$repo" "$pr_number" "$pr_info" "$review_comments" "$reviews"
+}
+
+# Main function
+main()
+{
+  local repo=""
+  local pr_number=""
+
+  # Parse arguments
+  case "${1:-}" in
+    -h | --help)
+      show_usage
+      exit 0
+      ;;
+    "")
+      log_error "Missing argument. Provide PR number or GitHub URL."
+      show_usage
+      exit 1
+      ;;
+    https://github.com/*)
+      local parsed
+      parsed=$(parse_github_url "$1") || exit 1
+      read -r repo pr_number <<< "$parsed"
+      ;;
+    [0-9]*)
+      repo=$(get_repo_info) || exit 1
+      pr_number="$1"
+      ;;
+    *)
+      log_error "Invalid argument: $1"
+      show_usage
+      exit 1
+      ;;
+  esac
+
+  check_dependencies
+
+  log_debug "Repository: $repo"
+  log_debug "PR Number: $pr_number"
+
+  # Fetch and display data
+  fetch_and_display_pr_data "$repo" "$pr_number"
+}
+
+# Run main function with all arguments
+main "$@"
