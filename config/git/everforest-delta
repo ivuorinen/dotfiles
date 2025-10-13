@@ -1,0 +1,22 @@
+# Everforest theme for git-delta
+# Generated from template - do not edit manually
+
+[delta]
+	syntax-theme = none
+	file-style = bold
+	file-decoration-style = none
+	hunk-header-decoration-style = cyan box ul
+	line-numbers = true
+	line-numbers-left-style = cyan
+	line-numbers-right-style = cyan
+	line-numbers-minus-style = red
+	line-numbers-plus-style = green
+	line-numbers-zero-style = "#859289"
+	minus-style = syntax "#e67e80"
+	minus-emph-style = syntax "#e67e80"
+	plus-style = syntax "#a7c080"
+	plus-emph-style = syntax "#a7c080"
+	zero-style = syntax
+	blame-code-style = syntax
+	blame-format = "{author:<18} ({commit:>8}) {timestamp:^16} "
+	blame-palette = "#7a8478" "#859289" "#9da9a0"
