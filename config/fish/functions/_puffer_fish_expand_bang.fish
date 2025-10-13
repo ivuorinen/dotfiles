@@ -6,4 +6,3 @@ function _puffer_fish_expand_bang
         commandline -i '!'
     end
 end
-

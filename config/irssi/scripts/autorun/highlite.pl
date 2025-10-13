@@ -110,4 +110,3 @@ Irssi::signal_add(
   'message kick' => \&msg_kick
 }
 );
-

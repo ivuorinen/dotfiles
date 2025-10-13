@@ -9,6 +9,7 @@
 .env
 .idea
 .nfs*
+.scannerwork
 .vscode
 Brewfile.lock.json
 antidote_plugins.zsh
@@ -51,3 +52,6 @@ local/bin/yabai
 local/man/yabai.1
 config/op/plugins/used_items/gh.json
 config/zed/settings.json
+*.tmp.*
+config/op/plugins/gh.json
+config/fish/fish_variables.*

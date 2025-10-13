@@ -69,5 +69,3 @@ Available format modifiers are:
 '.          For decimal conversions, applies the thousands grouping
             separator to the integer portion of the output according
             to the current LC_NUMERIC file.
-
-

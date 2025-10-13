@@ -122,4 +122,3 @@ complete -c aqua -n '__fish_seen_subcommand_from root-dir' -f -l help -s h -d 's
 complete -r -c aqua -n '__fish_aqua_no_subcommand' -a 'root-dir' -d 'Output the aqua root directory (AQUA_ROOT_DIR)'
 complete -c aqua -n '__fish_seen_subcommand_from help h' -f -l help -s h -d 'show help'
 complete -r -c aqua -n '__fish_aqua_no_subcommand' -a 'help h' -d 'Shows a list of commands or help for one command'
-

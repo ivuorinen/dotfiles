@@ -152,4 +152,3 @@ format = "[$virtualenv]($style) "
 
 [username]
 format = "[$user]($style) "
-

@@ -28,9 +28,9 @@ versions, Git tags, branch tags, and commit SHAs with simple commands.
 2. Make it executable: `chmod +x x-gh-get-latest-version`
 3. Optionally set up a GitHub token as an environment variable:
 
-   ```bash
-   export GITHUB_TOKEN="your_personal_access_token"
-   ```
+```bash
+export GITHUB_TOKEN="your_personal_access_token"
+```
 
 ## Usage
 

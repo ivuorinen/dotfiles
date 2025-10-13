@@ -71,7 +71,7 @@
 
 [submodule "tmux/tmux-dark-notify"]
 	path = config/tmux/plugins/tmux-dark-notify
-	url = https://github.com/erikw/tmux-dark-notify.git
+	url = https://github.com/ivuorinen/tmux-dark-notify.git
 	ignore = dirty
 
 [submodule "antidote"]

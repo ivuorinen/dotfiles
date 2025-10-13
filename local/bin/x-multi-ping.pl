@@ -19,9 +19,9 @@ to test the connectivity of a remote host and your route to it.
 
 =head1 AUTHOR
 
- Steve
- --
- http://www.steve.org.uk/
+Steve
+--
+http://www.steve.org.uk/
 
 =cut
 
@@ -214,7 +214,7 @@ sub parsedOptions
 
     exit
       if (
-           !GetOptions( "help"    => \$vars{ 'help' },
+          !GetOptions( "help"    => \$vars{ 'help' },
                         "verbose" => \$vars{ 'verbose' },
                         "forever" => \$vars{ 'loop' },
                         "loop"    => \$vars{ 'loop' },
@@ -226,4 +226,3 @@ sub parsedOptions
     return (%vars);
 
 }
-

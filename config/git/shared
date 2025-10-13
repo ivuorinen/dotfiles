@@ -51,4 +51,3 @@
 # dotfiles special config
 [includeIf "hasconfig:remote.*.url:https://github.com/ivuorinen/dotfiles.git"]
 	path = ~/.dotfiles/config/git/special/dotfiles ;
-

@@ -173,4 +173,3 @@ complete -c git-profile -e
 # The call to __git_profile_prepare_completions will setup __git_profile_comp_results
 # which provides the program's completion choices.
 complete -c git-profile -n '__git_profile_prepare_completions' -f -a '$__git_profile_comp_results'
-

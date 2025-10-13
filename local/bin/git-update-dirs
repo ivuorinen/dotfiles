@@ -77,11 +77,11 @@ Examples:
   $BIN              Update all git repositories
   $BIN --verbose    Update with detailed output
   $BIN --exclude node_modules --exclude vendor
-                               Update repositories but skip node_modules
-                               and vendor dirs
+                              Update repositories but skip node_modules
+                              and vendor dirs
   $BIN --cleanup    Update and clean up merged branches
   $BIN --config ~/.gitupdate.conf
-                               Use options from config file
+                              Use options from config file
 EOF
   exit 0
 }

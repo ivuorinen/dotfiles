@@ -13,6 +13,10 @@ config.color_scheme_dirs = {
 config.font_size = 16
 config.font = wezterm.font_with_fallback {
   {
+    family = 'Monaspace Argon NF',
+    weight = 'Regular',
+  },
+  {
     family = 'Operator Mono',
     weight = 'Book',
   },
@@ -22,7 +26,20 @@ config.font = wezterm.font_with_fallback {
   'Symbols Nerd Font Mono',
 }
 config.font_shaper = 'Harfbuzz'
-config.harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1' }
+config.harfbuzz_features = {
+  'calt=1',
+  'clig=1',
+  'liga=1',
+  'ss01=1',
+  'ss02=1',
+  'ss03=1',
+  'ss04=1',
+  'ss05=1',
+  'ss06=1',
+  'ss07=1',
+  'ss08=1',
+  'ss09=1',
+}
 
 config.selection_word_boundary = ' \t\n{[}]()"\'`,;:'
 

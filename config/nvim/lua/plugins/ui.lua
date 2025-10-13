@@ -6,9 +6,9 @@ return {
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       require('everforest').setup {
-        background = 'soft', -- hard, medium, soft
-        transparent_background_level = 0, -- 0, 1, 2
-        sign_column_background = 'none', -- none, dimmed, normal
+        background = 'medium', -- hard, medium, soft
+        transparent_background_level = 2, -- 0, 1, 2
+        sign_column_background = 'grey', -- none, grey
         disable_italic_comments = false,
         diagnostic_virtual_text = 'coloured', -- coloured, gray, underline, none
         diagnostic_line_highlight = true,
@@ -26,26 +26,6 @@ return {
       }
     end,
   },
-
-  -- {
-  --   'rose-pine/neovim',
-  --   name = 'rose-pine',
-  --   opts = {
-  --     dim_inactive_windows = false,
-  --     extend_background_behind_borders = true,
-  --     styles = {
-  --       bold = true,
-  --       italic = true,
-  --       transparency = true,
-  --     },
-  --     enable = {
-  --       terminal = true,
-  --       legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
-  --       migrations = true, -- Handle deprecated options automatically
-  --     },
-  --   },
-  --   config = function() vim.cmd 'colorscheme rose-pine' end,
-  -- },
 
   -- Automatic dark mode
   -- https://github.com/f-person/auto-dark-mode.nvim
@@ -80,35 +60,37 @@ return {
 
   -- Remove all background colors to make nvim transparent
   -- https://github.com/xiyaowong/nvim-transparent
-  -- {
-  --   'xiyaowong/nvim-transparent',
-  --   lazy = false,
-  --   enabled = false,
-  --   config = function()
-  --     local t = require 'transparent'
-  --     t.setup {
-  --       extra_groups = {
-  --         'NormalNC',
-  --         'NormalFloat',
-  --         'FloatTitle',
-  --         'FloatBorder',
-  --         'NotifyDEBUGBorder',
-  --         'NotifyERRORBorder',
-  --         'NotifyINFOBorder',
-  --         'NotifyINFOBorder73',
-  --         'NotifyINFOBorder75',
-  --         'NotifyINFOBorder101',
-  --         'NotifyTRACEBorder',
-  --         'NotifyWARNBorder',
-  --         'TelescopeBorder',
-  --         'TelescopePromptBorder',
-  --         'TelescopeResultsBorder',
-  --         'TelescopePreviewBorder',
-  --       },
-  --     }
-  --     t.clear_prefix 'NeoTree'
-  --   end,
-  -- },
+  {
+    'xiyaowong/nvim-transparent',
+    lazy = false,
+    enabled = true,
+    config = function()
+      local t = require 'transparent'
+      t.setup {
+        extra_groups = {
+          'NormalNC',
+          'NormalFloat',
+          'EndOfBuffer',
+          'FloatTitle',
+          'FloatBorder',
+          'NotifyDEBUGBorder',
+          'NotifyERRORBorder',
+          'NotifyINFOBorder',
+          'NotifyINFOBorder73',
+          'NotifyINFOBorder75',
+          'NotifyINFOBorder101',
+          'NotifyTRACEBorder',
+          'NotifyWARNBorder',
+          'NotifyBackground',
+          'TelescopeBorder',
+          'TelescopePromptBorder',
+          'TelescopeResultsBorder',
+          'TelescopePreviewBorder',
+        },
+      }
+      t.clear_prefix 'NeoTree'
+    end,
+  },
 
   -- Display a character as the colorcolumn
   -- https://github.com/lukas-reineke/virt-column.nvim

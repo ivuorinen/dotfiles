@@ -63,3 +63,5 @@
 	old = red bold
 	new = green bold
 	whitespace = red reverse
+[coderabbit]
+	machineId = cli/2d3277ec1da346c4b30b26d0fb373d8c

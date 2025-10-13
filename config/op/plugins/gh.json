@@ -1,6 +1,8 @@
 {
   "account_id": "S5Z2DMNFKJEZBPCWRHRWC4DCGI",
-  "entrypoint": ["gh"],
+  "entrypoint": [
+    "gh"
+  ],
   "credentials": [
     {
       "plugin": "github",

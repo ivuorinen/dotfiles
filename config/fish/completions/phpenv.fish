@@ -120,4 +120,3 @@ complete -c phpenv -f \
 
 # Complete help options
 complete -c phpenv -f -s h -l help -d "Show help"
-

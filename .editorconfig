@@ -13,6 +13,7 @@ max_line_length = 80
 
 [*.md]
 max_line_length = 120
+trim_trailing_whitespace = false
 
 [*.lua]
 max_line_length = 90
@@ -24,10 +25,6 @@ indent_size = 4
 indent_style = tab
 indent_size = 1
 
-[*.plist]
-indent_size = 1
-indent_style = tab
-
 [{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]
 indent_size        = 2
 tab_width          = 2
@@ -38,7 +35,8 @@ space_redirects    = true
 keep_padding       = false
 function_next_line = true # --func-next-line
 
-[config/git/config]
+[{*.plist,config/git/**,**/config/git/**}]
+indent_size = 1
 indent_style = tab
 
 # Ignore the entire "third_party" directory when calling shfmt on directories,
@@ -47,3 +45,7 @@ indent_style = tab
 # the ignore logic is applied only when the --apply-ignore flag is given.
 [{tools/**,local/bin/asdf/**,config/cheat/cheatsheets/**,config/tmux/plugins/**}]
 ignore = true
+
+[plan]
+trim_trailing_whitespace = false
+max_line_length = off

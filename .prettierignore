@@ -1,6 +1,7 @@
 # vim: ft=gitignore
 .mypy_cache/*
 Brewfile.lock.json
+base/plan
 config/cheat/cheatsheets/community
 config/cheat/cheatsheets/tldr
 config/fzf/*

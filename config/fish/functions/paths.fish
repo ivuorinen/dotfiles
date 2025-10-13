@@ -56,7 +56,7 @@ function ___paths_plugin_handle_found_item -a testName outFlags
             end
 
             set nameOut (string trim -- "$nameOut")
-            # do the tick 
+            # do the tick
             if set -q _flag_k # is not color
                 set nameOut "- $nameOut"
             else # is color
@@ -155,7 +155,7 @@ function paths --description "Reveal the executable matches in shell paths or fi
         end
     end
 
-    # check 
+    # check
     set -l built (type --type $input 12&>/dev/null)
     if test -n "$built"
         and test "$built" = 'builtin'

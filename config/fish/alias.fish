@@ -6,9 +6,12 @@ alias vim='vim -u "$XDG_CONFIG_HOME/vim/vimrc"'
 if type -q eza >/dev/null
     function eza_git -d "Use eza and its git options if in a git repo"
         if git rev-parse --is-inside-work-tree &>/dev/null
-            eza --group-directories-first --icons=always --smart-group --git $argv
+            eza --group-directories-first --icons=always \
+                --smart-group --git $argv
         else
-            eza --group-directories-first --icons=always --smart-group $argv
+            eza --group-directories-first \
+                --icons=always \
+                --smart-group $argv
         end
     end
 
@@ -30,7 +33,9 @@ if type -q eza >/dev/null
 end
 
 # Edit fish alias file
-function .a --wraps='nvim ~/.dotfiles/config/fish/alias.fish' --description 'edit alias.fish'
+function .a \
+    --wraps='nvim ~/.dotfiles/config/fish/alias.fish' \
+    --description 'edit alias.fish'
     nvim ~/.dotfiles/config/fish/alias.fish $argv
 end
 
@@ -55,7 +60,9 @@ function .p --wraps='cd ~/Code/ivuorinen' --description 'cd ~/Code/ivuorinen'
 end
 
 # shortcut to commit with a message
-function commit --wraps='git commit -a -m "chore: automated commit"' --description 'commit shortcut'
+function commit \
+    --wraps='git commit -a -m "chore: automated commit"' \
+    --description 'commit shortcut'
     set -l commitMessage $argv
     git add .
 
@@ -71,7 +78,8 @@ function commit --wraps='git commit -a -m "chore: automated commit"' --descripti
     git commit -a -m "$commitMessage"
 end
 
-function configure_tide --description 'Configure tide with the lean style and my preferences'
+function configure_tide \
+    --description 'Configure tide with the lean style and my preferences'
     tide configure \
         --auto \
         --style=Lean \

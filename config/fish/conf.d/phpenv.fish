@@ -35,4 +35,3 @@ if test -n "$PHPENV_GLOBAL_VERSION"; and not set -q PHPENV_INITIALIZED
     end
     set -g PHPENV_INITIALIZED true
 end
-

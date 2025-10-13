@@ -13,4 +13,3 @@ termcapinfo xterm* ti@:te@
 # Some settings for screen + vim
 term xterm-256color
 maptimeout 10
-
