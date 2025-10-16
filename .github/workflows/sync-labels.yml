@@ -29,4 +29,4 @@ jobs:
       issues: write
 
     steps:
-      - uses: ivuorinen/actions/sync-labels@d3cc8d4790723db59c5e27d2e370fdad3663c7bd # 25.10.12
+      - uses: ivuorinen/actions/sync-labels@d3c2de1bd16b791e2e078bc579640ef4252cc148 # 25.10.16
