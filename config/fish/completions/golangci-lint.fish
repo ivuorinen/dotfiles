@@ -3,7 +3,7 @@
 function __golangci_lint_debug
     set -l file "$BASH_COMP_DEBUG_FILE"
     if test -n "$file"
-        echo "$argv" >> $file
+        echo "$argv" >>$file
     end
 end
 
@@ -107,7 +107,6 @@ function __golangci_lint_requires_order_preservation
     __golangci_lint_debug "This doesn't require order preservation"
     return 1
 end
-
 
 # This function does two things:
 # - Obtain the completions and store them in the global __golangci_lint_comp_results
@@ -215,18 +214,18 @@ end
 # so we can properly delete any completions provided by another script.
 # Only do this if the program can be found, or else fish may print some errors; besides,
 # the existing completions will only be loaded if the program can be found.
-if type -q "golangci-lint"
+if type -q golangci-lint
     # The space after the program name is essential to trigger completion for the program
     # and not completion of the program name itself.
     # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
-    complete --do-complete "golangci-lint " > /dev/null 2>&1
+    complete --do-complete "golangci-lint " >/dev/null 2>&1
 end
 
 # Remove any pre-existing completions for the program since we will be handling all of them.
 complete -c golangci-lint -e
 
 # this will get called after the two calls below and clear the $__golangci_lint_perform_completion_once_result global
-complete -c golangci-lint -n '__golangci_lint_clear_perform_completion_once_result'
+complete -c golangci-lint -n __golangci_lint_clear_perform_completion_once_result
 # The call to __golangci_lint_prepare_completions will setup __golangci_lint_comp_results
 # which provides the program's completion choices.
 # If this doesn't require order preservation, we don't use the -k flag

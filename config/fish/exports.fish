@@ -48,23 +48,19 @@ test -z "$NVIM_UNDO_PATH" && set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
 # Ansible configuration
 set -q ANSIBLE_HOME; or set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
 set -q ANSIBLE_CONFIG; or set -x ANSIBLE_CONFIG "$ANSIBLE_HOME/ansible.cfg"
-set -q ANSIBLE_GALAXY_CACHE_DIR; or \
-    set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_HOME/ansible/galaxy_cache"
+set -q ANSIBLE_GALAXY_CACHE_DIR; or set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_HOME/ansible/galaxy_cache"
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
 # AWS configuration
 set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
-set -q AWS_SHARED_CREDENTIALS_FILE; or \
-    set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
-set -q AWS_SESSION_TOKEN; or \
-    set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
+set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
+set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
 set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
 set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
 set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
 set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
-set -q AWS_CONFIGURE_SESSION_DURATION; or \
-    set -x AWS_CONFIGURE_SESSION_DURATION 7200
+set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION 7200
 set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA true
 set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE true
 set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT true
@@ -74,8 +70,7 @@ set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT true
 set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS true
 set -q HOMEBREW_NO_ENV_HINTS; or set -x HOMEBREW_NO_ENV_HINTS true
 set -q HOMEBREW_BUNDLE_MAS_SKIP; or set -x HOMEBREW_BUNDLE_MAS_SKIP true
-set -q HOMEBREW_BUNDLE_FILE; or \
-    set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/homebrew/Brewfile"
+set -q HOMEBREW_BUNDLE_FILE; or set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/homebrew/Brewfile"
 
 # Composer configuration
 set -q COMPOSER_HOME; or set -x COMPOSER_HOME "$XDG_STATE_HOME/composer"
@@ -101,8 +96,7 @@ set -q FNM_RESOLVE_ENGINES; or set -x FNM_RESOLVE_ENGINES true
 
 # fzf configuration
 set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
-set -q FZF_DEFAULT_OPTS; or \
-    set -x FZF_DEFAULT_OPTS \
+set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
     '--height 40% --tmux bottom,40% --layout reverse --border top'
 
 # GnuPG configuration
@@ -113,8 +107,7 @@ set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
 
 set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
-set -q GOENV_RC_FILE; or \
-    set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
+set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
 
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
@@ -142,23 +135,19 @@ set -q SCREENRC; or set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"
 # Sonarlint configuration
 set -q SONARLINT_HOME; or set -x SONARLINT_HOME "$XDG_DATA_HOME/sonarlint"
 set -q SONARLINT_BIN; or set -x SONARLINT_BIN "$XDG_BIN_HOME"
-set -q SONARLINT_USER_HOME; or \
-    set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
+set -q SONARLINT_USER_HOME; or set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
 
 # Terraform configuration
 set -q TF_DATA_DIR; or set -x TF_DATA_DIR "$XDG_STATE_HOME/terraform"
-set -q TF_CLI_CONFIG_FILE; or \
-    set -x TF_CLI_CONFIG_FILE "$XDG_CONFIG_HOME/terraform/terraformrc"
-set -q TF_PLUGIN_CACHE_DIR; or \
-    set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
+set -q TF_CLI_CONFIG_FILE; or set -x TF_CLI_CONFIG_FILE "$XDG_CONFIG_HOME/terraform/terraformrc"
+set -q TF_PLUGIN_CACHE_DIR; or set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
 
 # tmux configuration
 set -q TMUX_TMPDIR; or set -x TMUX_TMPDIR "$XDG_STATE_HOME/tmux"
 set -q TMUX_CONF_DIR; or set -x TMUX_CONF_DIR "$XDG_CONFIG_HOME/tmux"
 set -q TMUX_PLUGINS; or set -x TMUX_PLUGINS "$TMUX_CONF_DIR/plugins"
 set -q TMUX_CONF; or set -x TMUX_CONF "$TMUX_CONF_DIR/tmux.conf"
-set -q TMUX_PLUGIN_MANAGER_PATH; or \
-    set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
+set -q TMUX_PLUGIN_MANAGER_PATH; or set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
 
 # Source tmux theme activation script for Fish shell
 if test -f "$DOTFILES/config/tmux/theme-activate.fish"
@@ -166,8 +155,7 @@ if test -f "$DOTFILES/config/tmux/theme-activate.fish"
 end
 
 # tms configuration
-set -q TMS_CONFIG_FILE; or \
-    set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
+set -q TMS_CONFIG_FILE; or set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
 
 # wakatime configuration
 set -q WAKATIME_HOME; or set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"
@@ -179,8 +167,7 @@ set -q _ZO_EXCLUDE_DIRS; or set -x _ZO_EXCLUDE_DIRS "$XDG_DATA_HOME"
 
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
-set -q SQLITE_HISTORY; or \
-    set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
+set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
 
 # Source additional configuration files if they exist
 if test -f "$DOTFILES/config/fish/exports-secret.fish"

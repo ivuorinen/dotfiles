@@ -24,7 +24,7 @@ if status is-interactive
     type -q pyenv; and source (pyenv virtualenv-init -|psub)
     type -q goenv; and source (goenv init -|psub)
     # type -q fnm; and fnm env --use-on-cd --shell fish | source
-    type -q load_nvm; and load_nvm > /dev/stderr
+    type -q load_nvm; and load_nvm >/dev/stderr
 
     # Intialize other tools if available
     type -q zoxide; and zoxide init fish | source
