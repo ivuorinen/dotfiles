@@ -1,0 +1,892 @@
+#!/bin/sh
+#
+# POSIX-Compliant SSH Security Auditing and Management Script
+# Purpose: Audit and manage SSH security configurations across multiple hosts
+# Compatible with: sh, dash, bash, ksh, zsh
+#
+# Author:    Ismo Vuorinen <https://github.com/ivuorinen>
+# Copyright: MIT
+# Version:   2.0-POSIX
+# Date:      2025-10-17
+
+set -eu
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+SCRIPT_NAME=$(basename "$0")
+# SCRIPT_DIR=$(dirname "$(readlink -f "$0" 2> /dev/null || pwd)")  # Reserved for future use
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+AUDIT_BASE_DIR="./ssh-audit/${TIMESTAMP}"
+BACKUP_DIR="${AUDIT_BASE_DIR}/backup"
+LOG_FILE="${AUDIT_BASE_DIR}/log.log"
+REPORT_FILE="${AUDIT_BASE_DIR}/report.csv"
+TEMP_DIR="${AUDIT_BASE_DIR}/tmp"
+
+# SSH connection parameters
+SSH_TIMEOUT=10
+SSH_RETRIES=3
+
+# Fallback usernames for SSH connections (in order of priority)
+FALLBACK_USERS="root ubuntu ivuorinen"
+
+# Common default SSH key locations (checked in order)
+DEFAULT_SSH_KEYS="
+  ~/.ssh/id_ed25519
+  ~/.ssh/id_rsa
+  ~/.ssh/id_ecdsa
+  ~/.ssh/id_dsa
+"
+
+# Color codes (using tput for POSIX compliance)
+if [ -t 1 ]; then
+  RED=$(tput setaf 1 2> /dev/null || echo '')
+  GREEN=$(tput setaf 2 2> /dev/null || echo '')
+  YELLOW=$(tput setaf 3 2> /dev/null || echo '')
+  BLUE=$(tput setaf 4 2> /dev/null || echo '')
+  RESET=$(tput sgr0 2> /dev/null || echo '')
+  BOLD=$(tput bold 2> /dev/null || echo '')
+else
+  RED='' GREEN='' YELLOW='' BLUE='' RESET='' BOLD=''
+fi
+
+# Global state files (replacing bash associative arrays)
+HOST_STATUS_FILE="${TEMP_DIR}/host-status"
+HOST_RESULTS_FILE="${TEMP_DIR}/host-results"
+HOSTS_LIST_FILE="${TEMP_DIR}/hosts-list"
+FAILED_HOSTS_FILE="${TEMP_DIR}/failed-hosts"
+
+# ============================================================================
+# HELPER FUNCTIONS FOR STATE MANAGEMENT
+# ============================================================================
+
+# Initialize state files
+init_state_files()
+{
+  : > "$HOST_STATUS_FILE"
+  : > "$HOST_RESULTS_FILE"
+  : > "$HOSTS_LIST_FILE"
+  : > "$FAILED_HOSTS_FILE"
+}
+
+# Detect available default SSH keys
+detect_available_ssh_keys()
+{
+  available_keys=""
+
+  for key in $DEFAULT_SSH_KEYS; do
+    # Expand tilde to home directory
+    expanded_key=$(eval echo "$key")
+
+    if [ -f "$expanded_key" ] && [ -r "$expanded_key" ]; then
+      available_keys="${available_keys}${available_keys:+ }${expanded_key}"
+    fi
+  done
+
+  printf '%s' "$available_keys"
+}
+
+# Trim whitespace from string (POSIX compatible)
+trim_whitespace()
+{
+  printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+
+# Extract SSH config value from sshd -T output
+get_sshd_value()
+{
+  config_file="$1"
+  key="$2"
+  grep -i "^${key}" "$config_file" | awk '{print $2}'
+}
+
+# Check security setting and log if it matches bad value
+check_security_issue()
+{
+  host="$1"
+  # $2 is setting_name (unused but kept for API clarity)
+  actual_value="$3"
+  bad_value="$4"
+  level="${5:-WARNING}"
+  message="$6"
+
+  if [ "$actual_value" = "$bad_value" ]; then
+    log_message "$level" "$host: $message"
+    return 0 # Issue found
+  fi
+  return 1 # No issue
+}
+
+# Set a key-value pair in state file
+set_state()
+{
+  state_file="$1"
+  key="$2"
+  value="$3"
+
+  # Remove existing entry if present
+  if [ -f "$state_file" ]; then
+    grep -v "^${key}=" "$state_file" > "${state_file}.tmp" 2> /dev/null || true
+    mv "${state_file}.tmp" "$state_file"
+  fi
+
+  # Add new entry
+  printf '%s=%s\n' "$key" "$value" >> "$state_file"
+}
+
+# Get a value from state file
+get_state()
+{
+  state_file="$1"
+  key="$2"
+  default="${3:-unknown}"
+
+  if [ -f "$state_file" ]; then
+    value=$(grep "^${key}=" "$state_file" 2> /dev/null | cut -d= -f2- | head -n1)
+    printf '%s' "${value:-$default}"
+  else
+    printf '%s' "$default"
+  fi
+}
+
+# ============================================================================
+# ERROR HANDLING AND CLEANUP
+# ============================================================================
+
+cleanup()
+{
+  exit_code=$?
+  printf '\n%sCleaning up...%s\n' "$YELLOW" "$RESET"
+
+  # Clean up temporary directory (keep logs, reports, and backups)
+  if [ -d "$TEMP_DIR" ]; then
+    rm -rf "$TEMP_DIR"
+  fi
+
+  if [ $exit_code -ne 0 ]; then
+    printf '%s[ERROR] Script failed with exit code: %d%s\n' "$RED" "$exit_code" "$RESET" >&2
+  fi
+
+  exit $exit_code
+}
+
+trap cleanup EXIT INT TERM
+
+# ============================================================================
+# LOGGING FUNCTIONS
+# ============================================================================
+
+setup_logging()
+{
+  # Create all necessary directories
+  mkdir -p "$BACKUP_DIR" "$TEMP_DIR" 2> /dev/null || {
+    printf '%s[ERROR] Failed to create audit directories%s\n' "$RED" "$RESET" >&2
+    exit 1
+  }
+
+  {
+    echo "=========================================="
+    echo "SSH Security Audit Log"
+    echo "Started: $(date)"
+    echo "Script:  $SCRIPT_NAME"
+    echo "User:    $(whoami)"
+    echo "Working Directory: $(pwd)"
+    echo "Output Directory: $AUDIT_BASE_DIR"
+    echo "=========================================="
+  } >> "$LOG_FILE"
+}
+
+log_message()
+{
+  level="$1"
+  message="$2"
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+  printf '[%s] [%s] %s\n' "$timestamp" "$level" "$message" >> "$LOG_FILE"
+
+  case "$level" in
+    ERROR)
+      printf '%s[ERROR] %s%s\n' "$RED" "$message" "$RESET" >&2
+      ;;
+    WARNING)
+      printf '%s[WARNING] %s%s\n' "$YELLOW" "$message" "$RESET" >&2
+      ;;
+    INFO)
+      printf '%s[INFO] %s%s\n' "$BLUE" "$message" "$RESET"
+      ;;
+    SUCCESS)
+      printf '%s[SUCCESS] %s%s\n' "$GREEN" "$message" "$RESET"
+      ;;
+  esac
+}
+
+# ============================================================================
+# INPUT VALIDATION
+# ============================================================================
+
+validate_hostname()
+{
+  hostname="$1"
+
+  # Basic hostname validation
+  case "$hostname" in
+    *[!a-zA-Z0-9.-]*)
+      log_message "ERROR" "Invalid hostname format: $hostname"
+      return 1
+      ;;
+    .*)
+      log_message "ERROR" "Invalid hostname format: $hostname"
+      return 1
+      ;;
+  esac
+
+  return 0
+}
+
+validate_username()
+{
+  username="$1"
+
+  # Basic username validation
+  case "$username" in
+    *[!a-zA-Z0-9_-]*)
+      log_message "ERROR" "Invalid username format: $username"
+      return 1
+      ;;
+    [0-9]*)
+      log_message "ERROR" "Invalid username format: $username"
+      return 1
+      ;;
+  esac
+
+  return 0
+}
+
+parse_host_list()
+{
+  input_file="$1"
+
+  if [ ! -f "$input_file" ]; then
+    log_message "ERROR" "Input file not found: $input_file"
+    exit 1
+  fi
+
+  while IFS=':' read -r host username ssh_key; do
+    # Skip empty lines and comments
+    case "$host" in
+      '' | '#'*) continue ;;
+    esac
+
+    # Trim whitespace (POSIX compatible)
+    host=$(trim_whitespace "$host")
+    username=$(trim_whitespace "$username")
+    ssh_key=$(trim_whitespace "$ssh_key")
+
+    if validate_hostname "$host" && validate_username "$username"; then
+      # Store with optional SSH key (empty if not provided)
+      printf '%s:%s:%s\n' "$host" "$username" "$ssh_key" >> "$HOSTS_LIST_FILE"
+      if [ -n "$ssh_key" ]; then
+        log_message "INFO" "Added host: $host with user: $username and SSH key: $ssh_key"
+      else
+        log_message "INFO" "Added host: $host with user: $username"
+      fi
+    else
+      log_message "WARNING" "Skipping invalid entry: ${host}:${username}"
+    fi
+  done < "$input_file"
+
+  if [ ! -s "$HOSTS_LIST_FILE" ]; then
+    log_message "ERROR" "No valid hosts found in input file"
+    exit 1
+  fi
+
+  host_count=$(wc -l < "$HOSTS_LIST_FILE")
+  log_message "INFO" "Loaded $host_count hosts for auditing"
+}
+
+# ============================================================================
+# SSH CONNECTION FUNCTIONS
+# ============================================================================
+
+ssh_with_retry()
+{
+  host="$1"
+  username="$2"
+  command="$3"
+  ssh_key="${4:-}"
+  max_retries="${5:-$SSH_RETRIES}"
+
+  # Build list of keys to try
+  keys_to_try=""
+
+  # Priority 1: Specific key if provided
+  if [ -n "$ssh_key" ] && [ -f "$ssh_key" ]; then
+    keys_to_try="$ssh_key"
+    log_message "INFO" "Will try specific SSH key: $ssh_key"
+  fi
+
+  # Priority 2: Detect and add available default keys
+  available_default_keys=$(detect_available_ssh_keys)
+  if [ -n "$available_default_keys" ]; then
+    keys_to_try="${keys_to_try}${keys_to_try:+ }${available_default_keys}"
+  fi
+
+  # Priority 3: Try without explicit key (agent/default)
+  keys_to_try="${keys_to_try}${keys_to_try:+ }NO_KEY"
+
+  attempt=1
+  while [ "$attempt" -le "$max_retries" ]; do
+    log_message "INFO" "Connecting to $host as $username (attempt $attempt/$max_retries)"
+
+    # Try each key in sequence
+    for try_key in $keys_to_try; do
+      ssh_opts="-o ConnectTimeout=$SSH_TIMEOUT -o BatchMode=yes -o StrictHostKeyChecking=yes"
+
+      if [ "$try_key" != "NO_KEY" ]; then
+        ssh_opts="$ssh_opts -i $try_key"
+        log_message "INFO" "Trying SSH key: $try_key"
+      else
+        log_message "INFO" "Trying SSH agent/default authentication"
+      fi
+
+      # shellcheck disable=SC2086
+      if ssh $ssh_opts "${username}@${host}" "$command" 2> /dev/null; then
+        if [ "$try_key" != "NO_KEY" ]; then
+          log_message "SUCCESS" "Connected using SSH key: $try_key"
+        else
+          log_message "SUCCESS" "Connected using SSH agent/default authentication"
+        fi
+        return 0
+      fi
+    done
+
+    status=$?
+    log_message "WARNING" "SSH connection failed to $host with all authentication methods (status: $status)"
+
+    if [ "$attempt" -lt "$max_retries" ]; then
+      sleep $((attempt * 2))
+    fi
+    attempt=$((attempt + 1))
+  done
+
+  return 1
+}
+
+test_ssh_connectivity()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+
+  if ssh_with_retry "$host" "$username" "echo 'SSH_OK'" "$ssh_key" | grep -q "SSH_OK"; then
+    log_message "SUCCESS" "SSH connectivity verified for ${username}@${host}"
+    return 0
+  else
+    log_message "ERROR" "Cannot establish SSH connection to ${username}@${host}"
+    return 1
+  fi
+}
+
+# ============================================================================
+# SSH SECURITY AUDIT FUNCTIONS
+# ============================================================================
+
+check_sshd_config()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+  temp_file="${TEMP_DIR}/sshd-config-${host}"
+
+  log_message "INFO" "Checking SSH configuration on $host"
+
+  # Get sshd configuration
+  if ! ssh_with_retry "$host" "$username" "sudo sshd -T 2>/dev/null || sshd -T 2>/dev/null" "$ssh_key" > "$temp_file"; then
+    log_message "ERROR" "Failed to retrieve SSH configuration from $host"
+    return 1
+  fi
+
+  # Parse configuration (POSIX compatible)
+  password_auth=$(get_sshd_value "$temp_file" "passwordauthentication")
+  pubkey_auth=$(get_sshd_value "$temp_file" "pubkeyauthentication")
+  permit_root=$(get_sshd_value "$temp_file" "permitrootlogin")
+  protocol=$(get_sshd_value "$temp_file" "protocol")
+  x11_forwarding=$(get_sshd_value "$temp_file" "x11forwarding")
+  permit_empty=$(get_sshd_value "$temp_file" "permitemptypasswords")
+
+  # Store results
+  set_state "$HOST_RESULTS_FILE" "${host}_password_auth" "${password_auth:-unknown}"
+  set_state "$HOST_RESULTS_FILE" "${host}_pubkey_auth" "${pubkey_auth:-unknown}"
+  set_state "$HOST_RESULTS_FILE" "${host}_permit_root" "${permit_root:-unknown}"
+  set_state "$HOST_RESULTS_FILE" "${host}_protocol" "${protocol:-unknown}"
+  set_state "$HOST_RESULTS_FILE" "${host}_x11_forwarding" "${x11_forwarding:-unknown}"
+  set_state "$HOST_RESULTS_FILE" "${host}_permit_empty_passwords" "${permit_empty:-unknown}"
+
+  # Security assessment
+  security_issues=0
+
+  check_security_issue "$host" "password_auth" "$password_auth" "yes" \
+    "WARNING" "Password authentication is enabled" && security_issues=$((security_issues + 1))
+
+  # Special handling for permit_root (check if NOT "no")
+  if [ "$permit_root" != "no" ]; then
+    log_message "WARNING" "$host: Root login is not disabled (current: $permit_root)"
+    security_issues=$((security_issues + 1))
+  fi
+
+  check_security_issue "$host" "permit_empty" "$permit_empty" "yes" \
+    "ERROR" "Empty passwords are permitted!" && security_issues=$((security_issues + 1))
+
+  check_security_issue "$host" "x11_forwarding" "$x11_forwarding" "yes" \
+    "WARNING" "X11 forwarding is enabled" && security_issues=$((security_issues + 1))
+
+  set_state "$HOST_RESULTS_FILE" "${host}_security_issues" "$security_issues"
+
+  rm -f "$temp_file"
+  return 0
+}
+
+# ============================================================================
+# AUTOMATED UPDATES DETECTION
+# ============================================================================
+
+check_automated_updates()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+
+  log_message "INFO" "Checking automated updates on $host"
+
+  # Detect distribution
+  distro=$(ssh_with_retry "$host" "$username" "
+        if [ -f /etc/os-release ]; then
+            . /etc/os-release
+            printf '%s' \"\$ID\"
+        elif [ -f /etc/debian_version ]; then
+            printf 'debian'
+        elif [ -f /etc/redhat-release ]; then
+            printf 'rhel'
+        else
+            printf 'unknown'
+        fi
+    " "$ssh_key")
+
+  auto_updates="disabled"
+
+  case "$distro" in
+    ubuntu | debian)
+      unattended_status=$(ssh_with_retry "$host" "$username" "
+                if dpkg -l unattended-upgrades >/dev/null 2>&1; then
+                    if [ -f /etc/apt/apt.conf.d/20auto-upgrades ]; then
+                        if grep '^APT::Periodic::Unattended-Upgrade' /etc/apt/apt.conf.d/20auto-upgrades | grep -q '\"1\"'; then
+                            printf 'enabled'
+                        else
+                            printf 'disabled'
+                        fi
+                    else
+                        printf 'not-configured'
+                    fi
+                else
+                    printf 'not-installed'
+                fi
+            " "$ssh_key")
+      auto_updates="$unattended_status"
+      ;;
+
+    rhel | centos | rocky | almalinux | fedora)
+      dnf_status=$(ssh_with_retry "$host" "$username" "
+                if command -v dnf >/dev/null 2>&1 && rpm -q dnf-automatic >/dev/null 2>&1; then
+                    if systemctl is-enabled dnf-automatic.timer >/dev/null 2>&1; then
+                        printf 'enabled'
+                    else
+                        printf 'disabled'
+                    fi
+                elif rpm -q yum-cron >/dev/null 2>&1; then
+                    if systemctl is-enabled yum-cron >/dev/null 2>&1; then
+                        printf 'enabled'
+                    else
+                        printf 'disabled'
+                    fi
+                else
+                    printf 'not-installed'
+                fi
+            " "$ssh_key")
+      auto_updates="$dnf_status"
+      ;;
+
+    *)
+      auto_updates="unknown"
+      ;;
+  esac
+
+  set_state "$HOST_RESULTS_FILE" "${host}_auto_updates" "$auto_updates"
+  set_state "$HOST_RESULTS_FILE" "${host}_distro" "$distro"
+
+  log_message "INFO" "$host: Automated updates status: $auto_updates (distro: $distro)"
+  return 0
+}
+
+# ============================================================================
+# PENDING REBOOT DETECTION
+# ============================================================================
+
+check_pending_reboot()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+
+  log_message "INFO" "Checking pending reboot status on $host"
+
+  # Multiple detection methods (POSIX compliant)
+  check_result=$(ssh_with_retry "$host" "$username" '
+        REBOOT_NEEDED=0
+        REASONS=""
+
+        # Method 1: Check /var/run/reboot-required
+        if [ -f /var/run/reboot-required ]; then
+            REBOOT_NEEDED=1
+            REASONS="${REASONS:+$REASONS,}reboot-required"
+        fi
+
+        # Method 2: Check kernel version mismatch
+        if command -v rpm >/dev/null 2>&1; then
+            CURRENT_KERNEL=$(uname -r)
+            LATEST_KERNEL=$(rpm -q kernel --last 2>/dev/null | head -1 | sed "s/^kernel-//;s/ .*//")
+            if [ -n "$LATEST_KERNEL" ] && [ "$CURRENT_KERNEL" != "$LATEST_KERNEL" ]; then
+                REBOOT_NEEDED=1
+                REASONS="${REASONS:+$REASONS,}kernel-mismatch"
+            fi
+        fi
+
+        # Method 3: Check needs-restarting
+        if command -v needs-restarting >/dev/null 2>&1; then
+            if ! needs-restarting -r >/dev/null 2>&1; then
+                REBOOT_NEEDED=1
+                REASONS="${REASONS:+$REASONS,}needs-restarting"
+            fi
+        fi
+
+        # Method 4: Check deleted libraries
+        DELETED_LIBS=$(lsof 2>/dev/null | grep -c "DEL.*deleted" || echo 0)
+        if [ "$DELETED_LIBS" -gt 10 ]; then
+            REBOOT_NEEDED=1
+            REASONS="${REASONS:+$REASONS,}deleted-libraries"
+        fi
+
+        if [ $REBOOT_NEEDED -eq 1 ]; then
+            printf "yes|%s" "${REASONS:-unknown}"
+        else
+            printf "no|none"
+        fi
+    ' "$ssh_key")
+
+  reboot_required=$(printf '%s' "$check_result" | cut -d'|' -f1)
+  reboot_reason=$(printf '%s' "$check_result" | cut -d'|' -f2)
+
+  set_state "$HOST_RESULTS_FILE" "${host}_reboot_required" "$reboot_required"
+  set_state "$HOST_RESULTS_FILE" "${host}_reboot_reason" "$reboot_reason"
+
+  if [ "$reboot_required" = "yes" ]; then
+    log_message "WARNING" "$host: Reboot required (reason: $reboot_reason)"
+  else
+    log_message "INFO" "$host: No reboot required"
+  fi
+
+  return 0
+}
+
+# ============================================================================
+# REMEDIATION FUNCTIONS
+# ============================================================================
+
+backup_sshd_config()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+
+  log_message "INFO" "Creating backup of sshd_config on $host"
+
+  ssh_with_retry "$host" "$username" "
+        sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup.${TIMESTAMP}
+        printf 'Backup created: /etc/ssh/sshd_config.backup.%s\n' '${TIMESTAMP}'
+    " "$ssh_key"
+}
+
+disable_password_auth()
+{
+  host="$1"
+  username="$2"
+  ssh_key="${3:-}"
+
+  log_message "INFO" "Disabling password authentication on $host"
+
+  # Create backup first
+  backup_sshd_config "$host" "$username" "$ssh_key"
+
+  # Create hardening configuration
+  config_content='# SSH Hardening - Automated Security Audit
+# Generated: '"$(date)"'
+# Disable password authentication
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+KbdInteractiveAuthentication no
+UsePAM no
+
+# Ensure key-based authentication
+PubkeyAuthentication yes
+AuthenticationMethods publickey
+
+# Additional security settings
+PermitRootLogin no
+PermitEmptyPasswords no
+MaxAuthTries 3
+MaxSessions 2
+ClientAliveInterval 300
+ClientAliveCountMax 2
+'
+
+  # Apply configuration
+  if ssh_with_retry "$host" "$username" "
+        printf '%s\n' '$config_content' | sudo tee /etc/ssh/sshd_config.d/99-hardening.conf >/dev/null
+        sudo sshd -t && sudo systemctl reload sshd
+    " "$ssh_key"; then
+    log_message "SUCCESS" "Password authentication disabled on $host"
+    set_state "$HOST_RESULTS_FILE" "${host}_remediation" "success"
+    return 0
+  else
+    log_message "ERROR" "Failed to disable password authentication on $host"
+    set_state "$HOST_RESULTS_FILE" "${host}_remediation" "failed"
+    return 1
+  fi
+}
+
+# ============================================================================
+# REPORTING FUNCTIONS
+# ============================================================================
+
+generate_csv_report()
+{
+  report_file="$1"
+
+  # Header
+  printf 'Timestamp,Hostname,Username,SSH Status,Password Auth,Key Auth,Root Login,Auto Updates,Reboot Required,Security Issues,Remediation\n' > "$report_file"
+
+  # Data rows
+  while IFS=':' read -r host username ssh_key; do
+    {
+      printf '%s,' "$(date '+%Y-%m-%d %H:%M:%S')"
+      printf '%s,' "$host"
+      printf '%s,' "$username"
+      printf '%s,' "$(get_state "$HOST_STATUS_FILE" "$host" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_password_auth" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_pubkey_auth" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_permit_root" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_auto_updates" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_reboot_required" "unknown")"
+      printf '%s,' "$(get_state "$HOST_RESULTS_FILE" "${host}_security_issues" "0")"
+      printf '%s\n' "$(get_state "$HOST_RESULTS_FILE" "${host}_remediation" "none")"
+    } >> "$report_file"
+  done < "$HOSTS_LIST_FILE"
+}
+
+display_summary()
+{
+  printf '\n'
+  printf '%s==========================================\n' "$BOLD"
+  printf '         SSH Security Audit Summary\n'
+  printf '==========================================%s\n' "$RESET"
+  printf '\n'
+
+  total_hosts=$(wc -l < "$HOSTS_LIST_FILE")
+  successful_audits=0
+  security_issues_found=0
+  reboots_required=0
+  password_auth_enabled=0
+
+  while IFS=':' read -r host username ssh_key; do
+    status=$(get_state "$HOST_STATUS_FILE" "$host" "unknown")
+    [ "$status" = "audited" ] && successful_audits=$((successful_audits + 1))
+
+    password_auth=$(get_state "$HOST_RESULTS_FILE" "${host}_password_auth" "unknown")
+    [ "$password_auth" = "yes" ] && password_auth_enabled=$((password_auth_enabled + 1))
+
+    reboot_req=$(get_state "$HOST_RESULTS_FILE" "${host}_reboot_required" "unknown")
+    [ "$reboot_req" = "yes" ] && reboots_required=$((reboots_required + 1))
+
+    issues=$(get_state "$HOST_RESULTS_FILE" "${host}_security_issues" "0")
+    [ "$issues" -gt 0 ] && security_issues_found=$((security_issues_found + 1))
+  done < "$HOSTS_LIST_FILE"
+
+  printf '%sTotal Hosts:%s %d\n' "$BLUE" "$RESET" "$total_hosts"
+  printf '%sSuccessfully Audited:%s %d\n' "$GREEN" "$RESET" "$successful_audits"
+  printf '%sPassword Auth Enabled:%s %d\n' "$YELLOW" "$RESET" "$password_auth_enabled"
+  printf '%sSecurity Issues Found:%s %d\n' "$YELLOW" "$RESET" "$security_issues_found"
+  printf '%sReboots Required:%s %d\n' "$YELLOW" "$RESET" "$reboots_required"
+
+  if [ -s "$FAILED_HOSTS_FILE" ]; then
+    printf '\n%sFailed Hosts:%s\n' "$RED" "$RESET"
+    while read -r failed; do
+      printf '  - %s\n' "$failed"
+    done < "$FAILED_HOSTS_FILE"
+  fi
+
+  printf '\n'
+  printf '%sReport saved to:%s %s\n' "$BOLD" "$RESET" "$REPORT_FILE"
+  printf '%sLog file:%s %s\n' "$BOLD" "$RESET" "$LOG_FILE"
+}
+
+# ============================================================================
+# MAIN AUDIT FUNCTION
+# ============================================================================
+
+audit_host()
+{
+  host_entry="$1"
+  host=$(printf '%s' "$host_entry" | cut -d':' -f1)
+  primary_user=$(printf '%s' "$host_entry" | cut -d':' -f2)
+  ssh_key=$(printf '%s' "$host_entry" | cut -d':' -f3)
+
+  log_message "INFO" "Starting audit of $host"
+
+  # Try multiple usernames (primary user first, then fallbacks)
+  connected=0
+  connected_user=""
+
+  for username in "$primary_user" $FALLBACK_USERS; do
+    if test_ssh_connectivity "$host" "$username" "$ssh_key"; then
+      connected=1
+      connected_user="$username"
+      log_message "SUCCESS" "Connected to $host as $username"
+      break
+    fi
+  done
+
+  if [ $connected -eq 0 ]; then
+    log_message "ERROR" "Could not connect to $host with any username"
+    set_state "$HOST_STATUS_FILE" "$host" "connection_failed"
+    printf '%s\n' "$host" >> "$FAILED_HOSTS_FILE"
+    return 1
+  fi
+
+  # Perform audit checks
+  check_sshd_config "$host" "$connected_user" "$ssh_key"
+  check_automated_updates "$host" "$connected_user" "$ssh_key"
+  check_pending_reboot "$host" "$connected_user" "$ssh_key"
+
+  set_state "$HOST_STATUS_FILE" "$host" "audited"
+  set_state "$HOST_RESULTS_FILE" "${host}_connected_user" "$connected_user"
+
+  log_message "SUCCESS" "Completed audit of $host"
+  return 0
+}
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+main()
+{
+  input_file="${1:-}"
+  auto_remediate="${2:-no}"
+
+  # Validate arguments
+  if [ -z "$input_file" ]; then
+    printf 'Usage: %s <host_list_file> [auto-remediate:yes|no]\n' "$SCRIPT_NAME"
+    printf '\n'
+    printf 'Host list file format (one per line):\n'
+    printf '  hostname1:username1\n'
+    printf '  hostname2:username2\n'
+    printf '  hostname3:username3:/path/to/ssh_key  # Optional SSH key\n'
+    printf '\n'
+    printf 'Format: hostname:username[:ssh_key]\n'
+    printf '  - hostname: The host to connect to\n'
+    printf '  - username: SSH username\n'
+    printf '  - ssh_key: (Optional) Path to SSH private key file\n'
+    printf '\n'
+    printf 'SSH Key Authentication Priority:\n'
+    printf '  1. Specific key (if provided in host file)\n'
+    printf '  2. Auto-detected default keys (~/.ssh/id_ed25519, id_rsa, etc.)\n'
+    printf '  3. SSH agent or system default authentication\n'
+    printf '\n'
+    printf 'Example:\n'
+    printf '  %s hosts.txt\n' "$SCRIPT_NAME"
+    printf '  %s hosts.txt yes  # Auto-remediate security issues\n' "$SCRIPT_NAME"
+    exit 1
+  fi
+
+  # Setup
+  setup_logging
+  init_state_files
+
+  log_message "INFO" "Starting SSH Security Audit"
+
+  # Detect available SSH keys and log
+  available_keys=$(detect_available_ssh_keys)
+  if [ -n "$available_keys" ]; then
+    key_count=$(printf '%s\n' "$available_keys" | wc -w | tr -d ' ')
+    log_message "INFO" "Detected $key_count default SSH key(s) for authentication"
+    for key in $available_keys; do
+      log_message "INFO" "  - $key"
+    done
+  else
+    log_message "INFO" "No default SSH keys detected, will use SSH agent/default authentication"
+  fi
+
+  # Parse input file
+  parse_host_list "$input_file"
+
+  # Audit each host
+  while IFS=':' read -r host username ssh_key; do
+    audit_host "${host}:${username}:${ssh_key}"
+  done < "$HOSTS_LIST_FILE"
+
+  # Generate report
+  generate_csv_report "$REPORT_FILE"
+
+  # Display summary
+  display_summary
+
+  # Offer remediation
+  if [ "$auto_remediate" != "yes" ]; then
+    printf '\n%sWould you like to automatically remediate security issues? (y/N)%s ' "$YELLOW" "$RESET"
+    read -r response
+
+    case "$response" in
+      [Yy]*) auto_remediate="yes" ;;
+    esac
+  fi
+
+  if [ "$auto_remediate" = "yes" ]; then
+    printf '\n%sStarting automatic remediation...%s\n' "$BOLD" "$RESET"
+
+    while IFS=':' read -r host username ssh_key; do
+      password_auth=$(get_state "$HOST_RESULTS_FILE" "${host}_password_auth" "unknown")
+      pubkey_auth=$(get_state "$HOST_RESULTS_FILE" "${host}_pubkey_auth" "unknown")
+
+      if [ "$password_auth" = "yes" ] && [ "$pubkey_auth" = "yes" ]; then
+        printf '\n%sDisabling password authentication on %s...%s\n' "$YELLOW" "$host" "$RESET"
+
+        connected_user=$(get_state "$HOST_RESULTS_FILE" "${host}_connected_user" "root")
+        if disable_password_auth "$host" "$connected_user" "$ssh_key"; then
+          printf '%s✓ Successfully disabled password authentication on %s%s\n' "$GREEN" "$host" "$RESET"
+        else
+          printf '%s✗ Failed to disable password authentication on %s%s\n' "$RED" "$host" "$RESET"
+        fi
+      fi
+    done < "$HOSTS_LIST_FILE"
+
+    # Regenerate report after remediation
+    remediated_report="${REPORT_FILE%.csv}-remediated.csv"
+    generate_csv_report "$remediated_report"
+    printf '\n%sRemediation complete. Updated report: %s%s\n' "$BOLD" "$remediated_report" "$RESET"
+  fi
+
+  log_message "INFO" "SSH Security Audit completed"
+}
+
+# Run main function
+main "$@"
