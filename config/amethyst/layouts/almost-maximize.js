@@ -6,14 +6,12 @@
  *
  * @param {Object} windows - All windows in the current space.
  * @param {Object} screenFrame - The frame of the current screen.
- * @param {Object} state - The state of the current space.
- * @param {Object} extendedFrames - The frames of the windows in the current space.
  * @return {Object} - The frames for the windows in the current space.
  */
-function _layout() {
+function layout() {
   return {
     name: 'Almost Maximize',
-    getFrameAssignments: (windows, screenFrame, _state, _extendedFrames) => {
+    getFrameAssignments: (windows, screenFrame) => {
       const width = screenFrame.width * 0.95
       const height = screenFrame.height * 0.95
       const x = (screenFrame.width - width) / 2
@@ -33,3 +31,5 @@ function _layout() {
     },
   }
 }
+
+module.exports = layout()
