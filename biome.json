@@ -1,0 +1,103 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.1/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!!**/.mypy_cache",
+      "!!**/Brewfile.lock.json",
+      "!!**/base/plan",
+      "!!**/config/cheat/cheatsheets/community",
+      "!!**/config/cheat/cheatsheets/tldr",
+      "!!**/config/fzf",
+      "!!**/config/nvim",
+      "!!**/config/op/plugins/used_plugins",
+      "!!**/config/tmux/plugins",
+      "!!**/config/zsh",
+      "!!**/config/vim",
+      "!!**/lazy-lock.json",
+      "!!**/local/bin/antigen.zsh",
+      "!!**/local/bin/asdf",
+      "!!**/tools/antidote",
+      "!!**/tools/dotbot",
+      "!!**/node_modules"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn"
+      },
+      "style": {
+        "useConst": "warn",
+        "useTemplate": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noConsole": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "enabled": true,
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteProperties": "asNeeded",
+      "indentStyle": "space",
+      "indentWidth": 2
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": false
+    },
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 80
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["*.md", "*.mdx"],
+      "formatter": {
+        "enabled": true,
+        "lineWidth": 120
+      }
+    },
+    {
+      "includes": ["package.json"],
+      "json": {
+        "formatter": {
+          "enabled": true,
+          "indentWidth": 2
+        }
+      }
+    }
+  ]
+}

@@ -103,9 +103,8 @@ fetch_keys_if_missing()
   if [[ ! -f "$KEYS_FILE" ]]; then
     log_message "Keys file '$KEYS_FILE' not found. Attempting to fetch from $KEYS_SOURCE..."
     mkdir -p "$(dirname "$KEYS_FILE")"
-    curl -s "$KEYS_SOURCE" -o "$KEYS_FILE"
 
-    if [[ $? -ne 0 || ! -s "$KEYS_FILE" ]]; then
+    if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
       log_message "Error: Failed to fetch keys from $KEYS_SOURCE"
       exit 1
     fi
@@ -126,8 +125,7 @@ encrypt_file_or_directory()
   elif [[ -f "$file" ]]; then
     fetch_keys_if_missing
     local output_file="${file}.age"
-    age -R "$KEYS_FILE" "$file" > "$output_file"
-    if [[ $? -eq 0 ]]; then
+    if age -R "$KEYS_FILE" "$file" > "$output_file"; then
       log_message "File encrypted successfully: $output_file"
     else
       log_message "Error: Failed to encrypt file '$file'."
@@ -147,8 +145,7 @@ decrypt_file_or_directory()
   elif [[ -f "$file" ]]; then
     fetch_keys_if_missing
     local output_file="${file%.age}"
-    age -d -i "$KEYS_FILE" "$file" > "$output_file"
-    if [[ $? -eq 0 ]]; then
+    if age -d -i "$KEYS_FILE" "$file" > "$output_file"; then
       log_message "File decrypted successfully: $output_file"
     else
       log_message "Error: Failed to decrypt file '$file'."

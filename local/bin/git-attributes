@@ -25,27 +25,27 @@ fi
 # Output functions
 msg_err()
 {
-  echo -e "\e[31m$@\e[0m" >&2
+  echo -e "\e[31m$*\e[0m" >&2
 }
 
 msg_success()
 {
-  echo -e "\e[32m$@\e[0m"
+  echo -e "\e[32m$*\e[0m"
 }
 
 msg_warn()
 {
-  echo -e "\e[33m$@\e[0m" >&2
+  echo -e "\e[33m$*\e[0m" >&2
 }
 
 msg_info()
 {
-  echo -e "\e[36m$@\e[0m"
+  echo -e "\e[36m$*\e[0m"
 }
 
 msg_debug()
 {
-  [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$@\e[0m"
+  [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$*\e[0m"
 }
 
 show_help()
@@ -180,7 +180,8 @@ format_rule()
 get_file_extension()
 {
   local file="$1"
-  local basename=$(basename "$file")
+  local basename
+  basename=$(basename "$file")
   local extension=""
 
   # Check if file has no extension or is a dotfile
@@ -231,8 +232,8 @@ suggest_rule()
   # If file path contains .d/ pattern, we need special handling
   if [[ "$file" =~ \.d/ ]]; then
     # Extract the pattern part that includes the .d/ directory
-    local dir_part=$(dirname "$file")
-    local base_name=$(basename "$file")
+    local dir_part
+    dir_part=$(dirname "$file")
 
     # Check if it's a config directory pattern worth capturing
     if [[ "$dir_part" =~ /(\.d|[^/]+\.d)$ ]]; then
@@ -430,7 +431,8 @@ detect_shell_scripts()
       fi
 
       # Skip if file extension already covered
-      local extension=$(get_file_extension "$rel_path")
+      local extension
+      extension=$(get_file_extension "$rel_path")
       if [[ "$extension" != "$rel_path" ]] && grep -q "^\*\.$extension " <<< "$existing_rules"; then
         msg_debug "Script covered by extension rule: $rel_path (*.$extension)"
         continue
@@ -458,7 +460,8 @@ detect_shell_scripts()
       fi
 
       # Group by directory
-      local dir=$(dirname "$rel_path")
+      local dir
+      dir=$(dirname "$rel_path")
       if [[ "$dir" == "." ]]; then
         dir="root"
       fi
@@ -480,7 +483,8 @@ detect_shell_scripts()
 
       # Check if we can use directory-based rules instead of individual files
       for dir in "${!scripts_by_dir[@]}"; do
-        local files_in_dir=$(echo -e "${scripts_by_dir[$dir]}" | wc -l)
+        local files_in_dir
+        files_in_dir=$(echo -e "${scripts_by_dir[$dir]}" | wc -l)
         local dir_path="$dir"
 
         if [[ "$dir" == "root" ]]; then
@@ -575,7 +579,8 @@ suggest_gitattributes()
   declare -A seen_patterns=()
 
   while IFS= read -r file; do
-    local suggestion=$(suggest_rule "$file")
+    local suggestion
+    suggestion=$(suggest_rule "$file")
     if [[ -n "$suggestion" ]]; then
       IFS=':' read -r pattern attributes <<< "$suggestion"
 
@@ -639,7 +644,8 @@ suggest_gitattributes()
       formatted_suggestions+="$pattern\n"
       echo "$pattern"
     else
-      local formatted_rule=$(printf "%-${format_width}s %s\n" "$pattern" "$attributes")
+      local formatted_rule
+      formatted_rule=$(printf "%-${format_width}s %s\n" "$pattern" "$attributes")
       formatted_suggestions+="$formatted_rule\n"
       echo "$formatted_rule"
     fi

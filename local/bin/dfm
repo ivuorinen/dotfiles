@@ -25,6 +25,7 @@ source_file()
   case "$CURRENT_SHELL" in
     fish)
       if [[ -f "$file.fish" ]]; then
+        # shellcheck disable=SC1090
         source "$file.fish"
       else
         echo "Fish shell file not found: $file.fish"
@@ -32,6 +33,7 @@ source_file()
       fi
       ;;
     sh | bash | zsh)
+      # shellcheck disable=SC1090
       source "$file"
       ;;
     *)
