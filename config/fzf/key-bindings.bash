@@ -1,4 +1,3 @@
-# shellcheck disable=all
 #     ____      ____
 #    / __/___  / __/
 #   / /_/_  / / /_
@@ -21,8 +20,8 @@ __fzf_select__() {
     -o -type d -print \
     -o -type l -print 2> /dev/null | cut -b3-"}"
   opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse ${FZF_DEFAULT_OPTS-} ${FZF_CTRL_T_OPTS-} -m"
-  eval "$cmd" |
-    FZF_DEFAULT_OPTS="$opts" $(__fzfcmd) "$@" |
+  # shellcheck disable=SC2091 # Intentionally execute output of __fzfcmd
+  eval "$cmd" | FZF_DEFAULT_OPTS="$opts" $(__fzfcmd) "$@" |
     while read -r item; do
       printf '%q ' "$item" # escape special chars
     done
@@ -36,7 +35,8 @@ if [[ $- =~ i ]]; then
   }
 
   fzf-file-widget() {
-    local selected="$(__fzf_select__ "$@")"
+    local selected
+    selected="$(__fzf_select__ "$@")"
     READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
     READLINE_POINT=$((READLINE_POINT + ${#selected}))
   }
@@ -46,6 +46,7 @@ if [[ $- =~ i ]]; then
     cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
     -o -type d -print 2> /dev/null | cut -b3-"}"
     opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-} +m"
+    # shellcheck disable=SC2091 # Intentionally execute output of __fzfcmd
     dir=$(
       set +o pipefail
       eval "$cmd" | FZF_DEFAULT_OPTS="$opts" $(__fzfcmd)
@@ -56,6 +57,7 @@ if [[ $- =~ i ]]; then
     local output opts script
     opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} -n2..,.. --scheme=history --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m --read0"
     script='BEGIN { getc; $/ = "\n\t"; $HISTCOUNT = $ENV{last_hist} + 1 } s/^[ *]//; print $HISTCOUNT - $. . "\t$_" if !$seen{$_}++'
+    # shellcheck disable=SC2091 # Intentionally execute output of __fzfcmd
     output=$(
       set +o pipefail
       builtin fc -lnr -2147483648 |

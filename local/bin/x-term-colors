@@ -81,12 +81,14 @@ done
 resetOutput
 
 for i in $(seq 0 127); do
-  setBackgroundColor "$(rainbowColor "$i")"
+  # shellcheck disable=SC2046 # Intentional word splitting to pass 3 RGB values as separate args
+  setBackgroundColor $(rainbowColor "$i")
   echo -n " "
 done
 resetOutput
 for i in $(seq 255 128); do
-  setBackgroundColor "$(rainbowColor "$i")"
+  # shellcheck disable=SC2046 # Intentional word splitting to pass 3 RGB values as separate args
+  setBackgroundColor $(rainbowColor "$i")
   echo -n " "
 done
 resetOutput
