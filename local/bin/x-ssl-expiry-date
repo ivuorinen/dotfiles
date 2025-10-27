@@ -93,7 +93,7 @@ for name in "$@"; do
 
   # Day diff
   diff=$(("$then" - "$now"))
-  diff=$($diff / 86400)
+  diff=$((diff / 86400))
 
   # All done
   if [ "$days" = "1" ]; then
