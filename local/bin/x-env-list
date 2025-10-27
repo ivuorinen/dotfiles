@@ -126,11 +126,11 @@ if [[ -f "$CONFIG_FILE" ]]; then
     PROTECTED_KEYS+=("$key")
   done <<< "$CUSTOM_KEYS"
 
-  SKIPPED+=("$(yq '.skipped_keys[]' "$CONFIG_FILE")")
+  mapfile -t SKIPPED < <(yq '.skipped_keys[]' "$CONFIG_FILE")
   while IFS= read -r key; do
     # Add to default_skipped_keys
     SKIPPED_KEYS+=("$key")
-  done <<< "$SKIPPED"
+  done <<< "${SKIPPED[*]}"
 
   CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
   while IFS= read -r group; do
@@ -159,7 +159,7 @@ is_protected()
       return 0
     fi
     # Wildcard match (protected_key contains '*')
-    if [[ "$protected_key" == *"*"* ]] && [[ "$key" == $protected_key ]]; then
+    if [[ "$protected_key" == *"*"* ]] && [[ "$key" == "$protected_key" ]]; then
       return 0
     fi
   done
@@ -198,7 +198,7 @@ is_skipped()
       return 0
     fi
     # Wildcard match (skipped_key contains '*')
-    if [[ "$skipped_key" == *"*"* ]] && [[ "$key" == $skipped_key ]]; then
+    if [[ "$skipped_key" == *"*"* ]] && [[ "$key" == "$skipped_key" ]]; then
       return 0
     fi
   done
@@ -245,7 +245,7 @@ while IFS='=' read -r key value; do
   fi
 
   # Update group data
-  if [[ ! " ${all_groups[*]} " =~ " $group " ]]; then
+  if [[ ! " ${all_groups[*]} " =~ \ $group\  ]]; then
     all_groups+=("$group")
   fi
 

@@ -6,14 +6,13 @@
     "doc": "docs"
   },
   "scripts": {
-    "lint:markdown": "markdownlint -d .",
-    "fix:markdown": "markdownlint -df .",
-    "lint:prettier": "prettier . --check",
-    "fix:prettier": "prettier . --write",
+    "lint:biome": "biome check .",
+    "fix:biome": "biome check --write .",
+    "format": "biome format --write .",
     "test": "bash test-all.sh",
     "lint:ec": "ec -f gcc",
-    "lint": "yarn lint:markdown && yarn lint:prettier && yarn lint:ec",
-    "fix": "yarn fix:markdown && yarn fix:prettier"
+    "lint": "yarn lint:biome && yarn lint:ec",
+    "fix": "yarn fix:biome"
   },
   "repository": {
     "type": "git",
@@ -30,13 +29,11 @@
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
   "devDependencies": {
-    "@ivuorinen/base-configs": "1.0.0",
-    "@types/node": "^24.10.1",
-    "bats": "^1.13.0",
-    "editorconfig-checker": "^6.1.1",
-    "markdownlint": "^0.40.0",
-    "prettier": "^3.7.4",
-    "typescript": "^5.9.3"
+    "@biomejs/biome": "^2.3.1",
+    "@types/node": "^24.0.1",
+    "bats": "^1.12.0",
+    "editorconfig-checker": "^6.1.0",
+    "typescript": "^5.8.3"
   },
   "packageManager": "yarn@4.12.0"
 }

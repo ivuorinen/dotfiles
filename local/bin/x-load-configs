@@ -30,10 +30,9 @@ config_msg()
 {
   # if $1 is empty, return
   [ -z "$1" ] && return
-  [ -z "$2" ] && $2=""
 
   local msg_type="$1"
-  local msg_content="$2"
+  local msg_content="${2:-}"
   [[ "$VERBOSE" -eq 1 ]] && printf 'x-load-configs: %s %s\n' "$msg_type" "$msg_content"
   return 0
 }

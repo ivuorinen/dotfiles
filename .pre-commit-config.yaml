@@ -20,14 +20,16 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=auto]
-      - id: pretty-format-json
-        args: [--autofix, --no-sort-keys]
 
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+  - repo: local
     hooks:
-      - id: markdownlint
-        args: [-c, .markdownlint.json, --fix]
+      - id: biome-check
+        name: Biome Check
+        entry: yarn biome check --write
+        language: system
+        types: [text]
+        files: \.(js|ts|jsx|tsx|json|md)$
+        pass_filenames: false
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
