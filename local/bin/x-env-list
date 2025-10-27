@@ -127,10 +127,10 @@ if [[ -f "$CONFIG_FILE" ]]; then
   done <<< "$CUSTOM_KEYS"
 
   mapfile -t SKIPPED < <(yq '.skipped_keys[]' "$CONFIG_FILE")
-  while IFS= read -r key; do
+  for key in "${SKIPPED[@]}"; do
     # Add to default_skipped_keys
     SKIPPED_KEYS+=("$key")
-  done <<< "${SKIPPED[*]}"
+  done
 
   CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
   while IFS= read -r group; do
