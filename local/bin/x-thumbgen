@@ -144,7 +144,7 @@ generate_thumbnails()
     fi
 
     # Determine the relative path with respect to the source directory.
-    rel_path="${file#$source_dir/}"
+    rel_path="${file#"$source_dir"/}"
     dir="$(dirname "$rel_path")"
     base="$(basename "$rel_path")"
     filename="${base%.*}"

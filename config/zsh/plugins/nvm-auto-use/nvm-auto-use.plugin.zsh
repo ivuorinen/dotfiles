@@ -1,4 +1,4 @@
-# shellcheck shell=zsh
+# shellcheck disable=SC1071,SC1103,SC2148
 # Source: https://github.com/nvm-sh/nvm#zsh
 # place this after nvm initialization!
 autoload -U add-zsh-hook
