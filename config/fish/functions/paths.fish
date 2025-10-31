@@ -158,7 +158,7 @@ function paths --description "Reveal the executable matches in shell paths or fi
     # check
     set -l built (type --type $input 12&>/dev/null)
     if test -n "$built"
-        and test "$built" = 'builtin'
+        and test "$built" = builtin
         set $foundStatus 0
         if not set -q _flag_c
             echo -e -n "builtin\n"
