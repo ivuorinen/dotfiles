@@ -16,7 +16,7 @@ permissions: read-all
 
 jobs:
   auto-update:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write

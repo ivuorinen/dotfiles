@@ -15,7 +15,7 @@ permissions: read-all
 
 jobs:
   new-daily-release:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     permissions: write-all
 

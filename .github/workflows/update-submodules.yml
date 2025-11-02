@@ -16,7 +16,7 @@ permissions: read-all
 
 jobs:
   update-submodules:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     permissions: write-all
 

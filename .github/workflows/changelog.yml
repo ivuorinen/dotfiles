@@ -13,7 +13,7 @@ permissions: read-all
 
 jobs:
   debug-changelog:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     permissions: write-all
 
