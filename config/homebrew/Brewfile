@@ -38,6 +38,8 @@ brew "openssl@3"
 brew "cryptography"
 # YAML Parser
 brew "libyaml"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Checks ansible playbooks for practices and behaviour
@@ -104,7 +106,7 @@ brew "glib"
 brew "cargo-binstall"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
-# Platform built on V8 to build network applications
+# Open-source, cross-platform JavaScript runtime environment
 brew "node", link: false
 # CLI tool for analyzing Claude Code usage from local JSONL files
 brew "ccusage"
@@ -230,6 +232,8 @@ brew "luarocks"
 brew "lzip"
 # Swiss Army Knife for macOS
 brew "m-cli"
+# Cross platform, open source .NET development framework
+brew "mono"
 # Collection of tools that nobody wrote when UNIX was young
 brew "moreutils"
 # NCurses Disk Usage
@@ -290,8 +294,8 @@ brew "tflint"
 brew "tfsec"
 # Terminal multiplexer
 brew "tmux"
-# Display directories as trees (with optional color/HTML output)
-brew "tree"
+# Extremely fast Python package installer and resolver, written in Rust
+brew "uv"
 # Tool for creating isolated virtual python environments
 brew "virtualenv"
 # Command-line interface to the WakaTime api
@@ -349,13 +353,18 @@ cask "fantastical"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-monaspace"
+cask "font-monaspace-nf"
 cask "font-open-sans"
 # GIT client
 cask "fork"
+# Desktop automation application
+cask "hammerspoon"
 # HTTP and GraphQL Client
 cask "insomnia"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
+# Keyboard customiser
+cask "karabiner-elements"
 # End-to-end encryption software
 cask "keybase"
 # Kubernetes IDE

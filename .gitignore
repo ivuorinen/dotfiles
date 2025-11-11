@@ -55,3 +55,4 @@ config/zed/settings.json
 *.tmp.*
 config/op/plugins/gh.json
 config/fish/fish_variables.*
+config/karabiner/automatic_backups
