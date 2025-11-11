@@ -66,9 +66,11 @@ config.scrollback_lines = 3000
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
   if appearance:find 'Dark' then
-    return 'Everforest Dark (Medium)'
+    return 'Catppuccin Mocha'
+    -- return 'Everforest Dark (Medium)'
   else
-    return 'Everforest Light (Medium)'
+    return 'Catppuccin Latte'
+    -- return 'Everforest Light (Medium)'
   end
 end
 
