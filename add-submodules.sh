@@ -42,6 +42,8 @@ git submodule add --name tmux/tmux-current-pane-hostname \
   -f https://github.com/soyuka/tmux-current-pane-hostname.git config/tmux/plugins/tmux-current-pane-hostname
 git submodule add --name tmux/tmux-dark-notify \
   -f https://github.com/ivuorinen/tmux-dark-notify.git config/tmux/plugins/tmux-dark-notify
+git submodule add --name tmux/catppuccin \
+  -f https://github.com/catppuccin/tmux.git config/tmux/plugins/catppuccin
 
 # Takes submodules and sets them to ignore all changes
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
