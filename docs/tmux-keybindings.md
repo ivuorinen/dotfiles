@@ -33,8 +33,10 @@ Leader: `<ctrl><space>`
     ?       List key bindings
     D       Choose and detach a client from a list
     E       Spread panes out evenly
-    L       Switch to the last client
+    L       last-session (via sesh) 
     M       Clear the marked pane
+    N       sesh ui
+    T       tms
     ]       Paste the most recent paste buffer
     c       Create a new window
     d       Detach the current client
@@ -46,7 +48,7 @@ Leader: `<ctrl><space>`
     o       Select the next pane
     q       Display pane numbers
     s       Choose a session from a list
-    t       tms
+    t       sesh selection
     w       Choose a window from a list
     x       Kill the active pane
     z       Zoom the active pane
@@ -74,8 +76,6 @@ Leader: `<ctrl><space>`
     M-Left  Resize the pane left by 5
     M-Right Resize the pane right by 5
     C-o     Rotate through the panes
-    C-r     tms refresh
-    C-s     tms switch
     C-w     tms windows
     C-z     Suspend the current client
     C-Up    Resize the pane up
@@ -87,3 +87,4 @@ Leader: `<ctrl><space>`
     S-Left  Move the visible part of the window left
     S-Right Move the visible part of the window right
 ```
+
