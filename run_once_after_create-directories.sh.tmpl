@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# run_once_after script to create required directories
+# This runs once after applying dotfiles
+
+set -e
+
+echo "→ Creating required directories..."
+
+# Create directories with proper permissions
+mkdir -p "$HOME/.cache"
+mkdir -p "$HOME/.cache/git"
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.local"
+mkdir -p "$HOME/.local/bin"
+mkdir -p "$HOME/.local/run"
+mkdir -p "$HOME/.local/share"
+mkdir -p "$HOME/.local/state"
+mkdir -p "$HOME/.local/state/tmux"
+mkdir -p "$HOME/.local/state/zsh"
+mkdir -p "$HOME/Code"
+
+# Create directories with restricted permissions
+mkdir -p "$HOME/.local/share/gnupg"
+chmod 0700 "$HOME/.local/share/gnupg"
+
+mkdir -p "$HOME/.ssh"
+chmod 0700 "$HOME/.ssh"
+
+mkdir -p "$HOME/.ssh/local.d"
+chmod 0700 "$HOME/.ssh/local.d"
+
+echo "✓ Directories created!"

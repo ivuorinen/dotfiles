@@ -1,0 +1,53 @@
+{{- $hostname := .chezmoi.hostname -}}
+{{- $username := .chezmoi.username -}}
+{{- $osid := .chezmoi.os -}}
+
+sourceDir: {{ .chezmoi.sourceDir | quote }}
+
+data:
+  hostname: {{ $hostname | quote }}
+  username: {{ $username | quote }}
+  osid: {{ $osid | quote }}
+
+  # Detect if we're on macOS
+  is_macos: {{ eq $osid "darwin" }}
+
+  # Detect if we're on Linux
+  is_linux: {{ eq $osid "linux" }}
+
+  # Host-specific flags
+  is_air: {{ eq $hostname "air" }}
+  is_lakka: {{ eq $hostname "lakka" }}
+  is_tunkki: {{ eq $hostname "tunkki" }}
+  is_s: {{ eq $hostname "s" }}
+
+# Merge strategy for dealing with conflicts
+merge:
+  command: "nvim"
+  args:
+    - "-d"
+    - "{{ "{{" }} .Destination {{ "}}" }}"
+    - "{{ "{{" }} .Source {{ "}}" }}"
+    - "{{ "{{" }} .Target {{ "}}" }}"
+
+# Template options
+template:
+  options:
+    - "missingkey=error"
+
+# Diff options
+diff:
+  exclude:
+    - "scripts"
+  pager: "delta"
+
+# Git options
+git:
+  autoCommit: false
+  autoPush: false
+
+# Hooks
+hooks:
+  read-source-state:
+    pre:
+      command: ".local/share/chezmoi/.chezmoihooks/pre-read-source-state.sh"

@@ -1,0 +1,90 @@
+# Chezmoi ignore file
+# Files and directories that should not be managed by chezmoi
+
+# Git and version control
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+
+# GitHub
+.github/
+
+# Documentation
+README.md
+*.md
+docs/
+AGENTS.md
+
+# Development tools
+.vscode/
+.serena/
+.claude/
+node_modules/
+
+# Testing
+tests/
+test-all.sh
+
+# Configuration files for the repo itself
+.editorconfig
+.editorconfig-checker.json
+.eslintrc.json
+.prettierrc.js
+.prettierignore
+.markdownlint.json
+.markdownlintignore
+.mega-linter.yml
+.commitlintrc.json
+.releaserc.json
+.shellcheckrc
+.yamlignore
+.yamllint.yml
+.browserslistrc
+.actrc
+.luarc.json
+.ignore
+stylua.toml
+phpcs.xml
+
+# Package management
+package.json
+yarn.lock
+
+# Python and Node version files
+.python-version
+.nvmrc
+.go-version
+
+# Dotbot (old system)
+install.conf.yaml
+tools/dotbot/
+tools/dotbot-*/
+tools/dotbot-defaults.yaml
+
+# Installation and build scripts in root
+install
+add-submodules.sh
+
+# Chezmoi-specific directories (not to be managed)
+.chezmoihooks/
+
+# Host-specific directories (will be handled via templates)
+{{- if not .is_air }}
+hosts/air/
+{{- end }}
+{{- if not .is_lakka }}
+hosts/lakka/
+{{- end }}
+{{- if not .is_tunkki }}
+hosts/tunkki/
+{{- end }}
+{{- if not .is_s }}
+hosts/s/
+{{- end }}
+
+# Secrets (should use separate secrets management)
+secrets/
+
+# macOS specific files
+.DS_Store

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# run_once_after script to install packages
+# This runs once after applying dotfiles
+
+set -e
+
+DOTFILES="{{ .chezmoi.sourceDir }}"
+export DOTFILES
+
+# Source shared configuration
+if [ -f "$DOTFILES/config/shared.sh" ]; then
+  source "$DOTFILES/config/shared.sh"
+fi
+
+# Source message helper if available
+if [ -f "$DOTFILES/local/bin/msgr" ]; then
+  source "$DOTFILES/local/bin/msgr"
+fi
+
+echo "→ Installing packages..."
+
+{{- if .is_macos }}
+# Install Homebrew packages
+if [ -f "$DOTFILES/config/homebrew/Brewfile" ]; then
+  echo "→ Installing Homebrew packages..."
+  brew bundle install --file="$DOTFILES/config/homebrew/Brewfile" --no-lock || true
+fi
+
+# Setup macOS defaults
+if [ -f "$DOTFILES/scripts/install-macos-defaults.sh" ]; then
+  echo "→ Setting up macOS defaults..."
+  bash "$DOTFILES/scripts/install-macos-defaults.sh" || true
+fi
+{{- end }}
+
+{{- if .is_linux }}
+# Install apt packages if on Debian/Ubuntu
+if command -v apt &> /dev/null && [ -f "$DOTFILES/tools/apt.txt" ]; then
+  echo "→ Installing apt packages..."
+  sudo apt install -y $(grep -vE '^\s*#' "$DOTFILES/tools/apt.txt" | sed -e 's/#.*//' | tr '\n' ' ') || true
+fi
+{{- end }}
+
+# Install pipx packages
+if command -v pipx &> /dev/null && [ -f "$DOTFILES/tools/requirements-pipx.txt" ]; then
+  echo "→ Installing pipx packages..."
+  while IFS= read -r package; do
+    [ -z "$package" ] || pipx install "$package" || true
+  done < "$DOTFILES/tools/requirements-pipx.txt"
+fi
+
+echo "✓ Packages installed!"

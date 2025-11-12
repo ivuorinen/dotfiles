@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# run_once_before script to install prerequisites
+# This runs once before applying dotfiles
+
+set -e
+
+echo "→ Installing prerequisites..."
+
+{{- if .is_macos }}
+# Install Homebrew if not present
+if ! command -v brew &> /dev/null; then
+  echo "→ Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install Xcode CLI tools if needed
+if ! xcode-select -p &> /dev/null; then
+  echo "→ Installing Xcode Command Line Tools..."
+  xcode-select --install || true
+fi
+{{- end }}
+
+{{- if .is_linux }}
+# Update package manager
+if command -v apt &> /dev/null; then
+  echo "→ Updating apt..."
+  sudo apt update
+fi
+{{- end }}
+
+echo "✓ Prerequisites installed!"

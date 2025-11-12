@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# run_once_after script to setup programming languages and tools
+# This runs once after applying dotfiles
+
+set -e
+
+DOTFILES="{{ .chezmoi.sourceDir }}"
+export DOTFILES
+
+echo "→ Setting up programming languages and tools..."
+
+# Install fonts
+if [ -f "$DOTFILES/scripts/install-fonts.sh" ]; then
+  echo "→ Installing fonts..."
+  bash "$DOTFILES/scripts/install-fonts.sh" || true
+fi
+
+# Install Cargo packages
+if command -v cargo &> /dev/null && [ -f "$DOTFILES/scripts/install-cargo-packages.sh" ]; then
+  echo "→ Installing Cargo packages..."
+  bash "$DOTFILES/scripts/install-cargo-packages.sh" || true
+fi
+
+# Install Go packages
+if command -v go &> /dev/null && [ -f "$DOTFILES/scripts/install-go-packages.sh" ]; then
+  echo "→ Installing Go packages..."
+  bash "$DOTFILES/scripts/install-go-packages.sh" || true
+fi
+
+# Install Composer
+if [ -f "$DOTFILES/scripts/install-composer.sh" ]; then
+  echo "→ Installing Composer..."
+  bash "$DOTFILES/scripts/install-composer.sh" || true
+fi
+
+# Install NVM
+if [ ! -d "$HOME/.nvm" ] && command -v curl &> /dev/null; then
+  echo "→ Installing NVM..."
+  NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+  PROFILE=/dev/null bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash" || true
+fi
+
+# Install latest Node LTS
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+  echo "→ Installing latest Node LTS..."
+  source "$HOME/.nvm/nvm.sh"
+  nvm install --lts --latest-npm --default || true
+fi
+
+# Install NPM packages
+if command -v npm &> /dev/null && [ -f "$DOTFILES/scripts/install-npm-packages.sh" ]; then
+  echo "→ Installing NPM packages..."
+  bash "$DOTFILES/scripts/install-npm-packages.sh" || true
+fi
+
+# Install GitHub CLI extensions
+if command -v gh &> /dev/null && [ -f "$DOTFILES/scripts/install-gh-extensions.sh" ]; then
+  echo "→ Installing GitHub CLI extensions..."
+  bash "$DOTFILES/scripts/install-gh-extensions.sh" || true
+fi
+
+# Install z
+if [ -f "$DOTFILES/scripts/install-z.sh" ]; then
+  echo "→ Installing z..."
+  bash "$DOTFILES/scripts/install-z.sh" || true
+fi
+
+# Install cheat databases
+for database in "$DOTFILES"/scripts/install-cheat-*; do
+  if [ -f "$database" ]; then
+    echo "→ Installing $(basename "$database")..."
+    bash "$database" || true
+  fi
+done
+
+echo "✓ Programming languages and tools setup complete!"
