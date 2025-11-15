@@ -350,7 +350,7 @@ ssh_with_retry()
         log_message "INFO" "Trying SSH agent/default authentication"
       fi
 
-      # shellcheck disable=SC2086
+      # shellcheck disable=SC2086,SC2029
       if ssh $ssh_opts "${username}@${host}" "$command" 2> /dev/null; then
         if [ "$try_key" != "NO_KEY" ]; then
           log_message "SUCCESS" "Connected using SSH key: $try_key"
