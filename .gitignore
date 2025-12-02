@@ -11,6 +11,7 @@
 .nfs*
 .scannerwork
 .vscode
+.yarn/
 !config/git/local.d/.gitkeep
 !config/nvim/spell/.gitkeep
 !config/zed/settings.json
