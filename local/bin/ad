@@ -37,7 +37,7 @@ if [[ ! -f "$KEYS_FILE" ]]; then
 
   # Fetch the keys and save to the file
   if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
-    rm -f "$KEYS_FILE" 2>/dev/null || true
+    rm -f "$KEYS_FILE" 2> /dev/null || true
     echo "Error: Failed to fetch keys from $KEYS_SOURCE"
     exit 1
   fi
@@ -49,7 +49,7 @@ fi
 
 # Decrypt the file
 OUTPUT_FILE="${FILE%.age}"
-TEMP_FILE="$(mktemp)"
+TEMP_FILE="$(mktemp -p "$(dirname "$OUTPUT_FILE")")"
 if age -d -i "$KEYS_FILE" "$FILE" > "$TEMP_FILE" && mv "$TEMP_FILE" "$OUTPUT_FILE"; then
   echo "File decrypted successfully: $OUTPUT_FILE"
 else

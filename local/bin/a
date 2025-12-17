@@ -105,7 +105,7 @@ fetch_keys_if_missing()
     mkdir -p "$(dirname "$KEYS_FILE")"
 
     if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
-      rm -f "$KEYS_FILE" 2>/dev/null || true
+      rm -f "$KEYS_FILE" 2> /dev/null || true
       log_message "Error: Failed to fetch keys from $KEYS_SOURCE"
       exit 1
     fi
@@ -127,7 +127,7 @@ encrypt_file_or_directory()
     fetch_keys_if_missing
     local output_file="${file}.age"
     local temp_file
-    temp_file="$(mktemp)"
+    temp_file="$(mktemp -p "$(dirname "$file")")"
     if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
       log_message "File encrypted successfully: $output_file"
     else
@@ -150,7 +150,7 @@ decrypt_file_or_directory()
     fetch_keys_if_missing
     local output_file="${file%.age}"
     local temp_file
-    temp_file="$(mktemp)"
+    temp_file="$(mktemp -p "$(dirname "$file")")"
     if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
       log_message "File decrypted successfully: $output_file"
     else
