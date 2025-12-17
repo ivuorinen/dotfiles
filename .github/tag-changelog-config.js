@@ -31,6 +31,6 @@ module.exports = {
     const now = new Date()
     const d = now.toISOString().substring(0, 10)
     const header = `# ${release} - ${d}\n`
-    return `${header + changes}\n\n`
+    return `${header}${changes}\n\n`
   },
 }

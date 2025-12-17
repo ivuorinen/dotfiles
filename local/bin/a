@@ -125,9 +125,12 @@ encrypt_file_or_directory()
   elif [[ -f "$file" ]]; then
     fetch_keys_if_missing
     local output_file="${file}.age"
-    if age -R "$KEYS_FILE" "$file" > "$output_file"; then
+    local temp_file
+    temp_file="$(mktemp)"
+    if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
       log_message "File encrypted successfully: $output_file"
     else
+      rm -f "$temp_file"
       log_message "Error: Failed to encrypt file '$file'."
       exit 1
     fi
@@ -145,9 +148,12 @@ decrypt_file_or_directory()
   elif [[ -f "$file" ]]; then
     fetch_keys_if_missing
     local output_file="${file%.age}"
-    if age -d -i "$KEYS_FILE" "$file" > "$output_file"; then
+    local temp_file
+    temp_file="$(mktemp)"
+    if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
       log_message "File decrypted successfully: $output_file"
     else
+      rm -f "$temp_file"
       log_message "Error: Failed to decrypt file '$file'."
       exit 1
     fi

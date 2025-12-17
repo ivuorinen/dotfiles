@@ -40,7 +40,7 @@ set -gx PATH $PATH $HOME/.lmstudio/bin
 # vim: ft=fish ts=4 sw=4 et:
 
 # opencode
-fish_add_path /Users/ivuorinen/.opencode/bin
+fish_add_path $HOME/.opencode/bin
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.

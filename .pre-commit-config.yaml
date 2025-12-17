@@ -25,11 +25,9 @@ repos:
     hooks:
       - id: biome-check
         name: Biome Check
-        entry: yarn biome check --write
+        entry: yarn biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
-        types: [text]
-        files: \.(js|ts|jsx|tsx|json|md)$
-        pass_filenames: false
+        files: \.(js|ts|jsx|tsx|json|md|lua)$
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
@@ -51,15 +49,11 @@ repos:
     hooks:
       - id: actionlint
 
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 42.52.8
-    hooks:
-      - id: renovate-config-validator
-
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v2.3.1
     hooks:
       - id: stylua # or stylua-system / stylua-github
+        exclude: hammerspoon\.types\.lua$
 
   - repo: https://github.com/hugoh/pre-commit-fish.git
     rev: v1.2

@@ -126,8 +126,8 @@ parse_options()
 # Generate thumbnails recursively using find and filtering by MIME type
 generate_thumbnails()
 {
-  local source_dir=$1
-  local output_dir=$2
+  local source_dir="$1"
+  local output_dir="$2"
 
   # Ensure the output directory exists (create if necessary)
   if [ ! -d "$output_dir" ]; then

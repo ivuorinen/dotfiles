@@ -193,11 +193,12 @@ end)
 
 -- Paste 1Password secret with Meh + P
 f18:bind({}, 'p', function()
-  local output, status = hs.execute('op read "op://Svea/3hzhctmvovbwlgulv7mgy25rf4/login-input"', true)
+  local output, status =
+    hs.execute('op read "op://Svea/3hzhctmvovbwlgulv7mgy25rf4/login-input"', true)
   if status then
     hs.eventtap.keyStrokes(output:gsub('%s+$', '')) -- trim trailing whitespace
   else
-    hs.alert.show('1Password CLI error')
+    hs.alert.show '1Password CLI error'
   end
 end)
 

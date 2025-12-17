@@ -1,4 +1,4 @@
-# shellcheck disable=SC2148
+# shellcheck shell=bash
 # Everforest theme for fzf
 # Generated from template - do not edit manually
 
