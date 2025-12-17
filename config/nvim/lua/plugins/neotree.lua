@@ -55,7 +55,8 @@ return {
       {
         event = 'file_opened',
         handler = function(_)
-          require('neo-tree.command').execute { action = 'close' }
+          local c = require 'neo-tree.command'
+          c.execute { action = 'close' }
         end,
       },
     },

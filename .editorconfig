@@ -9,7 +9,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.fish]
-max_line_length = 80
+max_line_length = 120
 
 [*.md]
 max_line_length = 120
@@ -48,4 +48,7 @@ ignore = true
 
 [plan]
 trim_trailing_whitespace = false
+max_line_length = off
+
+[base/hammerspoon/hammerspoon.types.lua]
 max_line_length = off

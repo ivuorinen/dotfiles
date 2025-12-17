@@ -30,10 +30,9 @@ config_msg()
 {
   # if $1 is empty, return
   [ -z "$1" ] && return
-  [ -z "$2" ] && $2=""
 
   local msg_type="$1"
-  local msg_content="$2"
+  local msg_content="${2:-}"
   [[ "$VERBOSE" -eq 1 ]] && printf 'x-load-configs: %s %s\n' "$msg_type" "$msg_content"
   return 0
 }
@@ -50,7 +49,8 @@ source_config()
 {
   local config_file=$1
   if [ -f "$config_file" ]; then
-    eval "$config_file"
+    # shellcheck disable=SC1090
+    source "$config_file"
     config_msg "Sourced" "$config_file"
   else
     msg "Config file $config_file not found"

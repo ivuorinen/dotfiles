@@ -1,0 +1,52 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - aquasec
+  - cdgr
+  - cheatsheets
+  - CODEQUALITY
+  - DEVSKIM
+  - dscacheutil
+  - emptytrash
+  - flushcache
+  - getifaddr
+  - goenv
+  - irssi
+  - Ismo
+  - isodate
+  - KEYSFILE
+  - KEYSSOURCE
+  - killall
+  - lakka
+  - libexec
+  - Licence
+  - lmstudio
+  - localip
+  - locatedb
+  - LOGFILE
+  - luarocks
+  - mvdan
+  - myip
+  - onnimonni
+  - opencode
+  - optstring
+  - orbstack
+  - osascript
+  - phpenv
+  - psub
+  - pyenv
+  - SARIF
+  - shellcheck
+  - shfmt
+  - shivammathur
+  - spelllang
+  - updatedb
+  - vendordirs
+  - vimrc
+  - virtualenv
+  - Vuorinen
+  - zedit
+ignoreWords: []
+import: []

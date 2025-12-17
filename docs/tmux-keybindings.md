@@ -33,7 +33,7 @@ Leader: `<ctrl><space>`
     ?       List key bindings
     D       Choose and detach a client from a list
     E       Spread panes out evenly
-    L       last-session (via sesh) 
+    L       last-session (via sesh)
     M       Clear the marked pane
     N       sesh ui
     T       tms
@@ -87,4 +87,3 @@ Leader: `<ctrl><space>`
     S-Left  Move the visible part of the window left
     S-Right Move the visible part of the window right
 ```
-

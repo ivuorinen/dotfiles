@@ -16,10 +16,10 @@ module.exports = {
 
   excludeTypes: [],
 
-  renderTypeSection: function (label, commits) {
+  renderTypeSection: (label, commits) => {
     let text = `\n## ${label}\n\n`
 
-    commits.forEach(commit => {
+    commits.forEach((commit) => {
       const scope = commit.scope ? `**${commit.scope}:** ` : ''
       text += `- ${scope}${commit.subject}\n`
     })
@@ -27,10 +27,10 @@ module.exports = {
     return text
   },
 
-  renderChangelog: function (release, changes) {
+  renderChangelog: (release, changes) => {
     const now = new Date()
     const d = now.toISOString().substring(0, 10)
     const header = `# ${release} - ${d}\n`
-    return header + changes + '\n\n'
+    return `${header}${changes}\n\n`
   },
 }

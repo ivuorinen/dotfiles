@@ -56,4 +56,3 @@ disable_startup_command = true
 name = "Downloads"
 path = "~/Downloads"
 startup_command = "lsa"
-

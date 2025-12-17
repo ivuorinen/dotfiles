@@ -60,7 +60,7 @@ log_debug()
 filter_coderabbit_addressed_comments()
 {
   local input_data="$1"
-  local is_wrapped="$2"  # true for {comments: [...]}, false for [...]
+  local is_wrapped="$2" # true for {comments: [...]}, false for [...]
 
   local jq_filter='select(
     (.user.login | contains("coderabbit") | not) or
@@ -68,9 +68,9 @@ filter_coderabbit_addressed_comments()
   )'
 
   if [[ "$is_wrapped" == "true" ]]; then
-    echo "$input_data" | jq "{comments: [.comments[] | $jq_filter]}" 2>/dev/null || echo "$input_data"
+    echo "$input_data" | jq "{comments: [.comments[] | $jq_filter]}" 2> /dev/null || echo "$input_data"
   else
-    echo "$input_data" | jq "[.[] | $jq_filter]" 2>/dev/null || echo "$input_data"
+    echo "$input_data" | jq "[.[] | $jq_filter]" 2> /dev/null || echo "$input_data"
   fi
 }
 
@@ -79,13 +79,13 @@ fetch_and_filter_data()
 {
   local endpoint="$1"
   local data_name="$2"
-  local is_wrapped="$3"  # true/false
+  local is_wrapped="$3" # true/false
 
   local data
-  data=$(gh api "$endpoint" 2>/dev/null || echo "[]")
+  data=$(gh api "$endpoint" 2> /dev/null || echo "[]")
 
   if [[ "$is_wrapped" == "true" ]]; then
-    data=$(echo "$data" | jq '{comments: .}' 2>/dev/null || echo '{"comments":[]}')
+    data=$(echo "$data" | jq '{comments: .}' 2> /dev/null || echo '{"comments":[]}')
   fi
 
   data=$(filter_coderabbit_addressed_comments "$data" "$is_wrapped")
@@ -94,13 +94,11 @@ fetch_and_filter_data()
   [[ "$is_wrapped" == "true" ]] && count_field=".comments | length"
 
   local count
-  count=$(echo "$data" | jq -r "$count_field" 2>/dev/null || echo "0")
+  count=$(echo "$data" | jq -r "$count_field" 2> /dev/null || echo "0")
   log_debug "$data_name count: $count"
 
   echo "$data"
 }
-
-
 
 # Format file-specific comments grouped by review
 format_grouped_review_comments()
@@ -110,7 +108,7 @@ format_grouped_review_comments()
   local repo="$3"
 
   local count
-  count=$(echo "$review_comments" | jq -r 'length' 2>/dev/null || echo "0")
+  count=$(echo "$review_comments" | jq -r 'length' 2> /dev/null || echo "0")
 
   if [[ "$count" -eq 0 ]]; then
     echo "No file-specific comments found."
@@ -143,7 +141,7 @@ Review ID: \($review.id) - API: gh api /repos/'"$repo"'/pulls/1/reviews/\($revie
 "] | join("")) + "
 ---
 "
-  ' 2>/dev/null || {
+  ' 2> /dev/null || {
     log_debug "Error grouping review comments by review ID"
     echo "Error parsing grouped review comments."
   }
@@ -244,7 +242,7 @@ EOF
 **URL:** \(.url)
 **Number:** '"$pr_number"'
 **Repository:** '"$repo"'
-"' 2>/dev/null || {
+"' 2> /dev/null || {
     echo "**Error:** Could not parse PR information"
     return 1
   }

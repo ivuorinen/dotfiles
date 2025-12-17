@@ -52,17 +52,18 @@ fi
 for name in "$@"; do
 
   # Make a temporary file
-  # Test if we have BSD or GNU version of mktemp
-  if (strings "$(which mktemp)" | grep -q GNU); then
-    # We have the GNU version
-    tmp=$(mktemp)
+  # Try GNU syntax first, fall back to BSD
+  if tmp=$(mktemp 2> /dev/null) && [ -f "$tmp" ]; then
+    # GNU mktemp succeeded
+    :
   else
-    # We have the BSD version
+    # Try BSD syntax
     tmp=$(mktemp -t tmp)
   fi
 
   # Download the certificate
   if (! echo "" | openssl s_client -connect "$name:$port" > "$tmp" 2> /dev/null); then
+    rm -f "$tmp"
     echo "Failed to get cert from https://$name:$port/"
     exit 3
   fi
@@ -74,26 +75,26 @@ for name in "$@"; do
   rm -f "$tmp"
 
   # Convert the expiry date + todays date to seconds-past epoch
-  # Check if we have the BSD or the GNU version of date
-  if (strings "$(which date)" | grep -q GNU); then
-    # We have GNU this is easy
-    then=$(date --date "$date" +%s)
+  # Try GNU syntax first, fall back to BSD
+  if then=$(date --date "$date" +%s 2> /dev/null); then
+    # GNU date succeeded
+    :
   else
-    # We have BSD now it is getting complicated
+    # BSD date requires manual parsing
     year=$(echo "$date" | awk '{print $4}')
     month=$(echo "$date" | awk '{print $1}')
     day=$(echo "$date" | awk '{print $2}')
     hour=$(echo "$date" | awk '{print $3}' | awk -F: '{print $1}')
     minute=$(echo "$date" | awk '{print $3}' | awk -F: '{print $2}')
     second=$(echo "$date" | awk '{print $3}' | awk -F: '{print $3}')
-    then=$(date -v${year}y -v${month} -v${day}d -v${hour}H -v${minute}M -v${second}S -u +%s)
+    then=$(date -v"${year}"y -v"${month}" -v"${day}"d -v"${hour}"H -v"${minute}"M -v"${second}"S -u +%s)
   fi
 
   now=$(date +%s)
 
   # Day diff
   diff=$(("$then" - "$now"))
-  diff=$($diff / 86400)
+  diff=$((diff / 86400))
 
   # All done
   if [ "$days" = "1" ]; then

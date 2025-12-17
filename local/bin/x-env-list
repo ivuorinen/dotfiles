@@ -126,11 +126,11 @@ if [[ -f "$CONFIG_FILE" ]]; then
     PROTECTED_KEYS+=("$key")
   done <<< "$CUSTOM_KEYS"
 
-  SKIPPED+=("$(yq '.skipped_keys[]' "$CONFIG_FILE")")
-  while IFS= read -r key; do
+  mapfile -t SKIPPED < <(yq '.skipped_keys[]' "$CONFIG_FILE")
+  for key in "${SKIPPED[@]}"; do
     # Add to default_skipped_keys
     SKIPPED_KEYS+=("$key")
-  done <<< "$SKIPPED"
+  done
 
   CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
   while IFS= read -r group; do
@@ -159,6 +159,7 @@ is_protected()
       return 0
     fi
     # Wildcard match (protected_key contains '*')
+    # shellcheck disable=SC2053 # Intentional glob matching - protected_key contains wildcard patterns
     if [[ "$protected_key" == *"*"* ]] && [[ "$key" == $protected_key ]]; then
       return 0
     fi
@@ -198,6 +199,7 @@ is_skipped()
       return 0
     fi
     # Wildcard match (skipped_key contains '*')
+    # shellcheck disable=SC2053 # Intentional glob matching - skipped_key contains wildcard patterns
     if [[ "$skipped_key" == *"*"* ]] && [[ "$key" == $skipped_key ]]; then
       return 0
     fi
@@ -244,8 +246,15 @@ while IFS='=' read -r key value; do
     value="[protected value]"
   fi
 
-  # Update group data
-  if [[ ! " ${all_groups[*]} " =~ " $group " ]]; then
+  # Update group data - check if group already exists
+  group_exists=false
+  for existing_group in "${all_groups[@]}"; do
+    if [[ "$existing_group" == "$group" ]]; then
+      group_exists=true
+      break
+    fi
+  done
+  if [[ "$group_exists" == false ]]; then
     all_groups+=("$group")
   fi
 

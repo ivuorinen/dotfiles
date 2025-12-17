@@ -142,7 +142,7 @@ if [ ! -x "${CURL}" ]; then
   exit 1
 fi
 
-devices="$(printf "${devices}" | xargs -n1 | sort -u | uniq)\n"
+devices="$(printf "%s" "${devices}" | xargs -n1 | sort -u)"
 
 if [ -z "${devices}" ]; then
   __pushover_send_message

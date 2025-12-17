@@ -2673,7 +2673,7 @@ function canvas:delete(fadeOutTime) end
 --- optionally return false to indicate that you do not wish to accept the item being dragged.
 --- "exit"    - the user has moved the item out of the canvas; if the previous "enter" callback returned false, this
 --- message will also occur when the user finally releases the items being dragged.
---- "receive" - indicates that the user has released the dragged object while it is still within the canvas frame. 
+--- "receive" - indicates that the user has released the dragged object while it is still within the canvas frame.
 --- When your callback receives this message, you can optionally return false to indicate to the sending application
 --- that you do not want to accept the dragged item -- this may affect the animations provided by the sending
 --- application.
@@ -2810,7 +2810,7 @@ function canvas:minimumTextSize(index, text) end
 --- element.  The message will be "mouseDown".
 --- trackMouseUp - indicates that a callback should be invoked when a mouse button has been released over the canvas
 --- element.  The message will be "mouseUp".
---- trackMouseEnterExit - indicates that a callback should be invoked when the mouse pointer enters or exits the 
+--- trackMouseEnterExit - indicates that a callback should be invoked when the mouse pointer enters or exits the
 --- canvas element.  The message will be "mouseEnter" or "mouseExit".
 --- trackMouseMove - indicates that a callback should be invoked when the mouse pointer moves within the canvas
 --- element.  The message will be "mouseMove".
@@ -4197,7 +4197,7 @@ hs.drawing.windowLevels = nil
 --- hs.drawing
 --- for text drawing objects.
 ---
---- Note: This method returns the default font, size, color, and paragraphStyle used by hs.drawing for text objects. 
+--- Note: This method returns the default font, size, color, and paragraphStyle used by hs.drawing for text objects.
 --- If you modify a drawing object's defaults with hs.drawing:setColor , hs.drawing:setTextFont , or
 --- hs.drawing:setTextSize , the changes will not be reflected by this function.
 ---@return table
@@ -4662,7 +4662,7 @@ hs.drawing.color.ansiTerminalColors = nil
 ---@type table
 hs.drawing.color.hammerspoon = nil
 
---- A collection of colors representing the X11 color names as defined at 
+--- A collection of colors representing the X11 color names as defined at
 --- https://en.wikipedia.org/wiki/Web_colors#X11_color_names (names in lowercase)
 ---@type any
 hs.drawing.color.x11 = nil
@@ -7022,7 +7022,7 @@ function hs.http.doAsyncRequest(url, method, data, headers, callback, cachePolic
 --- use the asynchronous functions.
 --- If you attempt to connect to a local Hammerspoon server created with hs.httpserver , then Hammerspoon will block
 --- until the connection times out (60 seconds), return a failed result due to the timeout, and then the hs.httpserver
---- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost). 
+--- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost).
 --- Use hs.http.doAsyncRequest to avoid this.
 --- If the Content-Type response header begins text/ then the response body return value is a UTF8 string. Any other
 --- content type passes the response body, unaltered, as a stream of bytes.
@@ -7054,7 +7054,7 @@ function hs.http.encodeForQuery(string) end
 --- are encouraged to use the asynchronous functions
 --- If you attempt to connect to a local Hammerspoon server created with hs.httpserver , then Hammerspoon will block
 --- until the connection times out (60 seconds), return a failed result due to the timeout, and then the hs.httpserver
---- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost). 
+--- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost).
 --- Use hs.http.asyncGet to avoid this.
 ---@param url string
 ---@param headers table|nil
@@ -7072,7 +7072,7 @@ function hs.http.get(url, headers) end
 --- are encouraged to use the asynchronous functions
 --- If you attempt to connect to a local Hammerspoon server created with hs.httpserver , then Hammerspoon will block
 --- until the connection times out (60 seconds), return a failed result due to the timeout, and then the hs.httpserver
---- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost). 
+--- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost).
 --- Use hs.http.asyncPost to avoid this.
 ---@param url string
 ---@param data string|nil
@@ -7091,7 +7091,7 @@ function hs.http.post(url, data, headers) end
 --- are encouraged to use the asynchronous functions
 --- If you attempt to connect to a local Hammerspoon server created with hs.httpserver , then Hammerspoon will block
 --- until the connection times out (60 seconds), return a failed result due to the timeout, and then the hs.httpserver
---- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost). 
+--- callback function will be invoked (so any side effects of the function will occur, but it's results will be lost).
 --- Use hs.http.asyncPost to avoid this.
 ---@param url string
 ---@param data string|nil
@@ -7374,7 +7374,7 @@ function hs.httpserver.hsminweb.new(documentRoot) end
 --- Get or set the access-list table for the hsminweb web server
 ---
 --- Note: The access-list feature works by comparing the request headers against a list of tests which either accept or
---- reject the request.  If no access list is set (i.e. it is assigned a value of nil ), then all requests are served. 
+--- reject the request.  If no access list is set (i.e. it is assigned a value of nil ), then all requests are served.
 --- If a table is passed into this method, then any request which is not explicitly accepted by one of the tests
 --- provided is rejected (i.e. there is an implicit "reject" at the end of the list).
 --- The access-list table is a list of tests which are evaluated in order.  The first test which matches a given
@@ -7919,7 +7919,7 @@ function hs.httpserver.hsminweb.cgilua.urlcode.insertfield(table, key, value) en
 --- Parse the query string and store the key-value pairs in the provided table.
 ---
 --- Note: The specification allows for the same key to be assigned multiple values in an encoded string, but does not
---- specify the behavior; by convention, web servers assign these multiple values to the same key in an array (table). 
+--- specify the behavior; by convention, web servers assign these multiple values to the same key in an array (table).
 --- This function follows that convention.  This is most commonly used by forms which allow selecting multiple options
 --- via check boxes or in a selection list.
 --- This function uses cgilua.urlcode.insertfield to build the key-value table.
@@ -10225,7 +10225,7 @@ function echorequest:seeAllUnexpectedPackets(state) end
 --- Sends a single ICMP Echo Request packet.
 ---
 --- Note: By convention, unless you are trying to test for specific network fragmentation or congestion problems, ICMP
---- Echo Requests are generally 64 bytes in length (this includes the 8 byte header, giving 56 bytes of payload data). 
+--- Echo Requests are generally 64 bytes in length (this includes the 8 byte header, giving 56 bytes of payload data).
 --- If you do not specify a payload, a default payload which will result in a packet size of 64 bytes is constructed.
 ---@param payload string|nil
 ---@return echoRequestObject|boolean|nil
@@ -15169,7 +15169,7 @@ function watcher:stop() end
 ---@class hs.utf8
 hs.utf8 = {}
 
---- A collection of UTF-8 characters already converted from codepoint and available as convenient key-value pairs. 
+--- A collection of UTF-8 characters already converted from codepoint and available as convenient key-value pairs.
 --- UTF-8 printable versions of common Apple and OS X special keys are predefined and others can be added with
 --- hs.utf8.registerCodepoint(label, codepoint)
 --- for your own use.
@@ -15238,7 +15238,7 @@ function hs.utf8.hexDump(inputString, count) end
 --- hs.utf8.registeredKeys[label]
 --- for convenience and readability.
 ---
---- Note: If a codepoint label was previously registered, this will overwrite the previous value with a new one. 
+--- Note: If a codepoint label was previously registered, this will overwrite the previous value with a new one.
 --- Because many of the special keys you may want to register have different variants, this allows you to easily modify
 --- the existing predefined defaults to suite your preferences.
 --- The return value is merely syntactic sugar and you do not need to save it locally; it can be safely ignored --
@@ -15585,13 +15585,13 @@ function hs.webview.newBrowser(rect, preferencesTable, userContentController) en
 ---@return webviewObject
 function webview:allowGestures(value) end
 
---- Get or set whether or not the webview will respond to magnification gestures from a trackpad or magic mouse. 
+--- Get or set whether or not the webview will respond to magnification gestures from a trackpad or magic mouse.
 --- Default is false.
 ---@param value any
 ---@return webviewObject
 function webview:allowMagnificationGestures(value) end
 
---- Get or set whether or not the webview will respond to the navigation gestures from a trackpad or magic mouse. 
+--- Get or set whether or not the webview will respond to the navigation gestures from a trackpad or magic mouse.
 --- Default is false.
 ---@param value any
 ---@return webviewObject
@@ -16455,7 +16455,7 @@ function usercontent:removeAllScripts() end
 --- } catch(err) {
 --- console.log('The controller does not exist yet');
 --- }
---- Where name matches the name specified in the constructor and message-object is the object to post to the function. 
+--- Where name matches the name specified in the constructor and message-object is the object to post to the function.
 --- This object can be a number, string, date, array, dictionary(table), or nil.
 ---@param fn function
 ---@return usercontentControllerObject

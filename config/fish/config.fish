@@ -26,7 +26,7 @@ if status is-interactive
     # type -q fnm; and fnm env --use-on-cd --shell fish | source
     type -q load_nvm; and load_nvm >/dev/stderr
 
-    # Intialize other tools if available
+    # Initialize other tools if available
     type -q zoxide; and zoxide init fish | source
 
     # Start tmux if not already running and not in SSH
@@ -40,7 +40,7 @@ set -gx PATH $PATH $HOME/.lmstudio/bin
 # vim: ft=fish ts=4 sw=4 et:
 
 # opencode
-fish_add_path /Users/ivuorinen/.opencode/bin
+fish_add_path $HOME/.opencode/bin
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
