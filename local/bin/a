@@ -105,6 +105,7 @@ fetch_keys_if_missing()
     mkdir -p "$(dirname "$KEYS_FILE")"
 
     if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
+      rm -f "$KEYS_FILE" 2>/dev/null || true
       log_message "Error: Failed to fetch keys from $KEYS_SOURCE"
       exit 1
     fi

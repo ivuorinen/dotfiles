@@ -37,6 +37,7 @@ if [[ ! -f "$KEYS_FILE" ]]; then
 
   # Fetch the keys and save to the file
   if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
+    rm -f "$KEYS_FILE" 2>/dev/null || true
     echo "Error: Failed to fetch keys from $KEYS_SOURCE"
     exit 1
   fi

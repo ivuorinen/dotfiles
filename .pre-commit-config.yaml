@@ -27,7 +27,7 @@ repos:
         name: Biome Check
         entry: yarn biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
-        files: \.(js|ts|jsx|tsx|json|md|lua)$
+        files: \.(js|ts|jsx|tsx|json|md)$
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1

@@ -16,7 +16,8 @@ SHOW_SKIPPED_LINTERS: false # Show skipped linters in MegaLinter log
 TYPESCRIPT_DEFAULT_STYLE: prettier # Default style for TypeScript
 DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
-  - JAVASCRIPT_ES
+  - JAVASCRIPT_ES # using biome
+  - JAVASCRIPT_PRETTIER # using biome
 YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.json
 JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
