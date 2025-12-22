@@ -80,33 +80,6 @@ return {
       vim.cmd.colorscheme 'catppuccin'
     end,
   },
-  -- {
-  --   'neanias/everforest-nvim',
-  --   version = false,
-  --   lazy = false,
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   config = function()
-  --     require('everforest').setup {
-  --       background = 'medium', -- hard, medium, soft
-  --       transparent_background_level = 2, -- 0, 1, 2
-  --       sign_column_background = 'grey', -- none, grey
-  --       disable_italic_comments = false,
-  --       diagnostic_virtual_text = 'coloured', -- coloured, gray, underline, none
-  --       diagnostic_line_highlight = true,
-  --       diagnostic_line_highlight_background = 'dimmed', -- dimmed, normal
-  --       diagnostic_text_highlight = true,
-  --       ui_contrast = 'low', -- high, low
-  --       italics = true,
-  --       spell_foreground = true,
-  --       show_eob = true,
-  --       colours_override = function() end,
-  --       float_style = 'dim',
-  --       on_highlights = function(_, _) end,
-  --       dim_inactive_windows = true,
-  --       inlay_hints_background = 'dimmed',
-  --     }
-  --   end,
-  -- },
 
   -- Automatic dark mode
   -- https://github.com/f-person/auto-dark-mode.nvim
@@ -139,39 +112,32 @@ return {
     },
   },
 
-  -- Remove all background colors to make nvim transparent
-  -- https://github.com/xiyaowong/nvim-transparent
-  -- {
-  --   'xiyaowong/nvim-transparent',
-  --   lazy = false,
-  --   enabled = true,
-  --   config = function()
-  --     local t = require 'transparent'
-  --     t.setup {
-  --       extra_groups = {
-  --         'NormalNC',
-  --         'NormalFloat',
-  --         'EndOfBuffer',
-  --         'FloatTitle',
-  --         'FloatBorder',
-  --         'NotifyDEBUGBorder',
-  --         'NotifyERRORBorder',
-  --         'NotifyINFOBorder',
-  --         'NotifyINFOBorder73',
-  --         'NotifyINFOBorder75',
-  --         'NotifyINFOBorder101',
-  --         'NotifyTRACEBorder',
-  --         'NotifyWARNBorder',
-  --         'NotifyBackground',
-  --         'TelescopeBorder',
-  --         'TelescopePromptBorder',
-  --         'TelescopeResultsBorder',
-  --         'TelescopePreviewBorder',
-  --       },
-  --     }
-  --     t.clear_prefix 'NeoTree'
-  --   end,
-  -- },
+  {
+    'dmtrKovalenko/fff.nvim',
+    build = function()
+      -- this will download prebuild binary or try to use existing rustup toolchain to build from source
+      -- (if you are using lazy you can use gb for rebuilding a plugin if needed)
+      require('fff.download').download_or_build_binary()
+    end,
+    -- if you are using nixos
+    -- build = "nix run .#release",
+    opts = { -- (optional)
+      debug = {
+        enabled = true, -- we expect your collaboration at least during the beta
+        show_scores = true, -- to help us optimize the scoring system, feel free to share your scores!
+      },
+    },
+    -- No need to lazy-load with lazy.nvim.
+    -- This plugin initializes itself lazily.
+    lazy = false,
+    keys = {
+      {
+        'ff', -- try it if you didn't it is a banger keybinding for a picker
+        function() require('fff').find_files() end,
+        desc = 'FFFind files',
+      },
+    },
+  },
 
   -- Display a character as the colorcolumn
   -- https://github.com/lukas-reineke/virt-column.nvim

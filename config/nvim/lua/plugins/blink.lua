@@ -3,7 +3,7 @@ return {
   -- https:/github.com/saghen/blink.cmp
   {
     'saghen/blink.cmp',
-    version = '1.*',
+    version = '*',
     lazy = false, -- lazy loading handled internally
     dependencies = {
       -- Compatibility layer for using nvim-cmp sources on blink.cmp
@@ -16,15 +16,6 @@ return {
           -- make sure to set opts so that lazy.nvim calls blink.compat's setup
           impersonate_nvim_cmp = true,
         },
-      },
-
-      { 'L3MON4D3/LuaSnip', version = 'v2.*', build = 'make install_jsregexp' },
-
-      -- Set of preconfigured snippets for different languages.
-      -- https://github.com/rafamadriz/friendly-snippets
-      {
-        'rafamadriz/friendly-snippets',
-        config = function() require('luasnip.loaders.from_vscode').lazy_load() end,
       },
 
       -- Lua plugin to turn github copilot into a cmp source
@@ -54,7 +45,6 @@ return {
     },
     ---@module 'blink.cmp'
     opts = {
-      snippets = { preset = 'luasnip' },
       -- 'default' for mappings similar to built-in completion
       -- 'super-tab' for mappings similar to vscode (tab to accept,
       -- arrow keys to navigate)

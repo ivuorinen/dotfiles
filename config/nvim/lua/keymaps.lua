@@ -32,24 +32,6 @@ K.nl('o', function() require('snacks').gitbrowse() end, 'Open repo in browser')
 K.n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 K.n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
--- ── ToggleTerm ──────────────────────────────────────────────────────
-K.d('<F1>', 'n', ':FloatermToggle<CR>', 'Toggle Floaterm')
-K.d('<F1>', 'i', '<Esc>:FloatermToggle<CR>', 'Toggle Floaterm')
-K.d('<F1>', 't', '<C-\\><C-n>:FloatermToggle<CR>', 'Toggle Floaterm')
-
--- ── Test operations ─────────────────────────────────────────────────
-K.nl('an', ':silent TestNearest<CR>', 'Test Nearest')
-K.nl('af', ':silent TestFile<CR>', 'Test File')
-K.nl('as', ':silent TestSuite<CR>', 'Test Suite')
-K.nl('al', ':silent TestLast<CR>', 'Test Last')
-K.nl('av', ':silent TestVisit<CR>', 'Test Visit')
-
--- ── PHPActor Operations ─────────────────────────────────────────────
-K.nl('apm', ':PhpactorContextMenu<cr>', 'PHPactor: Context Menu')
-K.nl('apn', ':PhpactorClassNew<cr>', 'PHPactor: Class New')
-K.nl('aps', ':PhpactorClassSearch<cr>', 'PHPactor: Class Search')
-K.nl('apt', ':PhpactorTransform<cr>', 'PHPactor: Transform')
-
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
@@ -100,32 +82,21 @@ K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 -- Convention: All mappings start with 's' followed by the operation
 -- unless it's a generic operation like searching or finding buffers
 
-local fuzzy_search = function()
-  require('telescope.builtin').find_files(require('telescope.themes').get_dropdown {
-    winblend = 20,
-    previewer = true,
-  })
-end
-
 local lazy_plugins = function()
   return require('telescope').extensions.lazy_plugins.lazy_plugins()
 end
 
-K.nl('f', ':Telescope find_files<cr>', 'Find Files')
+K.nl('f', function() require('fff').find_files() end, 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
-K.nl('/', function() fuzzy_search() end, 'Fuzzily search in current buffer')
 
-K.nl('sc', ':Telescope commands<cr>', 'Commands')
 K.nl('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
-K.nl('sg', ':Telescope live_grep<cr>', 'Search by Grep')
+K.nl('sf', ':Telescope grep_string<cr>', 'Grep String')
 K.nl('sh', ':Telescope help_tags<cr>', 'Help tags')
 K.nl('sk', ':Telescope keymaps<cr>', 'Search Keymaps')
-K.nl('sl', ':Telescope luasnip<CR>', 'Search LuaSnip')
 K.nl('so', ':Telescope oldfiles<CR>', 'Old Files')
 K.nl('sp', function() lazy_plugins() end, 'Lazy Plugins')
 K.nl('sq', ':Telescope quickfix<cr>', 'Quickfix')
 K.nl('ss', ':Telescope treesitter<cr>', 'Treesitter')
-K.nl('sw', ':Telescope grep_string<cr>', 'Grep String')
 K.nl('sx', ':Telescope import<cr>', 'Telescope: Import')
 
 -- ── Trouble operations ──────────────────────────────────────────────
@@ -155,14 +126,5 @@ K.nl('qQ', function()
     vim.cmd 'q!'
   end
 end, 'Force quit without saving')
-
--- ── Flash.nvim keymaps ──────────────────────────────────────────────
-local nxo = { 'n', 'x', 'o' }
-local fj = function() return require('flash').jump() end
-local ft = function() return require('flash').treesitter() end
-local fx = function() return require('flash').toggle() end
-K.d('zk', nxo, fj, { desc = 'Flash' })
-K.d('Zk', nxo, ft, { desc = 'Flash Treesitter' })
-K.d('<m-s>', 'c', fx, { desc = 'Toggle Flash Search' })
 
 -- That concludes the keymaps section of the config.

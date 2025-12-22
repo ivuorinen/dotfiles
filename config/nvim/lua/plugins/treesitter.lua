@@ -18,17 +18,11 @@ return {
 
     -- Add languages to be installed here that you want installed for treesitter
     ensure_installed = {
-      'bash',
-      'json',
-      'jsonc',
       'lua',
       'luadoc',
       'markdown',
       'markdown_inline',
-      'query',
       'regex',
-      'vim',
-      'vimdoc',
       'yaml',
     },
 
@@ -54,9 +48,6 @@ return {
         if require('nvim-treesitter.parsers').has_parser() then
           vim.opt.foldmethod = 'expr'
           vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
-        else
-          -- Otherwise, set foldmethod to syntax
-          vim.opt.foldmethod = 'syntax'
         end
 
         vim.opt.foldlevel = 9 -- Open all folds by default
