@@ -23,5 +23,7 @@ github.com/junegunn/fzf@latest
 golang.org/x/tools/gopls@latest
 // A language for writing HTML user interfaces in Go.
 github.com/a-h/templ/cmd/templ@latest
+// A tool for glamorous shell scripts 🎀
+github.com/charmbracelet/gum@latest
 // A terminal session manager
 github.com/joshmedeski/sesh/v2@latest
