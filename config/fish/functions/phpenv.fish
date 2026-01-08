@@ -99,7 +99,7 @@ end
 
 function __phpenv_find_version_file -a phpenv_filename
     set -l phpenv_dir (pwd)
-    while test "$phpenv_dir" != /
+    while test "$phpenv_dir" != "/"
         if test -f "$phpenv_dir/$phpenv_filename"
             echo "$phpenv_dir/$phpenv_filename"
             return
@@ -126,13 +126,13 @@ function __phpenv_parse_composer_version
     end
 
     set -l phpenv_platform_php (jq -r '.config.platform.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != null
+    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != "null"
         echo $phpenv_platform_php
         return
     end
 
     set -l phpenv_require_php (jq -r '.require.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != null
+    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != "null"
         __phpenv_parse_semver_constraint $phpenv_require_php
         return
     end
@@ -189,7 +189,7 @@ set -g __phpenv_version_cache_time 0
 
 function __phpenv_get_version_info
     set -l current_time (date +%s)
-    set -l cache_duration 300 # 5 minutes
+    set -l cache_duration 300  # 5 minutes
 
     # Return cached version if still valid
     if test -n "$__phpenv_version_cache"
@@ -224,6 +224,8 @@ function __phpenv_get_cellar_path
         set -g __phpenv_cellar_cache /opt/homebrew/Cellar
     else if test -d /usr/local/Cellar
         set -g __phpenv_cellar_cache /usr/local/Cellar
+    else if test -d /home/linuxbrew/.linuxbrew/Cellar
+        set -g __phpenv_cellar_cache /home/linuxbrew/.linuxbrew/Cellar
     else
         set -g __phpenv_cellar_cache ""
     end
@@ -236,12 +238,15 @@ function __phpenv_ensure_taps
         return 1
     end
 
-    # Add taps if not already added
-    if not brew tap | grep -q shivammathur/php 2>/dev/null
-        brew tap shivammathur/php 2>/dev/null
-    end
-    if not brew tap | grep -q shivammathur/extensions 2>/dev/null
-        brew tap shivammathur/extensions 2>/dev/null
+    # Check and add required taps only if missing
+    set -l required_taps "shivammathur/php" "shivammathur/extensions"
+    for tap in $required_taps
+        if not brew tap | grep -q $tap 2>/dev/null
+            if not brew tap $tap 2>/dev/null
+                echo "Warning: Failed to add tap $tap" >&2
+                return 1
+            end
+        end
     end
 end
 
@@ -267,7 +272,7 @@ function __phpenv_list_installed
                     continue
                 end
 
-                if test "$phpenv_basename" = php
+                if test "$phpenv_basename" = "php"
                     set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
                     set -a phpenv_versions $phpenv_latest
                 else if echo $phpenv_basename | grep -qE '^php@[0-9]+\.[0-9]+$'
@@ -284,9 +289,9 @@ end
 function __phpenv_resolve_version_alias -a phpenv_version
     switch $phpenv_version
         case latest
-            __phpenv_parse_version_field latest "8.4"
+            __phpenv_parse_version_field "latest" "8.4"
         case nightly
-            __phpenv_parse_version_field nightly "8.5"
+            __phpenv_parse_version_field "nightly" "8.5"
         case '8.x'
             __phpenv_parse_version_field "8.x" "8.4"
         case '7.x'
@@ -302,7 +307,7 @@ function __phpenv_get_formula_name -a phpenv_version
     set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
 
     if test "$phpenv_version" = "$phpenv_latest_version"
-        echo shivammathur/php/php
+        echo "shivammathur/php/php"
     else
         echo "shivammathur/php/php@$phpenv_version"
     end
@@ -475,7 +480,7 @@ function __phpenv_use
     set -l phpenv_version $argv[1]
 
     # Handle special case: restore system PHP
-    if test "$phpenv_version" = system
+    if test "$phpenv_version" = "system"
         __phpenv_restore_system_path
         echo "Restored system PHP"
         return 0
@@ -492,7 +497,7 @@ function __phpenv_use
     end
 
     if not __phpenv_is_version_installed $phpenv_version
-        if test "$(__phpenv_config_get auto-install)" = true
+        if test "$(__phpenv_config_get auto-install)" = "true"
             __phpenv_install $phpenv_version
         else
             echo "PHP $phpenv_version is not installed. Install with: phpenv install $phpenv_version"
@@ -514,7 +519,7 @@ function __phpenv_local -a phpenv_version
         return 1
     end
 
-    echo $phpenv_version >.php-version
+    echo $phpenv_version > .php-version
     echo "Set local PHP version to $phpenv_version"
 end
 
@@ -569,8 +574,7 @@ function __phpenv_get_tap_versions
         return
     end
 
-    set -l phpenv_formulas (brew tap-info shivammathur/php --json 2>/dev/null | \
-        jq -r '.[]|(.formula_names[]?)' 2>/dev/null)
+    set -l phpenv_formulas (__phpenv_get_tap_formulas "shivammathur/php")
 
     if test -z "$phpenv_formulas"
         return
@@ -587,7 +591,7 @@ function __phpenv_get_tap_versions
             continue
         end
 
-        if test "$phpenv_clean_name" = php
+        if test "$phpenv_clean_name" = "php"
             set -a phpenv_versions "$phpenv_latest_version (latest)"
         else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
             set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
@@ -672,39 +676,51 @@ function __phpenv_config -a phpenv_action phpenv_key phpenv_value
     end
 end
 
+# Helper function to get environment variable value
+function __phpenv_get_env_var -a key
+    switch $key
+        case global-version
+            echo $PHPENV_GLOBAL_VERSION
+        case auto-install
+            echo $PHPENV_AUTO_INSTALL
+        case auto-install-extensions
+            echo $PHPENV_AUTO_INSTALL_EXTENSIONS
+        case auto-switch
+            echo $PHPENV_AUTO_SWITCH
+        case default-extensions
+            echo $PHPENV_DEFAULT_EXTENSIONS
+    end
+end
+
+# Helper function to map config key to env var name
+function __phpenv_env_var_name -a key
+    switch $key
+        case global-version
+            echo PHPENV_GLOBAL_VERSION
+        case auto-install
+            echo PHPENV_AUTO_INSTALL
+        case auto-install-extensions
+            echo PHPENV_AUTO_INSTALL_EXTENSIONS
+        case auto-switch
+            echo PHPENV_AUTO_SWITCH
+        case default-extensions
+            echo PHPENV_DEFAULT_EXTENSIONS
+        case '*'
+            echo ""
+    end
+end
+
 function __phpenv_config_get -a phpenv_key
+    set -l phpenv_env_var (__phpenv_env_var_name $phpenv_key)
     set -l phpenv_value
     set -l phpenv_source
 
-    switch $phpenv_key
-        case global-version
-            if test -n "$PHPENV_GLOBAL_VERSION"
-                set phpenv_value $PHPENV_GLOBAL_VERSION
-                set phpenv_source "fish universal variable"
-            end
-        case auto-install
-            if test -n "$PHPENV_AUTO_INSTALL"
-                set phpenv_value $PHPENV_AUTO_INSTALL
-                set phpenv_source "fish universal variable"
-            end
-        case auto-install-extensions
-            if test -n "$PHPENV_AUTO_INSTALL_EXTENSIONS"
-                set phpenv_value $PHPENV_AUTO_INSTALL_EXTENSIONS
-                set phpenv_source "fish universal variable"
-            end
-        case auto-switch
-            if test -n "$PHPENV_AUTO_SWITCH"
-                set phpenv_value $PHPENV_AUTO_SWITCH
-                set phpenv_source "fish universal variable"
-            end
-        case default-extensions
-            if test -n "$PHPENV_DEFAULT_EXTENSIONS"
-                set phpenv_value $PHPENV_DEFAULT_EXTENSIONS
-                set phpenv_source "fish universal variable"
-            end
-    end
-
-    if test -z "$phpenv_value"
+    # Check if environment variable is set
+    if test -n "$phpenv_env_var"; and set -q $phpenv_env_var
+        set phpenv_value (eval echo \$$phpenv_env_var)
+        set phpenv_source "fish universal variable"
+    else
+        # Check config files if environment variable is unset
         for phpenv_config_file in ~/.config/fish/conf.d/phpenv.fish ~/.config/phpenv/config ~/.phpenv.fish
             if test -f $phpenv_config_file
                 set -l phpenv_file_value (grep "^$phpenv_key=" $phpenv_config_file | cut -d= -f2- | head -1)
@@ -717,7 +733,7 @@ function __phpenv_config_get -a phpenv_key
         end
     end
 
-    if test "$argv[2]" = --verbose
+    if test "$argv[2]" = "--verbose"
         if test -n "$phpenv_value"
             echo "$phpenv_key = $phpenv_value (from $phpenv_source)"
         else
@@ -867,19 +883,25 @@ function __phpenv_extensions_uninstall -a phpenv_extension
     end
 end
 
-function __phpenv_get_available_extensions
+# Unified helper for getting tap formulas
+function __phpenv_get_tap_formulas -a tap_name
     if not command -q brew
         return 1
     end
 
-    brew tap-info shivammathur/extensions --json 2>/dev/null | jq -r '.[]|(.formula_names[]?)' 2>/dev/null
+    brew tap-info $tap_name --json 2>/dev/null | \
+        jq -r '.[]|(.formula_names[]?)' 2>/dev/null
+end
+
+function __phpenv_get_available_extensions
+    __phpenv_get_tap_formulas "shivammathur/extensions"
 end
 
 function __phpenv_extension_available -a phpenv_extension phpenv_version
     set -l phpenv_available_extensions (__phpenv_get_available_extensions)
 
     if test -z "$phpenv_available_extensions"
-        return 0 # Assume available if can't check
+        return 0  # Assume available if can't check
     end
 
     for phpenv_ext_formula in $phpenv_available_extensions
@@ -935,7 +957,7 @@ function __phpenv_extensions_list
         for phpenv_ext_dir in $phpenv_cellar_path/*@$phpenv_version
             if test -d $phpenv_ext_dir
                 set -l phpenv_ext_name (basename $phpenv_ext_dir | sed "s/@$phpenv_version//")
-                if test "$phpenv_ext_name" != php
+                if test "$phpenv_ext_name" != "php"
                     echo "  $phpenv_ext_name"
                 end
             end
@@ -982,7 +1004,7 @@ function __phpenv_auto_switch --on-variable PWD
     end
 
     set -l phpenv_auto_switch (__phpenv_config_get auto-switch)
-    if test "$phpenv_auto_switch" = false
+    if test "$phpenv_auto_switch" = "false"
         return 0
     end
 
@@ -1005,7 +1027,7 @@ function __phpenv_auto_switch --on-variable PWD
         set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
     else
         set -l phpenv_auto_install (__phpenv_config_get auto-install)
-        if test "$phpenv_auto_install" = true
+        if test "$phpenv_auto_install" = "true"
             echo "Auto-installing PHP $phpenv_new_version..."
             if phpenv install "$phpenv_new_version"
                 set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
@@ -1051,7 +1073,7 @@ function __phpenv_help
 end
 
 function __phpenv_validate_boolean -a phpenv_value
-    test "$phpenv_value" = true -o "$phpenv_value" = false
+    test "$phpenv_value" = "true" -o "$phpenv_value" = "false"
 end
 
 function __phpenv_validate_version -a phpenv_version

@@ -16,7 +16,7 @@ if not set -q PHPENV_AUTO_SWITCH
 end
 
 if not set -q PHPENV_DEFAULT_EXTENSIONS
-    set -g PHPENV_DEFAULT_EXTENSIONS opcache
+    set -g PHPENV_DEFAULT_EXTENSIONS "opcache"
 end
 
 # Initialize PATH on shell startup if global version is set (less aggressive)
