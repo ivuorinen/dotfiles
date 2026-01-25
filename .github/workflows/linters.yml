@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Yarn Lock Changes
         uses: Simek/yarn-lock-changes@61d1a0595070b79c1abdc8e1e5a5f5d98b18918c # v0.12.2
@@ -35,4 +35,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run PR Lint
-        uses: ivuorinen/actions/pr-lint@cbfddb24339ba1e0129cc50ab5a0045131b8a2ba # v2026.01.13
+        uses: ivuorinen/actions/pr-lint@f98ae7cd7d0feb1f9d6b01de0addbb11414cfc73 # v2026.01.21
