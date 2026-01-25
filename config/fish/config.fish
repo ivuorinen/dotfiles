@@ -30,7 +30,7 @@ if status is-interactive
     type -q zoxide; and zoxide init fish | source
 
     # Start tmux if not already running and not in SSH
-    open-tmux # defined in functions/open-tmux.fish
+    #open-tmux # defined in functions/open-tmux.fish
 end
 
 # Added by LM Studio CLI (lms)

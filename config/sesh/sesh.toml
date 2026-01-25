@@ -33,10 +33,6 @@ name = "dotfiles"
 path = "~/.dotfiles"
 
 [[session]]
-name = "neovim config"
-path = "~/.dotfiles/config/nvim"
-
-[[session]]
 name = "sesh config"
 path = "~/.dotfiles/config/sesh"
 startup_command = "nvim sesh.toml"
