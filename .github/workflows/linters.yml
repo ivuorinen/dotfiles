@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Yarn Lock Changes
-        uses: Simek/yarn-lock-changes@61d1a0595070b79c1abdc8e1e5a5f5d98b18918c # v0.12.2
+        uses: Simek/yarn-lock-changes@c7543145aaafdd8fc925cea5d85b2bd5a73091f8 # v0.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
