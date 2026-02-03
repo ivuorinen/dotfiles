@@ -3,6 +3,13 @@
 
 # Set default configuration using session variables for most settings
 # Only PHPENV_GLOBAL_VERSION needs to persist across shells
+
+# Provider override (empty = auto-detect)
+# Valid values: homebrew, apt
+if not set -q PHPENV_PROVIDER
+    set -g PHPENV_PROVIDER ""
+end
+
 if not set -q PHPENV_AUTO_INSTALL
     set -g PHPENV_AUTO_INSTALL false
 end

@@ -3,7 +3,11 @@
 
 function phpenv -d "PHP version manager for Fish Shell"
     if not command -q jq
-        echo "Error: jq is required but not installed. Install with: brew install jq" >&2
+        set -l install_cmd "brew install jq"
+        if command -q apt-get
+            set install_cmd "sudo apt-get install jq"
+        end
+        echo "Error: jq is required but not installed. Install with: $install_cmd" >&2
         return 1
     end
 
@@ -175,8 +179,11 @@ function __phpenv_parse_semver_constraint -a phpenv_constraint
         case '5.*' '5.x.*'
             echo "5.6"
         case '*'
-            if echo $phpenv_constraint | grep -q '[0-9]\+\.[0-9]\+'
-                echo $phpenv_constraint | sed 's/[^0-9\.]//g' | cut -d. -f1,2
+            # Extract first major.minor match using proper string matching
+            # This handles complex constraints like ">=8.1 <9.0" correctly
+            set -l version_match (string match -r '[0-9]+\.[0-9]+' $phpenv_constraint)
+            if test -n "$version_match"
+                echo $version_match[1]
             else
                 echo $phpenv_latest
             end
@@ -214,26 +221,99 @@ end
 # Cache cellar path as it doesn't change
 set -g __phpenv_cellar_cache
 
-function __phpenv_get_cellar_path
-    if test -n "$__phpenv_cellar_cache"
-        echo $__phpenv_cellar_cache
-        return
-    end
-
-    if test -d /opt/homebrew/Cellar
-        set -g __phpenv_cellar_cache /opt/homebrew/Cellar
-    else if test -d /usr/local/Cellar
-        set -g __phpenv_cellar_cache /usr/local/Cellar
-    else if test -d /home/linuxbrew/.linuxbrew/Cellar
-        set -g __phpenv_cellar_cache /home/linuxbrew/.linuxbrew/Cellar
+# Provider infrastructure
+# Returns the XDG-compliant shim directory path
+function __phpenv_get_shim_dir
+    if set -q XDG_DATA_HOME; and test -n "$XDG_DATA_HOME"
+        echo "$XDG_DATA_HOME/phpenv/shims"
+    else if test -d ~/.local/share
+        echo ~/.local/share/phpenv/shims
     else
-        set -g __phpenv_cellar_cache ""
+        echo ~/.phpenv/shims
     end
-
-    echo $__phpenv_cellar_cache
 end
 
-function __phpenv_ensure_taps
+# Check if Ondřej PPA is configured on the system
+function __phpenv_has_ondrej_ppa
+    if test -d /etc/apt/sources.list.d
+        if grep -rq "ondrej/php" /etc/apt/sources.list.d/ 2>/dev/null
+            return 0
+        end
+    end
+    if test -f /etc/apt/sources.list
+        if grep -q "ondrej/php" /etc/apt/sources.list 2>/dev/null
+            return 0
+        end
+    end
+    return 1
+end
+
+# Detect and return the active provider name
+# Priority: PHPENV_PROVIDER override > macOS (homebrew) > Linux+apt+ondrej (apt) > Linux+brew (homebrew)
+function __phpenv_get_provider
+    # Check for user override
+    if set -q PHPENV_PROVIDER; and test -n "$PHPENV_PROVIDER"
+        if contains $PHPENV_PROVIDER homebrew apt
+            echo $PHPENV_PROVIDER
+            return 0
+        else
+            echo "Warning: Invalid PHPENV_PROVIDER '$PHPENV_PROVIDER', using auto-detect" >&2
+        end
+    end
+
+    # macOS always uses Homebrew
+    if test (uname -s) = "Darwin"
+        echo "homebrew"
+        return 0
+    end
+
+    # Linux: check for apt with Ondřej PPA first
+    if test (uname -s) = "Linux"
+        if command -q apt-get; and __phpenv_has_ondrej_ppa
+            echo "apt"
+            return 0
+        end
+
+        # Fall back to Homebrew (Linuxbrew) if available
+        if command -q brew
+            echo "homebrew"
+            return 0
+        end
+
+        # If apt is available but no PPA yet, still use apt provider
+        # (it will prompt to add the PPA when needed)
+        if command -q apt-get
+            echo "apt"
+            return 0
+        end
+    end
+
+    # Default fallback
+    echo "homebrew"
+    return 0
+end
+
+# Check if a provider is available on this system
+function __phpenv_provider_available -a provider
+    switch $provider
+        case homebrew
+            command -q brew
+        case apt
+            command -q apt-get
+        case '*'
+            return 1
+    end
+end
+
+# =============================================================================
+# HOMEBREW PROVIDER
+# =============================================================================
+
+function __phpenv_provider_homebrew_detect
+    command -q brew
+end
+
+function __phpenv_provider_homebrew_ensure_source
     if not command -q brew
         return 1
     end
@@ -241,7 +321,7 @@ function __phpenv_ensure_taps
     # Check and add required taps only if missing
     set -l required_taps "shivammathur/php" "shivammathur/extensions"
     for tap in $required_taps
-        if not brew tap | grep -q $tap 2>/dev/null
+        if not brew tap | grep -qx $tap 2>/dev/null
             if not brew tap $tap 2>/dev/null
                 echo "Warning: Failed to add tap $tap" >&2
                 return 1
@@ -250,16 +330,7 @@ function __phpenv_ensure_taps
     end
 end
 
-function __phpenv_parse_version_field -a field fallback
-    set -l version_info (__phpenv_get_version_info)
-    if test -n "$version_info"
-        echo $version_info | jq -r ".$field // \"$fallback\"" 2>/dev/null
-    else
-        echo $fallback
-    end
-end
-
-function __phpenv_list_installed
+function __phpenv_provider_homebrew_list_installed
     set -l phpenv_versions
     set -l phpenv_cellar_path (__phpenv_get_cellar_path)
 
@@ -284,6 +355,625 @@ function __phpenv_list_installed
     end
 
     printf '%s\n' $phpenv_versions | sort -V | uniq
+end
+
+function __phpenv_provider_homebrew_list_available
+    set -l phpenv_formulas (__phpenv_get_tap_formulas "shivammathur/php")
+
+    if test -z "$phpenv_formulas"
+        return
+    end
+
+    set -l phpenv_versions
+    set -l phpenv_version_info (__phpenv_get_version_info)
+    set -l phpenv_latest_version (echo $phpenv_version_info | jq -r '.latest // "8.4"' 2>/dev/null)
+
+    for phpenv_formula in $phpenv_formulas
+        set -l phpenv_clean_name (echo $phpenv_formula | sed 's|shivammathur/php/||')
+
+        if echo $phpenv_clean_name | grep -qE '(debug|zts|autoconf|bison)'
+            continue
+        end
+
+        if test "$phpenv_clean_name" = "php"
+            set -a phpenv_versions "$phpenv_latest_version (latest)"
+        else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
+            set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
+            set -a phpenv_versions $phpenv_version
+        end
+    end
+
+    if test (count $phpenv_versions) -gt 0
+        printf '%s\n' $phpenv_versions | sort -V | tr '\n' ' ' | sed 's/ $//'
+        echo ""
+    end
+end
+
+function __phpenv_provider_homebrew_get_php_path -a phpenv_version
+    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
+    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
+
+    set -l phpenv_target_dir
+    if test "$phpenv_version" = "$phpenv_latest_version"
+        if test -d "$phpenv_cellar_path/php"
+            set phpenv_target_dir "$phpenv_cellar_path/php"
+        else if test -d "$phpenv_cellar_path/php@$phpenv_version"
+            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
+        end
+    else
+        if test -d "$phpenv_cellar_path/php@$phpenv_version"
+            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
+        end
+    end
+
+    if test -n "$phpenv_target_dir"
+        # Find the latest version directory by sorting
+        set -l phpenv_versions
+        for phpenv_dir in $phpenv_target_dir/*
+            if test -d "$phpenv_dir"
+                set -a phpenv_versions (basename "$phpenv_dir")
+            end
+        end
+
+        if test (count $phpenv_versions) -gt 0
+            set -l phpenv_latest_dir (printf '%s\n' $phpenv_versions | sort -V | tail -1)
+            if test -n "$phpenv_latest_dir"
+                echo "$phpenv_target_dir/$phpenv_latest_dir/bin"
+            end
+        end
+    end
+end
+
+function __phpenv_provider_homebrew_is_installed -a phpenv_version
+    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
+    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
+
+    if test "$phpenv_version" = "$phpenv_latest_version"
+        test -d "$phpenv_cellar_path/php" -o -d "$phpenv_cellar_path/php@$phpenv_version"
+    else
+        test -d "$phpenv_cellar_path/php@$phpenv_version"
+    end
+end
+
+function __phpenv_provider_homebrew_install -a phpenv_version
+    if not __phpenv_provider_homebrew_ensure_source
+        echo "Error: Failed to set up Homebrew taps"
+        return 1
+    end
+
+    set -l phpenv_formula (__phpenv_get_formula_name $phpenv_version)
+    if test -z "$phpenv_formula"
+        echo "Unknown PHP version: $phpenv_version"
+        echo "Run 'phpenv versions' to see available versions"
+        return 1
+    end
+
+    if brew install $phpenv_formula
+        echo "PHP $phpenv_version installed successfully"
+        return 0
+    else
+        echo "Failed to install PHP $phpenv_version"
+        return 1
+    end
+end
+
+function __phpenv_provider_homebrew_uninstall -a phpenv_version
+    set -l phpenv_formula (__phpenv_get_formula_name $phpenv_version)
+    if brew uninstall $phpenv_formula
+        echo "PHP $phpenv_version uninstalled successfully"
+        return 0
+    else
+        echo "Failed to uninstall PHP $phpenv_version"
+        return 1
+    end
+end
+
+function __phpenv_provider_homebrew_ext_install -a phpenv_extension phpenv_version
+    if not __phpenv_provider_homebrew_ensure_source
+        echo "Error: Failed to set up Homebrew taps"
+        return 1
+    end
+
+    set -l phpenv_formula "shivammathur/extensions/$phpenv_extension@$phpenv_version"
+    if brew install $phpenv_formula
+        echo "$phpenv_extension@$phpenv_version installed successfully"
+        return 0
+    else
+        echo "Failed to install $phpenv_extension@$phpenv_version"
+        return 1
+    end
+end
+
+function __phpenv_provider_homebrew_ext_uninstall -a phpenv_extension phpenv_version
+    set -l phpenv_formula "shivammathur/extensions/$phpenv_extension@$phpenv_version"
+    if brew uninstall $phpenv_formula
+        echo "$phpenv_extension@$phpenv_version uninstalled successfully"
+        return 0
+    else
+        echo "Failed to uninstall $phpenv_extension@$phpenv_version"
+        return 1
+    end
+end
+
+function __phpenv_provider_homebrew_ext_list -a phpenv_version
+    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
+
+    if test -d $phpenv_cellar_path
+        for phpenv_ext_dir in $phpenv_cellar_path/*@$phpenv_version
+            if test -d $phpenv_ext_dir
+                set -l phpenv_ext_name (basename $phpenv_ext_dir | sed "s/@$phpenv_version//")
+                if test "$phpenv_ext_name" != "php"
+                    echo $phpenv_ext_name
+                end
+            end
+        end
+    end
+end
+
+function __phpenv_provider_homebrew_ext_available -a phpenv_version
+    set -l phpenv_available_extensions (__phpenv_get_available_extensions)
+
+    if test -n "$phpenv_available_extensions"
+        for phpenv_ext_formula in $phpenv_available_extensions
+            if echo $phpenv_ext_formula | grep -q "@$phpenv_version\$"
+                echo $phpenv_ext_formula | sed "s|shivammathur/extensions/||" | sed "s|@$phpenv_version||"
+            end
+        end
+    end
+end
+
+function __phpenv_provider_homebrew_get_path_pattern
+    echo "/(Cellar|opt/homebrew)/(php|php@)"
+end
+
+function __phpenv_provider_homebrew_doctor
+    if command -q brew
+        echo "✓ Homebrew is installed"
+    else
+        echo "✗ Homebrew is not installed"
+        return 1
+    end
+
+    # Check taps
+    set -l tap_status (__phpenv_provider_homebrew_ensure_source 2>/dev/null; echo $status)
+    if test $tap_status -eq 0
+        echo "✓ Required Homebrew taps are available"
+    else
+        echo "! Some Homebrew taps may need to be added automatically"
+    end
+end
+
+# =============================================================================
+# APT PROVIDER (Ubuntu/Debian with Ondřej Surý PPA)
+# =============================================================================
+
+# Validate input for APT commands (prevents command injection)
+function __phpenv_validate_apt_input -a input
+    # Only allow alphanumeric, dots, and hyphens
+    string match -rq '^[a-zA-Z0-9.-]+$' $input
+end
+
+function __phpenv_provider_apt_detect
+    command -q apt-get
+end
+
+function __phpenv_provider_apt_ensure_source
+    if not command -q apt-get
+        echo "Error: apt-get is not available" >&2
+        return 1
+    end
+
+    # Check if Ondřej PPA is already configured
+    if __phpenv_has_ondrej_ppa
+        return 0
+    end
+
+    # PPA not configured, ask user to add it
+    echo "The Ondřej Surý PHP PPA is required but not configured."
+    echo "This PPA provides up-to-date PHP versions for Ubuntu/Debian."
+    echo ""
+    read -P "Add ppa:ondrej/php? [y/N] " -l confirm
+
+    if test "$confirm" = "y" -o "$confirm" = "Y"
+        echo "Adding ppa:ondrej/php..."
+        if command -q add-apt-repository
+            if sudo add-apt-repository -y ppa:ondrej/php
+                echo "Updating package lists..."
+                sudo apt-get update
+                echo "PPA added successfully"
+                return 0
+            else
+                echo "Failed to add PPA" >&2
+                return 1
+            end
+        else
+            echo "Error: add-apt-repository not found. Install software-properties-common:" >&2
+            echo "  sudo apt-get install software-properties-common" >&2
+            return 1
+        end
+    else
+        echo "PPA not added. PHP installation requires the Ondřej PPA." >&2
+        return 1
+    end
+end
+
+function __phpenv_provider_apt_list_installed
+    # List installed PHP CLI packages
+    if not command -q dpkg
+        return 1
+    end
+
+    dpkg -l 'php[0-9]*-cli' 2>/dev/null | grep '^ii' | \
+        sed -E 's/^ii\s+php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+end
+
+function __phpenv_provider_apt_list_available
+    # List available PHP versions from apt cache
+    if not command -q apt-cache
+        return
+    end
+
+    apt-cache search '^php[0-9]+\.[0-9]+-cli$' 2>/dev/null | \
+        sed -E 's/^php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+end
+
+function __phpenv_provider_apt_get_php_path -a phpenv_version
+    # For APT, we use a shim directory to manage PHP version switching
+    # Create symlinks in the shim directory pointing to the correct version
+
+    set -l shim_dir (__phpenv_get_shim_dir)
+
+    # Ensure shim directory exists
+    if not test -d "$shim_dir"
+        mkdir -p "$shim_dir"
+    end
+
+    # Check if the PHP version is installed
+    if not test -x "/usr/bin/php$phpenv_version"
+        return 1
+    end
+
+    # Create/update symlinks for PHP binaries using atomic operation
+    set -l binaries php php-config phpize phar phar.phar
+    for binary in $binaries
+        set -l source "/usr/bin/$binary$phpenv_version"
+        set -l target "$shim_dir/$binary"
+
+        if test -x "$source"
+            # Atomic symlink creation: create temp link, then move
+            set -l temp_link "$target.$fish_pid"
+            ln -s "$source" "$temp_link" 2>/dev/null
+            and mv -f "$temp_link" "$target" 2>/dev/null
+        else if test "$binary" = "phar"; and test -x "/usr/bin/phar$phpenv_version"
+            set -l temp_link "$target.$fish_pid"
+            ln -s "/usr/bin/phar$phpenv_version" "$temp_link" 2>/dev/null
+            and mv -f "$temp_link" "$target" 2>/dev/null
+        end
+    end
+
+    echo "$shim_dir"
+end
+
+function __phpenv_provider_apt_is_installed -a phpenv_version
+    test -x "/usr/bin/php$phpenv_version"
+end
+
+function __phpenv_provider_apt_install -a phpenv_version
+    # Validate input before using in sudo commands
+    if not __phpenv_validate_apt_input $phpenv_version
+        echo "Error: Invalid version format" >&2
+        return 1
+    end
+
+    if not __phpenv_provider_apt_ensure_source
+        return 1
+    end
+
+    echo "Installing PHP $phpenv_version via apt..."
+
+    # Core packages to install
+    set -l packages \
+        "php$phpenv_version-cli" \
+        "php$phpenv_version-common" \
+        "php$phpenv_version-opcache"
+
+    if sudo apt-get install -y $packages
+        echo "PHP $phpenv_version installed successfully"
+        return 0
+    else
+        echo "Failed to install PHP $phpenv_version" >&2
+        return 1
+    end
+end
+
+function __phpenv_provider_apt_uninstall -a phpenv_version
+    # Validate input before using in sudo commands
+    if not __phpenv_validate_apt_input $phpenv_version
+        echo "Error: Invalid version format" >&2
+        return 1
+    end
+
+    echo "Uninstalling PHP $phpenv_version..."
+
+    # Remove all packages for this PHP version
+    set -l packages (dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}')
+
+    if test (count $packages) -eq 0
+        echo "No packages found for PHP $phpenv_version"
+        return 1
+    end
+
+    # Validate package names follow Debian naming rules before using in sudo command
+    set -l validated_packages
+    for pkg in $packages
+        # Debian package names: lowercase alphanumeric, plus, minus, period; min 2 chars
+        if string match -rq '^[a-z0-9][a-z0-9.+-]+$' $pkg
+            set -a validated_packages $pkg
+        end
+    end
+
+    if test (count $validated_packages) -eq 0
+        echo "No valid packages found for PHP $phpenv_version"
+        return 1
+    end
+
+    if sudo apt-get remove -y $validated_packages
+        echo "PHP $phpenv_version uninstalled successfully"
+
+        # Clean up shim directory if this version was active
+        set -l shim_dir (__phpenv_get_shim_dir)
+        if test -L "$shim_dir/php"
+            set -l target (readlink "$shim_dir/php")
+            if string match -q "*php$phpenv_version*" "$target"
+                # Remove only known phpenv binaries instead of using glob
+                set -l known_binaries php php-config phpize phar phar.phar
+                for binary in $known_binaries
+                    rm -f "$shim_dir/$binary"
+                end
+            end
+        end
+        return 0
+    else
+        echo "Failed to uninstall PHP $phpenv_version" >&2
+        return 1
+    end
+end
+
+function __phpenv_provider_apt_ext_install -a phpenv_extension phpenv_version
+    # Validate inputs before using in sudo commands
+    if not __phpenv_validate_apt_input $phpenv_extension
+        echo "Error: Invalid extension name" >&2
+        return 1
+    end
+    if not __phpenv_validate_apt_input $phpenv_version
+        echo "Error: Invalid version format" >&2
+        return 1
+    end
+
+    if not __phpenv_provider_apt_ensure_source
+        return 1
+    end
+
+    # Map common extension names to package names
+    set -l package_name "php$phpenv_version-$phpenv_extension"
+
+    # Some extensions have different package names
+    switch $phpenv_extension
+        case mysql
+            set package_name "php$phpenv_version-mysql"
+        case pdo
+            set package_name "php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3"
+        case gd
+            set package_name "php$phpenv_version-gd"
+    end
+
+    echo "Installing $phpenv_extension for PHP $phpenv_version..."
+
+    if sudo apt-get install -y $package_name
+        echo "$phpenv_extension installed successfully for PHP $phpenv_version"
+        return 0
+    else
+        echo "Failed to install $phpenv_extension for PHP $phpenv_version" >&2
+        echo "Try: apt-cache search php$phpenv_version- to see available packages"
+        return 1
+    end
+end
+
+function __phpenv_provider_apt_ext_uninstall -a phpenv_extension phpenv_version
+    # Validate inputs before using in sudo commands
+    if not __phpenv_validate_apt_input $phpenv_extension
+        echo "Error: Invalid extension name" >&2
+        return 1
+    end
+    if not __phpenv_validate_apt_input $phpenv_version
+        echo "Error: Invalid version format" >&2
+        return 1
+    end
+
+    # Map extension names to package names (mirror install logic)
+    set -l package_name "php$phpenv_version-$phpenv_extension"
+
+    # Some extensions have different package names
+    switch $phpenv_extension
+        case mysql
+            set package_name "php$phpenv_version-mysql"
+        case pdo
+            set package_name "php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3"
+        case gd
+            set package_name "php$phpenv_version-gd"
+    end
+
+    echo "Uninstalling $phpenv_extension for PHP $phpenv_version..."
+
+    if sudo apt-get remove -y $package_name
+        echo "$phpenv_extension uninstalled successfully"
+        return 0
+    else
+        echo "Failed to uninstall $phpenv_extension" >&2
+        return 1
+    end
+end
+
+function __phpenv_provider_apt_ext_list -a phpenv_version
+    # List installed extensions for this PHP version
+    # Filter out core packages (cli, common, etc.)
+    set -l core_packages cli common opcache fpm cgi phpdbg
+
+    dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}' | \
+        sed "s/php$phpenv_version-//" | while read ext
+        # Skip core packages
+        set -l is_core 0
+        for core in $core_packages
+            if test "$ext" = "$core"
+                set is_core 1
+                break
+            end
+        end
+        if test $is_core -eq 0
+            echo $ext
+        end
+    end
+end
+
+function __phpenv_provider_apt_ext_available -a phpenv_version
+    # List available extensions from apt cache
+    apt-cache search "^php$phpenv_version-" 2>/dev/null | \
+        sed "s/php$phpenv_version-//" | awk '{print $1}' | \
+        grep -v -E '^(cli|common|fpm|cgi|phpdbg|dev)$' | sort | uniq
+end
+
+function __phpenv_provider_apt_get_path_pattern
+    # Pattern to match phpenv shim directory in PATH
+    set -l shim_dir (__phpenv_get_shim_dir)
+    # Escape special regex characters using Fish's built-in escape
+    string escape --style=regex $shim_dir
+end
+
+function __phpenv_provider_apt_doctor
+    if command -q apt-get
+        echo "✓ apt-get is available"
+    else
+        echo "✗ apt-get is not available"
+        return 1
+    end
+
+    if __phpenv_has_ondrej_ppa
+        echo "✓ Ondřej PHP PPA is configured"
+    else
+        echo "! Ondřej PHP PPA is not configured"
+        echo "  Run 'phpenv install <version>' to add it"
+    end
+
+    set -l shim_dir (__phpenv_get_shim_dir)
+    if test -d "$shim_dir"
+        echo "✓ Shim directory exists: $shim_dir"
+    else
+        echo "! Shim directory not created yet: $shim_dir"
+    end
+end
+
+# =============================================================================
+# DISPATCHER FUNCTIONS (call provider-specific implementations)
+# =============================================================================
+
+function __phpenv_ensure_source
+    set -l provider (__phpenv_get_provider)
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_ensure_source
+        case apt
+            __phpenv_provider_apt_ensure_source
+        case '*'
+            echo "Unknown provider: $provider" >&2
+            return 1
+    end
+end
+
+function __phpenv_get_php_path -a phpenv_version
+    set -l provider (__phpenv_get_provider)
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_get_php_path $phpenv_version
+        case apt
+            __phpenv_provider_apt_get_php_path $phpenv_version
+        case '*'
+            echo "Unknown provider: $provider" >&2
+            return 1
+    end
+end
+
+function __phpenv_is_version_installed -a phpenv_version
+    set -l provider (__phpenv_get_provider)
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_is_installed $phpenv_version
+        case apt
+            __phpenv_provider_apt_is_installed $phpenv_version
+        case '*'
+            return 1
+    end
+end
+
+function __phpenv_list_installed
+    set -l provider (__phpenv_get_provider)
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_list_installed
+        case apt
+            __phpenv_provider_apt_list_installed
+        case '*'
+            echo "Unknown provider: $provider" >&2
+            return 1
+    end
+end
+
+function __phpenv_get_path_pattern
+    set -l provider (__phpenv_get_provider)
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_get_path_pattern
+        case apt
+            __phpenv_provider_apt_get_path_pattern
+        case '*'
+            echo ""
+    end
+end
+
+# =============================================================================
+# SHARED HELPER FUNCTIONS
+# =============================================================================
+
+function __phpenv_get_cellar_path
+    if test -n "$__phpenv_cellar_cache"
+        echo $__phpenv_cellar_cache
+        return
+    end
+
+    if test -d /opt/homebrew/Cellar
+        set -g __phpenv_cellar_cache /opt/homebrew/Cellar
+    else if test -d /usr/local/Cellar
+        set -g __phpenv_cellar_cache /usr/local/Cellar
+    else if test -d /home/linuxbrew/.linuxbrew/Cellar
+        set -g __phpenv_cellar_cache /home/linuxbrew/.linuxbrew/Cellar
+    else
+        set -g __phpenv_cellar_cache ""
+    end
+
+    echo $__phpenv_cellar_cache
+end
+
+# Legacy function - redirect to provider
+function __phpenv_ensure_taps
+    __phpenv_ensure_source
+end
+
+function __phpenv_parse_version_field -a field fallback
+    set -l version_info (__phpenv_get_version_info)
+    if test -n "$version_info"
+        echo $version_info | jq -r ".$field // \"$fallback\"" 2>/dev/null
+    else
+        echo $fallback
+    end
 end
 
 function __phpenv_resolve_version_alias -a phpenv_version
@@ -313,52 +1003,6 @@ function __phpenv_get_formula_name -a phpenv_version
     end
 end
 
-function __phpenv_is_version_installed -a phpenv_version
-    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
-    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
-
-    if test "$phpenv_version" = "$phpenv_latest_version"
-        test -d "$phpenv_cellar_path/php" -o -d "$phpenv_cellar_path/php@$phpenv_version"
-    else
-        test -d "$phpenv_cellar_path/php@$phpenv_version"
-    end
-end
-
-function __phpenv_get_php_path -a phpenv_version
-    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
-    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
-
-    set -l phpenv_target_dir
-    if test "$phpenv_version" = "$phpenv_latest_version"
-        if test -d "$phpenv_cellar_path/php"
-            set phpenv_target_dir "$phpenv_cellar_path/php"
-        else if test -d "$phpenv_cellar_path/php@$phpenv_version"
-            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
-        end
-    else
-        if test -d "$phpenv_cellar_path/php@$phpenv_version"
-            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
-        end
-    end
-
-    if test -n "$phpenv_target_dir"
-        # Find the latest version directory by sorting
-        set -l phpenv_versions
-        for phpenv_dir in $phpenv_target_dir/*
-            if test -d "$phpenv_dir"
-                set -a phpenv_versions (basename "$phpenv_dir")
-            end
-        end
-
-        if test (count $phpenv_versions) -gt 0
-            set -l phpenv_latest_dir (printf '%s\n' $phpenv_versions | sort -V | tail -1)
-            if test -n "$phpenv_latest_dir"
-                echo "$phpenv_target_dir/$phpenv_latest_dir"
-            end
-        end
-    end
-end
-
 function __phpenv_set_php_path -a phpenv_version
     set -l phpenv_php_path (__phpenv_get_php_path $phpenv_version)
     if test -z "$phpenv_php_path"
@@ -366,8 +1010,8 @@ function __phpenv_set_php_path -a phpenv_version
         return 1
     end
 
-    if not test -x "$phpenv_php_path/bin/php"
-        echo "PHP binary not found at $phpenv_php_path/bin/php" >&2
+    if not test -x "$phpenv_php_path/php"
+        echo "PHP binary not found at $phpenv_php_path/php" >&2
         return 1
     end
 
@@ -381,18 +1025,29 @@ function __phpenv_set_php_path -a phpenv_version
         return 0
     end
 
-    # Build clean PATH without any PHP paths
+    # Get provider-specific path pattern for filtering
+    set -l phpenv_path_pattern (__phpenv_get_path_pattern)
+    set -l phpenv_shim_dir (__phpenv_get_shim_dir)
+
+    # Build clean PATH without any PHP paths (from any provider)
     set -l phpenv_clean_path
     for phpenv_path_entry in $PHPENV_ORIGINAL_PATH
-        if not echo $phpenv_path_entry | grep -qE "/(Cellar|opt/homebrew)/(php|php@)"
-            set -a phpenv_clean_path $phpenv_path_entry
+        # Skip provider-specific paths
+        if test -n "$phpenv_path_pattern"; and echo $phpenv_path_entry | grep -qE "$phpenv_path_pattern"
+            continue
         end
+        # Skip shim directory
+        if test "$phpenv_path_entry" = "$phpenv_shim_dir"
+            continue
+        end
+        # Add to clean path (shim directory at front handles version selection)
+        set -a phpenv_clean_path $phpenv_path_entry
     end
 
     # Set new PATH with PHP version at front
-    set -gx PATH "$phpenv_php_path/bin" $phpenv_clean_path
+    set -gx PATH "$phpenv_php_path" $phpenv_clean_path
     set -g PHPENV_CURRENT_VERSION $phpenv_version
-    set -g PHPENV_CURRENT_PATH "$phpenv_php_path/bin"
+    set -g PHPENV_CURRENT_PATH "$phpenv_php_path"
 
     # Verify the change worked
     if command -q php
@@ -432,27 +1087,28 @@ function __phpenv_install -a phpenv_version
 
     echo "Installing PHP $phpenv_version..."
 
-    if not __phpenv_ensure_taps
-        echo "Error: Homebrew is required but not available"
-        return 1
-    end
+    set -l provider (__phpenv_get_provider)
 
-    set -l phpenv_formula (__phpenv_get_formula_name $phpenv_version)
-    if test -z "$phpenv_formula"
-        echo "Unknown PHP version: $phpenv_version"
-        echo "Run 'phpenv versions' to see available versions"
-        return 1
-    end
-
-    if brew install $phpenv_formula
-        echo "PHP $phpenv_version installed successfully"
-
-        if __phpenv_config_get auto-install-extensions | grep -q true
-            __phpenv_install_default_extensions $phpenv_version
-        end
-    else
-        echo "Failed to install PHP $phpenv_version"
-        return 1
+    switch $provider
+        case homebrew
+            if __phpenv_provider_homebrew_install $phpenv_version
+                if __phpenv_config_get auto-install-extensions | grep -q true
+                    __phpenv_install_default_extensions $phpenv_version
+                end
+            else
+                return 1
+            end
+        case apt
+            if __phpenv_provider_apt_install $phpenv_version
+                if __phpenv_config_get auto-install-extensions | grep -q true
+                    __phpenv_install_default_extensions $phpenv_version
+                end
+            else
+                return 1
+            end
+        case '*'
+            echo "Unknown provider: $provider"
+            return 1
     end
 end
 
@@ -467,12 +1123,16 @@ function __phpenv_uninstall -a phpenv_version
         return 1
     end
 
-    set -l phpenv_formula (__phpenv_get_formula_name $phpenv_version)
-    if brew uninstall $phpenv_formula
-        echo "PHP $phpenv_version uninstalled successfully"
-    else
-        echo "Failed to uninstall PHP $phpenv_version"
-        return 1
+    set -l provider (__phpenv_get_provider)
+
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_uninstall $phpenv_version
+        case apt
+            __phpenv_provider_apt_uninstall $phpenv_version
+        case '*'
+            echo "Unknown provider: $provider"
+            return 1
     end
 end
 
@@ -547,26 +1207,47 @@ function __phpenv_list
 end
 
 function __phpenv_versions
-    echo "Available versions from shivammathur/homebrew-php:"
+    set -l provider (__phpenv_get_provider)
 
-    set -l phpenv_tap_versions (__phpenv_get_tap_versions)
-    if test -n "$phpenv_tap_versions"
-        echo $phpenv_tap_versions
-        return
+    switch $provider
+        case homebrew
+            echo "Available versions from shivammathur/homebrew-php:"
+
+            set -l phpenv_tap_versions (__phpenv_provider_homebrew_list_available)
+            if test -n "$phpenv_tap_versions"
+                echo $phpenv_tap_versions
+                return
+            end
+
+            # Use cached version info as fallback
+            set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
+            set -l phpenv_nightly (__phpenv_parse_version_field "nightly" "8.5")
+            set -l phpenv_version_8x (__phpenv_parse_version_field "8.x" "8.4")
+            set -l phpenv_version_7x (__phpenv_parse_version_field "7.x" "7.4")
+            set -l phpenv_version_5x (__phpenv_parse_version_field "5.x" "5.6")
+
+            echo "Stable versions:"
+            echo "  $phpenv_version_5x (5.x latest)  $phpenv_version_7x (7.x latest)  $phpenv_latest (latest stable)"
+            echo "  $phpenv_nightly (nightly)"
+            echo "  5.6  7.0  7.1  7.2  7.3  7.4"
+            echo "  8.0  8.1  8.2  8.3  8.4  8.5"
+
+        case apt
+            echo "Available versions from Ondřej PPA:"
+
+            set -l apt_versions (__phpenv_provider_apt_list_available)
+            if test -n "$apt_versions"
+                printf '  %s\n' $apt_versions
+            else
+                echo "  Unable to fetch available versions."
+                echo "  Ensure the Ondřej PPA is configured: phpenv doctor"
+                echo ""
+                echo "  Common versions: 7.4, 8.0, 8.1, 8.2, 8.3, 8.4"
+            end
+
+        case '*'
+            echo "Unknown provider: $provider"
     end
-
-    # Use cached version info
-    set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
-    set -l phpenv_nightly (__phpenv_parse_version_field "nightly" "8.5")
-    set -l phpenv_version_8x (__phpenv_parse_version_field "8.x" "8.4")
-    set -l phpenv_version_7x (__phpenv_parse_version_field "7.x" "7.4")
-    set -l phpenv_version_5x (__phpenv_parse_version_field "5.x" "5.6")
-
-    echo "Stable versions:"
-    echo "  $phpenv_version_5x (5.x latest)  $phpenv_version_7x (7.x latest)  $phpenv_latest (latest stable)"
-    echo "  $phpenv_nightly (nightly)"
-    echo "  5.6  7.0  7.1  7.2  7.3  7.4"
-    echo "  8.0  8.1  8.2  8.3  8.4  8.5"
 end
 
 function __phpenv_get_tap_versions
@@ -611,8 +1292,8 @@ function __phpenv_which -a phpenv_binary
 
     if test -n "$phpenv_version"
         set -l phpenv_php_path (__phpenv_get_php_path $phpenv_version)
-        if test -x "$phpenv_php_path/bin/$phpenv_binary"
-            echo "$phpenv_php_path/bin/$phpenv_binary"
+        if test -x "$phpenv_php_path/$phpenv_binary"
+            echo "$phpenv_php_path/$phpenv_binary"
         else
             echo "$phpenv_binary not found for PHP $phpenv_version"
             return 1
@@ -625,28 +1306,37 @@ end
 function __phpenv_doctor
     echo "phpenv doctor"
     echo "============="
+    echo ""
 
+    # Show provider information
+    set -l provider (__phpenv_get_provider)
+    set -l provider_source "auto-detected"
+    if set -q PHPENV_PROVIDER; and test -n "$PHPENV_PROVIDER"
+        set provider_source "PHPENV_PROVIDER override"
+    end
+    echo "Provider: $provider ($provider_source)"
+    echo ""
+
+    # Common requirements
     if command -q jq
         echo "✓ jq is installed"
     else
         echo "✗ jq is not installed (required)"
     end
 
-    if command -q brew
-        echo "✓ Homebrew is installed"
-    else
-        echo "✗ Homebrew is not installed"
-        return 1
+    # Provider-specific diagnostics
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_doctor
+        case apt
+            __phpenv_provider_apt_doctor
+        case '*'
+            echo "✗ Unknown provider: $provider"
     end
 
-    # Check taps using unified function
-    set -l tap_status (__phpenv_ensure_taps 2>/dev/null; echo $status)
-    if test $tap_status -eq 0
-        echo "✓ Required Homebrew taps are available"
-    else
-        echo "! Some Homebrew taps may need to be added automatically"
-    end
+    echo ""
 
+    # Show installed versions
     set -l phpenv_versions (__phpenv_list_installed)
     if test (count $phpenv_versions) -gt 0
         echo "✓ PHP versions installed: "(string join ", " $phpenv_versions)
@@ -654,11 +1344,17 @@ function __phpenv_doctor
         echo "! No PHP versions installed"
     end
 
+    # Show current version
     set -l phpenv_current (__phpenv_detect_version)
     if test -n "$phpenv_current"
         echo "✓ Current PHP version: $phpenv_current"
     else
         echo "! No PHP version detected"
+    end
+
+    # Show active PATH if set
+    if set -q PHPENV_CURRENT_PATH
+        echo "✓ Active PHP path: $PHPENV_CURRENT_PATH"
     end
 end
 
@@ -839,26 +1535,18 @@ function __phpenv_extensions_install -a phpenv_extension
         return 1
     end
 
-    if not __phpenv_extension_available $phpenv_extension $phpenv_version
-        echo "Extension $phpenv_extension may not be available for PHP $phpenv_version"
-        echo "Attempting installation anyway..."
-    end
-
     echo "Installing $phpenv_extension for PHP $phpenv_version..."
 
-    if not __phpenv_ensure_taps
-        echo "Error: Homebrew is required but not available"
-        return 1
-    end
+    set -l provider (__phpenv_get_provider)
 
-    set -l phpenv_formula "shivammathur/extensions/$phpenv_extension@$phpenv_version"
-    if brew install $phpenv_formula
-        echo "$phpenv_extension@$phpenv_version installed successfully"
-    else
-        echo "Failed to install $phpenv_extension@$phpenv_version"
-        echo "Extension may not be available for PHP $phpenv_version"
-        echo "Run 'phpenv extensions available' to see available extensions"
-        return 1
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_ext_install $phpenv_extension $phpenv_version
+        case apt
+            __phpenv_provider_apt_ext_install $phpenv_extension $phpenv_version
+        case '*'
+            echo "Unknown provider: $provider"
+            return 1
     end
 end
 
@@ -874,12 +1562,16 @@ function __phpenv_extensions_uninstall -a phpenv_extension
         return 1
     end
 
-    set -l phpenv_formula "shivammathur/extensions/$phpenv_extension@$phpenv_version"
-    if brew uninstall $phpenv_formula
-        echo "$phpenv_extension@$phpenv_version uninstalled successfully"
-    else
-        echo "Failed to uninstall $phpenv_extension@$phpenv_version"
-        return 1
+    set -l provider (__phpenv_get_provider)
+
+    switch $provider
+        case homebrew
+            __phpenv_provider_homebrew_ext_uninstall $phpenv_extension $phpenv_version
+        case apt
+            __phpenv_provider_apt_ext_uninstall $phpenv_extension $phpenv_version
+        case '*'
+            echo "Unknown provider: $provider"
+            return 1
     end
 end
 
@@ -921,25 +1613,20 @@ function __phpenv_extensions_available
 
     echo "Available extensions for PHP $phpenv_version:"
 
-    set -l phpenv_available_extensions (__phpenv_get_available_extensions)
+    set -l provider (__phpenv_get_provider)
+    set -l phpenv_version_extensions
 
-    if test -n "$phpenv_available_extensions"
-        set -l phpenv_version_extensions
-        for phpenv_ext_formula in $phpenv_available_extensions
-            if echo $phpenv_ext_formula | grep -q "@$phpenv_version\$"
-                set -l phpenv_ext_name (echo $phpenv_ext_formula | \
-                    sed "s|shivammathur/extensions/||" | sed "s|@$phpenv_version||")
-                set -a phpenv_version_extensions $phpenv_ext_name
-            end
-        end
+    switch $provider
+        case homebrew
+            set phpenv_version_extensions (__phpenv_provider_homebrew_ext_available $phpenv_version)
+        case apt
+            set phpenv_version_extensions (__phpenv_provider_apt_ext_available $phpenv_version)
+    end
 
-        if test (count $phpenv_version_extensions) -gt 0
-            printf '  %s\n' $phpenv_version_extensions | sort
-        else
-            echo "  No extensions found for PHP $phpenv_version"
-        end
+    if test (count $phpenv_version_extensions) -gt 0
+        printf '  %s\n' $phpenv_version_extensions | sort
     else
-        echo "  Unable to fetch extension list or Homebrew not available"
+        echo "  No extensions found for PHP $phpenv_version"
     end
 end
 
@@ -950,18 +1637,22 @@ function __phpenv_extensions_list
         return 1
     end
 
-    set -l phpenv_cellar_path (__phpenv_get_cellar_path)
     echo "Extensions for PHP $phpenv_version:"
 
-    if test -d $phpenv_cellar_path
-        for phpenv_ext_dir in $phpenv_cellar_path/*@$phpenv_version
-            if test -d $phpenv_ext_dir
-                set -l phpenv_ext_name (basename $phpenv_ext_dir | sed "s/@$phpenv_version//")
-                if test "$phpenv_ext_name" != "php"
-                    echo "  $phpenv_ext_name"
-                end
-            end
-        end
+    set -l provider (__phpenv_get_provider)
+    set -l extensions
+
+    switch $provider
+        case homebrew
+            set extensions (__phpenv_provider_homebrew_ext_list $phpenv_version)
+        case apt
+            set extensions (__phpenv_provider_apt_ext_list $phpenv_version)
+    end
+
+    if test (count $extensions) -gt 0
+        printf '  %s\n' $extensions
+    else
+        echo "  No extensions installed"
     end
 end
 
@@ -1052,7 +1743,7 @@ function __phpenv_help
     echo "  current                 Show current PHP version"
     echo "  which [binary]          Show path to PHP binary"
     echo "  versions                Show all available versions"
-    echo "  doctor                  Check phpenv installation"
+    echo "  doctor                  Check phpenv installation and provider"
     echo "  config <action>         Manage configuration"
     echo "  extensions <action>     Manage PHP extensions"
     echo "  help                    Show this help"
@@ -1063,6 +1754,13 @@ function __phpenv_help
     echo "  3. composer.json"
     echo "  4. Global version"
     echo "  5. System PHP"
+    echo ""
+    echo "Supported providers:"
+    echo "  homebrew    macOS/Linux with Homebrew (shivammathur/php tap)"
+    echo "  apt         Ubuntu/Debian with Ondřej Surý PPA"
+    echo ""
+    echo "Provider is auto-detected, or override with:"
+    echo "  set -gx PHPENV_PROVIDER homebrew   # or 'apt'"
     echo ""
     echo "Configuration:"
     echo "  auto-switch: Enable automatic PHP version switching (default: true)"
