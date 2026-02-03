@@ -3,27 +3,37 @@
 
 msgr run "Starting to install rust/cargo packages"
 
+# Track packages already managed by cargo install-update
+declare -A installed_packages
+
 # If we have cargo install-update, use it first
 if command -v cargo-install-update &> /dev/null; then
   msgr run "Updating cargo packages with cargo install-update"
-  cargo install-update -a
+  # Show output in real-time (via stderr) while capturing it for parsing
+  update_output=$(cargo install-update -a 2>&1 | tee /dev/stderr)
   msgr run_done "Done with cargo install-update"
+
+  # Parse installed package names from the update output
+  while IFS= read -r pkg_name; do
+    [[ -n "$pkg_name" ]] && installed_packages["$pkg_name"]=1
+  done < <(echo "$update_output" | awk '/v[0-9]+\.[0-9]+/ { print $1 }')
 fi
 
-[[ -z "$ASDF_CRATE_DEFAULT_PACKAGES_FILE" ]] \
-  && ASDF_CRATE_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/cargo-packages"
-
-# Packages are defined in $DOTFILES/config/asdf/cargo-packages, one per line
-# Skip comments and empty lines
-packages=()
-while IFS= read -r line; do
-  # Skip comments
-  if [[ ${line:0:1} == "#" ]]; then continue; fi
-  if [[ ${line:0:1} == "/" ]]; then continue; fi
-  # Skip empty lines
-  if [[ -z "$line" ]]; then continue; fi
-  packages+=("$line")
-done < "$ASDF_CRATE_DEFAULT_PACKAGES_FILE"
+# Cargo packages to install
+packages=(
+  cargo-update       # A cargo subcommand for checking and applying updates to installed executables
+  cargo-cache        # Cargo cache management utility
+  tree-sitter-cli    # An incremental parsing system for programming tools
+  bkt                # A subprocess caching utility
+  difftastic         # A structural diff that understands syntax
+  fd-find            # A simple, fast and user-friendly alternative to 'find'
+  ripgrep            # Recursively searches directories for a regex pattern while respecting your gitignore
+  bob-nvim           # A version manager for neovim
+  bottom             # A cross-platform graphical process/system monitor
+  eza                # A modern alternative to ls
+  tmux-sessionizer   # A tool for opening git repositories as tmux sessions
+  zoxide             # A smarter cd command
+)
 
 # Number of jobs to run in parallel, this helps to keep the system responsive
 BUILD_JOBS=$(nproc --ignore=2 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 1)
@@ -32,10 +42,11 @@ BUILD_JOBS=$(nproc --ignore=2 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || 
 install_packages()
 {
   for pkg in "${packages[@]}"; do
-    # Trim spaces
-    pkg=${pkg// /}
-    # Skip comments
-    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+    # Skip packages already handled by cargo install-update
+    if [[ -n "${installed_packages[$pkg]+x}" ]]; then
+      msgr ok "Skipping $pkg (already installed)"
+      continue
+    fi
 
     msgr run "Installing cargo package $pkg"
     cargo install --jobs "$BUILD_JOBS" "$pkg"
