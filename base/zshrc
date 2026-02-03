@@ -33,24 +33,7 @@ source_fzf_config()
   fi
 }
 
-# Function to set up tmux window name plugin if tmux is active
-setup_tmux_window_name_plugin()
-{
-  if [[ -n "$TMUX" ]]; then
-    local tmux_window_name_plugin="$TMUX_PLUGINS/tmux-window-name/scripts/rename_session_windows.py"
-    if [[ -f "$tmux_window_name_plugin" ]]; then
-      tmux_window_name()
-      {
-        ($tmux_window_name_plugin &)
-      }
-      add-zsh-hook chpwd tmux_window_name
-      tmux_window_name
-    fi
-  fi
-}
-
 source_fzf_config
-setup_tmux_window_name_plugin
 x-have antidot && eval "$(antidot init)"
 
 autoload -Uz compinit bashcompinit

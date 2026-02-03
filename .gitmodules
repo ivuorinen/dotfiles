@@ -39,11 +39,6 @@
 	url = https://github.com/tmux-plugins/tmux-yank.git
 	ignore = dirty
 
-[submodule "tmux/tmux-window-name"]
-	path = config/tmux/plugins/tmux-window-name
-	url = https://github.com/ivuorinen/tmux-window-name.git
-	ignore = dirty
-
 [submodule "dotbot-pip"]
 	path = tools/dotbot-pip
 	url = https://github.com/sobolevn/dotbot-pip.git
