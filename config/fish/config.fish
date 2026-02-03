@@ -2,6 +2,8 @@
 # │                     fish/config.fish                     │
 # ╰──────────────────────────────────────────────────────────╯
 
+fish_config theme choose "Catppuccin Mocha"
+
 test -e "$HOME/.config/fish/alias.fish" &&
     source "$HOME/.config/fish/alias.fish"
 
