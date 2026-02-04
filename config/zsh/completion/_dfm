@@ -28,7 +28,6 @@ _dfm()
 
   sections=(
     'install:Installation commands'
-    'asdf:ASDF version manager commands'
     'brew:Homebrew package manager commands'
     'check:System check commands'
     'dotfiles:Dotfiles management commands'
@@ -67,24 +66,6 @@ _dfm()
             'z:Install z'
           )
           _describe 'install commands' install_cmds
-          ;;
-
-        asdf)
-          local -a asdf_cmds
-          asdf_cmds=(
-            'current:Show current versions'
-            'global:Show global versions'
-            'installed:Show installed versions'
-            'plugins-update:Update all plugins'
-            'plugins-install:Install plugins from configuration'
-            'plugins-remove:Remove installed plugins'
-            'reset:Reset plugins'
-            'fix-tool-versions:Remove uninstalled plugins from .tool-versions'
-            'versions:Show versions'
-            'where:Show where'
-            'which:Show which'
-          )
-          _describe 'asdf commands' asdf_cmds
           ;;
 
         brew)

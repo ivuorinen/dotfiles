@@ -299,7 +299,6 @@ section_helpers()
     "colors:Show colors"
     "env:Show environment variables"
     "functions:Show functions"
-    "aerospace:Show aerospace keybindings"
     "nvim:Show nvim keybindings"
     'path:Show $PATH dir by dir'
     "tmux:Show tmux keybindings"
@@ -361,7 +360,6 @@ section_helpers()
 
     "env") env | sort ;;
     "functions") declare -F ;;
-    "aerospace") cat "$DOTFILES/docs/aerospace-keybindings.md" ;;
     "nvim") cat "$DOTFILES/docs/nvim-keybindings.md" ;;
     "tmux") cat "$DOTFILES/docs/tmux-keybindings.md" ;;
     "wezterm") cat "$DOTFILES/docs/wezterm-keybindings.md" ;;
@@ -438,7 +436,6 @@ section_docs()
 
   MENU=(
     "all:Update all keybindings documentations"
-    "aerospace:Update aerospace keybindings documentation"
     "tmux:Update tmux keybindings documentation"
     "nvim:Update nvim keybindings documentation"
     "wezterm:Update wezterm keybindings documentation"
@@ -446,12 +443,10 @@ section_docs()
 
   case "$1" in
     all)
-      $0 docs aerospace
       $0 docs tmux
       $0 docs nvim
       $0 docs wezterm
       ;;
-    aerospace) bash "$DOTFILES/scripts/create-aerospace-keymaps.php" ;;
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
     wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;

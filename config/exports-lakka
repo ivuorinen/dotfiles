@@ -8,7 +8,6 @@ fi
 export PATH="$HOME/.local/go/bin:$PATH"
 
 alias logrotate='/usr/sbin/logrotate -s "$HOME/logs/state"'
-alias nano='nano -wS -$'
 alias gpg=gpg2
 
 ACME_PATH="$HOME/.acme.sh"

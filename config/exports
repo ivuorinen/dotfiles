@@ -348,12 +348,6 @@ export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 export PATH="$COMPOSER_BIN:$PATH"
 
-# direnv, https://direnv.net/
-# https://direnv.net/docs/hook.html
-# Set the hook to show the direnv message in a different color
-# export DIRENV_LOG_FORMAT=$'\033[2mdirenv: %s\033[0m'
-export DIRENV_LOG_FORMAT=
-
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 msg "Setting up Docker configuration"
 export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
@@ -410,11 +404,6 @@ x-have pyenv && eval "$(pyenv init -)"
 msg "Setting up Rust/Cargo configuration"
 export RUST_WITHOUT=rust-docs
 
-# screen
-# https://www.gnu.org/software/screen/manual/screen.html
-msg "Setting up screen configuration"
-export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
-
 # sonarlint
 # https://www.sonarlint.org/
 msg "Setting up Sonarlint configuration"
@@ -441,9 +430,6 @@ export ZSH_TMUX_CONFIG="$TMUX_CONF"
 export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false
 export ZSH_TMUX_DEFAULT_SESSION_NAME=main
-
-# tms, https://github.com/jrmoulton/tmux-sessionizer
-export TMS_CONFIG_FILE="${XDG_CONFIG_HOME}/tms/config.toml"
 
 # wakatime, https://github.com/wakatime/wakatime-cli
 msg "Setting up Wakatime configuration"

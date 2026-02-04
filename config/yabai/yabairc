@@ -20,7 +20,6 @@ yabai -m config \
   window_shadow float
 
 # apps to not manage (ignore)
-# TODO: add apps from aerospace config to here
 # list active apps:
 # > yabai -m query --windows | jq .[].app | sort | uniq
 yabai -m rule --add app="1Password" manage=off

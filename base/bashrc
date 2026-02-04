@@ -7,10 +7,6 @@ export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
 
-if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
-  builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"
-fi
-
 # shellcheck source=../config/fzf/fzf.bash
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
   source "${DOTFILES}/config/fzf/fzf.bash"

@@ -37,7 +37,6 @@ zdharma-continuum/fast-syntax-highlighting
 
 # Add some plugins that are not in OMZ
 jreese/zsh-titles
-yuki-ycino/tms
 
 # This needs to be last bundle
 # zsh-users/zsh-syntax-highlighting
