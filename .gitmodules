@@ -24,19 +24,9 @@
 	url = https://github.com/tmux-plugins/tmux-continuum
 	ignore = dirty
 
-[submodule "tmux/tmux-sensible"]
-	path = config/tmux/plugins/tmux-sensible
-	url = https://github.com/tmux-plugins/tmux-sensible.git
-	ignore = dirty
-
 [submodule "tmux/tmux-sessionist"]
 	path = config/tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist.git
-	ignore = dirty
-
-[submodule "tmux/tmux-yank"]
-	path = config/tmux/plugins/tmux-yank
-	url = https://github.com/tmux-plugins/tmux-yank.git
 	ignore = dirty
 
 [submodule "dotbot-pip"]
@@ -47,11 +37,6 @@
 [submodule "tmux/tmux-suspend"]
 	path = config/tmux/plugins/tmux-suspend
 	url = https://github.com/MunifTanjim/tmux-suspend.git
-	ignore = dirty
-
-[submodule "tmux/tmux-mode-indicator"]
-	path = config/tmux/plugins/tmux-mode-indicator
-	url = https://github.com/MunifTanjim/tmux-mode-indicator.git
 	ignore = dirty
 
 [submodule "tmux/tmux-current-pane-hostname"]

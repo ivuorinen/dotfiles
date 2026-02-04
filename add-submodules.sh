@@ -24,18 +24,12 @@ git submodule add --name antidote \
 # tmux plugin manager and plugins
 git submodule add --name tmux/tmux-continuum \
   -f https://github.com/tmux-plugins/tmux-continuum config/tmux/plugins/tmux-continuum
-git submodule add --name tmux/tmux-mode-indicator \
-  -f https://github.com/MunifTanjim/tmux-mode-indicator.git config/tmux/plugins/tmux-mode-indicator
 git submodule add --name tmux/tmux-resurrect \
   -f https://github.com/tmux-plugins/tmux-resurrect.git config/tmux/plugins/tmux-resurrect
-git submodule add --name tmux/tmux-sensible \
-  -f https://github.com/tmux-plugins/tmux-sensible.git config/tmux/plugins/tmux-sensible
 git submodule add --name tmux/tmux-sessionist \
   -f https://github.com/tmux-plugins/tmux-sessionist.git config/tmux/plugins/tmux-sessionist
 git submodule add --name tmux/tmux-suspend \
   -f https://github.com/MunifTanjim/tmux-suspend.git config/tmux/plugins/tmux-suspend
-git submodule add --name tmux/tmux-yank \
-  -f https://github.com/tmux-plugins/tmux-yank.git config/tmux/plugins/tmux-yank
 git submodule add --name tmux/tmux-current-pane-hostname \
   -f https://github.com/soyuka/tmux-current-pane-hostname.git config/tmux/plugins/tmux-current-pane-hostname
 git submodule add --name tmux/tmux-dark-notify \
@@ -60,6 +54,10 @@ folders=(
   "tools/dotbot-crontab"
   "tools/dotbot-snap"
   "config/tmux/plugins/tmux-window-name"
+  "config/tmux/plugins/tmux-sensible"
+  "config/tmux/plugins/tmux-mode-indicator"
+  "config/tmux/plugins/tmux-yank"
+  "config/tmux/plugins/tmux-fzf-url"
   "config/nvim-kickstart"
   "local/bin/asdf"
   "local/asdf"
