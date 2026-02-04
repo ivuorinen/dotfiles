@@ -11,31 +11,25 @@ msgr run "Installing go packages"
 
 ! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
 
-[[ -z "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]] \
-  && ASDF_GOLANG_DEFAULT_PACKAGES_FILE="$DOTFILES/config/asdf/golang-packages"
-
-# Packages are defined in $DOTFILES/config/asdf/golang-packages, one per line
-# Skip comments and empty lines
-packages=()
-if [[ -f "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE" ]]; then
-  while IFS= read -r line; do
-    # Skip comments
-    if [[ ${line:0:1} == "#" ]]; then continue; fi
-    if [[ ${line:0:1} == "/" ]]; then continue; fi
-    # Skip empty lines
-    if [[ -z "$line" ]]; then continue; fi
-    packages+=("$line")
-  done < "$ASDF_GOLANG_DEFAULT_PACKAGES_FILE"
-fi
+# Go packages to install
+packages=(
+  github.com/dotzero/git-profile@latest           # Switch between git user profiles
+  github.com/google/yamlfmt/cmd/yamlfmt@latest     # Format yaml files
+  github.com/cheat/cheat/cmd/cheat@latest          # Interactive cheatsheets on the CLI
+  github.com/charmbracelet/glow@latest             # Render markdown on the CLI
+  github.com/junegunn/fzf@latest                   # General-purpose fuzzy finder
+  github.com/charmbracelet/gum@latest              # Glamorous shell scripts
+  github.com/joshmedeski/sesh/v2@latest            # Terminal session manager
+)
 
 # Function to install go packages
 install_packages()
 {
   for pkg in "${packages[@]}"; do
-    # Trim spaces
-    pkg=${pkg// /}
-    # Skip comments
-    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+    # Strip inline comments and trim whitespace
+    pkg="${pkg%%#*}"
+    pkg="${pkg// /}"
+    [[ -z "$pkg" ]] && continue
 
     msgr nested "Installing go package: $pkg"
     go install "$pkg"
@@ -51,11 +45,6 @@ post_install()
   if command -v git-profile &> /dev/null; then
     git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
       && msgr run_done "Installed completions for git-profile"
-  fi
-
-  if command -v antidot &> /dev/null; then
-    antidot update \
-      && msgr run_done "Updated antidot database"
   fi
 }
 

@@ -1,6 +1,6 @@
 # install-go-packages
 
-Installs Go binaries defined in `config/go/packages`.
+Install Go packages defined in the script.
 
 ## Usage
 
@@ -8,5 +8,11 @@ Installs Go binaries defined in `config/go/packages`.
 scripts/install-go-packages.sh
 ```
 
-The script uses `go install` for each package path listed in the configuration
-file.
+## What it does
+
+1. Checks that `go` is available.
+2. Installs each package from the inline list using `go install`.
+3. Runs post-install steps (e.g. generating shell completions).
+4. Clears the Go module and build caches.
+
+To add or remove packages, edit the `packages` array in `scripts/install-go-packages.sh`.
