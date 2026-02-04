@@ -15,23 +15,20 @@ if ! command -v npm &> /dev/null; then
 fi
 
 packages=(
-  # This is a tool to check if your files consider your .editorconfig rules.
-  "editorconfig-checker"
-  # Node module to create a release or a changelog from
-  # a tag and uses issues or commits to creating the release notes.
-  "github-release-notes"
-  "neovim"
-  "corepack"
+  editorconfig-checker   # Check files against .editorconfig rules
+  github-release-notes   # Create release notes from tags and issues
+  neovim                 # Neovim node client
+  corepack               # Node.js package manager version management
 )
 
 # Function to install npm packages
 install_packages()
 {
   for pkg in "${packages[@]}"; do
-    # Trim spaces
-    pkg=${pkg// /}
-    # Skip comments
-    if [[ ${pkg:0:1} == "#" ]]; then continue; fi
+    # Strip inline comments and trim whitespace
+    pkg="${pkg%%#*}"
+    pkg="${pkg// /}"
+    [[ -z "$pkg" ]] && continue
 
     if npm ls -g -p "$pkg" &> /dev/null; then
       msgr run_done "$pkg" "already installed"
