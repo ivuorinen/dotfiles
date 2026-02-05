@@ -4,11 +4,6 @@
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
 
-[submodule "dotbot-brew"]
-	path = tools/dotbot-brew
-	url = https://github.com/wren/dotbot-brew.git
-	ignore = dirty
-
 [submodule "dotbot-include"]
 	path = tools/dotbot-include
 	url = https://gitlab.com/gnfzdz/dotbot-include.git
@@ -27,11 +22,6 @@
 [submodule "tmux/tmux-sessionist"]
 	path = config/tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist.git
-	ignore = dirty
-
-[submodule "dotbot-pip"]
-	path = tools/dotbot-pip
-	url = https://github.com/sobolevn/dotbot-pip.git
 	ignore = dirty
 
 [submodule "tmux/tmux-suspend"]
@@ -63,6 +53,8 @@
 [submodule "tmux/tmux-resurrect"]
 	path = config/tmux/plugins/tmux-resurrect
 	url = https://github.com/tmux-plugins/tmux-resurrect.git
+	ignore = dirty
 [submodule "tmux/catppuccin"]
 	path = config/tmux/plugins/catppuccin
 	url = https://github.com/catppuccin/tmux.git
+	ignore = dirty

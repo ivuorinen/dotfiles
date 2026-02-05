@@ -78,8 +78,3 @@
 - shell:
     # Use my dotfiles manager to install everything
     - bash local/bin/dfm install all
-
-- pipx:
-    file: tools/requirements-pipx.txt
-    stdout: true
-    stderr: true

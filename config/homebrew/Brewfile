@@ -260,8 +260,6 @@ brew "php@8.2", link: true
 brew "php@8.3"
 # Pins GitHub Actions to full hashes and versions
 brew "pinact"
-# Execute binaries from Python packages in isolated environments
-brew "pipx"
 # Python version management
 brew "pyenv"
 # Migrate pip packages from one Python version to another
