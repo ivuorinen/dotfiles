@@ -42,26 +42,64 @@ done
 # Mark certain repositories shallow
 git config -f .gitmodules submodule.antidote.shallow true
 
-# remove old submodules
-folders=(
-  "config/tmux/plugins/tpm"
-  "config/tmux/plugins/tmux"
-  "config/tmux/plugins/tmux-menus"
-  "tools/dotbot-crontab"
-  "tools/dotbot-snap"
-  "config/tmux/plugins/tmux-window-name"
-  "config/tmux/plugins/tmux-sensible"
-  "config/tmux/plugins/tmux-mode-indicator"
-  "config/tmux/plugins/tmux-yank"
-  "config/tmux/plugins/tmux-fzf-url"
-  "config/nvim-kickstart"
-  "local/bin/asdf"
-  "local/asdf"
-  "tools/dotbot-asdf"
+_log() {
+  if command -v msgr > /dev/null 2>&1; then
+    msgr run_done "$1"
+  else
+    echo "  [ok] $1"
+  fi
+}
+
+remove_old_submodule() {
+  local name="$1" path="$2"
+
+  # Remove working tree
+  if [ -d "$path" ]; then
+    rm -rf "$path"
+    _log "Removed $path"
+  fi
+
+  # Remove stale git index entry
+  git rm --cached "$path" 2> /dev/null || true
+
+  # Remove .git/config section keyed by path
+  git config --remove-section "submodule.$path" 2> /dev/null || true
+
+  # Skip name-based cleanup if no submodule name provided
+  [ -z "$name" ] && return 0
+
+  # Remove .git/config section keyed by name
+  git config --remove-section "submodule.$name" 2> /dev/null || true
+
+  # Remove .git/modules/<name>/ cached repository
+  if [ -d ".git/modules/$name" ]; then
+    rm -rf ".git/modules/$name"
+    _log "Removed .git/modules/$name"
+  fi
+}
+
+# remove old submodules (name:path pairs)
+old_submodules=(
+  "tmux/tpm:config/tmux/plugins/tpm"
+  ":config/tmux/plugins/tmux"
+  "tmux/tmux-menus:config/tmux/plugins/tmux-menus"
+  "dotbot-crontab:tools/dotbot-crontab"
+  "dotbot-snap:tools/dotbot-snap"
+  "tmux/tmux-window-name:config/tmux/plugins/tmux-window-name"
+  "tmux/tmux-sensible:config/tmux/plugins/tmux-sensible"
+  "tmux/tmux-mode-indicator:config/tmux/plugins/tmux-mode-indicator"
+  "tmux/tmux-yank:config/tmux/plugins/tmux-yank"
+  ":config/tmux/plugins/tmux-fzf-url"
+  "nvim-kickstart:config/nvim-kickstart"
+  "asdf:local/bin/asdf"
+  "asdf:local/asdf"
+  "dotbot-asdf:tools/dotbot-asdf"
+  "dotbot-pip:tools/dotbot-pip"
+  "dotbot-brew:tools/dotbot-brew"
 )
 
-for folder in "${folders[@]}"; do
-  [ -d "$folder" ] \
-    && rm -rf "$folder" \
-    && msgr run_done "Removed old submodule $folder"
+for entry in "${old_submodules[@]}"; do
+  name="${entry%%:*}"
+  path="${entry#*:}"
+  remove_old_submodule "$name" "$path"
 done
