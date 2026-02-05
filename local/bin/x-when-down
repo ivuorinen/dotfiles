@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 #
 # Wait until a given host is down (determined by ping) then execute the
 # given command

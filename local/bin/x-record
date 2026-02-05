@@ -35,7 +35,7 @@ msg()
 # Notify function
 notify()
 {
-  notify-call --replace-file "$replace_id" "$@"
+  notify-send.sh --replace-file "$replace_id" "$@"
 }
 
 # Stop recording function

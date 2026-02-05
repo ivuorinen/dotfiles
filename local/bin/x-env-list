@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # List environment variables grouped by the first part before underscore
 # protecting environment variables that possibly contain sensitive information.

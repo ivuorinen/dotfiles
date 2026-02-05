@@ -8,7 +8,7 @@ set -euo pipefail
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 
-A_DIR="$HOME/.config/alacritty"
+A_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/alacritty"
 
 # Function to print usage information
 usage()

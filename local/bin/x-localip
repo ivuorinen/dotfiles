@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # x-localip: script to display the local IP addresses of the system
 #

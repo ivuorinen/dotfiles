@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
-#   This file echoes a bunch of 24-bit color codes
-#   to the terminal to demonstrate its functionality.
-#   The foreground escape sequence is ^[38;2;<r>;<g>;<b>m
-#   The background escape sequence is ^[48;2;<r>;<g>;<b>m
-#   <r> <g> <b> range from 0 to 255 inclusive.
-#   The escape sequence ^[0m returns output to default
+# Display 24-bit terminal color test.
+#
+# Usage: x-term-colors
+#
+# The foreground escape sequence is ^[38;2;<r>;<g>;<b>m
+# The background escape sequence is ^[48;2;<r>;<g>;<b>m
+# <r> <g> <b> range from 0 to 255 inclusive.
+# The escape sequence ^[0m returns output to default
 
 setBackgroundColor()
 {
