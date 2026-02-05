@@ -16,7 +16,7 @@ main()
     printf "\`\`\`txt"
   } > "$DEST"
 
-  nvim -c "redir! >> $DEST" -c 'silent verbose map' -c 'redir END' -c 'q'
+  nvim -c "redir! >> \"$DEST\"" -c 'silent verbose map' -c 'redir END' -c 'q'
 
   printf "\n\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$DEST"
 

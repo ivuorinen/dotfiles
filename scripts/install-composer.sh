@@ -3,7 +3,7 @@ set -euo pipefail
 # @description Install PHP Package Manager Composer
 #
 # shellcheck source="shared.sh"
-source "$HOME/.dotfiles/config/shared.sh"
+source "$DOTFILES/config/shared.sh"
 
 if ! command -v php &> /dev/null; then
   msg_err "PHP Not Available, cannot install composer"

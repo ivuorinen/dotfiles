@@ -32,7 +32,7 @@ keep_alive_sudo()
   done 2> /dev/null &
 }
 
-XCODE_TOOLS_PATH=$(xcode-select -p)
+XCODE_TOOLS_PATH="$(xcode-select -p)"
 XCODE_SWIFT_PATH="$XCODE_TOOLS_PATH/usr/bin/swift"
 
 # Function to prompt for XCode CLI Tools installation
