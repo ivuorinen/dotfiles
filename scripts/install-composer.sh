@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install PHP Package Manager Composer
 #
 # shellcheck source="shared.sh"

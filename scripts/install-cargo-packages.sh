@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install cargo/rust packages.
+#
+# shellcheck source=shared.sh
+source "$DOTFILES/config/shared.sh"
 
 msgr run "Starting to install rust/cargo packages"
 

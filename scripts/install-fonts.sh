@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install NerdFonts
 #
 # shellcheck source="shared.sh"

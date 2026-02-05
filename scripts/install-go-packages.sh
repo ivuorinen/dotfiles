@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install Go packages
 #
 # shellcheck source=shared.sh

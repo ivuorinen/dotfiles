@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -uo pipefail
 # @description Sets macOS Defaults that I like
 #
 # This script contains large portions from following scripts:

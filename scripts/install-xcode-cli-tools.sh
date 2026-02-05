@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install npm packages globally.
 #
 # shellcheck source=shared.sh

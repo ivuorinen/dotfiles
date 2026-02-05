@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # @description Install Python packages using uv.
 #
 # shellcheck source=shared.sh
