@@ -15,37 +15,36 @@
 
 SCRIPT=$(basename "$0")
 
-# Detect the current shell
-CURRENT_SHELL=$(ps -p $$ -ocomm= | awk -F/ '{print $NF}')
+# Require bash 4.0+ for associative arrays and mapfile
+if ((BASH_VERSINFO[0] < 4)); then
+  echo "dfm requires bash 4.0+, found ${BASH_VERSION}"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    if ! command -v brew &> /dev/null; then
+      echo "Installing Homebrew..."
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    echo "Installing modern bash via Homebrew..."
+    brew install bash
+    echo "Done. Restart your shell and run dfm again."
+  else
+    echo "Install bash 4.0+ and try again."
+  fi
+  exit 1
+fi
 
-# Function to source files based on the shell
-source_file()
+# shellcheck disable=SC1091
+source "$DOTFILES/config/shared.sh"
+# shellcheck disable=SC1090
+source "${DOTFILES}/local/bin/msgr"
+
+# Get description from a script file's @description tag
+get_script_description()
 {
-  local file=$1
-  case "$CURRENT_SHELL" in
-    fish)
-      if [[ -f "$file.fish" ]]; then
-        # shellcheck disable=SC1090
-        source "$file.fish"
-      else
-        echo "Fish shell file not found: $file.fish"
-        exit 1
-      fi
-      ;;
-    sh | bash | zsh)
-      # shellcheck disable=SC1090
-      source "$file"
-      ;;
-    *)
-      echo "Unsupported shell: $CURRENT_SHELL"
-      exit 1
-      ;;
-  esac
+  local file="$1"
+  local desc
+  desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
+  echo "${desc:-No description available}"
 }
-
-# Modify the source commands to use the new function
-source_file "$DOTFILES/config/shared.sh"
-source_file "${DOTFILES}/local/bin/msgr"
 
 # Menu builder
 menu_builder()
@@ -54,9 +53,9 @@ menu_builder()
   local commands=("${@:2}")
   local width=60
 
-  printf "\n%s\n" "$(printf '%.s─' $(seq 1 $width))"
+  printf "\n%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
   printf "%-${width}s\n" "  $title"
-  printf "%s\n" "$(printf '%.s─' $(seq 1 $width))"
+  printf "%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
 
   for cmd in "${commands[@]}"; do
     local name=${cmd%%:*}
@@ -80,7 +79,6 @@ section_install()
     "imagick:Install ImageMagick CLI"
     "macos:Setup nice macOS defaults"
     "npm-packages:Install NPM Packages"
-    "ntfy:Install ntfy"
     "nvm-latest:Install latest lts node using nvm"
     "nvm:Install Node Version Manager (nvm)"
     "z:Install z"
@@ -100,6 +98,7 @@ section_install()
       $0 install npm-packages
       $0 install z
       msgr msg "Reloading configurations again..."
+      # shellcheck disable=SC1091
       source "$DOTFILES/config/shared.sh"
       msgr yay "All done!"
       ;;
@@ -208,87 +207,88 @@ section_brew()
     "untracked:List untracked brew packages"
   )
 
-  x-have brew && {
-    case "$1" in
-      install)
-        brew bundle install --file="$BREWFILE" --force --quiet && msgr yay "Done!"
-        ;;
+  if ! x-have brew; then
+    msgr warn "brew not available, skipping"
+    return 0
+  fi
 
-      update)
-        brew update && brew outdated && brew upgrade && brew cleanup
-        msgr yay "Done!"
-        ;;
+  case "$1" in
+    install)
+      brew bundle install --file="$BREWFILE" --force --quiet && msgr yay "Done!"
+      ;;
 
-      updatebundle)
-        # Updates .dotfiles/homebrew/Brewfile with descriptions
-        brew bundle dump \
-          --force \
-          --file="$BREWFILE" \
-          --cleanup \
-          --tap \
-          --formula \
-          --cask \
-          --describe && msgr yay "Done!"
-        ;;
+    update)
+      brew update && brew outdated && brew upgrade && brew cleanup
+      msgr yay "Done!"
+      ;;
 
-      leaves)
-        brew leaves --installed-on-request
-        ;;
+    updatebundle)
+      # Updates .dotfiles/homebrew/Brewfile with descriptions
+      brew bundle dump \
+        --force \
+        --file="$BREWFILE" \
+        --cleanup \
+        --tap \
+        --formula \
+        --cask \
+        --describe && msgr yay "Done!"
+      ;;
 
-      untracked)
-        declare -a BREW_LIST_ALL
-        while IFS= read -r line; do
-          BREW_LIST_ALL+=("$line")
-        done < <(brew list --formula --installed-on-request -1 --full-name)
-        while IFS= read -r c; do
-          BREW_LIST_ALL+=("$c")
-        done < <(brew list --cask -1 --full-name)
+    leaves)
+      brew leaves --installed-on-request
+      ;;
 
-        # Remove entries that are installed as dependencies
-        declare -a BREW_LIST_DEPENDENCIES
-        while IFS= read -r l; do
-          BREW_LIST_DEPENDENCIES+=("$l")
-        done < <(brew list -1 --installed-as-dependency)
+    untracked)
+      declare -a BREW_LIST_ALL
+      while IFS= read -r line; do
+        BREW_LIST_ALL+=("$line")
+      done < <(brew list --formula --installed-on-request -1 --full-name)
+      while IFS= read -r c; do
+        BREW_LIST_ALL+=("$c")
+      done < <(brew list --cask -1 --full-name)
 
-        declare -a BREW_LIST_BUNDLED
-        while IFS= read -r b; do
-          BREW_LIST_BUNDLED+=("$b")
-        done < <(brew bundle list --all --file="$BREWFILE")
+      # Remove entries that are installed as dependencies
+      declare -a BREW_LIST_DEPENDENCIES
+      while IFS= read -r l; do
+        BREW_LIST_DEPENDENCIES+=("$l")
+      done < <(brew list -1 --installed-as-dependency)
 
-        declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
-        for f in "${BREW_LIST_ALL[@]}"; do
-          # shellcheck disable=SC2199
-          if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
-            BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
-          fi
-        done
+      declare -a BREW_LIST_BUNDLED
+      while IFS= read -r b; do
+        BREW_LIST_BUNDLED+=("$b")
+      done < <(brew bundle list --all --file="$BREWFILE")
 
-        array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
-
-        # If there are no untracked packages, exit
-        if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
-          msgr yay "No untracked packages found!"
-          exit 0
+      declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
+      for f in "${BREW_LIST_ALL[@]}"; do
+        # shellcheck disable=SC2199
+        if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
+          BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
         fi
+      done
 
-        echo "Untracked:"
-        for f in "${BREW_LIST_UNTRACKED[@]}"; do
-          echo "  $f"
-        done
-        ;;
+      array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
 
-      autoupdate)
-        brew autoupdate delete
-        brew autoupdate start 43200 --upgrade --cleanup --immediate
-        ;;
+      # If there are no untracked packages, return
+      if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
+        msgr yay "No untracked packages found!"
+        return 0
+      fi
 
-      clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+      echo "Untracked:"
+      for f in "${BREW_LIST_UNTRACKED[@]}"; do
+        echo "  $f"
+      done
+      ;;
 
-      *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
-    esac
-  }
+    autoupdate)
+      brew autoupdate delete
+      brew autoupdate start 43200 --upgrade --cleanup --immediate
+      ;;
 
-  ! x-have brew && menu_builder "$USAGE_PREFIX" "brew not available on this system"
+    clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
 }
 
 section_helpers()
@@ -305,10 +305,10 @@ section_helpers()
     "wezterm:Show wezterm keybindings"
   )
 
-  CMD="$1"
-  shift
-  SECTION="$1"
-  shift
+  CMD="${1:-}"
+  [[ $# -gt 0 ]] && shift
+  SECTION="${1:-}"
+  [[ $# -gt 0 ]] && shift
 
   case "$CMD" in
     path)
@@ -379,55 +379,60 @@ section_apt()
     "clean:Clean apt cache"
   )
 
-  x-have apt && {
-    case "$1" in
-      upkeep)
-        sudo apt update \
-          && sudo apt upgrade -y \
-          && sudo apt autoremove -y \
-          && sudo apt clean
-        ;;
+  if ! x-have apt; then
+    msgr warn "apt not available, skipping"
+    return 0
+  fi
 
-      install)
-        # if apt.txt is not found, exit
-        [ ! -f "$DOTFILES/tools/apt.txt" ] && msgr err "apt.txt not found" && exit 0
+  case "$1" in
+    upkeep)
+      sudo apt update \
+        && sudo apt upgrade -y \
+        && sudo apt autoremove -y \
+        && sudo apt clean
+      ;;
 
-        # Load apt.txt, remove comments (even if trailing comment) and empty lines.
-        #
-        # Ignoring "Quote this to prevent word splitting."
+    install)
+      # if apt.txt is not found, return with error
+      if [ ! -f "$DOTFILES/tools/apt.txt" ]; then
+        msgr err "apt.txt not found"
+        return 1
+      fi
+
+      # Load apt.txt, remove comments (even if trailing comment) and empty lines.
+      #
+      # Ignoring "Quote this to prevent word splitting."
+      # shellcheck disable=SC2046
+      sudo apt install \
+        -y $(
+          grep -vE '^\s*#' "$DOTFILES/tools/apt.txt" \
+            | sed -e 's/#.*//' \
+            | tr '\n' ' '
+        )
+
+      # If there's a apt.txt file under hosts/$hostname/apt.txt,
+      # run install on those lines too.
+      HOSTNAME=$(hostname -s)
+      HOST_APT="$DOTFILES/hosts/$HOSTNAME/apt.txt"
+      [[ -f $HOST_APT ]] && {
         # shellcheck disable=SC2046
-        sudo apt install \
-          -y $(
-            grep -vE '^\s*#' "$DOTFILES/tools/apt.txt" \
-              | sed -e 's/#.*//' \
-              | tr '\n' ' '
-          )
+        sudo apt install -y $(
+          grep -vE '^\s*#' "$HOST_APT" \
+            | sed -e 's/#.*//' \
+            | tr '\n' ' '
+        )
+      }
 
-        # If there's a apt.txt file under hosts/$hostname/apt.txt,
-        # run install on those lines too.
-        HOSTNAME=$(hostname -s)
-        HOST_APT="$DOTFILES/hosts/$HOSTNAME/apt.txt"
-        [[ -f $HOST_APT ]] && {
-          # shellcheck disable=SC2046
-          sudo apt install -y $(
-            grep -vE '^\s*#' "$HOST_APT" \
-              | sed -e 's/#.*//' \
-              | tr '\n' ' '
-          )
-        }
+      # Try this for an alternative way to install packages
+      # xargs -a <(awk '! /^ *(#|$)/' "$packagelist") -r -- sudo apt-get install -y
+      ;;
 
-        # Try this for an alternative way to install packages
-        # xargs -a <(awk '! /^ *(#|$)/' "$packagelist") -r -- sudo apt-get install -y
-        ;;
-
-      update) sudo apt update ;;
-      upgrade) sudo apt upgrade -y ;;
-      autoremove) sudo apt autoremove -y ;;
-      clean) sudo apt clean ;;
-      *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
-    esac
-  }
-  ! x-have apt && menu_builder "$USAGE_PREFIX" "apt not available on this system"
+    update) sudo apt update ;;
+    upgrade) sudo apt upgrade -y ;;
+    autoremove) sudo apt autoremove -y ;;
+    clean) sudo apt clean ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
 }
 
 section_docs()
@@ -534,13 +539,13 @@ section_check()
 
   case "$1" in
     a | arch)
-      [[ $2 == "" ]] && echo "$X_ARCH" && exit 0
-      [[ $X_ARCH == "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_ARCH" && return 0
+      [[ $X_ARCH == "$2" ]] && return 0 || return 1
       ;;
 
     h | host | hostname)
-      [[ $2 == "" ]] && echo "$X_HOSTNAME" && exit 0
-      [[ $X_HOSTNAME == "$2" ]] && exit 0 || exit 1
+      [[ $2 == "" ]] && echo "$X_HOSTNAME" && return 0
+      [[ $X_HOSTNAME == "$2" ]] && return 0 || return 1
       ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
@@ -551,33 +556,18 @@ section_scripts()
 {
   USAGE_PREFIX="$SCRIPT scripts <command>"
 
-  # Get description from a file
-  get_script_description()
-  {
-    local file
-    local desc
-    file="$1"
-    desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
-    echo "${desc:-No description available}"
-  }
-
   # Collect scripts and their descriptions
-  declare -A SCRIPT_MENU
+  local menu_items=()
   for script in "$DOTFILES/scripts/install-"*.sh; do
     if [ -f "$script" ]; then
       name=$(basename "$script" .sh | sed 's/install-//')
       desc=$(get_script_description "$script")
-      SCRIPT_MENU[$name]="$desc"
+      menu_items+=("$name:$desc")
     fi
   done
 
   case "$1" in
     "")
-      # Show the menu
-      local menu_items=()
-      for name in "${!SCRIPT_MENU[@]}"; do
-        menu_items+=("$name:${SCRIPT_MENU[$name]}")
-      done
       menu_builder "$USAGE_PREFIX" "${menu_items[@]}"
       ;;
     *)
@@ -609,7 +599,7 @@ section_tests()
         echo "  $i"
       done
       ;;
-    msg)
+    msgr)
       # shellcheck disable=SC1010
       msgr done "msgr done"
       msgr done_suffix "msgr done_suffix"
@@ -633,7 +623,7 @@ usage()
 {
   echo ""
   msgr prompt "Usage: $SCRIPT <section> <command>"
-  echo $"  Empty <command> prints <section> help."
+  echo "  Empty <command> prints <section> help."
   echo ""
   section_install
   echo ""
@@ -654,8 +644,8 @@ usage()
 
 main()
 {
-  SECTION="$1"
-  shift
+  SECTION="${1:-}"
+  [[ $# -gt 0 ]] && shift
   # The main loop. The first keyword after $0 triggers section, or help.
   case "$SECTION" in
     install) section_install "$@" ;;
@@ -667,7 +657,7 @@ main()
     docs) section_docs "$@" ;;
     scripts) section_scripts "$@" ;;
     tests) section_tests "$@" ;;
-    *) usage && exit 0 ;;
+    *) usage && return 0 ;;
   esac
 }
 
