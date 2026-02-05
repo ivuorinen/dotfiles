@@ -86,7 +86,7 @@ process_chapters()
     if [ '---' != "$(head -1 < "$cheat_file")" ]; then
       local metadata
       metadata="$PBB_SYNTAX\n$PBB_TAGS\n$PBB_SOURCE\n"
-      echo -e "---\n$metadata---\n$(cat "$cheat_file")" > "$cheat_file"
+      printf '%s\n%b%s\n%s' "---" "$metadata" "---" "$(cat "$cheat_file")" > "$cheat_file"
     fi
   done
 }
