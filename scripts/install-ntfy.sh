@@ -23,6 +23,7 @@ case $(dfm check arch) in
     ;;
   *)
     msgr err "Unsupported OS"
+    exit 1
     ;;
 esac
 

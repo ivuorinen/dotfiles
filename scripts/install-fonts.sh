@@ -21,7 +21,7 @@ clone_or_update_repo()
     git clone --quiet --filter=blob:none --sparse --depth=1 "$GIT_REPO" "$TMP_PATH"
   fi
 
-  cd "$TMP_PATH" || msgr err "No such folder $TMP_PATH"
+  cd "$TMP_PATH" || { msgr err "No such folder $TMP_PATH"; exit 1; }
 }
 
 # Function to add fonts to sparse-checkout
