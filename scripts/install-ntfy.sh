@@ -29,23 +29,25 @@ esac
 
 NTFY_VERSION="$(x-gh-get-latest-version binwiederhier/ntfy)"
 NTFY_URL="https://github.com/binwiederhier/ntfy"
-NTFY_DEST="/tmp/ntfy_${NTFY_VERSION}_${NTFY_ARCH}"
+NTFY_TARBALL="ntfy_${NTFY_VERSION}_${NTFY_ARCH}.tar.gz"
+NTFY_DIR="ntfy_${NTFY_VERSION}_${NTFY_ARCH}"
 
 # Download and extract ntfy
 install_ntfy()
 {
-  curl -L "$NTFY_URL/releases/download/v${NTFY_VERSION}/${NTFY_DEST}.tar.gz" -o "${NTFY_DEST}.tar.gz"
-  tar zxvf "${NTFY_DEST}.tar.gz"
-  cp -a "${NTFY_DEST}/ntfy" ~/.local/bin/ntfy
+  local tmpdir
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf "$tmpdir"' EXIT
+
+  curl -L "$NTFY_URL/releases/download/v${NTFY_VERSION}/${NTFY_TARBALL}" -o "$tmpdir/${NTFY_TARBALL}"
+  tar zxvf "$tmpdir/${NTFY_TARBALL}" -C "$tmpdir"
+  cp -a "$tmpdir/${NTFY_DIR}/ntfy" ~/.local/bin/ntfy
   mkdir -p ~/.config/ntfy
 
   # Copy config only if it does not exist
   if [ ! -f "$HOME/.config/ntfy/client.yml" ]; then
-    cp "${NTFY_DEST}/client/client.yml" ~/.config/ntfy/client.yml
+    cp "$tmpdir/${NTFY_DIR}/client/client.yml" ~/.config/ntfy/client.yml
   fi
-
-  # Clean up
-  rm -rf "${NTFY_DEST}" "${NTFY_DEST}.tar.gz"
 }
 
 main()

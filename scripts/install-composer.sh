@@ -22,5 +22,7 @@ fi
 php composer-setup.php --quiet
 RESULT=$?
 rm composer-setup.php
-mv composer.phar ~/.local/bin/composer
+if [ $RESULT -eq 0 ]; then
+  mv composer.phar ~/.local/bin/composer
+fi
 exit $RESULT
