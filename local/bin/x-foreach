@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 #
-# foreach <folder> <commands that should be run to each file>
-# foreach "ls -d */" "git status" # run git status in each folder
+# Run a command in each directory matching a pattern.
+#
+# Usage: x-foreach <listing-command> <command> [args...]
+#   x-foreach "ls -d */" "git status"
 #
 # Source: https://github.com/mvdan/dotfiles/blob/master/.bin/foreach
 
-cmd=$1
+set -euo pipefail
+
+if [ $# -lt 2 ]; then
+  echo "Usage: $0 <listing-command> <command> [args...]"
+  exit 1
+fi
+
+listing=$1
 shift
 
-for dir in $($cmd); do
+for dir in $(eval "$listing"); do
   (
     echo "$dir"
     cd "$dir" || exit 1
-    # shellcheck disable=SC2294,SC2034
-    eval "$@" # allow multiple commands like "foo && bar"
+    "$@"
   )
 done

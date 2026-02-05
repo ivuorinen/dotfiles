@@ -7,13 +7,15 @@
 # Author: Ismo Vuorinen 2025
 # License: MIT
 
+set -euo pipefail
+
 # Check if the user has provided a directory as an argument
-if [ "$1" ]; then
+if [ "${1:-}" ]; then
   # Check if the directory exists
   if [ -d "$1" ]; then
     CLEANDIR="$1"
   else
-    msgr err "Directory $1 does not exist."
+    echo "Error: Directory $1 does not exist." >&2
     exit 1
   fi
 else
@@ -27,7 +29,7 @@ remove_node_modules_vendor()
 
   # If the directory is a symlink, skip it
   if [ -L "$dir" ]; then
-    msgr msg "Skipping symlink $dir"
+    echo "Skipping symlink $dir"
     return
   fi
 
@@ -35,18 +37,18 @@ remove_node_modules_vendor()
   if [ -d "$dir" ]; then
     # If node_modules or vendor folder exists, remove it and all its contents
     if [ -d "$dir/node_modules" ]; then
-      msgr run "Removing $dir/node_modules"
+      echo "Removing $dir/node_modules"
       rm -rf "$dir/node_modules"
     fi
 
     if [ -d "$dir/vendor" ]; then
-      msgr run "Removing $dir/vendor"
+      echo "Removing $dir/vendor"
       rm -rf "$dir/vendor"
     fi
 
     # Recursively check subdirectories
     for item in "$dir"/*; do
-      remove_node_modules_vendor "$item"
+      [ -d "$item" ] && remove_node_modules_vendor "$item"
     done
   fi
 }

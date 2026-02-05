@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+#
+# Display external IP address.
+#
 # Source: https://github.com/thirtythreeforty/dotfiles/blob/master/bin/extip
 
-curl icanhazip.com "${@}"
+set -euo pipefail
+
+if ! command -v curl &> /dev/null; then
+  echo "Error: curl is required" >&2
+  exit 1
+fi
+
+curl -sf icanhazip.com
