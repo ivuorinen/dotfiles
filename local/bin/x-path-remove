@@ -1,41 +1,17 @@
 #!/usr/bin/env bash
 #
-# Optimized script to remove directories from PATH.
-# For each specified directory, all occurrences are removed from PATH.
+# Thin wrapper — delegates to x-path remove.
+# Can be sourced (PATH changes propagate) or executed.
 #
 # Usage: x-path-remove <directory1> [<directory2> ...]
-#
-# Enable verbose output by setting the environment variable VERBOSE=1.
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 # License: MIT
 
 VERBOSE="${VERBOSE:-0}"
 
-# Ensure that at least one directory is provided.
-[ "$#" -lt 1 ] && {
-  echo "Usage: $0 <directory> [<directory> ...]"
-  exit 1
-}
+# shellcheck source=./x-path
+. "$(dirname "${BASH_SOURCE[0]:-$0}")/x-path"
 
-for dir in "$@"; do
-  # Remove trailing slash if present, unless the directory is "/"
-  [ "$dir" != "/" ] && dir="${dir%/}"
-
-  # Check if the directory is present in PATH.
-  case ":$PATH:" in
-    *":$dir:"*)
-      # Remove all occurrences of the directory from PATH using parameter expansion.
-      PATH=":${PATH}:"
-      PATH="${PATH//:$dir:/:}"
-      PATH="${PATH#:}"
-      PATH="${PATH%:}"
-      [ "$VERBOSE" -eq 1 ] && echo "Removed '$dir' from PATH."
-      ;;
-    *)
-      [ "$VERBOSE" -eq 1 ] && echo "(?) '$dir' is not in PATH."
-      ;;
-  esac
-done
-
-export PATH
+normalize_path_var
+do_remove "$@"

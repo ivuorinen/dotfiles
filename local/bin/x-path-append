@@ -1,44 +1,17 @@
 #!/usr/bin/env bash
 #
-# Optimized script to append directories to PATH.
-# For each given directory, it removes all duplicate occurrences from PATH
-# and then appends it if the directory exists.
+# Thin wrapper — delegates to x-path append.
+# Can be sourced (PATH changes propagate) or executed.
 #
 # Usage: x-path-append <directory1> [<directory2> ...]
-#
-# Enable verbose output by setting the environment variable VERBOSE=1.
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 # License: MIT
 
 VERBOSE="${VERBOSE:-0}"
 
-# Ensure that at least one directory is provided.
-[ "$#" -lt 1 ] && {
-  echo "Usage: $0 <directory> [<directory> ...]"
-  exit 1
-}
+# shellcheck source=./x-path
+. "$(dirname "${BASH_SOURCE[0]:-$0}")/x-path"
 
-for dir in "$@"; do
-  # Check if the specified directory exists.
-  if [ ! -d "$dir" ]; then
-    [ "$VERBOSE" -eq 1 ] && echo "(?) Directory '$dir' does not exist. Skipping."
-    continue
-  fi
-
-  # Remove all duplicate occurrences of the directory from PATH.
-  case ":$PATH:" in
-    *":$dir:"*)
-      PATH=":${PATH}:"
-      PATH="${PATH//:$dir:/:}"
-      PATH="${PATH#:}"
-      PATH="${PATH%:}"
-      [ "$VERBOSE" -eq 1 ] && echo "Removed previous occurrences of '$dir' from PATH."
-      ;;
-    *) ;;
-  esac
-
-  # Append the directory to PATH.
-  export PATH="${PATH:+$PATH:}$dir"
-  [ "$VERBOSE" -eq 1 ] && echo "Appended '$dir' to PATH."
-done
+normalize_path_var
+do_append "$@"

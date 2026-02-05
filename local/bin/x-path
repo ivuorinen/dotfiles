@@ -227,6 +227,9 @@ do_check()
   fi
 }
 
+# If sourced, provide functions without executing main logic
+(return 0 2> /dev/null) && return
+
 #######################################
 # Main routine: Parse subcommand and arguments, normalize PATH,
 # and dispatch to the appropriate functionality.

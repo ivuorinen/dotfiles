@@ -1,50 +1,17 @@
 #!/usr/bin/env bash
 #
-# Optimized script to batch prepend directories to PATH.
-# For each given directory, it removes all duplicate occurrences from PATH
-# and then prepends it. Directories that do not exist are skipped.
+# Thin wrapper — delegates to x-path prepend.
+# Can be sourced (PATH changes propagate) or executed.
 #
 # Usage: x-path-prepend <directory1> [<directory2> ...]
-#
-# Enable verbose output by setting the environment variable VERBOSE=1.
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
 # License: MIT
 
 VERBOSE="${VERBOSE:-0}"
 
-# Ensure that at least one argument is provided.
-[ "$#" -lt 1 ] && {
-  echo "Usage: $0 <directory> [<directory> ...]"
-  exit 1
-}
+# shellcheck source=./x-path
+. "$(dirname "${BASH_SOURCE[0]:-$0}")/x-path"
 
-# Save the arguments in an array.
-dirs=("$@")
-
-# Process the directories in reverse order so that the first argument ends up leftmost in PATH.
-for ((idx = ${#dirs[@]} - 1; idx >= 0; idx--)); do
-  dir="${dirs[idx]}"
-
-  # Check if the specified directory exists.
-  if [ ! -d "$dir" ]; then
-    [ "$VERBOSE" -eq 1 ] && echo "(?) Directory '$dir' does not exist. Skipping."
-    continue
-  fi
-
-  # Remove all duplicate occurrences of the directory from PATH using built-in string operations.
-  case ":$PATH:" in
-    *":$dir:"*)
-      PATH=":${PATH}:"
-      PATH="${PATH//:$dir:/:}"
-      PATH="${PATH#:}"
-      PATH="${PATH%:}"
-      [ "$VERBOSE" -eq 1 ] && echo "Removed duplicate occurrences of '$dir' from PATH."
-      ;;
-    *) ;;
-  esac
-
-  # Prepend the directory to PATH.
-  export PATH="$dir${PATH:+":$PATH"}"
-  [ "$VERBOSE" -eq 1 ] && echo "Prepended '$dir' to PATH."
-done
+normalize_path_var
+do_prepend "$@"
