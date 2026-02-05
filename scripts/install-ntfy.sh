@@ -5,9 +5,6 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 # Check if ntfy is already installed
 if x-have "ntfy"; then
   msgr "done" "ntfy already installed"

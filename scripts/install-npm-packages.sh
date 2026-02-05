@@ -5,9 +5,6 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 msgr msg "Starting to install npm packages"
 
 if ! command -v npm &> /dev/null; then

@@ -4,9 +4,6 @@ set -euo pipefail
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 # Check if the script is running on macOS
 if [ "$(uname)" != "Darwin" ]; then
   msgr warn "Not a macOS system"

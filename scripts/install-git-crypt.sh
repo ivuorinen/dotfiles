@@ -7,9 +7,6 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 msgr run "Installing git-crypt"
 
 if ! command -v git-crypt &> /dev/null; then

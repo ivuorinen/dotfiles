@@ -5,9 +5,6 @@ set -euo pipefail
 # shellcheck source="shared.sh"
 source "${DOTFILES}/config/shared.sh"
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 msgr run "Installing gh (GitHub Client) extensions"
 
 if ! command -v gh &> /dev/null; then

@@ -5,9 +5,6 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
-
 msgr run "Installing go packages"
 
 ! x-have "go" && msgr err "go hasn't been installed yet." && exit 0
