@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # A script for encrypting and decrypting files or directories with age and SSH keys
 
-VERSION="1.0.0"
+set -euo pipefail
+
+VERSION="1.1.0"
 
 # Default ENV values
 KEYS_FILE="${AGE_KEYSFILE:-$HOME/.ssh/keys.txt}"
@@ -9,14 +11,49 @@ KEYS_SOURCE="${AGE_KEYSSOURCE:-https://github.com/ivuorinen.keys}"
 LOG_FILE="${AGE_LOGFILE:-$HOME/.cache/a.log}"
 
 VERBOSE=false
+DELETE_ORIGINAL=false
+FORCE=false
 
-# Parse flags for verbosity
-for arg in "$@"; do
-  if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
-    VERBOSE=true
-    break
+# Check for required dependencies
+check_dependencies()
+{
+  if ! command -v age &> /dev/null; then
+    echo "Error: 'age' is not installed. Please install it first." >&2
+    echo "  brew install age    # macOS" >&2
+    echo "  apt install age     # Debian/Ubuntu" >&2
+    echo "  dnf install age     # Fedora" >&2
+    exit 1
   fi
-done
+
+  if ! command -v curl &> /dev/null; then
+    echo "Error: 'curl' is not installed." >&2
+    exit 1
+  fi
+}
+
+# Parse flags
+parse_flags()
+{
+  local args=()
+  for arg in "$@"; do
+    case "$arg" in
+      -v | --verbose)
+        VERBOSE=true
+        ;;
+      --delete)
+        DELETE_ORIGINAL=true
+        ;;
+      -f | --force)
+        FORCE=true
+        ;;
+      *)
+        args+=("$arg")
+        ;;
+    esac
+  done
+  # Return remaining arguments
+  printf '%s\n' "${args[@]}"
+}
 
 # Ensure log directory and file exist with correct permissions
 prepare_log_file()
@@ -38,8 +75,6 @@ prepare_log_file()
   chmod 0600 "$LOG_FILE"
 }
 
-prepare_log_file
-
 # Logging function
 log_message()
 {
@@ -56,7 +91,7 @@ log_message()
 print_help()
 {
   cat << EOF
-Usage: a [command] [file_or_directory] [options]
+Usage: a [options] [command] [file_or_directory]
 
 Commands:
   e, enc, encrypt      Encrypt the specified file or directory
@@ -65,12 +100,14 @@ Commands:
   version, --version   Show version information
 
 Options:
-  -v, --verbose        Print log messages to console in addition to writing to log file
+  -v, --verbose        Print log messages to console
+  --delete             Delete original files after successful encryption
+  -f, --force          Overwrite existing output files without prompting
 
 Environment Variables:
-  AGE_KEYSFILE         Path to the SSH keys file (default: $HOME/.ssh/keys.txt)
+  AGE_KEYSFILE         Path to the SSH keys file (default: \$HOME/.ssh/keys.txt)
   AGE_KEYSSOURCE       URL to fetch SSH keys if keys file does not exist
-  AGE_LOGFILE          Path to the log file (default: $HOME/.cache/a.log)
+  AGE_LOGFILE          Path to the log file (default: \$HOME/.cache/a.log)
 
 Examples:
   Encrypt a file:
@@ -79,14 +116,21 @@ Examples:
   Encrypt a directory:
     a e /path/to/directory
 
+  Encrypt and delete originals:
+    a --delete e file.txt
+
   Decrypt a file:
     a d file.txt.age
+
+  Force overwrite existing files:
+    a -f e file.txt
 
   Specify a custom keys file:
     AGE_KEYSFILE=/path/to/keys.txt a e file.txt
 
-  Specify a custom keys source and log file:
-    AGE_KEYSSOURCE=https://example.com/keys.txt AGE_LOGFILE=/tmp/a.log a d file.txt.age
+Requirements:
+  - age (encryption tool): https://github.com/FiloSottile/age
+  - curl (for fetching keys)
 EOF
 }
 
@@ -115,26 +159,104 @@ fetch_keys_if_missing()
   fi
 }
 
+# Function to encrypt a single file
+encrypt_single_file()
+{
+  local file="$1"
+
+  # Skip already encrypted files
+  if [[ "$file" == *.age ]]; then
+    log_message "Skipping already encrypted file: $file"
+    return 0
+  fi
+
+  local output_file="${file}.age"
+
+  # Check if output file exists
+  if [[ -f "$output_file" && "$FORCE" != true ]]; then
+    log_message "Error: Output file '$output_file' already exists. Use --force to overwrite."
+    return 1
+  fi
+
+  fetch_keys_if_missing
+
+  local temp_file
+  temp_file="$(mktemp -p "$(dirname "$file")")"
+
+  if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
+    log_message "File encrypted successfully: $output_file"
+
+    if [[ "$DELETE_ORIGINAL" == true ]]; then
+      rm -f "$file"
+      log_message "Original file deleted: $file"
+    fi
+  else
+    rm -f "$temp_file"
+    log_message "Error: Failed to encrypt file '$file'."
+    return 1
+  fi
+}
+
 # Function to encrypt files or directories
 encrypt_file_or_directory()
 {
   local file="$1"
+
   if [[ -d "$file" ]]; then
-    for f in "$file"/*; do
+    # Enable dotglob to include hidden files
+    shopt -s dotglob nullglob
+    local files=("$file"/*)
+    shopt -u dotglob nullglob
+
+    if [[ ${#files[@]} -eq 0 ]]; then
+      log_message "Warning: Directory '$file' is empty."
+      return 0
+    fi
+
+    for f in "${files[@]}"; do
       encrypt_file_or_directory "$f"
     done
   elif [[ -f "$file" ]]; then
-    fetch_keys_if_missing
-    local output_file="${file}.age"
-    local temp_file
-    temp_file="$(mktemp -p "$(dirname "$file")")"
-    if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
-      log_message "File encrypted successfully: $output_file"
-    else
-      rm -f "$temp_file"
-      log_message "Error: Failed to encrypt file '$file'."
-      exit 1
+    encrypt_single_file "$file"
+  else
+    log_message "Warning: '$file' is not a file or directory, skipping."
+  fi
+}
+
+# Function to decrypt a single file
+decrypt_single_file()
+{
+  local file="$1"
+
+  if [[ ! "$file" == *.age ]]; then
+    log_message "Skipping non-.age file: $file"
+    return 0
+  fi
+
+  local output_file="${file%.age}"
+
+  # Check if output file exists
+  if [[ -f "$output_file" && "$FORCE" != true ]]; then
+    log_message "Error: Output file '$output_file' already exists. Use --force to overwrite."
+    return 1
+  fi
+
+  fetch_keys_if_missing
+
+  local temp_file
+  temp_file="$(mktemp -p "$(dirname "$file")")"
+
+  if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
+    log_message "File decrypted successfully: $output_file"
+
+    if [[ "$DELETE_ORIGINAL" == true ]]; then
+      rm -f "$file"
+      log_message "Encrypted file deleted: $file"
     fi
+  else
+    rm -f "$temp_file"
+    log_message "Error: Failed to decrypt file '$file'."
+    return 1
   fi
 }
 
@@ -142,54 +264,76 @@ encrypt_file_or_directory()
 decrypt_file_or_directory()
 {
   local file="$1"
+
   if [[ -d "$file" ]]; then
-    for f in "$file"/*.age; do
-      decrypt_file_or_directory "$f"
+    # Enable nullglob to handle no matches gracefully
+    shopt -s nullglob
+    local files=("$file"/*.age)
+    shopt -u nullglob
+
+    if [[ ${#files[@]} -eq 0 ]]; then
+      log_message "Warning: No .age files found in directory '$file'."
+      return 0
+    fi
+
+    for f in "${files[@]}"; do
+      decrypt_single_file "$f"
     done
   elif [[ -f "$file" ]]; then
-    fetch_keys_if_missing
-    local output_file="${file%.age}"
-    local temp_file
-    temp_file="$(mktemp -p "$(dirname "$file")")"
-    if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
-      log_message "File decrypted successfully: $output_file"
-    else
-      rm -f "$temp_file"
-      log_message "Error: Failed to decrypt file '$file'."
-      exit 1
-    fi
+    decrypt_single_file "$file"
+  else
+    log_message "Warning: '$file' is not a file or directory, skipping."
   fi
 }
 
-# Main logic
-case "$1" in
-  e | enc | encrypt)
-    if [[ $# -lt 2 ]]; then
-      log_message "Error: No file or directory specified for encryption."
+# Main entry point
+main()
+{
+  check_dependencies
+
+  # Parse flags and get remaining arguments
+  mapfile -t ARGS < <(parse_flags "$@")
+
+  prepare_log_file
+
+  local command="${ARGS[0]:-}"
+  local target="${ARGS[1]:-}"
+
+  case "$command" in
+    e | enc | encrypt)
+      if [[ -z "$target" ]]; then
+        log_message "Error: No file or directory specified for encryption."
+        print_help
+        exit 1
+      fi
+      encrypt_file_or_directory "$target"
+      ;;
+    d | dec | decrypt)
+      if [[ -z "$target" ]]; then
+        log_message "Error: No file or directory specified for decryption."
+        print_help
+        exit 1
+      fi
+      decrypt_file_or_directory "$target"
+      ;;
+    help | --help | -h)
+      print_help
+      ;;
+    version | --version)
+      print_version
+      ;;
+    "")
       print_help
       exit 1
-    fi
-    encrypt_file_or_directory "$2"
-    ;;
-  d | dec | decrypt)
-    if [[ $# -lt 2 ]]; then
-      log_message "Error: No file or directory specified for decryption."
+      ;;
+    *)
+      log_message "Error: Unknown command '$command'"
       print_help
       exit 1
-    fi
-    decrypt_file_or_directory "$2"
-    ;;
-  help | --help)
-    print_help
-    ;;
-  version | --version)
-    print_version
-    ;;
-  *)
-    log_message "Error: Unknown command '$1'"
-    print_help
-    exit 1
-    ;;
-esac
+      ;;
+  esac
+}
+
+main "$@"
 
 # vim: ft=bash:syn=sh:ts=2:sw=2:et:ai:nowrap
