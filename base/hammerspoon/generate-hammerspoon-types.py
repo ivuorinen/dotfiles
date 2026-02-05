@@ -370,7 +370,7 @@ def infer_type_from_param_name(param_name: str) -> str:
 
     # Function indicators
     if (param_name in ["fn", "func", "callback", "handler", "listener",
-                       "predicate", "filter", "mapper", "reducer"]):
+        "predicate", "filter", "mapper", "reducer"]):
         return "function"
 
     # Number indicators

@@ -40,7 +40,8 @@ return {
           operators = {},
           -- miscs = {}, -- Uncomment to turn off hard-coded styles
         },
-        lsp_styles = { -- Handles the style of specific lsp hl groups (see `:h lsp-highlight`).
+        -- Style of specific lsp hl groups (`:h lsp-highlight`)
+        lsp_styles = {
           virtual_text = {
             errors = { 'italic' },
             hints = { 'italic' },
@@ -72,7 +73,8 @@ return {
             enabled = true,
             indentscope_color = '',
           },
-          -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+          -- More integrations:
+          -- github.com/catppuccin/nvim#integrations
         },
       }
 
@@ -115,7 +117,8 @@ return {
   {
     'dmtrKovalenko/fff.nvim',
     build = function()
-      -- this will download prebuild binary or try to use existing rustup toolchain to build from source
+      -- Downloads prebuild binary or uses rustup
+      -- toolchain to build from source
       -- (if you are using lazy you can use gb for rebuilding a plugin if needed)
       require('fff.download').download_or_build_binary()
     end,
@@ -124,7 +127,8 @@ return {
     opts = { -- (optional)
       debug = {
         enabled = true, -- we expect your collaboration at least during the beta
-        show_scores = true, -- to help us optimize the scoring system, feel free to share your scores!
+        -- Share scores to help optimize scoring
+        show_scores = true,
       },
     },
     -- No need to lazy-load with lazy.nvim.

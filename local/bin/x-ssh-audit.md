@@ -37,7 +37,7 @@ The script automatically tries authentication methods in this order:
 
 1. **Specific key** (if provided in host file)
 2. **Auto-detected default keys** (`~/.ssh/id_ed25519`, `id_rsa`, `id_ecdsa`,
-   `id_dsa`)
+    `id_dsa`)
 3. **SSH agent or system default authentication**
 
 This means you can mix hosts with and without specific keys, and the script will
@@ -178,7 +178,7 @@ SSH_RETRIES=3
 3. **Staged Rollout**: Test on non-critical hosts first
 4. **Review Logs**: Check log files for detailed information
 5. **Preserve Access**: Script ensures key-based auth works before disabling
-   passwords
+    passwords
 
 ## Version
 

@@ -2,14 +2,14 @@
 -- These globals can be set and accessed:
 --
 globals = {
-	"rawrequire",
+  "rawrequire",
 }
 
 --
 -- These globals can only be accessed:
 --
 read_globals = {
-	"hs",
-	"ls",
-	"spoon",
+  "hs",
+  "ls",
+  "spoon",
 }
