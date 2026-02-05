@@ -282,7 +282,8 @@ export LESSHISTFILE="$XDG_STATE_HOME"/less/history
 export MANPAGER="less -X"
 
 # Always enable colored `grep` output
-export GREP_OPTIONS="--color=auto"
+# Note: GREP_OPTIONS is deprecated since GNU grep 2.21
+# Color is handled via alias in config/alias
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -435,6 +436,10 @@ export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
+
+# LM Studio CLI
+msg "Setting up LM Studio configuration"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # Misc
 msg "Setting up miscellaneous configuration"
