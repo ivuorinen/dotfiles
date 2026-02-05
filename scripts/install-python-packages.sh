@@ -18,7 +18,8 @@ fi
 
 # CLI tools — installed isolated with `uv tool install`
 tools=(
-  ansible    # IT automation and configuration management
+  ansible                # IT automation and configuration management
+  openapi-python-client  # Generate Python API clients from OpenAPI specs
 )
 
 # Library packages — installed into system Python with `uv pip install --system`
