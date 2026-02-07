@@ -102,7 +102,7 @@ def get_top_blobs(count, size_limit):
   verify_pack = "git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{}nr".format(sort_column)  # noqa: E501
   output = check_output(verify_pack, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
 
-  blobs = dict()
+  blobs = {}
   # use __lt__ to do the appropriate comparison
   compare_blob = Blob("a b {} {} c".format(size_limit, size_limit))
   for obj_line in output:
