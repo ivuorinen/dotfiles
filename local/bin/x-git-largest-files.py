@@ -116,7 +116,7 @@ def get_top_blobs(count, size_limit):
     )
     if grep_blob.stdout:
         grep_blob.stdout.close()
-    output = [l for l in sort_cmd.communicate()[0].decode("utf-8").strip().split("\n") if l]
+    output = [line for line in sort_cmd.communicate()[0].decode("utf-8").strip().split("\n") if line]
 
     blobs = {}
     # use __lt__ to do the appropriate comparison
@@ -152,7 +152,7 @@ def populate_blob_paths(blobs):
         awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
         if rev_list.stdout:
             rev_list.stdout.close()
-        all_object_lines = [l for l in awk_filter.communicate()[0].decode("utf-8").strip().split("\n") if l]
+        all_object_lines = [line for line in awk_filter.communicate()[0].decode("utf-8").strip().split("\n") if line]
         outstanding_keys = list(blobs.keys())
 
         for line in all_object_lines:
