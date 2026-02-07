@@ -1,5 +1,5 @@
 ---
-- include: 'tools/dotbot-defaults.yaml'
+- include: "tools/dotbot-defaults.yaml"
 - shell:
     - echo "Configuring tunkki"
 - link:
@@ -7,7 +7,7 @@
       force: true
       glob: true
       path: hosts/tunkki/base/**
-      prefix: '.'
+      prefix: "."
     ~/.config/:
       glob: true
       force: true

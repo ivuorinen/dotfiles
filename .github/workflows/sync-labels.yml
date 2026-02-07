@@ -11,7 +11,7 @@ on:
       - .github/workflows/sync-labels.yml
       - .github/labels.yml
   schedule:
-    - cron: '34 5 * * *'
+    - cron: "34 5 * * *"
   workflow_call:
   workflow_dispatch:
 

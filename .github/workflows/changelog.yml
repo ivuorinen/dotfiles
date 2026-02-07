@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
 
-      - name: 'Echo results'
+      - name: "Echo results"
         id: output-changelog
         run: |
           echo "${{ steps.changelog.outputs.changes }}"

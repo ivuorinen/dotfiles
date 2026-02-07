@@ -13,11 +13,11 @@ ignore_all_files_in_gitignore: true
 # Was previously called `ignored_dirs`, please update your config if you are using that.
 # Added (renamed) on 2025-04-07
 ignored_paths:
-  - '*.swp'
-  - '*.tmp'
-  - '*.tmp.*'
-  - '.DS_Store'
-  - '.git/**'
+  - "*.swp"
+  - "*.tmp"
+  - "*.tmp.*"
+  - ".DS_Store"
+  - ".git/**"
   - /config/cheat/cheatsheets/community/**
   - /config/cheat/cheatsheets/pure-bash-bible/**
   - /config/cheat/cheatsheets/tldr/**
@@ -85,6 +85,6 @@ excluded_tools: []
 
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
-initial_prompt: ''
+initial_prompt: ""
 
-project_name: '.dotfiles'
+project_name: ".dotfiles"

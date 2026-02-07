@@ -14,14 +14,13 @@ SARIF_REPORTER: true # Generate SARIF report
 SHOW_SKIPPED_LINTERS: false # Show skipped linters in MegaLinter log
 DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
-  - JAVASCRIPT_ES         # using biome
-  - JAVASCRIPT_PRETTIER   # using biome
-  - TYPESCRIPT_PRETTIER   # using biome
-  - JSON_PRETTIER         # using biome
-  - PYTHON_BLACK          # using ruff
-  - PYTHON_FLAKE8         # using ruff
-  - PYTHON_PYLINT         # using ruff
-  - YAML_PRETTIER         # using biome
+  - JAVASCRIPT_ES # using biome
+  - JAVASCRIPT_PRETTIER # using biome
+  - TYPESCRIPT_PRETTIER # using biome
+  - JSON_PRETTIER # using biome
+  - PYTHON_BLACK # using ruff
+  - PYTHON_FLAKE8 # using ruff
+  - PYTHON_PYLINT # using ruff
 YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
 BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn

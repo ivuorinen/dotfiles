@@ -5,7 +5,7 @@ name: Release Daily State
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 21 * * *' # 00:00 at Europe/Helsinki
+    - cron: "0 21 * * *" # 00:00 at Europe/Helsinki
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
