@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && case \"$fp\" in */fzf-tmux|*/yarn.lock|*/.yarn/*) echo \"BLOCKED: $fp is a vendor/lock file — do not edit directly\" >&2; exit 2;; esac; exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.sh|*/bin/*) head -1 \"$fp\" | grep -qE '^#!.*(ba)?sh' && command -v shfmt > /dev/null && shfmt -i 2 -bn -ci -sr -fn -w \"$fp\";; esac; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
