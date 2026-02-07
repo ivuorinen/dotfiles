@@ -71,33 +71,57 @@ section_install()
 
   MENU=(
     "all:Installs everything in the correct order"
+    "apt-packages:Install apt packages (Debian/Ubuntu)"
     "cargo:Install rust/cargo packages"
     "cheat-databases:Install cheat external cheatsheet databases"
     "composer:Install composer"
+    "dnf-packages:Install dnf packages (Fedora/RHEL)"
     "fonts:Install programming fonts"
     "gh:Install GitHub CLI Extensions"
+    "git-crypt:Install git-crypt from source"
     "go:Install Go Packages"
     "imagick:Install ImageMagick CLI"
     "macos:Setup nice macOS defaults"
     "npm-packages:Install NPM Packages"
+    "ntfy:Install ntfy notification tool"
     "nvm-latest:Install latest lts node using nvm"
     "nvm:Install Node Version Manager (nvm)"
+    "python-packages:Install Python packages via uv"
+    "xcode-cli-tools:Install Xcode CLI tools (macOS)"
     "z:Install z"
   )
 
   case "$1" in
     all)
       msgr msg "Starting to install all and reloading configurations..."
-      $0 install macos
-      $0 install fonts
+
+      # Tier 0: Platform foundations (OS packages, build tools)
+      [[ "$(uname)" == "Darwin" ]] && $0 install macos
+      [[ "$(uname)" == "Darwin" ]] && $0 install xcode-cli-tools
+      command -v apt &> /dev/null && $0 install apt-packages
+      command -v dnf &> /dev/null && $0 install dnf-packages
+
+      # Tier 1: Package managers & fonts
       $0 brew install
+      $0 install fonts
+
+      # Tier 2: Language packages (depend on runtimes from Tier 1)
       $0 install cargo
       $0 install go
       $0 install composer
-      $0 install cheat-databases
       $0 install nvm
       $0 install npm-packages
+      $0 install python-packages
+
+      # Tier 3: Tool-dependent installers
+      $0 install cheat-databases
+      $0 install gh
+      $0 install git-crypt
+      $0 install ntfy
+
+      # Tier 4: Independent utilities
       $0 install z
+
       msgr msg "Reloading configurations again..."
       # shellcheck disable=SC1091
       source "$DOTFILES/config/shared.sh"
@@ -182,6 +206,42 @@ section_install()
       msgr run "NPM Packages install started..."
       bash "$DOTFILES/scripts/install-npm-packages.sh" \
         && msgr yay "NPM Packages have been installed!"
+      ;;
+
+    apt-packages)
+      msgr run "Installing apt packages..."
+      bash "$DOTFILES/scripts/install-apt-packages.sh" \
+        && msgr yay "apt packages installed!"
+      ;;
+
+    dnf-packages)
+      msgr run "Installing dnf packages..."
+      bash "$DOTFILES/scripts/install-dnf-packages.sh" \
+        && msgr yay "dnf packages installed!"
+      ;;
+
+    git-crypt)
+      msgr run "Installing git-crypt..."
+      bash "$DOTFILES/scripts/install-git-crypt.sh" \
+        && msgr yay "git-crypt installed!"
+      ;;
+
+    ntfy)
+      msgr run "Installing ntfy..."
+      bash "$DOTFILES/scripts/install-ntfy.sh" \
+        && msgr yay "ntfy installed!"
+      ;;
+
+    python-packages)
+      msgr run "Installing Python packages..."
+      bash "$DOTFILES/scripts/install-python-packages.sh" \
+        && msgr yay "Python packages installed!"
+      ;;
+
+    xcode-cli-tools)
+      msgr run "Installing Xcode CLI tools..."
+      bash "$DOTFILES/scripts/install-xcode-cli-tools.sh" \
+        && msgr yay "Xcode CLI tools installed!"
       ;;
 
     z)
