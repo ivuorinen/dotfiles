@@ -43,7 +43,7 @@ install_packages()
 upgrade_global_packages()
 {
   msgr run "Upgrading all global packages"
-  npm -g --no-progress --no-timing --no-fund outdated
+  npm -g --no-progress --no-timing --no-fund outdated || true
   npm -g --no-timing --no-fund upgrade
   return 0
 }
