@@ -9,10 +9,13 @@
     "lint:biome": "biome check .",
     "fix:biome": "biome check --write .",
     "format": "biome format --write .",
+    "lint:prettier": "prettier --check '**/*.{yml,yaml}'",
+    "fix:prettier": "prettier --write '**/*.{yml,yaml}'",
+    "format:yaml": "prettier --write '**/*.{yml,yaml}'",
     "test": "bash test-all.sh",
     "lint:ec": "ec -f gcc",
-    "lint": "yarn lint:biome && yarn lint:ec",
-    "fix": "yarn fix:biome"
+    "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec",
+    "fix": "yarn fix:biome && yarn fix:prettier"
   },
   "repository": {
     "type": "git",
@@ -33,6 +36,7 @@
     "@types/node": "^24.0.1",
     "bats": "^1.12.0",
     "editorconfig-checker": "^6.1.0",
+    "prettier": "^3.8.1",
     "typescript": "^5.8.3"
   },
   "packageManager": "yarn@4.12.0"

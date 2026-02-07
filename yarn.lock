@@ -132,9 +132,19 @@ __metadata:
     "@types/node": "npm:^24.0.1"
     bats: "npm:^1.12.0"
     editorconfig-checker: "npm:^6.1.0"
+    prettier: "npm:^3.8.1"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
+
+"prettier@npm:^3.8.1":
+  version: 3.8.1
+  resolution: "prettier@npm:3.8.1"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/33169b594009e48f570471271be7eac7cdcf88a209eed39ac3b8d6d78984039bfa9132f82b7e6ba3b06711f3bfe0222a62a1bfb87c43f50c25a83df1b78a2c42
+  languageName: node
+  linkType: hard
 
 "typescript@npm:^5.8.3":
   version: 5.9.3
