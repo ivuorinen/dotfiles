@@ -14,8 +14,10 @@
     "format:yaml": "prettier --write '**/*.{yml,yaml}'",
     "test": "bash test-all.sh",
     "lint:ec": "ec -f gcc",
-    "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec",
-    "fix": "yarn fix:biome && yarn fix:prettier"
+    "lint:md-table": "git ls-files '*.md' | xargs markdown-table-formatter --check",
+    "fix:md-table": "git ls-files '*.md' | xargs markdown-table-formatter",
+    "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec && yarn lint:md-table",
+    "fix": "yarn fix:biome && yarn fix:prettier && yarn fix:md-table"
   },
   "repository": {
     "type": "git",
@@ -36,6 +38,7 @@
     "@types/node": "^24.0.1",
     "bats": "^1.12.0",
     "editorconfig-checker": "^6.1.0",
+    "markdown-table-formatter": "^1.7.0",
     "prettier": "^3.8.1",
     "typescript": "^5.8.3"
   },

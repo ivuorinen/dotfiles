@@ -11,15 +11,15 @@ The directory layout follows the XDG Base Directory Specification.
 
 ## Directory Layout and Linking
 
-| Source | Destination | Notes |
-|--------|------------|-------|
-| `base/*` | `~/.*` | Home-level dotfiles (`.` added by Dotbot) |
-| `config/*` | `~/.config/` | Application configurations |
-| `local/bin/*` | `~/.local/bin/` | Helper scripts and utilities |
-| `local/share/*` | `~/.local/share/` | Data files |
-| `local/man/**` | `~/.local/man/` | Manual pages |
-| `ssh/*` | `~/.ssh/` | SSH configuration (mode 0600) |
-| `hosts/<hostname>/` | Overlays | Host-specific overrides |
+| Source              | Destination       | Notes                                     |
+|---------------------|-------------------|-------------------------------------------|
+| `base/*`            | `~/.*`            | Home-level dotfiles (`.` added by Dotbot) |
+| `config/*`          | `~/.config/`      | Application configurations                |
+| `local/bin/*`       | `~/.local/bin/`   | Helper scripts and utilities              |
+| `local/share/*`     | `~/.local/share/` | Data files                                |
+| `local/man/**`      | `~/.local/man/`   | Manual pages                              |
+| `ssh/*`             | `~/.ssh/`         | SSH configuration (mode 0600)             |
+| `hosts/<hostname>/` | Overlays          | Host-specific overrides                   |
 
 Installation: `./install` runs Dotbot with `install.conf.yaml`,
 then applies `hosts/<hostname>/install.conf.yaml` if it exists.

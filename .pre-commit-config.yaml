@@ -28,6 +28,11 @@ repos:
         entry: yarn biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
         files: \.(js|ts|jsx|tsx|json|md)$
+      - id: markdown-table-formatter
+        name: Markdown Table Formatter
+        entry: yarn markdown-table-formatter
+        language: system
+        types: [markdown]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0

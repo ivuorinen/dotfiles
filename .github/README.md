@@ -37,7 +37,7 @@ see what interesting stuff you've done with it. Sharing is caring.
 ### Interesting folders
 
 | Path                | Description                                  |
-| ------------------- | -------------------------------------------- |
+|---------------------|----------------------------------------------|
 | `.github`           | GitHub Repository configuration files, meta. |
 | `hosts/{hostname}/` | Configs that should apply to that host only. |
 | `local/bin`         | Helper scripts that I've collected or wrote. |
@@ -52,7 +52,7 @@ is processed by Dotbot during installation.
 ### dotfile folders
 
 | Repo      | Destination | Description                                 |
-| --------- | ----------- | ------------------------------------------- |
+|-----------|-------------|---------------------------------------------|
 | `base/`   | `.*`        | `$HOME` level files.                        |
 | `config/` | `.config/`  | Configurations for applications.            |
 | `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `state` |
@@ -86,7 +86,7 @@ The folder structure follows [XDG Base Directory Specification][xdg] where possi
 ### XDG Variables
 
 | Env                | Default              | Short description                              |
-| ------------------ | -------------------- | ---------------------------------------------- |
+|--------------------|----------------------|------------------------------------------------|
 | `$XDG_BIN_HOME`    | `$HOME/.local/bin`   | Local binaries                                 |
 | `$XDG_CONFIG_HOME` | `$HOME/.config`      | User-specific configs                          |
 | `$XDG_DATA_HOME`   | `$HOME/.local/share` | User-specific data files                       |
