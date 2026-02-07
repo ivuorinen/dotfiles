@@ -3,9 +3,11 @@ set -euo pipefail
 # @description Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
+# shellcheck source=../config/shared.sh
+source "${DOTFILES}/config/shared.sh"
 
 # Check if the script is running on macOS
-if [ "$(uname)" != "Darwin" ]; then
+if [[ "$(uname)" != "Darwin" ]]; then
   msgr warn "Not a macOS system"
   exit 0
 fi
@@ -27,6 +29,7 @@ keep_alive_sudo()
     sleep 60
     kill -0 "$$" || exit
   done 2> /dev/null &
+  return 0
 }
 
 XCODE_TOOLS_PATH="$(xcode-select -p)"
@@ -40,12 +43,13 @@ prompt_xcode_install()
       'tell app "System Events" to display dialog "Please click install when Command Line Developer Tools appears"'
   )"
 
-  if [ "$XCODE_MESSAGE" = "button returned:OK" ]; then
+  if [[ "$XCODE_MESSAGE" = "button returned:OK" ]]; then
     xcode-select --install
   else
     msgr warn "You have cancelled the installation, please rerun the installer."
     exit 1
   fi
+  return 0
 }
 
 # Main function
@@ -53,16 +57,17 @@ main()
 {
   keep_alive_sudo
 
-  if [ -x "$XCODE_SWIFT_PATH" ]; then
+  if [[ -x "$XCODE_SWIFT_PATH" ]]; then
     msgr run "You have swift from xcode-select. Continuing..."
   else
     prompt_xcode_install
   fi
 
-  until [ -f "$XCODE_SWIFT_PATH" ]; do
+  until [[ -f "$XCODE_SWIFT_PATH" ]]; do
     echo -n "."
     sleep 1
   done
+  return 0
 }
 
 main "$@"

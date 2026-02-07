@@ -16,14 +16,15 @@ fi
 
 # CLI tools — installed isolated with `uv tool install`
 tools=(
-  ansible                # IT automation and configuration management
-  openapi-python-client  # Generate Python API clients from OpenAPI specs
+  ansible               # IT automation and configuration management
+  openapi-python-client # Generate Python API clients from OpenAPI specs
+  ruff                  # Fast Python linter and formatter
 )
 
 # Library packages — installed into system Python with `uv pip install --system`
 libraries=(
-  libtmux    # Python API for tmux
-  pynvim     # Neovim Python client
+  libtmux # Python API for tmux
+  pynvim  # Neovim Python client
 )
 
 # Function to install CLI tools via uv tool install
@@ -40,6 +41,7 @@ install_tools()
     uv tool install --upgrade "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to install library packages via uv pip install
@@ -56,6 +58,7 @@ install_libraries()
     uv pip install --system --upgrade "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to upgrade all uv-managed tools
@@ -63,14 +66,17 @@ upgrade_tools()
 {
   msgr run "Upgrading all uv-managed tools"
   uv tool upgrade --all
+  return 0
 }
 
+# Install Python tools, libraries, and upgrade all
 main()
 {
   install_tools
   install_libraries
   upgrade_tools
   msgr yay "Python package installations complete"
+  return 0
 }
 
 main "$@"

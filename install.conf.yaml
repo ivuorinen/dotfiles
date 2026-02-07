@@ -1,5 +1,5 @@
 ---
-- include: 'tools/dotbot-defaults.yaml'
+- include: "tools/dotbot-defaults.yaml"
 
 - clean:
     ~/:
@@ -34,7 +34,7 @@
       force: true
       glob: true
       path: base/*
-      prefix: '.'
+      prefix: "."
     # Most of the configs
     ~/.config/:
       glob: true

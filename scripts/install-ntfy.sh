@@ -43,15 +43,18 @@ install_ntfy()
   mkdir -p ~/.config/ntfy
 
   # Copy config only if it does not exist
-  if [ ! -f "$HOME/.config/ntfy/client.yml" ]; then
+  if [[ ! -f "$HOME/.config/ntfy/client.yml" ]]; then
     cp "$tmpdir/${NTFY_DIR}/client/client.yml" ~/.config/ntfy/client.yml
   fi
+  return 0
 }
 
+# Download and install ntfy
 main()
 {
   install_ntfy
   msgr "done" "ntfy installation complete"
+  return 0
 }
 
 main "$@"

@@ -90,13 +90,14 @@ declare -A DIR_HAS_REPOS
 # Record start time
 START_TIME=$(date +%s)
 
-# Logging functions
+# Log an error message
 log_error()
 {
   print_color "31" "ERROR:" >&2
   echo " $*" >&2
 }
 
+# Log an informational message
 log_info()
 {
   if [[ $VERBOSE -eq 1 ]]; then
@@ -105,6 +106,7 @@ log_info()
   fi
 }
 
+# Log a warning message
 log_warn()
 {
   print_color "33" "WARNING:" >&2
@@ -911,6 +913,7 @@ process_in_parallel()
   echo -e "\nProcessed $total repositories in $dur (Total runtime: $runtime)"
 }
 
+# Check a directory for git status with progress tracking
 check_directory_with_progress()
 {
   local dir

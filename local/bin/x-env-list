@@ -190,6 +190,7 @@ get_custom_group()
   return 1
 }
 
+# Check if a key matches the skipped keys list
 is_skipped()
 {
   local key=$1

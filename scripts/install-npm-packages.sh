@@ -13,10 +13,10 @@ if ! command -v npm &> /dev/null; then
 fi
 
 packages=(
-  editorconfig-checker   # Check files against .editorconfig rules
-  github-release-notes   # Create release notes from tags and issues
-  neovim                 # Neovim node client
-  corepack               # Node.js package manager version management
+  editorconfig-checker # Check files against .editorconfig rules
+  github-release-notes # Create release notes from tags and issues
+  neovim               # Neovim node client
+  corepack             # Node.js package manager version management
 )
 
 # Function to install npm packages
@@ -36,14 +36,16 @@ install_packages()
     fi
     echo ""
   done
+  return 0
 }
 
 # Function to upgrade all global npm packages
 upgrade_global_packages()
 {
   msgr run "Upgrading all global packages"
-  npm -g --no-progress --no-timing --no-fund outdated
+  npm -g --no-progress --no-timing --no-fund outdated || true
   npm -g --no-timing --no-fund upgrade
+  return 0
 }
 
 # Function to clean npm cache
@@ -53,14 +55,17 @@ clean_npm_cache()
   npm cache verify
   npm cache clean --force
   npm cache verify
+  return 0
 }
 
+# Install, upgrade, and clean npm packages
 main()
 {
   install_packages
   upgrade_global_packages
   clean_npm_cache
   msgr yay "npm package installations complete"
+  return 0
 }
 
 main "$@"

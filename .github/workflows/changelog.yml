@@ -9,13 +9,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   debug-changelog:
     runs-on: ubuntu-latest
 
-    permissions: write-all
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -27,7 +29,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
 
-      - name: 'Echo results'
+      - name: "Echo results"
         id: output-changelog
         run: |
           echo "${{ steps.changelog.outputs.changes }}"

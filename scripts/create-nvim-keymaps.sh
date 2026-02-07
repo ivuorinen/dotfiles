@@ -7,6 +7,7 @@ set -euo pipefail
 source "${DOTFILES}/config/shared.sh"
 DEST="$HOME/.dotfiles/docs/nvim-keybindings.md"
 
+# Generate Neovim keybindings documentation
 main()
 {
   msg "Generating Neovim keybindings documentation"
@@ -28,6 +29,7 @@ main()
     && mv "${DEST}.tmp" "$DEST"
 
   msg "Neovim keybindings documentation generated at $DEST"
+  return 0
 }
 
 main "$@"

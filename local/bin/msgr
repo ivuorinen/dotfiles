@@ -23,21 +23,25 @@ CLR_RESET="\033[0m"
 #  │ Color functions                                          │
 #  ╰──────────────────────────────────────────────────────────╯
 
+# Wrap text in red color
 function __color_red()
 {
   local MSG="$1"
   echo -e "${CLR_RED}${MSG}${CLR_RESET}"
 }
+# Wrap text in yellow color
 function __color_yellow()
 {
   local MSG="$1"
   echo -e "${CLR_YELLOW}${MSG}${CLR_RESET}"
 }
+# Wrap text in green color
 function __color_green()
 {
   local MSG="$1"
   echo -e "${CLR_GREEN}${MSG}${CLR_RESET}"
 }
+# Wrap text in blue color
 function __color_blue()
 {
   local MSG="$1"
@@ -48,36 +52,43 @@ function __color_blue()
 #  │ Helpers                                                  │
 #  ╰──────────────────────────────────────────────────────────╯
 
+# Print blue arrow marker
 function __log_marker()
 {
   echo -e "${CLR_BLUE}➜${CLR_RESET}"
 }
 
+# Print green checkmark marker
 function __log_marker_ok()
 {
   echo -e "${CLR_GREEN}✔${CLR_RESET}"
 }
 
+# Print blue checkmark marker
 function __log_marker_ok_blue()
 {
   echo -e "${CLR_BLUE}✔${CLR_RESET}"
 }
 
+# Print yellow warning marker
 function __log_marker_warn()
 {
   echo -e "${CLR_YELLOW}⁕${CLR_RESET}"
 }
 
+# Print yellow question marker
 function __log_marker_question()
 {
   echo -e "${CLR_YELLOW}?${CLR_RESET}"
 }
 
+# Print red error marker
 function __log_marker_err()
 {
   echo -e "${CLR_RED}⛌${CLR_RESET}"
 }
 
+# Print indentation spacing
 function __log_indent()
 {
   echo "    "
@@ -87,71 +98,85 @@ function __log_indent()
 #  │ Log functions                                            │
 #  ╰──────────────────────────────────────────────────────────╯
 
+# Print a message with arrow marker
 function msg()
 {
   echo -e "$(__log_marker) $1"
 }
 
+# Print a celebration message
 function msg_yay()
 {
   echo -e "🎉 $1"
 }
 
+# Print a celebration message with checkmark
 function msg_yay_done()
 {
   echo -e "🎉 $1 ...$(__log_marker_ok)"
 }
 
+# Print a message with completion checkmark
 function msg_done()
 {
   echo -e "$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
+# Print a completion checkmark suffix
 function msg_done_suffix()
 {
   echo -e "$(__log_marker) ...$(__log_marker_ok)"
 }
 
+# Print a prompt-style message
 function msg_prompt()
 {
   echo -e "$(__log_marker_question) $1"
 }
 
+# Print a prompt message with checkmark
 function msg_prompt_done()
 {
   echo -e "$(__log_marker_question) $1 ...$(__log_marker_ok)"
 }
 
+# Print an indented message
 function msg_nested()
 {
   echo -e "$(__log_indent)$(__log_marker) $1"
 }
 
+# Print an indented message with checkmark
 function msg_nested_done()
 {
   echo -e "$(__log_indent)$(__log_marker) $1 ...$(__log_marker_ok)"
 }
 
+# Print a running-task message in green
 function msg_run()
 {
   echo -e "${CLR_GREEN}➜ $1${CLR_RESET} $2"
 }
 
+# Print a running-task message with checkmark
 function msg_run_done()
 {
   echo -e "${CLR_GREEN}➜ $1${CLR_RESET} $2 ...$(__log_marker_ok)"
 }
 
+# Print an ok/success message
 function msg_ok()
 {
   echo -e "$(__log_marker_ok) $1"
 }
 
+# Print a warning message
 function msg_warn()
 {
   echo -e "$(__log_marker_warn) $1"
 }
 
+# Print an error message
 function msg_err()
 {
   echo -e "$(__log_marker_err) $1"
@@ -174,6 +199,7 @@ ask()
 # If this is being sourced, no need to run the next steps.
 [ "$sourced" = 1 ] && return
 
+# Run visual tests for all message types
 function __tests()
 {
   msg "[ msg ]"
@@ -192,6 +218,7 @@ function __tests()
   msg_yay_done "[ yay_done ]"
 }
 
+# Show usage information and examples
 function usage()
 {
   echo "usage: msgr [type] [message] [optional second message]"

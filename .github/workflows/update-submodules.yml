@@ -5,20 +5,22 @@ name: Update submodules
 on:
   schedule:
     # At 04:00 on Monday and Thursday.
-    - cron: '0 4 * * 1'
+    - cron: "0 4 * * 1"
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   update-submodules:
     runs-on: ubuntu-latest
 
-    permissions: write-all
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository

@@ -25,18 +25,18 @@ fi
 
 # Cargo packages to install
 packages=(
-  cargo-update       # A cargo subcommand for checking and applying updates to installed executables
-  cargo-cache        # Cargo cache management utility
-  tree-sitter-cli    # An incremental parsing system for programming tools
-  bkt                # A subprocess caching utility
-  difftastic         # A structural diff that understands syntax
-  fd-find            # A simple, fast and user-friendly alternative to 'find'
-  ripgrep            # Recursively searches directories for a regex pattern while respecting your gitignore
-  bob-nvim           # A version manager for neovim
-  bottom             # A cross-platform graphical process/system monitor
-  eza                # A modern alternative to ls
-  tmux-sessionizer   # A tool for opening git repositories as tmux sessions
-  zoxide             # A smarter cd command
+  cargo-update     # A cargo subcommand for checking and applying updates to installed executables
+  cargo-cache      # Cargo cache management utility
+  tree-sitter-cli  # An incremental parsing system for programming tools
+  bkt              # A subprocess caching utility
+  difftastic       # A structural diff that understands syntax
+  fd-find          # A simple, fast and user-friendly alternative to 'find'
+  ripgrep          # Recursively searches directories for a regex pattern while respecting your gitignore
+  bob-nvim         # A version manager for neovim
+  bottom           # A cross-platform graphical process/system monitor
+  eza              # A modern alternative to ls
+  tmux-sessionizer # A tool for opening git repositories as tmux sessions
+  zoxide           # A smarter cd command
 )
 
 # Number of jobs to run in parallel, this helps to keep the system responsive
@@ -57,6 +57,7 @@ install_packages()
     msgr run_done "Done installing $pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to perform additional steps for installed cargo packages
@@ -72,13 +73,16 @@ post_install_steps()
   msgr run "Removing cargo cache"
   cargo cache --autoclean
   msgr "done" "Done removing cargo cache"
+  return 0
 }
 
+# Install cargo packages and run post-install steps
 main()
 {
   install_packages
   msgr "done" "Installed cargo packages!"
   post_install_steps
+  return 0
 }
 
 main "$@"

@@ -24,7 +24,7 @@ str_to_operator = {
 def vercmp(expr):
     """Version Comparison function."""
     words = expr.split()
-    comparisons = [words[i: i + 3] for i in range(0, len(words) - 2, 2)]
+    comparisons = [words[i : i + 3] for i in range(0, len(words) - 2, 2)]
     for left, op_str, right in comparisons:
         compare_op = str_to_operator[op_str]
         if not compare_op(version.parse(left), version.parse(right)):
@@ -63,7 +63,7 @@ def test():
     except KeyError:
         pass
     else:
-        assert False, "invalid operator did not raise"
+        raise AssertionError("invalid operator did not raise")
 
 
 if __name__ == "__main__":

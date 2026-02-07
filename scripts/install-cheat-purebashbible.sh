@@ -12,6 +12,7 @@ PBB_SYNTAX="syntax: bash"
 PBB_TAGS="tags: [bash]"
 PBB_TEMP_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/cheat/pbb"
 
+# Verify required tools are installed
 check_required_tools()
 {
   for t in "${PBB_REQUIRED_TOOLS[@]}"; do
@@ -20,32 +21,37 @@ check_required_tools()
       exit 1
     fi
   done
+  return 0
 }
 
+# Clone or update the pure-bash-bible repository
 clone_or_update_repo()
 {
-  if [ ! -d "$PBB_TEMP_DIR/.git" ]; then
+  if [[ ! -d "$PBB_TEMP_DIR/.git" ]]; then
     msg_run "Starting to clone $PBB_GIT"
-    git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR" \
-      && msg_yay "Cloned $PBB_GIT"
+    git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR"
+    msg_yay "Cloned $PBB_GIT"
   else
     msg_run "Starting to update $PBB_GIT"
     git -C "$PBB_TEMP_DIR" reset --hard origin/master
-    git -C "$PBB_TEMP_DIR" pull -q \
-      && msgr yay "Updated $PBB_GIT"
+    git -C "$PBB_TEMP_DIR" pull -q
+    msg_yay "Updated $PBB_GIT"
   fi
+  return 0
 }
 
+# Get the cheat destination directory for pure-bash-bible
 prepare_cheat_dest()
 {
   local cheat_dest
   cheat_dest="$(cheat -d | grep pure-bash-bible | head -1 | awk '{print $2}')"
 
-  if [ ! -d "$cheat_dest" ]; then
+  if [[ ! -d "$cheat_dest" ]]; then
     mkdir -p "$cheat_dest"
   fi
 
   echo "$cheat_dest"
+  return 0
 }
 
 # Processes chapter files from the pure-bash-bible repository and generates or updates corresponding cheat sheets.
@@ -83,19 +89,22 @@ process_chapters()
     LC_ALL=C perl -pi.bak -e 's/\<\!-- CHAPTER END --\>//' "$cheat_file"
     rm "$cheat_file.bak"
 
-    if [ '---' != "$(head -1 < "$cheat_file")" ]; then
+    if [[ '---' != "$(head -1 < "$cheat_file")" ]]; then
       local metadata
       metadata="$PBB_SYNTAX\n$PBB_TAGS\n$PBB_SOURCE\n"
       printf '%s\n%b%s\n%s' "---" "$metadata" "---" "$(cat "$cheat_file")" > "$cheat_file"
     fi
   done
+  return 0
 }
 
+# Install pure-bash-bible cheatsheets
 main()
 {
   check_required_tools
   clone_or_update_repo
   process_chapters
+  return 0
 }
 
 main "$@"

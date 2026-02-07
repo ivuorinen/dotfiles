@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
-setup() {
+setup()
+{
   export DOTFILES="$PWD"
 }
 

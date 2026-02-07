@@ -45,12 +45,15 @@ install_extensions()
     gh extension install "$ext"
     echo ""
   done
+  return 0
 }
 
+# Install all GitHub CLI extensions
 main()
 {
   install_extensions
   msgr run_done "Done"
+  return 0
 }
 
 main "$@"

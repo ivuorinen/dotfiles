@@ -150,6 +150,7 @@ commit()
   git commit -a -m "$commitMessage"
 }
 
+# Run Laravel scheduler in a loop
 scheduler()
 {
   while :; do

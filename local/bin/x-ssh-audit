@@ -154,6 +154,7 @@ get_state()
 # ERROR HANDLING AND CLEANUP
 # ============================================================================
 
+# Clean up temporary files and handle exit
 cleanup()
 {
   exit_code=$?
@@ -177,6 +178,7 @@ trap cleanup EXIT INT TERM
 # LOGGING FUNCTIONS
 # ============================================================================
 
+# Create audit directories and initialize log file
 setup_logging()
 {
   # Create all necessary directories
@@ -197,6 +199,7 @@ setup_logging()
   } >> "$LOG_FILE"
 }
 
+# Log a message with timestamp and severity level
 log_message()
 {
   level="$1"
@@ -225,6 +228,7 @@ log_message()
 # INPUT VALIDATION
 # ============================================================================
 
+# Validate hostname format for SSH connection
 validate_hostname()
 {
   hostname="$1"
@@ -244,6 +248,7 @@ validate_hostname()
   return 0
 }
 
+# Validate username format for SSH connection
 validate_username()
 {
   username="$1"
@@ -263,6 +268,7 @@ validate_username()
   return 0
 }
 
+# Parse input file into validated host entries
 parse_host_list()
 {
   input_file="$1"
@@ -309,6 +315,7 @@ parse_host_list()
 # SSH CONNECTION FUNCTIONS
 # ============================================================================
 
+# Execute SSH command with retry logic and key fallback
 ssh_with_retry()
 {
   host="$1"
@@ -373,6 +380,7 @@ ssh_with_retry()
   return 1
 }
 
+# Verify SSH connectivity to a host
 test_ssh_connectivity()
 {
   host="$1"
@@ -392,6 +400,7 @@ test_ssh_connectivity()
 # SSH SECURITY AUDIT FUNCTIONS
 # ============================================================================
 
+# Audit SSH daemon configuration on a remote host
 check_sshd_config()
 {
   host="$1"
@@ -451,6 +460,7 @@ check_sshd_config()
 # AUTOMATED UPDATES DETECTION
 # ============================================================================
 
+# Check if automated security updates are enabled
 check_automated_updates()
 {
   host="$1"
@@ -532,6 +542,7 @@ check_automated_updates()
 # PENDING REBOOT DETECTION
 # ============================================================================
 
+# Detect if a remote host requires a reboot
 check_pending_reboot()
 {
   host="$1"
@@ -602,6 +613,7 @@ check_pending_reboot()
 # REMEDIATION FUNCTIONS
 # ============================================================================
 
+# Create a timestamped backup of sshd_config
 backup_sshd_config()
 {
   host="$1"
@@ -616,6 +628,7 @@ backup_sshd_config()
     " "$ssh_key"
 }
 
+# Disable password authentication on a remote host
 disable_password_auth()
 {
   host="$1"
@@ -668,6 +681,7 @@ ClientAliveCountMax 2
 # REPORTING FUNCTIONS
 # ============================================================================
 
+# Generate CSV report from audit results
 generate_csv_report()
 {
   report_file="$1"
@@ -693,6 +707,7 @@ generate_csv_report()
   done < "$HOSTS_LIST_FILE"
 }
 
+# Display formatted audit summary to terminal
 display_summary()
 {
   printf '\n'
@@ -743,6 +758,7 @@ display_summary()
 # MAIN AUDIT FUNCTION
 # ============================================================================
 
+# Run all audit checks on a single host
 audit_host()
 {
   host_entry="$1"
@@ -788,6 +804,7 @@ audit_host()
 # MAIN EXECUTION
 # ============================================================================
 
+# Main entry point: parse args, run audits, generate report
 main()
 {
   input_file="${1:-}"

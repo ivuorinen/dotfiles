@@ -5,19 +5,21 @@ name: Release Daily State
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 21 * * *' # 00:00 at Europe/Helsinki
+    - cron: "0 21 * * *" # 00:00 at Europe/Helsinki
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   new-daily-release:
     runs-on: ubuntu-latest
 
-    permissions: write-all
+    permissions:
+      contents: write
 
     outputs:
       created: ${{ steps.daily-version.outputs.created }}

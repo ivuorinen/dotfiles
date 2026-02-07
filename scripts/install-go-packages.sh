@@ -11,13 +11,13 @@ msgr run "Installing go packages"
 
 # Go packages to install
 packages=(
-  github.com/dotzero/git-profile@latest           # Switch between git user profiles
-  github.com/google/yamlfmt/cmd/yamlfmt@latest     # Format yaml files
-  github.com/cheat/cheat/cmd/cheat@latest          # Interactive cheatsheets on the CLI
-  github.com/charmbracelet/glow@latest             # Render markdown on the CLI
-  github.com/junegunn/fzf@latest                   # General-purpose fuzzy finder
-  github.com/charmbracelet/gum@latest              # Glamorous shell scripts
-  github.com/joshmedeski/sesh/v2@latest            # Terminal session manager
+  github.com/dotzero/git-profile@latest        # Switch between git user profiles
+  github.com/google/yamlfmt/cmd/yamlfmt@latest # Format yaml files
+  github.com/cheat/cheat/cmd/cheat@latest      # Interactive cheatsheets on the CLI
+  github.com/charmbracelet/glow@latest         # Render markdown on the CLI
+  github.com/junegunn/fzf@latest               # General-purpose fuzzy finder
+  github.com/charmbracelet/gum@latest          # Glamorous shell scripts
+  github.com/joshmedeski/sesh/v2@latest        # Terminal session manager
 )
 
 # Function to install go packages
@@ -33,6 +33,7 @@ install_packages()
     go install "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to install completions and run actions for selected packages
@@ -44,6 +45,7 @@ post_install()
     git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
       && msgr run_done "Installed completions for git-profile"
   fi
+  return 0
 }
 
 # Function to clear go cache
@@ -51,14 +53,17 @@ clear_go_cache()
 {
   msgr run "Clearing go cache"
   go clean -cache -modcache
+  return 0
 }
 
+# Install go packages, completions, and clear cache
 main()
 {
   install_packages
   post_install
   clear_go_cache
   msgr run_done "Done"
+  return 0
 }
 
 main "$@"

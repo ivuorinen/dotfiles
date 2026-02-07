@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-if [ -x "node_modules/bats/bin/bats" ]; then
+if [[ -x "node_modules/bats/bin/bats" ]]; then
   git ls-files '*.bats' -z | xargs -0 node_modules/bats/bin/bats
 elif command -v npx > /dev/null; then
   git ls-files '*.bats' -z | xargs -0 npx --yes bats

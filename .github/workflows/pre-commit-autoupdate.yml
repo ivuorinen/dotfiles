@@ -5,14 +5,15 @@ name: Pre-commit autoupdate
 on:
   schedule:
     # At 04:00 on Monday and Thursday.
-    - cron: '0 4 * * 1,4'
+    - cron: "0 4 * * 1,4"
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   auto-update:
@@ -33,6 +34,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update/pre-commit-hooks
-          title: 'chore: update pre-commit hooks'
-          commit-message: 'chore: update pre-commit hooks'
+          title: "chore: update pre-commit hooks"
+          commit-message: "chore: update pre-commit hooks"
           body: Update versions of pre-commit hooks to latest version.

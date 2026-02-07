@@ -41,6 +41,7 @@ LOOP=0
 SLEEP=1
 TIMEOUT=5
 
+# Display usage information and options
 usage()
 {
   echo "Usage: $0 [--loop|--forever] [--sleep=N] hostname1 hostname2 ..."

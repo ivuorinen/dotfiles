@@ -28,6 +28,7 @@
 
 set -euo pipefail
 
+# Display usage information and options
 usage()
 {
   cat << EOF
@@ -52,6 +53,7 @@ THUMB_SUFFIX="${THUMB_SUFFIX:-_thumb}"
 # List of MIME types supported by ImageMagick (adjust as needed)
 ALLOWED_MIMETYPES=("image/jpeg" "image/png" "image/gif" "image/bmp" "image/tiff" "image/webp")
 
+# Verify ImageMagick is available
 check_magick_installed()
 {
   if ! command -v magick &> /dev/null; then
@@ -60,6 +62,7 @@ check_magick_installed()
   fi
 }
 
+# Verify mimetype command is available
 check_mimetype_installed()
 {
   if ! command -v mimetype &> /dev/null; then
@@ -165,6 +168,7 @@ generate_thumbnails()
   done < <(find "$source_dir" -type f -print0)
 }
 
+# Parse options, validate inputs, and generate thumbnails
 main()
 {
   parse_options "$@"
