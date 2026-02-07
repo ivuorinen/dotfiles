@@ -34,6 +34,7 @@
 import argparse
 import signal
 import sys
+import glob
 from subprocess import PIPE, Popen, check_output
 
 sortByOnDiskSize = False
@@ -97,10 +98,25 @@ def get_top_blobs(count, size_limit):
     if sortByOnDiskSize:
         sort_column = 3
 
-    verify_pack = (
-        f"git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{sort_column}nr"
+    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()
+    idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
+    verify_pack = Popen(
+        ["git", "verify-pack", "-v", *idx_files],
+        stdout=PIPE,
+        stderr=PIPE,
     )
-    output = check_output(verify_pack, shell=True).decode("utf-8").strip().split("\n")[:-1]
+    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=PIPE)
+    if verify_pack.stdout:
+        verify_pack.stdout.close()
+    sort_cmd = Popen(
+        ["sort", f"-k{sort_column}nr"],
+        stdin=grep_blob.stdout,
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+    if grep_blob.stdout:
+        grep_blob.stdout.close()
+    output = sort_cmd.communicate()[0].decode("utf-8").strip().split("\n")[:-1]
 
     blobs = {}
     # use __lt__ to do the appropriate comparison
@@ -132,8 +148,11 @@ def populate_blob_paths(blobs):
         print("Finding object paths…")
 
         # Only include revs which have a path. Other revs aren't blobs.
-        rev_list = "git rev-list --all --objects | awk '$2 {print}'"
-        all_object_lines = check_output(rev_list, shell=True).decode("utf-8").strip().split("\n")[:-1]
+        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=PIPE)
+        awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)
+        if rev_list.stdout:
+            rev_list.stdout.close()
+        all_object_lines = awk_filter.communicate()[0].decode("utf-8").strip().split("\n")[:-1]
         outstanding_keys = list(blobs.keys())
 
         for line in all_object_lines:
@@ -203,7 +222,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def signal_handler(signal, frame):
+def signal_handler(_signal, _frame):
     print("Caught Ctrl-C. Exiting.")
     sys.exit(0)
 
