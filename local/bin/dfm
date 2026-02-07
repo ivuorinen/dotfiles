@@ -112,7 +112,7 @@ section_install()
 
     cheat-databases)
       msgr run "Installing cheat databases..."
-      for database in "$DOTFILES"/scripts/install-cheat-*; do
+      for database in "$DOTFILES"/scripts/install-cheat-*.sh; do
         bash "$database" \
           && msgr run_done "Cheat: $database run"
       done
