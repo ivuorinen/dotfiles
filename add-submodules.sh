@@ -43,10 +43,11 @@ done
 git config -f .gitmodules submodule.antidote.shallow true
 
 _log() {
+  local msg="$1"
   if command -v msgr > /dev/null 2>&1; then
-    msgr run_done "$1"
+    msgr run_done "$msg"
   else
-    echo "  [ok] $1"
+    echo "  [ok] $msg"
   fi
   return 0
 }
