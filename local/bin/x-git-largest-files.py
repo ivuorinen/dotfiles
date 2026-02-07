@@ -32,9 +32,9 @@
 # vim:tw=120:ts=4:ft=python:norl:
 
 import argparse
+import glob
 import signal
 import sys
-import glob
 from subprocess import PIPE, Popen, check_output  # nosec B404
 
 sortByOnDiskSize = False
