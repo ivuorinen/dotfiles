@@ -18,6 +18,7 @@ fi
 tools=(
   ansible                # IT automation and configuration management
   openapi-python-client  # Generate Python API clients from OpenAPI specs
+  ruff                   # Fast Python linter and formatter
 )
 
 # Library packages — installed into system Python with `uv pip install --system`

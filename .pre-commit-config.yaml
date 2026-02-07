@@ -60,3 +60,10 @@ repos:
     hooks:
       - id: fish_syntax
       - id: fish_indent
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format

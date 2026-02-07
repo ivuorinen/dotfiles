@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 # Python script to find the largest files in a git repository.
 # The general method is based on the script in this blog post:
@@ -32,60 +31,59 @@
 
 # vim:tw=120:ts=4:ft=python:norl:
 
-from subprocess import check_output, Popen, PIPE
 import argparse
 import signal
 import sys
+from subprocess import PIPE, Popen, check_output
 
 sortByOnDiskSize = False
 
-class Blob(object):
-  sha1 = ''
-  size = 0
-  packed_size = 0
-  path = ''
 
-  def __init__(self, line):
-    cols = line.split()
-    self.sha1, self.size, self.packed_size = cols[0], int(cols[2]), int(cols[3])
+class Blob:
+    sha1 = ""
+    size = 0
+    packed_size = 0
+    path = ""
 
-  def __repr__(self):
-    return '{} - {} - {} - {}'.format(
-      self.sha1, self.size, self.packed_size, self.path)
+    def __init__(self, line):
+        cols = line.split()
+        self.sha1, self.size, self.packed_size = cols[0], int(cols[2]), int(cols[3])
 
-  def __lt__(self, other):
-    if (sortByOnDiskSize):
-      return self.size < other.size
-    else:
-      return self.packed_size < other.packed_size
+    def __repr__(self):
+        return f"{self.sha1} - {self.size} - {self.packed_size} - {self.path}"
 
-  def csv_line(self):
-    return "{},{},{},{}".format(
-      self.size/1024, self.packed_size/1024, self.sha1, self.path)
+    def __lt__(self, other):
+        if sortByOnDiskSize:
+            return self.size < other.size
+        else:
+            return self.packed_size < other.packed_size
+
+    def csv_line(self):
+        return f"{self.size / 1024},{self.packed_size / 1024},{self.sha1},{self.path}"
 
 
 def main():
-  global sortByOnDiskSize
+    global sortByOnDiskSize
 
-  signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
-  args = parse_arguments()
-  sortByOnDiskSize = args.sortByOnDiskSize
-  size_limit = 1024*args.filesExceeding
+    args = parse_arguments()
+    sortByOnDiskSize = args.sortByOnDiskSize
+    size_limit = 1024 * args.filesExceeding
 
-  if args.filesExceeding > 0:
-    print("Finding objects larger than {}kB…".format(args.filesExceeding))
-  else:
-    print("Finding the {} largest objects…".format(args.matchCount))
+    if args.filesExceeding > 0:
+        print(f"Finding objects larger than {args.filesExceeding}kB…")
+    else:
+        print(f"Finding the {args.matchCount} largest objects…")
 
-  blobs = get_top_blobs(args.matchCount, size_limit)
+    blobs = get_top_blobs(args.matchCount, size_limit)
 
-  populate_blob_paths(blobs)
-  print_out_blobs(blobs)
+    populate_blob_paths(blobs)
+    print_out_blobs(blobs)
 
 
 def get_top_blobs(count, size_limit):
-  """Get top blobs from git repository
+    """Get top blobs from git repository
 
     Args:
         count (int): How many items to return
@@ -93,110 +91,123 @@ def get_top_blobs(count, size_limit):
 
     Returns:
         dict: Dictionary of Blobs
-  """
-  sort_column = 4
+    """
+    sort_column = 4
 
-  if sortByOnDiskSize:
-    sort_column = 3
+    if sortByOnDiskSize:
+        sort_column = 3
 
-  verify_pack = "git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{}nr".format(sort_column)  # noqa: E501
-  output = check_output(verify_pack, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
+    verify_pack = (
+        f"git verify-pack -v `git rev-parse --git-dir`/objects/pack/pack-*.idx | grep blob | sort -k{sort_column}nr"
+    )
+    output = check_output(verify_pack, shell=True).decode("utf-8").strip().split("\n")[:-1]
 
-  blobs = {}
-  # use __lt__ to do the appropriate comparison
-  compare_blob = Blob("a b {} {} c".format(size_limit, size_limit))
-  for obj_line in output:
-    blob = Blob(obj_line)
+    blobs = {}
+    # use __lt__ to do the appropriate comparison
+    compare_blob = Blob(f"a b {size_limit} {size_limit} c")
+    for obj_line in output:
+        blob = Blob(obj_line)
 
-    if size_limit > 0:
-      if compare_blob < blob:
-        blobs[blob.sha1] = blob
-      else:
-        break
-    else:
-      blobs[blob.sha1] = blob
+        if size_limit > 0:
+            if compare_blob < blob:
+                blobs[blob.sha1] = blob
+            else:
+                break
+        else:
+            blobs[blob.sha1] = blob
 
-      if len(blobs) == count:
-        break
+            if len(blobs) == count:
+                break
 
-  return blobs
+    return blobs
 
 
 def populate_blob_paths(blobs):
-  """Populate blob paths that only have a path
+    """Populate blob paths that only have a path
 
-  Args:
-    blobs (Blob, dict): Dictionary of Blobs
-  """
-  if len(blobs):
-    print("Finding object paths…")
+    Args:
+      blobs (Blob, dict): Dictionary of Blobs
+    """
+    if len(blobs):
+        print("Finding object paths…")
 
-    # Only include revs which have a path. Other revs aren't blobs.
-    rev_list = "git rev-list --all --objects | awk '$2 {print}'"
-    all_object_lines = check_output(rev_list, shell=True).decode('utf-8').strip().split("\n")[:-1]  # noqa: E501
-    outstanding_keys = list(blobs.keys())
+        # Only include revs which have a path. Other revs aren't blobs.
+        rev_list = "git rev-list --all --objects | awk '$2 {print}'"
+        all_object_lines = check_output(rev_list, shell=True).decode("utf-8").strip().split("\n")[:-1]
+        outstanding_keys = list(blobs.keys())
 
-    for line in all_object_lines:
-      cols = line.split()
-      sha1, path = cols[0], " ".join(cols[1:])
+        for line in all_object_lines:
+            cols = line.split()
+            sha1, path = cols[0], " ".join(cols[1:])
 
-      if (sha1 in outstanding_keys):
-        outstanding_keys.remove(sha1)
-        blobs[sha1].path = path
+            if sha1 in outstanding_keys:
+                outstanding_keys.remove(sha1)
+                blobs[sha1].path = path
 
-        # short-circuit the search if we're done
-        if not len(outstanding_keys):
-          break
+                # short-circuit the search if we're done
+                if not len(outstanding_keys):
+                    break
 
 
 def print_out_blobs(blobs):
-  if len(blobs):
-    csv_lines = ["size,pack,hash,path"]
+    if len(blobs):
+        csv_lines = ["size,pack,hash,path"]
 
-    for blob in sorted(blobs.values(), reverse=True):
-      csv_lines.append(blob.csv_line())
+        for blob in sorted(blobs.values(), reverse=True):
+            csv_lines.append(blob.csv_line())
 
-    command = ["column", "-t", "-s", ","]
-    p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        command = ["column", "-t", "-s", ","]
+        p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-    # Encode the input as bytes
-    input_data = ("\n".join(csv_lines) + "\n").encode()
+        # Encode the input as bytes
+        input_data = ("\n".join(csv_lines) + "\n").encode()
 
-    stdout, _ = p.communicate(input_data)
+        stdout, _ = p.communicate(input_data)
 
-    print("\nAll sizes in kB. The pack column is the compressed size of the object inside the pack file.\n")  # noqa: E501
+        print("\nAll sizes in kB. The pack column is the compressed size of the object inside the pack file.\n")
 
-    print(stdout.decode("utf-8").rstrip('\n'))
-  else:
-    print("No files found which match those criteria.")
+        print(stdout.decode("utf-8").rstrip("\n"))
+    else:
+        print("No files found which match those criteria.")
 
 
 def parse_arguments():
-  parser = argparse.ArgumentParser(
-    description='List the largest files in a git repository'
-  )
-  parser.add_argument(
-    '-c', '--match-count', dest='matchCount', type=int, default=10,
-    help='Files to return. Default is 10. Ignored if --files-exceeding is used.'
-  )
-  parser.add_argument(
-    '--files-exceeding', dest='filesExceeding', type=int, default=0,
-    help='The cutoff amount, in KB. Files with a pack size (or physical size, with -p) larger than this will be printed.' # noqa: E501
-  )
-  parser.add_argument(
-    '-p', '--physical-sort', dest='sortByOnDiskSize',
-    action='store_true', default=False,
-    help='Sort by the on-disk size. Default is to sort by the pack size.'
-  )
+    parser = argparse.ArgumentParser(description="List the largest files in a git repository")
+    parser.add_argument(
+        "-c",
+        "--match-count",
+        dest="matchCount",
+        type=int,
+        default=10,
+        help="Files to return. Default is 10. Ignored if --files-exceeding is used.",
+    )
+    parser.add_argument(
+        "--files-exceeding",
+        dest="filesExceeding",
+        type=int,
+        default=0,
+        help=(
+            "The cutoff amount, in KB. Files with a pack size"
+            " (or physical size, with -p) larger than this will be printed."
+        ),
+    )
+    parser.add_argument(
+        "-p",
+        "--physical-sort",
+        dest="sortByOnDiskSize",
+        action="store_true",
+        default=False,
+        help="Sort by the on-disk size. Default is to sort by the pack size.",
+    )
 
-  return parser.parse_args()
+    return parser.parse_args()
 
 
 def signal_handler(signal, frame):
-    print('Caught Ctrl-C. Exiting.')
+    print("Caught Ctrl-C. Exiting.")
     sys.exit(0)
 
 
 # Default function is main()
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+    main()
