@@ -34,6 +34,8 @@ yarn install
 yarn lint              # Run biome + prettier + editorconfig-checker
 yarn lint:biome        # Biome only
 yarn lint:ec           # EditorConfig checker only
+yarn lint:md-table     # Markdown table formatting check
+yarn fix:md-table      # Auto-fix markdown tables
 
 # Formatting
 yarn fix:biome         # Autofix with biome (JS/TS/JSON/MD)
@@ -74,12 +76,24 @@ which loads:
 Zsh additionally uses **antidote** (in `tools/antidote/`)
 for plugin management and **oh-my-posh** for the prompt.
 
+### msgr — Messaging Helper
+
+`local/bin/msgr` provides colored output functions (`msgr msg`,
+`msgr run`, `msgr yay`, `msgr err`, `msgr warn`). Sourced by `dfm`
+and most scripts in `local/bin/`.
+
 ### dfm — Dotfiles Manager
 
 `local/bin/dfm` is the main management script. Key commands:
-- `dfm install all` — install everything (called during `./install`)
+- `dfm install all` — install everything in tiered stages
 - `dfm brew install` / `dfm brew update` — Homebrew management
+- `dfm apt upkeep` — APT package maintenance (Debian/Ubuntu)
+- `dfm dotfiles fmt` / `dfm dotfiles shfmt` — format configs/scripts
+- `dfm helpers <name>` — inspect aliases, colors, env, functions, path
 - `dfm docs all` — regenerate documentation under `docs/`
+- `dfm check arch` / `dfm check host` — system info
+- `dfm scripts` — run scripts from `scripts/` (discovered via `@description` tags)
+- `dfm tests` — test visualization helpers
 
 ### Submodules
 
@@ -117,6 +131,26 @@ Defined in `.shellcheckrc`:
 SC2039 (POSIX `local`), SC2166 (`-o` in test),
 SC2154 (unassigned variables), SC1091 (source following),
 SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
+
+## Gotchas
+
+- **POSIX scripts**: `x-ssh-audit`, `x-codeql`, `x-until-error`,
+  `x-until-success`, `x-ssl-expiry-date` use `/bin/sh`.
+  Validate with `sh -n`, not `bash -n`.
+- **Vendor file**: `local/bin/fzf-tmux` is vendored from
+  junegunn/fzf — do not modify.
+- **Fish config**: `config/fish/` has its own config chain
+  (`config.fish`, `exports.fish`, `alias.fish`) plus 80+ functions.
+- **Python**: Two scripts (`x-compare-versions.py`,
+  `x-git-largest-files.py`) linted by Ruff (config in `pyproject.toml`).
+
+## Claude Code Configuration
+
+- **Hooks** (`.claude/settings.json`):
+  - *PreToolUse*: Blocks edits to `fzf-tmux`, `yarn.lock`, `.yarn/`
+  - *PostToolUse*: Auto-runs `shfmt` on shell scripts after Edit/Write
+- **Skills** (`.claude/skills/`):
+  - `shell-validate`: Auto-validates shell scripts (syntax + shellcheck)
 
 ## Package Manager
 
