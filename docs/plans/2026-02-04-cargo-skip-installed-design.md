@@ -31,7 +31,7 @@ and skip `cargo install` for any package that appeared in the update output.
 
 The `cargo install-update -a` output format:
 
-```
+```text
 Package           Installed  Latest   Needs update
 zoxide            v0.9.8     v0.9.9   Yes
 bkt               v0.8.2     v0.8.2   No
