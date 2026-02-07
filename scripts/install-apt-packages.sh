@@ -64,12 +64,14 @@ install_packages()
   else
     msgr ok "All packages already installed"
   fi
+  return 0
 }
 
 main()
 {
   install_packages
   msgr yay "apt package installations complete"
+  return 0
 }
 
 main "$@"

@@ -36,6 +36,7 @@ x-path-prepend()
       exit 1
       ;;
   esac
+  return 0
 }
 
 # Function to set environment variables based on the shell
@@ -55,6 +56,7 @@ x-set-env()
       exit 1
       ;;
   esac
+  return 0
 }
 
 # Explicitly set XDG folders, if not already set
@@ -149,6 +151,7 @@ if ! declare -f array_diff > /dev/null; then
     eval local ARR2=\(\"\${$3[@]}\"\)
     local IFS=$'\n'
     mapfile -t "$1" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
+    return 0
   }
 fi
 

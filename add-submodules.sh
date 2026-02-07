@@ -48,6 +48,7 @@ _log() {
   else
     echo "  [ok] $1"
   fi
+  return 0
 }
 
 remove_old_submodule() {

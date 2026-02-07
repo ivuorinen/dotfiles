@@ -40,6 +40,7 @@ install_tools()
     uv tool install --upgrade "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to install library packages via uv pip install
@@ -56,6 +57,7 @@ install_libraries()
     uv pip install --system --upgrade "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to upgrade all uv-managed tools
@@ -63,6 +65,7 @@ upgrade_tools()
 {
   msgr run "Upgrading all uv-managed tools"
   uv tool upgrade --all
+  return 0
 }
 
 main()
@@ -71,6 +74,7 @@ main()
   install_libraries
   upgrade_tools
   msgr yay "Python package installations complete"
+  return 0
 }
 
 main "$@"

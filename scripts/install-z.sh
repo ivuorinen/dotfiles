@@ -20,12 +20,14 @@ clone_z_repo()
   else
     msgr ok "z ($bin_path/) already installed"
   fi
+  return 0
 }
 
 # Main function
 main()
 {
   clone_z_repo "$Z_GIT_PATH" "$Z_BIN_PATH"
+  return 0
 }
 
 main "$@"

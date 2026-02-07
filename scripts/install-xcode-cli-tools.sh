@@ -27,6 +27,7 @@ keep_alive_sudo()
     sleep 60
     kill -0 "$$" || exit
   done 2> /dev/null &
+  return 0
 }
 
 XCODE_TOOLS_PATH="$(xcode-select -p)"
@@ -46,6 +47,7 @@ prompt_xcode_install()
     msgr warn "You have cancelled the installation, please rerun the installer."
     exit 1
   fi
+  return 0
 }
 
 # Main function
@@ -63,6 +65,7 @@ main()
     echo -n "."
     sleep 1
   done
+  return 0
 }
 
 main "$@"

@@ -33,6 +33,7 @@ install_packages()
     go install "$pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to install completions and run actions for selected packages
@@ -44,6 +45,7 @@ post_install()
     git-profile completion zsh > "$ZSH_CUSTOM_COMPLETION_PATH/_git-profile" \
       && msgr run_done "Installed completions for git-profile"
   fi
+  return 0
 }
 
 # Function to clear go cache
@@ -51,6 +53,7 @@ clear_go_cache()
 {
   msgr run "Clearing go cache"
   go clean -cache -modcache
+  return 0
 }
 
 main()
@@ -59,6 +62,7 @@ main()
   post_install
   clear_go_cache
   msgr run_done "Done"
+  return 0
 }
 
 main "$@"

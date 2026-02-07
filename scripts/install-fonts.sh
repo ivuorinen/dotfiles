@@ -23,6 +23,7 @@ clone_or_update_repo()
   fi
 
   cd "$TMP_PATH" || { msgr err "No such folder $TMP_PATH"; exit 1; }
+  return 0
 }
 
 # Function to add fonts to sparse-checkout
@@ -38,6 +39,7 @@ add_fonts_to_sparse_checkout()
     git sparse-checkout add "patched-fonts/$font"
     echo ""
   done
+  return 0
 }
 
 # Function to install NerdFonts
@@ -47,11 +49,13 @@ install_fonts()
   # shellcheck disable=SC2048,SC2086
   ./install.sh -q -s ${fonts[*]}
   msgr run_done "Done"
+  return 0
 }
 
 remove_tmp_path()
 {
   rm -rf "$TMP_PATH"
+  return 0
 }
 
 main()
@@ -60,6 +64,7 @@ main()
   add_fonts_to_sparse_checkout
   install_fonts
   remove_tmp_path
+  return 0
 }
 
 main "$@"

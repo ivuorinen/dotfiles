@@ -28,6 +28,7 @@ main()
     && mv "${DEST}.tmp" "$DEST"
 
   msg "Neovim keybindings documentation generated at $DEST"
+  return 0
 }
 
 main "$@"

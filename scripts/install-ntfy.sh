@@ -46,12 +46,14 @@ install_ntfy()
   if [[ ! -f "$HOME/.config/ntfy/client.yml" ]]; then
     cp "$tmpdir/${NTFY_DIR}/client/client.yml" ~/.config/ntfy/client.yml
   fi
+  return 0
 }
 
 main()
 {
   install_ntfy
   msgr "done" "ntfy installation complete"
+  return 0
 }
 
 main "$@"

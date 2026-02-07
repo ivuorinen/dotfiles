@@ -20,6 +20,7 @@ check_required_tools()
       exit 1
     fi
   done
+  return 0
 }
 
 clone_or_update_repo()
@@ -34,6 +35,7 @@ clone_or_update_repo()
     git -C "$PBB_TEMP_DIR" pull -q \
       && msgr yay "Updated $PBB_GIT"
   fi
+  return 0
 }
 
 prepare_cheat_dest()
@@ -46,6 +48,7 @@ prepare_cheat_dest()
   fi
 
   echo "$cheat_dest"
+  return 0
 }
 
 # Processes chapter files from the pure-bash-bible repository and generates or updates corresponding cheat sheets.
@@ -89,6 +92,7 @@ process_chapters()
       printf '%s\n%b%s\n%s' "---" "$metadata" "---" "$(cat "$cheat_file")" > "$cheat_file"
     fi
   done
+  return 0
 }
 
 main()
@@ -96,6 +100,7 @@ main()
   check_required_tools
   clone_or_update_repo
   process_chapters
+  return 0
 }
 
 main "$@"

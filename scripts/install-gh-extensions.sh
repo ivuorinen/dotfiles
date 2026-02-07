@@ -45,12 +45,14 @@ install_extensions()
     gh extension install "$ext"
     echo ""
   done
+  return 0
 }
 
 main()
 {
   install_extensions
   msgr run_done "Done"
+  return 0
 }
 
 main "$@"

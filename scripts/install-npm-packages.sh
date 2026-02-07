@@ -36,6 +36,7 @@ install_packages()
     fi
     echo ""
   done
+  return 0
 }
 
 # Function to upgrade all global npm packages
@@ -44,6 +45,7 @@ upgrade_global_packages()
   msgr run "Upgrading all global packages"
   npm -g --no-progress --no-timing --no-fund outdated
   npm -g --no-timing --no-fund upgrade
+  return 0
 }
 
 # Function to clean npm cache
@@ -53,6 +55,7 @@ clean_npm_cache()
   npm cache verify
   npm cache clean --force
   npm cache verify
+  return 0
 }
 
 main()
@@ -61,6 +64,7 @@ main()
   upgrade_global_packages
   clean_npm_cache
   msgr yay "npm package installations complete"
+  return 0
 }
 
 main "$@"

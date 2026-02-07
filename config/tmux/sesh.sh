@@ -22,6 +22,7 @@ pick_with_gum() {
       --placeholder 'Pick a sesh' \
       --height 50 \
       --prompt='⚡'
+  return 0
 }
 
 FZF_COMMON_OPTS=(
@@ -42,10 +43,12 @@ FZF_COMMON_OPTS=(
 
 pick_with_fzf_tmux() {
   sesh list --icons | fzf-tmux -p 80%,70% "${FZF_COMMON_OPTS[@]}"
+  return 0
 }
 
 pick_with_fzf() {
   sesh list --icons | fzf "${FZF_COMMON_OPTS[@]}"
+  return 0
 }
 
 pick_with_select() {

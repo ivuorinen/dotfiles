@@ -20,6 +20,7 @@ main()
   printf "\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$DEST"
 
   msg "wezterm keybindings documentation generated at $DEST"
+  return 0
 }
 
 main "$@"

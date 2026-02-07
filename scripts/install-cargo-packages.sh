@@ -57,6 +57,7 @@ install_packages()
     msgr run_done "Done installing $pkg"
     echo ""
   done
+  return 0
 }
 
 # Function to perform additional steps for installed cargo packages
@@ -72,6 +73,7 @@ post_install_steps()
   msgr run "Removing cargo cache"
   cargo cache --autoclean
   msgr "done" "Done removing cargo cache"
+  return 0
 }
 
 main()
@@ -79,6 +81,7 @@ main()
   install_packages
   msgr "done" "Installed cargo packages!"
   post_install_steps
+  return 0
 }
 
 main "$@"

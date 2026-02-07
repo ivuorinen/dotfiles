@@ -47,6 +47,7 @@ install_dev_tools_group()
     msgr run "Installing @development-tools group"
     sudo dnf group install -y "Development Tools"
   fi
+  return 0
 }
 
 install_packages()
@@ -71,6 +72,7 @@ install_packages()
   else
     msgr ok "All packages already installed"
   fi
+  return 0
 }
 
 main()
@@ -78,6 +80,7 @@ main()
   install_dev_tools_group
   install_packages
   msgr yay "dnf package installations complete"
+  return 0
 }
 
 main "$@"
