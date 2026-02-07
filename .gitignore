@@ -56,5 +56,6 @@ local/man/yabai.1
 local/share/fonts/*
 lock
 node_modules
+__pycache__
 ssh/local.d/*
 config/fish/fish_variables*
