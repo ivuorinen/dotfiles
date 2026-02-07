@@ -13,32 +13,37 @@
 if [[ $- =~ i ]]; then
 
   # To use custom commands instead of find, override _fzf_compgen_{path,dir}
-  if ! declare -f _fzf_compgen_path >/dev/null; then
-    _fzf_compgen_path() {
+  if ! declare -f _fzf_compgen_path > /dev/null; then
+    _fzf_compgen_path()
+    {
       echo "$1"
       command find -L "$1" \
         -name .git -prune -o -name .hg -prune -o -name .svn -prune -o \( -type d -o -type f -o -type l \) \
-        -a -not -path "$1" -print 2>/dev/null | sed 's@^\./@@'
+        -a -not -path "$1" -print 2> /dev/null | sed 's@^\./@@'
     }
   fi
 
-  if ! declare -f _fzf_compgen_dir >/dev/null; then
-    _fzf_compgen_dir() {
+  if ! declare -f _fzf_compgen_dir > /dev/null; then
+    _fzf_compgen_dir()
+    {
       command find -L "$1" \
         -name .git -prune -o -name .hg -prune -o -name .svn -prune -o -type d \
-        -a -not -path "$1" -print 2>/dev/null | sed 's@^\./@@'
+        -a -not -path "$1" -print 2> /dev/null | sed 's@^\./@@'
     }
   fi
 
   ###########################################################
 
   # To redraw line after fzf closes (printf '\e[5n')
-  bind '"\e[0n": redraw-current-line' 2>/dev/null
+  bind '"\e[0n": redraw-current-line' 2> /dev/null
 
-  __fzf_comprun() {
+  __fzf_comprun()
+  {
     if [[ "$(type -t _fzf_comprun 2>&1)" = function ]]; then
       _fzf_comprun "$@"
-    elif [[ -n "${TMUX_PANE-}" ]] && { [[ "${FZF_TMUX:-0}" != 0 ]] || [[ -n "${FZF_TMUX_OPTS-}" ]]; }; then
+    elif [[ -n "${TMUX_PANE-}" ]] && {
+      [[ "${FZF_TMUX:-0}" != 0 ]] || [[ -n "${FZF_TMUX_OPTS-}" ]]
+    }; then
       shift
       fzf-tmux ${FZF_TMUX_OPTS:--d${FZF_TMUX_HEIGHT:-40%}} -- "$@"
     else
@@ -47,7 +52,8 @@ if [[ $- =~ i ]]; then
     fi
   }
 
-  __fzf_orig_completion() {
+  __fzf_orig_completion()
+  {
     local l comp f cmd
     while read -r l; do
       if [[ "$l" =~ ^(.*\ -F)\ *([^ ]*).*\ ([^ ]*)$ ]]; then
@@ -63,7 +69,8 @@ if [[ $- =~ i ]]; then
     done
   }
 
-  _fzf_opts_completion() {
+  _fzf_opts_completion()
+  {
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -112,18 +119,18 @@ if [[ $- =~ i ]]; then
     --sync"
 
     case "${prev}" in
-    --tiebreak)
-      COMPREPLY=($(compgen -W "length begin end index" -- "$cur"))
-      return 0
-      ;;
-    --color)
-      COMPREPLY=($(compgen -W "dark light 16 bw" -- "$cur"))
-      return 0
-      ;;
-    --history)
-      COMPREPLY=()
-      return 0
-      ;;
+      --tiebreak)
+        COMPREPLY=($(compgen -W "length begin end index" -- "$cur"))
+        return 0
+        ;;
+      --color)
+        COMPREPLY=($(compgen -W "dark light 16 bw" -- "$cur"))
+        return 0
+        ;;
+      --history)
+        COMPREPLY=()
+        return 0
+        ;;
     esac
 
     if [[ "$cur" =~ ^-|\+ ]]; then
@@ -134,7 +141,8 @@ if [[ $- =~ i ]]; then
     return 0
   }
 
-  _fzf_handle_dynamic_completion() {
+  _fzf_handle_dynamic_completion()
+  {
     local cmd orig_var orig ret orig_cmd orig_complete
     cmd="$1"
     shift
@@ -142,15 +150,15 @@ if [[ $- =~ i ]]; then
     orig_var="_fzf_orig_completion_$cmd"
     orig="${!orig_var-}"
     orig="${orig##*#}"
-    if [[ -n "$orig" ]] && type "$orig" >/dev/null 2>&1; then
+    if [[ -n "$orig" ]] && type "$orig" > /dev/null 2>&1; then
       $orig "$@"
     elif [[ -n "${_fzf_completion_loader-}" ]]; then
-      orig_complete=$(complete -p "$orig_cmd" 2>/dev/null)
+      orig_complete=$(complete -p "$orig_cmd" 2> /dev/null)
       _completion_loader "$@"
       ret=$?
       # _completion_loader may not have updated completion for the command
-      if [[ "$(complete -p "$orig_cmd" 2>/dev/null)" != "$orig_complete" ]]; then
-        __fzf_orig_completion < <(complete -p "$orig_cmd" 2>/dev/null)
+      if [[ "$(complete -p "$orig_cmd" 2> /dev/null)" != "$orig_complete" ]]; then
+        __fzf_orig_completion < <(complete -p "$orig_cmd" 2> /dev/null)
         if [[ "${__fzf_nospace_commands-}" = *" $orig_cmd "* ]]; then
           eval "${orig_complete/ -F / -o nospace -F }"
         else
@@ -161,7 +169,8 @@ if [[ $- =~ i ]]; then
     fi
   }
 
-  __fzf_generic_path_completion() {
+  __fzf_generic_path_completion()
+  {
     local cur base dir leftover matches trigger cmd
     cmd="${COMP_WORDS[0]}"
     if [[ $cmd == \\* ]]; then
@@ -207,7 +216,8 @@ if [[ $- =~ i ]]; then
     fi
   }
 
-  _fzf_complete() {
+  _fzf_complete()
+  {
     # Split arguments around --
     local args rest str_arg i sep
     args=("$@")
@@ -231,7 +241,7 @@ if [[ $- =~ i ]]; then
 
     local cur selected trigger cmd post
     post="$(caller 0 | awk '{print $2}')_post"
-    type -t "$post" >/dev/null 2>&1 || post=cat
+    type -t "$post" > /dev/null 2>&1 || post=cat
 
     cmd="${COMP_WORDS[0]//[^A-Za-z0-9_=]/_}"
     trigger=${FZF_COMPLETION_TRIGGER-'**'}
@@ -253,50 +263,59 @@ if [[ $- =~ i ]]; then
     fi
   }
 
-  _fzf_path_completion() {
+  _fzf_path_completion()
+  {
     __fzf_generic_path_completion _fzf_compgen_path "-m" "" "$@"
   }
 
   # Deprecated. No file only completion.
-  _fzf_file_completion() {
+  _fzf_file_completion()
+  {
     _fzf_path_completion "$@"
   }
 
-  _fzf_dir_completion() {
+  _fzf_dir_completion()
+  {
     __fzf_generic_path_completion _fzf_compgen_dir "" "/" "$@"
   }
 
-  _fzf_complete_kill() {
+  _fzf_complete_kill()
+  {
     _fzf_proc_completion "$@"
   }
 
-  _fzf_proc_completion() {
+  _fzf_proc_completion()
+  {
     _fzf_complete -m --header-lines=1 --preview 'echo {}' --preview-window down:3:wrap --min-height 15 -- "$@" < <(
-      command ps -eo user,pid,ppid,start,time,command 2>/dev/null ||
-        command ps -eo user,pid,ppid,time,args # For BusyBox
+      command ps -eo user,pid,ppid,start,time,command 2> /dev/null \
+        || command ps -eo user,pid,ppid,time,args # For BusyBox
     )
   }
 
-  _fzf_proc_completion_post() {
+  _fzf_proc_completion_post()
+  {
     awk '{print $2}'
   }
 
-  _fzf_host_completion() {
+  _fzf_host_completion()
+  {
     _fzf_complete +m -- "$@" < <(
-      command cat <(command tail -n +1 ~/.ssh/config ~/.ssh/config.d/* /etc/ssh/ssh_config 2>/dev/null | command grep -i '^\s*host\(name\)\? ' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}' | command grep -v '[*?%]') \
+      command cat <(command tail -n +1 ~/.ssh/config ~/.ssh/config.d/* /etc/ssh/ssh_config 2> /dev/null | command grep -i '^\s*host\(name\)\? ' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}' | command grep -v '[*?%]') \
         <(command grep -oE '^[[a-z0-9.,:-]+' ~/.ssh/known_hosts | tr ',' '\n' | tr -d '[' | awk '{ print $1 " " $1 }') \
-        <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') |
-        awk '{if (length($2) > 0) {print $2}}' | sort -u
+        <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') \
+        | awk '{if (length($2) > 0) {print $2}}' | sort -u
     )
   }
 
-  _fzf_var_completion() {
+  _fzf_var_completion()
+  {
     _fzf_complete -m -- "$@" < <(
       declare -xp | sed -En 's|^declare [^ ]+ ([^=]+).*|\1|p'
     )
   }
 
-  _fzf_alias_completion() {
+  _fzf_alias_completion()
+  {
     _fzf_complete -m -- "$@" < <(
       alias | sed -En 's|^alias ([^=]+).*|\1|p'
     )
@@ -321,13 +340,14 @@ if [[ $- =~ i ]]; then
   svn tar unzip zip"
 
   # Preserve existing completion
-  __fzf_orig_completion < <(complete -p $d_cmds $a_cmds 2>/dev/null)
+  __fzf_orig_completion < <(complete -p $d_cmds $a_cmds 2> /dev/null)
 
-  if type _completion_loader >/dev/null 2>&1; then
+  if type _completion_loader > /dev/null 2>&1; then
     _fzf_completion_loader=1
   fi
 
-  __fzf_defc() {
+  __fzf_defc()
+  {
     local cmd func opts orig_var orig def
     cmd="$1"
     func="$2"
@@ -354,22 +374,23 @@ if [[ $- =~ i ]]; then
 
   unset cmd d_cmds a_cmds
 
-  _fzf_setup_completion() {
+  _fzf_setup_completion()
+  {
     local kind fn cmd
     kind=$1
     fn=_fzf_${1}_completion
-    if [[ $# -lt 2 ]] || ! type -t "$fn" >/dev/null; then
+    if [[ $# -lt 2 ]] || ! type -t "$fn" > /dev/null; then
       echo "usage: ${FUNCNAME[0]} path|dir|var|alias|host|proc COMMANDS..."
       return 1
     fi
     shift
-    __fzf_orig_completion < <(complete -p "$@" 2>/dev/null)
+    __fzf_orig_completion < <(complete -p "$@" 2> /dev/null)
     for cmd in "$@"; do
       case "$kind" in
-      dir) __fzf_defc "$cmd" "$fn" "-o nospace -o dirnames" ;;
-      var) __fzf_defc "$cmd" "$fn" "-o default -o nospace -v" ;;
-      alias) __fzf_defc "$cmd" "$fn" "-a" ;;
-      *) __fzf_defc "$cmd" "$fn" "-o default -o bashdefault" ;;
+        dir) __fzf_defc "$cmd" "$fn" "-o nospace -o dirnames" ;;
+        var) __fzf_defc "$cmd" "$fn" "-o default -o nospace -v" ;;
+        alias) __fzf_defc "$cmd" "$fn" "-a" ;;
+        *) __fzf_defc "$cmd" "$fn" "-o default -o bashdefault" ;;
       esac
     done
   }
