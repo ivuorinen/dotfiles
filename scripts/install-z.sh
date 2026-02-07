@@ -14,7 +14,7 @@ clone_z_repo()
   local git_path=$1
   local bin_path=$2
 
-  if [ ! -d "$bin_path" ]; then
+  if [[ ! -d "$bin_path" ]]; then
     git clone "$git_path" "$bin_path"
     msgr run_done "z installed at $bin_path"
   else

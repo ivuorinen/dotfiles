@@ -5,7 +5,7 @@ set -euo pipefail
 #
 
 # Check if the script is running on macOS
-if [ "$(uname)" != "Darwin" ]; then
+if [[ "$(uname)" != "Darwin" ]]; then
   msgr warn "Not a macOS system"
   exit 0
 fi
@@ -40,7 +40,7 @@ prompt_xcode_install()
       'tell app "System Events" to display dialog "Please click install when Command Line Developer Tools appears"'
   )"
 
-  if [ "$XCODE_MESSAGE" = "button returned:OK" ]; then
+  if [[ "$XCODE_MESSAGE" = "button returned:OK" ]]; then
     xcode-select --install
   else
     msgr warn "You have cancelled the installation, please rerun the installer."
@@ -53,13 +53,13 @@ main()
 {
   keep_alive_sudo
 
-  if [ -x "$XCODE_SWIFT_PATH" ]; then
+  if [[ -x "$XCODE_SWIFT_PATH" ]]; then
     msgr run "You have swift from xcode-select. Continuing..."
   else
     prompt_xcode_install
   fi
 
-  until [ -f "$XCODE_SWIFT_PATH" ]; do
+  until [[ -f "$XCODE_SWIFT_PATH" ]]; do
     echo -n "."
     sleep 1
   done

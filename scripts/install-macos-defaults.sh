@@ -5,7 +5,7 @@ set -uo pipefail
 # This script contains large portions from following scripts:
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh
 
-[ "$(uname)" != "Darwin" ] && echo "Not a macOS system" && exit 0
+[[ "$(uname)" != "Darwin" ]] && echo "Not a macOS system" && exit 0
 
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

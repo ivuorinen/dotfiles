@@ -54,7 +54,7 @@ remove_old_submodule() {
   local name="$1" path="$2"
 
   # Remove working tree
-  if [ -d "$path" ]; then
+  if [[ -d "$path" ]]; then
     rm -rf "$path"
     _log "Removed $path"
   fi
@@ -66,13 +66,13 @@ remove_old_submodule() {
   git config --remove-section "submodule.$path" 2> /dev/null || true
 
   # Skip name-based cleanup if no submodule name provided
-  [ -z "$name" ] && return 0
+  [[ -z "$name" ]] && return 0
 
   # Remove .git/config section keyed by name
   git config --remove-section "submodule.$name" 2> /dev/null || true
 
   # Remove .git/modules/<name>/ cached repository
-  if [ -d ".git/modules/$name" ]; then
+  if [[ -d ".git/modules/$name" ]]; then
     rm -rf ".git/modules/$name"
     _log "Removed .git/modules/$name"
   fi
