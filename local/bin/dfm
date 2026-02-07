@@ -12,6 +12,7 @@
 : "${DOTFILES:=$HOME/.dotfiles}"
 : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
 : "${HOSTFILES:=$DOTFILES/hosts}"
+export DOTFILES BREWFILE HOSTFILES
 
 SCRIPT=$(basename "$0")
 

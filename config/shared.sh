@@ -5,7 +5,7 @@
 # shellcheck shell=bash
 
 # Defaults
-[[ -z "$DOTFILES" ]] && export DOTFILES="$HOME/.dotfiles"
+[[ -z "${DOTFILES:-}" ]] && export DOTFILES="$HOME/.dotfiles"
 DOTFILES_CURRENT_SHELL=$(basename "$SHELL")
 export DOTFILES_CURRENT_SHELL
 
@@ -76,9 +76,9 @@ x-path-prepend "$DOTFILES/local/bin"
 x-path-prepend "$XDG_BIN_HOME"
 
 # Custom completion paths
-[[ -z "$ZSH_CUSTOM_COMPLETION_PATH" ]] && export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
+[[ -z "${ZSH_CUSTOM_COMPLETION_PATH:-}" ]] && export ZSH_CUSTOM_COMPLETION_PATH="$XDG_CONFIG_HOME/zsh/completion"
 x-dc "$ZSH_CUSTOM_COMPLETION_PATH"
-export FPATH="$ZSH_CUSTOM_COMPLETION_PATH:$FPATH"
+export FPATH="$ZSH_CUSTOM_COMPLETION_PATH:${FPATH:-}"
 
 if ! declare -f msg > /dev/null; then
   # Function to print messages if VERBOSE is enabled
