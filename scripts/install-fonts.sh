@@ -18,7 +18,8 @@ fonts=(
 # Function to clone or update the NerdFonts repository
 clone_or_update_repo()
 {
-  if [[ ! -d "$TMP_PATH" ]]; then
+  if [[ ! -d "$TMP_PATH/.git" ]]; then
+    rm -rf "$TMP_PATH"
     git clone --quiet --filter=blob:none --sparse --depth=1 "$GIT_REPO" "$TMP_PATH"
   fi
 
