@@ -35,7 +35,7 @@ import argparse
 import signal
 import sys
 import glob
-from subprocess import PIPE, Popen, check_output
+from subprocess import PIPE, Popen, check_output  # nosec B404
 
 sortByOnDiskSize = False
 
@@ -98,17 +98,17 @@ def get_top_blobs(count, size_limit):
     if sortByOnDiskSize:
         sort_column = 3
 
-    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()
+    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603
     idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
-    verify_pack = Popen(
+    verify_pack = Popen(  # nosec B603
         ["git", "verify-pack", "-v", *idx_files],
         stdout=PIPE,
         stderr=PIPE,
     )
-    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=PIPE)
+    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
     if verify_pack.stdout:
         verify_pack.stdout.close()
-    sort_cmd = Popen(
+    sort_cmd = Popen(  # nosec B603
         ["sort", f"-k{sort_column}nr"],
         stdin=grep_blob.stdout,
         stdout=PIPE,
@@ -148,8 +148,8 @@ def populate_blob_paths(blobs):
         print("Finding object paths…")
 
         # Only include revs which have a path. Other revs aren't blobs.
-        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=PIPE)
-        awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)
+        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=PIPE)  # nosec B603
+        awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
         if rev_list.stdout:
             rev_list.stdout.close()
         all_object_lines = awk_filter.communicate()[0].decode("utf-8").strip().split("\n")[:-1]
