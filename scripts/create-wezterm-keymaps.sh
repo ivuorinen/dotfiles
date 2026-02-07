@@ -16,7 +16,10 @@ main()
     printf "\`\`\`txt\n"
   } > "$DEST"
 
-  wezterm show-keys >> "$DEST"
+  if ! wezterm show-keys >> "$DEST"; then
+    msg "Failed to run 'wezterm show-keys'"
+    return 1
+  fi
 
   printf "\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$DEST"
 

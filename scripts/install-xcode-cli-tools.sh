@@ -3,6 +3,8 @@ set -euo pipefail
 # @description Install XCode CLI Tools with osascript magic.
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
+# shellcheck source=shared.sh
+source "${DOTFILES}/config/shared.sh"
 
 # Check if the script is running on macOS
 if [[ "$(uname)" != "Darwin" ]]; then

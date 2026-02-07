@@ -29,13 +29,13 @@ clone_or_update_repo()
 {
   if [[ ! -d "$PBB_TEMP_DIR/.git" ]]; then
     msg_run "Starting to clone $PBB_GIT"
-    git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR" \
-      && msg_yay "Cloned $PBB_GIT"
+    git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR"
+    msg_yay "Cloned $PBB_GIT"
   else
     msg_run "Starting to update $PBB_GIT"
     git -C "$PBB_TEMP_DIR" reset --hard origin/master
-    git -C "$PBB_TEMP_DIR" pull -q \
-      && msgr yay "Updated $PBB_GIT"
+    git -C "$PBB_TEMP_DIR" pull -q
+    msg_yay "Updated $PBB_GIT"
   fi
   return 0
 }

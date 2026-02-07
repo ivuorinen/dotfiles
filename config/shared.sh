@@ -33,7 +33,7 @@ x-path-prepend()
       ;;
     *)
       echo "Unsupported shell: $CURRENT_SHELL"
-      exit 1
+      return 1
       ;;
   esac
   return 0
@@ -53,7 +53,7 @@ x-set-env()
       ;;
     *)
       echo "Unsupported shell: $CURRENT_SHELL"
-      exit 1
+      return 1
       ;;
   esac
   return 0
