@@ -11,18 +11,23 @@ main()
 {
   msg "Generating wezterm keybindings documentation"
 
+  local tmp
+  tmp="$(mktemp)"
+  trap 'rm -f "$tmp"' RETURN
+
   {
     printf "# wezterm keybindings\n\n"
     printf "\`\`\`txt\n"
-  } > "$DEST"
+  } > "$tmp"
 
-  if ! wezterm show-keys >> "$DEST"; then
+  if ! wezterm show-keys >> "$tmp"; then
     msg "Failed to run 'wezterm show-keys'"
     return 1
   fi
 
-  printf "\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$DEST"
+  printf "\`\`\`\n\n- Generated on %s\n" "$(date)" >> "$tmp"
 
+  mv "$tmp" "$DEST"
   msg "wezterm keybindings documentation generated at $DEST"
   return 0
 }
