@@ -98,7 +98,7 @@ def get_top_blobs(count, size_limit):
     if sortByOnDiskSize:
         sort_column = 3
 
-    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603
+    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603 # nosemgrep
     idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
     verify_pack = Popen(  # nosec B603
         ["git", "verify-pack", "-v", *idx_files],
