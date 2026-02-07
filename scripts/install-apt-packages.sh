@@ -14,31 +14,31 @@ fi
 
 packages=(
   # Build essentials
-  build-essential    # gcc, g++, make
-  cmake              # Cross-platform build system
-  pkg-config         # Helper for compiling against libraries
-  autoconf           # Automatic configure script builder
-  automake           # Makefile generator
-  libtool            # Generic library support script
+  build-essential # gcc, g++, make
+  cmake           # Cross-platform build system
+  pkg-config      # Helper for compiling against libraries
+  autoconf        # Automatic configure script builder
+  automake        # Makefile generator
+  libtool         # Generic library support script
 
   # Libraries for compiling languages
-  libssl-dev         # SSL development headers
-  libffi-dev         # Foreign function interface
-  zlib1g-dev         # Compression library
-  libreadline-dev    # Command-line editing
-  libbz2-dev         # Bzip2 compression
-  libsqlite3-dev     # SQLite database
-  libncurses-dev     # Terminal UI library
+  libssl-dev      # SSL development headers
+  libffi-dev      # Foreign function interface
+  zlib1g-dev      # Compression library
+  libreadline-dev # Command-line editing
+  libbz2-dev      # Bzip2 compression
+  libsqlite3-dev  # SQLite database
+  libncurses-dev  # Terminal UI library
 
   # CLI utilities (not in cargo/go/npm)
-  jq                 # JSON processor
-  tmux               # Terminal multiplexer
-  tree               # Directory listing
-  unzip              # Archive extraction
-  shellcheck         # Shell script linter
-  socat              # Multipurpose network relay
-  gnupg              # GPG encryption/signing
-  software-properties-common  # add-apt-repository command
+  jq                         # JSON processor
+  tmux                       # Terminal multiplexer
+  tree                       # Directory listing
+  unzip                      # Archive extraction
+  shellcheck                 # Shell script linter
+  socat                      # Multipurpose network relay
+  gnupg                      # GPG encryption/signing
+  software-properties-common # add-apt-repository command
 )
 
 # Install apt packages that are not already present

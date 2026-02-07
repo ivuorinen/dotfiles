@@ -11,13 +11,13 @@ msgr run "Installing go packages"
 
 # Go packages to install
 packages=(
-  github.com/dotzero/git-profile@latest           # Switch between git user profiles
-  github.com/google/yamlfmt/cmd/yamlfmt@latest     # Format yaml files
-  github.com/cheat/cheat/cmd/cheat@latest          # Interactive cheatsheets on the CLI
-  github.com/charmbracelet/glow@latest             # Render markdown on the CLI
-  github.com/junegunn/fzf@latest                   # General-purpose fuzzy finder
-  github.com/charmbracelet/gum@latest              # Glamorous shell scripts
-  github.com/joshmedeski/sesh/v2@latest            # Terminal session manager
+  github.com/dotzero/git-profile@latest        # Switch between git user profiles
+  github.com/google/yamlfmt/cmd/yamlfmt@latest # Format yaml files
+  github.com/cheat/cheat/cmd/cheat@latest      # Interactive cheatsheets on the CLI
+  github.com/charmbracelet/glow@latest         # Render markdown on the CLI
+  github.com/junegunn/fzf@latest               # General-purpose fuzzy finder
+  github.com/charmbracelet/gum@latest          # Glamorous shell scripts
+  github.com/joshmedeski/sesh/v2@latest        # Terminal session manager
 )
 
 # Function to install go packages

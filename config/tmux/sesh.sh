@@ -8,13 +8,14 @@
 set -euo pipefail
 
 # Fall back to native tmux session picker if sesh is not installed
-if ! command -v sesh &>/dev/null; then
+if ! command -v sesh &> /dev/null; then
   tmux choose-tree -Zs
   exit 0
 fi
 
 # Pick a sesh session using gum filter
-pick_with_gum() {
+pick_with_gum()
+{
   sesh list -i \
     | gum filter \
       --limit 1 \
@@ -43,19 +44,22 @@ FZF_COMMON_OPTS=(
 )
 
 # Pick a sesh session using fzf-tmux popup
-pick_with_fzf_tmux() {
+pick_with_fzf_tmux()
+{
   sesh list --icons | fzf-tmux -p 80%,70% "${FZF_COMMON_OPTS[@]}"
   return 0
 }
 
 # Pick a sesh session using fzf inline
-pick_with_fzf() {
+pick_with_fzf()
+{
   sesh list --icons | fzf "${FZF_COMMON_OPTS[@]}"
   return 0
 }
 
 # Pick a sesh session using bash select menu
-pick_with_select() {
+pick_with_select()
+{
   local sessions
   mapfile -t sessions < <(sesh list)
   if [[ ${#sessions[@]} -eq 0 ]]; then
@@ -71,11 +75,11 @@ pick_with_select() {
 }
 
 # Cascading tool detection
-if command -v gum &>/dev/null; then
+if command -v gum &> /dev/null; then
   selection=$(pick_with_gum)
-elif command -v fzf-tmux &>/dev/null; then
+elif command -v fzf-tmux &> /dev/null; then
   selection=$(pick_with_fzf_tmux)
-elif command -v fzf &>/dev/null; then
+elif command -v fzf &> /dev/null; then
   selection=$(pick_with_fzf)
 else
   selection=$(pick_with_select)

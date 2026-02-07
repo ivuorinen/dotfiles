@@ -16,15 +16,15 @@ fi
 
 # CLI tools — installed isolated with `uv tool install`
 tools=(
-  ansible                # IT automation and configuration management
-  openapi-python-client  # Generate Python API clients from OpenAPI specs
-  ruff                   # Fast Python linter and formatter
+  ansible               # IT automation and configuration management
+  openapi-python-client # Generate Python API clients from OpenAPI specs
+  ruff                  # Fast Python linter and formatter
 )
 
 # Library packages — installed into system Python with `uv pip install --system`
 libraries=(
-  libtmux    # Python API for tmux
-  pynvim     # Neovim Python client
+  libtmux # Python API for tmux
+  pynvim  # Neovim Python client
 )
 
 # Function to install CLI tools via uv tool install

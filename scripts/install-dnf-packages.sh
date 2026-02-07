@@ -14,35 +14,35 @@ fi
 
 packages=(
   # Build essentials (individual packages, group handled separately)
-  cmake              # Cross-platform build system
-  pkgconfig          # Helper for compiling against libraries
-  autoconf           # Automatic configure script builder
-  automake           # Makefile generator
-  libtool            # Generic library support script
+  cmake     # Cross-platform build system
+  pkgconfig # Helper for compiling against libraries
+  autoconf  # Automatic configure script builder
+  automake  # Makefile generator
+  libtool   # Generic library support script
 
   # Libraries for compiling languages
-  openssl-devel      # SSL development headers
-  libffi-devel       # Foreign function interface
-  zlib-devel         # Compression library
-  readline-devel     # Command-line editing
-  bzip2-devel        # Bzip2 compression
-  sqlite-devel       # SQLite database
-  ncurses-devel      # Terminal UI library
+  openssl-devel  # SSL development headers
+  libffi-devel   # Foreign function interface
+  zlib-devel     # Compression library
+  readline-devel # Command-line editing
+  bzip2-devel    # Bzip2 compression
+  sqlite-devel   # SQLite database
+  ncurses-devel  # Terminal UI library
 
   # CLI utilities (not in cargo/go/npm)
-  jq                 # JSON processor
-  tmux               # Terminal multiplexer
-  tree               # Directory listing
-  unzip              # Archive extraction
-  ShellCheck         # Shell script linter
-  socat              # Multipurpose network relay
-  gnupg2             # GPG encryption/signing
+  jq         # JSON processor
+  tmux       # Terminal multiplexer
+  tree       # Directory listing
+  unzip      # Archive extraction
+  ShellCheck # Shell script linter
+  socat      # Multipurpose network relay
+  gnupg2     # GPG encryption/signing
 )
 
 # Install the Development Tools dnf group
 install_dev_tools_group()
 {
-  if dnf group list installed 2>/dev/null | grep -q "Development Tools"; then
+  if dnf group list installed 2> /dev/null | grep -q "Development Tools"; then
     msgr ok "@development-tools group already installed"
   else
     msgr run "Installing @development-tools group"

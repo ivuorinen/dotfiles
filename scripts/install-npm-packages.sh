@@ -13,10 +13,10 @@ if ! command -v npm &> /dev/null; then
 fi
 
 packages=(
-  editorconfig-checker   # Check files against .editorconfig rules
-  github-release-notes   # Create release notes from tags and issues
-  neovim                 # Neovim node client
-  corepack               # Node.js package manager version management
+  editorconfig-checker # Check files against .editorconfig rules
+  github-release-notes # Create release notes from tags and issues
+  neovim               # Neovim node client
+  corepack             # Node.js package manager version management
 )
 
 # Function to install npm packages

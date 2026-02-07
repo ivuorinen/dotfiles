@@ -25,18 +25,18 @@ fi
 
 # Cargo packages to install
 packages=(
-  cargo-update       # A cargo subcommand for checking and applying updates to installed executables
-  cargo-cache        # Cargo cache management utility
-  tree-sitter-cli    # An incremental parsing system for programming tools
-  bkt                # A subprocess caching utility
-  difftastic         # A structural diff that understands syntax
-  fd-find            # A simple, fast and user-friendly alternative to 'find'
-  ripgrep            # Recursively searches directories for a regex pattern while respecting your gitignore
-  bob-nvim           # A version manager for neovim
-  bottom             # A cross-platform graphical process/system monitor
-  eza                # A modern alternative to ls
-  tmux-sessionizer   # A tool for opening git repositories as tmux sessions
-  zoxide             # A smarter cd command
+  cargo-update     # A cargo subcommand for checking and applying updates to installed executables
+  cargo-cache      # Cargo cache management utility
+  tree-sitter-cli  # An incremental parsing system for programming tools
+  bkt              # A subprocess caching utility
+  difftastic       # A structural diff that understands syntax
+  fd-find          # A simple, fast and user-friendly alternative to 'find'
+  ripgrep          # Recursively searches directories for a regex pattern while respecting your gitignore
+  bob-nvim         # A version manager for neovim
+  bottom           # A cross-platform graphical process/system monitor
+  eza              # A modern alternative to ls
+  tmux-sessionizer # A tool for opening git repositories as tmux sessions
+  zoxide           # A smarter cd command
 )
 
 # Number of jobs to run in parallel, this helps to keep the system responsive
