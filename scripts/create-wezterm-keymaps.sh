@@ -6,6 +6,7 @@
 source "${DOTFILES}/config/shared.sh"
 DEST="$HOME/.dotfiles/docs/wezterm-keybindings.md"
 
+# Generate wezterm keybindings documentation
 main()
 {
   msg "Generating wezterm keybindings documentation"

@@ -68,6 +68,7 @@ upgrade_tools()
   return 0
 }
 
+# Install Python tools, libraries, and upgrade all
 main()
 {
   install_tools

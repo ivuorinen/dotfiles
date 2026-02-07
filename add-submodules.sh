@@ -42,6 +42,7 @@ done
 # Mark certain repositories shallow
 git config -f .gitmodules submodule.antidote.shallow true
 
+# Log a message using msgr if available, else echo
 _log() {
   local msg="$1"
   if command -v msgr > /dev/null 2>&1; then
@@ -52,6 +53,7 @@ _log() {
   return 0
 }
 
+# Remove a stale git submodule and clean up references
 remove_old_submodule() {
   local name="$1" path="$2"
 

@@ -76,6 +76,7 @@ post_install_steps()
   return 0
 }
 
+# Install cargo packages and run post-install steps
 main()
 {
   install_packages

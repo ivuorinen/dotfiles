@@ -10,6 +10,7 @@ VERSION="1.0.0"
 LANG_MAP="c:.c,.h|cpp:.cpp,.cc,.cxx,.hpp,.hxx|csharp:.cs|go:.go|java:.java|
 javascript:.js,.jsx,.mjs,.ts,.tsx|python:.py|ruby:.rb|swift:.swift"
 
+# Display usage information and options
 usage()
 {
   cat << EOF
@@ -24,22 +25,26 @@ EOF
   exit "${1:-0}"
 }
 
+# Log a timestamped message to stderr
 log()
 {
   printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*" >&2
 }
+# Log an error message and exit
 err()
 {
   log "ERROR: $*"
   exit 1
 }
 
+# Verify codeql binary is available in PATH
 check_codeql()
 {
   command -v codeql > /dev/null 2>&1 || err "codeql binary not found in PATH"
   log "Found codeql: $(codeql version --format=terse)"
 }
 
+# Get or create the CodeQL cache directory
 get_cache_dir()
 {
   cache="${XDG_CACHE_HOME:-$HOME/.cache}/codeql"
@@ -47,6 +52,7 @@ get_cache_dir()
   printf '%s' "$cache"
 }
 
+# Detect supported programming languages in source path
 detect_languages()
 {
   src_path="$1"
@@ -85,6 +91,7 @@ detect_languages()
   printf '%s' "$detected" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/ $//'
 }
 
+# Create a CodeQL database for a language
 create_database()
 {
   lang="$1"
@@ -98,6 +105,7 @@ create_database()
     --overwrite
 }
 
+# Display analysis result statistics from SARIF file
 show_results_stats()
 {
   sarif_file="$1"
@@ -126,6 +134,7 @@ show_results_stats()
   return 0
 }
 
+# Run CodeQL analysis for a single language
 analyze_language()
 {
   lang="$1"
@@ -172,6 +181,7 @@ analyze_language()
   rm -rf "$db_path"
 }
 
+# Parse arguments and run CodeQL analysis pipeline
 main()
 {
   src_path="."

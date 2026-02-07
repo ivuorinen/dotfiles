@@ -30,6 +30,7 @@ if [ "$#" -lt 2 ]; then
   exit 1
 fi
 
+# Extract hostname from arguments, handling ssh shortcut
 get_host()
 {
   if [ "$1" = "ssh" ]; then
@@ -39,6 +40,7 @@ get_host()
   fi
 }
 
+# Wait until host responds to ping
 wait_for_host()
 {
   local host=$1
@@ -50,6 +52,7 @@ wait_for_host()
   done
 }
 
+# Wait for host to come online then execute command
 main()
 {
   local host

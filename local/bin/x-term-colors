@@ -9,11 +9,13 @@
 # <r> <g> <b> range from 0 to 255 inclusive.
 # The escape sequence ^[0m returns output to default
 
+# Set terminal background to an RGB color
 setBackgroundColor()
 {
   echo -en "\x1b[48;2;$1;$2;$3""m"
 }
 
+# Reset terminal output formatting
 resetOutput()
 {
   echo -en "\x1b[0m\n"

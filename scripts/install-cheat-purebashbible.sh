@@ -12,6 +12,7 @@ PBB_SYNTAX="syntax: bash"
 PBB_TAGS="tags: [bash]"
 PBB_TEMP_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/cheat/pbb"
 
+# Verify required tools are installed
 check_required_tools()
 {
   for t in "${PBB_REQUIRED_TOOLS[@]}"; do
@@ -23,6 +24,7 @@ check_required_tools()
   return 0
 }
 
+# Clone or update the pure-bash-bible repository
 clone_or_update_repo()
 {
   if [[ ! -d "$PBB_TEMP_DIR/.git" ]]; then
@@ -38,6 +40,7 @@ clone_or_update_repo()
   return 0
 }
 
+# Get the cheat destination directory for pure-bash-bible
 prepare_cheat_dest()
 {
   local cheat_dest
@@ -95,6 +98,7 @@ process_chapters()
   return 0
 }
 
+# Install pure-bash-bible cheatsheets
 main()
 {
   check_required_tools

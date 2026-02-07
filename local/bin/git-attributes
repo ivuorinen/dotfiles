@@ -22,32 +22,37 @@ if [ "$DEBUG" -eq 1 ]; then
   set -x
 fi
 
-# Output functions
+# Print an error message in red
 msg_err()
 {
   echo -e "\e[31m$*\e[0m" >&2
 }
 
+# Print a success message in green
 msg_success()
 {
   echo -e "\e[32m$*\e[0m"
 }
 
+# Print a warning message in yellow
 msg_warn()
 {
   echo -e "\e[33m$*\e[0m" >&2
 }
 
+# Print an info message in blue
 msg_info()
 {
   echo -e "\e[36m$*\e[0m"
 }
 
+# Print a debug message when verbose mode is on
 msg_debug()
 {
   [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$*\e[0m"
 }
 
+# Display usage information and examples
 show_help()
 {
   cat << EOF

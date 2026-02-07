@@ -52,12 +52,14 @@ install_fonts()
   return 0
 }
 
+# Remove the temporary nerd-fonts clone directory
 remove_tmp_path()
 {
   rm -rf "$TMP_PATH"
   return 0
 }
 
+# Clone, sparse-checkout, install fonts, and clean up
 main()
 {
   clone_or_update_repo

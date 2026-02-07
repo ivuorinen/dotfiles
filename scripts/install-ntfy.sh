@@ -49,6 +49,7 @@ install_ntfy()
   return 0
 }
 
+# Download and install ntfy
 main()
 {
   install_ntfy

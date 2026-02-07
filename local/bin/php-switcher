@@ -19,7 +19,7 @@ set -euo pipefail # Add error handling
 LATEST_VERSION_FORMULA="php"    # The formula name for latest PHP version
 PHP_VERSION_FILE=".php-version" # File name to look for when auto-switching
 
-# Switch brew php version
+# Verify that Homebrew is installed
 function check_dependencies()
 {
   if ! command -v brew > /dev/null 2>&1; then
@@ -28,6 +28,7 @@ function check_dependencies()
   fi
 }
 
+# Display help message and usage examples
 function usage()
 {
   echo "Brew PHP Switcher - Switch between PHP versions installed via Homebrew"
@@ -53,6 +54,7 @@ function usage()
   exit 0
 }
 
+# List all PHP versions installed via Homebrew
 function list_php_versions()
 {
   # Check Homebrew's installation path for PHP versions
@@ -185,6 +187,7 @@ function list_php_versions()
   done
 }
 
+# Convert a version number to a Homebrew formula name
 function get_php_formula_for_version()
 {
   local version="$1"
@@ -199,6 +202,7 @@ function get_php_formula_for_version()
   echo "php@$version"
 }
 
+# Check if a Homebrew formula is installed
 function check_formula_installed()
 {
   local formula="$1"
@@ -216,6 +220,7 @@ function check_formula_installed()
   return 1
 }
 
+# Unlink the currently active PHP version
 function unlink_current_php()
 {
   local current_formula=""
@@ -241,6 +246,7 @@ function unlink_current_php()
   fi
 }
 
+# Link a specific PHP formula as the active version
 function link_php_version()
 {
   local formula="$1"
@@ -265,6 +271,7 @@ function link_php_version()
   fi
 }
 
+# Display the currently active PHP version
 function get_current_version()
 {
   if ! command -v php > /dev/null 2>&1; then
@@ -300,6 +307,7 @@ function get_current_version()
   fi
 }
 
+# Validate PHP version format (x.y or latest)
 function validate_version()
 {
   local version="$1"
@@ -312,6 +320,7 @@ function validate_version()
   fi
 }
 
+# Search for .php-version file in directory hierarchy
 function find_php_version_file()
 {
   local dir="$PWD"
@@ -334,6 +343,7 @@ function find_php_version_file()
   return 1
 }
 
+# Auto-switch PHP based on .php-version file
 function auto_switch_php_version()
 {
   local version_file
@@ -360,6 +370,7 @@ function auto_switch_php_version()
   switch_php_version "$version"
 }
 
+# Switch to a specific PHP version
 function switch_php_version()
 {
   local version="$1"
@@ -398,6 +409,7 @@ function switch_php_version()
   echo "PHP executable: $(command -v php)"
 }
 
+# Parse arguments and dispatch to appropriate action
 function main()
 {
   local version=""

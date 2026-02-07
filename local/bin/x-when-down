@@ -26,6 +26,7 @@ if [ "$#" -lt 2 ]; then
   exit 1
 fi
 
+# Wait until host stops responding to ping
 wait_for_host_down()
 {
   local host=$1
@@ -37,6 +38,7 @@ wait_for_host_down()
   done
 }
 
+# Wait for host to go down then execute command
 main()
 {
   local host=$1

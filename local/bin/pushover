@@ -5,6 +5,7 @@
 #
 # Modified by Ismo Vuorinen <https://github.com/ivuorinen> 2023
 
+# Display usage information for pushover
 __pushover_usage()
 {
   printf "pushover <options> <message>\n"
@@ -23,6 +24,7 @@ __pushover_usage()
   return 1
 }
 
+# Format an optional curl form field
 __pushover_opt_field()
 {
   field=$1
@@ -33,6 +35,7 @@ __pushover_opt_field()
   fi
 }
 
+# Send a pushover notification via curl
 __pushover_send_message()
 {
   device="${1:-}"

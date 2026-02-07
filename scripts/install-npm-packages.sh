@@ -58,6 +58,7 @@ clean_npm_cache()
   return 0
 }
 
+# Install, upgrade, and clean npm packages
 main()
 {
   install_packages

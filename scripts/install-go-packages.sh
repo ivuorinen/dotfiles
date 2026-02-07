@@ -56,6 +56,7 @@ clear_go_cache()
   return 0
 }
 
+# Install go packages, completions, and clear cache
 main()
 {
   install_packages

@@ -48,6 +48,7 @@ install_extensions()
   return 0
 }
 
+# Install all GitHub CLI extensions
 main()
 {
   install_extensions

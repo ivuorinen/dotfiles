@@ -41,6 +41,7 @@ packages=(
   software-properties-common  # add-apt-repository command
 )
 
+# Install apt packages that are not already present
 install_packages()
 {
   local to_install=()
@@ -67,6 +68,7 @@ install_packages()
   return 0
 }
 
+# Install all apt packages and report completion
 main()
 {
   install_packages

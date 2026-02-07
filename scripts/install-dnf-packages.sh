@@ -39,6 +39,7 @@ packages=(
   gnupg2             # GPG encryption/signing
 )
 
+# Install the Development Tools dnf group
 install_dev_tools_group()
 {
   if dnf group list installed 2>/dev/null | grep -q "Development Tools"; then
@@ -50,6 +51,7 @@ install_dev_tools_group()
   return 0
 }
 
+# Install dnf packages that are not already present
 install_packages()
 {
   local to_install=()
@@ -75,6 +77,7 @@ install_packages()
   return 0
 }
 
+# Install all dnf packages and report completion
 main()
 {
   install_dev_tools_group

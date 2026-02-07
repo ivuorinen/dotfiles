@@ -64,6 +64,7 @@ menu_builder()
   done
 }
 
+# Handle install section commands
 section_install()
 {
   USAGE_PREFIX="$SCRIPT install <command>"
@@ -193,6 +194,7 @@ section_install()
   esac
 }
 
+# Handle Homebrew section commands
 section_brew()
 {
   USAGE_PREFIX="$SCRIPT brew <command>"
@@ -291,6 +293,7 @@ section_brew()
   esac
 }
 
+# Handle helper utility commands
 section_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
@@ -367,6 +370,7 @@ section_helpers()
   esac
 }
 
+# Handle apt package manager commands
 section_apt()
 {
   USAGE_PREFIX="$SCRIPT apt <command>"
@@ -435,6 +439,7 @@ section_apt()
   esac
 }
 
+# Handle documentation generation commands
 section_docs()
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
@@ -459,6 +464,7 @@ section_docs()
   esac
 }
 
+# Handle dotfiles formatting and reset commands
 section_dotfiles()
 {
   USAGE_PREFIX="$SCRIPT dotfiles <command>"
@@ -526,6 +532,7 @@ section_dotfiles()
   esac
 }
 
+# Handle system check commands (arch, hostname)
 section_check()
 {
   USAGE_PREFIX="$SCRIPT check <command>"
@@ -552,6 +559,7 @@ section_check()
   esac
 }
 
+# Handle install script execution
 section_scripts()
 {
   USAGE_PREFIX="$SCRIPT scripts <command>"
@@ -619,6 +627,7 @@ section_tests()
   esac
 }
 
+# Display main usage information for all sections
 usage()
 {
   echo ""
@@ -642,6 +651,7 @@ usage()
   section_helpers
 }
 
+# Parse section argument and dispatch to handler
 main()
 {
   SECTION="${1:-}"

@@ -13,6 +13,7 @@ if ! command -v sesh &>/dev/null; then
   exit 0
 fi
 
+# Pick a sesh session using gum filter
 pick_with_gum() {
   sesh list -i \
     | gum filter \
@@ -41,16 +42,19 @@ FZF_COMMON_OPTS=(
   --preview 'sesh preview {}'
 )
 
+# Pick a sesh session using fzf-tmux popup
 pick_with_fzf_tmux() {
   sesh list --icons | fzf-tmux -p 80%,70% "${FZF_COMMON_OPTS[@]}"
   return 0
 }
 
+# Pick a sesh session using fzf inline
 pick_with_fzf() {
   sesh list --icons | fzf "${FZF_COMMON_OPTS[@]}"
   return 0
 }
 
+# Pick a sesh session using bash select menu
 pick_with_select() {
   local sessions
   mapfile -t sessions < <(sesh list)
