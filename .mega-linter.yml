@@ -21,6 +21,7 @@ DISABLE_LINTERS:
   - PYTHON_BLACK # using ruff
   - PYTHON_FLAKE8 # using ruff
   - PYTHON_PYLINT # using ruff
+  - PYTHON_ISORT # using ruff (I rules)
 YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
 BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn
