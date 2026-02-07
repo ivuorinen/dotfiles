@@ -470,24 +470,24 @@ EOF
 ## Next Steps for LLM Analysis
 
 1. **Validate against current code:**
-   - Check if mentioned files and lines still match the reported issues
-   - Verify issues are not already fixed in the current branch
-   - Identify false positives and explain why they are false positives
+  - Check if mentioned files and lines still match the reported issues
+  - Verify issues are not already fixed in the current branch
+  - Identify false positives and explain why they are false positives
 
 2. **Prioritize fixes:**
-   - Address BLOCKER and CRITICAL severity issues first
-   - Group fixes by file to minimize context switching
-   - Consider effort estimates when planning the fix order
+  - Address BLOCKER and CRITICAL severity issues first
+  - Group fixes by file to minimize context switching
+  - Consider effort estimates when planning the fix order
 
 3. **Group by file for implementation:**
-   - Batch changes to the same file together
-   - Consider dependencies between fixes
-   - Plan atomic commits per logical change group
+  - Batch changes to the same file together
+  - Consider dependencies between fixes
+  - Plan atomic commits per logical change group
 
 4. **Track progress:**
-   - Use todo lists and memory tools to track which issues are addressed
-   - Mark false positives with clear reasoning
-   - Verify fixes do not introduce new issues
+  - Use todo lists and memory tools to track which issues are addressed
+  - Mark false positives with clear reasoning
+  - Verify fixes do not introduce new issues
 EOF
 }
 
