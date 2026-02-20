@@ -6,17 +6,17 @@ __metadata:
   cacheKey: 10c0
 
 "@biomejs/biome@npm:^2.3.1":
-  version: 2.4.0
-  resolution: "@biomejs/biome@npm:2.4.0"
+  version: 2.4.3
+  resolution: "@biomejs/biome@npm:2.4.3"
   dependencies:
-    "@biomejs/cli-darwin-arm64": "npm:2.4.0"
-    "@biomejs/cli-darwin-x64": "npm:2.4.0"
-    "@biomejs/cli-linux-arm64": "npm:2.4.0"
-    "@biomejs/cli-linux-arm64-musl": "npm:2.4.0"
-    "@biomejs/cli-linux-x64": "npm:2.4.0"
-    "@biomejs/cli-linux-x64-musl": "npm:2.4.0"
-    "@biomejs/cli-win32-arm64": "npm:2.4.0"
-    "@biomejs/cli-win32-x64": "npm:2.4.0"
+    "@biomejs/cli-darwin-arm64": "npm:2.4.3"
+    "@biomejs/cli-darwin-x64": "npm:2.4.3"
+    "@biomejs/cli-linux-arm64": "npm:2.4.3"
+    "@biomejs/cli-linux-arm64-musl": "npm:2.4.3"
+    "@biomejs/cli-linux-x64": "npm:2.4.3"
+    "@biomejs/cli-linux-x64-musl": "npm:2.4.3"
+    "@biomejs/cli-win32-arm64": "npm:2.4.3"
+    "@biomejs/cli-win32-x64": "npm:2.4.3"
   dependenciesMeta:
     "@biomejs/cli-darwin-arm64":
       optional: true
@@ -36,70 +36,63 @@ __metadata:
       optional: true
   bin:
     biome: bin/biome
-  checksum: 10c0/c10de983720ac20df56755f42f48b2b56fcc1082d364193f1410d07b62c4b7c3437abdbc9cfd60f2a65cd0f3baa7abf8d09a85cd6962b1363f77034e877c13b3
+  checksum: 10c0/acbc413ba93d278b437856c5bb1748b64a248645d3845b2c1e098e0dc639d8e6ac43e6fb122cfbf7c4d76ce47de58cba8cd9e83233b11078cd4fae7c0017aed1
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-arm64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-darwin-arm64@npm:2.4.0"
+"@biomejs/cli-darwin-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-darwin-arm64@npm:2.4.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-x64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-darwin-x64@npm:2.4.0"
+"@biomejs/cli-darwin-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-darwin-x64@npm:2.4.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64-musl@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.4.0"
+"@biomejs/cli-linux-arm64-musl@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.4.3"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-linux-arm64@npm:2.4.0"
+"@biomejs/cli-linux-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-arm64@npm:2.4.3"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64-musl@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-linux-x64-musl@npm:2.4.0"
+"@biomejs/cli-linux-x64-musl@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-x64-musl@npm:2.4.3"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-linux-x64@npm:2.4.0"
+"@biomejs/cli-linux-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-linux-x64@npm:2.4.3"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-arm64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-win32-arm64@npm:2.4.0"
+"@biomejs/cli-win32-arm64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-win32-arm64@npm:2.4.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-x64@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@biomejs/cli-win32-x64@npm:2.4.0"
+"@biomejs/cli-win32-x64@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@biomejs/cli-win32-x64@npm:2.4.3"
   conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@isaacs/cliui@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@isaacs/cliui@npm:9.0.0"
-  checksum: 10c0/971063b7296419f85053dacd0a0285dcadaa3dfc139228b23e016c1a9848121ad4aa5e7fcca7522062014e1eb6239a7424188b9f2cba893a79c90aae5710319c
   languageName: node
   linkType: hard
 
@@ -113,11 +106,9 @@ __metadata:
   linkType: hard
 
 "balanced-match@npm:^4.0.2":
-  version: 4.0.2
-  resolution: "balanced-match@npm:4.0.2"
-  dependencies:
-    jackspeak: "npm:^4.2.3"
-  checksum: 10c0/493eee4bece3f8b270cea8d3d6d1122ce008dd6b0d5aca8a3f1e623be6897be18c926018eadc454bd719bb7cc46d939c39fa2a05fff86b30f65382f020f6926d
+  version: 4.0.3
+  resolution: "balanced-match@npm:4.0.3"
+  checksum: 10c0/4d96945d0815849934145b2cdc0ccb80fb869d909060820fde5f95da0a32040f2142560ef931584fbb6a1607d39d399707e7d2364030a720ac1dc6f78ddaf9dc
   languageName: node
   linkType: hard
 
@@ -194,13 +185,13 @@ __metadata:
   linkType: hard
 
 "glob@npm:^13.0.0":
-  version: 13.0.3
-  resolution: "glob@npm:13.0.3"
+  version: 13.0.6
+  resolution: "glob@npm:13.0.6"
   dependencies:
-    minimatch: "npm:^10.2.0"
-    minipass: "npm:^7.1.2"
-    path-scurry: "npm:^2.0.0"
-  checksum: 10c0/333dc5c40ca0e50400465d8f5c45aa7cdd32580c4d1a4c502dfb4fb9c469a936b8e0c6bbd09cd6353fd05982e48d7f79e819159a36fb3e0a41ee722607bc11a9
+    minimatch: "npm:^10.2.2"
+    minipass: "npm:^7.1.3"
+    path-scurry: "npm:^2.0.2"
+  checksum: 10c0/269c236f11a9b50357fe7a8c6aadac667e01deb5242b19c84975628f05f4438d8ee1354bb62c5d6c10f37fd59911b54d7799730633a2786660d8c69f1d18120a
   languageName: node
   linkType: hard
 
@@ -224,15 +215,6 @@ __metadata:
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
-
-"jackspeak@npm:^4.2.3":
-  version: 4.2.3
-  resolution: "jackspeak@npm:4.2.3"
-  dependencies:
-    "@isaacs/cliui": "npm:^9.0.0"
-  checksum: 10c0/b5c0c414f1607c2aa0597f4bf2c03b8443897fccd5fd3c2b3e4f77d556b2bc7c3d3413828ba91e0789f6fb40ad90242f7f89fb20aee9e9d705bc1681f7564f67
-  languageName: node
-  linkType: hard
 
 "jsonfile@npm:^6.0.1":
   version: 6.2.0
@@ -289,19 +271,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^10.2.0":
-  version: 10.2.0
-  resolution: "minimatch@npm:10.2.0"
+"minimatch@npm:^10.2.2":
+  version: 10.2.2
+  resolution: "minimatch@npm:10.2.2"
   dependencies:
     brace-expansion: "npm:^5.0.2"
-  checksum: 10c0/256e72812bb99a86cdc788bf46a4da3f6e139db9123e20ed85a6795b93fdc0b76468ac511eb5535a023adb02a53fd598f971e990d0ca3bd6de6d41ea0199def1
+  checksum: 10c0/098831f2f542cb802e1f249c809008a016e1fef6b3a9eda9cf9ecb2b3d7979083951bd47c0c82fcf34330bd3b36638a493d4fa8e24cce58caf5b481de0f4e238
   languageName: node
   linkType: hard
 
-"minipass@npm:^7.1.2":
-  version: 7.1.2
-  resolution: "minipass@npm:7.1.2"
-  checksum: 10c0/b0fd20bb9fb56e5fa9a8bfac539e8915ae07430a619e4b86ff71f5fc757ef3924b23b2c4230393af1eda647ed3d75739e4e0acb250a6b1eb277cf7f8fe449557
+"minipass@npm:^7.1.2, minipass@npm:^7.1.3":
+  version: 7.1.3
+  resolution: "minipass@npm:7.1.3"
+  checksum: 10c0/539da88daca16533211ea5a9ee98dc62ff5742f531f54640dd34429e621955e91cc280a91a776026264b7f9f6735947629f920944e9c1558369e8bf22eb33fbb
   languageName: node
   linkType: hard
 
@@ -326,13 +308,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-scurry@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "path-scurry@npm:2.0.1"
+"path-scurry@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "path-scurry@npm:2.0.2"
   dependencies:
     lru-cache: "npm:^11.0.0"
     minipass: "npm:^7.1.2"
-  checksum: 10c0/2a16ed0e81fbc43513e245aa5763354e25e787dab0d539581a6c3f0f967461a159ed6236b2559de23aa5b88e7dc32b469b6c47568833dd142a4b24b4f5cd2620
+  checksum: 10c0/b35ad37cf6557a87fd057121ce2be7695380c9138d93e87ae928609da259ea0a170fac6f3ef1eb3ece8a068e8b7f2f3adf5bb2374cf4d4a57fe484954fcc9482
   languageName: node
   linkType: hard
 
