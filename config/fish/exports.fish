@@ -17,6 +17,9 @@ set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 # Add local bin to path
 fish_add_path "$XDG_BIN_HOME"
 
+# Add mise shims to path
+fish_add_path "$XDG_DATA_HOME/mise/shims"
+
 # Add cargo bin to path
 fish_add_path "$XDG_SHARE_HOME/cargo/bin"
 

@@ -21,6 +21,7 @@ if status is-interactive
         source "$HOME/.config/op/plugins.sh"
 
     # version manager initializers
+    type -q mise; and source (mise activate fish|psub)
     type -q rbenv; and source (rbenv init -|psub)
     type -q pyenv; and source (pyenv init -|psub)
     type -q pyenv; and source (pyenv virtualenv-init -|psub)
