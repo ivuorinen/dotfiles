@@ -1,11 +1,16 @@
 ---
 name: shell-validate
-description: Validate shell scripts after editing. Apply when writing or modifying any shell script in local/bin/ or scripts/.
+description: >-
+  Validate shell scripts after editing.
+  Apply when writing or modifying any shell script
+  in local/bin/ or scripts/.
 user-invocable: false
 allowed-tools: Bash, Read, Grep
 ---
 
-After editing any shell script in `local/bin/`, `scripts/`, or `config/` (files with a `#!` shebang or `# shellcheck shell=` directive), validate it:
+After editing any shell script in `local/bin/`, `scripts/`, or `config/`
+(files with a `#!` shebang or `# shellcheck shell=` directive),
+validate it:
 
 ## 1. Determine the shell
 
@@ -28,7 +33,9 @@ If syntax check fails, fix the issue before proceeding.
 
 ## 3. ShellCheck
 
-Run `shellcheck <file>`. The project `.shellcheckrc` already disables SC2039, SC2166, SC2154, SC1091, SC2174, SC2016. Only report and fix warnings that are NOT in that exclude list.
+Run `shellcheck <file>`. The project `.shellcheckrc` already
+disables SC2039, SC2166, SC2154, SC1091, SC2174, SC2016.
+Only report and fix warnings that are NOT in that exclude list.
 
 ## Key files to never validate (not shell scripts)
 
