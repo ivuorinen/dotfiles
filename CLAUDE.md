@@ -50,6 +50,9 @@ yarn test              # Run all tests in tests/
 
 # Shell linting
 shellcheck <script>    # Lint shell scripts
+
+# Tooling maintenance
+yarn biome migrate --write  # Update biome schema version
 ```
 
 ## Pre-commit Hooks
@@ -140,7 +143,9 @@ SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
 - **Vendor file**: `local/bin/fzf-tmux` is vendored from
   junegunn/fzf — do not modify.
 - **Fish config**: `config/fish/` has its own config chain
-  (`config.fish`, `exports.fish`, `alias.fish`) plus 80+ functions.
+  (`config.fish`, `exports.fish`, `alias.fish`) plus 60+ functions.
+- **gh CLI config**: `config/gh/hosts.yml` is managed by `gh` CLI
+  and excluded from prettier (see `.prettierignore`).
 - **Python**: Two scripts (`x-compare-versions.py`,
   `x-git-largest-files.py`) linted by Ruff (config in `pyproject.toml`).
 
