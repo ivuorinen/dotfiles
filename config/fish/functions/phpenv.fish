@@ -103,7 +103,7 @@ end
 
 function __phpenv_find_version_file -a phpenv_filename
     set -l phpenv_dir (pwd)
-    while test "$phpenv_dir" != "/"
+    while test "$phpenv_dir" != /
         if test -f "$phpenv_dir/$phpenv_filename"
             echo "$phpenv_dir/$phpenv_filename"
             return
@@ -130,13 +130,13 @@ function __phpenv_parse_composer_version
     end
 
     set -l phpenv_platform_php (jq -r '.config.platform.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != "null"
+    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != null
         echo $phpenv_platform_php
         return
     end
 
     set -l phpenv_require_php (jq -r '.require.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != "null"
+    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != null
         __phpenv_parse_semver_constraint $phpenv_require_php
         return
     end
@@ -196,7 +196,7 @@ set -g __phpenv_version_cache_time 0
 
 function __phpenv_get_version_info
     set -l current_time (date +%s)
-    set -l cache_duration 300  # 5 minutes
+    set -l cache_duration 300 # 5 minutes
 
     # Return cached version if still valid
     if test -n "$__phpenv_version_cache"
@@ -236,12 +236,12 @@ end
 # Check if Ondřej PPA is configured on the system
 function __phpenv_has_ondrej_ppa
     if test -d /etc/apt/sources.list.d
-        if grep -rq "ondrej/php" /etc/apt/sources.list.d/ 2>/dev/null
+        if grep -rq ondrej/php /etc/apt/sources.list.d/ 2>/dev/null
             return 0
         end
     end
     if test -f /etc/apt/sources.list
-        if grep -q "ondrej/php" /etc/apt/sources.list 2>/dev/null
+        if grep -q ondrej/php /etc/apt/sources.list 2>/dev/null
             return 0
         end
     end
@@ -262,34 +262,34 @@ function __phpenv_get_provider
     end
 
     # macOS always uses Homebrew
-    if test (uname -s) = "Darwin"
-        echo "homebrew"
+    if test (uname -s) = Darwin
+        echo homebrew
         return 0
     end
 
     # Linux: check for apt with Ondřej PPA first
-    if test (uname -s) = "Linux"
+    if test (uname -s) = Linux
         if command -q apt-get; and __phpenv_has_ondrej_ppa
-            echo "apt"
+            echo apt
             return 0
         end
 
         # Fall back to Homebrew (Linuxbrew) if available
         if command -q brew
-            echo "homebrew"
+            echo homebrew
             return 0
         end
 
         # If apt is available but no PPA yet, still use apt provider
         # (it will prompt to add the PPA when needed)
         if command -q apt-get
-            echo "apt"
+            echo apt
             return 0
         end
     end
 
     # Default fallback
-    echo "homebrew"
+    echo homebrew
     return 0
 end
 
@@ -319,7 +319,7 @@ function __phpenv_provider_homebrew_ensure_source
     end
 
     # Check and add required taps only if missing
-    set -l required_taps "shivammathur/php" "shivammathur/extensions"
+    set -l required_taps shivammathur/php shivammathur/extensions
     for tap in $required_taps
         if not brew tap | grep -qx $tap 2>/dev/null
             if not brew tap $tap 2>/dev/null
@@ -343,7 +343,7 @@ function __phpenv_provider_homebrew_list_installed
                     continue
                 end
 
-                if test "$phpenv_basename" = "php"
+                if test "$phpenv_basename" = php
                     set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
                     set -a phpenv_versions $phpenv_latest
                 else if echo $phpenv_basename | grep -qE '^php@[0-9]+\.[0-9]+$'
@@ -375,7 +375,7 @@ function __phpenv_provider_homebrew_list_available
             continue
         end
 
-        if test "$phpenv_clean_name" = "php"
+        if test "$phpenv_clean_name" = php
             set -a phpenv_versions "$phpenv_latest_version (latest)"
         else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
             set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
@@ -502,7 +502,7 @@ function __phpenv_provider_homebrew_ext_list -a phpenv_version
         for phpenv_ext_dir in $phpenv_cellar_path/*@$phpenv_version
             if test -d $phpenv_ext_dir
                 set -l phpenv_ext_name (basename $phpenv_ext_dir | sed "s/@$phpenv_version//")
-                if test "$phpenv_ext_name" != "php"
+                if test "$phpenv_ext_name" != php
                     echo $phpenv_ext_name
                 end
             end
@@ -574,7 +574,7 @@ function __phpenv_provider_apt_ensure_source
     echo ""
     read -P "Add ppa:ondrej/php? [y/N] " -l confirm
 
-    if test "$confirm" = "y" -o "$confirm" = "Y"
+    if test "$confirm" = y -o "$confirm" = Y
         echo "Adding ppa:ondrej/php..."
         if command -q add-apt-repository
             if sudo add-apt-repository -y ppa:ondrej/php
@@ -603,8 +603,7 @@ function __phpenv_provider_apt_list_installed
         return 1
     end
 
-    dpkg -l 'php[0-9]*-cli' 2>/dev/null | grep '^ii' | \
-        sed -E 's/^ii\s+php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+    dpkg -l 'php[0-9]*-cli' 2>/dev/null | grep '^ii' | sed -E 's/^ii\s+php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
 end
 
 function __phpenv_provider_apt_list_available
@@ -613,8 +612,7 @@ function __phpenv_provider_apt_list_available
         return
     end
 
-    apt-cache search '^php[0-9]+\.[0-9]+-cli$' 2>/dev/null | \
-        sed -E 's/^php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+    apt-cache search '^php[0-9]+\.[0-9]+-cli$' 2>/dev/null | sed -E 's/^php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
 end
 
 function __phpenv_provider_apt_get_php_path -a phpenv_version
@@ -644,7 +642,7 @@ function __phpenv_provider_apt_get_php_path -a phpenv_version
             set -l temp_link "$target.$fish_pid"
             ln -s "$source" "$temp_link" 2>/dev/null
             and mv -f "$temp_link" "$target" 2>/dev/null
-        else if test "$binary" = "phar"; and test -x "/usr/bin/phar$phpenv_version"
+        else if test "$binary" = phar; and test -x "/usr/bin/phar$phpenv_version"
             set -l temp_link "$target.$fish_pid"
             ln -s "/usr/bin/phar$phpenv_version" "$temp_link" 2>/dev/null
             and mv -f "$temp_link" "$target" 2>/dev/null
@@ -819,8 +817,7 @@ function __phpenv_provider_apt_ext_list -a phpenv_version
     # Filter out core packages (cli, common, etc.)
     set -l core_packages cli common opcache fpm cgi phpdbg
 
-    dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}' | \
-        sed "s/php$phpenv_version-//" | while read ext
+    dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}' | sed "s/php$phpenv_version-//" | while read ext
         # Skip core packages
         set -l is_core 0
         for core in $core_packages
@@ -837,9 +834,7 @@ end
 
 function __phpenv_provider_apt_ext_available -a phpenv_version
     # List available extensions from apt cache
-    apt-cache search "^php$phpenv_version-" 2>/dev/null | \
-        sed "s/php$phpenv_version-//" | awk '{print $1}' | \
-        grep -v -E '^(cli|common|fpm|cgi|phpdbg|dev)$' | sort | uniq
+    apt-cache search "^php$phpenv_version-" 2>/dev/null | sed "s/php$phpenv_version-//" | awk '{print $1}' | grep -v -E '^(cli|common|fpm|cgi|phpdbg|dev)$' | sort | uniq
 end
 
 function __phpenv_provider_apt_get_path_pattern
@@ -979,9 +974,9 @@ end
 function __phpenv_resolve_version_alias -a phpenv_version
     switch $phpenv_version
         case latest
-            __phpenv_parse_version_field "latest" "8.4"
+            __phpenv_parse_version_field latest "8.4"
         case nightly
-            __phpenv_parse_version_field "nightly" "8.5"
+            __phpenv_parse_version_field nightly "8.5"
         case '8.x'
             __phpenv_parse_version_field "8.x" "8.4"
         case '7.x'
@@ -997,7 +992,7 @@ function __phpenv_get_formula_name -a phpenv_version
     set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
 
     if test "$phpenv_version" = "$phpenv_latest_version"
-        echo "shivammathur/php/php"
+        echo shivammathur/php/php
     else
         echo "shivammathur/php/php@$phpenv_version"
     end
@@ -1140,7 +1135,7 @@ function __phpenv_use
     set -l phpenv_version $argv[1]
 
     # Handle special case: restore system PHP
-    if test "$phpenv_version" = "system"
+    if test "$phpenv_version" = system
         __phpenv_restore_system_path
         echo "Restored system PHP"
         return 0
@@ -1157,7 +1152,7 @@ function __phpenv_use
     end
 
     if not __phpenv_is_version_installed $phpenv_version
-        if test "$(__phpenv_config_get auto-install)" = "true"
+        if test "$(__phpenv_config_get auto-install)" = true
             __phpenv_install $phpenv_version
         else
             echo "PHP $phpenv_version is not installed. Install with: phpenv install $phpenv_version"
@@ -1179,7 +1174,7 @@ function __phpenv_local -a phpenv_version
         return 1
     end
 
-    echo $phpenv_version > .php-version
+    echo $phpenv_version >.php-version
     echo "Set local PHP version to $phpenv_version"
 end
 
@@ -1272,7 +1267,7 @@ function __phpenv_get_tap_versions
             continue
         end
 
-        if test "$phpenv_clean_name" = "php"
+        if test "$phpenv_clean_name" = php
             set -a phpenv_versions "$phpenv_latest_version (latest)"
         else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
             set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
@@ -1310,7 +1305,7 @@ function __phpenv_doctor
 
     # Show provider information
     set -l provider (__phpenv_get_provider)
-    set -l provider_source "auto-detected"
+    set -l provider_source auto-detected
     if set -q PHPENV_PROVIDER; and test -n "$PHPENV_PROVIDER"
         set provider_source "PHPENV_PROVIDER override"
     end
@@ -1429,7 +1424,7 @@ function __phpenv_config_get -a phpenv_key
         end
     end
 
-    if test "$argv[2]" = "--verbose"
+    if test "$argv[2]" = --verbose
         if test -n "$phpenv_value"
             echo "$phpenv_key = $phpenv_value (from $phpenv_source)"
         else
@@ -1581,19 +1576,18 @@ function __phpenv_get_tap_formulas -a tap_name
         return 1
     end
 
-    brew tap-info $tap_name --json 2>/dev/null | \
-        jq -r '.[]|(.formula_names[]?)' 2>/dev/null
+    brew tap-info $tap_name --json 2>/dev/null | jq -r '.[]|(.formula_names[]?)' 2>/dev/null
 end
 
 function __phpenv_get_available_extensions
-    __phpenv_get_tap_formulas "shivammathur/extensions"
+    __phpenv_get_tap_formulas shivammathur/extensions
 end
 
 function __phpenv_extension_available -a phpenv_extension phpenv_version
     set -l phpenv_available_extensions (__phpenv_get_available_extensions)
 
     if test -z "$phpenv_available_extensions"
-        return 0  # Assume available if can't check
+        return 0 # Assume available if can't check
     end
 
     for phpenv_ext_formula in $phpenv_available_extensions
@@ -1695,7 +1689,7 @@ function __phpenv_auto_switch --on-variable PWD
     end
 
     set -l phpenv_auto_switch (__phpenv_config_get auto-switch)
-    if test "$phpenv_auto_switch" = "false"
+    if test "$phpenv_auto_switch" = false
         return 0
     end
 
@@ -1718,7 +1712,7 @@ function __phpenv_auto_switch --on-variable PWD
         set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
     else
         set -l phpenv_auto_install (__phpenv_config_get auto-install)
-        if test "$phpenv_auto_install" = "true"
+        if test "$phpenv_auto_install" = true
             echo "Auto-installing PHP $phpenv_new_version..."
             if phpenv install "$phpenv_new_version"
                 set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
@@ -1771,7 +1765,7 @@ function __phpenv_help
 end
 
 function __phpenv_validate_boolean -a phpenv_value
-    test "$phpenv_value" = "true" -o "$phpenv_value" = "false"
+    test "$phpenv_value" = true -o "$phpenv_value" = false
 end
 
 function __phpenv_validate_version -a phpenv_version
