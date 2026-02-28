@@ -18,6 +18,10 @@
           {
             "type": "command",
             "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.sh|*/bin/*) head -1 \"$fp\" | grep -qE '^#!.*(ba)?sh' && command -v shfmt > /dev/null && shfmt -i 2 -bn -ci -sr -fn -w \"$fp\";; esac; exit 0"
+          },
+          {
+            "type": "command",
+            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.fish) command -v fish_indent > /dev/null && fish_indent -w \"$fp\";; esac; exit 0"
           }
         ]
       }
