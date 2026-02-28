@@ -10,7 +10,7 @@ config.color_scheme_dirs = {
 }
 
 -- Font and font size
-config.font_size = 16
+config.font_size = 12
 config.font = wezterm.font_with_fallback {
   {
     family = 'Monaspace Argon NF',
@@ -48,9 +48,9 @@ config.window_background_opacity = 0.97
 config.window_decorations = 'RESIZE'
 config.macos_window_background_blur = 10
 config.window_padding = {
-  left = 5,
-  right = 5,
-  top = 5,
+  left = 10,
+  right = 10,
+  top = 10,
   bottom = 5,
 }
 
