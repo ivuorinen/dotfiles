@@ -26,7 +26,8 @@ usage()
   echo "  -h, --help     Show this help message"
   echo "  -v, --verbose  Print each directory as it is visited"
   echo "  -n, --dry-run  List directories without adding them"
-  exit 1
+  local code="${1:-1}"
+  exit "$code"
 }
 
 # Function to print messages if VERBOSE is enabled
@@ -51,8 +52,7 @@ visit_dir()
   if zoxide add "$1" 2> /dev/null; then
     msg "Added: $1"
   else
-    msg "zoxide add failed, falling back to cd: $1"
-    (cd "$1")
+    msg "zoxide add failed for: $1"
   fi
 }
 
@@ -61,7 +61,7 @@ main()
 {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -h | --help) usage ;;
+      -h | --help) usage 0 ;;
       -v | --verbose) VERBOSE=1 ;;
       -n | --dry-run) DRY_RUN=1 ;;
       -*)
@@ -94,7 +94,7 @@ main()
     else
       visit_dir "$dir"
     fi
-    ((count++))
+    count=$((count + 1))
   done
 
   echo "Visited $count directories."
