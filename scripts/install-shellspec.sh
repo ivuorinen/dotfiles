@@ -12,7 +12,7 @@ install_shellspec()
 {
   if [[ -d "$SHELLSPEC_CACHE" ]]; then
     msgr ok "shellspec repo already cloned, pulling latest..."
-    git -C "$SHELLSPEC_CACHE" pull --quiet
+    git -C "$SHELLSPEC_CACHE" pull --quiet --depth=1
   else
     git clone --depth 1 "$SHELLSPEC_REPO" "$SHELLSPEC_CACHE"
   fi
