@@ -9,6 +9,8 @@ testing framework for shell scripts.
 scripts/install-shellspec.sh
 ```
 
-The script clones shellspec to `~/.cache/shellspec` and runs
+The script resolves the latest release tag via `x-gh-get-latest-version`,
+clones shellspec to `~/.cache/shellspec` pinned to that tag, and runs
 `make install PREFIX=$HOME/.local`, placing the binary in `~/.local/bin/`.
-Re-running the script pulls the latest version and reinstalls.
+Re-running the script fetches and checks out the newest release tag
+before reinstalling.
