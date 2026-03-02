@@ -88,6 +88,7 @@ section_install()
     "nvm-latest:Install latest lts node using nvm"
     "nvm:Install Node Version Manager (nvm)"
     "python-packages:Install Python packages via uv"
+    "shellspec:Install shellspec testing framework"
     "xcode-cli-tools:Install Xcode CLI tools (macOS)"
     "z:Install z"
   )
@@ -121,6 +122,7 @@ section_install()
       $0 install ntfy
 
       # Tier 4: Independent utilities
+      $0 install shellspec
       $0 install z
 
       msgr msg "Reloading configurations again..."
@@ -243,6 +245,12 @@ section_install()
       msgr run "Installing Xcode CLI tools..."
       bash "$DOTFILES/scripts/install-xcode-cli-tools.sh" \
         && msgr yay "Xcode CLI tools installed!"
+      ;;
+
+    shellspec)
+      msgr run "Installing shellspec..."
+      bash "$DOTFILES/scripts/install-shellspec.sh" \
+        && msgr yay "shellspec has been installed!"
       ;;
 
     z)
