@@ -24,7 +24,14 @@ return {
   -- https://github.com/fatih/vim-go
   {
     'fatih/vim-go',
-    config = function() end,
+    ft = 'go',
+    config = function()
+      vim.g.go_def_mode = 'gopls'
+      vim.g.go_info_mode = 'gopls'
+      vim.g.go_fmt_autosave = 0
+      vim.g.go_imports_autosave = 0
+      vim.g.go_mod_fmt_autosave = 0
+    end,
   },
 
   -- Clarify and beautify your comments using boxes and lines.

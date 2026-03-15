@@ -223,7 +223,7 @@ return {
               vim.env.VIMRUNTIME,
             }
             client.config.settings.Lua.runtime = { version = 'LuaJIT' }
-            client.notify(
+            client:notify(
               'workspace/didChangeConfiguration',
               { settings = client.config.settings }
             )

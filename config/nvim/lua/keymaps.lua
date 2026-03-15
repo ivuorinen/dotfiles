@@ -28,7 +28,6 @@ K.d('<C-k>', { 'n', 'v' }, ":m '<-2<CR>gv=gv", 'Move Block Up')
 K.d('<C-j>', { 'n', 'v' }, ":m '>+1<CR>gv=gv", 'Move Block Down')
 
 -- ── Other operations ────────────────────────────────────────────────
-K.nl('o', function() require('snacks').gitbrowse() end, 'Open repo in browser')
 K.n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 K.n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
@@ -59,7 +58,6 @@ K.ld('cci', 'n', function() b().lsp_incoming_calls() end, 'Incoming calls')
 K.ld('cco', 'n', function() b().lsp_outgoing_calls() end, 'Outgoing calls')
 K.ld('cd', 'n', function() b().lsp_definitions() end, 'Definitions')
 K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
-K.ld('cg', 'n', ':lua require("neogen").generate()<CR>', 'Generate annotations')
 K.ld('ci', 'n', function() b().lsp_implementations() end, 'Implementations')
 K.ld('cp', 'n', function() b().lsp_type_definitions() end, 'Type Definition')
 K.ld('cr', 'n', vim.lsp.buf.rename, 'Rename')
