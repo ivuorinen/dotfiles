@@ -5,7 +5,7 @@ name: Lint Code Base
 # yamllint disable-line
 on:
   pull_request:
-    branches: [master, main]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
