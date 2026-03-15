@@ -100,5 +100,6 @@ function GetIntelephenseLicense()
   local f = assert(io.open(p, 'rb'))
   local content = f:read '*a'
   f:close()
-  return (string.gsub(content, '%s+', ''))
+  local stripped = string.gsub(content, '%s+', '')
+  return stripped == '' and nil or stripped
 end
