@@ -52,13 +52,13 @@ yarn test              # Run all tests in tests/
 shellcheck <script>    # Lint shell scripts
 
 # Tooling maintenance
-yarn biome migrate --write  # Update biome schema version
+npx @biomejs/biome migrate --write  # Update biome schema version
 ```
 
 ## Pre-commit Hooks
 
 Configured in `.pre-commit-config.yaml`: shellcheck, shfmt, biome,
-yamllint, prettier, actionlint, stylua, fish_syntax/fish_indent.
+yamllint, prettier, actionlint, stylua, fish_syntax/fish_indent, ruff.
 Run `pre-commit run --all-files` to check everything.
 
 ## Commit Convention
@@ -124,7 +124,7 @@ These are layered on top of the global config during installation.
 - **Lua** (neovim config): Formatted with stylua (`stylua.toml`),
   90-char line length.
 - **JSON/JS/TS/Markdown**: Formatted with Biome (`biome.json`),
-  80-char width.
+  80-char width (Markdown uses 120-char override).
 - **YAML**: Formatted with Prettier (`.prettierrc.json`),
   validated with yamllint (`.yamllint.yml`).
 
@@ -154,8 +154,17 @@ SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
 - **Hooks** (`.claude/settings.json`):
   - *PreToolUse*: Blocks edits to `fzf-tmux`, `yarn.lock`, `.yarn/`
   - *PostToolUse*: Auto-runs `shfmt` on shell scripts after Edit/Write
+  - *PostToolUse*: Auto-runs `fish_indent` on `.fish` files after Edit/Write
+  - *PostToolUse*: Auto-runs `stylua` on `.lua` files after Edit/Write
 - **Skills** (`.claude/skills/`):
   - `shell-validate`: Auto-validates shell scripts (syntax + shellcheck)
+  - `fish-validate`: Auto-validates fish scripts (syntax + fish_indent)
+  - `lua-format`: Auto-formats Lua files with stylua
+  - `yaml-validate`: Auto-validates YAML files (yamllint + actionlint)
+- **Subagents** (`.claude/agents/`):
+  - `code-reviewer`: Reviews shell/fish/lua changes for correctness and style
+- **MCP Servers**:
+  - `context7`: Live documentation lookup for tools and libraries
 
 ## Package Manager
 
