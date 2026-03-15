@@ -13,10 +13,6 @@ local a = vim.api -- A table to store API functions
 g.mapleader = ' ' -- Space as the leader key
 g.maplocalleader = ' ' -- Space as the local leader key
 
--- g.colors_theme = 'onedark' -- Set the colorscheme
--- g.colors_variant_light = 'tokyonight-day' -- Set the light variant
--- g.colors_variant_dark = 'tokyonight-storm' -- Set the dark variant
-
 g.editorconfig = true -- Make sure editorconfig support is enabled
 g.loaded_perl_provider = 0 -- Disable perl provider
 g.loaded_ruby_provider = 0 -- Disable ruby provider

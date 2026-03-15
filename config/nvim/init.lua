@@ -2,7 +2,7 @@
 -- │            ivuorinen's Neovim configuration             │
 -- ╰─────────────────────────────────────────────────────────╯
 
--- ── Install lazylazy ────────────────────────────────────────────────
+-- ── Install lazy ────────────────────────────────────────────────────
 -- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -53,15 +53,13 @@ require('lazy').setup(
       path = '~/Code/nvim', -- Load wip plugins from this path
     },
     install = {
-      colorscheme = { vim.g.colors_theme },
+      colorscheme = { 'catppuccin' },
     },
     profiling = {
       loader = true,
     },
   }
 )
-
--- require('nvm-default').setup()
 
 require 'keymaps'
 

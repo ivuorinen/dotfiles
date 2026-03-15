@@ -7,6 +7,7 @@
 *-secret
 __secret
 __ignored
+__ignored/*
 __test_*.php
 __test_*.txt
 __test.php
