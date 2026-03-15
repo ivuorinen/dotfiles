@@ -2,6 +2,8 @@
 # │                     fish/config.fish                     │
 # ╰──────────────────────────────────────────────────────────╯
 
+set -g fish_greeting
+
 fish_config theme choose "Catppuccin Mocha"
 
 test -e "$HOME/.config/fish/alias.fish" &&
@@ -33,7 +35,7 @@ if status is-interactive
     type -q zoxide; and zoxide init fish | source
 
     # Start tmux if not already running and not in SSH
-    #open-tmux # defined in functions/open-tmux.fish
+    #.t # defined in functions/.t.fish
 end
 
 # Added by LM Studio CLI (lms)
@@ -48,3 +50,8 @@ fish_add_path $HOME/.opencode/bin
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :
+
+# Warn if GITHUB_TOKEN is not set
+if status is-interactive; and not set -q GITHUB_TOKEN
+    echo "Warning: GITHUB_TOKEN is not set" >&2
+end
