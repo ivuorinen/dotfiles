@@ -2,6 +2,9 @@
 [include]
 	path = ~/.dotfiles/config/git/shared
 
+[core]
+	excludesfile = ~/.dotfiles/config/git/overrides/ignore
+
 [gpg]
 	format = ssh
 
