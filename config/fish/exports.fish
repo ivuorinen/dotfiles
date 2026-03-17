@@ -36,6 +36,9 @@ fish_add_path "$YARN_GLOBAL_FOLDER/bin"
 set -q MASON_HOME; or set -x MASON_HOME "$XDG_DATA_HOME/nvim/mason"
 fish_add_path "$MASON_HOME/bin"
 
+# Add dotnet tools to path
+fish_add_path "$HOME/.dotnet/tools/"
+
 # Set Neovim environment variables
 test -z "$NVIM_STATE" && set -x NVIM_STATE "$XDG_STATE_HOME/nvim"
 test -z "$NVIM_CONFIG_HOME" && set -x NVIM_CONFIG_HOME "$XDG_CONFIG_HOME/nvim"
