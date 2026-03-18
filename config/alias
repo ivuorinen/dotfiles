@@ -33,6 +33,8 @@ alias .c='cd $HOME/Code'
 alias .d='cd $DOTFILES'
 alias .l='cd $HOME/.local'
 alias .o='cd $HOME/Code/ivuorinen/obsidian/'
+alias .s='cd $HOME/Code/s'
+alias .p='cd $HOME/Code/ivuorinen'
 
 # Shortcuts for listing
 alias ll="ls -la"

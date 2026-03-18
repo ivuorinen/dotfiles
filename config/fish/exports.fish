@@ -61,11 +61,14 @@ set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
 set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
 set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
 set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
+set -q AWS_DEFAULT_REGION; or set -x AWS_DEFAULT_REGION eu-west-1
 set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
 set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
 set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
 set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION 7200
 set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA true
+set -q AWS_CONFIGURE_REGION; or set -x AWS_CONFIGURE_REGION true
+set -q AWS_CONFIGURE_OUTPUT; or set -x AWS_CONFIGURE_OUTPUT true
 set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE true
 set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT true
 set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT true
@@ -107,7 +110,7 @@ set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
 set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
 # Go configuration
-# set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
+set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
 set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
 
 set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
@@ -168,6 +171,15 @@ x-dc "$WAKATIME_HOME"
 # Zoxide configuration
 set -q _ZO_DATA_DIR; or set -x _ZO_DATA_DIR "$XDG_DATA_HOME/zoxide"
 set -q _ZO_EXCLUDE_DIRS; or set -x _ZO_EXCLUDE_DIRS "$XDG_DATA_HOME"
+
+# bkt (shell command caching tool) configuration
+set -q BKT_TTL; or set -x BKT_TTL 1m
+
+# Manpager
+set -q MANPAGER; or set -x MANPAGER "less -X"
+
+# Lando
+fish_add_path "$HOME/.lando/bin"
 
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
