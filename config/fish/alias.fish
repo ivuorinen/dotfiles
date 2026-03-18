@@ -114,9 +114,10 @@ end
 # cd to git root directory
 function cdgr --description 'cd to git root'
     if git rev-parse --is-inside-work-tree &>/dev/null
-        cd (git rev-parse --show-toplevel)
+        cd (git rev-parse --show-toplevel); or return $status
     else
         echo >&2 "Not in a git repository"
+        return 1
     end
 end
 

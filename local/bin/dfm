@@ -169,7 +169,7 @@ section_install()
       if ! command -v mise &> /dev/null; then
         msgr nested "Installing mise..."
         curl https://mise.run | sh
-        export PATH="$HOME/.local/bin:$PATH"
+        export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
       fi
       mise install --yes
       mise reshim

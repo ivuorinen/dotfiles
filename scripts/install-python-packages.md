@@ -10,7 +10,7 @@ scripts/install-python-packages.sh
 
 ## What it does
 
-1. Checks that `uv` is available; if missing, installs it via the official installer.
+1. Checks that `uv` is available; if missing, exits with an error (install `uv` via mise first).
 2. Installs each library from the inline `libraries` array using `uv pip install --system --upgrade`.
 
 To add or remove packages, edit the `libraries` array in `scripts/install-python-packages.sh`.

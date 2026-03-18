@@ -13,8 +13,8 @@ remove_dir()
 {
   local dir="$1"
   local label="$2"
-  if [ -d "$dir" ]; then
-    if [ "$DRY_RUN" = "--dry-run" ]; then
+  if [[ -d "$dir" ]]; then
+    if [[ "$DRY_RUN" = "--dry-run" ]]; then
       msgr warn "[DRY RUN] Would remove $label: $dir"
     else
       msgr run "Removing $label: $dir"
@@ -30,8 +30,8 @@ remove_file()
 {
   local file="$1"
   local label="$2"
-  if [ -f "$file" ]; then
-    if [ "$DRY_RUN" = "--dry-run" ]; then
+  if [[ -f "$file" ]]; then
+    if [[ "$DRY_RUN" = "--dry-run" ]]; then
       msgr warn "[DRY RUN] Would remove $label: $file"
     else
       rm -f "$file"
@@ -67,7 +67,7 @@ remove_dir "$XDG_DATA_HOME/bob" "bob-nvim data"
 
 CARGO_BIN="${XDG_DATA_HOME}/cargo/bin"
 CARGO_MANAGED_TOOLS=(
-  bkt bottom btm difft difftastic eza fd rg ripgrep
+  bkt btm difft eza fd rg
   tree-sitter tmux-sessionizer zoxide bob
   cargo-install-update cargo-cache
 )
@@ -82,7 +82,7 @@ GO_BIN="${XDG_DATA_HOME}/go/bin"
 GO_MANAGED_TOOLS=(
   yamlfmt cheat glow fzf gum sesh git-profile
 )
-if [ "$GO_BIN" != "$XDG_BIN_HOME" ] && [ -d "$GO_BIN" ]; then
+if [[ "$GO_BIN" != "$XDG_BIN_HOME" ]] && [[ -d "$GO_BIN" ]]; then
   for tool in "${GO_MANAGED_TOOLS[@]}"; do
     remove_file "$GO_BIN/$tool" "go-installed $tool"
   done
@@ -108,11 +108,12 @@ if command -v brew &> /dev/null; then
   )
   for pkg in "${BREW_REMOVE[@]}"; do
     if brew list "$pkg" &> /dev/null; then
-      if [ "$DRY_RUN" = "--dry-run" ]; then
+      if [[ "$DRY_RUN" = "--dry-run" ]]; then
         msgr warn "[DRY RUN] Would brew uninstall $pkg"
       else
         msgr run "Uninstalling brew package: $pkg"
-        brew uninstall --ignore-dependencies "$pkg" || true
+        msgr warn "Note: $pkg may have dependents"
+        brew uninstall "$pkg" || true
         msgr run_done "Uninstalled $pkg"
       fi
     fi

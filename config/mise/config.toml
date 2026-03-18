@@ -12,7 +12,7 @@ rust = "stable"
 "ubi:ClementTsang/bottom" = "latest"
 "ubi:ajeetdsouza/zoxide" = "latest"
 "ubi:tree-sitter/tree-sitter" = "latest"
-"ubi:neovim/neovim" = "latest"
+"ubi:neovim/neovim" = "latest" # Neovim editor binary
 "ubi:dandavison/delta" = "latest"
 
 # Cargo-based tools (no pre-built binary available)
@@ -32,7 +32,7 @@ rust = "stable"
 # npm-based tools
 "npm:editorconfig-checker" = "latest"
 "npm:github-release-notes" = "latest"
-"npm:neovim" = "latest"
+"npm:neovim" = "latest" # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "latest"
 
 # Python tools (via pipx backend)

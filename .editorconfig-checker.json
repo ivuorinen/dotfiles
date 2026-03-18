@@ -7,6 +7,7 @@
   "Exclude": [
     "base/plan",
     "config/fish/completions/.*",
+    "config/karabiner/.*",
     "config/fish/conf.d/.*",
     "config/fish/functions/.*",
     "config/fzf/key-bindings.fish",

@@ -25,6 +25,8 @@ config/alacritty/theme-active.toml
 config/cheat/cheatsheets/pure-bash-bible/*
 config/cheat/cheatsheets/tldr/*
 config/fish/completions/asdf.fish
+config/fish/completions/kubectl.fish
+config/fish/completions/orbctl.fish
 config/fish/fish_variables
 config/fish/fish_variables.*
 config/gh/hosts.yml
