@@ -27,7 +27,7 @@ repos:
         name: Biome Check
         entry: yarn biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
-        files: \.(js|ts|jsx|tsx|json|md)$
+        files: \.(js|ts|jsx|tsx|json)$
       - id: markdown-table-formatter
         name: Markdown Table Formatter
         entry: yarn markdown-table-formatter
