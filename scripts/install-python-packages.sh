@@ -35,5 +35,5 @@ install_libraries()
   return 0
 }
 
-install_libraries
-msgr yay "Python library installations complete"
+install_libraries \
+  && msgr yay "Python library installations complete"

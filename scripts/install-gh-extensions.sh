@@ -51,8 +51,8 @@ install_extensions()
 # Install all GitHub CLI extensions
 main()
 {
-  install_extensions
-  msgr run_done "Done"
+  install_extensions \
+    && msgr run_done "Done"
   return 0
 }
 
