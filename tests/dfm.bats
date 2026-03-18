@@ -38,23 +38,36 @@ setup()
   [ "$status" -eq 0 ]
   [[ "$output" == *"all"* ]]
   [[ "$output" == *"apt-packages"* ]]
-  [[ "$output" == *"cargo"* ]]
   [[ "$output" == *"cheat-databases"* ]]
   [[ "$output" == *"composer"* ]]
   [[ "$output" == *"dnf-packages"* ]]
   [[ "$output" == *"fonts"* ]]
   [[ "$output" == *"gh"* ]]
   [[ "$output" == *"git-crypt"* ]]
-  [[ "$output" == *"go"* ]]
   [[ "$output" == *"imagick"* ]]
   [[ "$output" == *"macos"* ]]
-  [[ "$output" == *"npm-packages"* ]]
+  [[ "$output" == *"mise"* ]]
+  [[ "$output" == *"mise-cleanup"* ]]
   [[ "$output" == *"ntfy"* ]]
-  [[ "$output" == *"nvm-latest"* ]]
-  [[ "$output" == *"nvm"* ]]
-  [[ "$output" == *"python-packages"* ]]
+  [[ "$output" == *"python-libs"* ]]
   [[ "$output" == *"xcode-cli-tools"* ]]
   [[ "$output" == *"z"* ]]
+}
+
+@test "dfm install menu does not show removed nvm/cargo/go entries" {
+  run bash local/bin/dfm install
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"nvm-latest"* ]]
+  [[ "$output" != *"npm-packages"* ]]
+  [[ "$output" != *"python-packages"* ]]
+}
+
+@test "dfm install menu shows mise entry with description" {
+  run bash local/bin/dfm install
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"mise"* ]]
+  [[ "$output" == *"mise-cleanup"* ]]
+  [[ "$output" == *"python-libs"* ]]
 }
 
 @test "dfm install with invalid subcommand shows menu" {
@@ -101,9 +114,17 @@ setup()
 @test "dfm scripts menu lists install scripts" {
   run bash local/bin/dfm scripts
   [ "$status" -eq 0 ]
-  [[ "$output" == *"cargo-packages"* ]]
   [[ "$output" == *"fonts"* ]]
   [[ "$output" == *"z"* ]]
+  [[ "$output" == *"python-packages"* ]]
+}
+
+@test "dfm scripts menu does not list removed cargo and go scripts" {
+  run bash local/bin/dfm scripts
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"cargo-packages"* ]]
+  [[ "$output" != *"go-packages"* ]]
+  [[ "$output" != *"npm-packages"* ]]
 }
 
 @test "dfm tests menu shows entries" {
