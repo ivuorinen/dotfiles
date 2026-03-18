@@ -24,13 +24,9 @@ ohmyzsh/ohmyzsh path:plugins/fzf
 ohmyzsh/ohmyzsh path:plugins/git
 ohmyzsh/ohmyzsh path:plugins/golang
 ohmyzsh/ohmyzsh path:plugins/gpg-agent
-ohmyzsh/ohmyzsh path:plugins/nvm
 ohmyzsh/ohmyzsh path:plugins/python
 # ohmyzsh/ohmyzsh path:plugins/tmux
 ohmyzsh/ohmyzsh path:plugins/z
-
-# Automatically activate nvm if .nvmrc file is present
-ivuorinen/nvm-auto-use
 
 # Add core plugins that make Zsh a bit more like Fish
 zdharma-continuum/fast-syntax-highlighting

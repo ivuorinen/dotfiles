@@ -18,7 +18,6 @@
 # Plugin configurations
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 zstyle ':omz:update' mode reminder
-zstyle ':omz:plugins:nvm' autoload yes
 
 # Pure prompt settings
 export PURE_PROMPT_SYMBOL='➜'

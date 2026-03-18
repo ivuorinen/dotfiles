@@ -18,7 +18,7 @@
 [ -z "${EDITOR:-}" ] && export EDITOR="nvim"
 [ -z "${VISUAL:-}" ] && export VISUAL="code"
 
-export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
@@ -334,10 +334,6 @@ export AWS_CONFIGURE_SESSION=true
 export AWS_CONFIGURE_SESSION_DURATION=7200
 export AWS_CONFIGURE_SESSION_MFA=true
 
-# bob manages nvim versions
-msg "Setting up bob configuration"
-x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
-
 # Mason (nvim package manager)
 msg "Setting up Mason configuration"
 export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
@@ -373,10 +369,6 @@ export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 export PATH="$COMPOSER_BIN:$PATH"
 
-# NVM/Node
-msg "Setting up NVM configuration"
-export NVM_DIR="$XDG_DATA_HOME/nvm"
-
 # Yarn
 msg "Setting up Yarn configuration"
 export YARN_GLOBAL_FOLDER="$XDG_DATA_HOME/yarn"
@@ -397,14 +389,6 @@ export DIRENV_LOG_FORMAT=""
 export FZF_BASE="${XDG_CONFIG_HOME}/fzf"
 export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
 
-# FNM (Fast Node Manager)
-msg "Setting up FNM configuration"
-export FNM_DIR="$XDG_DATA_HOME/fnm"
-export FNM_VERSION_FILE_STRATEGY="recursive"
-export FNM_USE_ON_CD=true
-export FNM_COREPACK_ENABLED=true
-export FNM_RESOLVE_ENGINES=true
-
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
 msg "Setting up GnuPG configuration"
@@ -419,13 +403,6 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
-# NPM: Add npm packages to path
-msg "Setting up NPM configuration"
-x-have node && {
-  NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
-  export PATH="$NVM_NODE_BIN_DIR:$PATH"
-}
-
 # oh-my-posh (omp) configuration
 msg "Setting up oh-my-posh configuration"
 export OHMYPOSH_CFG="$DOTFILES/config/omp/own.toml"
@@ -435,16 +412,10 @@ msg "Setting up 1Password CLI configuration"
 export OP_CACHE="$XDG_STATE_HOME/1password"
 
 # Python
-#
-# pyenv, python environments
 msg "Setting up Python configuration"
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
-export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 ## for MichaelAquilina/zsh-autoswitch-virtualenv
 export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-x-have pyenv && eval "$(pyenv init -)"
 
 # Rust / cargo
 msg "Setting up Rust/Cargo configuration"
@@ -514,13 +485,15 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
 # Additional PATH entries (aligned with fish config)
 [ -d "$XDG_DATA_HOME/mise/shims" ] && export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
-[ -d "$NVM_DIR/bin" ] && export PATH="$NVM_DIR/bin:$PATH"
 [ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$YARN_GLOBAL_FOLDER/bin:$PATH"
 [ -d "$MASON_HOME/bin" ] && export PATH="$MASON_HOME/bin:$PATH"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$HOME/.dotnet/tools:$PATH"
-[ -d "$FNM_DIR" ] && export PATH="$FNM_DIR:$PATH"
 [ -d "$POETRY_HOME/bin" ] && export PATH="$POETRY_HOME/bin:$PATH"
 [ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+
+# mise — unified tool version manager
+# https://mise.jdx.dev
+command -v mise &> /dev/null && eval "$(mise activate bash)"
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
 if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/exports-local"; fi

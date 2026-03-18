@@ -23,11 +23,6 @@ fish_add_path "$XDG_DATA_HOME/mise/shims"
 # Add cargo bin to path
 fish_add_path "$XDG_DATA_HOME/cargo/bin"
 
-# NPM/NVM configuration
-set -q NVM_DIR; or set -x NVM_DIR "$XDG_DATA_HOME/nvm"
-fish_add_path "$NVM_DIR/bin"
-fish_add_path "$XDG_CONFIG_HOME/nvm"
-
 # Yarn configuration
 set -q YARN_GLOBAL_FOLDER; or set -x YARN_GLOBAL_FOLDER "$XDG_DATA_HOME/yarn"
 fish_add_path "$YARN_GLOBAL_FOLDER/bin"
@@ -93,14 +88,6 @@ x-dc "$DOCKER_CONFIG"
 set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
 set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
-# FNM / Node.js configuration
-set -q FNM_DIR; or set -x FNM_DIR "$XDG_DATA_HOME/fnm"
-fish_add_path "$FNM_DIR"
-set -q FNM_VERSION_FILE_STRATEGY; or set -x FNM_VERSION_FILE_STRATEGY recursive
-set -q FNM_USE_ON_CD; or set -x FNM_USE_ON_CD true
-set -q FNM_COREPACK_ENABLED; or set -x FNM_COREPACK_ENABLED true
-set -q FNM_RESOLVE_ENGINES; or set -x FNM_RESOLVE_ENGINES true
-
 # fzf configuration
 set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
 set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
@@ -113,16 +100,11 @@ set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
 set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
 
-set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
-set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
-
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 
 # Python configuration
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
-set -q PYENV_ROOT; or set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
-fish_add_path "$PYENV_ROOT/bin"
 
 # Poetry configuration
 set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
@@ -134,7 +116,6 @@ set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
 set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
 fish_add_path "$CARGO_HOME/bin"
-fish_add_path "$XDG_DATA_HOME/bob/nvim-bin"
 
 # screen configuration
 set -q SCREENRC; or set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"

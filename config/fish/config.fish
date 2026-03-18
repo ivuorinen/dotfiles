@@ -22,20 +22,17 @@ if status is-interactive
     type -q op; and test -e "$HOME/.config/op/plugins.sh" &&
         source "$HOME/.config/op/plugins.sh"
 
-    # version manager initializers
-    type -q mise; and source (mise activate fish|psub)
-    type -q rbenv; and source (rbenv init -|psub)
-    type -q pyenv; and source (pyenv init -|psub)
-    type -q pyenv; and source (pyenv virtualenv-init -|psub)
-    type -q goenv; and source (goenv init -|psub)
-    # type -q fnm; and fnm env --use-on-cd --shell fish | source
-    type -q load_nvm; and load_nvm >/dev/stderr
+    # mise version manager
+    type -q mise; and mise activate fish | source
 
     # Initialize other tools if available
     type -q zoxide; and zoxide init fish | source
 
     # Start tmux if not already running and not in SSH
     #.t # defined in functions/.t.fish
+else
+    # Non-interactive shells (IDE subprocesses) use shims for tool discovery
+    type -q mise; and mise activate fish --shims | source
 end
 
 # Added by LM Studio CLI (lms)
