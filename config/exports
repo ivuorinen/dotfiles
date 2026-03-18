@@ -21,7 +21,7 @@
 # Bootstrap: ensure local/bin is on PATH so x-path is available
 PATH="$DOTFILES/local/bin:$PATH"
 # Use x-path to deduplicate PATH entries
-PATH="$(x-path prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "$XDG_DATA_HOME/cargo/bin" "/opt/homebrew/bin" "/usr/local/bin")"
+PATH="$(x-path prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin")"
 export PATH
 
 if ! command -v msg &> /dev/null; then
@@ -333,7 +333,7 @@ export AWS_CONFIGURE_OUTPUT=true
 export AWS_CONFIGURE_PROFILE=true
 export AWS_CONFIGURE_PROMPT=true
 export AWS_CONFIGURE_PROMPT_DEFAULT="default"
-export AWS_SESSION_TOKEN="${XDG_STATE_HOME}/aws/session_token"
+export AWS_SESSION_TOKEN_FILE="${XDG_STATE_HOME}/aws/session_token"
 export AWS_CONFIGURE_SESSION=true
 export AWS_CONFIGURE_SESSION_DURATION=7200
 export AWS_CONFIGURE_SESSION_MFA=true
@@ -489,15 +489,21 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
 # Additional PATH entries (aligned with fish config)
 [ -d "$XDG_DATA_HOME/mise/shims" ] && export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
-[ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$YARN_GLOBAL_FOLDER/bin:$PATH"
-[ -d "$MASON_HOME/bin" ] && export PATH="$MASON_HOME/bin:$PATH"
-[ -d "$HOME/.dotnet/tools" ] && export PATH="$HOME/.dotnet/tools:$PATH"
-[ -d "$POETRY_HOME/bin" ] && export PATH="$POETRY_HOME/bin:$PATH"
-[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+[ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$PATH:$YARN_GLOBAL_FOLDER/bin"
+[ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
+[ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
+[ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
+[ -d "$HOME/.opencode/bin" ] && export PATH="$PATH:$HOME/.opencode/bin"
 
 # mise — unified tool version manager
 # https://mise.jdx.dev
-command -v mise &> /dev/null && eval "$(mise activate bash)"
+if command -v mise &> /dev/null; then
+  if [ -n "${ZSH_NAME:-}" ]; then
+    eval "$(mise activate zsh)"
+  else
+    eval "$(mise activate bash)"
+  fi
+fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
 if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/exports-local"; fi

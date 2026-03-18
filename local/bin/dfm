@@ -168,17 +168,26 @@ section_install()
       msgr run "Installing tools via mise..."
       if ! command -v mise &> /dev/null; then
         msgr nested "Installing mise..."
-        curl https://mise.run | sh
+        if ! curl https://mise.run | sh; then
+          msgr err "Failed to install mise"
+          exit 1
+        fi
         export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
       fi
-      mise install --yes
-      mise reshim
+      if ! mise install --yes; then
+        msgr err "mise install failed"
+        exit 1
+      fi
+      if ! mise reshim; then
+        msgr err "mise reshim failed"
+        exit 1
+      fi
       msgr yay "mise tools installed!"
       ;;
 
     mise-cleanup)
       msgr run "Cleaning up old version manager installations..."
-      bash "$DOTFILES/scripts/cleanup-old-version-managers.sh" "${2:-}"
+      bash "$DOTFILES/scripts/cleanup-old-version-managers.sh" "${@:2}"
       ;;
 
     apt-packages)
@@ -539,7 +548,7 @@ section_dotfiles()
       msgr ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim
       msgr ok "Linked nvim and astronvim"
-      x-have npm && $0 install npm
+      x-have mise && $0 install mise
       msgr ok "Installed packages"
       msgr run_done "nvim reset!"
       ;;

@@ -4,6 +4,11 @@ set -euo pipefail
 # This script targets specific known directories — NOT which/command -v,
 # because nvim's Mason installs some of the same tool names.
 #
+# Ensure DOTFILES is set even when script is invoked directly
+if [ -z "${DOTFILES:-}" ]; then
+  DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  export DOTFILES
+fi
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
@@ -113,8 +118,11 @@ if command -v brew &> /dev/null; then
       else
         msgr run "Uninstalling brew package: $pkg"
         msgr warn "Note: $pkg may have dependents"
-        brew uninstall "$pkg" || true
-        msgr run_done "Uninstalled $pkg"
+        if brew uninstall "$pkg"; then
+          msgr run_done "Uninstalled $pkg"
+        else
+          msgr err "Failed to uninstall $pkg"
+        fi
       fi
     fi
   done
