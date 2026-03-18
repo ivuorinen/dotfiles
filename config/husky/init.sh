@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-eval "$(mise activate bash --shims)"
+eval "$(mise activate --shims)"
