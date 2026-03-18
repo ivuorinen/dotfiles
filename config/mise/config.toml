@@ -1,0 +1,100 @@
+[tools]
+# Language runtimes
+node = "lts"
+python = "3"
+go = "latest"
+rust = "stable"
+
+# Pre-built binaries via ubi (fast — no compilation)
+"ubi:sharkdp/fd" = "latest"
+"ubi:BurntSushi/ripgrep" = "latest"
+"ubi:eza-community/eza" = "latest"
+"ubi:ClementTsang/bottom" = "latest"
+"ubi:ajeetdsouza/zoxide" = "latest"
+"ubi:tree-sitter/tree-sitter" = "latest"
+"ubi:neovim/neovim" = "latest"
+"ubi:dandavison/delta" = "latest"
+
+# Cargo-based tools (no pre-built binary available)
+"cargo:bkt" = "latest"
+"cargo:difftastic" = "latest"
+"cargo:tmux-sessionizer" = "latest"
+
+# Go-based tools
+"go:github.com/google/yamlfmt/cmd/yamlfmt" = "latest"
+"go:github.com/cheat/cheat/cmd/cheat" = "latest"
+"go:github.com/charmbracelet/glow" = "latest"
+"go:github.com/junegunn/fzf" = "latest"
+"go:github.com/charmbracelet/gum" = "latest"
+"go:github.com/joshmedeski/sesh/v2" = "latest"
+"go:github.com/dotzero/git-profile" = "latest"
+
+# npm-based tools
+"npm:editorconfig-checker" = "latest"
+"npm:github-release-notes" = "latest"
+"npm:neovim" = "latest"
+"npm:corepack" = "latest"
+
+# Python tools (via pipx backend)
+"pipx:ansible" = "latest"
+"pipx:ansible-lint" = "latest"
+"pipx:ruff" = "latest"
+"pipx:openapi-python-client" = "latest"
+
+# .NET tools (via dotnet backend)
+"dotnet:coverlet.console" = "latest"
+"dotnet:csharp-ls" = "latest"
+"dotnet:csharpier" = "latest"
+"dotnet:ilspycmd" = "latest"
+"dotnet:dotnet-ef" = "latest"
+
+# DevOps & security tools
+act = "latest"
+age = "latest"
+aws-cli = "latest"
+checkov = "latest"
+grype = "latest"
+pinact = "latest"
+snyk = "latest"
+
+# Dev tools (pre-built binaries)
+lazygit = "latest"
+bat = "latest"
+bats = "latest"
+choose = "latest"
+cmake = "latest"
+gdu = "latest"
+github-cli = "latest"
+jq = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+stylua = "latest"
+actionlint = "latest"
+"aqua:mpalmer/action-validator" = "latest"
+oh-my-posh = "latest"
+"ubi:o2sh/onefetch" = "latest"
+"ubi:wakatime/wakatime-cli" = "latest"
+
+# Terraform (replaces tfenv)
+terraform = "latest"
+tflint = "latest"
+tfsec = "latest"
+
+# Other useful tools
+uv = "latest"
+
+[settings]
+# Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
+# This repo uses .mise.toml at the repo root for pinned versions.
+idiomatic_version_file = true
+idiomatic_version_file_enable_tools = [
+  "node", "python", "ruby", "go", "java",
+  "terraform", "yarn", "bun", "deno", "dotnet",
+]
+
+# Generate mise.lock for reproducible installs
+lockfile = true
+
+# Save disk space — don't keep downloaded archives or failed installs
+always_keep_download = false
+always_keep_install = false
