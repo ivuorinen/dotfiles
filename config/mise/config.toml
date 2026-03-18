@@ -84,6 +84,11 @@ tfsec = "latest"
 uv = "latest"
 
 [settings]
+trusted_config_paths = [
+  "~/Code/ivuorinen",
+  "~/Code/s",
+  "~/Code/masf",
+]
 # Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
 # This repo uses .mise.toml at the repo root for pinned versions.
 idiomatic_version_file = true
