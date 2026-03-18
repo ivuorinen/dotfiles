@@ -22,7 +22,10 @@
 PATH="$DOTFILES/local/bin:$PATH"
 # Use x-path to deduplicate PATH entries (only if x-path is available)
 if command -v x-path &> /dev/null; then
-  PATH="$(x-path prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin")"
+  # shellcheck source=../local/bin/x-path
+  source "$(command -v x-path)"
+  normalize_path_var
+  do_prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin"
 fi
 export PATH
 

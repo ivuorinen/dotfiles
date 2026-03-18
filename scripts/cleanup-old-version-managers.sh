@@ -12,7 +12,15 @@ fi
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
-DRY_RUN="${1:-}"
+DRY_RUN=""
+if [[ $# -gt 0 ]]; then
+  if [[ "$1" = "--dry-run" ]]; then
+    DRY_RUN="--dry-run"
+  else
+    echo "Usage: $0 [--dry-run]" >&2
+    exit 1
+  fi
+fi
 
 remove_dir()
 {

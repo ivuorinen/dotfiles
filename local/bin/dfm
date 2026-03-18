@@ -531,9 +531,9 @@ section_dotfiles()
   case "$1" in
     fmt)
       msgr run "Running all formatters"
-      $0 dotfiles yamlfmt
-      $0 dotfiles shfmt
-      msgr run_done "...done!"
+      $0 dotfiles yamlfmt \
+        && $0 dotfiles shfmt \
+        && msgr run_done "...done!"
       ;;
 
     reset_all)
@@ -547,12 +547,16 @@ section_dotfiles()
         ~/.local/share/nvim \
         ~/.local/state/nvim \
         ~/.cache/nvim \
-        ~/.config/nvim
-      msgr ok "Deleted old nvim files (share, state and cache + config)"
-      ln -s "$DOTFILES/config/nvim" ~/.config/nvim
-      msgr ok "Linked nvim and astronvim"
-      $0 install mise
-      msgr ok "Installed packages"
+        ~/.config/nvim \
+        && msgr ok "Deleted old nvim files (share, state and cache + config)"
+      ln -s "$DOTFILES/config/nvim" ~/.config/nvim \
+        && msgr ok "Linked nvim and astronvim"
+      if $0 install mise; then
+        msgr ok "Installed packages"
+      else
+        msgr err "Failed to install mise tools"
+        exit 1
+      fi
       msgr run_done "nvim reset!"
       ;;
 
@@ -575,8 +579,8 @@ section_dotfiles()
         --language-dialect bash \
         --func-next-line --list --write \
         --indent 2 --case-indent --space-redirects \
-        --binary-next-line {} \;
-      msgr yay "dotfiles have been shfmt formatted!"
+        --binary-next-line {} \; \
+        && msgr yay "dotfiles have been shfmt formatted!"
       ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
