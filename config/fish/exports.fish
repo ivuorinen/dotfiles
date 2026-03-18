@@ -23,11 +23,6 @@ fish_add_path "$XDG_DATA_HOME/mise/shims"
 # Add cargo bin to path
 fish_add_path "$XDG_DATA_HOME/cargo/bin"
 
-# NPM/NVM configuration
-set -q NVM_DIR; or set -x NVM_DIR "$XDG_DATA_HOME/nvm"
-fish_add_path "$NVM_DIR/bin"
-fish_add_path "$XDG_CONFIG_HOME/nvm"
-
 # Yarn configuration
 set -q YARN_GLOBAL_FOLDER; or set -x YARN_GLOBAL_FOLDER "$XDG_DATA_HOME/yarn"
 fish_add_path "$YARN_GLOBAL_FOLDER/bin"
@@ -36,15 +31,18 @@ fish_add_path "$YARN_GLOBAL_FOLDER/bin"
 set -q MASON_HOME; or set -x MASON_HOME "$XDG_DATA_HOME/nvim/mason"
 fish_add_path "$MASON_HOME/bin"
 
+# Add dotnet tools to path
+fish_add_path "$HOME/.dotnet/tools/"
+
 # Set Neovim environment variables
-test -z "$NVIM_STATE" && set -x NVIM_STATE "$XDG_STATE_HOME/nvim"
-test -z "$NVIM_CONFIG_HOME" && set -x NVIM_CONFIG_HOME "$XDG_CONFIG_HOME/nvim"
-test -z "$NVIM_DATA_HOME" && set -x NVIM_DATA_HOME "$XDG_DATA_HOME/nvim"
-test -z "$NVIM_CACHE_HOME" && set -x NVIM_CACHE_HOME "$XDG_CACHE_HOME/nvim"
-test -z "$NVIM_LOG_PATH" && set -x NVIM_LOG_PATH "$NVIM_STATE/log"
-test -z "$NVIM_SESSION_PATH" && set -x NVIM_SESSION_PATH "$NVIM_STATE/session"
-test -z "$NVIM_SHADA_PATH" && set -x NVIM_SHADA_PATH "$NVIM_STATE/shada"
-test -z "$NVIM_UNDO_PATH" && set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
+set -q NVIM_STATE; or set -x NVIM_STATE "$XDG_STATE_HOME/nvim"
+set -q NVIM_CONFIG_HOME; or set -x NVIM_CONFIG_HOME "$XDG_CONFIG_HOME/nvim"
+set -q NVIM_DATA_HOME; or set -x NVIM_DATA_HOME "$XDG_DATA_HOME/nvim"
+set -q NVIM_CACHE_HOME; or set -x NVIM_CACHE_HOME "$XDG_CACHE_HOME/nvim"
+set -q NVIM_LOG_PATH; or set -x NVIM_LOG_PATH "$NVIM_STATE/log"
+set -q NVIM_SESSION_PATH; or set -x NVIM_SESSION_PATH "$NVIM_STATE/session"
+set -q NVIM_SHADA_PATH; or set -x NVIM_SHADA_PATH "$NVIM_STATE/shada"
+set -q NVIM_UNDO_PATH; or set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
 
 # Ansible configuration
 set -q ANSIBLE_HOME; or set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
@@ -58,11 +56,14 @@ set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
 set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
 set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
 set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
+set -q AWS_DEFAULT_REGION; or set -x AWS_DEFAULT_REGION eu-west-1
 set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
 set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
 set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
 set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION 7200
 set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA true
+set -q AWS_CONFIGURE_REGION; or set -x AWS_CONFIGURE_REGION true
+set -q AWS_CONFIGURE_OUTPUT; or set -x AWS_CONFIGURE_OUTPUT true
 set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE true
 set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT true
 set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT true
@@ -87,14 +88,6 @@ x-dc "$DOCKER_CONFIG"
 set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
 set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
-# FNM / Node.js configuration
-set -q FNM_DIR; or set -x FNM_DIR "$XDG_DATA_HOME/fnm"
-fish_add_path "$FNM_DIR"
-set -q FNM_VERSION_FILE_STRATEGY; or set -x FNM_VERSION_FILE_STRATEGY recursive
-set -q FNM_USE_ON_CD; or set -x FNM_USE_ON_CD true
-set -q FNM_COREPACK_ENABLED; or set -x FNM_COREPACK_ENABLED true
-set -q FNM_RESOLVE_ENGINES; or set -x FNM_RESOLVE_ENGINES true
-
 # fzf configuration
 set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
 set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
@@ -104,19 +97,14 @@ set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
 set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
 # Go configuration
-# set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
+set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
 set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
-
-set -q GOENV_ROOT; or set -x GOENV_ROOT "$XDG_DATA_HOME/goenv"
-set -q GOENV_RC_FILE; or set -x GOENV_RC_FILE "$XDG_CONFIG_HOME/goenv/goenvrc.fish"
 
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 
 # Python configuration
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
-set -q PYENV_ROOT; or set -x PYENV_ROOT "$XDG_DATA_HOME/pyenv"
-fish_add_path "$PYENV_ROOT/bin"
 
 # Poetry configuration
 set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
@@ -128,7 +116,6 @@ set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
 set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
 fish_add_path "$CARGO_HOME/bin"
-fish_add_path "$XDG_DATA_HOME/bob/nvim-bin"
 
 # screen configuration
 set -q SCREENRC; or set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"
@@ -165,6 +152,15 @@ x-dc "$WAKATIME_HOME"
 # Zoxide configuration
 set -q _ZO_DATA_DIR; or set -x _ZO_DATA_DIR "$XDG_DATA_HOME/zoxide"
 set -q _ZO_EXCLUDE_DIRS; or set -x _ZO_EXCLUDE_DIRS "$XDG_DATA_HOME"
+
+# bkt (shell command caching tool) configuration
+set -q BKT_TTL; or set -x BKT_TTL 1m
+
+# Manpager
+set -q MANPAGER; or set -x MANPAGER "less -X"
+
+# Lando
+fish_add_path "$HOME/.lando/bin"
 
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
