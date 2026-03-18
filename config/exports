@@ -347,22 +347,6 @@ export AWS_CONFIGURE_SESSION_MFA=true
 msg "Setting up Mason configuration"
 export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
 
-# Neovim environment variables — optional overrides for external tools.
-# Neovim itself uses vim.fn.stdpath() and does not read these.
-msg "Setting up Neovim configuration"
-[ -z "${NVIM_STATE:-}" ] && export NVIM_STATE="$XDG_STATE_HOME/nvim"
-[ -z "${NVIM_CONFIG_HOME:-}" ] && export NVIM_CONFIG_HOME="$XDG_CONFIG_HOME/nvim"
-[ -z "${NVIM_DATA_HOME:-}" ] && export NVIM_DATA_HOME="$XDG_DATA_HOME/nvim"
-[ -z "${NVIM_CACHE_HOME:-}" ] && export NVIM_CACHE_HOME="$XDG_CACHE_HOME/nvim"
-[ -z "${NVIM_LOG_PATH:-}" ] && export NVIM_LOG_PATH="$NVIM_STATE/log"
-[ -z "${NVIM_SESSION_PATH:-}" ] && export NVIM_SESSION_PATH="$NVIM_STATE/session"
-[ -z "${NVIM_SHADA_PATH:-}" ] && export NVIM_SHADA_PATH="$NVIM_STATE/shada"
-[ -z "${NVIM_UNDO_PATH:-}" ] && export NVIM_UNDO_PATH="$NVIM_STATE/undo"
-
-# Mason (nvim package manager)
-msg "Setting up Mason configuration"
-export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
-
 # Neovim environment variables
 msg "Setting up Neovim configuration"
 [ -z "${NVIM_STATE:-}" ] && export NVIM_STATE="$XDG_STATE_HOME/nvim"
@@ -413,14 +397,6 @@ export DIRENV_LOG_FORMAT=""
 # fzf
 export FZF_BASE="${XDG_CONFIG_HOME}/fzf"
 export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
-
-# FNM (Fast Node Manager)
-msg "Setting up FNM configuration"
-export FNM_DIR="$XDG_DATA_HOME/fnm"
-export FNM_VERSION_FILE_STRATEGY="recursive"
-export FNM_USE_ON_CD=true
-export FNM_COREPACK_ENABLED=true
-export FNM_RESOLVE_ENGINES=true
 
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html

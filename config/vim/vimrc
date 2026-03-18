@@ -3,6 +3,9 @@
 "
 " vim: ts=2 sw=2 expandtab
 " vint: +ProhibitAbbreviationOption +ProhibitSetNoCompatible
+
+" mise — add shims to PATH for tool discovery
+let $PATH = $HOME . '/.local/share/mise/shims:' . $PATH
 "*****************************************************************************
 "" Vim-Plug core
 "*****************************************************************************
