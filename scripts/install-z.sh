@@ -15,8 +15,8 @@ clone_z_repo()
   local bin_path=$2
 
   if [[ ! -d "$bin_path" ]]; then
-    git clone "$git_path" "$bin_path"
-    msgr run_done "z installed at $bin_path"
+    git clone "$git_path" "$bin_path" \
+      && msgr run_done "z installed at $bin_path"
   else
     msgr ok "z ($bin_path/) already installed"
   fi

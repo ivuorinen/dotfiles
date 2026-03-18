@@ -27,8 +27,12 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- ── Add ~/.local/bin to the PATH ────────────────────────────────────
-vim.fn.setenv('PATH', vim.fn.expand '$HOME/.local/bin' .. ':' .. vim.fn.expand '$PATH')
+-- ── Add mise shims and ~/.local/bin to the PATH ───────────────────────
+vim.env.PATH = vim.env.HOME
+  .. '/.local/share/mise/shims:'
+  .. vim.env.HOME
+  .. '/.local/bin:'
+  .. vim.env.PATH
 
 require 'options'
 require 'autogroups'

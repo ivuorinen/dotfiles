@@ -23,8 +23,8 @@ install_shellspec()
   fi
 
   msgr run "Running make install..."
-  make -C "$SHELLSPEC_CACHE" install PREFIX="$HOME/.local"
-  msgr run_done "shellspec $version installed to $HOME/.local/bin/shellspec"
+  make -C "$SHELLSPEC_CACHE" install PREFIX="$HOME/.local" \
+    && msgr run_done "shellspec $version installed to $HOME/.local/bin/shellspec"
   return 0
 }
 

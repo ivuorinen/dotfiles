@@ -1,6 +1,7 @@
 # Set aliases for fish shell
 
-alias vim='vim -u "$XDG_CONFIG_HOME/vim/vimrc"'
+alias vim='nvim'
+alias vi='nvim'
 
 # eza aliases if eza is installed
 if type -q eza >/dev/null
@@ -91,6 +92,42 @@ function configure_tide \
         --icons='Many icons' \
         --transient=Yes
 end
+
+# Navigation aliases
+abbr --add .. 'cd ..'
+abbr --add ... 'cd ../..'
+abbr --add .... 'cd ../../..'
+
+# Interesting folders
+function .b --wraps='cd $XDG_BIN_HOME' --description 'cd $XDG_BIN_HOME'
+    cd $XDG_BIN_HOME $argv
+end
+
+function .l --wraps='cd ~/.local' --description 'cd ~/.local'
+    cd ~/.local $argv
+end
+
+function .o --wraps='cd ~/Code/ivuorinen/obsidian/' --description 'cd ~/Code/ivuorinen/obsidian/'
+    cd ~/Code/ivuorinen/obsidian/ $argv
+end
+
+# cd to git root directory
+function cdgr --description 'cd to git root'
+    if git rev-parse --is-inside-work-tree &>/dev/null
+        cd (git rev-parse --show-toplevel); or return $status
+    else
+        echo >&2 "Not in a git repository"
+        return 1
+    end
+end
+
+# Colored grep
+abbr --add grep 'grep --color'
+
+# Date helpers
+alias isodate="date +'%Y-%m-%d'"
+alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
+alias x-timestamp="date +'%s'"
 
 # Random abbreviations
 abbr --add stats onefetch --nerd-fonts --true-color never

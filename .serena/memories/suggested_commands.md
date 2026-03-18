@@ -59,10 +59,11 @@ pre-commit run --all-files
 ## Version Management
 
 ```bash
-# Check current versions
-node --version        # Managed by nvm (.nvmrc: v20.18.1)
-go version           # Managed by asdf (.go-version)
-python --version     # Managed by asdf (.python-version)
+# Check current versions (all managed by mise)
+node --version        # mise (.nvmrc via idiomatic_version_file)
+go version           # mise (.go-version)
+python --version     # mise (.python-version)
+mise ls              # List all installed tool versions
 ```
 
 ## System Utilities (Darwin-specific)

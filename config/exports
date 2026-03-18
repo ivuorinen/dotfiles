@@ -347,8 +347,7 @@ export AWS_CONFIGURE_SESSION_MFA=true
 msg "Setting up Mason configuration"
 export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
 
-# Neovim environment variables — optional overrides for external tools.
-# Neovim itself uses vim.fn.stdpath() and does not read these.
+# Neovim environment variables
 msg "Setting up Neovim configuration"
 [ -z "${NVIM_STATE:-}" ] && export NVIM_STATE="$XDG_STATE_HOME/nvim"
 [ -z "${NVIM_CONFIG_HOME:-}" ] && export NVIM_CONFIG_HOME="$XDG_CONFIG_HOME/nvim"

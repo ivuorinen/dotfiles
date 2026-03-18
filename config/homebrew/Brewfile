@@ -1,17 +1,13 @@
 tap "1password/tap"
-tap "anchore/grype"
 tap "cormacrelf/tap"
 tap "ddosify/tap"
 tap "dm3ch/tap"
 tap "doron-cohen/tap"
 tap "gesquive/tap"
-tap "github/gh"
 tap "golangci/tap"
 tap "homebrew/autoupdate"
 tap "homebrew/bundle"
 tap "homebrew/services"
-tap "jesseduffield/lazygit"
-tap "k8sgpt-ai/k8sgpt"
 tap "keith/formulae"
 tap "koekeishiya/formulae"
 tap "mongodb/brew"
@@ -20,14 +16,9 @@ tap "pantheon-systems/external"
 tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
-tap "snyk/tap"
 tap "tabbyml/tabby"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
-# Run your GitHub Actions locally
-brew "act"
-# Simple, modern, secure file encryption
-brew "age"
 # Mozilla CA certificate store
 brew "ca-certificates"
 # Mozilla CA bundle for Python
@@ -40,10 +31,6 @@ brew "cryptography"
 brew "libyaml"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Automate deployment, configuration, and upgrading
-brew "ansible"
-# Checks ansible playbooks for practices and behaviour
-brew "ansible-lint"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -80,18 +67,12 @@ brew "pkgconf"
 brew "autogen"
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
-# Official Amazon AWS command-line interface
-brew "awscli"
 # GNU internationalization (i18n) and localization (l10n) library
 brew "gettext"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
-# Clone of cat(1) with syntax highlighting and Git integration
-brew "bat"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
-# Bash Automated Testing System
-brew "bats-core"
 # Parser generator
 brew "bison"
 # Freely available high-quality data compressor
@@ -102,22 +83,12 @@ brew "freetype"
 brew "fontconfig"
 # Core application library for C
 brew "glib"
-# Binary installation for rust projects
-brew "cargo-binstall"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node", link: false
 # CLI tool for analyzing Claude Code usage from local JSONL files
 brew "ccusage"
 # JSON Schema CLI
 brew "check-jsonschema"
-# Prevent cloud misconfigurations during build-time for IaC tools
-brew "checkov"
-# Human-friendly and fast alternative to cut and (sometimes) awk
-brew "choose-rust"
-# Cross-platform make
-brew "cmake"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Network authentication protocol
@@ -154,14 +125,8 @@ brew "flock"
 brew "freetds"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
-# Command-line fuzzy finder written in Go
-brew "fzf"
 # Graphics library to dynamically manipulate images
 brew "gd"
-# Disk usage analyzer with console interface written in Go
-brew "gdu"
-# GitHub command-line tool
-brew "gh"
 # Distributed revision control system
 brew "git"
 # Enable transparent encryption/decryption of files in a git repo
@@ -170,14 +135,10 @@ brew "git-crypt"
 brew "git-extras"
 # Browse your latest git branches, formatted real fancy
 brew "git-recent"
-# Render markdown on the CLI
-brew "glow"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
-# Go version management
-brew "goenv"
 # Library access to GnuPG
 brew "gpgme"
 # Manage your GnuPG keys with ease!
@@ -190,8 +151,6 @@ brew "librsvg"
 brew "graphviz"
 # GNU grep, egrep and fgrep
 brew "grep"
-# Vulnerability scanner for container images and filesystems
-brew "grype"
 # Popular GNU data compression program
 brew "gzip"
 # Improved top (interactive process viewer)
@@ -206,8 +165,6 @@ brew "imagemagick"
 brew "irssi"
 # Image manipulation library
 brew "jpeg"
-# Lightweight and flexible command-line JSON processor
-brew "jq"
 # JSON parser for C
 brew "json-c"
 # Crawling and spidering framework
@@ -244,8 +201,6 @@ brew "nginx"
 brew "nmap"
 # Libraries for security-enabled client and server applications
 brew "nss"
-# Command-line Git information tool
-brew "onefetch"
 # General-purpose speech recognition model
 brew "openai-whisper"
 # Open source suite of directory software
@@ -258,46 +213,18 @@ brew "php", link: false
 brew "php@8.2", link: true
 # General-purpose scripting language
 brew "php@8.3"
-# Pins GitHub Actions to full hashes and versions
-brew "pinact"
-# Python version management
-brew "pyenv"
-# Migrate pip packages from one Python version to another
-brew "pyenv-pip-migrate"
-# Pyenv plugin to manage virtualenv
-brew "pyenv-virtualenv"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
-# Install various Ruby versions and implementations
-brew "ruby-build"
-# Ruby version manager
-brew "rbenv"
 # Generate C-based recognizers from regular expressions
 brew "re2c"
-# Rust toolchain installer
-brew "rustup"
-# Static analysis and lint tool, for (ba)sh scripts
-brew "shellcheck"
 # User interface to the TELNET protocol
 brew "telnet"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
-# Terraform version manager inspired by rbenv
-brew "tfenv"
-# Linter for Terraform files
-brew "tflint"
-# Static analysis security scanner for your terraform code
-brew "tfsec"
 # Terminal multiplexer
 brew "tmux"
-# Extremely fast Python package installer and resolver, written in Rust
-brew "uv"
-# Tool for creating isolated virtual python environments
-brew "virtualenv"
-# Command-line interface to the WakaTime api
-brew "wakatime-cli"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
 # Internet file retriever
@@ -336,8 +263,6 @@ brew "shivammathur/extensions/yaml@8.3"
 brew "shivammathur/php/php-debug"
 # General-purpose scripting language
 brew "shivammathur/php/php@8.2-debug"
-# Find & fix known vulnerabilities in open-source dependencies
-brew "snyk/tap/snyk"
 # Tabby: AI Coding Assistant
 brew "tabbyml/tabby/tabby"
 # Command-line interface for 1Password

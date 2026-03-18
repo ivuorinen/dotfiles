@@ -51,8 +51,8 @@ install_fonts()
 {
   msgr run "Starting to install NerdFonts..."
   # shellcheck disable=SC2048,SC2086
-  ./install.sh -q -s ${fonts[*]}
-  msgr run_done "Done"
+  ./install.sh -q -s ${fonts[*]} \
+    && msgr run_done "Done"
   return 0
 }
 

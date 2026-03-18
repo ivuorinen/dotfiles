@@ -71,7 +71,6 @@ x-set-env XDG_BIN_HOME "$HOME/.local/bin"
 x-path-prepend "/usr/local/bin"
 x-path-prepend "/opt/homebrew/bin"
 x-path-prepend "$XDG_DATA_HOME/cargo/bin"
-x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
 x-path-prepend "$DOTFILES/local/bin"
 x-path-prepend "$XDG_BIN_HOME"
 
