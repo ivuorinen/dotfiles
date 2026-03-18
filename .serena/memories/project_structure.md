@@ -30,7 +30,7 @@ Configuration files for development tools and applications:
 - `starship.toml` - Starship prompt configuration
 - `shared.sh` - Cross-shell compatibility functions
 - `aerospace/`, `amethyst/`, `yabai/`, `skhd/` - Window managers
-- `direnv/`, `asdf/`, `aqua/` - Development environment tools
+- `direnv/`, `mise/`, `aqua/` - Development environment tools
 - `gpg-tui/`, `op/`, `gh/` - Security and CLI tools
 - Theme configurations: everforest color schemes across multiple tools
 
@@ -97,7 +97,7 @@ Installation and setup automation scripts
 - `.shellcheckrc` - ShellCheck configuration
 - `.mega-linter.yml` - MegaLinter configuration
 - `.luarc.json` - Lua language server configuration
-- `.nvmrc`, `.go-version`, `.python-version` - Version management
+- `.nvmrc`, `.go-version`, `.python-version` - Version files (consumed by mise)
 - Various ignore files (.gitignore, .prettierignore, .yamlignore, etc.)
 
 ## Testing Infrastructure

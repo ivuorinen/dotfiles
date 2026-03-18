@@ -50,12 +50,11 @@ the primary installation framework to manage symlinks and setup configurations.
 
 - **Platform**: Darwin (macOS) - Version 24.6.0
 - **Architecture**: Universal (Intel/Apple Silicon via Homebrew)
-- **Dependencies**: Git, Homebrew, Yarn, various CLI tools managed via asdf/aqua
+- **Dependencies**: Git, Homebrew, Yarn, various CLI tools managed via mise
 
 ## Development Environment
 
-- Node.js managed via nvm/asdf
-- Go version specified (.go-version)
-- Python version specified (.python-version)
+- Node.js, Go, Python, Ruby, Rust managed via mise
+- Version files (.nvmrc, .go-version, .python-version) consumed by mise via idiomatic_version_file
 - Package management via Yarn with lockfile
 - TypeScript support for configuration files
