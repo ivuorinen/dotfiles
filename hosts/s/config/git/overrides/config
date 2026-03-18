@@ -3,7 +3,7 @@
 	path = ~/.dotfiles/config/git/shared
 
 [core]
-	excludesfile = ~/.dotfiles/config/git/overrides/ignore
+	excludesfile = ~/.config/git/overrides/ignore
 
 [gpg]
 	format = ssh
