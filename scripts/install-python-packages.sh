@@ -9,7 +9,7 @@ msgr run "Starting to install Python libraries"
 
 # Ensure uv is available
 if ! command -v uv &> /dev/null; then
-  msgr err "uv not found — install it via mise first"
+  msgr err "uv not found — install it via mise first (run: dfm install mise)"
   exit 1
 fi
 
