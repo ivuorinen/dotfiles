@@ -168,11 +168,20 @@ section_install()
       msgr run "Installing tools via mise..."
       if ! command -v mise &> /dev/null; then
         msgr nested "Installing mise..."
-        curl -fsSL https://mise.run | sh || { msgr err "Failed to install mise"; exit 1; }
+        curl -fsSL https://mise.run | sh || {
+          msgr err "Failed to install mise"
+          exit 1
+        }
         export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
       fi
-      mise install --yes || { msgr err "mise install failed"; exit 1; }
-      mise reshim || { msgr err "mise reshim failed"; exit 1; }
+      mise install --yes || {
+        msgr err "mise install failed"
+        exit 1
+      }
+      mise reshim || {
+        msgr err "mise reshim failed"
+        exit 1
+      }
       msgr yay "mise tools installed!"
       ;;
 
@@ -542,7 +551,10 @@ section_dotfiles()
         && msgr ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim \
         && msgr ok "Linked nvim and astronvim"
-      $0 install mise || { msgr err "Failed to install mise tools"; exit 1; }
+      $0 install mise || {
+        msgr err "Failed to install mise tools"
+        exit 1
+      }
       msgr ok "Installed packages"
       msgr run_done "nvim reset!"
       ;;
