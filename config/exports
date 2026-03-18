@@ -14,7 +14,20 @@
 # if DOTFILES is not set, set it to the default location
 [ -z "${DOTFILES:-}" ] && export DOTFILES="$HOME/.dotfiles"
 
-export PATH="$XDG_BIN_HOME:$DOTFILES/local/bin:$XDG_DATA_HOME/bob/nvim-bin:$XDG_DATA_HOME/cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+# Editor settings
+[ -z "${EDITOR:-}" ] && export EDITOR="nvim"
+[ -z "${VISUAL:-}" ] && export VISUAL="code"
+
+# Bootstrap: ensure local/bin is on PATH so x-path is available
+PATH="$DOTFILES/local/bin:$PATH"
+# Use x-path to deduplicate PATH entries (only if x-path is available)
+if command -v x-path &> /dev/null; then
+  # shellcheck source=../local/bin/x-path
+  source "$(command -v x-path)"
+  normalize_path_var
+  do_prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin"
+fi
+export PATH
 
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
@@ -304,7 +317,7 @@ export ANTIDOTE_PLUGINS="$XDG_CONFIG_HOME/zsh/antidote_plugins"
 # https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 msg "Setting up Ansible configuration"
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
-export ANSIBLE_CONFIG="$XDG_CONFIG_HOME/ansible.cfg"
+export ANSIBLE_CONFIG="$ANSIBLE_HOME/ansible.cfg"
 export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
@@ -325,10 +338,26 @@ export AWS_CONFIGURE_OUTPUT=true
 export AWS_CONFIGURE_PROFILE=true
 export AWS_CONFIGURE_PROMPT=true
 export AWS_CONFIGURE_PROMPT_DEFAULT="default"
+export AWS_SESSION_TOKEN_FILE="${XDG_STATE_HOME}/aws/session_token"
+export AWS_CONFIGURE_SESSION=true
+export AWS_CONFIGURE_SESSION_DURATION=7200
+export AWS_CONFIGURE_SESSION_MFA=true
 
-# bob manages nvim versions
-msg "Setting up bob configuration"
-x-path-prepend "$XDG_DATA_HOME/bob/nvim-bin"
+# Mason (nvim package manager)
+msg "Setting up Mason configuration"
+export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
+
+# Neovim environment variables — optional overrides for external tools.
+# Neovim itself uses vim.fn.stdpath() and does not read these.
+msg "Setting up Neovim configuration"
+[ -z "${NVIM_STATE:-}" ] && export NVIM_STATE="$XDG_STATE_HOME/nvim"
+[ -z "${NVIM_CONFIG_HOME:-}" ] && export NVIM_CONFIG_HOME="$XDG_CONFIG_HOME/nvim"
+[ -z "${NVIM_DATA_HOME:-}" ] && export NVIM_DATA_HOME="$XDG_DATA_HOME/nvim"
+[ -z "${NVIM_CACHE_HOME:-}" ] && export NVIM_CACHE_HOME="$XDG_CACHE_HOME/nvim"
+[ -z "${NVIM_LOG_PATH:-}" ] && export NVIM_LOG_PATH="$NVIM_STATE/log"
+[ -z "${NVIM_SESSION_PATH:-}" ] && export NVIM_SESSION_PATH="$NVIM_STATE/session"
+[ -z "${NVIM_SHADA_PATH:-}" ] && export NVIM_SHADA_PATH="$NVIM_STATE/shada"
+[ -z "${NVIM_UNDO_PATH:-}" ] && export NVIM_UNDO_PATH="$NVIM_STATE/undo"
 
 # bkt (shell command caching tool) configuration
 msg "Setting up bkt configuration"
@@ -350,12 +379,21 @@ export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 export PATH="$COMPOSER_BIN:$PATH"
 
+# Yarn
+msg "Setting up Yarn configuration"
+export YARN_GLOBAL_FOLDER="$XDG_DATA_HOME/yarn"
+
 # docker, https://docs.docker.com/engine/reference/commandline/cli/
 msg "Setting up Docker configuration"
 export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
 x-dc "$DOCKER_CONFIG"
 # Docker: Disable snyk ad
 export DOCKER_SCAN_SUGGEST=false
+export DOCKER_HIDE_LEGACY_COMMANDS=true
+
+# direnv
+msg "Setting up direnv configuration"
+export DIRENV_LOG_FORMAT=""
 
 # fzf
 export FZF_BASE="${XDG_CONFIG_HOME}/fzf"
@@ -375,13 +413,6 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
-# NPM: Add npm packages to path
-msg "Setting up NPM configuration"
-x-have node && {
-  NVM_NODE_BIN_DIR="$(dirname "$(which node)")"
-  export PATH="$NVM_NODE_BIN_DIR:$PATH"
-}
-
 # oh-my-posh (omp) configuration
 msg "Setting up oh-my-posh configuration"
 export OHMYPOSH_CFG="$DOTFILES/config/omp/own.toml"
@@ -391,20 +422,21 @@ msg "Setting up 1Password CLI configuration"
 export OP_CACHE="$XDG_STATE_HOME/1password"
 
 # Python
-#
-# pyenv, python environments
 msg "Setting up Python configuration"
 export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
-export PYENV_ROOT="$XDG_STATE_HOME/pyenv"
 ## for MichaelAquilina/zsh-autoswitch-virtualenv
 export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-x-have pyenv && eval "$(pyenv init -)"
 
 # Rust / cargo
 msg "Setting up Rust/Cargo configuration"
-export RUST_WITHOUT=rust-docs
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export CARGO_BIN_HOME="$XDG_BIN_HOME"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+export RUST_WITHOUT="clippy,docs,rls"
+
+# Poetry
+msg "Setting up Poetry configuration"
+export POETRY_HOME="$XDG_DATA_HOME/poetry"
 
 # sonarlint
 # https://www.sonarlint.org/
@@ -433,6 +465,10 @@ export ZSH_TMUX_UNICODE=true
 export ZSH_TMUX_AUTOQUIT=false
 export ZSH_TMUX_DEFAULT_SESSION_NAME=main
 
+# tms (tmux session manager)
+msg "Setting up tms configuration"
+export TMS_CONFIG_FILE="$XDG_CONFIG_HOME/tms/config.toml"
+
 # wakatime, https://github.com/wakatime/wakatime-cli
 msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
@@ -442,11 +478,34 @@ x-dc "$WAKATIME_HOME"
 msg "Setting up LM Studio configuration"
 export PATH="$PATH:$HOME/.lmstudio/bin"
 
+# Screen
+msg "Setting up screen configuration"
+export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
+
+# Zoxide
+msg "Setting up Zoxide configuration"
+export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
+export _ZO_EXCLUDE_DIRS="$XDG_DATA_HOME"
+
 # Misc
 msg "Setting up miscellaneous configuration"
 export ZSHZ_DATA="$XDG_STATE_HOME/z"
 export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
+
+# Additional PATH entries (aligned with fish config)
+[ -d "$XDG_DATA_HOME/mise/shims" ] && export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
+[ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$PATH:$YARN_GLOBAL_FOLDER/bin"
+[ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
+[ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
+[ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
+[ -d "$HOME/.opencode/bin" ] && export PATH="$PATH:$HOME/.opencode/bin"
+
+# mise — unified tool version manager
+# https://mise.jdx.dev
+if command -v mise &> /dev/null; then
+  eval "$(mise activate "$(basename "${SHELL:-bash}")")"
+fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
 if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/exports-local"; fi
