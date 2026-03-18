@@ -37,6 +37,7 @@ remove_dir()
   else
     msgr ok "$label not found (already clean): $dir"
   fi
+  return 0
 }
 
 remove_file()
@@ -51,6 +52,7 @@ remove_file()
       msgr run_done "Removed $label: $file"
     fi
   fi
+  return 0
 }
 
 msgr msg "Cleaning up old version manager installations..."

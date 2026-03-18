@@ -168,7 +168,7 @@ section_install()
       msgr run "Installing tools via mise..."
       if ! command -v mise &> /dev/null; then
         msgr nested "Installing mise..."
-        if ! curl https://mise.run | sh; then
+        if ! curl -fsSL https://mise.run | sh; then
           msgr err "Failed to install mise"
           exit 1
         fi
