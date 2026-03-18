@@ -105,9 +105,9 @@ section_install()
       $0 install fonts
 
       # Tier 2: Runtimes and CLI tools via mise, then remaining installers
-      $0 install mise
-      $0 install composer
-      $0 install python-libs
+      $0 install mise || exit 1
+      $0 install composer || exit 1
+      $0 install python-libs || exit 1
 
       # Tier 3: Tool-dependent installers
       $0 install cheat-databases
@@ -268,8 +268,11 @@ section_brew()
       ;;
 
     update)
-      brew update && brew outdated && brew upgrade && brew cleanup
-      msgr yay "Done!"
+      if brew update && brew outdated && brew upgrade && brew cleanup; then
+        msgr yay "Done!"
+      else
+        msgr err "brew update failed"
+      fi
       ;;
 
     updatebundle)
@@ -548,7 +551,7 @@ section_dotfiles()
       msgr ok "Deleted old nvim files (share, state and cache + config)"
       ln -s "$DOTFILES/config/nvim" ~/.config/nvim
       msgr ok "Linked nvim and astronvim"
-      x-have mise && $0 install mise
+      $0 install mise
       msgr ok "Installed packages"
       msgr run_done "nvim reset!"
       ;;

@@ -5,7 +5,7 @@ set -euo pipefail
 # because nvim's Mason installs some of the same tool names.
 #
 # Ensure DOTFILES is set even when script is invoked directly
-if [ -z "${DOTFILES:-}" ]; then
+if [[ -z "${DOTFILES:-}" ]]; then
   DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   export DOTFILES
 fi

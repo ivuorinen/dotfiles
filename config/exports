@@ -20,8 +20,10 @@
 
 # Bootstrap: ensure local/bin is on PATH so x-path is available
 PATH="$DOTFILES/local/bin:$PATH"
-# Use x-path to deduplicate PATH entries
-PATH="$(x-path prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin")"
+# Use x-path to deduplicate PATH entries (only if x-path is available)
+if command -v x-path &> /dev/null; then
+  PATH="$(x-path prepend "$XDG_BIN_HOME" "$DOTFILES/local/bin" "/opt/homebrew/bin" "/usr/local/bin")"
+fi
 export PATH
 
 if ! command -v msg &> /dev/null; then
