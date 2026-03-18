@@ -5,7 +5,7 @@
 " vint: +ProhibitAbbreviationOption +ProhibitSetNoCompatible
 
 " mise — add shims to PATH for tool discovery
-let $PATH = $HOME . '/.local/share/mise/shims:' . $PATH
+let $PATH = $HOME . '/.local/bin:' . $HOME . '/.local/share/mise/shims:' . $PATH
 "*****************************************************************************
 "" Vim-Plug core
 "*****************************************************************************

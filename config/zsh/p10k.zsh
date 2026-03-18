@@ -61,7 +61,7 @@
     vcs                       # git status
     # command_execution_time    # previous command duration
     go
-    mise
+    asdf
     aws
     # =========================[ Line #2 ]=========================
     newline                   # \n
