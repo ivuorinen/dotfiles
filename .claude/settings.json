@@ -33,6 +33,15 @@
           },
           {
             "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-dotbot-validate.sh",
+            "statusMessage": "Validating Dotbot config..."
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-config-warn.sh"
+          },
+          {
+            "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/async-bats.sh",
             "async": true,
             "statusMessage": "Running tests..."
