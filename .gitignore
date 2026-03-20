@@ -64,3 +64,9 @@ node_modules
 __pycache__
 ssh/local.d/*
 config/fish/fish_variables*
+
+# Allow .claude directory (overrides global **/.claude/* ignore)
+!.claude/
+!.claude/**
+.claude/**/*.log
+.claude/settings.local.json
