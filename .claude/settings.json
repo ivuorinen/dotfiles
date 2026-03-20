@@ -1,12 +1,23 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start-context.sh",
+            "statusMessage": "Loading project context..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && case \"$fp\" in */fzf-tmux|*/yarn.lock|*/.yarn/*) echo \"BLOCKED: $fp is a vendor/lock file — do not edit directly\" >&2; exit 2;; esac; exit 0"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-edit-block.sh"
           }
         ]
       }
@@ -17,15 +28,48 @@
         "hooks": [
           {
             "type": "command",
-            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.sh|*/bin/*) head -1 \"$fp\" | grep -qE '^#!.*(ba)?sh' && command -v shfmt > /dev/null && shfmt -i 2 -bn -ci -sr -fn -w \"$fp\";; esac; exit 0"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-format.sh",
+            "statusMessage": "Formatting..."
           },
           {
             "type": "command",
-            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.fish) command -v fish_indent > /dev/null && fish_indent -w \"$fp\";; esac; exit 0"
-          },
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/async-bats.sh",
+            "async": true,
+            "statusMessage": "Running tests..."
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
           {
             "type": "command",
-            "command": "fp=$(cat | jq -r '.tool_input.file_path // empty') && [ -n \"$fp\" ] && [ -f \"$fp\" ] && case \"$fp\" in *.lua) command -v stylua > /dev/null && stylua \"$fp\";; esac; exit 0"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-failures.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/notify-idle.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-lint-gate.sh",
+            "statusMessage": "Running lint gate..."
           }
         ]
       }
