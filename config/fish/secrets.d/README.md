@@ -6,21 +6,21 @@ This directory contains sensitive environment variables like API tokens and cred
 
 1. Copy an example file (e.g., `github.fish.example`) to remove the `.example` suffix:
 
-   ```bash
-   cp github.fish.example github.fish
-   ```
+    ```bash
+    cp github.fish.example github.fish
+    ```
 
 2. Edit the file and replace placeholder values with your actual secrets:
 
-   ```bash
-   $EDITOR github.fish
-   ```
+    ```bash
+    $EDITOR github.fish
+    ```
 
 3. Reload your fish shell or source the exports:
 
-   ```fish
-   source ~/.config/fish/exports.fish
-   ```
+    ```fish
+    source ~/.config/fish/exports.fish
+    ```
 
 ## Adding New Secret Files
 
