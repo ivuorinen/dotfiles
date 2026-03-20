@@ -10,6 +10,18 @@ case "$fp" in
     echo "BLOCKED: $fp is a vendor/lock file — do not edit directly" >&2
     exit 2
     ;;
+  */tools/dotbot/* | */tools/dotbot-include/* | */tools/antidote/*)
+    echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
+    exit 2
+    ;;
+  */config/tmux/plugins/*)
+    echo "BLOCKED: $fp is a tmux plugin submodule — do not edit" >&2
+    exit 2
+    ;;
+  */config/cheat/cheatsheets/community/* | */config/cheat/cheatsheets/tldr/*)
+    echo "BLOCKED: $fp is a cheat submodule — do not edit" >&2
+    exit 2
+    ;;
   */secrets.d/*.fish)
     case "$(basename "$fp")" in
       *.example.fish | *.fish.example) exit 0 ;;
