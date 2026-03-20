@@ -5,45 +5,50 @@ python = "3"
 go = "latest"
 rust = "stable"
 
-# Pre-built binaries via ubi (fast — no compilation)
-"ubi:sharkdp/fd" = "latest"
-"ubi:BurntSushi/ripgrep" = "latest"
-"ubi:eza-community/eza" = "latest"
-"ubi:ClementTsang/bottom" = "latest"
-"ubi:ajeetdsouza/zoxide" = "latest"
-"ubi:tree-sitter/tree-sitter" = "latest"
-"ubi:neovim/neovim" = "latest" # Neovim editor binary
-"ubi:dandavison/delta" = "latest"
+# Pre-built binaries via aqua registry
+fd = "latest"
+ripgrep = "latest"
+eza = "latest"
+bottom = "latest"
+zoxide = "latest"
+tree-sitter = "latest"
+neovim = "latest" # Neovim editor binary
+delta = "latest"
+difftastic = "latest"
 
-# Cargo-based tools (no pre-built binary available)
-"cargo:bkt" = "latest"
-"cargo:difftastic" = "latest"
-"cargo:tmux-sessionizer" = "latest"
+# GitHub releases (no aqua entry)
+"github:dimo414/bkt" = "latest"
+"github:jrmoulton/tmux-sessionizer" = "latest"
 
-# Go-based tools
-"go:github.com/google/yamlfmt/cmd/yamlfmt" = "latest"
-"go:github.com/cheat/cheat/cmd/cheat" = "latest"
-"go:github.com/charmbracelet/glow" = "latest"
-"go:github.com/junegunn/fzf" = "latest"
-"go:github.com/charmbracelet/gum" = "latest"
+# Go-compiled tools (no registry binary available)
 "go:github.com/joshmedeski/sesh/v2" = "latest"
 "go:github.com/dotzero/git-profile" = "latest"
 
+# Registry shorthands (aqua binaries)
+yamlfmt = "latest"
+cheat = "latest"
+glow = "latest"
+fzf = "latest"
+gum = "latest"
+
 # npm-based tools
-"npm:editorconfig-checker" = "latest"
+editorconfig-checker = "latest"
 "npm:github-release-notes" = "latest"
 "npm:neovim" = "latest" # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "latest"
 
 # Python tools (via pipx backend)
-"pipx:ansible" = "latest"
+"pipx:detect-secrets" = "latest"
+"pipx:git-filter-repo" = "latest"
+yamllint = "latest"
+ansible = "latest"
 "pipx:ansible-lint" = "latest"
-"pipx:ruff" = "latest"
+ruff = "latest"
 "pipx:openapi-python-client" = "latest"
+"pipx:python-lsp-server[websockets]" = "latest"
 
 # .NET tools (via dotnet backend)
 "dotnet:coverlet.console" = "latest"
-"dotnet:csharp-ls" = "latest"
 "dotnet:csharpier" = "latest"
 "dotnet:ilspycmd" = "latest"
 "dotnet:dotnet-ef" = "latest"
@@ -56,8 +61,12 @@ checkov = "latest"
 grype = "latest"
 pinact = "latest"
 snyk = "latest"
+cosign = "latest"
+gitleaks = "latest"
+syft = "latest"
 
 # Dev tools (pre-built binaries)
+gitui = "latest"
 lazygit = "latest"
 bat = "latest"
 bats = "latest"
@@ -66,14 +75,21 @@ cmake = "latest"
 gdu = "latest"
 github-cli = "latest"
 jq = "latest"
+hadolint = "latest"
+hugo = "latest"
+just = "latest"
+yq = "latest"
+"github:exercism/cli" = "latest"
+"github:projectdiscovery/katana" = "latest"
+"github:Legit-Labs/legitify" = "latest"
 shellcheck = "latest"
 shfmt = "latest"
 stylua = "latest"
 actionlint = "latest"
 "aqua:mpalmer/action-validator" = "latest"
 oh-my-posh = "latest"
-"ubi:o2sh/onefetch" = "latest"
-"ubi:wakatime/wakatime-cli" = "latest"
+"github:o2sh/onefetch" = "latest"
+"github:wakatime/wakatime-cli" = "latest"
 
 # Terraform (replaces tfenv)
 terraform = "latest"
@@ -103,3 +119,4 @@ lockfile = true
 # Save disk space — don't keep downloaded archives or failed installs
 always_keep_download = false
 always_keep_install = false
+experimental = true

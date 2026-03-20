@@ -133,6 +133,15 @@ if command -v brew &> /dev/null; then
       fi
     fi
   done
+
+  # Clean up orphaned dependencies left after the removals above
+  if [[ "$DRY_RUN" = "--dry-run" ]]; then
+    msgr warn "[DRY RUN] Would run: brew autoremove"
+  else
+    msgr run "Removing orphaned brew dependencies..."
+    brew autoremove
+    msgr run_done "Orphaned dependencies removed"
+  fi
 fi
 
 msgr yay "Cleanup complete! Run 'mise install' to set up tools via mise."

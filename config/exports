@@ -503,7 +503,7 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 # mise — unified tool version manager
 # https://mise.jdx.dev
 if command -v mise &> /dev/null; then
-  eval "$(mise activate "$(basename "${SHELL:-bash}")")"
+  eval "$(mise activate bash)"
 fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
