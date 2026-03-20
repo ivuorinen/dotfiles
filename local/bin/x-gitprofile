@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# @description Set up mise enter hooks for git-profile auto-switching
+set -euo pipefail
+
+DEFAULTS=(
+  "home:$HOME/Code/ivuorinen"
+  "masf:$HOME/Code/masf"
+)
+
+write_hook()
+{
+  local profile="$1" dir="$2"
+  mkdir -p "$dir"
+  cat > "$dir/.mise.toml" << EOF
+[hooks]
+enter = "git profile use $profile"
+EOF
+  echo "Set git profile '$profile' for $dir"
+}
+
+if [[ $# -eq 0 ]]; then
+  for entry in "${DEFAULTS[@]}"; do
+    write_hook "${entry%%:*}" "${entry#*:}"
+  done
+elif [[ $# -eq 2 ]]; then
+  write_hook "$1" "$2"
+else
+  echo "Usage: x-gitprofile [<profile> <dir>]"
+  echo "  No args: set up defaults (home, masf)"
+  echo "  With args: create .mise.toml in <dir>"
+  exit 1
+fi
