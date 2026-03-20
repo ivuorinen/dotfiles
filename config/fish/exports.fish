@@ -180,6 +180,15 @@ if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
     source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
 end
 
+# Source secret environment variables from secrets.d directory
+if test -d "$DOTFILES/config/fish/secrets.d"
+    for secret_file in "$DOTFILES/config/fish/secrets.d"/*.fish
+        if test -f "$secret_file"
+            source "$secret_file"
+        end
+    end
+end
+
 # Configure tide prompt
 set -gx tide_prompt_transient_enabled true
 set -gx tide_prompt_add_newline_before true

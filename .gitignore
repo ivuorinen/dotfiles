@@ -29,6 +29,9 @@ config/fish/completions/kubectl.fish
 config/fish/completions/orbctl.fish
 config/fish/fish_variables
 config/fish/fish_variables.*
+config/fish/secrets.d/*
+!config/fish/secrets.d/*.example
+!config/fish/secrets.d/README.md
 config/gh/hosts.yml
 config/git/credentials
 config/git/local.d/*
