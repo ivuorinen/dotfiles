@@ -97,8 +97,9 @@ set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
 set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
 # Go configuration
-set -q GOPATH; or set -x GOPATH "$XDG_DATA_HOME/go"
-set -q GOBIN; or set -x GOBIN "$XDG_BIN_HOME"
+set -x GOPATH "$XDG_DATA_HOME/go"
+set -x GOBIN "$XDG_BIN_HOME"
+set -e GOROOT
 
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
