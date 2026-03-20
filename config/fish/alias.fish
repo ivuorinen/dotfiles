@@ -1,7 +1,9 @@
 # Set aliases for fish shell
 
-alias vim='nvim'
-alias vi='nvim'
+if type -q nvim
+    alias vim='nvim'
+    alias vi='nvim'
+end
 
 # eza aliases if eza is installed
 if type -q eza >/dev/null
@@ -30,6 +32,19 @@ if type -q eza >/dev/null
 
     function l --wraps='eza_git' --description eza
         eza_git $argv
+    end
+else
+    function ls --description 'ls (system fallback)'
+        command ls $argv
+    end
+    function ll --description 'ls -lh (system fallback)'
+        command ls -lh $argv
+    end
+    function l --description 'ls (system fallback)'
+        command ls $argv
+    end
+    function lsa --description 'ls -lah (system fallback)'
+        command ls -lah $argv
     end
 end
 
@@ -130,4 +145,6 @@ alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
 alias x-timestamp="date +'%s'"
 
 # Random abbreviations
-abbr --add stats onefetch --nerd-fonts --true-color never
+if type -q onefetch
+    abbr --add stats onefetch --nerd-fonts --true-color never
+end

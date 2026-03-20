@@ -52,3 +52,4 @@ source ~/.orbstack/shell/init2.fish 2>/dev/null || :
 if status is-interactive; and not set -q GITHUB_TOKEN
     echo "Warning: GITHUB_TOKEN is not set" >&2
 end
+eval "$(/opt/homebrew/bin/brew shellenv fish)"
