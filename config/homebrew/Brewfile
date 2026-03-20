@@ -1,13 +1,18 @@
 tap "1password/tap"
+tap "anchore/grype"
+tap "caarlos0/tap"
 tap "cormacrelf/tap"
+tap "dagger/tap"
 tap "ddosify/tap"
 tap "dm3ch/tap"
 tap "doron-cohen/tap"
 tap "gesquive/tap"
+tap "github/gh"
 tap "golangci/tap"
 tap "homebrew/autoupdate"
-tap "homebrew/bundle"
-tap "homebrew/services"
+tap "ivuorinen/tap"
+tap "jesseduffield/lazygit"
+tap "k8sgpt-ai/k8sgpt"
 tap "keith/formulae"
 tap "koekeishiya/formulae"
 tap "mongodb/brew"
@@ -16,21 +21,10 @@ tap "pantheon-systems/external"
 tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
+tap "snyk/tap"
 tap "tabbyml/tabby"
 tap "teamookla/speedtest"
 tap "xwmx/taps"
-# Mozilla CA certificate store
-brew "ca-certificates"
-# Mozilla CA bundle for Python
-brew "certifi"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
-# YAML Parser
-brew "libyaml"
-# Display directories as trees (with optional color/HTML output)
-brew "tree"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
 # Library and utilities for processing GIFs
@@ -41,6 +35,8 @@ brew "highway"
 brew "imath"
 # JPEG image codec that aids compression and decompression
 brew "jpeg-turbo"
+# Library for manipulating PNG images
+brew "libpng"
 # Zstandard is a real-time compression algorithm
 brew "zstd"
 # New file format for still image compression
@@ -49,6 +45,10 @@ brew "jpeg-xl"
 brew "aom"
 # Apache Portable Runtime library
 brew "apr"
+# Mozilla CA certificate store
+brew "ca-certificates"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Companion library to apr, the Apache Portable Runtime library
 brew "apr-util"
 # Password hashing library and CLI utility
@@ -69,10 +69,10 @@ brew "autogen"
 brew "automake"
 # GNU internationalization (i18n) and localization (l10n) library
 brew "gettext"
+# Text-based UI library
+brew "ncurses"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
-# GNU File, Shell, and Text utilities
-brew "coreutils"
 # Parser generator
 brew "bison"
 # Freely available high-quality data compressor
@@ -83,37 +83,27 @@ brew "freetype"
 brew "fontconfig"
 # Core application library for C
 brew "glib"
-# Multi-platform support library with a focus on asynchronous I/O
-brew "libuv"
-# CLI tool for analyzing Claude Code usage from local JSONL files
-brew "ccusage"
-# JSON Schema CLI
-brew "check-jsonschema"
+# Mozilla CA bundle for Python
+brew "certifi"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
-# Network authentication protocol
-brew "krb5"
 # OpenType text shaping engine
 brew "harfbuzz"
 # OWASP dependency-check
 brew "dependency-check"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
+# .NET Core
+brew "dotnet@8", link: true
 # Spellchecker wrapping library
 brew "enchant"
-# Command-line tool to interact with exercism.io
-brew "exercism"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
-# Validating, recursive, caching DNS resolver
-brew "unbound"
-# GNU Transport Layer Security (TLS) Library
-brew "gnutls"
-# Secure hashing function
-brew "libb2"
-# Framework for layout and rendering of i18n text
-brew "pango"
-# Play, record, convert, and stream audio and video
+# Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
 # Banner-like program prints strings as ASCII art
 brew "figlet"
@@ -127,17 +117,19 @@ brew "freetds"
 brew "fswatch"
 # Graphics library to dynamically manipulate images
 brew "gd"
+# Conversion library
+brew "libiconv"
 # Distributed revision control system
 brew "git"
-# Enable transparent encryption/decryption of files in a git repo
-brew "git-crypt"
 # Small git utilities
 brew "git-extras"
-# Browse your latest git branches, formatted real fancy
-brew "git-recent"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
-# GNU Pretty Good Privacy (PGP) package
+# Validating, recursive, caching DNS resolver
+brew "unbound"
+# GNU Transport Layer Security (TLS) Library
+brew "gnutls"
+# GNU Privacy Guard (OpenPGP)
 brew "gnupg"
 # Library access to GnuPG
 brew "gpgme"
@@ -145,6 +137,8 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
+# Framework for layout and rendering of i18n text
+brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -153,13 +147,15 @@ brew "graphviz"
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
+# Secure hashing function
+brew "libb2"
 # Improved top (interactive process viewer)
 brew "htop"
 # Portable abstraction of the hierarchical topology of modern architectures
 brew "hwloc"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
-# Tools and libraries to manipulate images in many formats
+# Tools and libraries to manipulate images in select formats
 brew "imagemagick"
 # Modular IRC client
 brew "irssi"
@@ -167,22 +163,26 @@ brew "irssi"
 brew "jpeg"
 # JSON parser for C
 brew "json-c"
-# Crawling and spidering framework
-brew "katana"
-# Style and grammar checker
-brew "languagetool"
-# Tool to detect/remediate misconfig and security risks of GitHub/GitLab assets
-brew "legitify"
+# Code coverage tester for compiled programs, Python, and shell scripts
+brew "kcov"
+# Network authentication protocol
+brew "krb5"
 # BSD-style licensed readline alternative
 brew "libedit"
-# Conversion library
-brew "libiconv"
+# Postgres C API library
+brew "libpq"
 # Version of the SSL/TLS protocol forked from OpenSSL
 brew "libressl"
+# Multi-platform support library with a focus on asynchronous I/O
+brew "libuv"
 # Linguistic software and Finnish dictionary
 brew "libvoikko"
 # GNOME XML library
 brew "libxml2"
+# YAML Parser
+brew "libyaml"
+# C library for reading, creating, and modifying zip archives
+brew "libzip"
 # Package manager for the Lua programming language
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
@@ -210,27 +210,33 @@ brew "ossp-uuid"
 # General-purpose scripting language
 brew "php", link: false
 # General-purpose scripting language
+brew "php@8.1"
+# General-purpose scripting language
 brew "php@8.2", link: true
 # General-purpose scripting language
 brew "php@8.3"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
+# Easily download, build, install, upgrade, and uninstall Python packages
+brew "python-setuptools"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
 # Generate C-based recognizers from regular expressions
 brew "re2c"
-# User interface to the TELNET protocol
-brew "telnet"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
 # Terminal multiplexer
 brew "tmux"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
 # Internet file retriever
 brew "wget"
-# Check your $HOME for unwanted files and directories
-brew "xdg-ninja", args: ["HEAD"]
 # General-purpose lossless data-compression library
 brew "zlib"
 # Watcher for macOS 10.14+ light/dark mode changes
@@ -241,32 +247,50 @@ brew "doron-cohen/tap/antidot"
 brew "gesquive/tap/git-user"
 # Simple hotkey-daemon for macOS.
 brew "koekeishiya/formulae/skhd"
-# Automated code review tool integrated with any code analysis tools regardless of programming language.
-brew "reviewdog/tap/reviewdog"
-# Igbinary PHP extension
-brew "shivammathur/extensions/igbinary@8.3"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.1"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.2"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.3"
+# Imagick PHP extension
+brew "shivammathur/extensions/imagick@8.4"
 # Mcrypt PHP extension
 brew "shivammathur/extensions/mcrypt@8.3"
 # Msgpack PHP extension
 brew "shivammathur/extensions/msgpack@8.3"
 # PCOV PHP extension
+brew "shivammathur/extensions/pcov@8.1"
+# PCOV PHP extension
+brew "shivammathur/extensions/pcov@8.2"
+# PCOV PHP extension
 brew "shivammathur/extensions/pcov@8.3"
 # Redis PHP extension
-brew "shivammathur/extensions/redis@8.3"
+brew "shivammathur/extensions/phpredis@8.3"
 # Uuid PHP extension
 brew "shivammathur/extensions/uuid@8.3"
+# Xdebug PHP extension
+brew "shivammathur/extensions/xdebug@8.1"
+# Xdebug PHP extension
+brew "shivammathur/extensions/xdebug@8.2"
+# Xdebug PHP extension
+brew "shivammathur/extensions/xdebug@8.4"
+# Xdebug PHP extension
+brew "shivammathur/extensions/xdebug@8.5"
 # Yaml PHP extension
 brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
-brew "shivammathur/php/php-debug"
+brew "shivammathur/php/php-debug", link: false
+# General-purpose scripting language
+brew "shivammathur/php/php@8.1-debug"
 # General-purpose scripting language
 brew "shivammathur/php/php@8.2-debug"
-# Tabby: AI Coding Assistant
-brew "tabbyml/tabby/tabby"
+# General-purpose scripting language
+brew "shivammathur/php/php@8.4"
 # Command-line interface for 1Password
 cask "1password-cli"
+# Semantic code analysis engine
+cask "codeql"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Database version management tool
@@ -332,6 +356,8 @@ cask "thonny"
 cask "todoist-app"
 # Configuration application for the Ultimate Hacking Keyboard
 cask "uhk-agent"
+# Google Chromium, sans integration with Google
+cask "ungoogled-chromium"
 # Open-source code editor
 cask "visual-studio-code"
 # Multimedia player
@@ -340,7 +366,7 @@ cask "vlc"
 cask "voikkospellservice"
 # GPU-accelerated cross-platform terminal emulator and multiplexer
 cask "wezterm"
-# Application for generating TOTP and HOTP codes
+# Full-featured companion app to the YubiKey
 cask "yubico-authenticator"
 # Multiplayer code editor
 cask "zed"
