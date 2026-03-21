@@ -1,8 +1,34 @@
+[settings]
+# Use uvx (from uv) instead of requiring pipx to be installed separately
+pipx.uvx = true
+# Compile Python from source — precompiled freethreaded builds lack a lib/ dir
+python.compile = true
+trusted_config_paths = [
+  "~/Code/ivuorinen",
+  "~/Code/s",
+  "~/Code/masf",
+]
+# Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
+# This repo uses .mise.toml at the repo root for pinned versions.
+idiomatic_version_file = true
+idiomatic_version_file_enable_tools = [
+  "node", "python", "ruby", "go", "java",
+  "terraform", "yarn", "bun", "deno", "dotnet",
+]
+
+# Generate mise.lock for reproducible installs
+lockfile = true
+
+# Save disk space — don't keep downloaded archives or failed installs
+always_keep_download = false
+always_keep_install = false
+experimental = true
+
 [tools]
 # Language runtimes
 node = "lts"
-python = "3"
-go = "latest"
+python = "3.13"
+go = "1.26.1"
 rust = "stable"
 
 # Pre-built binaries via aqua registry
@@ -12,7 +38,7 @@ eza = "latest"
 bottom = "latest"
 zoxide = "latest"
 tree-sitter = "latest"
-neovim = "latest" # Neovim editor binary
+neovim = "0.11.6" # Neovim editor binary
 delta = "latest"
 difftastic = "latest"
 
@@ -38,25 +64,27 @@ editorconfig-checker = "latest"
 "npm:corepack" = "latest"
 
 # Python tools (via pipx backend)
-"pipx:detect-secrets" = "latest"
-"pipx:git-filter-repo" = "latest"
+# Disabled: mise pipx backend can't find uvx when uv is mise-managed
+# See https://github.com/jdx/mise/discussions/7477
+# "pipx:detect-secrets" = "latest"
+# "pipx:git-filter-repo" = "latest"
 yamllint = "latest"
-ansible = "latest"
-"pipx:ansible-lint" = "latest"
+# ansible = "13.4.0"
+# "pipx:ansible-lint" = "latest"
 ruff = "latest"
-"pipx:openapi-python-client" = "latest"
-"pipx:python-lsp-server[websockets]" = "latest"
+# "pipx:openapi-python-client" = "latest"
+# "pipx:python-lsp-server[websockets]" = "latest"
 
 # .NET tools (via dotnet backend)
 "dotnet:coverlet.console" = "latest"
 "dotnet:csharpier" = "latest"
 "dotnet:ilspycmd" = "latest"
-"dotnet:dotnet-ef" = "latest"
+"dotnet:dotnet-ef" = "10.0.5"
 
 # DevOps & security tools
 act = "latest"
 age = "latest"
-aws-cli = "latest"
+aws-cli = "2.34.14"
 checkov = "latest"
 grype = "latest"
 pinact = "latest"
@@ -71,12 +99,10 @@ lazygit = "latest"
 bat = "latest"
 bats = "latest"
 choose = "latest"
-cmake = "latest"
-gdu = "latest"
+cmake = "4.3.0"
 github-cli = "latest"
 jq = "latest"
 hadolint = "latest"
-hugo = "latest"
 just = "latest"
 yq = "latest"
 "github:exercism/cli" = "latest"
@@ -92,31 +118,9 @@ oh-my-posh = "latest"
 "github:wakatime/wakatime-cli" = "latest"
 
 # Terraform (replaces tfenv)
-terraform = "latest"
+terraform = "1.14.7"
 tflint = "latest"
 tfsec = "latest"
 
 # Other useful tools
 uv = "latest"
-
-[settings]
-trusted_config_paths = [
-  "~/Code/ivuorinen",
-  "~/Code/s",
-  "~/Code/masf",
-]
-# Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
-# This repo uses .mise.toml at the repo root for pinned versions.
-idiomatic_version_file = true
-idiomatic_version_file_enable_tools = [
-  "node", "python", "ruby", "go", "java",
-  "terraform", "yarn", "bun", "deno", "dotnet",
-]
-
-# Generate mise.lock for reproducible installs
-lockfile = true
-
-# Save disk space — don't keep downloaded archives or failed installs
-always_keep_download = false
-always_keep_install = false
-experimental = true

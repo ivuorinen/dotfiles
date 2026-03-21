@@ -42,11 +42,11 @@ packages=(
 # Install the Development Tools dnf group
 install_dev_tools_group()
 {
-  if dnf group list installed 2> /dev/null | grep -q "Development Tools"; then
+  if dnf group list installed 2> /dev/null | grep -q "development-tools"; then
     msgr ok "@development-tools group already installed"
   else
     msgr run "Installing @development-tools group"
-    sudo dnf group install -y "Development Tools"
+    sudo dnf group install -y "development-tools"
   fi
   return 0
 }

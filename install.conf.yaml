@@ -5,8 +5,10 @@
     ~/:
     ~/.config:
       recursive: true
-    ~/.local:
+    ~/.local/bin:
+    ~/.local/man:
       recursive: true
+    ~/.local/share:
     ~/.ssh:
       recursive: true
 
@@ -35,12 +37,16 @@
       glob: true
       path: base/*
       prefix: "."
+    # mise config — force-relink because mise may create the file before Dotbot runs
+    ~/.config/mise/config.toml:
+      force: true
+      path: config/mise/config.toml
     # Most of the configs
     ~/.config/:
       glob: true
       relink: true
       path: config/*
-      exclude: [config/fzf, config/op]
+      exclude: [config/op, config/mise]
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
@@ -52,10 +58,6 @@
     ~/.local/bin:
       glob: true
       path: local/bin/*
-      exclude: [local/bin/fzf]
-    ~/.local/fzf:
-      glob: true
-      path: config/fzf/*
     # Manuals
     ~/.local/man:
       glob: true
