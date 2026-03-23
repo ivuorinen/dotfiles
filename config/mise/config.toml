@@ -27,7 +27,7 @@ experimental = true
 [tools]
 # Language runtimes
 node = "lts"
-python = "3.13"
+python = "3.14.3"
 go = "1.26.1"
 rust = "stable"
 
