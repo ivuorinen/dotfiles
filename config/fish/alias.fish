@@ -5,6 +5,10 @@ if type -q nvim
     alias vi='nvim'
 end
 
+if type -q bat
+    alias cat='bat'
+end
+
 # eza aliases if eza is installed
 if type -q eza >/dev/null
     function eza_git -d "Use eza and its git options if in a git repo"

@@ -7,6 +7,10 @@ x-have eza && {
   alias ls="eza -h -s=type --git --icons --group-directories-first"
 }
 
+x-have bat && {
+  alias cat="bat"
+}
+
 # Easier navigation: .., ..., ....
 alias ..="cd .."
 alias ...="cd ../.."
