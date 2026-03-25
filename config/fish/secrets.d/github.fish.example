@@ -2,4 +2,4 @@
 # Copy this file to github.fish (remove .example) and set your token
 # Generate token at: https://github.com/settings/tokens
 
-set -x GITHUB_TOKEN "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+set -x GITHUB_TOKEN ""
