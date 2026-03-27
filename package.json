@@ -40,7 +40,7 @@
     "editorconfig-checker": "^6.1.1",
     "markdown-table-formatter": "^1.7.0",
     "prettier": "^3.8.1",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.0"
   },
   "resolutions": {
     "minimatch": "^10.2.4"
