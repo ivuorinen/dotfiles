@@ -179,6 +179,8 @@ return {
       }
 
       -- ── LSP Highlight (cursor word) ──────────────────────────
+      local lsp_detach_augroup =
+        vim.api.nvim_create_augroup('lsp-detach', { clear = true })
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('lsp-highlight', { clear = true }),
         callback = function(event)
@@ -203,7 +205,8 @@ return {
               callback = vim.lsp.buf.clear_references,
             })
             vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+              group = lsp_detach_augroup,
+              buffer = event.buf,
               callback = function(event2)
                 vim.lsp.buf.clear_references()
                 vim.api.nvim_clear_autocmds {

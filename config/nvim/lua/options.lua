@@ -37,7 +37,7 @@ o.splitbelow = true -- split to the bottom
 o.splitright = true -- vsplit to the right
 o.termguicolors = true -- Enable GUI colors
 o.timeoutlen = 250 -- Decrease mapped sequence wait time
-o.updatetime = 250 -- 250 ms = 2,5 seconds
+o.updatetime = 250 -- 250 ms = 0.25 seconds
 o.undofile = true -- Persistent undo across sessions
 o.cursorline = true -- Highlight current line
 o.linebreak = true -- Break lines at word boundaries

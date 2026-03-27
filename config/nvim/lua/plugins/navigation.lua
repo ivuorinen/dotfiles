@@ -33,6 +33,9 @@ return {
             '--smart-case',
             '--hidden',
             '--glob=!.git/',
+            '--glob=!node_modules/',
+            '--glob=!vendor/',
+            '--glob=!.DS_Store',
           },
           preview = {
             filesize_limit = 0.1,
