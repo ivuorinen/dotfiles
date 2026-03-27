@@ -48,19 +48,6 @@ return {
       -- │                    General workflow                     │
       -- ╰─────────────────────────────────────────────────────────╯
 
-      -- Presets for common options and mappings
-      -- h: MiniBasics.config
-      require('mini.basics').setup {
-        options = {
-          basics = true,
-          extra_ui = true,
-        },
-        mappings = {
-          basic = true,
-          option_toggle_prefix = [[<leader>tm]],
-        },
-      }
-
       -- Buffer removing (unshow, delete, wipeout), which saves window layout
       require('mini.bufremove').setup()
 
@@ -121,7 +108,7 @@ return {
           { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
           { mode = 'n', keys = '<Leader>s', desc = '+Telescope' },
           { mode = 'n', keys = '<Leader>t', desc = '+Toggle' },
-          { mode = 'n', keys = '<Leader>tm', desc = '+Mini' },
+          { mode = 'n', keys = '<Leader>tm', desc = '+Toggle Options' },
           { mode = 'n', keys = '<Leader>x', desc = '+Trouble' },
           { mode = 'n', keys = '<leader>z', desc = '+TreeSitter' },
           { mode = 'n', keys = '<leader>zg', desc = '+Goto' },
@@ -158,7 +145,6 @@ return {
       local hp = require 'mini.hipatterns'
       hp.setup {
         highlighters = {
-          -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE', 'BUG', 'PERF' words
           fixme = {
             pattern = '%f[%w]()FIXME:?%s*()%f[%W]',
             group = 'MiniHipatternsFixme',
@@ -193,10 +179,10 @@ return {
       require('mini.icons').setup {
         file = {
           ['.keep'] = { glyph = '󰊢', hl = 'MiniIconsGrey' },
-          ['devcontainer.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+          ['devcontainer.json'] = { hl = 'MiniIconsAzure' },
         },
         filetype = {
-          dotenv = { glyph = '', hl = 'MiniIconsYellow' },
+          dotenv = { hl = 'MiniIconsYellow' },
         },
       }
 
@@ -262,5 +248,59 @@ return {
       -- Work with trailing whitespace
       require('mini.trailspace').setup()
     end,
+  },
+
+  -- Detect tabstop and shiftwidth automatically
+  -- https://github.com/tpope/vim-sleuth
+  { 'tpope/vim-sleuth', event = 'BufReadPre' },
+
+  -- Break bad habits, master Vim motions
+  -- https://github.com/m4xshen/hardtime.nvim
+  {
+    'm4xshen/hardtime.nvim',
+    event = 'VeryLazy',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {
+      restriction_mode = 'hint',
+      disabled_keys = {
+        ['<Up>'] = { '', 'n' },
+        ['<Down>'] = { '', 'n' },
+        ['<Left>'] = { '', 'n' },
+        ['<Right>'] = { '', 'n' },
+        ['<C-Up>'] = { '', 'n' },
+        ['<C-Down>'] = { '', 'n' },
+        ['<C-Left>'] = { '', 'n' },
+        ['<C-Right>'] = { '', 'n' },
+      },
+      disabled_filetypes = {
+        'TelescopePrompt',
+        'Trouble',
+        'lazy',
+        'mason',
+        'help',
+        'notify',
+        'dashboard',
+        'alpha',
+      },
+      hints = {
+        ['[dcyvV][ia][%(%)]'] = {
+          message = function(keys)
+            return 'Use ' .. keys:sub(1, 2) .. 'b instead of ' .. keys
+          end,
+          length = 3,
+        },
+        ['[dcyvV][ia][%{%}]'] = {
+          message = function(keys)
+            return 'Use ' .. keys:sub(1, 2) .. 'B instead of ' .. keys
+          end,
+          length = 3,
+        },
+        ['<Esc><Esc>'] = {
+          -- stylua: ignore
+          message = function() return 'Use single <Esc> to clear hlsearch (0.11)' end,
+          length = 2,
+        },
+      },
+    },
   },
 }

@@ -1,0 +1,13 @@
+{
+  "diagnostics.globals": [
+    "vim",
+    "K",
+    "MiniBufremove",
+    "MiniStatusline",
+    "ToggleBackground",
+    "GetIntelephenseLicense"
+  ],
+  "runtime.version": "LuaJIT",
+  "workspace.library": ["${3rd}/luv/library"],
+  "workspace.checkThirdParty": false
+}
