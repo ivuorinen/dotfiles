@@ -8,6 +8,9 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.lua]
+max_line_length = 90
+
 [*.py]
 indent_size = 4
 max_line_length = 120
@@ -18,9 +21,6 @@ max_line_length = 120
 [*.md]
 max_line_length = 120
 trim_trailing_whitespace = false
-
-[*.lua]
-max_line_length = 90
 
 [*.{php,fish}]
 indent_size = 4
