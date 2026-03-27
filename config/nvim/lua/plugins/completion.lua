@@ -11,9 +11,7 @@ return {
       {
         'saghen/blink.compat',
         version = '*',
-        -- lazy.nvim will automatically load the plugin when it's required by blink.cmp
         opts = {
-          -- make sure to set opts so that lazy.nvim calls blink.compat's setup
           impersonate_nvim_cmp = true,
         },
       },
@@ -45,27 +43,13 @@ return {
     },
     ---@module 'blink.cmp'
     opts = {
-      -- 'default' for mappings similar to built-in completion
-      -- 'super-tab' for mappings similar to vscode (tab to accept,
-      -- arrow keys to navigate)
-      -- 'enter' for mappings similar to 'super-tab' but with 'enter' to
-      -- accept
-      -- see the "default configuration" section below for
-      -- documentation on how to
-      -- define your own keymap.
       keymap = {
         preset = 'default',
-        -- Use Ctrl-x to trigger auto completion
         ['<C-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
       },
 
       appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- will be removed in a future release
         use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
         nerd_font_variant = vim.g.nerd_font_variant or 'mono',
       },
 
@@ -87,8 +71,6 @@ return {
         },
       },
 
-      -- default list of enabled providers defined so that you can extend it
-      -- elsewhere in your config, without redefining it, via `opts_extend`
       sources = {
         default = {
           'lsp',
@@ -106,26 +88,15 @@ return {
           lazydev = {
             name = 'LazyDev',
             module = 'lazydev.integrations.blink',
-            -- make lazydev completions top priority (see `:h blink.cmp`)
             score_offset = 100,
           },
         },
       },
 
-      -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
-      -- which automatically downloads a prebuilt binary when enabled.
-      --
-      -- By default, we use the Lua implementation instead, but you may enable
-      -- the rust implementation via `'prefer_rust_with_warning'`
-      --
-      -- See :h blink-cmp-config-fuzzy for more information
       fuzzy = { implementation = 'lua' },
 
-      -- experimental signature help support
       signature = { enabled = true },
     },
-    -- allows extending the enabled_providers array elsewhere in your config
-    -- without having to redefine it
     opts_extend = { 'sources.completion.enabled_providers' },
   },
 }

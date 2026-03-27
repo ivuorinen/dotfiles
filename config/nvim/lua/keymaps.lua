@@ -4,18 +4,11 @@ require 'utils'
 -- │                         Keymaps                         │
 -- ╰─────────────────────────────────────────────────────────╯
 
--- ── Disable arrow keys in normal mode ───────────────────────────────
-K.n('<left>', ':echo "Use h to move!!"<CR>')
-K.n('<right>', ':echo "Use l to move!!"<CR>')
-K.n('<up>', ':echo "Use k to move!!"<CR>')
-K.n('<down>', ':echo "Use j to move!!"<CR>')
-
 -- ── Splits ──────────────────────────────────────────────────────────
 K.n('<C-w>,', ':vertical resize -10<CR>', { desc = 'V Resize -' })
 K.n('<C-w>.', ':vertical resize +10<CR>', { desc = 'V Resize +' })
 K.n('<C-w>-', ':resize -10<CR>', { desc = 'H Resize -' })
 K.n('<C-w>+', ':resize +10<CR>', { desc = 'H Resize +' })
-K.n('<C-w>=', '<C-w>=', { desc = 'Equal Size Splits' })
 
 -- ── Deal with word wrap ─────────────────────────────────────────────
 K.n('k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Move up', noremap = true, expr = true })
@@ -29,7 +22,6 @@ K.d('<C-j>', { 'n', 'v' }, ":m '>+1<CR>gv=gv", 'Move Block Down')
 
 -- ── Other operations ────────────────────────────────────────────────
 K.n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
-K.n('<esc><esc>', ':nohlsearch<cr>', { desc = 'Clear Search Highlighting' })
 
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
@@ -52,15 +44,12 @@ local lws = function() return b().lsp_workspace_symbols() end
 local ldws = function() return b().lsp_dynamic_workspace_symbols() end
 
 K.n('<C-l>', ':lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature' })
-K.n('K', ':lua vim.lsp.buf.hover()<CR>', { desc = 'Hover Documentation' })
-K.ld('ca', 'n', ':lua vim.lsp.buf.code_action()<CR>', 'Code Action')
 K.ld('cci', 'n', function() b().lsp_incoming_calls() end, 'Incoming calls')
 K.ld('cco', 'n', function() b().lsp_outgoing_calls() end, 'Outgoing calls')
 K.ld('cd', 'n', function() b().lsp_definitions() end, 'Definitions')
 K.ld('cf', { 'n', 'x' }, ':lua vim.lsp.buf.format()<CR>', 'Format')
 K.ld('ci', 'n', function() b().lsp_implementations() end, 'Implementations')
 K.ld('cp', 'n', function() b().lsp_type_definitions() end, 'Type Definition')
-K.ld('cr', 'n', vim.lsp.buf.rename, 'Rename')
 K.ld('cs', 'n', ':Telescope lsp_document_symbols<CR>', 'LSP Document Symbols')
 K.ld('ct', 'n', function() b().treesitter() end, 'treesitter')
 K.ld('cws', 'n', function() lws() end, 'Workspace Symbols')
@@ -84,13 +73,15 @@ local lazy_plugins = function()
   return require('telescope').extensions.lazy_plugins.lazy_plugins()
 end
 
-K.nl('f', function() require('fff').find_files() end, 'Find Files')
+K.nl('f', ':Telescope find_files<cr>', 'Find Files')
 K.nl(',', ':Telescope buffers<cr>', 'Find existing buffers')
 
 K.nl('sd', ':Telescope diagnostics<cr>', 'Search Diagnostics')
 K.nl('sf', ':Telescope grep_string<cr>', 'Grep String')
+K.nl('sg', ':Telescope live_grep<cr>', 'Live Grep')
 K.nl('sh', ':Telescope help_tags<cr>', 'Help tags')
 K.nl('sk', ':Telescope keymaps<cr>', 'Search Keymaps')
+K.nl('sn', ':Noice telescope<cr>', 'Noice Messages')
 K.nl('so', ':Telescope oldfiles<CR>', 'Old Files')
 K.nl('sp', function() lazy_plugins() end, 'Lazy Plugins')
 K.nl('sq', ':Telescope quickfix<cr>', 'Quickfix')
@@ -107,10 +98,33 @@ K.nl('xx', ':Trouble diagnostics<cr>', 'Diagnostic')
 
 -- ── Toggle settings ─────────────────────────────────────────────────
 -- Convention is 't' followed by the operation
-K.nl('tc', ':CloakToggle<cr>', 'Cloak: Toggle')
 K.nl('te', ':Neotree toggle<cr>', 'Toggle Neotree')
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
 K.nl('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
+
+-- ── Option toggles ────────────────────────────────────────────────────
+-- Convention is 'tm' followed by the option letter
+K.nl('tmc', function() vim.o.cursorline = not vim.o.cursorline end, 'Toggle cursorline')
+K.nl(
+  'tmC',
+  function() vim.o.cursorcolumn = not vim.o.cursorcolumn end,
+  'Toggle cursorcolumn'
+)
+K.nl(
+  'tmd',
+  function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end,
+  'Toggle diagnostics'
+)
+K.nl('tmh', function() vim.o.hlsearch = not vim.o.hlsearch end, 'Toggle hlsearch')
+K.nl('tml', function() vim.o.list = not vim.o.list end, 'Toggle list')
+K.nl('tmn', function() vim.o.number = not vim.o.number end, 'Toggle number')
+K.nl(
+  'tmr',
+  function() vim.o.relativenumber = not vim.o.relativenumber end,
+  'Toggle relativenumber'
+)
+K.nl('tms', function() vim.o.spell = not vim.o.spell end, 'Toggle spell')
+K.nl('tmw', function() vim.o.wrap = not vim.o.wrap end, 'Toggle wrap')
 
 -- ── Quit operations ─────────────────────────────────────────────────
 -- Convention is 'q' followed by the operation

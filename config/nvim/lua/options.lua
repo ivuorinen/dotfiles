@@ -7,7 +7,6 @@
 
 local g = vim.g -- A table to store global variables
 local o = vim.opt -- A table to store global options
-local a = vim.api -- A table to store API functions
 
 -- vim.global
 g.mapleader = ' ' -- Space as the leader key
@@ -19,14 +18,13 @@ g.loaded_ruby_provider = 0 -- Disable ruby provider
 g.loaded_java_provider = 0 -- Disable java provider
 
 -- vim.options
--- Most of the good defaults are provided by `mini.basics`
--- See: lua/plugins/mini.lua
 o.confirm = true -- Confirm before closing unsaved buffers
 o.dictionary = '/usr/share/dict/words' -- Add system dictionary
 o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
 o.list = true -- Show invisible characters
 o.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+o.fillchars = { eob = ' ' } -- Hide ~ at end of buffer
 o.number = true -- Show line numbers
 o.numberwidth = 3 -- Set the width of the number column
 o.relativenumber = true -- Show relative line numbers
@@ -40,6 +38,22 @@ o.splitright = true -- vsplit to the right
 o.termguicolors = true -- Enable GUI colors
 o.timeoutlen = 250 -- Decrease mapped sequence wait time
 o.updatetime = 250 -- 250 ms = 2,5 seconds
+o.undofile = true -- Persistent undo across sessions
+o.cursorline = true -- Highlight current line
+o.linebreak = true -- Break lines at word boundaries
+o.breakindent = true -- Indent wrapped lines
+o.smartcase = true -- Smart case for search (with ignorecase)
+o.infercase = true -- Smart case for completion
+o.smartindent = true -- Auto indentation
+o.virtualedit = 'block' -- Virtual editing in visual block mode
+o.completeopt = 'menuone,noselect' -- Completion menu behavior
+o.formatoptions = 'qjl1' -- Comment formatting
+o.mouse = 'a' -- Enable mouse support
+o.backup = false -- Don't create backup files
+o.writebackup = false -- Don't backup on write
+o.pumblend = 10 -- Transparent popup menu
+o.pumheight = 10 -- Popup menu max height
+o.winblend = 10 -- Transparent floating windows
 
 -- Session options
 -- This is a comma separated list of options that will be
@@ -48,9 +62,6 @@ local so = 'buffers,curdir,folds,tabpages,winsize,winpos,terminal,localoptions'
 o.sessionoptions = so
 
 o.wildmode = 'longest:full,full' -- Command-line completion mode
-
--- Enable the colorcolumn
-a.nvim_set_option_value('colorcolumn', '+1', { scope = 'global' })
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -61,6 +72,5 @@ vim.schedule(function()
 end)
 
 -- xiyaowong/transparent.nvim
-vim.g.transparent_enabled = true
 
 -- vim: ts=2 sts=2 sw=2 et

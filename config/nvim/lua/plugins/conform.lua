@@ -69,8 +69,4 @@ return {
       end
     end,
   },
-  {
-    'gpanders/editorconfig.nvim',
-    lazy = false,
-  },
 }
