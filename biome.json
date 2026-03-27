@@ -36,7 +36,7 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 80
+    "lineWidth": 90
   },
   "linter": {
     "enabled": true,
@@ -80,7 +80,7 @@
       "enabled": true,
       "indentStyle": "space",
       "indentWidth": 2,
-      "lineWidth": 80
+      "lineWidth": 90
     }
   },
   "overrides": [
