@@ -179,10 +179,10 @@ return {
       require('mini.icons').setup {
         file = {
           ['.keep'] = { glyph = '󰊢', hl = 'MiniIconsGrey' },
-          ['devcontainer.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+          ['devcontainer.json'] = { hl = 'MiniIconsAzure' },
         },
         filetype = {
-          dotenv = { glyph = '', hl = 'MiniIconsYellow' },
+          dotenv = { hl = 'MiniIconsYellow' },
         },
       }
 

@@ -18,8 +18,9 @@ return {
       local t = require 'telescope'
       local a = require 'telescope.actions'
 
-      local open_with_trouble = require('trouble.sources.telescope').open
-      local add_to_trouble = require('trouble.sources.telescope').add
+      local tst = 'trouble.sources.telescope'
+      local open_with_trouble = function(...) require(tst).open(...) end
+      local add_to_trouble = function(...) require(tst).add(...) end
 
       t.setup {
         defaults = {
@@ -143,7 +144,7 @@ return {
       event_handlers = {
         {
           event = 'file_opened',
-          handler = function(_)
+          handler = function()
             local c = require 'neo-tree.command'
             c.execute { action = 'close' }
           end,

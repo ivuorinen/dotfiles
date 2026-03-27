@@ -143,12 +143,11 @@ return {
       end
 
       -- ── Enable all servers ────────────────────────────────────
-      vim.lsp.enable(vim.list_extend(default_servers, {
-        'gopls',
-        'intelephense',
-        'lua_ls',
-        'yamlls',
-      }))
+      local all_servers = vim.list_extend(
+        vim.deepcopy(default_servers),
+        { 'gopls', 'intelephense', 'lua_ls', 'yamlls' }
+      )
+      vim.lsp.enable(all_servers)
 
       -- ── Diagnostic Config ─────────────────────────────────────
       vim.diagnostic.config {

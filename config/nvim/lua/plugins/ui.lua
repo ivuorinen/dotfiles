@@ -103,7 +103,7 @@ return {
             kind = '',
             any = {
               { find = 'written' },
-              { find = '%d of %d --%d%--' },
+              { find = '%d of %d %-%-%d%%%-%-' },
             },
           },
           opts = { skip = true },
