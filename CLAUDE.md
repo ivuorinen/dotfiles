@@ -51,6 +51,12 @@ yarn test              # Run all tests in tests/
 # Shell linting
 shellcheck <script>    # Lint shell scripts
 
+# Lua formatting
+stylua config/nvim/    # Format neovim Lua files
+
+# Pre-commit (all hooks)
+pre-commit run --all-files
+
 # Tooling maintenance
 npx @biomejs/biome migrate --write  # Update biome schema version
 ```
