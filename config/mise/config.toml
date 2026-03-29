@@ -118,7 +118,7 @@ oh-my-posh = "latest"
 "github:wakatime/wakatime-cli" = "latest"
 
 # Terraform (replaces tfenv)
-terraform = "1.14.7"
+terraform = "1.14.8"
 tflint = "latest"
 tfsec = "latest"
 
