@@ -65,6 +65,29 @@ require('lazy').setup(
   }
 )
 
+-- ── Native LSP setup (after lazy so blink.cmp is available) ─────────
+vim.lsp.config('*', {
+  capabilities = require('blink.cmp').get_lsp_capabilities(),
+})
+vim.lsp.enable {
+  'ansiblels',
+  'bashls',
+  'cssls',
+  'dockerls',
+  'eslint',
+  'gopls',
+  'html',
+  'intelephense',
+  'jsonls',
+  'lua_ls',
+  'pyright',
+  'tailwindcss',
+  'terraformls',
+  'ts_ls',
+  'vimls',
+  'yamlls',
+}
+
 require 'keymaps'
 
 -- vim: set ts=2 sts=2 sw=2 wrap et :
