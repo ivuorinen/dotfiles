@@ -24,13 +24,19 @@ o.ignorecase = true -- Ignore case in search patterns
 o.inccommand = 'split' -- Preview substitutions live, as you type!
 o.list = true -- Show invisible characters
 o.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-o.fillchars = { eob = ' ' } -- Hide ~ at end of buffer
+o.fillchars = { eob = ' ', foldopen = '▾', foldclose = '▸', foldsep = ' ' }
 o.number = true -- Show line numbers
 o.numberwidth = 3 -- Set the width of the number column
 o.relativenumber = true -- Show relative line numbers
 o.scrolloff = 8 -- Show context around cursor
 o.sidescrolloff = 8 -- Show context around cursor
 o.signcolumn = 'yes' -- Keep signcolumn on by default
+-- stylua: ignore
+local fc = '%{foldlevel(v:lnum) > 0'
+  .. ' ? (foldlevel(v:lnum) > foldlevel(v:lnum - 1)'
+  .. ' ? (foldclosed(v:lnum) == -1 ? "▾" : "▸")'
+  .. ' : " ") : " "} '
+o.statuscolumn = '%s%l ' .. fc
 o.spell = true -- Enable spell checking
 o.spelllang = 'en_gb,en_us' -- Set the spell checking language
 o.splitbelow = true -- split to the bottom
@@ -54,6 +60,14 @@ o.writebackup = false -- Don't backup on write
 o.pumblend = 10 -- Transparent popup menu
 o.pumheight = 10 -- Popup menu max height
 o.winblend = 10 -- Transparent floating windows
+
+-- Folding via treesitter
+o.foldmethod = 'expr'
+o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+o.foldtext = ''
+o.foldcolumn = '0'
+o.foldlevel = 99
+o.foldlevelstart = 99
 
 -- Session options
 -- This is a comma separated list of options that will be
