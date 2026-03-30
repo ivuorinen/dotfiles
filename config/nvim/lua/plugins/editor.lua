@@ -23,16 +23,15 @@ return {
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 750 }
 
-      -- Comment lines
-      require('mini.comment').setup()
-
       -- Text edit operators
       -- g= - Evaluate text and replace with output
       -- gx - Exchange text regions
       -- gm - Multiply (duplicate) text
-      -- gr - Replace text with register
+      -- gR - Replace text with register (gr reserved for LSP)
       -- gs - Sort text
-      require('mini.operators').setup()
+      require('mini.operators').setup {
+        replace = { prefix = 'gR' },
+      }
 
       -- Split and join arguments, lists, and other sequences
       require('mini.splitjoin').setup()
@@ -100,7 +99,6 @@ return {
           miniclue.gen_clues.registers(),
           miniclue.gen_clues.windows(),
           miniclue.gen_clues.z(),
-          { mode = 'n', keys = '<Leader>a', desc = '+Automation' },
           { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
           { mode = 'n', keys = '<Leader>c', desc = '+Code' },
           { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
@@ -110,11 +108,7 @@ return {
           { mode = 'n', keys = '<Leader>t', desc = '+Toggle' },
           { mode = 'n', keys = '<Leader>tm', desc = '+Toggle Options' },
           { mode = 'n', keys = '<Leader>x', desc = '+Trouble' },
-          { mode = 'n', keys = '<leader>z', desc = '+TreeSitter' },
-          { mode = 'n', keys = '<leader>zg', desc = '+Goto' },
           { mode = 'n', keys = '<Leader>?', desc = '+Help' },
-          { mode = 'n', keys = 'd', desc = '+Diagnostics' },
-          { mode = 'n', keys = 'y', desc = '+Yank' },
         },
       }
 
@@ -124,12 +118,39 @@ return {
       -- Git integration
       require('mini.git').setup()
 
-      -- Session management (read, write, delete)
-      require('mini.sessions').setup {
+      -- Session management (auto per-directory)
+      local sessions = require 'mini.sessions'
+      sessions.setup {
         autowrite = true,
         directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
         file = '',
       }
+
+      -- Auto-read session for cwd on startup (no file args)
+      vim.api.nvim_create_autocmd('VimEnter', {
+        group = vim.api.nvim_create_augroup('auto-session', { clear = true }),
+        nested = true,
+        callback = function()
+          if vim.fn.argc() > 0 then return end
+          local cwd = vim.fn.getcwd()
+          local name = cwd:gsub('[/\\]', '%%')
+          local ok = pcall(sessions.read, name, { force = true })
+          if not ok then
+            -- No session yet — will be created on exit
+            vim.g.mini_sessions_current = name
+          end
+        end,
+      })
+
+      -- Auto-write session for cwd on exit
+      vim.api.nvim_create_autocmd('VimLeavePre', {
+        group = vim.api.nvim_create_augroup('auto-session-write', { clear = true }),
+        callback = function()
+          local cwd = vim.fn.getcwd()
+          local name = cwd:gsub('[/\\]', '%%')
+          sessions.write(name, { force = true })
+        end,
+      })
 
       -- ╭─────────────────────────────────────────────────────────╮
       -- │                       Appearance                        │
@@ -158,7 +179,7 @@ return {
             group = 'MiniHipatternsNote',
           },
           note = {
-            pattern = '%f[%w]()NOTE()%f[%W]',
+            pattern = '%f[%w]()NOTE:?%s*()%f[%W]',
             group = 'MiniHipatternsNote',
           },
           bug = {
@@ -187,22 +208,9 @@ return {
       }
 
       -- Visualize and work with indent scope
-      require('mini.indentscope').setup()
-
-      -- Fast and flexible start screen
-      local starter = require 'mini.starter'
-      ---@modules mini.starter
-      starter.setup {
-        items = {
-          starter.sections.telescope(),
-          starter.sections.builtin_actions(),
-          starter.sections.recent_files(5),
-        },
-        content_hooks = {
-          starter.gen_hook.adding_bullet(),
-          starter.gen_hook.indexing('all', { 'Builtin actions' }),
-          starter.gen_hook.aligning('center', 'center'),
-        },
+      local iscope = require 'mini.indentscope'
+      iscope.setup {
+        draw = { animation = iscope.gen_animation.none() },
       }
 
       -- Minimal and fast statusline module with opinionated default look
@@ -224,7 +232,10 @@ return {
                 HINT = 'H ',
               },
             }
-            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+            local lsp = sl.section_lsp { trunc_width = 75 }
+            local lsp_status = #vim.lsp.get_clients { bufnr = 0 } > 0
+                and (vim.lsp.status() ~= '' and '󰔚' or '󰄬')
+              or ''
             local filename = sl.section_filename { trunc_width = 140 }
             local fileinfo = sl.section_fileinfo { trunc_width = 9999 }
             local location = sl.section_location { trunc_width = 9999 }
@@ -237,6 +248,7 @@ return {
               '%<', -- Mark general truncate point
               { hl = 'statuslineFilename', strings = { filename } },
               '%=', -- End left alignment
+              { hl = 'MiniStatuslineDevinfo', strings = { lsp_status } },
               { hl = 'statuslineFileinfo', strings = { diagnostics } },
               { hl = 'statuslineFileinfo', strings = { fileinfo } },
               { hl = mode_hl, strings = { location } },
