@@ -145,7 +145,7 @@ autocmd('LspAttach', {
         group = lsp_detach_augroup,
         buffer = event.buf,
         callback = function(event2)
-          local dominated = vim.tbl_filter(
+          local remaining = vim.tbl_filter(
             function(c)
               return c.id ~= event2.data.client_id
                 and c:supports_method(
@@ -155,8 +155,11 @@ autocmd('LspAttach', {
             end,
             vim.lsp.get_clients { bufnr = event2.buf }
           )
-          if #dominated == 0 then
-            vim.lsp.buf.clear_references()
+          if #remaining == 0 then
+            vim.api.nvim_buf_call(
+              event2.buf,
+              function() vim.lsp.buf.clear_references() end
+            )
             vim.api.nvim_clear_autocmds {
               group = 'lsp-highlight-refs',
               buffer = event2.buf,

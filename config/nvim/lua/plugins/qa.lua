@@ -60,7 +60,7 @@ return {
       vim.keymap.set(
         'n',
         '<leader>tf',
-        ':ToggleFormat<CR>',
+        '<cmd>ToggleFormat<CR>',
         { desc = 'Toggle autoformat on save' }
       )
     end,
