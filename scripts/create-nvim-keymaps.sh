@@ -42,10 +42,53 @@ local modes = {
   { char = "t", name = "Terminal" },
 }
 
---- Escape pipe characters for markdown tables
-local function esc(s)
-  return s:gsub("|", "\\|")
+--- Escape for inside backtick code spans (Key, Command columns)
+local function esc_code(s)
+  s = s:gsub("<lt>", "<")
+  s = s:gsub("|", "\\|")
+  s = s:gsub("`", "'")
+  s = s:gsub("==", "=\xE2\x80\x8B=")
+  s = s:gsub("~~", "~\xE2\x80\x8B~")
+  return s
 end
+
+--- Escape for plain text (Description column)
+local function esc_text(s)
+  s = s:gsub("&", "&amp;")
+  s = s:gsub("<", "&lt;")
+  s = s:gsub(">", "&gt;")
+  s = s:gsub("|", "&#124;")
+  s = s:gsub("=", "&#61;")
+  s = s:gsub("~", "&#126;")
+  return s
+end
+
+-- Fallback descriptions for keymaps without desc
+local matchit = {
+  ["%"] = "Go to matching bracket (matchit)",
+  ["[%"] = "Previous unmatched group (matchit)",
+  ["]%"] = "Next unmatched group (matchit)",
+  ["g%"] = "Reverse matching bracket (matchit)",
+  ["a%"] = "Select matching group (matchit)",
+}
+local fallback_desc = {
+  n = vim.tbl_extend("force", matchit, {
+    ["s"] = "Surround (mini.surround)",
+    ["&"] = "Repeat last :s substitute",
+  }),
+  v = vim.tbl_extend("force", matchit, {
+    ["s"] = "Surround (mini.surround)",
+  }),
+  x = vim.tbl_extend("force", matchit, {
+    ["s"] = "Surround (mini.surround)",
+  }),
+  s = {
+    ["s"] = "Surround (mini.surround)",
+  },
+  o = vim.tbl_extend("force", matchit, {
+    ["s"] = "Surround (mini.surround)",
+  }),
+}
 
 f:write("# Neovim Keybindings\n\n")
 
@@ -56,22 +99,37 @@ for _, mode in ipairs(modes) do
       return a.lhs < b.lhs
     end)
 
-    f:write("## " .. mode.name .. " Mode\n\n")
-    f:write("| Key | Description | Command |\n")
-    f:write("|-----|-------------|---------|\n")
-
+    -- Filter out <Plug> mappings first
+    local filtered = {}
     for _, map in ipairs(maps) do
-      local key = esc(map.lhs or "")
-      local desc = esc(map.desc or "")
-      local cmd = map.rhs or ""
-      if cmd == "" then
-        cmd = "<Lua callback>"
+      local lhs = map.lhs or ""
+      if not lhs:find("<Plug>") then
+        filtered[#filtered + 1] = map
       end
-      cmd = esc(cmd)
-      f:write(string.format("| `%s` | %s | %s |\n", key, desc, cmd))
     end
 
-    f:write("\n")
+    if #filtered > 0 then
+      f:write("## " .. mode.name .. " Mode\n\n")
+      f:write("| Key | Description | Command |\n")
+      f:write("|-----|-------------|---------|\n")
+
+      local mode_fb = fallback_desc[mode.char] or {}
+      for _, map in ipairs(filtered) do
+        local key = esc_code(map.lhs or "")
+        local raw_desc = map.desc or mode_fb[map.lhs] or ""
+        local desc = esc_text(raw_desc)
+        local cmd = map.rhs or ""
+        if cmd == "" then
+          cmd = "<Lua callback>"
+        end
+        cmd = esc_code(cmd)
+        f:write(string.format(
+          "| `%s` | %s | `%s` |\n", key, desc, cmd
+        ))
+      end
+
+      f:write("\n")
+    end
   end
 end
 
