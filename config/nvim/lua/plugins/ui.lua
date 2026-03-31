@@ -168,9 +168,12 @@ return {
     },
   },
 
-  -- xiyaowong/transparent.nvim
+  -- Render markdown inline (tables, headings, code blocks)
+  -- https://github.com/MeanderingProgrammer/render-markdown.nvim
   {
-    'xiyaowong/transparent.nvim',
-    init = function() vim.g.transparent_enabled = true end,
+    'MeanderingProgrammer/render-markdown.nvim',
+    ft = { 'markdown' },
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    opts = {},
   },
 }
