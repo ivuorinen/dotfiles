@@ -56,6 +56,21 @@ autocmd('FileType', {
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 
+-- Pin special buffers to their window (replaces stickybuf.nvim)
+autocmd('FileType', {
+  group = augroup('winfixbuf', { clear = true }),
+  pattern = {
+    'trouble',
+    'qf',
+    'help',
+    'man',
+    'lspinfo',
+    'notify',
+    'startuptime',
+  },
+  callback = function() vim.wo.winfixbuf = true end,
+})
+
 -- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
@@ -80,6 +95,80 @@ autocmd({ 'FileType' }, {
   group = augroup('json_conceal', { clear = true }),
   pattern = { 'json', 'jsonc', 'json5' },
   callback = function() vim.opt_local.conceallevel = 0 end,
+})
+
+-- ── Diagnostic Config ────────────────────────────────────────────────
+vim.diagnostic.config {
+  severity_sort = true,
+  float = { border = 'rounded', source = 'if_many' },
+  underline = { severity = vim.diagnostic.severity.ERROR },
+  signs = vim.g.have_nerd_font and {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '󰅚 ',
+      [vim.diagnostic.severity.WARN] = '󰀪 ',
+      [vim.diagnostic.severity.INFO] = '󰋽 ',
+      [vim.diagnostic.severity.HINT] = '󰌶 ',
+    },
+  } or {},
+  virtual_text = {
+    source = 'if_many',
+    spacing = 2,
+    format = function(diagnostic) return diagnostic.message end,
+  },
+}
+
+-- ── LSP Highlight (cursor word) ─────────────────────────────────────
+local lsp_detach_augroup = augroup('lsp-detach', { clear = true })
+autocmd('LspAttach', {
+  group = augroup('lsp-highlight', { clear = true }),
+  callback = function(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if
+      client
+      and client:supports_method(
+        vim.lsp.protocol.Methods.textDocument_documentHighlight,
+        event.buf
+      )
+    then
+      local highlight_augroup = augroup('lsp-highlight-refs', { clear = false })
+      autocmd({ 'CursorHold', 'CursorHoldI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.document_highlight,
+      })
+      autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.clear_references,
+      })
+      autocmd('LspDetach', {
+        group = lsp_detach_augroup,
+        buffer = event.buf,
+        callback = function(event2)
+          local remaining = vim.tbl_filter(
+            function(c)
+              return c.id ~= event2.data.client_id
+                and c:supports_method(
+                  vim.lsp.protocol.Methods.textDocument_documentHighlight,
+                  event2.buf
+                )
+            end,
+            vim.lsp.get_clients { bufnr = event2.buf }
+          )
+          if #remaining == 0 then
+            vim.api.nvim_buf_call(
+              event2.buf,
+              function() vim.lsp.buf.clear_references() end
+            )
+            vim.api.nvim_clear_autocmds {
+              group = 'lsp-highlight-refs',
+              buffer = event2.buf,
+            }
+          end
+        end,
+      })
+    end
+  end,
 })
 
 -- Set filetype for SSH config directory

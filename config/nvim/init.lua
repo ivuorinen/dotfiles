@@ -5,6 +5,7 @@
 -- ── Install lazy ────────────────────────────────────────────────────
 -- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
+---@diagnostic disable-next-line: undefined-field
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system {
@@ -64,6 +65,29 @@ require('lazy').setup(
     },
   }
 )
+
+-- ── Native LSP setup (after lazy so blink.cmp is available) ─────────
+vim.lsp.config('*', {
+  capabilities = require('blink.cmp').get_lsp_capabilities(),
+})
+vim.lsp.enable {
+  'ansiblels',
+  'bashls',
+  'cssls',
+  'dockerls',
+  'eslint',
+  'gopls',
+  'html',
+  'intelephense',
+  'jsonls',
+  'lua_ls',
+  'pyright',
+  'tailwindcss',
+  'terraformls',
+  'ts_ls',
+  'vimls',
+  'yamlls',
+}
 
 require 'keymaps'
 
