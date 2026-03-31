@@ -50,6 +50,22 @@ return {
       -- Buffer removing (unshow, delete, wipeout), which saves window layout
       require('mini.bufremove').setup()
 
+      -- File explorer (column-based, Finder-style)
+      require('mini.files').setup {
+        content = {
+          filter = function(entry)
+            return entry.name ~= '.DS_Store'
+              and entry.name ~= '.git'
+              and entry.name ~= 'node_modules'
+          end,
+        },
+        mappings = {
+          go_in_plus = '<CR>',
+          close = '<Esc>',
+        },
+        windows = { preview = true },
+      }
+
       -- Show next key clues
       local miniclue = require 'mini.clue'
       ---@modules mini.clue
@@ -114,9 +130,6 @@ return {
 
       -- Work with diff hunks
       require('mini.diff').setup()
-
-      -- Git integration
-      require('mini.git').setup()
 
       -- Session management (auto per-directory)
       local sessions = require 'mini.sessions'
@@ -248,9 +261,9 @@ return {
               '%<', -- Mark general truncate point
               { hl = 'statuslineFilename', strings = { filename } },
               '%=', -- End left alignment
-              { hl = 'MiniStatuslineDevinfo', strings = { lsp_status } },
               { hl = 'statuslineFileinfo', strings = { diagnostics } },
               { hl = 'statuslineFileinfo', strings = { fileinfo } },
+              { hl = 'MiniStatuslineDevinfo', strings = { lsp_status } },
               { hl = mode_hl, strings = { location } },
             }
           end,
