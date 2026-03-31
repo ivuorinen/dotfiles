@@ -249,7 +249,7 @@ return {
             local lsp_status = #vim.lsp.get_clients { bufnr = 0 } > 0
                 and (vim.lsp.status() ~= '' and '󰔚' or '󰄬')
               or ''
-            local fmt = vim.g.autoformat_enabled and '󰉼' or '󰉾'
+            local fmt = (vim.g.autoformat_enabled ~= false) and '󰉼' or '󰉾'
             local filename = sl.section_filename { trunc_width = 140 }
             local fileinfo = sl.section_fileinfo { trunc_width = 9999 }
             local location = sl.section_location { trunc_width = 9999 }
