@@ -36,7 +36,9 @@ local fc = '%{foldlevel(v:lnum) > 0'
   .. ' ? (foldlevel(v:lnum) > foldlevel(v:lnum - 1)'
   .. ' ? (foldclosed(v:lnum) == -1 ? "▾" : "▸")'
   .. ' : " ") : " "} '
-o.statuscolumn = '%s%l ' .. fc
+-- stylua: ignore
+local ln = '%{v:relnum == 0 ? v:lnum : v:relnum}'
+o.statuscolumn = '%s' .. ln .. ' ' .. fc
 o.spell = true -- Enable spell checking
 o.spelllang = 'en_gb,en_us' -- Set the spell checking language
 o.splitbelow = true -- split to the bottom
