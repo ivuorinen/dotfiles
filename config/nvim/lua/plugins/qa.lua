@@ -2,11 +2,13 @@
 -- │           Formatting (conform) and Linting              │
 -- ╰─────────────────────────────────────────────────────────╯
 
--- Check if a config file exists in the project
-local function has_file(patterns)
+-- Check if a config file exists relative to a buffer
+local function has_file(patterns, bufnr)
+  local bufname = vim.api.nvim_buf_get_name(bufnr or 0)
+  local dir = vim.fn.fnamemodify(bufname, ':h')
   return #vim.fs.find(patterns, {
     upward = true,
-    path = vim.fn.getcwd(),
+    path = dir,
     limit = 1,
   }) > 0
 end
@@ -95,9 +97,9 @@ return {
 
       vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
         group = vim.api.nvim_create_augroup('nvim-lint', { clear = true }),
-        callback = function()
-          -- Biome only when config exists in project
-          if biome_fts[vim.bo.filetype] and has_file { 'biome.json', 'biome.jsonc' } then
+        callback = function(args)
+          local ft = vim.bo[args.buf].filetype
+          if biome_fts[ft] and has_file({ 'biome.json', 'biome.jsonc' }, args.buf) then
             lint.try_lint 'biomejs'
           end
 

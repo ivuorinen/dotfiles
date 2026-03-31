@@ -145,11 +145,23 @@ autocmd('LspAttach', {
         group = lsp_detach_augroup,
         buffer = event.buf,
         callback = function(event2)
-          vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds {
-            group = 'lsp-highlight-refs',
-            buffer = event2.buf,
-          }
+          local dominated = vim.tbl_filter(
+            function(c)
+              return c.id ~= event2.data.client_id
+                and c:supports_method(
+                  vim.lsp.protocol.Methods.textDocument_documentHighlight,
+                  event2.buf
+                )
+            end,
+            vim.lsp.get_clients { bufnr = event2.buf }
+          )
+          if #dominated == 0 then
+            vim.lsp.buf.clear_references()
+            vim.api.nvim_clear_autocmds {
+              group = 'lsp-highlight-refs',
+              buffer = event2.buf,
+            }
+          end
         end,
       })
     end
