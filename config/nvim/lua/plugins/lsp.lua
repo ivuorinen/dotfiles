@@ -39,6 +39,7 @@ return {
         -- Tools
         'actionlint',
         'ansible-lint',
+        'goimports',
         'golangci-lint',
         'hadolint',
         'shfmt',
