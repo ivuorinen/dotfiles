@@ -4,14 +4,14 @@
 
 | Key          | Description                                                                                | Command                                                 |
 |--------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| ` ,`         | Find existing buffers                                                                      | `:Telescope buffers<CR>`                                |
-| ` ba`        | Close all except current                                                                   | `:%bd\|e#\|bd#<CR>`                                     |
-| ` bd`        | Delete buf                                                                                 | `:lua MiniBufremove.delete()<CR>`                       |
-| ` bh`        | Prev buf                                                                                   | `:bprev<CR>`                                            |
-| ` bj`        | First buf                                                                                  | `:bfirst<CR>`                                           |
-| ` bk`        | Last buf                                                                                   | `:blast<CR>`                                            |
-| ` bl`        | Next buf                                                                                   | `:bnext<CR>`                                            |
-| ` bw`        | Wipeout                                                                                    | `:lua MiniBufremove.wipeout()<CR>`                      |
+| ` ,`         | Find existing buffers                                                                      | `<Cmd>Telescope buffers<CR>`                            |
+| ` ba`        | Close all except current                                                                   | `<Lua callback>`                                        |
+| ` bd`        | Delete buf                                                                                 | `<Cmd>lua MiniBufremove.delete()<CR>`                   |
+| ` bh`        | Prev buf                                                                                   | `<Cmd>bprev<CR>`                                        |
+| ` bj`        | First buf                                                                                  | `<Cmd>bfirst<CR>`                                       |
+| ` bk`        | Last buf                                                                                   | `<Cmd>blast<CR>`                                        |
+| ` bl`        | Next buf                                                                                   | `<Cmd>bnext<CR>`                                        |
+| ` bw`        | Wipeout                                                                                    | `<Cmd>lua MiniBufremove.wipeout()<CR>`                  |
 | ` cbb`       | CB: Box Title                                                                              | `<Cmd>CBccbox<CR>`                                      |
 | ` cbd`       | CB: Remove a box                                                                           | `<Cmd>CBd<CR>`                                          |
 | ` cbl`       | CB: Simple Line                                                                            | `<Cmd>CBline<CR>`                                       |
@@ -20,56 +20,59 @@
 | ` cci`       | Incoming calls                                                                             | `<Lua callback>`                                        |
 | ` cco`       | Outgoing calls                                                                             | `<Lua callback>`                                        |
 | ` cd`        | Definitions                                                                                | `<Lua callback>`                                        |
-| ` cf`        | Format                                                                                     | `:lua vim.lsp.buf.format()<CR>`                         |
+| ` cf`        | Format                                                                                     | `<Cmd>lua vim.lsp.buf.format()<CR>`                     |
 | ` ci`        | Implementations                                                                            | `<Lua callback>`                                        |
 | ` cp`        | Type Definition                                                                            | `<Lua callback>`                                        |
-| ` cs`        | LSP Document Symbols                                                                       | `:Telescope lsp_document_symbols<CR>`                   |
+| ` cs`        | LSP Document Symbols                                                                       | `<Cmd>Telescope lsp_document_symbols<CR>`               |
 | ` ct`        | treesitter                                                                                 | `<Lua callback>`                                        |
 | ` cwd`       | Dynamic Workspace Symbols                                                                  | `<Lua callback>`                                        |
 | ` cws`       | Workspace Symbols                                                                          | `<Lua callback>`                                        |
-| ` f`         | Find Files                                                                                 | `:Telescope find_files<CR>`                             |
-| ` qf`        | Quicker close split                                                                        | `:q<CR>`                                                |
-| ` sd`        | Search Diagnostics                                                                         | `:Telescope diagnostics<CR>`                            |
-| ` sf`        | Grep String                                                                                | `:Telescope grep_string<CR>`                            |
-| ` sg`        | Live Grep                                                                                  | `:Telescope live_grep<CR>`                              |
-| ` sh`        | Help tags                                                                                  | `:Telescope help_tags<CR>`                              |
-| ` sk`        | Search Keymaps                                                                             | `:Telescope keymaps<CR>`                                |
-| ` sn`        | Noice Messages                                                                             | `:Noice telescope<CR>`                                  |
-| ` so`        | Old Files                                                                                  | `:Telescope oldfiles<CR>`                               |
+| ` f`         | Find Files                                                                                 | `<Cmd>Telescope find_files<CR>`                         |
+| ` qQ`        | Force quit without saving                                                                  | `<Lua callback>`                                        |
+| ` qf`        | Quicker close split                                                                        | `<Cmd>q<CR>`                                            |
+| ` qq`        | Quit with force saving                                                                     | `<Lua callback>`                                        |
+| ` qw`        | Write and quit                                                                             | `<Cmd>wq<CR>`                                           |
+| ` sd`        | Search Diagnostics                                                                         | `<Cmd>Telescope diagnostics<CR>`                        |
+| ` sf`        | Grep String                                                                                | `<Cmd>Telescope grep_string<CR>`                        |
+| ` sg`        | Live Grep                                                                                  | `<Cmd>Telescope live_grep<CR>`                          |
+| ` sh`        | Help tags                                                                                  | `<Cmd>Telescope help_tags<CR>`                          |
+| ` sk`        | Search Keymaps                                                                             | `<Cmd>Telescope keymaps<CR>`                            |
+| ` sn`        | Noice Messages                                                                             | `<Cmd>Noice telescope<CR>`                              |
+| ` so`        | Old Files                                                                                  | `<Cmd>Telescope oldfiles<CR>`                           |
 | ` sp`        | Lazy Plugins                                                                               | `<Lua callback>`                                        |
-| ` sq`        | Quickfix                                                                                   | `:Telescope quickfix<CR>`                               |
-| ` ss`        | Treesitter                                                                                 | `:Telescope treesitter<CR>`                             |
-| ` sx`        | Telescope: Import                                                                          | `:Telescope import<CR>`                                 |
+| ` sq`        | Quickfix                                                                                   | `<Cmd>Telescope quickfix<CR>`                           |
+| ` ss`        | Treesitter                                                                                 | `<Cmd>Telescope treesitter<CR>`                         |
+| ` sx`        | Telescope: Import                                                                          | `<Cmd>Telescope import<CR>`                             |
 | ` te`        | File Explorer (cwd)                                                                        | `<Lua callback>`                                        |
-| ` tf`        | Toggle autoformat on save                                                                  | `:ToggleFormat<CR>`                                     |
+| ` tf`        | Toggle autoformat on save                                                                  | `<Cmd>ToggleFormat<CR>`                                 |
 | ` tl`        | Toggle Light/Dark Mode                                                                     | `<Lua callback>`                                        |
 | ` tmC`       | Toggle cursorcolumn                                                                        | `<Lua callback>`                                        |
 | ` tmc`       | Toggle cursorline                                                                          | `<Lua callback>`                                        |
 | ` tmd`       | Toggle diagnostics                                                                         | `<Lua callback>`                                        |
 | ` tmh`       | Toggle hlsearch                                                                            | `<Lua callback>`                                        |
 | ` tml`       | Toggle list                                                                                | `<Lua callback>`                                        |
-| ` tmm`       | Toggle markdown render                                                                     | `:RenderMarkdown toggle<CR>`                            |
+| ` tmm`       | Toggle markdown render                                                                     | `<Cmd>RenderMarkdown toggle<CR>`                        |
 | ` tmn`       | Toggle number                                                                              | `<Lua callback>`                                        |
 | ` tmr`       | Toggle relativenumber                                                                      | `<Lua callback>`                                        |
 | ` tms`       | Toggle spell                                                                               | `<Lua callback>`                                        |
 | ` tmw`       | Toggle wrap                                                                                | `<Lua callback>`                                        |
-| ` tn`        | Noice: Dismiss Notification                                                                | `:Noice dismiss<CR>`                                    |
-| ` xc`        | Cascade (most severe)                                                                      | `:Trouble cascade<CR>`                                  |
-| ` xl`        | Location List                                                                              | `:Trouble loclist<CR>`                                  |
-| ` xq`        | Quickfix                                                                                   | `:Trouble quickfix<CR>`                                 |
-| ` xt`        | Test (split preview)                                                                       | `:Trouble test<CR>`                                     |
-| ` xx`        | Diagnostics                                                                                | `:Trouble diagnostics<CR>`                              |
+| ` tn`        | Noice: Dismiss Notification                                                                | `<Cmd>Noice dismiss<CR>`                                |
+| ` xc`        | Cascade (most severe)                                                                      | `<Cmd>Trouble cascade<CR>`                              |
+| ` xl`        | Location List                                                                              | `<Cmd>Trouble loclist<CR>`                              |
+| ` xq`        | Quickfix                                                                                   | `<Cmd>Trouble quickfix<CR>`                             |
+| ` xt`        | Test (split preview)                                                                       | `<Cmd>Trouble test<CR>`                                 |
+| ` xx`        | Diagnostics                                                                                | `<Cmd>Trouble diagnostics<CR>`                          |
 | `%`          | Go to matching bracket (matchit)                                                           | `<Plug>(MatchitNormalForward)`                          |
 | `&`          | :help &amp;-default                                                                        | `:&&<CR>`                                               |
 | `-`          | File Explorer (current file)                                                               | `<Lua callback>`                                        |
-| `<C-J>`      | Move Block Down                                                                            | `:m '>+1<CR>gv=gv`                                      |
-| `<C-K>`      | Move Block Up                                                                              | `:m '<-2<CR>gv=gv`                                      |
-| `<C-L>`      | Signature                                                                                  | `:lua vim.lsp.buf.signature_help()<CR>`                 |
-| `<C-S>`      | Save                                                                                       | `:w!<CR>`                                               |
-| `<C-W>+`     | H Resize +                                                                                 | `:resize +10<CR>`                                       |
-| `<C-W>,`     | V Resize -                                                                                 | `:vertical resize -10<CR>`                              |
-| `<C-W>-`     | H Resize -                                                                                 | `:resize -10<CR>`                                       |
-| `<C-W>.`     | V Resize +                                                                                 | `:vertical resize +10<CR>`                              |
+| `<C-J>`      | Move Block Down                                                                            | `<Cmd>m '>+1<CR>gv=gv`                                  |
+| `<C-K>`      | Move Block Up                                                                              | `<Cmd>m '<-2<CR>gv=gv`                                  |
+| `<C-L>`      | Signature                                                                                  | `<Cmd>lua vim.lsp.buf.signature_help()<CR>`             |
+| `<C-S>`      | Save                                                                                       | `<Cmd>w!<CR>`                                           |
+| `<C-W>+`     | H Resize +                                                                                 | `<Cmd>resize +10<CR>`                                   |
+| `<C-W>,`     | V Resize -                                                                                 | `<Cmd>vertical resize -10<CR>`                          |
+| `<C-W>-`     | H Resize -                                                                                 | `<Cmd>resize -10<CR>`                                   |
+| `<C-W>.`     | V Resize +                                                                                 | `<Cmd>vertical resize +10<CR>`                          |
 | `<C-W><C-D>` | Show diagnostics under the cursor                                                          | `<C-W>d`                                                |
 | `<C-W>d`     | Show diagnostics under the cursor                                                          | `<Lua callback>`                                        |
 | `<`          | Indent Left                                                                                | `<gv`                                                   |
@@ -176,12 +179,12 @@
 
 | Key       | Description                                                                                | Command                                                                              |
 |-----------|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| ` cf`     | Format                                                                                     | `:lua vim.lsp.buf.format()<CR>`                                                      |
+| ` cf`     | Format                                                                                     | `<Cmd>lua vim.lsp.buf.format()<CR>`                                                  |
 | `#`       | :help v_#-default                                                                          | `<Lua callback>`                                                                     |
 | `%`       | Go to matching bracket (matchit)                                                           | `<Plug>(MatchitVisualForward)`                                                       |
 | `*`       | :help v_star-default                                                                       | `<Lua callback>`                                                                     |
-| `<C-J>`   | Move Block Down                                                                            | `:m '>+1<CR>gv=gv`                                                                   |
-| `<C-K>`   | Move Block Up                                                                              | `:m '<-2<CR>gv=gv`                                                                   |
+| `<C-J>`   | Move Block Down                                                                            | `<Cmd>m '>+1<CR>gv=gv`                                                               |
+| `<C-K>`   | Move Block Up                                                                              | `<Cmd>m '<-2<CR>gv=gv`                                                               |
 | `<C-S>`   | vim.lsp.buf.signature_help()                                                               | `<Lua callback>`                                                                     |
 | `<S-Tab>` | vim.snippet.jump if active, otherwise &lt;S-Tab&gt;                                        | `<Lua callback>`                                                                     |
 | `<Tab>`   | vim.snippet.jump if active, otherwise &lt;Tab&gt;                                          | `<Lua callback>`                                                                     |
@@ -233,12 +236,12 @@
 
 | Key     | Description                                                                                | Command                                                                              |
 |---------|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| ` cf`   | Format                                                                                     | `:lua vim.lsp.buf.format()<CR>`                                                      |
+| ` cf`   | Format                                                                                     | `<Cmd>lua vim.lsp.buf.format()<CR>`                                                  |
 | `#`     | :help v_#-default                                                                          | `<Lua callback>`                                                                     |
 | `%`     | Go to matching bracket (matchit)                                                           | `<Plug>(MatchitVisualForward)`                                                       |
 | `*`     | :help v_star-default                                                                       | `<Lua callback>`                                                                     |
-| `<C-J>` | Move Block Down                                                                            | `:m '>+1<CR>gv=gv`                                                                   |
-| `<C-K>` | Move Block Up                                                                              | `:m '<-2<CR>gv=gv`                                                                   |
+| `<C-J>` | Move Block Down                                                                            | `<Cmd>m '>+1<CR>gv=gv`                                                               |
+| `<C-K>` | Move Block Up                                                                              | `<Cmd>m '<-2<CR>gv=gv`                                                               |
 | `<`     | Indent Left                                                                                | `<gv`                                                                                |
 | `>`     | Indent Right                                                                               | `>gv`                                                                                |
 | `@`     | :help v_@-default                                                                          | `mode() =​=# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'`                           |
@@ -285,15 +288,15 @@
 
 ## Select Mode
 
-| Key       | Description                                         | Command            |
-|-----------|-----------------------------------------------------|--------------------|
-| `<C-J>`   | Move Block Down                                     | `:m '>+1<CR>gv=gv` |
-| `<C-K>`   | Move Block Up                                       | `:m '<-2<CR>gv=gv` |
-| `<C-S>`   | vim.lsp.buf.signature_help()                        | `<Lua callback>`   |
-| `<S-Tab>` | vim.snippet.jump if active, otherwise &lt;S-Tab&gt; | `<Lua callback>`   |
-| `<Tab>`   | vim.snippet.jump if active, otherwise &lt;Tab&gt;   | `<Lua callback>`   |
-| `<`       | Indent Left                                         | `<gv`              |
-| `>`       | Indent Right                                        | `>gv`              |
+| Key       | Description                                         | Command                |
+|-----------|-----------------------------------------------------|------------------------|
+| `<C-J>`   | Move Block Down                                     | `<Cmd>m '>+1<CR>gv=gv` |
+| `<C-K>`   | Move Block Up                                       | `<Cmd>m '<-2<CR>gv=gv` |
+| `<C-S>`   | vim.lsp.buf.signature_help()                        | `<Lua callback>`       |
+| `<S-Tab>` | vim.snippet.jump if active, otherwise &lt;S-Tab&gt; | `<Lua callback>`       |
+| `<Tab>`   | vim.snippet.jump if active, otherwise &lt;Tab&gt;   | `<Lua callback>`       |
+| `<`       | Indent Left                                         | `<gv`                  |
+| `>`       | Indent Right                                        | `>gv`                  |
 
 ## Operator-pending Mode
 
