@@ -61,7 +61,7 @@ autocmd('FileType', {
   group = augroup('winfixbuf', { clear = true }),
   pattern = {
     'neo-tree',
-    'Trouble',
+    'trouble',
     'qf',
     'help',
     'man',
