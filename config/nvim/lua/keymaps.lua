@@ -27,11 +27,11 @@ K.n('<C-s>', ':w!<cr>', { desc = 'Save', noremap = true })
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
 K.nl('ba', ':%bd|e#|bd#<cr>', 'Close all except current')
-K.nl('bd', ':lua MiniBufremove.delete()<CR>', 'Delete')
-K.nl('bh', ':bprev<cr>', 'Prev')
-K.nl('bj', ':bfirst<cr>', 'First')
-K.nl('bk', ':blast<cr>', 'Last')
-K.nl('bl', ':bnext<cr>', 'Next')
+K.nl('bd', ':lua MiniBufremove.delete()<CR>', 'Delete buf')
+K.nl('bh', ':bprev<cr>', 'Prev buf')
+K.nl('bj', ':bfirst<cr>', 'First buf')
+K.nl('bk', ':blast<cr>', 'Last buf')
+K.nl('bl', ':bnext<cr>', 'Next buf')
 K.nl('bw', ':lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 
 -- ── Code & LSP operations ───────────────────────────────────────────
@@ -90,15 +90,20 @@ K.nl('sx', ':Telescope import<cr>', 'Telescope: Import')
 
 -- ── Trouble operations ──────────────────────────────────────────────
 -- Convention is 'x' followed by the operation
-K.nl('xd', ':Trouble diagnostics<cr>', 'Document Diagnostics')
+K.nl('xc', ':Trouble cascade<cr>', 'Cascade (most severe)')
 K.nl('xl', ':Trouble loclist<cr>', 'Location List')
 K.nl('xq', ':Trouble quickfix<cr>', 'Quickfix')
-K.nl('xw', ':Trouble workspace_diagnostics<cr>', 'Workspace Diagnostics')
-K.nl('xx', ':Trouble diagnostics<cr>', 'Diagnostic')
+K.nl('xt', ':Trouble test<cr>', 'Test (split preview)')
+K.nl('xx', ':Trouble diagnostics<cr>', 'Diagnostics')
 
 -- ── Toggle settings ─────────────────────────────────────────────────
 -- Convention is 't' followed by the operation
-K.nl('te', ':Neotree toggle<cr>', 'Toggle Neotree')
+K.nl('te', function() MiniFiles.open() end, 'File Explorer (cwd)')
+K.n(
+  '-',
+  function() MiniFiles.open(vim.api.nvim_buf_get_name(0)) end,
+  { desc = 'File Explorer (current file)' }
+)
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
 K.nl('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 
@@ -125,18 +130,10 @@ K.nl(
 )
 K.nl('tms', function() vim.o.spell = not vim.o.spell end, 'Toggle spell')
 K.nl('tmw', function() vim.o.wrap = not vim.o.wrap end, 'Toggle wrap')
+K.nl('tmm', ':RenderMarkdown toggle<CR>', 'Toggle markdown render')
 
 -- ── Quit operations ─────────────────────────────────────────────────
 -- Convention is 'q' followed by the operation
 K.nl('qf', ':q<CR>', 'Quicker close split')
-K.nl('qq', function()
-  if vim.fn.confirm('Force save and quit?', '&Yes\n&No', 2) == 1 then vim.cmd 'wq!' end
-end, 'Quit with force saving')
-K.nl('qw', ':wq<CR>', 'Write and quit')
-K.nl('qQ', function()
-  if vim.fn.confirm('Force quit without saving?', '&Yes\n&No', 2) == 1 then
-    vim.cmd 'q!'
-  end
-end, 'Force quit without saving')
 
 -- That concludes the keymaps section of the config.
