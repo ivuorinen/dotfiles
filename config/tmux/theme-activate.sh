@@ -12,7 +12,7 @@
 # License: MIT
 
 THEME_DIR="$HOME/.dotfiles/config/tmux"
-THEME_FILE="$HOME/.local/state/tmux/tmux-dark-notify-theme.conf"
+THEME_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/tmux/tmux-dark-notify-theme.conf"
 
 # Detect the current OS theme (dark or light).
 # macOS: reads AppleInterfaceStyle via defaults(1)
@@ -31,7 +31,11 @@ detect_system_theme()
   elif [[ "$os" == "Linux" ]] && command -v gsettings > /dev/null 2>&1; then
     local scheme
     scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)
-    [[ "$scheme" == "'prefer-dark'" ]] && echo "dark" || echo "light"
+    case "$scheme" in
+      "'prefer-dark'") echo "dark" ;;
+      "'default'" | "'prefer-light'") echo "light" ;;
+      *) echo "dark" ;; # empty or unknown → dark fallback
+    esac
 
   else
     echo "dark"

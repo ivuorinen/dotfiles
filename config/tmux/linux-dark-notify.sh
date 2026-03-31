@@ -13,7 +13,7 @@
 
 set -o errexit
 set -o pipefail
-[[ "${TRACE-0}" =~ ^1|t|y|true|yes$ ]] && set -o xtrace
+[[ "${TRACE-0}" =~ ^(1|t|y|true|yes)$ ]] && set -o xtrace
 
 # Only run on Linux.
 [[ "$(uname -s)" != "Linux" ]] && exit 0
@@ -23,7 +23,9 @@ set -o pipefail
 # =============================================================================
 
 TMUX_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
-LOCK_FILE="${TMUX_STATE_DIR}/linux-dark-notify.lock"
+# Key lock per tmux server socket so multiple independent servers each get a daemon.
+_tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null || echo "default")"
+LOCK_FILE="${TMUX_STATE_DIR}/linux-dark-notify-${_tmux_sock_name}.lock"
 THEME_LINK="${TMUX_STATE_DIR}/tmux-dark-notify-theme.conf"
 OPTION_THEME_LIGHT="@dark-notify-theme-path-light"
 OPTION_THEME_DARK="@dark-notify-theme-path-dark"
@@ -100,12 +102,17 @@ tmux_get_option()
 }
 
 # Returns "dark" or "light" based on the GNOME color-scheme gsettings key.
+# Falls back to "dark" when gsettings is unavailable or returns an empty/unknown value.
 get_current_theme()
 {
   if program_is_in_path gsettings; then
     local scheme
     scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)
-    [[ "$scheme" == "'prefer-dark'" ]] && echo "dark" || echo "light"
+    case "$scheme" in
+      "'prefer-dark'") echo "dark" ;;
+      "'default'" | "'prefer-light'") echo "light" ;;
+      *) echo "dark" ;; # empty or unknown → dark fallback
+    esac
     return
   fi
   echo "dark"
@@ -124,7 +131,9 @@ apply_theme()
   fi
 
   theme_path=$(tmux_get_option "$theme_opt")
-  theme_path=$(eval echo "$theme_path")
+  # Expand ~ and $HOME without eval to avoid arbitrary code execution.
+  theme_path="${theme_path/#\~/$HOME}"
+  theme_path="${theme_path//\$HOME/$HOME}"
 
   if [[ ! -r "$theme_path" ]]; then
     echo "Theme file not readable: $theme_path" >&2
