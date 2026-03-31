@@ -19,6 +19,8 @@ return {
     config = function()
       local conform = require 'conform'
 
+      vim.g.autoformat_enabled = true
+
       conform.setup {
         formatters_by_ft = {
           ['yaml.ansible'] = { 'ansible-lint' },
@@ -47,9 +49,6 @@ return {
       }
 
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
-      -- Autoformat toggle
-      vim.g.autoformat_enabled = true
 
       vim.api.nvim_create_user_command('ToggleFormat', function()
         vim.g.autoformat_enabled = not vim.g.autoformat_enabled

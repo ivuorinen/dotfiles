@@ -17,7 +17,7 @@ return {
       },
       completion = { callSnippet = 'Replace' },
       workspace = {
-        checkThirdParty = true,
+        checkThirdParty = false,
         library = { vim.env.VIMRUNTIME },
       },
       hint = {

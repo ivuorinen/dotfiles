@@ -98,12 +98,12 @@ K.nl('xx', ':Trouble diagnostics<cr>', 'Diagnostics')
 
 -- ── Toggle settings ─────────────────────────────────────────────────
 -- Convention is 't' followed by the operation
-K.nl('te', function() MiniFiles.open() end, 'File Explorer (cwd)')
-K.n(
-  '-',
-  function() MiniFiles.open(vim.api.nvim_buf_get_name(0)) end,
-  { desc = 'File Explorer (current file)' }
-)
+K.nl('te', function()
+  if MiniFiles then MiniFiles.open() end
+end, 'File Explorer (cwd)')
+K.n('-', function()
+  if MiniFiles then MiniFiles.open(vim.api.nvim_buf_get_name(0)) end
+end, { desc = 'File Explorer (current file)' })
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
 K.nl('tn', ':Noice dismiss<cr>', 'Noice: Dismiss Notification')
 
