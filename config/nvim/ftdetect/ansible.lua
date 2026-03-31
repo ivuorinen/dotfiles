@@ -8,6 +8,6 @@ vim.filetype.add {
     ['.*/host_vars/.*%.ya?ml'] = 'yaml.ansible',
     ['playbook.*%.ya?ml'] = 'yaml.ansible',
     ['site%.ya?ml'] = 'yaml.ansible',
-    ['ansible%.cfg'] = 'yaml.ansible',
+    ['ansible%.cfg'] = 'dosini',
   },
 }
