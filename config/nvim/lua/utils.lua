@@ -1,11 +1,6 @@
 -- These are my utility functions
 -- I use to make my life bit easier
 
-local function file_exists(name)
-  if type(name) ~= 'string' then return false end
-  return os.rename(name, name) and true or false
-end
-
 -- ╭─────────────────────────────────────────────────────────╮
 -- │            Function shortcuts for keymap set            │
 -- ╰─────────────────────────────────────────────────────────╯
