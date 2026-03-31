@@ -56,6 +56,22 @@ autocmd('FileType', {
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 
+-- Pin special buffers to their window (replaces stickybuf.nvim)
+autocmd('FileType', {
+  group = augroup('winfixbuf', { clear = true }),
+  pattern = {
+    'neo-tree',
+    'Trouble',
+    'qf',
+    'help',
+    'man',
+    'lspinfo',
+    'notify',
+    'startuptime',
+  },
+  callback = function() vim.wo.winfixbuf = true end,
+})
+
 -- wrap and check for spell in text filetypes
 autocmd('FileType', {
   group = augroup('wrap_spell', { clear = true }),
