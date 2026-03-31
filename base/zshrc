@@ -29,7 +29,7 @@ source_fzf_config()
 }
 
 source_fzf_config
-x-have antidot && eval "$(antidot init)"
+x-have antidot && eval "$(antidot init --shell zsh)"
 
 autoload -Uz compinit bashcompinit
 compinit -d "$ZSH_COMPDUMP"

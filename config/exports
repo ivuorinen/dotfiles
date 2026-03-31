@@ -29,6 +29,18 @@ if command -v x-path &> /dev/null; then
 fi
 export PATH
 
+# Ensure standard system binary paths are present.
+# Some environments (non-login shells, restricted SSH, containers) do not
+# inherit them, so we append them as a safe fallback.
+for _sys_path in /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin; do
+  case ":$PATH:" in
+    *":$_sys_path:"*) ;;
+    *) [ -d "$_sys_path" ] && PATH="$PATH:$_sys_path" ;;
+  esac
+done
+unset _sys_path
+export PATH
+
 if ! command -v msg &> /dev/null; then
   # Function to print messages if VERBOSE is enabled
   # $1 - message (string)
@@ -503,7 +515,11 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 # mise — unified tool version manager
 # https://mise.jdx.dev
 if command -v mise &> /dev/null; then
-  eval "$(mise activate bash)"
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    eval "$(env -u MISE_SHELL SHELL=zsh mise activate zsh)"
+  else
+    eval "$(env -u MISE_SHELL SHELL=bash mise activate bash)"
+  fi
 fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi

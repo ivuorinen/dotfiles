@@ -57,7 +57,12 @@ normalize_path_var()
 {
   local new_path=""
   local d
-  IFS=':' read -r -a arr <<< "$PATH"
+  local -a arr
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    IFS=':' read -r -A arr <<< "$PATH"
+  else
+    IFS=':' read -r -a arr <<< "$PATH"
+  fi
   for d in "${arr[@]}"; do
     d=$(normalize_dir "$d")
     if [ -z "$new_path" ]; then

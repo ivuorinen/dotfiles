@@ -16,7 +16,7 @@ source "$DOTFILES/config/shared.sh"
 ssh-add -A 2>/dev/null
 
 x-have antidot && {
-  eval "$(antidot init)"
+  eval "$(antidot init --shell bash)"
 }
 
 PROMPT_DIRTRIM=3
