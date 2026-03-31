@@ -95,9 +95,9 @@ function ToggleBackground() vim.o.bg = vim.o.bg == 'light' and 'dark' or 'light'
 function GetIntelephenseLicense()
   local p = os.getenv 'HOME' .. '/intelephense/license.txt'
 
-  if not file_exists(p) then return nil end
+  local f = io.open(p, 'rb')
+  if not f then return nil end
 
-  local f = assert(io.open(p, 'rb'))
   local content = f:read '*a'
   f:close()
   local stripped = string.gsub(content, '%s+', '')
