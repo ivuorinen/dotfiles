@@ -11,10 +11,10 @@ documentation files across the repository.
 
 ## Files
 
-| File                    | Purpose                      |
-| ----------------------- | ---------------------------- |
-| `local/bin/x-help`      | The script                   |
-| `local/bin/x-help.md`   | Companion documentation      |
+| File                  | Purpose                 |
+|-----------------------|-------------------------|
+| `local/bin/x-help`    | The script              |
+| `local/bin/x-help.md` | Companion documentation |
 
 ## Dependencies
 
@@ -69,13 +69,13 @@ Argument is the bare name without `.md` extension.
 
 ## Error Handling
 
-| Condition              | Behavior                                         |
-| ---------------------- | ------------------------------------------------ |
-| `fzf` not installed    | `msgr err` + exit 1                              |
-| No `.md` files found   | `msgr warn` + exit 0                             |
-| Direct mode, no match  | `msgr err "No documentation found for '<name>'"` + exit 1 |
-| fzf cancel / empty     | Silent `exit 0` (via `\|\| exit 0`)              |
-| `$DOTFILES` unset      | Defaults to `$HOME/.dotfiles`                    |
+| Condition             | Behavior                                                  |
+|-----------------------|-----------------------------------------------------------|
+| `fzf` not installed   | `msgr err` + exit 1                                       |
+| No `.md` files found  | `msgr warn` + exit 0                                      |
+| Direct mode, no match | `msgr err "No documentation found for '<name>'"` + exit 1 |
+| fzf cancel / empty    | Silent `exit 0` (via `\|\| exit 0`)                       |
+| `$DOTFILES` unset     | Defaults to `$HOME/.dotfiles`                             |
 
 ## Script Conventions
 
