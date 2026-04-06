@@ -22,9 +22,11 @@ dfm install fonts                  # Via dotfiles manager
 Edit the `FONTS` array at the top of the script. Each entry is
 pipe-delimited:
 
-```
+```text
 display_name|check_pattern|github_repo|version|asset_pattern
 ```
+
+`version` can be `latest` or a pinned tag (e.g., `v3.3.0`).
 
 ## Font Directories
 

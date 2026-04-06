@@ -26,7 +26,7 @@ repositories. Supports macOS and Linux.
 
 ## CLI Interface
 
-```
+```text
 Usage: install-fonts.sh [--force] [--help]
 
   --force    Re-download and reinstall all fonts
@@ -39,7 +39,7 @@ No per-font selection. Always processes the full list.
 
 Array at the top of the script. Pipe-delimited fields:
 
-```
+```text
 display_name|check_pattern|github_repo|version|asset_pattern
 ```
 
@@ -73,8 +73,9 @@ For each font in the registry:
 
 1. Check if `check_pattern` matches files in font dir. Skip if
    found, unless `--force`.
-2. Resolve release URL via `gh api repos/{repo}/releases/latest`
-   (preferred) or anonymous `curl` to GitHub API.
+2. Resolve release JSON via `gh api` (preferred) or anonymous
+   `curl`. Uses `releases/latest` or `releases/tags/<tag>` based
+   on the version field.
 3. Find asset matching `asset_pattern` from release JSON.
 4. Download ZIP to temp dir.
 5. Extract `.ttf`, `.otf`, and `.woff2` files to font dir

@@ -11,10 +11,10 @@ source "${DOTFILES}/config/shared.sh"
 # Format: display_name|check_pattern|github_repo|version|asset_pattern
 # Add new fonts by appending a line to this array.
 FONTS=(
-  "JetBrainsMono NF|JetBrainsMonoNL|ryanoasis/nerd-fonts|latest|JetBrainsMono.zip"
-  "OpenDyslexic NF|OpenDyslexic|ryanoasis/nerd-fonts|latest|OpenDyslexic.zip"
-  "Monaspace|Monaspace|githubnext/monaspace|latest|monaspace-*.zip"
-  "FiraCode|FiraCode|tonsky/FiraCode|latest|Fira_Code_*.zip"
+  "JetBrainsMono NF|JetBrainsMonoNL*|ryanoasis/nerd-fonts|latest|JetBrainsMono.zip"
+  "OpenDyslexic NF|OpenDyslexic*|ryanoasis/nerd-fonts|latest|OpenDyslexic.zip"
+  "Monaspace|Monaspace*|githubnext/monaspace|latest|monaspace-*.zip"
+  "FiraCode|FiraCode*|tonsky/FiraCode|latest|Fira_Code_*.zip"
 )
 
 # ── Configuration ──────────────────────────────────────────────
@@ -38,6 +38,7 @@ FONT_DIR="$(detect_font_dir)"
 # ── Usage ──────────────────────────────────────────────────────
 usage()
 {
+  local exit_code="${1:-0}"
   cat << EOF
 Usage: $(basename "$0") [--force] [--help]
 
@@ -47,20 +48,30 @@ Options:
   --force    Re-download and reinstall all fonts
   --help     Show this help message
 EOF
-  exit 0
+  exit "$exit_code"
 }
 
 # ── GitHub API ─────────────────────────────────────────────────
-# Fetch latest release JSON from GitHub API.
+# Fetch release JSON from GitHub API.
 # Prefers gh CLI (handles auth/rate limits), falls back to curl.
 # $1 - github repo (owner/repo)
+# $2 - version ("latest" or a tag like "v3.3.0")
 fetch_release_json()
 {
   local repo="$1"
-  if command -v gh > /dev/null 2>&1; then
-    gh api "repos/${repo}/releases/latest" 2> /dev/null
+  local version="${2:-latest}"
+  local endpoint
+
+  if [[ "$version" == "latest" ]]; then
+    endpoint="repos/${repo}/releases/latest"
   else
-    curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" 2> /dev/null
+    endpoint="repos/${repo}/releases/tags/${version}"
+  fi
+
+  if command -v gh > /dev/null 2>&1; then
+    gh api "$endpoint" 2> /dev/null
+  else
+    curl -fsSL "https://api.github.com/${endpoint}" 2> /dev/null
   fi
 }
 
@@ -74,8 +85,8 @@ find_asset_url()
 
   # Extract asset names and URLs, find matching pattern
   echo "$json" \
-    | grep -o '"browser_download_url":\s*"[^"]*"' \
-    | sed 's/"browser_download_url":\s*"//;s/"$//' \
+    | grep -oE '"browser_download_url":[[:space:]]*"[^"]*"' \
+    | sed 's/"browser_download_url":[[:space:]]*"//;s/"$//' \
     | while IFS= read -r url; do
       local name
       name="$(basename "$url")"
@@ -96,7 +107,7 @@ is_font_installed()
 {
   local pattern="$1"
   # shellcheck disable=SC2086
-  compgen -G "${FONT_DIR}/${pattern}"* > /dev/null 2>&1
+  compgen -G "${FONT_DIR}/${pattern}" > /dev/null 2>&1
 }
 
 # Install a single font from GitHub releases.
@@ -123,9 +134,9 @@ install_font()
 
   # Fetch release info
   local json
-  json=$(fetch_release_json "$repo") || {
+  json=$(fetch_release_json "$repo" "$version") || {
     msgr warn "Failed to fetch release info for $repo — skipping"
-    return 0
+    return 1
   }
 
   # Find download URL
@@ -133,18 +144,20 @@ install_font()
   url=$(find_asset_url "$json" "$asset_pat") || true
   if [[ -z "$url" ]]; then
     msgr err "No asset matching '$asset_pat' in $repo release"
-    return 0
+    return 1
   fi
 
   # Download to temp dir
   local tmp_dir
   tmp_dir=$(mktemp -d)
+  # shellcheck disable=SC2064
+  trap "rm -rf '$tmp_dir'" RETURN
+
   local zip_file="${tmp_dir}/font.zip"
 
   curl -fsSL -o "$zip_file" "$url" || {
     msgr warn "Failed to download $url — skipping"
-    rm -rf "$tmp_dir"
-    return 0
+    return 1
   }
 
   # Extract font files
@@ -152,8 +165,7 @@ install_font()
   local extract_dir="${tmp_dir}/extracted"
   unzip -qo "$zip_file" -d "$extract_dir" || {
     msgr warn "Failed to extract $zip_file — skipping"
-    rm -rf "$tmp_dir"
-    return 0
+    return 1
   }
 
   # Copy font files (flatten nested dirs)
@@ -165,13 +177,11 @@ install_font()
     \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.woff2' \) \
     -print0)
 
-  # Clean up
-  rm -rf "$tmp_dir"
-
   if [[ "$count" -gt 0 ]]; then
     msgr run_done "$name — installed $count font files"
   else
     msgr warn "$name — no font files found in archive"
+    return 1
   fi
 }
 
@@ -189,7 +199,7 @@ main()
         ;;
       *)
         msgr err "Unknown option: $arg"
-        usage
+        usage 1
         ;;
     esac
   done
@@ -204,10 +214,12 @@ main()
 
   msgr run "Installing fonts to $FONT_DIR"
 
-  # Process each font
+  # Process each font, track failures
+  local failures=0
   for entry in "${FONTS[@]}"; do
     IFS='|' read -r name check repo version asset_pat <<< "$entry"
-    install_font "$name" "$check" "$repo" "$version" "$asset_pat"
+    install_font "$name" "$check" "$repo" "$version" "$asset_pat" \
+      || ((failures++)) || true
   done
 
   # Refresh font cache on Linux
@@ -215,6 +227,11 @@ main()
     msgr run "Refreshing font cache..."
     fc-cache -f
     msgr run_done "Font cache refreshed"
+  fi
+
+  if [[ "$failures" -gt 0 ]]; then
+    msgr warn "Font installation completed with $failures failure(s)"
+    return 1
   fi
 
   msgr yay "Font installation complete!"
