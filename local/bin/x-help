@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# x-help — Browse and display dotfiles documentation
+# @description Browse and display dotfiles documentation
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+# Source msgr for colored output, with fallback
+MSGR="${DOTFILES}/local/bin/msgr"
+if [[ -f "$MSGR" ]]; then
+  set +u
+  # shellcheck source=msgr
+  source "$MSGR"
+  set -u
+fi
+if ! declare -f msgr > /dev/null 2>&1; then
+  msgr()
+  {
+    echo "$*" >&2
+  }
+fi
+
+# Allow sourcing for tests without running main
+if [[ "${1:-}" == "--source-only" ]]; then
+  # Functions are loaded, skip main execution
+  _X_HELP_SOURCE_ONLY=1
+fi
+
+# Discover all .md documentation files in the dotfiles tree.
+# Outputs relative paths (e.g., local/bin/x-foreach.md), sorted.
+discover_files()
+{
+  find "$DOTFILES" -name '*.md' -type f \
+    -not -path '*/tools/*' \
+    -not -path '*/docs/plans/*' \
+    -not -path '*/docs/superpowers/*' \
+    -not -path '*/config/tmux/plugins/*' \
+    -not -path '*/node_modules/*' \
+    -not -path '*/.git/*' \
+    | sed "s|^${DOTFILES}/||" \
+    | sort -u
+}
+
+# Look up documentation by bare name (without .md extension).
+# Returns: exit 0 + prints path if exactly one match,
+#          exit 2 + prints paths if multiple matches,
+#          exit 1 if no match found.
+# $1 - bare name to search for (e.g., "x-foreach")
+direct_lookup()
+{
+  local name="$1"
+  local target="${name}.md"
+  local matches
+
+  matches=$(discover_files | while IFS= read -r path; do
+    if [[ "$(basename "$path")" == "$target" ]]; then
+      echo "$path"
+    fi
+  done)
+
+  if [[ -z "$matches" ]]; then
+    return 1
+  fi
+
+  local count
+  count=$(echo "$matches" | wc -l)
+
+  if [[ "$count" -eq 1 ]]; then
+    echo "$matches"
+    return 0
+  else
+    echo "$matches"
+    return 2
+  fi
+}
+
+# Check that fzf is available. Called only in code paths that need it.
+require_fzf()
+{
+  if ! command -v fzf > /dev/null 2>&1; then
+    msgr err "fzf is required but not installed"
+    exit 1
+  fi
+}
+
+main()
+{
+  # Direct mode: x-help <name>
+  if [[ $# -ge 1 ]]; then
+    local name="$1"
+    local result
+    local exit_code=0
+    result=$(direct_lookup "$name") || exit_code=$?
+
+    case "$exit_code" in
+      0)
+        # Single match — display it
+        cat "$DOTFILES/$result"
+        ;;
+      2)
+        # Multiple matches — fzf to disambiguate
+        require_fzf
+        local selected
+        selected=$(echo "$result" | fzf) || exit 0
+        [[ -z "$selected" ]] && exit 0
+        cat "$DOTFILES/$selected"
+        ;;
+      *)
+        # No match
+        msgr err "No documentation found for '$name'"
+        exit 1
+        ;;
+    esac
+    return
+  fi
+
+  # Interactive mode: x-help
+  require_fzf
+
+  local files
+  files=$(discover_files)
+
+  if [[ -z "$files" ]]; then
+    msgr warn "No documentation files found"
+    exit 0
+  fi
+
+  local selected
+  selected=$(echo "$files" | fzf) || exit 0
+  [[ -z "$selected" ]] && exit 0
+  cat "$DOTFILES/$selected"
+}
+
+if [[ "${_X_HELP_SOURCE_ONLY:-0}" != "1" ]]; then
+  main "$@"
+fi
