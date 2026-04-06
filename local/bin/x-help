@@ -35,7 +35,6 @@ discover_files()
     -not -path '*/tools/*' \
     -not -path '*/docs/plans/*' \
     -not -path '*/docs/superpowers/*' \
-    -not -path '*/config/tmux/plugins/*' \
     -not -path '*/node_modules/*' \
     -not -path '*/.git/*' \
     | sed "s|^${DOTFILES}/||" \

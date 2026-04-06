@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
-setup() {
+setup()
+{
   # Create a temporary dotfiles tree for testing
   export TEST_DOTFILES="$BATS_TMPDIR/dotfiles-$$"
   mkdir -p "$TEST_DOTFILES/local/bin"
@@ -9,7 +10,6 @@ setup() {
   mkdir -p "$TEST_DOTFILES/docs/plans"
   mkdir -p "$TEST_DOTFILES/docs/superpowers"
   mkdir -p "$TEST_DOTFILES/tools/antidote"
-  mkdir -p "$TEST_DOTFILES/config/tmux/plugins/tpm"
   mkdir -p "$TEST_DOTFILES/node_modules/foo"
   mkdir -p "$TEST_DOTFILES/.git/objects"
 
@@ -23,7 +23,6 @@ setup() {
   echo "# excluded" > "$TEST_DOTFILES/tools/antidote/README.md"
   echo "# excluded" > "$TEST_DOTFILES/docs/plans/old-plan.md"
   echo "# excluded" > "$TEST_DOTFILES/docs/superpowers/spec.md"
-  echo "# excluded" > "$TEST_DOTFILES/config/tmux/plugins/tpm/README.md"
   echo "# excluded" > "$TEST_DOTFILES/node_modules/foo/README.md"
   echo "# excluded" > "$TEST_DOTFILES/.git/objects/README.md"
 
@@ -31,7 +30,8 @@ setup() {
   export PATH="$BATS_TEST_DIRNAME/../local/bin:$PATH"
 }
 
-teardown() {
+teardown()
+{
   rm -rf "$TEST_DOTFILES"
 }
 
@@ -57,11 +57,6 @@ teardown() {
 @test "x-help discover_files excludes docs/superpowers/" {
   run bash -c "DOTFILES='$TEST_DOTFILES' source local/bin/x-help --source-only && discover_files"
   [[ "$output" != *"docs/superpowers/"* ]]
-}
-
-@test "x-help discover_files excludes config/tmux/plugins/" {
-  run bash -c "DOTFILES='$TEST_DOTFILES' source local/bin/x-help --source-only && discover_files"
-  [[ "$output" != *"config/tmux/plugins/"* ]]
 }
 
 @test "x-help discover_files excludes node_modules/" {
@@ -103,7 +98,7 @@ teardown() {
 
 @test "x-help require_fzf fails when fzf missing" {
   local test_script="$BATS_TMPDIR/test-require-fzf-$$"
-  cat > "$test_script" <<SCRIPT
+  cat > "$test_script" << SCRIPT
 #!/usr/bin/env bash
 export DOTFILES="$TEST_DOTFILES"
 source local/bin/x-help --source-only

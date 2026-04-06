@@ -14,10 +14,6 @@ case "$fp" in
     echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
     exit 2
     ;;
-  */config/tmux/plugins/*)
-    echo "BLOCKED: $fp is a tmux plugin submodule — do not edit" >&2
-    exit 2
-    ;;
   */config/cheat/cheatsheets/community/* | */config/cheat/cheatsheets/tldr/*)
     echo "BLOCKED: $fp is a cheat submodule — do not edit" >&2
     exit 2

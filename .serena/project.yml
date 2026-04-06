@@ -20,7 +20,6 @@ ignored_paths:
   - /config/nvim/snippets/**
   - /config/nvim/spell/**
   - /config/op/plugins/**
-  - /config/tmux/plugins/**
   - /config/vim/extra/**
   - /config/zsh/completions/**
   - /config/zsh/plugins/**

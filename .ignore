@@ -2,7 +2,6 @@
 *.pyc
 .git/**
 config/cheat/cheatsheets/community/**
-config/tmux/plugins/**
 config/vim/plugged/**
 node_modules
 tools/antidote/**
