@@ -56,7 +56,6 @@ set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
 set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
 set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
 set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
-set -q AWS_DEFAULT_REGION; or set -x AWS_DEFAULT_REGION eu-west-1
 set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
 set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
 set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
@@ -159,6 +158,9 @@ set -q BKT_TTL; or set -x BKT_TTL 1m
 
 # Manpager
 set -q MANPAGER; or set -x MANPAGER "less -X"
+
+# sonarqube-cli
+fish_add_path "$XDG_DATA_HOME/sonarqube-cli/bin"
 
 # Lando
 fish_add_path "$HOME/.lando/bin"

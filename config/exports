@@ -342,7 +342,6 @@ msg "Setting up AWS configuration"
 export AWS_CONFIG_FILE="${XDG_STATE_HOME}/aws/config"
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_STATE_HOME}/aws/credentials"
 export AWS_DATA_PATH="${XDG_DATA_HOME}/aws"
-export AWS_DEFAULT_REGION="eu-west-1"
 export AWS_DEFAULT_OUTPUT="table"
 export AWS_CONFIGURE_KEYS=true
 export AWS_CONFIGURE_REGION=true
@@ -511,6 +510,9 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
 [ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
 [ -d "$HOME/.opencode/bin" ] && export PATH="$PATH:$HOME/.opencode/bin"
+
+# sonarqube-cli
+[ -d "$HOME/.local/share/sonarqube-cli/bin" ] && export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
 
 # mise — unified tool version manager
 # https://mise.jdx.dev

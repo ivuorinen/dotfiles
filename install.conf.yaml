@@ -5,6 +5,8 @@
     ~/:
     ~/.config:
       recursive: true
+      exclude:
+        - "mise/config.toml"
     ~/.local/bin:
     ~/.local/man:
       recursive: true
