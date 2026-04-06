@@ -47,7 +47,7 @@ indent_style = tab
 # such as "shfmt -l -w .". When formatting files directly,
 # like "shfmt -w third_party/foo.sh" or "shfmt --filename=third_party/foo.sh",
 # the ignore logic is applied only when the --apply-ignore flag is given.
-[{tools/**,local/bin/asdf/**,config/cheat/cheatsheets/**,config/tmux/plugins/**}]
+[{tools/**,local/bin/asdf/**,config/cheat/cheatsheets/**}]
 ignore = true
 
 [plan]

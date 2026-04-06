@@ -17,22 +17,6 @@ git submodule add --name antidote \
   --depth 1 \
   -f https://github.com/mattmc3/antidote.git tools/antidote
 
-# tmux plugin manager and plugins
-git submodule add --name tmux/tmux-continuum \
-  -f https://github.com/tmux-plugins/tmux-continuum config/tmux/plugins/tmux-continuum
-git submodule add --name tmux/tmux-resurrect \
-  -f https://github.com/tmux-plugins/tmux-resurrect.git config/tmux/plugins/tmux-resurrect
-git submodule add --name tmux/tmux-sessionist \
-  -f https://github.com/tmux-plugins/tmux-sessionist.git config/tmux/plugins/tmux-sessionist
-git submodule add --name tmux/tmux-suspend \
-  -f https://github.com/MunifTanjim/tmux-suspend.git config/tmux/plugins/tmux-suspend
-git submodule add --name tmux/tmux-current-pane-hostname \
-  -f https://github.com/soyuka/tmux-current-pane-hostname.git config/tmux/plugins/tmux-current-pane-hostname
-git submodule add --name tmux/tmux-dark-notify \
-  -f https://github.com/ivuorinen/tmux-dark-notify.git config/tmux/plugins/tmux-dark-notify
-git submodule add --name tmux/catppuccin \
-  -f https://github.com/catppuccin/tmux.git config/tmux/plugins/catppuccin
-
 # Takes submodules and sets them to ignore all changes
 for MODULE in $(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'); do
   echo "Ignoring submodule changes for submodule.${MODULE}..."
@@ -82,6 +66,12 @@ remove_old_submodule()
     rm -rf ".git/modules/$name"
     _log "Removed .git/modules/$name"
   fi
+
+  # Remove .gitmodules entry keyed by name
+  if [[ -n "$name" ]] && git config -f .gitmodules --get "submodule.$name.path" &> /dev/null; then
+    git config -f .gitmodules --remove-section "submodule.$name"
+    _log "Removed $name from .gitmodules"
+  fi
 }
 
 # remove old submodules (name:path pairs)
@@ -102,6 +92,13 @@ old_submodules=(
   "dotbot-asdf:tools/dotbot-asdf"
   "dotbot-pip:tools/dotbot-pip"
   "dotbot-brew:tools/dotbot-brew"
+  "tmux/tmux-continuum:config/tmux/plugins/tmux-continuum"
+  "tmux/tmux-resurrect:config/tmux/plugins/tmux-resurrect"
+  "tmux/tmux-sessionist:config/tmux/plugins/tmux-sessionist"
+  "tmux/tmux-suspend:config/tmux/plugins/tmux-suspend"
+  "tmux/tmux-current-pane-hostname:config/tmux/plugins/tmux-current-pane-hostname"
+  "tmux/tmux-dark-notify:config/tmux/plugins/tmux-dark-notify"
+  "tmux/catppuccin:config/tmux/plugins/catppuccin"
 )
 
 for entry in "${old_submodules[@]}"; do
