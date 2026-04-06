@@ -43,13 +43,13 @@ Already staged in dirty working tree. Include in this change.
 
 ### Files
 
-| File                        | Change                                      |
-| --------------------------- | ------------------------------------------- |
-| `install.conf.yaml`         | Add exclude for mise/config.toml            |
-| `base/bashrc`               | Remove sonarqube-cli PATH line              |
-| `base/zshrc`                | Remove sonarqube-cli PATH line              |
-| `config/exports`            | Add sonarqube-cli PATH before mise activate |
-| `config/fish/exports.fish`  | Add sonarqube-cli fish_add_path             |
+| File                       | Change                                      |
+|----------------------------|---------------------------------------------|
+| `install.conf.yaml`        | Add exclude for mise/config.toml            |
+| `base/bashrc`              | Remove sonarqube-cli PATH line              |
+| `base/zshrc`               | Remove sonarqube-cli PATH line              |
+| `config/exports`           | Add sonarqube-cli PATH before mise activate |
+| `config/fish/exports.fish` | Add sonarqube-cli fish_add_path             |
 
 ## Verification
 
