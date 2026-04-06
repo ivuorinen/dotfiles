@@ -14,7 +14,7 @@ if [[ -f "$MSGR" ]]; then
   source "$MSGR"
   set -u
 fi
-if ! command -v msgr > /dev/null 2>&1; then
+if ! declare -f msgr > /dev/null 2>&1; then
   msgr()
   {
     echo "$*" >&2
@@ -75,14 +75,17 @@ direct_lookup()
   fi
 }
 
-main()
+# Check that fzf is available. Called only in code paths that need it.
+require_fzf()
 {
-  # Check for fzf
   if ! command -v fzf > /dev/null 2>&1; then
     msgr err "fzf is required but not installed"
     exit 1
   fi
+}
 
+main()
+{
   # Direct mode: x-help <name>
   if [[ $# -ge 1 ]]; then
     local name="$1"
@@ -97,6 +100,7 @@ main()
         ;;
       2)
         # Multiple matches — fzf to disambiguate
+        require_fzf
         local selected
         selected=$(echo "$result" | fzf) || exit 0
         [[ -z "$selected" ]] && exit 0
@@ -112,6 +116,8 @@ main()
   fi
 
   # Interactive mode: x-help
+  require_fzf
+
   local files
   files=$(discover_files)
 

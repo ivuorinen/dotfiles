@@ -101,9 +101,18 @@ teardown() {
   [[ "$output" == *"config/alias.md"* ]]
 }
 
-@test "x-help with missing fzf exits 1" {
-  # Hide fzf from PATH
-  run env PATH="/usr/bin:/bin" DOTFILES="$TEST_DOTFILES" bash local/bin/x-help
+@test "x-help require_fzf fails when fzf missing" {
+  local test_script="$BATS_TMPDIR/test-require-fzf-$$"
+  cat > "$test_script" <<SCRIPT
+#!/usr/bin/env bash
+export DOTFILES="$TEST_DOTFILES"
+source local/bin/x-help --source-only
+export PATH="/nonexistent"
+require_fzf
+SCRIPT
+  chmod +x "$test_script"
+  run bash "$test_script"
+  rm -f "$test_script"
   [ "$status" -eq 1 ]
   [[ "$output" == *"fzf"* ]]
 }
