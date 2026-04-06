@@ -4,20 +4,8 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
-# Source msgr for colored output, with fallback
-MSGR="${DOTFILES}/local/bin/msgr"
-if [[ -f "$MSGR" ]]; then
-  set +u
-  # shellcheck source=../local/bin/msgr
-  source "$MSGR"
-  set -u
-fi
-if ! declare -f msgr > /dev/null 2>&1; then
-  msgr()
-  {
-    echo "$*" >&2
-  }
-fi
+# shellcheck source=../config/shared.sh
+source "${DOTFILES}/config/shared.sh"
 
 # ── Font Registry ──────────────────────────────────────────────
 # Format: display_name|check_pattern|github_repo|version|asset_pattern
