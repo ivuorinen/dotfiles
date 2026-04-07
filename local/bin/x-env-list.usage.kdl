@@ -1,0 +1,2 @@
+bin "x-env-list"
+about "List environment variables grouped by prefix"

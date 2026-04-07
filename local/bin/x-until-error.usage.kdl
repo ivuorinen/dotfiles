@@ -1,0 +1,7 @@
+bin "x-until-error"
+about "Run a command repeatedly until it fails"
+
+flag "--sleep <seconds>" help="Sleep between iterations"
+flag "--help" help="Show help"
+
+arg "<command>" help="Command to run" var=#true

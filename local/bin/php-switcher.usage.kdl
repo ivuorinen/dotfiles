@@ -1,0 +1,9 @@
+bin "php-switcher"
+about "Switch between PHP versions installed via Homebrew"
+
+flag "--help" help="Show help"
+flag "--installed" help="List installed PHP versions"
+flag "--current" help="Show currently active version"
+flag "--auto" help="Auto-switch based on .php-version file"
+
+arg "[version]" help="PHP version (e.g., 7.4, 8.0) or 'latest'"

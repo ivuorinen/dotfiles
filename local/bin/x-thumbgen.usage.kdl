@@ -1,0 +1,8 @@
+bin "x-thumbgen"
+about "Generate image thumbnails using ImageMagick"
+
+flag "-h --help" help="Show help"
+flag "-o <output_dir>" help="Output directory (default: same as source)"
+flag "-s <suffix>" help="Thumbnail suffix (default: _thumb)"
+
+arg "<source_dir>" help="Directory containing images"

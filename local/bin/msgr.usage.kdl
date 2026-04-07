@@ -1,0 +1,44 @@
+bin "msgr"
+about "Colored message output helper for shell scripts"
+
+cmd "msg" help="Print a message with arrow marker" {
+  arg "<message>" help="Message text"
+}
+cmd "yay" help="Print a celebration message" {
+  arg "<message>" help="Message text"
+}
+cmd "yay_done" help="Print a celebration with checkmark" {
+  arg "<message>" help="Message text"
+}
+cmd "done" help="Print a completion checkmark" {
+  arg "<message>" help="Message text"
+}
+cmd "run" help="Print a running-task message" {
+  arg "<message>" help="Message text"
+}
+cmd "run_done" help="Print a running-task with checkmark" {
+  arg "<message>" help="Message text"
+}
+cmd "ok" help="Print a success message" {
+  arg "<message>" help="Message text"
+}
+cmd "warn" help="Print a warning message" {
+  arg "<message>" help="Message text"
+}
+cmd "err" help="Print an error message" {
+  arg "<message>" help="Message text"
+}
+cmd "prompt" help="Print a prompt-style message" {
+  arg "<message>" help="Message text"
+}
+cmd "prompt_done" help="Print a prompt with checkmark" {
+  arg "<message>" help="Message text"
+}
+cmd "nested" help="Print an indented message" {
+  arg "<message>" help="Message text"
+}
+cmd "nested_done" help="Print an indented message with checkmark" {
+  arg "<message>" help="Message text"
+}
+cmd "test" help="Show all message types"
+cmd "help" help="Show help"

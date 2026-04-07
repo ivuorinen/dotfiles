@@ -1,0 +1,5 @@
+bin "x-backup-folder"
+about "Backup a folder with a timestamp"
+
+arg "<folder>" help="Folder to backup"
+arg "[filename]" help="Custom output filename (default: folder name)"

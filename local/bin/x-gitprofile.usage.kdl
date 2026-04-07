@@ -1,0 +1,5 @@
+bin "x-gitprofile"
+about "Set git profile configuration hooks"
+
+arg "[profile]" help="Profile name"
+arg "[directory]" help="Directory to configure"

@@ -1,0 +1,2 @@
+bin "x-git-largest-files.py"
+about "Find largest files in git repository history"

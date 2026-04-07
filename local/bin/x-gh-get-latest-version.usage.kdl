@@ -1,0 +1,12 @@
+bin "x-gh-get-latest-version"
+about "Get latest GitHub release version for a repository"
+
+flag "--branch" help="Get latest branch name"
+flag "--tag" help="Get latest tag (default)"
+flag "--commit" help="Get latest commit SHA"
+flag "--json" help="Output as JSON"
+flag "-v --verbose" help="Verbose output"
+flag "--oldest" help="Get oldest instead of latest"
+flag "--prereleases" help="Include pre-releases"
+
+arg "<repo>" help="GitHub repository (owner/repo)"

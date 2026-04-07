@@ -1,0 +1,4 @@
+bin "x-clean-vendordirs"
+about "Remove vendor and node_modules directories recursively"
+
+arg "[directory]" help="Directory to clean (default: current)"

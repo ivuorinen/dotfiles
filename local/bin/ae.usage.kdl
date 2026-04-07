@@ -1,0 +1,4 @@
+bin "ae"
+about "Encrypt a file using age with GitHub SSH keys"
+
+arg "<file>" help="File to encrypt"

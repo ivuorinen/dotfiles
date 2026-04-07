@@ -1,0 +1,4 @@
+bin "x-dc"
+about "Create a directory with verbose output"
+
+arg "<path>" help="Directory path to create"

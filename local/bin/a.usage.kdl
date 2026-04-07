@@ -1,0 +1,22 @@
+bin "a"
+about "Encrypt and decrypt files or directories with age and SSH keys"
+version "1.1.0"
+
+flag "-v --verbose" help="Print log messages to console"
+flag "--delete" help="Delete original files after encryption"
+flag "-f --force" help="Overwrite existing output files"
+
+cmd "encrypt" help="Encrypt a file or directory" {
+  alias "e"
+  alias "enc"
+  arg "<target>" help="File or directory to encrypt"
+}
+
+cmd "decrypt" help="Decrypt a file or directory" {
+  alias "d"
+  alias "dec"
+  arg "<target>" help="File or directory to decrypt"
+}
+
+cmd "help" help="Show help"
+cmd "version" help="Show version"

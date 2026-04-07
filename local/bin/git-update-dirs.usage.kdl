@@ -1,0 +1,8 @@
+bin "git-update-dirs"
+about "Pull and rebase all git repos in subdirectories"
+
+flag "--help" help="Display help"
+flag "--version" help="Display version"
+flag "-v --verbose" help="Verbose output"
+flag "-q --quiet" help="Quiet output"
+flag "--force" help="Force operations"

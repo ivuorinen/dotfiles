@@ -1,0 +1,8 @@
+bin "x-visit-folders"
+about "Register subdirectories with zoxide"
+
+flag "--dry-run" help="Show what would be registered"
+flag "--verbose" help="Verbose output"
+flag "--help" help="Show help"
+
+arg "[directory]" help="Target directory (default: current)"

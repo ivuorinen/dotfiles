@@ -1,0 +1,2 @@
+bin "x-compare-versions.py"
+about "Compare semantic version strings"

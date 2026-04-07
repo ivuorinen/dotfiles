@@ -1,0 +1,6 @@
+bin "x-help"
+about "Browse and display dotfiles documentation"
+
+flag "--source-only" help="Show raw source instead of rendered output"
+
+arg "[name]" help="Script name to look up (interactive fzf if omitted)"
