@@ -1,0 +1,2 @@
+bin "install-gh-extensions.sh"
+about "Install GitHub CLI extensions"

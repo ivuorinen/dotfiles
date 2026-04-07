@@ -1,0 +1,5 @@
+bin "install-fonts.sh"
+about "Install programming fonts from GitHub releases"
+
+flag "--force" help="Re-download and reinstall all fonts"
+flag "--help" help="Show help"

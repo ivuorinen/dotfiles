@@ -1,0 +1,2 @@
+bin "install-xcode-cli-tools.sh"
+about "Install Xcode Command Line Tools (macOS)"

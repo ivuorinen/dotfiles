@@ -1,0 +1,2 @@
+bin "update-readme-aliases.sh"
+about "Update alias documentation in docs/alias.md"

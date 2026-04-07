@@ -1,0 +1,2 @@
+bin "shared.sh"
+about "Shared bash functions and helpers for install scripts"

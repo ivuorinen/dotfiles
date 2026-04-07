@@ -1,0 +1,2 @@
+bin "install-macos-defaults.sh"
+about "Configure macOS system defaults"
