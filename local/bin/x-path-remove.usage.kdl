@@ -1,0 +1,4 @@
+bin "x-path-remove"
+about "Remove directories from PATH"
+
+arg "<directory>" help="Directories to remove" var=#true

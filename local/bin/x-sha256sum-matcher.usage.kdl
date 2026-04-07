@@ -1,0 +1,8 @@
+bin "x-sha256sum-matcher"
+about "Compare two files by SHA256 hash"
+
+flag "-v --verbose" help="Verbose output"
+flag "-h --help" help="Show help"
+
+arg "<file1>" help="First file"
+arg "<file2>" help="Second file"

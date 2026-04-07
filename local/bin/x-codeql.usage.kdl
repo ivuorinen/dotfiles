@@ -1,0 +1,7 @@
+bin "x-codeql"
+about "CodeQL security scanning wrapper"
+
+flag "--path <path>" help="Source path to analyze (default: current directory)"
+flag "--parallel" help="Run language analyses in parallel"
+flag "-h --help" help="Show help"
+flag "-v --version" help="Show version"

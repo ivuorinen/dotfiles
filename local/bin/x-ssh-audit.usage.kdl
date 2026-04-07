@@ -1,0 +1,2 @@
+bin "x-ssh-audit"
+about "Run SSH security audit and generate reports"

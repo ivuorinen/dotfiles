@@ -1,0 +1,5 @@
+bin "x-when-up"
+about "Wait for host to come online, then execute command"
+
+arg "<host>" help="Host to monitor"
+arg "<command>" help="Command to execute when host is up" var=#true

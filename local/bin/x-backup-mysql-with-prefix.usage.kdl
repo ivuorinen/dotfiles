@@ -1,0 +1,6 @@
+bin "x-backup-mysql-with-prefix"
+about "Backup MySQL tables matching a prefix"
+
+arg "<table_prefix>" help="Table name prefix to match"
+arg "<filename_prefix>" help="Output filename prefix"
+arg "[database]" help="Database name (optional)"

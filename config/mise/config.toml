@@ -124,3 +124,4 @@ tfsec = "latest"
 
 # Other useful tools
 uv = "latest"
+usage = "latest"

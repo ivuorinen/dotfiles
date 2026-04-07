@@ -1,0 +1,4 @@
+bin "git-dirty"
+about "Recursively check for dirty git repositories"
+
+flag "-v --verbose" help="Verbose output"

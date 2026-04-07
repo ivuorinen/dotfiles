@@ -6,7 +6,9 @@
   "NoColor": false,
   "Exclude": [
     "base/plan",
+    "config/bash/completions.d/.*",
     "config/fish/completions/.*",
+    "config/zsh/completions.d/.*",
     "config/karabiner/.*",
     "config/fish/conf.d/.*",
     "config/fish/functions/.*",
@@ -15,6 +17,7 @@
     "config/vim/autoload/.*",
     "docs/.*",
     "local/man/.*",
+    "local/md/.*",
     "local/share/.*"
   ],
   "AllowedContentTypes": [],

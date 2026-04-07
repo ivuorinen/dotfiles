@@ -12,6 +12,12 @@ source "$DOTFILES/config/shared.sh"
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
   source "${DOTFILES}/config/fzf/fzf.bash"
 
+# Source usage-generated bash completions
+for f in "$HOME/.config/bash/completions.d/"*.bash; do
+  [[ -f "$f" ]] && source "$f"
+done
+unset f
+
 # Import ssh keys in keychain (macOS-specific -A flag, silently fails on Linux)
 ssh-add -A 2>/dev/null
 

@@ -1,0 +1,2 @@
+bin "x-quota-usage.php"
+about "Display disk quota usage information"

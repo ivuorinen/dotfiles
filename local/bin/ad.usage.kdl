@@ -1,0 +1,4 @@
+bin "ad"
+about "Decrypt a file using age with GitHub SSH keys"
+
+arg "<file>" help="File to decrypt"

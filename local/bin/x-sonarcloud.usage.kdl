@@ -1,0 +1,12 @@
+bin "x-sonarcloud"
+about "Fetch SonarCloud issues for LLM analysis"
+
+flag "--pr <number>" help="PR-specific issues"
+flag "--branch <name>" help="Branch-specific issues"
+flag "--org <org>" help="Organization name"
+flag "--project-key <key>" help="Project key"
+flag "--severities <severities>" help="Filter by severity (BLOCKER,CRITICAL,MAJOR,MINOR,INFO)"
+flag "--types <types>" help="Filter by type (BUG,VULNERABILITY,CODE_SMELL,SECURITY_HOTSPOT)"
+flag "--statuses <statuses>" help="Filter by status (OPEN,CONFIRMED,REOPENED)"
+flag "--resolved" help="Include resolved issues"
+flag "-h --help" help="Show help"

@@ -1,0 +1,6 @@
+bin "x-pr-comments"
+about "Fetch PR comments formatted for LLM analysis"
+
+flag "--help" help="Show help"
+
+arg "<pr>" help="PR number or full GitHub URL"

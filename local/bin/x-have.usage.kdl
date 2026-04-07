@@ -1,0 +1,4 @@
+bin "x-have"
+about "Check if a command exists on the system"
+
+arg "<command>" help="Command to check for"

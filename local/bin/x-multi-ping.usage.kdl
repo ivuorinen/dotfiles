@@ -1,0 +1,10 @@
+bin "x-multi-ping"
+about "Multi-protocol ping for IPv4 and IPv6"
+
+flag "--help" help="Show help"
+flag "--verbose" help="Verbose output"
+flag "--loop" help="Loop indefinitely"
+flag "--forever" help="Loop indefinitely (alias)"
+flag "--sleep <seconds>" help="Sleep between iterations (default: 1)"
+
+arg "<hostnames>" help="Hostnames to ping" var=#true

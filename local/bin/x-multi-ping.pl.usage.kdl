@@ -1,0 +1,2 @@
+bin "x-multi-ping.pl"
+about "Multi-protocol ping utility (Perl version)"

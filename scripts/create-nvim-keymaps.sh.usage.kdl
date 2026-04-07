@@ -1,0 +1,2 @@
+bin "create-nvim-keymaps.sh"
+about "Generate Neovim keybindings documentation"

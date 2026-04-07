@@ -1,0 +1,2 @@
+bin "install-python-packages.sh"
+about "Install Python libraries via uv pip"

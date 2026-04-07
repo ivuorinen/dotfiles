@@ -1,0 +1,4 @@
+bin "x-set-php-aliases"
+about "Cache PHP installations and generate shell aliases"
+
+flag "--prefix" help="Show Homebrew prefix"

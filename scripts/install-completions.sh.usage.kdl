@@ -1,0 +1,2 @@
+bin "install-completions.sh"
+about "Generate shell completions, markdown docs, and manpages from usage specs"

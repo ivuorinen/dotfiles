@@ -1,0 +1,2 @@
+bin "install-dnf-packages.sh"
+about "Install essential dnf packages for development"

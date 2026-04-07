@@ -1,0 +1,17 @@
+bin "pushover"
+about "Send Pushover notifications from the command line"
+
+flag "-c <callback>" help="Callback URL"
+flag "-d <device>" help="Target device"
+flag "-D <timestamp>" help="Delivery timestamp"
+flag "-e <expire>" help="Expiration time in seconds"
+flag "-p <priority>" help="Priority level (-2 to 2)"
+flag "-r <retry>" help="Retry interval in seconds"
+flag "-t <title>" help="Message title"
+flag "-T <token>" help="Pushover API token"
+flag "-s <sound>" help="Notification sound"
+flag "-u <url>" help="URL to include"
+flag "-U <user>" help="Pushover user key"
+flag "-a <url_title>" help="URL title"
+
+arg "<message>" help="Message content"

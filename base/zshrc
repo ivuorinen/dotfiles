@@ -31,6 +31,9 @@ source_fzf_config()
 source_fzf_config
 x-have antidot && eval "$(antidot init --shell zsh)"
 
+# Add usage-generated completions to fpath
+fpath=("${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions.d" $fpath)
+
 autoload -Uz compinit bashcompinit
 compinit -d "$ZSH_COMPDUMP"
 bashcompinit

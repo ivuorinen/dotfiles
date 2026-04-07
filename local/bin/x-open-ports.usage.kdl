@@ -1,0 +1,5 @@
+bin "x-open-ports"
+about "List open ports in Markdown or JSON format"
+
+flag "--json" help="Output in JSON format"
+flag "--help" help="Show help"

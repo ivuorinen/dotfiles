@@ -1,0 +1,6 @@
+bin "x-gh-get-latest-release-targz"
+about "Download latest GitHub release tarball"
+
+flag "--get" help="Download the release"
+
+arg "<repo>" help="GitHub repository (owner/repo)"

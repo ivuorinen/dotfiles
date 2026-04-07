@@ -1,0 +1,10 @@
+bin "git-attributes"
+about "Check .gitattributes coverage and suggest missing rules"
+
+flag "-h --help" help="Show help"
+flag "-v --verbose" help="Verbose output"
+flag "-e --exit" help="Exit with error if uncovered files found"
+flag "-p --pattern" help="Show pattern matches"
+flag "-n --no-suggest" help="Skip suggestions"
+flag "-w --write" help="Write suggested rules to .gitattributes"
+flag "-f --format-width <width>" help="Format column width"

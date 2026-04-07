@@ -1,0 +1,2 @@
+bin "x-load-configs"
+about "Load host-specific configuration files"

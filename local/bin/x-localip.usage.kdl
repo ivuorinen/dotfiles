@@ -1,0 +1,9 @@
+bin "x-localip"
+about "Display local IP addresses"
+
+flag "--help" help="Show help"
+flag "--version" help="Show version"
+flag "--ipv4" help="Show only IPv4 addresses"
+flag "--ipv6" help="Show only IPv6 addresses"
+
+arg "[interface]" help="Specific network interface"

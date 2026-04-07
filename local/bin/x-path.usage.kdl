@@ -1,0 +1,15 @@
+bin "x-path"
+about "Unified PATH manipulation tool"
+
+cmd "append" help="Append directory to PATH" {
+  arg "<directory>" help="Directory to append"
+}
+cmd "prepend" help="Prepend directory to PATH" {
+  arg "<directory>" help="Directory to prepend"
+}
+cmd "remove" help="Remove directory from PATH" {
+  arg "<directory>" help="Directory to remove"
+}
+cmd "check" help="Check if directory is in PATH" {
+  arg "<directory>" help="Directory to check"
+}
