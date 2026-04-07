@@ -1,0 +1,57 @@
+.TH A 1
+.SH NAME
+a \- Encrypt and decrypt files or directories with age and SSH keys
+.SH SYNOPSIS
+\fBa\fR [OPTIONS] [COMMAND]
+.SH DESCRIPTION
+Encrypt and decrypt files or directories with age and SSH keys
+.PP
+.SH OPTIONS
+.TP
+\fB\-v, \-\-verbose\fR
+Print log messages to console
+.TP
+\fB\-\-delete\fR
+Delete original files after encryption
+.TP
+\fB\-f, \-\-force\fR
+Overwrite existing output files
+.SH COMMANDS
+.TP
+\fBencrypt\fR
+Encrypt a file or directory
+.RS
+\fIAliases: \fRe, enc
+.RE
+.TP
+\fBdecrypt\fR
+Decrypt a file or directory
+.RS
+\fIAliases: \fRd, dec
+.RE
+.TP
+\fBhelp\fR
+Show help
+.TP
+\fBversion\fR
+Show version
+.SH "A ENCRYPT"
+Encrypt a file or directory
+.PP
+\fBUsage:\fR a encrypt <target>
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<target>\fR
+File or directory to encrypt
+.SH "A DECRYPT"
+Decrypt a file or directory
+.PP
+\fBUsage:\fR a decrypt <target>
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<target>\fR
+File or directory to decrypt

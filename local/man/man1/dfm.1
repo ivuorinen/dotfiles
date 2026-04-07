@@ -1,0 +1,250 @@
+.TH DFM 1
+.SH NAME
+dfm \- Dotfiles manager and install helper
+.SH SYNOPSIS
+\fBdfm\fR [COMMAND]
+.SH DESCRIPTION
+Dotfiles manager and install helper
+.PP
+.SH COMMANDS
+.TP
+\fBinstall\fR
+Install tools, packages, and configurations
+.TP
+\fBinstall all\fR
+Install everything in the correct order
+.TP
+\fBinstall apt\-packages\fR
+Install apt packages (Debian/Ubuntu)
+.TP
+\fBinstall cheat\-databases\fR
+Install cheat external cheatsheet databases
+.TP
+\fBinstall composer\fR
+Install PHP Package Manager Composer
+.TP
+\fBinstall dnf\-packages\fR
+Install dnf packages (Fedora/RHEL)
+.TP
+\fBinstall fonts\fR
+Install programming fonts
+.TP
+\fBinstall gh\fR
+Install GitHub CLI Extensions
+.TP
+\fBinstall git\-crypt\fR
+Install git\-crypt from source
+.TP
+\fBinstall imagick\fR
+Install ImageMagick CLI
+.TP
+\fBinstall macos\fR
+Setup nice macOS defaults
+.TP
+\fBinstall mise\fR
+Install tools via mise (runtimes + CLI tools)
+.TP
+\fBinstall mise\-cleanup\fR
+Remove old version manager installations
+.TP
+\fBinstall ntfy\fR
+Install ntfy notification tool
+.TP
+\fBinstall python\-libs\fR
+Install Python libraries (libtmux, pynvim)
+.TP
+\fBinstall shellspec\fR
+Install shellspec testing framework
+.TP
+\fBinstall xcode\-cli\-tools\fR
+Install Xcode CLI tools (macOS)
+.TP
+\fBinstall z\fR
+Install z directory jumper
+.TP
+\fBbrew\fR
+Homebrew package management
+.TP
+\fBbrew install\fR
+Install packages from Brewfile
+.TP
+\fBbrew update\fR
+Update Homebrew and packages
+.TP
+\fBbrew updatebundle\fR
+Update Brewfile with descriptions
+.TP
+\fBbrew autoupdate\fR
+Setup Homebrew auto\-update
+.TP
+\fBbrew leaves\fR
+List installed\-on\-request packages
+.TP
+\fBbrew clean\fR
+Cleanup old versions
+.TP
+\fBbrew untracked\fR
+List packages not in Brewfile
+.TP
+\fBapt\fR
+APT package management (Debian/Ubuntu)
+.TP
+\fBapt upkeep\fR
+Full maintenance (update + upgrade + autoremove + clean)
+.TP
+\fBapt install\fR
+Install packages from apt.txt
+.TP
+\fBapt update\fR
+Update package lists
+.TP
+\fBapt upgrade\fR
+Upgrade installed packages
+.TP
+\fBapt autoremove\fR
+Remove unused packages
+.TP
+\fBapt clean\fR
+Clean package cache
+.TP
+\fBcheck\fR
+System information checks
+.TP
+\fBcheck arch\fR
+Get or check current architecture
+.RS
+\fIAliases: \fRa
+.RE
+.TP
+\fBcheck host\fR
+Get or check current hostname
+.RS
+\fIAliases: \fRh, hostname
+.RE
+.TP
+\fBdotfiles\fR
+Format and reset configurations
+.TP
+\fBdotfiles fmt\fR
+Run all formatters
+.TP
+\fBdotfiles yamlfmt\fR
+Format YAML files
+.TP
+\fBdotfiles shfmt\fR
+Format shell scripts
+.TP
+\fBdotfiles reset_all\fR
+Reset everything
+.TP
+\fBdotfiles reset_nvim\fR
+Reset neovim state and config
+.TP
+\fBhelpers\fR
+Display system information
+.TP
+\fBhelpers aliases\fR
+Show shell aliases
+.TP
+\fBhelpers colors\fR
+Show 256 terminal colors
+.TP
+\fBhelpers env\fR
+Show environment variables
+.TP
+\fBhelpers functions\fR
+Show shell functions
+.TP
+\fBhelpers nvim\fR
+Show neovim keybindings
+.TP
+\fBhelpers path\fR
+Show PATH directories
+.TP
+\fBhelpers tmux\fR
+Show tmux keybindings
+.TP
+\fBhelpers wezterm\fR
+Show wezterm keybindings
+.TP
+\fBdocs\fR
+Generate documentation
+.TP
+\fBdocs all\fR
+Update all keybindings docs
+.TP
+\fBdocs tmux\fR
+Update tmux keybindings
+.TP
+\fBdocs nvim\fR
+Update nvim keybindings
+.TP
+\fBdocs wezterm\fR
+Update wezterm keybindings
+.TP
+\fBscripts\fR
+Run install scripts from scripts/
+.TP
+\fBtests\fR
+Test visualization helpers
+.TP
+\fBtests msgr\fR
+Show all msgr message types
+.TP
+\fBtests params\fR
+List all parameters
+.TP
+\fBhelp\fR
+Show help
+.SH "DFM INSTALL MISE-CLEANUP"
+Remove old version manager installations
+.PP
+\fBUsage:\fR dfm install mise\-cleanup [OPTIONS]
+.PP
+\fBOptions:\fR
+.PP
+.TP
+\fB\-\-dry\-run\fR
+Show what would be removed without removing
+.SH "DFM CHECK ARCH"
+Get or check current architecture
+.PP
+\fBUsage:\fR dfm check arch [<arch>]
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<arch>\fR
+Architecture to check against
+.SH "DFM CHECK HOST"
+Get or check current hostname
+.PP
+\fBUsage:\fR dfm check host [<hostname>]
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<hostname>\fR
+Hostname to check against
+.SH "DFM HELPERS ALIASES"
+Show shell aliases
+.PP
+\fBUsage:\fR dfm helpers aliases <shell>
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<shell>\fR
+Shell to show aliases for (bash, zsh, fish)
+.SH "DFM SCRIPTS"
+Run install scripts from scripts/
+.PP
+\fBUsage:\fR dfm scripts [<script>]
+.PP
+\fBArguments:\fR
+.PP
+.TP
+\fB<script>\fR
+Script name to run (without install\- prefix)
+.SH AUTHOR
+Ismo Vuorinen

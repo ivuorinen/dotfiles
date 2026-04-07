@@ -1,0 +1,36 @@
+.TH X-SONARCLOUD 1
+.SH NAME
+x\-sonarcloud \- Fetch SonarCloud issues for LLM analysis
+.SH SYNOPSIS
+\fBx\-sonarcloud\fR [OPTIONS]
+.SH DESCRIPTION
+Fetch SonarCloud issues for LLM analysis
+.PP
+.SH OPTIONS
+.TP
+\fB\-\-pr\fR \fI<number>\fR
+PR\-specific issues
+.TP
+\fB\-\-branch\fR \fI<name>\fR
+Branch\-specific issues
+.TP
+\fB\-\-org\fR \fI<org>\fR
+Organization name
+.TP
+\fB\-\-project\-key\fR \fI<key>\fR
+Project key
+.TP
+\fB\-\-severities\fR \fI<severities>\fR
+Filter by severity (BLOCKER,CRITICAL,MAJOR,MINOR,INFO)
+.TP
+\fB\-\-types\fR \fI<types>\fR
+Filter by type (BUG,VULNERABILITY,CODE_SMELL,SECURITY_HOTSPOT)
+.TP
+\fB\-\-statuses\fR \fI<statuses>\fR
+Filter by status (OPEN,CONFIRMED,REOPENED)
+.TP
+\fB\-\-resolved\fR
+Include resolved issues
+.TP
+\fB\-h, \-\-help\fR
+Show help

@@ -1,0 +1,34 @@
+.TH X-GH-GET-LATEST-VERSION 1
+.SH NAME
+x\-gh\-get\-latest\-version \- Get latest GitHub release version for a repository
+.SH SYNOPSIS
+\fBx\-gh\-get\-latest\-version\fR [OPTIONS] <repo>
+.SH DESCRIPTION
+Get latest GitHub release version for a repository
+.PP
+.SH OPTIONS
+.TP
+\fB\-\-branch\fR
+Get latest branch name
+.TP
+\fB\-\-tag\fR
+Get latest tag (default)
+.TP
+\fB\-\-commit\fR
+Get latest commit SHA
+.TP
+\fB\-\-json\fR
+Output as JSON
+.TP
+\fB\-v, \-\-verbose\fR
+Verbose output
+.TP
+\fB\-\-oldest\fR
+Get oldest instead of latest
+.TP
+\fB\-\-prereleases\fR
+Include pre\-releases
+.SH ARGUMENTS
+.TP
+\fB<repo>\fR
+GitHub repository (owner/repo)
