@@ -1,4 +1,4 @@
 bin "x-path-append"
 about "Append directories to PATH"
 
-arg "<directory>" help="Directory to append" var=#true
+arg "<directory>" help="Directories to append" var=#true

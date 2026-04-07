@@ -83,8 +83,8 @@ cmd "docs" help="Generate documentation" {
   cmd "wezterm" help="Update wezterm keybindings"
 }
 
-cmd "scripts" help="Run install scripts from scripts/" {
-  arg "[script]" help="Script name to run (without install- prefix)"
+cmd "scripts" help="Discover available scripts or run one from scripts/" {
+  arg "[script]" help="Script name to run (without install- prefix); omit to list available"
 }
 
 cmd "tests" help="Test visualization helpers" {

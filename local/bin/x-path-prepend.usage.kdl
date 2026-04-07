@@ -1,4 +1,4 @@
 bin "x-path-prepend"
 about "Prepend directories to PATH"
 
-arg "<directory>" help="Directory to prepend" var=#true
+arg "<directory>" help="Directories to prepend" var=#true

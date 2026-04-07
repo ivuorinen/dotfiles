@@ -41,7 +41,7 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
   echo "Generating for: $bin_name"
 
   # Completions
-  if usage generate completion fish "$bin_name" -f "$spec" > "$FISH_DIR/$bin_name.fish" 2> /dev/null; then
+  if usage generate completion fish "$bin_name" -f "$spec" > "$FISH_DIR/$bin_name.fish" 2>&1; then
     :
   else
     echo "  WARN: fish completion failed for $bin_name" >&2
@@ -49,7 +49,7 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
     ((errors++)) || true
   fi
 
-  if usage generate completion bash "$bin_name" -f "$spec" > "$BASH_DIR/$bin_name.bash" 2> /dev/null; then
+  if usage generate completion bash "$bin_name" -f "$spec" > "$BASH_DIR/$bin_name.bash" 2>&1; then
     :
   else
     echo "  WARN: bash completion failed for $bin_name" >&2
@@ -57,7 +57,7 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
     ((errors++)) || true
   fi
 
-  if usage generate completion zsh "$bin_name" -f "$spec" > "$ZSH_DIR/_$bin_name" 2> /dev/null; then
+  if usage generate completion zsh "$bin_name" -f "$spec" > "$ZSH_DIR/_$bin_name" 2>&1; then
     :
   else
     echo "  WARN: zsh completion failed for $bin_name" >&2
@@ -66,7 +66,7 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
   fi
 
   # Markdown docs
-  if usage generate markdown -f "$spec" --out-file "$MD_DIR/$bin_name.md" 2> /dev/null; then
+  if usage generate markdown -f "$spec" --out-file "$MD_DIR/$bin_name.md" 2>&1; then
     :
   else
     echo "  WARN: markdown generation failed for $bin_name" >&2
@@ -75,7 +75,7 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
   fi
 
   # Manpages
-  if usage generate manpage -f "$spec" --out-file "$MAN_DIR/$bin_name.1" 2> /dev/null; then
+  if usage generate manpage -f "$spec" --out-file "$MAN_DIR/$bin_name.1" 2>&1; then
     :
   else
     echo "  WARN: manpage generation failed for $bin_name" >&2
@@ -88,3 +88,7 @@ done
 
 echo ""
 echo "Done: processed $count specs ($errors warnings)"
+
+if ((errors > 0)); then
+  exit 1
+fi
