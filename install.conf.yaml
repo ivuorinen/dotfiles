@@ -28,6 +28,8 @@
     ~/.local/state:
     ~/.local/state/tmux:
     ~/.local/state/zsh:
+    ~/.config/bash/completions.d:
+    ~/.config/zsh/completions.d:
     ~/.ssh:
       mode: 0700
     ~/.ssh/local.d:
