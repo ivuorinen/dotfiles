@@ -10,7 +10,6 @@ cmd "install" help="Install tools, packages, and configurations" {
   cmd "dnf-packages" help="Install dnf packages (Fedora/RHEL)"
   cmd "fonts" help="Install programming fonts"
   cmd "gh" help="Install GitHub CLI Extensions"
-  cmd "git-crypt" help="Install git-crypt from source"
   cmd "imagick" help="Install ImageMagick CLI"
   cmd "macos" help="Setup nice macOS defaults"
   cmd "mise" help="Install tools via mise (runtimes + CLI tools)"

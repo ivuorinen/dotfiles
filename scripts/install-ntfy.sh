@@ -26,6 +26,7 @@ case $(dfm check arch) in
 esac
 
 NTFY_VERSION="$(x-gh-get-latest-version binwiederhier/ntfy)"
+NTFY_VERSION="${NTFY_VERSION#v}"
 NTFY_URL="https://github.com/binwiederhier/ntfy"
 NTFY_TARBALL="ntfy_${NTFY_VERSION}_${NTFY_ARCH}.tar.gz"
 NTFY_DIR="ntfy_${NTFY_VERSION}_${NTFY_ARCH}"

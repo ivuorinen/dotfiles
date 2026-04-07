@@ -78,7 +78,6 @@ section_install()
     "dnf-packages:Install dnf packages (Fedora/RHEL)"
     "fonts:Install programming fonts"
     "gh:Install GitHub CLI Extensions"
-    "git-crypt:Install git-crypt from source"
     "imagick:Install ImageMagick CLI"
     "macos:Setup nice macOS defaults"
     "mise:Install tools via mise (runtimes + CLI tools)"
@@ -112,7 +111,6 @@ section_install()
       # Tier 3: Tool-dependent installers
       $0 install cheat-databases
       $0 install gh
-      $0 install git-crypt
       $0 install ntfy
 
       # Tier 4: Independent utilities
@@ -208,12 +206,6 @@ section_install()
       msgr run "Installing dnf packages..."
       bash "$DOTFILES/scripts/install-dnf-packages.sh" \
         && msgr yay "dnf packages installed!"
-      ;;
-
-    git-crypt)
-      msgr run "Installing git-crypt..."
-      bash "$DOTFILES/scripts/install-git-crypt.sh" \
-        && msgr yay "git-crypt installed!"
       ;;
 
     ntfy)
