@@ -119,6 +119,11 @@ section_install()
       $0 install shellspec
       $0 install z
 
+      # Tier 5: Generate completions, docs, and manpages from usage specs
+      msgr run "Generating completions and docs from usage specs..."
+      bash "$DOTFILES/scripts/install-completions.sh" \
+        && msgr run_done "Completions and docs generated!"
+
       msgr msg "Reloading configurations again..."
       # shellcheck disable=SC1091
       source "$DOTFILES/config/shared.sh"
