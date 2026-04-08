@@ -5,8 +5,6 @@
     ~/:
     ~/.config:
       recursive: true
-      exclude:
-        - "mise/config.toml"
     ~/.local/bin:
     ~/.local/man:
       recursive: true
@@ -28,8 +26,6 @@
     ~/.local/state:
     ~/.local/state/tmux:
     ~/.local/state/zsh:
-    ~/.config/bash/completions.d:
-    ~/.config/zsh/completions.d:
     ~/.ssh:
       mode: 0700
     ~/.ssh/local.d:
@@ -42,16 +38,12 @@
       glob: true
       path: base/*
       prefix: "."
-    # mise config — force-relink because mise may create the file before Dotbot runs
-    ~/.config/mise/config.toml:
-      force: true
-      path: config/mise/config.toml
     # Most of the configs
     ~/.config/:
       glob: true
       relink: true
       path: config/*
-      exclude: [config/op, config/mise]
+      exclude: [config/op]
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
