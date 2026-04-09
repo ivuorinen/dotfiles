@@ -66,7 +66,7 @@ repos:
       - id: actionlint
 
   - repo: https://github.com/JohnnyMorganz/StyLua
-    rev: v2.4.0
+    rev: v2.4.1
     hooks:
       - id: stylua # or stylua-system / stylua-github
         exclude: hammerspoon\.types\.lua$
