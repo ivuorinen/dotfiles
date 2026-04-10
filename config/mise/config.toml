@@ -28,7 +28,7 @@ experimental = true
 # Language runtimes
 node = "lts"
 python = "3.14.4"
-go = "1.26.1"
+go = "1.26.2"
 rust = "stable"
 
 # Pre-built binaries via aqua registry
