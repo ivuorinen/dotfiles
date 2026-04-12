@@ -514,6 +514,11 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 # sonarqube-cli
 [ -d "$HOME/.local/share/sonarqube-cli/bin" ] && export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
 
+# Set precompiled Python arch+OS so mise downloads the right binary
+if command -v mise-python-arch > /dev/null 2>&1; then
+  eval "$(mise-python-arch 2> /dev/null)" || true
+fi
+
 # mise — unified tool version manager
 # https://mise.jdx.dev
 if command -v mise &> /dev/null; then
