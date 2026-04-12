@@ -1,0 +1,5 @@
+# UHK 60 v2: remap "International 1" (KEY_RO) → KEY_102ND
+# The UHK ISO key sends HID usage 0x70087 which Linux maps to KEY_RO
+# (evdev 89). Finnish Mac layout expects KEY_102ND (evdev 86 / <LSGT>).
+evdev:input:b0003v37A8p0003*
+ KEYBOARD_KEY_70087=102nd
