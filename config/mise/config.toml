@@ -1,8 +1,6 @@
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pipx.uvx = true
-# Compile Python from source — precompiled freethreaded builds lack a lib/ dir
-python.compile = true
 trusted_config_paths = [
   "~/Code/ivuorinen",
   "~/Code/s",
