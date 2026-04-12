@@ -116,6 +116,7 @@ actionlint = "latest"
 oh-my-posh = "latest"
 "github:o2sh/onefetch" = "latest"
 "github:wakatime/wakatime-cli" = "latest"
+"github:max-sixty/worktrunk" = "latest"
 
 # Terraform (replaces tfenv)
 terraform = "1.14.8"
