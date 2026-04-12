@@ -3,4 +3,17 @@
 # Set whether or not to follow arbitrary file
 # paths in source statements (since 0.8.0).
 external-sources=true
+
+# For Bash Language Server. Makes the server index all symbols
+# (functions, variables, etc.) from all files in the workspace,
+# not just the currently open file.
 includeAllWorkspaceSymbols=true
+
+# Turn on warnings for unquoted variables with safe values
+enable=quote-safe-variables
+
+# Turn on warnings for unassigned uppercase variables
+enable=check-unassigned-uppercase
+
+# Allow [ ! -z foo ] instead of suggesting -n
+disable=SC2236
