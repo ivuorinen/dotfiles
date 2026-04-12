@@ -54,5 +54,8 @@ ignore = true
 trim_trailing_whitespace = false
 max_line_length = off
 
+[*.hwdb]
+indent_size = 1
+
 [base/hammerspoon/hammerspoon.types.lua]
 max_line_length = off

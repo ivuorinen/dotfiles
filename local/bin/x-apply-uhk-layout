@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# @description Install UHK 60 v2 hwdb rule to remap ISO key (KEY_RO → KEY_102ND)
+# shellcheck shell=bash
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+# msgr uses unguarded variables ($ZSH_VERSION, $1) — disable nounset
+set +u
+# shellcheck source=msgr
+source "${DOTFILES}/local/bin/msgr"
+set -u
+
+HWDB_SRC="${DOTFILES}/config/udev/90-uhk-iso-key.hwdb"
+HWDB_DST="/etc/udev/hwdb.d/90-uhk-iso-key.hwdb"
+
+if [[ ! -f "$HWDB_SRC" ]]; then
+  msgr err "hwdb rule not found: ${HWDB_SRC}"
+  exit 1
+fi
+
+msgr msg "Installing hwdb rule to ${HWDB_DST}"
+sudo cp -- "$HWDB_SRC" "$HWDB_DST"
+
+msgr msg "Rebuilding hwdb database"
+sudo systemd-hwdb update
+
+msgr msg "Triggering udev to apply remap"
+sudo udevadm trigger --subsystem-match=input
+
+# One-time: restore COSMIC xkb_config if it has the crashed layout
+COSMIC_CFG="$HOME/.config/cosmic/com.system76.CosmicComp/v1/xkb_config"
+if [[ -f "$COSMIC_CFG" ]] && grep -q 'layout: "mac-fi-uhk"' "$COSMIC_CFG"; then
+  msgr msg "Restoring COSMIC keyboard config to fi/mac"
+
+  options=$(awk -F'"' '/options: Some\(/ { print $2 }' "$COSMIC_CFG")
+  repeat_delay=$(awk '/repeat_delay:/ { gsub(/[^0-9]/,""); print }' "$COSMIC_CFG")
+  repeat_rate=$(awk '/repeat_rate:/ { gsub(/[^0-9]/,""); print }' "$COSMIC_CFG")
+  : "${repeat_delay:=200}" "${repeat_rate:=45}"
+
+  options_field="None"
+  if [[ -n "$options" ]]; then
+    options_field="Some(\"${options}\")"
+  fi
+
+  tmp="${COSMIC_CFG}.tmp.$$"
+  cat > "$tmp" << EOF
+(
+    rules: "",
+    model: "",
+    layout: "fi",
+    variant: "mac",
+    options: ${options_field},
+    repeat_delay: ${repeat_delay},
+    repeat_rate: ${repeat_rate},
+)
+EOF
+  mv -- "$tmp" "$COSMIC_CFG"
+  msgr yay "COSMIC config restored to fi/mac"
+fi
+
+msgr yay "UHK 60 v2 ISO key remap installed"
+msgr msg "The key should work immediately. If not, unplug and replug the UHK."
