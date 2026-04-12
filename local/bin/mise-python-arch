@@ -5,6 +5,18 @@
 # Source this script or eval its output.
 # Exits 0 and prints exports on success; exits 1 silently on unknown systems.
 
+# Source msgr helper if available (for potential future error messaging)
+# shellcheck disable=SC1091
+if [ -n "${BASH_SOURCE:-}" ]; then
+  _msgr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+elif [ -n "${ZSH_VERSION:-}" ]; then
+  _msgr_dir="$(cd "$(dirname "$0")" && pwd)"
+else
+  _msgr_dir="$(cd "$(dirname "$(command -v mise-python-arch 2>/dev/null || echo "$0")")" && pwd)"
+fi
+[ -f "$_msgr_dir/msgr" ] && . "$_msgr_dir/msgr" 2>/dev/null || true
+unset _msgr_dir
+
 _os="$(uname -s)"
 _cpu="$(uname -m)"
 
@@ -12,6 +24,11 @@ _cpu="$(uname -m)"
 case "$_cpu" in
   arm64) _cpu="aarch64" ;;
   i386) _cpu="i686" ;;
+  aarch64 | x86_64 | i686) ;;  # Already normalized, no change needed
+  *)
+    printf 'Unsupported CPU architecture: %s\n' "$_cpu" >&2
+    exit 1
+    ;;
 esac
 
 case "$_os" in

@@ -16,23 +16,23 @@ precompiled architecture, causing install failures. Setting
 
 ## Goal
 
-Add a portable detection helper that sets `MISE_PYTHON_PRECOMPILED_ARCH` to the
-correct LLVM target triple for the current machine, loaded before mise activates in
+Add a portable detection helper that exports `MISE_PYTHON_PRECOMPILED_ARCH` and
+`MISE_PYTHON_PRECOMPILED_OS` for the current machine, loaded before mise activates in
 all supported shells: **bash, sh, zsh, and fish**.
 
 ## Files
 
-| File                          | Purpose                                                                  |
-|-------------------------------|--------------------------------------------------------------------------|
-| `local/bin/mise-python-arch`  | POSIX sh executable — detects and prints arch triple                     |
-| `config/exports`              | Sources the result in the mise section (existing file, small addition)   |
-| `config/fish/exports.fish`    | Sources the result in the Python section (existing file, small addition) |
-| `tests/mise_python_arch.bats` | Bats test suite                                                          |
+| File                          | Purpose                                                                           |
+|-------------------------------|-----------------------------------------------------------------------------------|
+| `local/bin/mise-python-arch`  | POSIX sh executable — detects and prints export statements for arch and OS        |
+| `config/exports`              | Evaluates the script output in the mise section (existing file, small addition)   |
+| `config/fish/exports.fish`    | Evaluates the script output in the Python section (existing file, small addition) |
+| `tests/mise_python_arch.bats` | Bats test suite                                                                   |
 
 ## Script: `local/bin/mise-python-arch`
 
 - Shebang: `#!/bin/sh` (POSIX, no bashisms)
-- Prints exactly one line to stdout: the LLVM target triple
+- Prints two export statements to stdout: `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTHON_PRECOMPILED_OS`
 - Exits 0 on success, exits 1 silently if the system is unrecognized
 - No side effects; safe to call multiple times
 
@@ -45,17 +45,17 @@ all supported shells: **bash, sh, zsh, and fish**.
 
 ### Output matrix
 
-| OS     | CPU (`uname -m`) | libc  | Output                       |
-|--------|------------------|-------|------------------------------|
-| Darwin | arm64 / aarch64  | —     | `aarch64-apple-darwin`       |
-| Darwin | x86_64           | —     | `x86_64-apple-darwin`        |
-| Linux  | x86_64           | glibc | `x86_64-unknown-linux-gnu`   |
-| Linux  | x86_64           | musl  | `x86_64-unknown-linux-musl`  |
-| Linux  | aarch64          | glibc | `aarch64-unknown-linux-gnu`  |
-| Linux  | aarch64          | musl  | `aarch64-unknown-linux-musl` |
-| Linux  | i686 / i386      | glibc | `i686-unknown-linux-gnu`     |
-| Linux  | i686 / i386      | musl  | `i686-unknown-linux-musl`    |
-| other  | any              | any   | (no output, exit 1)          |
+| OS     | CPU (`uname -m`) | libc  | MISE_PYTHON_PRECOMPILED_ARCH | MISE_PYTHON_PRECOMPILED_OS |
+|--------|------------------|-------|------------------------------|----------------------------|
+| Darwin | arm64 / aarch64  | —     | `aarch64`                    | `apple-darwin`             |
+| Darwin | x86_64           | —     | `x86_64`                     | `apple-darwin`             |
+| Linux  | x86_64           | glibc | `x86_64`                     | `unknown-linux-gnu`        |
+| Linux  | x86_64           | musl  | `x86_64`                     | `unknown-linux-musl`       |
+| Linux  | aarch64          | glibc | `aarch64`                    | `unknown-linux-gnu`        |
+| Linux  | aarch64          | musl  | `aarch64`                    | `unknown-linux-musl`       |
+| Linux  | i686 / i386      | glibc | `i686`                       | `unknown-linux-gnu`        |
+| Linux  | i686 / i386      | musl  | `i686`                       | `unknown-linux-musl`       |
+| other  | any              | any   | (no output, exit 1)          | (no output, exit 1)        |
 
 ## Integration
 
@@ -65,12 +65,11 @@ Added in the `mise` section, before `eval "$(... mise activate ...)"`:
 
 ```sh
 # Set precompiled Python arch for mise to avoid source builds
-_arch="$(mise-python-arch 2>/dev/null)" && export MISE_PYTHON_PRECOMPILED_ARCH="$_arch"
-unset _arch
+eval "$(mise-python-arch 2>/dev/null)"
 ```
 
-If detection fails (exit 1), the var is left unset and mise falls back to its own
-detection. The temp variable is unset immediately to keep the environment clean.
+If detection fails (exit 1), the variables are left unset and mise falls back to its own
+detection. The script exports both `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTHON_PRECOMPILED_OS`.
 
 ### `config/fish/exports.fish` (fish)
 
@@ -78,11 +77,9 @@ Added in the Python configuration section:
 
 ```fish
 # Set precompiled Python arch for mise to avoid source builds
-set _arch (mise-python-arch 2>/dev/null)
-if test $status -eq 0; and test -n "$_arch"
-    set -gx MISE_PYTHON_PRECOMPILED_ARCH $_arch
+if type -q mise-python-arch
+    eval (mise-python-arch 2>/dev/null)
 end
-set -e _arch
 ```
 
 ### Why this order is safe
@@ -99,17 +96,17 @@ wrapper scripts to PATH, then asserts the script's stdout and exit code.
 
 ### Test cases
 
-| # | Scenario                       | Expected output              |
-|---|--------------------------------|------------------------------|
-| 1 | macOS arm64                    | `aarch64-apple-darwin`       |
-| 2 | macOS x86_64                   | `x86_64-apple-darwin`        |
-| 3 | Linux x86_64 + glibc           | `x86_64-unknown-linux-gnu`   |
-| 4 | Linux x86_64 + musl            | `x86_64-unknown-linux-musl`  |
-| 5 | Linux aarch64 + glibc          | `aarch64-unknown-linux-gnu`  |
-| 6 | Linux aarch64 + musl           | `aarch64-unknown-linux-musl` |
-| 7 | Linux i686 + glibc             | `i686-unknown-linux-gnu`     |
-| 8 | Linux i386 (normalized) + musl | `i686-unknown-linux-musl`    |
-| 9 | Unknown OS                     | empty output, exit code 1    |
+| # | Scenario                       | Expected ARCH | Expected OS          | Exit |
+|---|--------------------------------|---------------|----------------------|------|
+| 1 | macOS arm64                    | `aarch64`     | `apple-darwin`       | 0    |
+| 2 | macOS x86_64                   | `x86_64`      | `apple-darwin`       | 0    |
+| 3 | Linux x86_64 + glibc           | `x86_64`      | `unknown-linux-gnu`  | 0    |
+| 4 | Linux x86_64 + musl            | `x86_64`      | `unknown-linux-musl` | 0    |
+| 5 | Linux aarch64 + glibc          | `aarch64`     | `unknown-linux-gnu`  | 0    |
+| 6 | Linux aarch64 + musl           | `aarch64`     | `unknown-linux-musl` | 0    |
+| 7 | Linux i686 + glibc             | `i686`        | `unknown-linux-gnu`  | 0    |
+| 8 | Linux i386 (normalized) + musl | `i686`        | `unknown-linux-musl` | 0    |
+| 9 | Unknown OS                     | (no output)   | (no output)          | 1    |
 
 ## Out of scope
 
