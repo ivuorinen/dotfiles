@@ -82,7 +82,7 @@ ruff = "latest"
 # DevOps & security tools
 act = "latest"
 age = "latest"
-aws-cli = "2.34.24"
+aws-cli = "2.34.29"
 checkov = "latest"
 grype = "latest"
 pinact = "latest"
