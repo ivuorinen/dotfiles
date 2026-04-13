@@ -4,7 +4,7 @@
 
 **Goal:** Add `local/bin/mise-python-arch`, a POSIX sh script that detects and prints the correct LLVM target triple for `MISE_PYTHON_PRECOMPILED_ARCH`, and wire it into bash/zsh/sh and fish startup before mise activates.
 
-**Architecture:** Single executable `local/bin/mise-python-arch` uses `uname -s` / `uname -m` for OS and CPU, `ldd --version` for Linux libc detection, and prints the triple to stdout (exits 1 if unrecognized). `config/exports` and `config/fish/exports.fish` each get a small block that calls the script and exports the result before the mise activation block.
+**Architecture:** Single executable `local/bin/mise-python-arch` uses `uname -s` / `uname -m` for OS and CPU, `ldd --version` for Linux libc detection, and prints `export KEY="value"` lines to stdout for `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTHON_PRECOMPILED_OS` (exits 1 if unrecognized). `config/exports` captures the output into a variable and only `eval`s it when the command succeeds and output is non-empty. `config/fish/exports.fish` reads the output line-by-line and sets each variable with `set -gx`.
 
 **Tech Stack:** POSIX sh (`/bin/sh`), bats (Bash Automated Testing System), fish shell
 
@@ -262,11 +262,13 @@ Edit `config/exports`: find the exact string:
 
 Replace with:
 ```sh
-# Set precompiled Python arch so mise downloads the right binary
-if _arch="$(mise-python-arch 2>/dev/null)"; then
-  export MISE_PYTHON_PRECOMPILED_ARCH="$_arch"
+# Set precompiled Python arch+OS so mise downloads the right binary
+if command -v mise-python-arch > /dev/null 2>&1; then
+  if _mise_python_arch_env="$(mise-python-arch 2>/dev/null)" && [ -n "$_mise_python_arch_env" ]; then
+    eval "$_mise_python_arch_env"
+  fi
+  unset _mise_python_arch_env
 fi
-unset _arch
 
 # mise — unified tool version manager
 # https://mise.jdx.dev
@@ -314,12 +316,15 @@ Replace with:
 # Python configuration
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 
-# Set precompiled Python arch so mise downloads the right binary
-set _arch (mise-python-arch 2>/dev/null)
-if test $status -eq 0; and test -n "$_arch"
-    set -gx MISE_PYTHON_PRECOMPILED_ARCH $_arch
+# Set precompiled Python arch+OS so mise downloads the right binary
+if command -v mise-python-arch >/dev/null 2>&1
+    mise-python-arch 2>/dev/null | while read -l _line
+        set -l _kv (string replace -r '^export ' '' -- $_line)
+        set -l _key (string split -m1 '=' $_kv)[1]
+        set -l _val (string replace -r '^[^=]+="|"$' '' -- $_kv | string replace -ra '"' '')
+        set -gx $_key $_val
+    end
 end
-set -e _arch
 ```
 
 - [ ] **Step 3: Verify the change looks correct**
