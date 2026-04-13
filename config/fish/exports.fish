@@ -106,6 +106,19 @@ set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 # Python configuration
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 
+# Set precompiled Python arch+OS so mise downloads the right binary
+# Each output line from mise-python-arch has the format: export KEY="value"
+if command -v mise-python-arch >/dev/null 2>&1
+    mise-python-arch 2>/dev/null | while read -l _line
+        set -l _kv (string replace -r '^export ' '' -- $_line)
+        set -l _key (string split -m1 '=' $_kv)[1]
+        set -l _val (string replace -r '^[^=]+="|"$' '' -- $_kv | string replace -ra '"' '')
+        if test -n "$_key"
+            set -gx $_key $_val
+        end
+    end
+end
+
 # Poetry configuration
 set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
 fish_add_path "$POETRY_HOME/bin"

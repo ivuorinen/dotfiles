@@ -1,0 +1,42 @@
+#!/bin/sh
+# shellcheck shell=sh
+# @description Print MISE_PYTHON_PRECOMPILED_ARCH and MISE_PYTHON_PRECOMPILED_OS
+# for this machine as shell export statements.
+# Eval the output to set both variables in the current shell.
+# Exits 0 and prints exports on success; exits 1 silently on unknown systems.
+
+_os="$(uname -s)"
+_cpu="$(uname -m)"
+
+# Normalize CPU names to match LLVM target triple conventions
+case "$_cpu" in
+  arm64) _cpu="aarch64" ;;
+  i386) _cpu="i686" ;;
+  aarch64 | x86_64 | i686) ;;  # Already normalized, no change needed
+  *)
+    printf 'Unsupported CPU architecture: %s\n' "$_cpu" >&2
+    exit 1
+    ;;
+esac
+
+case "$_os" in
+  Darwin)
+    printf 'export MISE_PYTHON_PRECOMPILED_ARCH="%s"\n' "$_cpu"
+    printf 'export MISE_PYTHON_PRECOMPILED_OS="apple-darwin"\n'
+    ;;
+  Linux)
+    _os_str="unknown-linux-gnu"
+    if command -v ldd > /dev/null 2>&1 \
+      && ldd --version 2>&1 \
+      | grep -qi musl; then
+      _os_str="unknown-linux-musl"
+    elif ls /lib/libc.musl-* > /dev/null 2>&1; then
+      _os_str="unknown-linux-musl"
+    fi
+    printf 'export MISE_PYTHON_PRECOMPILED_ARCH="%s"\n' "$_cpu"
+    printf 'export MISE_PYTHON_PRECOMPILED_OS="%s"\n' "$_os_str"
+    ;;
+  *)
+    exit 1
+    ;;
+esac
