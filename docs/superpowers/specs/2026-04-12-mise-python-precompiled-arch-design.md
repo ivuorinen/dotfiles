@@ -61,11 +61,18 @@ all supported shells: **bash, sh, zsh, and fish**.
 
 ### `config/exports` (bash / zsh / sh)
 
-Added in the `mise` section, before `eval "$(... mise activate ...)"`:
+Added before the `mise` activation block. Output is captured first; `eval` only runs
+when the command succeeds and produces non-empty output, preserving the helper's exit
+status and avoiding silent masking of failures:
 
 ```sh
-# Set precompiled Python arch for mise to avoid source builds
-eval "$(mise-python-arch 2>/dev/null)"
+# Set precompiled Python arch+OS so mise downloads the right binary
+if command -v mise-python-arch > /dev/null 2>&1; then
+  if _mise_python_arch_env="$(mise-python-arch 2>/dev/null)" && [ -n "$_mise_python_arch_env" ]; then
+    eval "$_mise_python_arch_env"
+  fi
+  unset _mise_python_arch_env
+fi
 ```
 
 If detection fails (exit 1), the variables are left unset and mise falls back to its own
@@ -73,12 +80,19 @@ detection. The script exports both `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTH
 
 ### `config/fish/exports.fish` (fish)
 
-Added in the Python configuration section:
+Added in the Python configuration section. Output is read line-by-line using
+`while read -l` (safe for lines containing spaces), and temporary parsing variables
+use `set -l` to avoid leaking into the caller's global scope:
 
 ```fish
-# Set precompiled Python arch for mise to avoid source builds
-if type -q mise-python-arch
-    eval (mise-python-arch 2>/dev/null)
+# Set precompiled Python arch+OS so mise downloads the right binary
+if command -v mise-python-arch >/dev/null 2>&1
+    mise-python-arch 2>/dev/null | while read -l _line
+        set -l _kv (string replace -r '^export ' '' -- $_line)
+        set -l _key (string split -m1 '=' $_kv)[1]
+        set -l _val (string replace -r '^[^=]+="|"$' '' -- $_kv | string replace -ra '"' '')
+        set -gx $_key $_val
+    end
 end
 ```
 
