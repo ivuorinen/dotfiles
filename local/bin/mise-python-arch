@@ -12,7 +12,7 @@ _cpu="$(uname -m)"
 case "$_cpu" in
   arm64) _cpu="aarch64" ;;
   i386) _cpu="i686" ;;
-  aarch64 | x86_64 | i686) ;;  # Already normalized, no change needed
+  aarch64 | x86_64 | i686) ;; # Already normalized, no change needed
   *)
     printf 'Unsupported CPU architecture: %s\n' "$_cpu" >&2
     exit 1
