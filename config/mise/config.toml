@@ -25,7 +25,7 @@ experimental = true
 [tools]
 # Language runtimes
 node = "lts"
-python = "3.14.4"
+python = "3.14"
 go = "1.26.2"
 rust = "stable"
 
@@ -36,7 +36,7 @@ eza = "latest"
 bottom = "latest"
 zoxide = "latest"
 tree-sitter = "latest"
-neovim = "0.11.6" # Neovim editor binary
+neovim = "0.12.0"
 delta = "latest"
 difftastic = "latest"
 
