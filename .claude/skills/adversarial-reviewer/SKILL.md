@@ -144,7 +144,7 @@ Stop when no new concrete failures can be produced.
 
 ## Output Format (Strict)
 
-```
+```text
 **BUG: [short title]**
 File: path/to/file:line
 Category: [Checklist category]
@@ -177,7 +177,7 @@ If unsure → omit.
 
 If no **provable** failures remain:
 
-```
+```text
 No bugs found
 ```
 

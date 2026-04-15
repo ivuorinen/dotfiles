@@ -110,17 +110,19 @@ wrapper scripts to PATH, then asserts the script's stdout and exit code.
 
 ### Test cases
 
-| # | Scenario                       | Expected ARCH | Expected OS          | Exit |
-|---|--------------------------------|---------------|----------------------|------|
-| 1 | macOS arm64                    | `aarch64`     | `apple-darwin`       | 0    |
-| 2 | macOS x86_64                   | `x86_64`      | `apple-darwin`       | 0    |
-| 3 | Linux x86_64 + glibc           | `x86_64`      | `unknown-linux-gnu`  | 0    |
-| 4 | Linux x86_64 + musl            | `x86_64`      | `unknown-linux-musl` | 0    |
-| 5 | Linux aarch64 + glibc          | `aarch64`     | `unknown-linux-gnu`  | 0    |
-| 6 | Linux aarch64 + musl           | `aarch64`     | `unknown-linux-musl` | 0    |
-| 7 | Linux i686 + glibc             | `i686`        | `unknown-linux-gnu`  | 0    |
-| 8 | Linux i386 (normalized) + musl | `i686`        | `unknown-linux-musl` | 0    |
-| 9 | Unknown OS                     | (no output)   | (no output)          | 1    |
+| #  | Scenario                            | Expected ARCH | Expected OS          | Exit |
+|----|-------------------------------------|---------------|----------------------|------|
+| 1  | macOS arm64                         | `aarch64`     | `apple-darwin`       | 0    |
+| 2  | macOS x86_64                        | `x86_64`      | `apple-darwin`       | 0    |
+| 3  | Linux x86_64 + glibc                | `x86_64`      | `unknown-linux-gnu`  | 0    |
+| 4  | Linux x86_64 + musl                 | `x86_64`      | `unknown-linux-musl` | 0    |
+| 5  | Linux aarch64 + glibc               | `aarch64`     | `unknown-linux-gnu`  | 0    |
+| 6  | Linux aarch64 + musl                | `aarch64`     | `unknown-linux-musl` | 0    |
+| 7  | Linux i686 + glibc                  | `i686`        | `unknown-linux-gnu`  | 0    |
+| 8  | Linux i386 (normalized) + musl      | `i686`        | `unknown-linux-musl` | 0    |
+| 9  | Unknown OS                          | (no output)   | (no output)          | 1    |
+| 10 | Unknown CPU (e.g. riscv64)          | (no output)   | (no output)          | 1    |
+| 11 | Linux x86_64 + musl via ls fallback | `x86_64`      | `unknown-linux-musl` | 0    |
 
 ## Out of scope
 

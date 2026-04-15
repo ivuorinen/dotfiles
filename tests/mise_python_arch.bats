@@ -130,3 +130,25 @@ export MISE_PYTHON_PRECOMPILED_OS="unknown-linux-musl"' ]
   [ "$status" -eq 1 ]
   [ "$output" = "" ]
 }
+
+@test "Unknown CPU exits 1 with no output" {
+  _stub_uname "Linux" "riscv64"
+  run sh "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [ "$output" = "" ]
+}
+
+@test "Linux x86_64 musl detected via ls fallback" {
+  _stub_uname "Linux" "x86_64"
+  _stub_ldd "ldd (GNU libc) 2.35"
+  # stub ls to exit 0, simulating /lib/libc.musl-* present
+  cat > "$STUB_DIR/ls" << 'EOF'
+#!/bin/sh
+exit 0
+EOF
+  chmod +x "$STUB_DIR/ls"
+  run sh "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$output" = 'export MISE_PYTHON_PRECOMPILED_ARCH="x86_64"
+export MISE_PYTHON_PRECOMPILED_OS="unknown-linux-musl"' ]
+}
