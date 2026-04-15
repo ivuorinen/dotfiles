@@ -40,6 +40,17 @@ EOF
   chmod +x "$STUB_DIR/ldd"
 }
 
+# Write a stub ls that always exits 1, preventing the /lib/libc.musl-* fallback
+# from reading the real filesystem on musl hosts during glibc tests.
+_stub_ls_no_musl()
+{
+  cat > "$STUB_DIR/ls" << 'EOF'
+#!/bin/sh
+exit 1
+EOF
+  chmod +x "$STUB_DIR/ls"
+}
+
 @test "macOS arm64 exports aarch64 arch and apple-darwin os" {
   _stub_uname "Darwin" "arm64"
   run sh "$SCRIPT"
@@ -59,6 +70,7 @@ export MISE_PYTHON_PRECOMPILED_OS="apple-darwin"' ]
 @test "Linux x86_64 glibc exports x86_64 arch and unknown-linux-gnu os" {
   _stub_uname "Linux" "x86_64"
   _stub_ldd "ldd (GNU libc) 2.35"
+  _stub_ls_no_musl
   run sh "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$output" = 'export MISE_PYTHON_PRECOMPILED_ARCH="x86_64"
@@ -77,6 +89,7 @@ export MISE_PYTHON_PRECOMPILED_OS="unknown-linux-musl"' ]
 @test "Linux aarch64 glibc exports aarch64 arch and unknown-linux-gnu os" {
   _stub_uname "Linux" "aarch64"
   _stub_ldd "ldd (GNU libc) 2.35"
+  _stub_ls_no_musl
   run sh "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$output" = 'export MISE_PYTHON_PRECOMPILED_ARCH="aarch64"
@@ -95,6 +108,7 @@ export MISE_PYTHON_PRECOMPILED_OS="unknown-linux-musl"' ]
 @test "Linux i686 glibc exports i686 arch and unknown-linux-gnu os" {
   _stub_uname "Linux" "i686"
   _stub_ldd "ldd (GNU libc) 2.17"
+  _stub_ls_no_musl
   run sh "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$output" = 'export MISE_PYTHON_PRECOMPILED_ARCH="i686"
