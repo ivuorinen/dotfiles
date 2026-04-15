@@ -26,11 +26,13 @@ case "$_os" in
     ;;
   Linux)
     _os_str="unknown-linux-gnu"
-    if command -v ldd > /dev/null 2>&1 \
-      && ldd --version 2>&1 \
-      | grep -qi musl; then
-      _os_str="unknown-linux-musl"
-    elif ls /lib/libc.musl-* > /dev/null 2>&1; then
+    if command -v ldd > /dev/null 2>&1; then
+      _ldd_out="$(ldd --version 2>&1)"
+      if printf '%s\n' "$_ldd_out" | grep -qi musl; then
+        _os_str="unknown-linux-musl"
+      fi
+    fi
+    if [ "$_os_str" = "unknown-linux-gnu" ] && ls /lib/libc.musl-* > /dev/null 2>&1; then
       _os_str="unknown-linux-musl"
     fi
     printf 'export MISE_PYTHON_PRECOMPILED_ARCH="%s"\n' "$_cpu"
