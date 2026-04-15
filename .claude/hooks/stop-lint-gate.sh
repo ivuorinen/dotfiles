@@ -17,6 +17,9 @@ if command -v corepack > /dev/null 2>&1; then
   corepack enable --install-directory "$HOME/.local/bin" 2> /dev/null || true
 fi
 
+# Ensure node_modules are installed (fast no-op if already up to date)
+yarn install 2> /dev/null
+
 output=$(yarn lint:biome 2>&1 && yarn lint:prettier 2>&1 && yarn lint:md-table 2>&1)
 status=$?
 
