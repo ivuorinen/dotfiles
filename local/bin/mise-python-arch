@@ -14,7 +14,6 @@ case "$_cpu" in
   i386) _cpu="i686" ;;
   aarch64 | x86_64 | i686) ;; # Already normalized, no change needed
   *)
-    printf 'Unsupported CPU architecture: %s\n' "$_cpu" >&2
     exit 1
     ;;
 esac

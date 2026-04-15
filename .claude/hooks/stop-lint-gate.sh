@@ -7,8 +7,8 @@ cd "$CLAUDE_PROJECT_DIR" || exit 0
 # Ensure node/yarn are on PATH via mise (if available)
 if command -v mise > /dev/null 2>&1; then
   eval "$(mise activate bash --shims)" 2> /dev/null
-  node_dir="$(mise where node 2> /dev/null)/bin"
-  [ -d "$node_dir" ] && export PATH="$node_dir:$PATH"
+  node_root="$(mise where node 2> /dev/null)"
+  [ -n "$node_root" ] && [ -d "$node_root/bin" ] && export PATH="$node_root/bin:$PATH"
 fi
 
 # Fall back to corepack shim locations if yarn is still the legacy v1
