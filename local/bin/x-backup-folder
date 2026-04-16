@@ -26,6 +26,7 @@ usage()
 msg()
 {
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
 }
 
 # Function to print error messages and exit
@@ -78,6 +79,10 @@ main()
 
   if [ -z "$directory" ]; then
     msg_err "DIRECTORY (first argument) is missing"
+  fi
+
+  if [ ! -d "$directory" ]; then
+    msg_err "Directory does not exist: $directory"
   fi
 
   backup_directory "$directory" "$filename"
