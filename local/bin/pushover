@@ -85,6 +85,16 @@ CURL_OPTS=""
 devices=""
 optstring="c:d:D:e:p:r:t:T:s:u:U:a:h"
 
+callback=""
+timestamp=""
+priority=""
+retry=""
+expire=""
+title=""
+sound=""
+url=""
+url_title=""
+
 OPTIND=1
 while getopts ${optstring} c; do
   case ${c} in
