@@ -26,6 +26,7 @@ usage()
 msg()
 {
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
 }
 
 # Function to print error messages and exit
@@ -52,13 +53,14 @@ backup_mysql_tables()
 
   msg "Backing up tables with prefix '$prefix' from database '$database' to file '$filename_timestamp'"
 
+  # shellcheck disable=SC2046  # word splitting is intentional: expands table names as separate args
   mysqldump \
     "${database}" \
-    "$(
+    $(
       echo "show tables like '${prefix}%';" \
         | mysql "${database}" \
         | sed '/Tables_in/d'
-    )" > "${filename_timestamp}"
+    ) > "${filename_timestamp}"
 
   msg "Backup completed and saved to '$filename_timestamp'"
 }
