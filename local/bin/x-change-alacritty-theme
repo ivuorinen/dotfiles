@@ -33,6 +33,10 @@ set_alacritty_theme()
   local theme=$1
   local theme_file="$A_DIR/theme-$theme.toml"
   msg "Setting alacritty theme to $theme ($theme_file)"
+  if [ ! -f "$theme_file" ]; then
+    echo "ERROR: Theme file not found: $theme_file" >&2
+    return 1
+  fi
   cp -f "$theme_file" "$A_DIR/theme-active.toml"
   return 0
 }
