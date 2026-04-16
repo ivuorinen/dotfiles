@@ -169,14 +169,14 @@ SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
 ## Claude Code Configuration
 
 - **Hooks** (`.claude/settings.json`):
-  - *PreToolUse*: Blocks edits to `fzf-tmux`, `yarn.lock`,
+  - _PreToolUse_: Blocks edits to `fzf-tmux`, `yarn.lock`,
     `.yarn/`, submodule paths, and real secrets.d files
-  - *PostToolUse*: Auto-formats files by extension
+  - _PostToolUse_: Auto-formats files by extension
     (shfmt, fish_indent, stylua, biome, prettier)
-  - *PostToolUse*: Validates Dotbot `install.conf.yaml`
+  - _PostToolUse_: Validates Dotbot `install.conf.yaml`
     after edits
-  - *PostToolUse*: Warns on formatter/linter config changes
-  - *Stop*: Runs `yarn lint` gate before finishing
+  - _PostToolUse_: Warns on formatter/linter config changes
+  - _Stop_: Runs `yarn lint` gate before finishing
 - **Skills** (`.claude/skills/`):
   - `shell-validate`: Auto-validates shell scripts
     (syntax + shellcheck)
