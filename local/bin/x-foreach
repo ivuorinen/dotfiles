@@ -17,6 +17,7 @@ fi
 listing=$1
 shift
 
+# shellcheck disable=SC2294  # eval is intentional: listing is a trusted owner-supplied command string
 for dir in $(eval "$listing"); do
   (
     echo "$dir"
