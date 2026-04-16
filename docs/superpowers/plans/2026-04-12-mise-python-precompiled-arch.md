@@ -152,7 +152,7 @@ EOF
 
 - [ ] **Step 2: Run the tests to confirm they all fail (script not created yet)**
 
-```
+```bash
 yarn test tests/mise_python_arch.bats
 ```
 
@@ -210,12 +210,12 @@ chmod +x local/bin/mise-python-arch
 
 - [ ] **Step 3: Run the tests and verify all 9 pass**
 
-```
+```bash
 yarn test tests/mise_python_arch.bats
 ```
 
 Expected output:
-```
+```text
  ✓ macOS arm64 returns aarch64-apple-darwin
  ✓ macOS x86_64 returns x86_64-apple-darwin
  ✓ Linux x86_64 glibc returns x86_64-unknown-linux-gnu
@@ -255,7 +255,7 @@ if command -v mise &> /dev/null; then
 - [ ] **Step 2: Insert the arch detection block before the mise section**
 
 Edit `config/exports`: find the exact string:
-```
+```sh
 # mise — unified tool version manager
 # https://mise.jdx.dev
 ```
@@ -306,7 +306,7 @@ set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 - [ ] **Step 2: Insert the arch detection after the WORKON_HOME line**
 
 Edit `config/fish/exports.fish`: find the exact string:
-```
+```fish
 # Python configuration
 set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 ```
@@ -341,7 +341,7 @@ Expected: the new block appears directly below the WORKON_HOME line.
 
 - [ ] **Step 1: Run all tests**
 
-```
+```bash
 yarn test
 ```
 
@@ -349,7 +349,7 @@ Expected: all tests pass, 0 failures.
 
 - [ ] **Step 2: Run lint**
 
-```
+```bash
 yarn lint
 ```
 

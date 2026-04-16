@@ -8,7 +8,7 @@ cd "$CLAUDE_PROJECT_DIR" || exit 0
 if command -v mise > /dev/null 2>&1; then
   eval "$(mise activate bash --shims)" 2> /dev/null
   node_root="$(mise where node 2> /dev/null)"
-  [ -n "$node_root" ] && [ -d "$node_root/bin" ] && export PATH="$node_root/bin:$PATH"
+  [[ -n "$node_root" && -d "$node_root/bin" ]] && export PATH="$node_root/bin:$PATH"
 fi
 
 # Fall back to corepack shim locations if yarn is still the legacy v1
@@ -18,7 +18,9 @@ if command -v corepack > /dev/null 2>&1; then
 fi
 
 # Ensure node_modules are installed (fast no-op if already up to date)
-yarn install 2> /dev/null
+if ! yarn install; then
+  echo "Warning: yarn install failed" >&2
+fi
 
 output=$(yarn lint:biome 2>&1 && yarn lint:prettier 2>&1 && yarn lint:md-table 2>&1)
 status=$?
@@ -26,7 +28,7 @@ status=$?
 # Run ec separately; skip if it fails due to binary download issues (network/rate-limit)
 ec_output=$(yarn lint:ec 2>&1)
 ec_status=$?
-if [ $ec_status -ne 0 ]; then
+if [[ $ec_status -ne 0 ]]; then
   if echo "$ec_output" | grep -q "rate limit\|Failed to download\|HttpError"; then
     echo "Warning: editorconfig-checker skipped (binary download failed — GitHub rate limit)" >&2
   else
