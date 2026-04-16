@@ -1,4 +1,4 @@
-#!/usr/bin/env bats
+# setup creates a temporary stub directory, prepends it to PATH so stubs override system commands, and sets SCRIPT to the test target path.
 
 setup()
 {
@@ -7,13 +7,14 @@ setup()
   SCRIPT="$PWD/local/bin/mise-python-arch"
 }
 
+# teardown removes the temporary stub directory created during setup.
 teardown()
 {
   rm -rf "$STUB_DIR"
 }
 
 # Write a stub uname that returns controlled -s and -m values.
-# Usage: _stub_uname <os-string> <cpu-string>
+# _stub_uname writes an executable stub at "$STUB_DIR/uname" that responds to `uname -s` with the given OS string and `uname -m` with the given CPU string.
 _stub_uname()
 {
   local _os="$1"
@@ -29,7 +30,7 @@ EOF
 }
 
 # Write a stub ldd that prints a fixed version string to stdout.
-# Usage: _stub_ldd <version-string>
+# _stub_ldd writes an executable stub `ldd` into `STUB_DIR` that prints the given version-string when invoked.
 _stub_ldd()
 {
   local _out="$1"
@@ -41,7 +42,7 @@ EOF
 }
 
 # Write a stub ls that always exits 1, preventing the /lib/libc.musl-* fallback
-# from reading the real filesystem on musl hosts during glibc tests.
+# _stub_ls_no_musl writes an executable stub named `ls` into `$STUB_DIR` that immediately exits with status 1 to block musl-detection fallbacks that inspect the real filesystem.
 _stub_ls_no_musl()
 {
   cat > "$STUB_DIR/ls" << 'EOF'
