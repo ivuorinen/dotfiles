@@ -4,7 +4,7 @@ setup()
 {
   STUB_DIR="$(mktemp -d)"
   export PATH="$STUB_DIR:$PATH"
-  SCRIPT="$PWD/local/bin/mise-python-arch"
+  SCRIPT="$BATS_TEST_DIRNAME/../local/bin/mise-python-arch"
 }
 
 teardown()

@@ -109,7 +109,7 @@ set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
 # Set precompiled Python arch+OS so mise downloads the right binary
 # Each output line from mise-python-arch has the format: export KEY="value"
 if command -v mise-python-arch >/dev/null 2>&1
-    mise-python-arch 2>/dev/null | while read -l _line
+    for _line in (mise-python-arch 2>/dev/null | string split \n)
         set -l _kv (string replace -r '^export ' '' -- $_line)
         set -l _key (string split -m1 '=' $_kv)[1]
         set -l _val (string replace -r '^[^=]+="|"$' '' -- $_kv | string replace -ra '"' '')

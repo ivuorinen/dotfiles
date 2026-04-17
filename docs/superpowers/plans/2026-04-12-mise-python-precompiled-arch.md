@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add `local/bin/mise-python-arch`, a POSIX sh script that detects and prints the correct LLVM target triple for `MISE_PYTHON_PRECOMPILED_ARCH`, and wire it into bash/zsh/sh and fish startup before mise activates.
+**Goal:** Add `local/bin/mise-python-arch`, a POSIX sh script that detects the current machine and prints `export KEY="value"` lines for `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTHON_PRECOMPILED_OS`, and wire it into bash/zsh/sh and fish startup before mise activates.
 
 **Architecture:** Single executable `local/bin/mise-python-arch` uses `uname -s` / `uname -m` for OS and CPU, `ldd --version` for Linux libc detection, and prints `export KEY="value"` lines to stdout for `MISE_PYTHON_PRECOMPILED_ARCH` and `MISE_PYTHON_PRECOMPILED_OS` (exits 1 if unrecognized). `config/exports` captures the output into a variable and only `eval`s it when the command succeeds and output is non-empty. `config/fish/exports.fish` reads the output line-by-line and sets each variable with `set -gx`.
 
@@ -12,12 +12,12 @@
 
 ## File Map
 
-| File                          | Action             | Responsibility                                                   |
-|-------------------------------|--------------------|------------------------------------------------------------------|
-| `local/bin/mise-python-arch`  | Create             | Detection script — prints LLVM arch triple to stdout             |
-| `tests/mise_python_arch.bats` | Create             | 9-case bats test suite                                           |
-| `config/exports`              | Modify (~line 516) | Export `MISE_PYTHON_PRECOMPILED_ARCH` before mise activates      |
-| `config/fish/exports.fish`    | Modify (~line 108) | Set `MISE_PYTHON_PRECOMPILED_ARCH` in fish before mise activates |
+| File                          | Action             | Responsibility                                                 |
+|-------------------------------|--------------------|----------------------------------------------------------------|
+| `local/bin/mise-python-arch`  | Create             | Detection script — prints `export` statements for ARCH and OS  |
+| `tests/mise_python_arch.bats` | Create             | 11-case bats test suite                                        |
+| `config/exports`              | Modify (~line 516) | Eval script output to set ARCH/OS vars before mise activates   |
+| `config/fish/exports.fish`    | Modify (~line 108) | Parse script output and set ARCH/OS vars before mise activates |
 
 ---
 

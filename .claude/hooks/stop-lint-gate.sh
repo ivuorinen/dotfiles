@@ -11,16 +11,18 @@ if command -v mise > /dev/null 2>&1; then
   [[ -n "$node_root" && -d "$node_root/bin" ]] && export PATH="$node_root/bin:$PATH"
 fi
 
-# Fall back to corepack shim locations if yarn is still the legacy v1
-export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
-if command -v corepack > /dev/null 2>&1; then
-  corepack enable --install-directory "$HOME/.local/bin" 2> /dev/null || true
+# Fall back to corepack shim location only when yarn is missing or legacy v1
+if ! command -v yarn > /dev/null 2>&1 || yarn --version 2> /dev/null | grep -q '^1\.'; then
+  export PATH="$HOME/.local/bin:$PATH"
+  if command -v corepack > /dev/null 2>&1; then
+    corepack enable --install-directory "$HOME/.local/bin" 2> /dev/null || true
+  fi
 fi
 
 # Resolve the correct yarn binary: prefer corepack yarn (v4+) over the global v1 shim
 YARN_BIN="yarn"
 if command -v corepack > /dev/null 2>&1; then
-  yarn_version="$(yarn --version 2>/dev/null || echo "0")"
+  yarn_version="$(yarn --version 2> /dev/null || echo "0")"
   if [[ "$yarn_version" == 1.* ]]; then
     YARN_BIN="corepack yarn"
   fi
@@ -40,7 +42,7 @@ status=$?
 ec_output=$($YARN_BIN lint:ec 2>&1)
 ec_status=$?
 if [[ $ec_status -ne 0 ]]; then
-  if echo "$ec_output" | grep -q "rate limit\|Failed to download\|HttpError"; then
+  if echo "$ec_output" | grep -Eq "rate limit|Failed to download|HttpError"; then
     echo "Warning: editorconfig-checker skipped (binary download failed — GitHub rate limit)" >&2
   else
     output="$output
@@ -49,7 +51,7 @@ $ec_output"
   fi
 fi
 
-if [ $status -ne 0 ]; then
+if [[ $status -ne 0 ]]; then
   echo "Lint failed — fix before finishing:" >&2
   echo "$output" >&2
   exit 2
