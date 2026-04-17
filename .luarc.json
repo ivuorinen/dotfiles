@@ -1,3 +1,11 @@
 {
-  "diagnostics.globals": ["vim"]
+  "diagnostics.globals": [
+    "vim",
+    "hs",
+    "K",
+    "MiniBufremove",
+    "MiniFiles",
+    "ToggleBackground",
+    "GetIntelephenseLicense"
+  ]
 }
