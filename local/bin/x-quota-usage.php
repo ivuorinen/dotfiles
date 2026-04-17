@@ -56,6 +56,10 @@ foreach ($quota as $lineNum => $line) {
 
     $result = array_combine(['fs', 'used', 'quota', 'limit'], $values);
 
+    if ((int) $result['quota'] <= 0) {
+        continue;
+    }
+
     $result['used_percentage'] = round($result['used'] / $result['quota'] * 100, 3);
     $result['used_gb'] = round($result['used'] / 1024 / 1024, 2);
     $result['quota_gb'] = round($result['quota'] / 1024 / 1024, 2);
