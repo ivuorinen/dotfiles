@@ -28,6 +28,10 @@ if status is-interactive
     # Initialize other tools if available
     type -q zoxide; and zoxide init fish | source
 
+    # Seed zoxide with project dirs in the background so sesh/gum finds them
+    type -q zoxide; and type -q fd; and functions -q zoxide-seed; and zoxide-seed &
+    disown 2>/dev/null
+
     # Start tmux if not already running and not in SSH
     #.t # defined in functions/.t.fish
 else
