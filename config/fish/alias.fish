@@ -1,4 +1,6 @@
 # Set aliases for fish shell
+# @fish-lsp-disable 4004
+# - 4004 disabled: interactive aliases have no in-file callers
 
 if type -q nvim
     alias v='nvim'

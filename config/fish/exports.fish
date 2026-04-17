@@ -44,6 +44,12 @@ test -z "$NVIM_SESSION_PATH" && set -x NVIM_SESSION_PATH "$NVIM_STATE/session"
 test -z "$NVIM_SHADA_PATH" && set -x NVIM_SHADA_PATH "$NVIM_STATE/shada"
 test -z "$NVIM_UNDO_PATH" && set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
 
+# fish-lsp — silence 4006 (duplicate function in same scope).
+# Our if/else blocks define the same function name in mutually exclusive
+# branches; fish-lsp flags them lexically, which is a false positive.
+set -q fish_lsp_diagnostic_disable_error_codes
+or set -gx fish_lsp_diagnostic_disable_error_codes 4006
+
 # Ansible configuration
 set -q ANSIBLE_HOME; or set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
 set -q ANSIBLE_CONFIG; or set -x ANSIBLE_CONFIG "$ANSIBLE_HOME/ansible.cfg"
