@@ -28,6 +28,7 @@ node = "lts"
 python = "3.14.4"
 go = "1.26.2"
 rust = "stable"
+uv = "latest"
 
 # Pre-built binaries via aqua registry
 fd = "latest"
@@ -82,7 +83,6 @@ ruff = "latest"
 # DevOps & security tools
 act = "latest"
 age = "latest"
-aws-cli = "2.34.30"
 checkov = "latest"
 grype = "latest"
 pinact = "latest"
@@ -122,5 +122,4 @@ tflint = "latest"
 tfsec = "latest"
 
 # Other useful tools
-uv = "latest"
 usage = "latest"
