@@ -116,7 +116,7 @@ generate_aliases()
 if ! cache_is_valid "$BREW_LIST_CACHE" "$CACHE_TTL"; then
   [[ "$VERBOSE" -ge 1 ]] && echo "Brew list cache is stale or missing. Regenerating brew list and aliases."
   # Regenerate the brew list cache (filtering only PHP formulas).
-  brew list | grep '^php' > "$BREW_LIST_CACHE"
+  brew list | grep '^php' > "$BREW_LIST_CACHE" || true
   # Generate the aliases cache from the new brew list.
   generate_aliases "$BREW_LIST_CACHE" > "$ALIASES_CACHE"
 else
@@ -131,7 +131,7 @@ fi
 if [[ -f "$ALIASES_CACHE" ]]; then
   # shellcheck source=/dev/null
   source "$ALIASES_CACHE"
-  [[ "$VERBOSE" -ge 1 ]] && echo "Aliases loaded from cache."
+  [[ "$VERBOSE" -ge 1 ]] && echo "Aliases loaded from cache." || true
 else
-  [[ "$VERBOSE" -ge 1 ]] && echo "No alias cache found; no aliases were loaded."
+  [[ "$VERBOSE" -ge 1 ]] && echo "No alias cache found; no aliases were loaded." || true
 fi
