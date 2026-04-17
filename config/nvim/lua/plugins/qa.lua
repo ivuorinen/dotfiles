@@ -33,6 +33,7 @@ return {
           python = { 'ruff_format' },
           sh = { 'shfmt' },
           terraform = { 'terraform_fmt' },
+          toml = { 'taplo' },
         },
         default_format_opts = {
           lsp_format = 'fallback',

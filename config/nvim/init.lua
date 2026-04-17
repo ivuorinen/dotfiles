@@ -83,6 +83,7 @@ vim.lsp.enable {
   'lua_ls',
   'pyright',
   'tailwindcss',
+  'taplo',
   'terraformls',
   'ts_ls',
   'vimls',
