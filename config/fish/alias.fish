@@ -1,6 +1,7 @@
 # Set aliases for fish shell
 
 if type -q nvim
+    alias v='nvim'
     alias vim='nvim'
     alias vi='nvim'
 end
@@ -87,11 +88,7 @@ function commit \
     git add .
 
     if test -z "$commitMessage"
-        if type -q aicommits
-            aicommits --type conventional
-        else
-            git commit -a -m "chore: automated commit"
-        end
+        git commit -a -m "chore: automated commit"
         return
     end
 
