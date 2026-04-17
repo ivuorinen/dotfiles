@@ -171,6 +171,32 @@ autocmd('LspAttach', {
   end,
 })
 
+-- Gracefully handle LSP requests the attached server doesn't support.
+-- Nvim 0.11's default `grt`, `gri`, `grr`, `gra` keymaps call vim.lsp.buf.*
+-- which spam "… is not supported" when the server lacks that capability.
+local lsp_method_map = {
+  grt = vim.lsp.protocol.Methods.textDocument_typeDefinition,
+  gri = vim.lsp.protocol.Methods.textDocument_implementation,
+}
+autocmd('LspAttach', {
+  group = augroup('lsp-capability-keymaps', { clear = true }),
+  callback = function(event)
+    for lhs, method in pairs(lsp_method_map) do
+      vim.keymap.set('n', lhs, function()
+        if #vim.lsp.get_clients { bufnr = event.buf, method = method } > 0 then
+          if method == vim.lsp.protocol.Methods.textDocument_typeDefinition then
+            vim.lsp.buf.type_definition()
+          else
+            vim.lsp.buf.implementation()
+          end
+        else
+          vim.notify(method .. ' not supported by attached LSP', vim.log.levels.INFO)
+        end
+      end, { buffer = event.buf, desc = 'LSP ' .. method .. ' (capability-checked)' })
+    end
+  end,
+})
+
 -- Set filetype for SSH config directory
 -- Pattern handles directories with files like:
 -- .dotfiles/ssh/config.d/*, .ssh/config.local, .ssh/config.work,
