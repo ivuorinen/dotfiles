@@ -143,12 +143,6 @@ if [[ -f "$CONFIG_FILE" ]]; then
   done <<< "$CUSTOM_GROUPS"
 fi
 
-if [[ -f "$X_ENV_GROUPING" ]]; then
-  while IFS=':' read -r key group; do
-    DEFINED_GROUPS+=("$key=$group")
-  done < "$X_ENV_GROUPING"
-fi
-
 # Check if the key is in the protected keywords list
 is_protected()
 {
