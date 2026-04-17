@@ -123,3 +123,4 @@ tfsec = "latest"
 
 # Other useful tools
 usage = "latest"
+taplo = "latest"
