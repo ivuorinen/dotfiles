@@ -24,3 +24,4 @@ dfm.sh
 .zsh_history
 **/.claude/settings.local.json
 **/.serena/cache
+.playwright-mcp/*
