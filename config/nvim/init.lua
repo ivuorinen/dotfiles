@@ -76,6 +76,7 @@ vim.lsp.enable {
   'cssls',
   'dockerls',
   'eslint',
+  'fish_lsp',
   'gopls',
   'html',
   'intelephense',

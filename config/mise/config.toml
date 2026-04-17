@@ -61,6 +61,7 @@ editorconfig-checker = "latest"
 "npm:github-release-notes" = "latest"
 "npm:neovim" = "latest" # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "latest"
+"npm:fish-lsp" = "latest"
 
 # Python tools (via pipx backend)
 # Disabled: mise pipx backend can't find uvx when uv is mise-managed
