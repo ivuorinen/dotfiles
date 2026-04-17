@@ -44,7 +44,7 @@ config.harfbuzz_features = {
 config.selection_word_boundary = ' \t\n{[}]()"\'`,;:'
 
 -- Window configuration
-config.window_background_opacity = 0.97
+config.window_background_opacity = 0.99
 config.window_decorations = 'RESIZE'
 config.macos_window_background_blur = 10
 config.window_padding = {
@@ -67,10 +67,8 @@ config.scrollback_lines = 3000
 function Scheme_for_appearance(appearance)
   if appearance:find 'Dark' then
     return 'Catppuccin Mocha'
-    -- return 'Everforest Dark (Medium)'
   else
     return 'Catppuccin Latte'
-    -- return 'Everforest Light (Medium)'
   end
 end
 
@@ -79,6 +77,9 @@ end
 wezterm.on('window-config-reloaded', function(window, pane)
   local overrides = window:get_config_overrides() or {}
   local appearance = window:get_appearance()
+  if not appearance then
+    return
+  end
   local scheme = Scheme_for_appearance(appearance)
   if overrides.color_scheme ~= scheme then
     overrides.color_scheme = scheme
