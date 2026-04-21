@@ -41,6 +41,11 @@ return {
           'path',
           'snippets',
           'buffer',
+          -- Wraps &omnifunc via blink.cmp.sources.complete_func. Built-in
+          -- `enabled` guard skips when omnifunc is the LSP handler, so no
+          -- duplication with the `lsp` source. Catches filetypes without
+          -- an LSP (gitcommit, help, plugin-provided completefuncs).
+          'omni',
         },
       },
 
