@@ -1,0 +1,3 @@
+-- Empty ftplugin — registers `gotmpl` in Neovim's filetype completion
+-- list so `:checkhealth vim.lsp` stops warning. Declared by lsp/gopls.lua
+-- for Go template files (.tmpl / .gotmpl).

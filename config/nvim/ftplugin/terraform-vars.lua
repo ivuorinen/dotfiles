@@ -1,0 +1,3 @@
+-- Empty ftplugin — registers `terraform-vars` in Neovim's filetype
+-- completion list so `:checkhealth vim.lsp` stops warning. Declared by
+-- lsp/terraformls.lua for .tfvars files.

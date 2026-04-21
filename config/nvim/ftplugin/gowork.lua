@@ -1,0 +1,3 @@
+-- Empty ftplugin — registers `gowork` in Neovim's filetype completion
+-- list so `:checkhealth vim.lsp` stops warning. Declared by lsp/gopls.lua
+-- for go.work files; detection is handled by the Go runtime/treesitter.

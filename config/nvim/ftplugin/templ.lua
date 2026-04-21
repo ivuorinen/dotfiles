@@ -1,0 +1,3 @@
+-- Empty ftplugin — registers `templ` in Neovim's filetype completion
+-- list so `:checkhealth vim.lsp` stops warning. Declared by lsp/html.lua
+-- so a-h/templ files get HTML-style completion via htmlls.

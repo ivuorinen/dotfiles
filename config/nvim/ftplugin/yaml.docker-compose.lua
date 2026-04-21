@@ -1,0 +1,4 @@
+-- Empty ftplugin — registers `yaml.docker-compose` in Neovim's
+-- filetype completion list so `:checkhealth vim.lsp` stops warning
+-- about the compound filetype declared by lsp/yamlls.lua. Base
+-- `yaml` ftplugin still applies for compound types.

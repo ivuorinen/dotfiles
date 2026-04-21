@@ -1,0 +1,5 @@
+-- Empty ftplugin — registers `yaml.ansible` in Neovim's filetype
+-- completion list so `:checkhealth vim.lsp` stops warning about the
+-- compound filetype declared by lsp/ansiblels.lua. Behaviour comes
+-- from the base `yaml` ftplugin (still applied for compound types);
+-- ansible-specific settings would go here if ever needed.
