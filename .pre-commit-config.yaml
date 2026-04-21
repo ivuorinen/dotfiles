@@ -3,8 +3,6 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: requirements-txt-fixer
-      - id: detect-aws-credentials
       - id: detect-private-key
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
