@@ -1,17 +1,21 @@
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pipx.uvx = true
-trusted_config_paths = [
-  "~/Code/ivuorinen",
-  "~/Code/s",
-  "~/Code/masf",
-]
+trusted_config_paths = ["~/Code/ivuorinen", "~/Code/s", "~/Code/masf"]
 # Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
 # This repo uses .mise.toml at the repo root for pinned versions.
 idiomatic_version_file = true
 idiomatic_version_file_enable_tools = [
-  "node", "python", "ruby", "go", "java",
-  "terraform", "yarn", "bun", "deno", "dotnet",
+  "node",
+  "python",
+  "ruby",
+  "go",
+  "java",
+  "terraform",
+  "yarn",
+  "bun",
+  "deno",
+  "dotnet",
 ]
 
 # Generate mise.lock for reproducible installs
@@ -27,7 +31,7 @@ experimental = true
 node = "lts"
 python = "3.14"
 go = "1.26.2"
-rust = "stable"
+rust = "latest"
 uv = "latest"
 
 # Pre-built binaries via aqua registry
@@ -59,7 +63,7 @@ gum = "latest"
 # npm-based tools
 editorconfig-checker = "latest"
 "npm:github-release-notes" = "latest"
-"npm:neovim" = "latest" # Node.js client for Neovim's RPC API (required by plugins)
+"npm:neovim" = "latest"               # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "latest"
 "npm:fish-lsp" = "latest"
 
@@ -118,7 +122,7 @@ oh-my-posh = "latest"
 "github:max-sixty/worktrunk" = "latest"
 
 # Terraform (replaces tfenv)
-terraform = "1.14.8"
+terraform = "1.14.9"
 tflint = "latest"
 tfsec = "latest"
 
