@@ -6,6 +6,9 @@ set -q XDG_STATE_HOME; or set -x XDG_STATE_HOME "$HOME/.local/state"
 set -q XDG_BIN_HOME; or set -x XDG_BIN_HOME "$HOME/.local/bin"
 set -q XDG_RUNTIME_DIR; or set -x XDG_RUNTIME_DIR "$HOME/.local/run"
 
+# POSIX fallback; macOS launchd sets its own per-user TMPDIR.
+set -q TMPDIR; or set -x TMPDIR /tmp
+
 # Dotfiles directory
 set -q DOTFILES; or set -x DOTFILES "$HOME/.dotfiles"
 

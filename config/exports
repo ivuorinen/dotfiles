@@ -11,6 +11,9 @@
 [ -z "${XDG_BIN_HOME:-}" ] && export XDG_BIN_HOME="$HOME/.local/bin"
 [ -z "${XDG_RUNTIME_DIR:-}" ] && export XDG_RUNTIME_DIR="$HOME/.local/run"
 
+# POSIX fallback; macOS launchd sets its own per-user TMPDIR.
+[ -z "${TMPDIR:-}" ] && export TMPDIR="/tmp"
+
 # if DOTFILES is not set, set it to the default location
 [ -z "${DOTFILES:-}" ] && export DOTFILES="$HOME/.dotfiles"
 
@@ -516,7 +519,7 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
 # Set precompiled Python arch+OS so mise downloads the right binary
 if command -v mise-python-arch > /dev/null 2>&1; then
-  if _mise_python_arch_env="$(mise-python-arch 2>/dev/null)" && [ -n "$_mise_python_arch_env" ]; then
+  if _mise_python_arch_env="$(mise-python-arch 2> /dev/null)" && [ -n "$_mise_python_arch_env" ]; then
     eval "$_mise_python_arch_env"
   fi
   unset _mise_python_arch_env
