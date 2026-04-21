@@ -6,9 +6,9 @@ local augroup = vim.api.nvim_create_augroup -- Create/get autocommand group
 local autocmd = vim.api.nvim_create_autocmd -- Create autocommand
 
 -- Highlight on yank
--- See `:help vim.highlight.on_yank()`
+-- See `:help vim.hl.on_yank()`
 autocmd('TextYankPost', {
-  callback = function() vim.highlight.on_yank() end,
+  callback = function() vim.hl.on_yank() end,
   group = augroup('YankHighlight', { clear = true }),
   pattern = '*',
 })
