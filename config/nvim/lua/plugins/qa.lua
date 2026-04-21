@@ -1,17 +1,8 @@
 -- ╭─────────────────────────────────────────────────────────╮
 -- │           Formatting (conform) and Linting              │
 -- ╰─────────────────────────────────────────────────────────╯
-
--- Check if a config file exists relative to a buffer
-local function has_file(patterns, bufnr)
-  local bufname = vim.api.nvim_buf_get_name(bufnr or 0)
-  local dir = vim.fn.fnamemodify(bufname, ':h')
-  return #vim.fs.find(patterns, {
-    upward = true,
-    path = dir,
-    limit = 1,
-  }) > 0
-end
+-- Project-gated tools use HasConfig()/Gated() from utils.lua.
+-- Tools not gated here run unconditionally (opinion-free defaults).
 
 return {
   -- Formatting
@@ -34,6 +25,16 @@ return {
           sh = { 'shfmt' },
           terraform = { 'terraform_fmt' },
           toml = { 'taplo' },
+          yaml = { 'prettier' },
+        },
+        -- Always-on formatters (standard/opinion-free): shfmt,
+        -- fish_indent, gofmt, goimports, terraform_fmt.
+        formatters = {
+          ['ansible-lint'] = Gated 'ansible_lint',
+          prettier = Gated 'prettier',
+          ruff_format = Gated 'ruff',
+          stylua = Gated 'stylua',
+          taplo = Gated 'taplo',
         },
         default_format_opts = {
           lsp_format = 'fallback',
@@ -86,6 +87,17 @@ return {
         ['yaml.ansible'] = { 'ansible_lint' },
       }
 
+      -- Linter name → TOOL_CONFIGS key. Linters absent from this map
+      -- run unconditionally (shellcheck, fish).
+      local LINTER_GATES = {
+        ansible_lint = 'ansible_lint',
+        golangci_lint = 'golangci_lint',
+        hadolint = 'hadolint',
+        ruff = 'ruff',
+        tflint = 'tflint',
+        yamllint = 'yamllint',
+      }
+
       -- Filetypes where biome applies
       local biome_fts = {
         javascript = true,
@@ -100,11 +112,16 @@ return {
         group = vim.api.nvim_create_augroup('nvim-lint', { clear = true }),
         callback = function(args)
           local ft = vim.bo[args.buf].filetype
-          if biome_fts[ft] and has_file({ 'biome.json', 'biome.jsonc' }, args.buf) then
+          if biome_fts[ft] and HasConfig('biome', args.buf) then
             lint.try_lint 'biomejs'
           end
 
-          lint.try_lint()
+          local names = {}
+          for _, name in ipairs(lint.linters_by_ft[ft] or {}) do
+            local gate = LINTER_GATES[name]
+            if gate == nil or HasConfig(gate, args.buf) then table.insert(names, name) end
+          end
+          if #names > 0 then lint.try_lint(names) end
         end,
       })
     end,

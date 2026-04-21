@@ -42,6 +42,7 @@ return {
         'goimports',
         'golangci-lint',
         'hadolint',
+        'prettier',
         'shfmt',
         'stylua',
         'shellcheck',

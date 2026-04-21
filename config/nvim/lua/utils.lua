@@ -98,3 +98,71 @@ function GetIntelephenseLicense()
   local stripped = string.gsub(content, '%s+', '')
   return stripped == '' and nil or stripped
 end
+
+-- ╭─────────────────────────────────────────────────────────╮
+-- │          Project tool-configuration detection           │
+-- ╰─────────────────────────────────────────────────────────╯
+
+-- Marker files per tool, keyed by logical name. Used to detect whether
+-- a project has opted into a given formatter/linter before running it.
+-- Shared between conform (via Gated()) and nvim-lint (via HasConfig()
+-- in lua/plugins/qa.lua's LINTER_GATES). Extend this table to gate a
+-- new tool; keys are referenced by string from consumers.
+---@type table<string, string[]>
+TOOL_CONFIGS = {
+  ansible_lint = { '.ansible-lint', '.ansible-lint.yml', '.ansible-lint.yaml' },
+  biome = { 'biome.json', 'biome.jsonc' },
+  golangci_lint = {
+    '.golangci.yml',
+    '.golangci.yaml',
+    '.golangci.toml',
+    '.golangci.json',
+  },
+  hadolint = { '.hadolint.yaml', '.hadolint.yml' },
+  prettier = {
+    '.prettierrc',
+    '.prettierrc.json',
+    '.prettierrc.json5',
+    '.prettierrc.yml',
+    '.prettierrc.yaml',
+    '.prettierrc.toml',
+    '.prettierrc.js',
+    '.prettierrc.cjs',
+    '.prettierrc.mjs',
+    'prettier.config.js',
+    'prettier.config.cjs',
+    'prettier.config.mjs',
+  },
+  -- pyproject.toml without [tool.ruff] is a false positive; toggle
+  -- format off with <leader>tf in those rare projects.
+  ruff = { 'ruff.toml', '.ruff.toml', 'pyproject.toml' },
+  stylua = { 'stylua.toml', '.stylua.toml' },
+  taplo = { 'taplo.toml', '.taplo.toml' },
+  tflint = { '.tflint.hcl' },
+  yamllint = { '.yamllint', '.yamllint.yml', '.yamllint.yaml' },
+}
+
+-- Does the buffer's file tree contain a config for `tool`? Walks
+-- upward from the buffer's file via vim.fs.root until a marker in
+-- TOOL_CONFIGS[tool] is found or the filesystem root is reached.
+-- Returns false for unknown tool names (fail-closed).
+---@param tool string key in TOOL_CONFIGS
+---@param bufnr integer? buffer handle; defaults to current (0)
+---@return boolean
+function HasConfig(tool, bufnr)
+  local bufname = vim.api.nvim_buf_get_name(bufnr or 0)
+  return vim.fs.root(bufname, TOOL_CONFIGS[tool] or {}) ~= nil
+end
+
+-- conform formatter spec builder that gates the formatter on
+-- HasConfig(). Intended for use inside conform.setup's `formatters`
+-- table, e.g. `formatters = { prettier = Gated 'prettier' }`. The
+-- returned table is shallow-merged by conform with the built-in
+-- formatter spec, so cmd/args/cwd/etc. are preserved.
+---@param tool string key in TOOL_CONFIGS
+---@return { condition: fun(self: any, ctx: { buf: integer }): boolean }
+function Gated(tool)
+  return {
+    condition = function(_, ctx) return HasConfig(tool, ctx.buf) end,
+  }
+end

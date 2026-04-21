@@ -37,6 +37,7 @@ vim.env.PATH = vim.env.HOME
 
 require 'options'
 require 'autogroups'
+require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
 
 -- ── Load plugins ────────────────────────────────────────────────────
 require('lazy').setup(
