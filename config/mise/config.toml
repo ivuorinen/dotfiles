@@ -83,7 +83,7 @@ ruff = "latest"
 "dotnet:coverlet.console" = "latest"
 "dotnet:csharpier" = "latest"
 "dotnet:ilspycmd" = "latest"
-"dotnet:dotnet-ef" = "10.0.6"
+"dotnet:dotnet-ef" = "10.0.7"
 
 # DevOps & security tools
 act = "latest"
