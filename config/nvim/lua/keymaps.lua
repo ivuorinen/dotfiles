@@ -22,6 +22,7 @@ K.d('<C-j>', { 'n', 'v' }, "<cmd>m '>+1<CR>gv=gv", 'Move Block Down')
 
 -- ── Other operations ────────────────────────────────────────────────
 K.n('<C-s>', '<cmd>w!<CR>', { desc = 'Save', noremap = true })
+K.n('<Esc><Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.

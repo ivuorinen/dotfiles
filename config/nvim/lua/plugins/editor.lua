@@ -324,11 +324,6 @@ return {
           end,
           length = 3,
         },
-        ['<Esc><Esc>'] = {
-          -- stylua: ignore
-          message = function() return 'Use single <Esc> to clear hlsearch (0.11)' end,
-          length = 2,
-        },
       },
     },
   },
