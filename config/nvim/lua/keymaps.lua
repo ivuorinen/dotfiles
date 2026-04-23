@@ -33,6 +33,7 @@ K.nl('bh', '<cmd>bprev<CR>', 'Prev buf')
 K.nl('bj', '<cmd>bfirst<CR>', 'First buf')
 K.nl('bk', '<cmd>blast<CR>', 'Last buf')
 K.nl('bl', '<cmd>bnext<CR>', 'Next buf')
+K.nl('bn', '<cmd>enew<CR>', 'New buf')
 K.nl('bw', '<cmd>lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 
 -- ── Code & LSP operations ───────────────────────────────────────────
