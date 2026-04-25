@@ -60,6 +60,9 @@ pre-commit run --all-files
 
 **Package manager: Yarn v4+** — do NOT use `npm install` or `npm run`.
 
+> **MANDATORY: Run `yarn lint` before every commit. All lint issues must be
+> fixed — no exceptions. A commit with lint errors is never acceptable.**
+
 ---
 
 ## Code Style Rules
@@ -225,3 +228,12 @@ Add files under `hosts/<hostname>/` and update
 - Lua → `stylua <file>`
 - JSON/JS/TS/MD → `yarn fix:biome`
 - YAML → `yarn fix:prettier`
+
+### Before every commit (mandatory, no exceptions)
+
+```bash
+yarn lint        # must pass with zero errors before any commit
+```
+
+If `yarn lint` reports errors, fix them and re-run until it is clean. Do not
+commit with lint failures under any circumstances.
