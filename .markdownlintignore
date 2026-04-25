@@ -4,6 +4,7 @@ config/cheat/cheatsheets/community/*
 config/cheat/cheatsheets/tldr/*
 config/op/plugins/used_plugins/*
 config/vim/*
+docs/*
 local/bin/asdf/*
 node_modules/*
 tools/*
