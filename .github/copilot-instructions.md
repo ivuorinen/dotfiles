@@ -67,15 +67,15 @@ pre-commit run --all-files
 
 ## Code Style Rules
 
-| File type       | Formatter / Linter | Key settings                                                                       |
-|-----------------|--------------------|------------------------------------------------------------------------------------|
-| Shell (bash/sh) | shfmt + shellcheck | 2-space, binary_next_line, switch_case_indent, space_redirects, function_next_line |
-| Fish            | fish_indent        | 4-space indent, 120-char line limit                                                |
-| Lua             | stylua             | 90-char line limit (`stylua.toml`)                                                 |
-| JSON / JS / TS  | Biome              | 90-char width (`biome.json`)                                                       |
-| Markdown        | Biome              | 120-char width override                                                            |
-| YAML            | Prettier           | Validated with yamllint (`.yamllint.yml`)                                          |
-| Python          | ruff               | Config in `pyproject.toml`                                                         |
+| File type       | Formatter / Linter | Key settings                                                                 |
+|-----------------|--------------------|------------------------------------------------------------------------------|
+| Shell (bash/sh) | shfmt + shellcheck | 2-space, binary_next_line, switch_case_indent, space_redirects, fn_next_line |
+| Fish            | fish_indent        | 4-space indent, 120-char line limit                                          |
+| Lua             | stylua             | 90-char line limit (`stylua.toml`)                                           |
+| JSON / JS / TS  | Biome              | 90-char width (`biome.json`)                                                 |
+| Markdown        | Biome              | 120-char width override                                                      |
+| YAML            | Prettier           | Validated with yamllint (`.yamllint.yml`)                                    |
+| Python          | ruff               | Config in `pyproject.toml`                                                   |
 
 - **EditorConfig**: 2-space indent, UTF-8, LF line endings globally.
   `.editorconfig` has per-filetype overrides (4-space for PHP/fish, tabs for git config).
@@ -95,10 +95,10 @@ suppressed project-wide; do not add `# shellcheck disable` for them inline.
 
 ### Shell Configuration Chain
 
-```
-base/bashrc  ──┐
-               ├──▶ config/shared.sh ──▶ config/exports  (env vars, XDG, PATH)
-base/zshrc   ──┘                    └──▶ config/alias    (shell aliases)
+```text
+base/bashrc ──┐
+              ├──▶ config/shared.sh ──▶ config/exports  (env vars, XDG, PATH)
+base/zshrc  ──┘                     └──▶ config/alias    (shell aliases)
 ```
 
 Zsh additionally loads **antidote** (plugin manager, in `tools/antidote/`) and
@@ -152,18 +152,18 @@ Machine overrides live in `hosts/<hostname>/` (current hosts: `air`, `lakka`,
 ## Important Gotchas
 
 1. **POSIX scripts** — `x-ssh-audit`, `x-codeql`, `x-until-error`,
-   `x-until-success`, `x-ssl-expiry-date` use `/bin/sh`. Validate with
-   `sh -n`, not `bash -n`.
+    `x-until-success`, `x-ssl-expiry-date` use `/bin/sh`. Validate with
+    `sh -n`, not `bash -n`.
 2. **Fish config chain** — `config/fish/config.fish` →
-   `exports.fish` → `alias.fish`. The `exports.fish` auto-sources
-   `secrets.d/*.fish`. Only `*.example` files and `README.md` in
-   `secrets.d/` are tracked.
+    `exports.fish` → `alias.fish`. The `exports.fish` auto-sources
+    `secrets.d/*.fish`. Only `*.example` files and `README.md` in
+    `secrets.d/` are tracked.
 3. **Scripts in `scripts/`** are discovered by `dfm scripts` via a
-   `@description` tag comment near the top of each file.
+    `@description` tag comment near the top of each file.
 4. **Documentation** under `docs/` is generated — do not edit generated
-   files manually; use `dfm docs all` to regenerate.
+    files manually; use `dfm docs all` to regenerate.
 5. **`.github/copilot-instructions.md`** (this file) — do not delete or
-   overwrite; update it incrementally when the repo changes significantly.
+    overwrite; update it incrementally when the repo changes significantly.
 
 ---
 
@@ -209,7 +209,7 @@ yarn test             # run all tests
 
 1. Create `<name>.fish` following the existing patterns.
 2. Validate: `fish -n config/fish/functions/<name>.fish` and
-   `fish_indent --check config/fish/functions/<name>.fish`.
+    `fish_indent --check config/fish/functions/<name>.fish`.
 
 ### Modifying Dotbot linking (`install.conf.yaml`)
 

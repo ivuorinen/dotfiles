@@ -11,6 +11,8 @@ on:
     paths:
       - .github/workflows/copilot-setup-steps.yml
 
+permissions: {}
+
 jobs:
   copilot-setup-steps:
     runs-on: ubuntu-latest
@@ -56,3 +58,16 @@ jobs:
             -o /tmp/stylua.zip
           unzip -q /tmp/stylua.zip -d /tmp/stylua/
           sudo install -m 0755 /tmp/stylua/stylua /usr/local/bin/stylua
+
+      - name: Set up Python for pre-commit
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Install pre-commit hooks
+        run: |
+          pre-commit install
+          pre-commit install-hooks
