@@ -92,33 +92,68 @@ cleanup_and_exit()
 
 tmux_get_option()
 {
-  local opt_val
-  opt_val=$(tmux show-option -gqv "$1")
-  if [[ -z "$opt_val" ]]; then
-    echo "Required tmux option '$1' not set" >&2
-    exit 1
-  fi
-  echo "$opt_val"
+  # Don't exit on missing option — a transient empty read during a config
+  # reload would otherwise kill the daemon. Caller checks for empty output.
+  tmux show-option -gqv "$1" 2> /dev/null
 }
 
-# Returns "dark" or "light" based on the GNOME color-scheme gsettings key.
-# Falls back to "dark" when gsettings is unavailable or returns an empty/unknown value.
+# Query xdg-desktop-portal for color-scheme via D-Bus.
+# Returns "dark", "light", or "" (no answer).
+# Spec: org.freedesktop.portal.Settings → 1=dark, 2=light, 0=no preference.
+get_portal_theme()
+{
+  program_is_in_path busctl || return 0
+  local out
+  out=$(busctl --user --json=short call \
+    org.freedesktop.portal.Desktop \
+    /org/freedesktop/portal/desktop \
+    org.freedesktop.portal.Settings Read \
+    ss org.freedesktop.appearance color-scheme 2> /dev/null) || return 0
+  case "$out" in
+    *'"data":1'*) echo "dark" ;;
+    *'"data":2'*) echo "light" ;;
+    *) : ;;
+  esac
+}
+
+# Query GNOME color-scheme via gsettings.
+# Returns "dark", "light", or "" (no answer).
+get_gsettings_theme()
+{
+  program_is_in_path gsettings || return 0
+  local scheme
+  scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)
+  case "$scheme" in
+    "'prefer-dark'") echo "dark" ;;
+    "'default'" | "'prefer-light'") echo "light" ;;
+    *) : ;;
+  esac
+}
+
+# Resolve the current appearance.
+# Order: xdg-desktop-portal (cross-DE), gsettings (GNOME), then fallback dark.
 get_current_theme()
 {
-  if program_is_in_path gsettings; then
-    local scheme
-    scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)
-    case "$scheme" in
-      "'prefer-dark'") echo "dark" ;;
-      "'default'" | "'prefer-light'") echo "light" ;;
-      *) echo "dark" ;; # empty or unknown → dark fallback
-    esac
+  local theme
+  theme=$(get_portal_theme)
+  [[ -n "$theme" ]] && {
+    echo "$theme"
     return
-  fi
+  }
+  theme=$(get_gsettings_theme)
+  [[ -n "$theme" ]] && {
+    echo "$theme"
+    return
+  }
   echo "dark"
 }
 
-# Sources the tmux theme file and updates the shared state symlink.
+# Sources the tmux theme file and updates the shared state symlink. Fish
+# polls that symlink on each prompt render (see
+# config/fish/conf.d/theme-switch.fish) — we deliberately avoid OS signals
+# because fish's default disposition for SIGUSR1/SIGUSR2 is Terminate, which
+# would kill any fish that hasn't yet loaded the handler (including the
+# desktop-session login shell).
 apply_theme()
 {
   local mode="$1"
@@ -131,13 +166,18 @@ apply_theme()
   fi
 
   theme_path=$(tmux_get_option "$theme_opt")
+  if [[ -z "$theme_path" ]]; then
+    echo "linux-dark-notify: option '$theme_opt' is unset; skipping switch." >&2
+    return 0
+  fi
+
   # Expand ~ and $HOME without eval to avoid arbitrary code execution.
   theme_path="${theme_path/#\~/$HOME}"
   theme_path="${theme_path//\$HOME/$HOME}"
 
   if [[ ! -r "$theme_path" ]]; then
-    echo "Theme file not readable: $theme_path" >&2
-    return 1
+    echo "linux-dark-notify: theme file not readable: $theme_path" >&2
+    return 0
   fi
 
   tmux source-file "$theme_path"
@@ -164,12 +204,19 @@ daemon_mode()
   # Apply current appearance before entering the monitor loop.
   apply_theme "$(get_current_theme)"
 
-  # Stream gsettings changes; re-apply theme on every color-scheme update.
-  gsettings monitor org.gnome.desktop.interface 2> /dev/null \
-    | grep --line-buffered "color-scheme" \
-    | while IFS= read -r _line; do
-      apply_theme "$(get_current_theme)"
-    done
+  # Stream gsettings changes and re-apply theme on every color-scheme update.
+  # The outer `while true` ensures the daemon self-recovers if `gsettings
+  # monitor` ever exits (e.g. dbus restart, transient pipe close). The
+  # trailing `|| :` keeps errexit from killing the daemon when the pipeline
+  # produces no matches before EOF.
+  while true; do
+    gsettings monitor org.gnome.desktop.interface 2> /dev/null \
+      | grep --line-buffered '^color-scheme ' \
+      | while IFS= read -r _line; do
+        apply_theme "$(get_current_theme)"
+      done || :
+    sleep 1
+  done
 
   cleanup_and_exit
 }

@@ -159,11 +159,6 @@ set -q TMUX_PLUGINS; or set -x TMUX_PLUGINS "$TMUX_CONF_DIR/plugins"
 set -q TMUX_CONF; or set -x TMUX_CONF "$TMUX_CONF_DIR/tmux.conf"
 set -q TMUX_PLUGIN_MANAGER_PATH; or set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
 
-# Source tmux theme activation script for Fish shell
-if test -f "$DOTFILES/config/tmux/theme-activate.fish"
-    source "$DOTFILES/config/tmux/theme-activate.fish"
-end
-
 # tms configuration
 set -q TMS_CONFIG_FILE; or set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
 

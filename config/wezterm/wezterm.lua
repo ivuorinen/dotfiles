@@ -5,10 +5,6 @@ config.set_environment_variables = {
   COLORTERM = 'truecolor',
 }
 
-config.color_scheme_dirs = {
-  '~/.config/wezterm/colors',
-}
-
 -- Font and font size
 config.font_size = 12
 config.font = wezterm.font_with_fallback {
