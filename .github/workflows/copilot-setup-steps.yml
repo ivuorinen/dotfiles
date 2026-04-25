@@ -47,7 +47,10 @@ jobs:
       - name: Install stylua
         run: |
           STYLUA_VERSION="2.4.1"
-          npm install --global "@johnnymorganz/stylua-bin@${STYLUA_VERSION}"
+          curl -sSL "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip" \
+            -o /tmp/stylua.zip
+          unzip -q /tmp/stylua.zip -d /tmp/stylua/
+          sudo install -m 0755 /tmp/stylua/stylua /usr/local/bin/stylua
 
       - name: Set up Python for pre-commit
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
