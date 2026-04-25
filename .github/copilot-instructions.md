@@ -30,9 +30,10 @@ Linking is driven by `install.conf.yaml` at the repo root (and an optional
 yarn install
 
 # Lint everything
-yarn lint              # biome + prettier + editorconfig-checker + md-table check
+yarn lint              # biome + prettier + editorconfig-checker + markdownlint + md-table check
 yarn lint:biome        # JS/TS/JSON/MD via Biome
 yarn lint:ec           # EditorConfig checker
+yarn lint:markdownlint # Markdown linting
 yarn lint:md-table     # Markdown table formatting
 
 # Auto-fix
