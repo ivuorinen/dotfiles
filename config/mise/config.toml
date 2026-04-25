@@ -129,6 +129,7 @@ tfsec = "latest"
 # Other useful tools
 usage = "3.2.1"
 taplo = "latest"
-bun = "latest"
 semgrep = "latest"
+opengrep = "latest"
+trufflehog = "latest"
 trivy = "latest"
