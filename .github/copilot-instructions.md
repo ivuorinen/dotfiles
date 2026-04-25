@@ -67,15 +67,15 @@ pre-commit run --all-files
 
 ## Code Style Rules
 
-| File type       | Formatter / Linter | Key settings                                                                 |
-|-----------------|--------------------|------------------------------------------------------------------------------|
-| Shell (bash/sh) | shfmt + shellcheck | 2-space, binary_next_line, switch_case_indent, space_redirects, fn_next_line |
-| Fish            | fish_indent        | 4-space indent, 120-char line limit                                          |
-| Lua             | stylua             | 90-char line limit (`stylua.toml`)                                           |
-| JSON / JS / TS  | Biome              | 90-char width (`biome.json`)                                                 |
-| Markdown        | Biome              | 120-char width override                                                      |
-| YAML            | Prettier           | Validated with yamllint (`.yamllint.yml`)                                    |
-| Python          | ruff               | Config in `pyproject.toml`                                                   |
+| File type       | Formatter / Linter | Key settings                                                      |
+|-----------------|--------------------|-------------------------------------------------------------------|
+| Shell (bash/sh) | shfmt + shellcheck | 2-space, binary_next_line, switch_case_indent, function_next_line |
+| Fish            | fish_indent        | 4-space indent, 120-char line limit                               |
+| Lua             | stylua             | 90-char line limit (`stylua.toml`)                                |
+| JSON / JS / TS  | Biome              | 90-char width (`biome.json`)                                      |
+| Markdown        | Biome              | 120-char width override                                           |
+| YAML            | Prettier           | Validated with yamllint (`.yamllint.yml`)                         |
+| Python          | ruff               | Config in `pyproject.toml`                                        |
 
 - **EditorConfig**: 2-space indent, UTF-8, LF line endings globally.
   `.editorconfig` has per-filetype overrides (4-space for PHP/fish, tabs for git config).
