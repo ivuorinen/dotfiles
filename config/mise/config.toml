@@ -29,6 +29,7 @@ experimental = true
 [tools]
 # Language runtimes
 node = "lts"
+bun = "latest"
 python = "3.14"
 go = "1.26.2"
 rust = "latest"
