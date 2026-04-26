@@ -94,19 +94,23 @@ Manjaro = ""
 Pop = ""
 
 # Username — only shown over SSH (or as root) per starship defaults.
-# Differentiated from hostname via peach.
+# Differentiated from hostname via peach. The "@" separator lives in
+# the hostname format below so it only appears when hostname renders
+# (avoids a dangling "root@" when running as root locally without SSH).
 [username]
 style_user = "peach"
 style_root = "red bold"
-format = "[$user]($style)[@](subtext0)"
+format = "[$user]($style)"
 
 # Hostname — SSH-only by default; lavender so it contrasts with peach user.
 # trim_at = "." matches tide_context_hostname_parts = 1 (drop domain).
+# The "@" separator is part of this format (subtext0) so it only renders
+# when hostname renders.
 [hostname]
 ssh_only = true
 trim_at = "."
 style = "lavender"
-format = "[$hostname]($style) "
+format = "[@](subtext0)[$hostname]($style) "
 
 # Path — sky (Catppuccin's cyan) matches omp's cyan path colour.
 [directory]

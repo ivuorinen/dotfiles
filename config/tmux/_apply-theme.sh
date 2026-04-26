@@ -88,9 +88,17 @@ get_current_theme()
 
 # Idempotent symlink: only call ln(1) when target actually changes. Avoids
 # pointless mtime churn that obscures last-real-change time during debugging.
+#
+# Refuses to overwrite a regular file at the destination — that's user data,
+# not something the daemon owns. If the user manually replaced one of our
+# managed symlinks (e.g. ~/.config/starship.toml) with a hand-rolled config
+# file, we leave it alone instead of silently destroying their work.
 _idempotent_ln_sf()
 {
   local src=$1 dst=$2
+  if [[ -e "$dst" && ! -L "$dst" ]]; then
+    return 0
+  fi
   if [[ "$(readlink "$dst" 2> /dev/null)" != "$src" ]]; then
     ln -sf "$src" "$dst"
   fi

@@ -2,11 +2,13 @@
 
 Generated: 2026-04-26
 Last validated: 2026-04-26
-Scope of latest round: changed-files (starship migration + post-migration audit fixes).
+Scope of latest round: changed-files re-audit after the 5 commits on
+feat/unified-prompt-and-theme-chain (96ce5fd...452287b). Surfaced and
+fixed two new defects introduced by the branch (N-021, N-022).
 
 ## Summary
 
-- Total: 17 | Open: 1 | Fixed: 14 | Invalid: 0 | Advisory: 2
+- Total: 19 | Open: 1 | Fixed: 16 | Invalid: 0 | Advisory: 2
 
 ## Open Findings
 
@@ -34,6 +36,25 @@ update both `~/.config/starship.toml` and the tmux state symlink so a later
 tmux launch finds the right state.
 
 ## Fixed
+
+#### [N-021] `_idempotent_ln_sf` clobbered regular files at the destination
+Fixed: 2026-04-26
+Notes: Added a guard to `_idempotent_ln_sf` in `config/tmux/_apply-theme.sh`:
+if the destination is a regular file (not a symlink), the helper returns
+early instead of replacing it with `ln -sf`. Reproduced before fix: a
+hand-rolled `~/.config/starship.toml` with custom content was silently
+destroyed on the next theme flip. Reproduced after fix: the regular file
+is preserved across daemon invocations; a working symlink is still
+left alone (mtime unchanged); a broken symlink is still repaired.
+
+#### [N-022] Dangling `@` separator when username shows but hostname doesn't
+Fixed: 2026-04-26
+Notes: Username had `format = "[$user]($style)[@](subtext0)"` which
+emitted `user@` even when the hostname module was suppressed (running
+as root locally with no SSH). Moved the `@` separator into the hostname
+format: `format = "[@](subtext0)[$hostname]($style) "`. Now the `@`
+only renders when the hostname does. Username keeps just `[$user]($style)`.
+Applied to both starship-dark.toml and starship-light.toml.
 
 #### [N-001] macOS has no continuous appearance watcher
 Fixed: 2026-04-26
