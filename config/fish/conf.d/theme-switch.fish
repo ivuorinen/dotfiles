@@ -1,10 +1,13 @@
-# theme-switch.fish — keep fish/tide colors in sync with tmux dark/light state.
+# theme-switch.fish — keep fish syntax/completion colours in sync with tmux
+# dark/light state.
 #
 # Polls the tmux state symlink (managed by linux-dark-notify.sh and
 # theme-activate.sh) on every prompt render. When the symlink target changes
 # we re-save the active fish theme so fish re-queries the terminal background
-# (OSC 11) and picks the matching [light]/[dark] palette section, then asks
-# tide to invalidate its cached prompt strings.
+# (OSC 11) and picks the matching [light]/[dark] palette section. The shell
+# prompt itself is rendered by starship, which reads ~/.config/starship.toml
+# fresh on every prompt subprocess invocation — no fish-side reload is
+# needed for the prompt.
 #
 # Polling on `fish_prompt` is intentional: signal-based IPC (SIGUSR1, etc.)
 # is unsafe because the default disposition is Terminate, so any fish that
@@ -28,13 +31,10 @@ function __theme_switch_check --on-event fish_prompt --description 'Refresh them
 
     set -g __theme_switch_last_target "$target"
 
-    # First observation in this fish session — config.fish already applied
-    # the theme via `fish_config theme choose`, so don't re-do it.
-    if not set -q __theme_switch_initialized
-        set -g __theme_switch_initialized 1
-        return 0
-    end
-
+    # Always re-save on first observation. config.fish ran `fish_config theme
+    # choose` once at startup, but if tmux created the symlink AFTER fish
+    # started (fish-then-tmux ordering) the initial choose ran without a tmux
+    # state to consult — re-saving now is the safe action and costs only one
+    # fish subprocess fork.
     fish_config theme save "Catppuccin Mocha" 2>/dev/null
-    functions -q tide; and tide reload 2>/dev/null
 end
