@@ -25,7 +25,6 @@ end
 
 ## 2. Conventions
 
-- Do NOT use `_tide_` prefix (reserved for tide prompt plugin)
 - Use `--wraps` if the function wraps an existing command
 - For abbreviation-like functions, prefer fish abbreviations
   in `config/fish/alias.fish` instead

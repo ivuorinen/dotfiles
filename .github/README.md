@@ -26,8 +26,6 @@ see what interesting stuff you've done with it. Sharing is caring.
 
 ## The looks
 
-![screenshot of the oh-my-posh shell](./screenshots/oh-my-posh.png)
-
 ![screenshot of light version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-light.png)
 
 ![screenshot of dark version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-dark.png)

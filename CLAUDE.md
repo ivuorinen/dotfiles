@@ -84,7 +84,16 @@ which loads:
 - `config/alias` — shell aliases
 
 Zsh additionally uses **antidote** (in `tools/antidote/`)
-for plugin management and **oh-my-posh** for the prompt.
+for plugin management. All three shells (bash, zsh, fish) render
+their prompt with **starship** (`config/starship/starship-{dark,light}.toml`);
+the active config is `~/.config/starship.toml`, a symlink swapped by the
+tmux dark-light daemons (`config/tmux/_apply-theme.sh` is the shared
+library; `linux-dark-notify.sh` watches gsettings on Linux,
+`macos-dark-notify.sh` polls `defaults read` on macOS, both spawned by
+`run-shell` from `tmux.conf`) so the prompt flips on OS appearance change
+without a shell-side reload. **Limitation:** the chain requires tmux —
+fish-without-tmux sessions don't get appearance-driven prompt updates
+because no daemon owns the symlink in that mode.
 
 ### msgr — Messaging Helper
 
