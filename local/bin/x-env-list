@@ -84,7 +84,6 @@ DEFINED_GROUPS=(
 )
 
 SKIPPED_KEYS=(
-  "_tide*"
   "__FISH_*"
   "___paths_plugin_colors"
   "__CFBundleIdentifier"

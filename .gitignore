@@ -79,7 +79,6 @@ config/fish/completions/*.fish
 !config/fish/completions/phpenv.fish
 !config/fish/completions/pinact.fish
 !config/fish/completions/sesh.fish
-!config/fish/completions/tide.fish
 !config/fish/completions/wezterm.fish
 config/zsh/completions.d/
 local/md/
