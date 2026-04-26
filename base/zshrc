@@ -4,7 +4,6 @@
 
 # export VERBOSE=1
 # export DEBUG=1
-autoload -U promptinit; promptinit
 
 export DOTFILES="$HOME/.dotfiles"
 # Minimal PATH for x-have and utilities; full PATH set in shared.sh/exports
@@ -38,8 +37,16 @@ autoload -Uz compinit bashcompinit
 compinit -d "$ZSH_COMPDUMP"
 bashcompinit
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-export P10K_CONFIG="$DOTFILES/config/zsh/p10k.zsh"
-[[ ! -f "$P10K_CONFIG" ]] || source "$P10K_CONFIG"
+# Starship prompt — colours flip via ~/.config/starship.toml symlink swap
+# managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+# `enable_transience` collapses prior prompts to just the character symbol
+# so scrollback stays clean (matches tide --transient=Yes).
+if command -v starship > /dev/null 2>&1; then
+  eval "$(starship init zsh)"
+  function starship_transient_prompt_func() {
+    starship module character
+  }
+  enable_transience
+fi
 
-if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+if command -v wt > /dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi

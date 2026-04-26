@@ -207,14 +207,3 @@ if test -d "$DOTFILES/config/fish/secrets.d"
         end
     end
 end
-
-# Configure tide prompt
-set -gx tide_prompt_transient_enabled true
-set -gx tide_prompt_add_newline_before true
-set -gx tide_prompt_min_cols 34
-set -gx tide_prompt_pad_items false
-set -gx tide_left_prompt_items context pwd git node python rustc java php \
-    pulumi ruby go gcloud kubectl distrobox toolbox terraform aws nix_shell \
-    crystal elixir zig newline character
-set -gx tide_right_prompt_items status jobs direnv
-set -gx tide_context_hostname_parts 1
