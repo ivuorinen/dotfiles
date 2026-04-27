@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# handlers.d/tmux — source the matching tmux palette.
+# Errexit-masked: a transient tmux server failure must not poison the
+# rest of the chain.
+set -uo pipefail
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+palette="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/tmux.${mode}.conf"
+[[ -r "$palette" ]] || {
+  echo "tmux handler: missing palette $palette" >&2
+  exit 1
+}
+
+tmux source-file "$palette" 2> /dev/null || true
