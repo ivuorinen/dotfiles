@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# handlers.d/eza — swap ~/.config/eza/theme.yml symlink to the matching
+# variant. Refuses to clobber a regular file (N-021 guard). eza reads
+# theme.yml on each invocation, so no shell refresh is required.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/eza.${mode}.yml"
+dst="${EZA_CONFIG_DIR:-$HOME/.config/eza}/theme.yml"
+[[ -r "$src" ]] || {
+  echo "eza handler: missing palette $src" >&2
+  exit 1
+}
+
+mkdir -p -- "$(dirname -- "$dst")"
+_idempotent_ln_sf "$src" "$dst"

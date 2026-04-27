@@ -28,7 +28,7 @@ x-have antidot && {
 PROMPT_DIRTRIM=3
 
 # Starship prompt — colours flip via ~/.config/starship.toml symlink swap
-# managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+# managed by the theme orchestrator (config/theme/handlers.d/starship).
 command -v starship > /dev/null 2>&1 && eval "$(starship init bash)"
 
 if command -v wt > /dev/null 2>&1; then eval "$(command wt config shell init bash)"; fi

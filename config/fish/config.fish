@@ -30,7 +30,7 @@ if status is-interactive
     type -q mise; and mise activate fish | source
 
     # Starship prompt — colours flip via ~/.config/starship.toml symlink
-    # swap managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+    # swap managed by the theme orchestrator (handlers.d/starship).
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship
@@ -73,3 +73,21 @@ if status is-interactive; and not set -q GITHUB_TOKEN
     echo "Warning: GITHUB_TOKEN is not set" >&2
 end
 test -x /opt/homebrew/bin/brew; and eval "$(/opt/homebrew/bin/brew shellenv fish)"
+
+# Spawn the theme orchestrator watcher (no-op if one is already running;
+# the watcher self-locks). Skip in SSH sessions — the remote OS is the
+# wrong oracle; rely on per-session OSC 11 via `apply $(theme-mode)`.
+if status is-interactive
+    if not set -q SSH_TTY; and not set -q SSH_CONNECTION
+        set -l watcher "$DOTFILES/config/theme/watcher"
+        if test -x $watcher
+            $watcher >/dev/null 2>&1 & disown 2>/dev/null
+        end
+    end
+    # Bootstrap mode so the prompt + LS_COLORS are right on first prompt.
+    set -l apply "$DOTFILES/config/theme/apply"
+    if test -x $apply
+        set -l m (theme-mode 2>/dev/null)
+        $apply $m >/dev/null 2>&1
+    end
+end

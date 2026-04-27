@@ -2,8 +2,8 @@
 # theme), Catppuccin Mocha (dark).
 #
 # Mirror of starship-light.toml with the palette swapped. The dark/light
-# variants are kept as separate complete files so the dark-light daemons
-# (config/tmux/_apply-theme.sh, linux-dark-notify.sh, macos-dark-notify.sh)
+# variants are kept as separate complete files so the theme orchestrator
+# (config/theme/handlers.d/starship)
 # can switch them via a symlink at ~/.config/starship.toml. Starship reads
 # its config on every prompt subprocess invocation, so the swap takes
 # effect on the next prompt with no shell-side reload.

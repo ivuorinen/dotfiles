@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# watcher — the theme orchestrator daemon. Self-locks; subscribes to
+# the OS appearance event source; calls `apply` on each detected
+# change.
+#
+# OS sources (auto-detected, override with --source):
+#   linux  : prefers `gsettings monitor`; falls back to `busctl monitor`
+#            for non-GNOME; exits 0 if neither reachable.
+#   macos  : 2s `defaults read` polling.
+#   stub   : reads modes (one per line) from --stub-input. Test seam.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/_lib.sh"
+
+SOURCE=""
+STUB_INPUT=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --source)
+      SOURCE="$2"
+      shift 2
+      ;;
+    --stub-input)
+      STUB_INPUT="$2"
+      shift 2
+      ;;
+    *)
+      echo "watcher: unknown arg '$1'" >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -z "$SOURCE" ]]; then
+  case "$(uname -s)" in
+    Darwin) SOURCE="macos" ;;
+    Linux) SOURCE="linux" ;;
+    *)
+      _log "WARN watcher: unsupported OS, exiting"
+      exit 0
+      ;;
+  esac
+fi
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+mkdir -p -- "$state_dir"
+pidfile="$state_dir/daemon.pid"
+
+if ! _acquire_lock "$pidfile"; then
+  _log "INFO watcher: another instance holds $pidfile; exiting"
+  exit 1
+fi
+
+trap 'rm -f "$pidfile"' EXIT INT TERM HUP
+
+apply_cmd="$(dirname -- "$0")/apply"
+
+apply_mode()
+{
+  local m="$1"
+  [[ "$m" = "dark" || "$m" = "light" ]] || return 0
+  "$apply_cmd" "$m" || true
+}
+
+case "$SOURCE" in
+  stub)
+    [[ -r "$STUB_INPUT" ]] || {
+      _log "ERROR watcher stub: --stub-input unreadable"
+      exit 1
+    }
+    while IFS= read -r line; do
+      apply_mode "$line"
+    done < "$STUB_INPUT"
+    ;;
+  macos)
+    last=""
+    while true; do
+      style="$(defaults read -g AppleInterfaceStyle 2> /dev/null || true)"
+      if [[ "$style" = "Dark" ]]; then
+        cur="dark"
+      else
+        cur="light"
+      fi
+      if [[ "$cur" != "$last" ]]; then
+        apply_mode "$cur"
+        last="$cur"
+      fi
+      sleep 2
+    done
+    ;;
+  linux)
+    if command -v gsettings > /dev/null 2>&1; then
+      _log "INFO watcher: subscribing via gsettings monitor"
+      gsettings monitor org.gnome.desktop.interface color-scheme 2> /dev/null \
+        | while IFS= read -r _; do
+          scheme="$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
+          case "$scheme" in
+            "'prefer-dark'") apply_mode dark ;;
+            "'default'" | "'prefer-light'") apply_mode light ;;
+          esac
+        done
+    elif command -v busctl > /dev/null 2>&1; then
+      _log "INFO watcher: subscribing via busctl monitor (portal)"
+      busctl --user --json=short monitor org.freedesktop.portal.Desktop 2> /dev/null \
+        | while IFS= read -r line; do
+          # Anchor on the JSON variant token so we don't false-match
+          # timestamps or sequence numbers that happen to contain 1/2.
+          # busctl --json=short emits `"v":1` (dark) / `"v":2` (light)
+          # for the org.freedesktop.appearance color-scheme settings.
+          case "$line" in
+            *'"color-scheme"'*'"v":1'*) apply_mode dark ;;
+            *'"color-scheme"'*'"v":2'*) apply_mode light ;;
+          esac
+        done
+    else
+      _log "WARN watcher linux: neither gsettings nor busctl available; exiting"
+      exit 0
+    fi
+    ;;
+  *)
+    echo "watcher: unknown --source '$SOURCE'" >&2
+    exit 2
+    ;;
+esac

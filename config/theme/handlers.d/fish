@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# handlers.d/fish — persist the Catppuccin palette for future fish
+# sessions. Running fish sessions update themselves via the in-process
+# event handler in config/fish/conf.d/theme-switch.fish.
+#
+# config/fish/themes/Catppuccin Mocha.theme is a dual-palette file with
+# both [light] and [dark] sections; fish picks the right section by
+# querying terminal background via OSC 11. We therefore save the SAME
+# theme name regardless of mode — re-saving triggers fish's re-query,
+# which is what flips the colours in-process. We do NOT save
+# "Catppuccin Latte" because that .theme file is not vendored in this
+# repo (only Mocha/Frappe/Macchiato are present); a Latte save would
+# error out and the `|| true` fallback would silently leave the prompt
+# stuck in dark colours.
+set -uo pipefail
+
+mode="${1:-}"
+case "$mode" in
+  dark | light) ;;
+  *) exit 2 ;;
+esac
+
+if ! command -v fish > /dev/null 2>&1; then
+  echo "fish handler: fish not in PATH" >&2
+  exit 1
+fi
+
+# `echo y |` bypasses fish_config's interactive
+# "Overwrite your current theme? [y/N]" prompt; >/dev/null silences the
+# confirmation echo. `|| true` prevents a transient fish failure from
+# poisoning the actor's parallel-handler exit-code aggregation.
+echo y | fish -c 'fish_config theme save "Catppuccin Mocha"' > /dev/null 2>&1 || true

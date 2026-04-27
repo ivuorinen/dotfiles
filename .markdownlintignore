@@ -8,3 +8,5 @@ docs/*
 local/bin/asdf/*
 node_modules/*
 tools/*
+# Code-review export pasted from GitHub PR comments — not authored here.
+cr.md

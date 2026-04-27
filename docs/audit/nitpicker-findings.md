@@ -2,7 +2,8 @@
 
 Generated: 2026-04-26
 Last validated: 2026-04-27
-Scope of latest round (Pass 2): default-mode full-repo audit run on
+Scope of latest round (Pass 3): N-010 closed by theme orchestrator.
+Scope of previous round (Pass 2): default-mode full-repo audit run on
 feat/theming-and-switching at 88b74c2. Re-validated all prior findings,
 hunted for new defects across mise/, scripts/, local/bin/, fish, neovim,
 tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
@@ -10,32 +11,11 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 30 | Open: 1 | Fixed: 23 | Advisory: 2 | Invalid: 4
+- Total: 30 | Open: 0 | Fixed: 24 | Advisory: 2 | Invalid: 4
 
 ## Open Findings
 
-### Medium
-
-#### [N-010] No verification scenario for fish-without-tmux (wezterm direct)
-Category: correctness
-Area: `config/fish/conf.d/theme-switch.fish`, `config/exports`
-Problem: If fish runs directly under wezterm (no tmux), the symlink at
-`$XDG_STATE_HOME/tmux/tmux-dark-notify-theme.conf` may not exist or may be stale
-from a prior tmux session. Fish then never updates fish syntax colours on OS
-appearance change. The same gap applies to starship: the
-`~/.config/starship.toml` symlink is updated by `theme-activate.sh` (one-shot
-at tmux start) and by the `{linux,macos}-dark-notify.sh` daemons (continuous
-only when tmux is running) — no daemon updates it without tmux.
-Status: **DOCUMENTED** as a known limitation in `CLAUDE.md` (the prompt
-section now explicitly states the chain requires tmux). A future-work item
-would be a no-tmux daemon spawned from the shell rc when `[ -z "$TMUX" ]`,
-querying OSC 11 directly. Not implemented this round because the user's
-primary workflow is always tmux+fish; the documentation is the appropriate
-fix until that workflow changes.
-Fix (deferred): standalone OSC 11 polling daemon spawned from `config/exports`
-when no tmux session is detected and no other daemon owns the lock. Would
-update both `~/.config/starship.toml` and the tmux state symlink so a later
-tmux launch finds the right state.
+_(none)_
 
 ## Advisory
 
@@ -48,6 +28,17 @@ No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
 The repo no longer references it, so it won't be reinstalled.
 
 ## Fixed
+
+### Pass 3 — 2026-04-27
+
+#### [N-010] No verification scenario for fish-without-tmux (wezterm direct)
+
+Fixed: 2026-04-27
+Notes: Replaced by the theme orchestrator. The watcher daemon is spawned
+from shell init (any flavour, with `_acquire_lock` ensuring single-instance),
+so fish-without-tmux now gets live OS-driven updates. SSH sessions skip
+the spawn and rely on per-session OSC 11 via `theme-mode`. The "chain
+requires tmux" CLAUDE.md note has been removed.
 
 ### Pass 1 — 2026-04-26
 

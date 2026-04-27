@@ -426,31 +426,89 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
-# Starship bootstrap. The dark/light TOMLs live at
-# ~/.config/starship/starship-{dark,light}.toml (dotbot-linked from
-# config/starship/). The active config is the symlink ~/.config/starship.toml,
-# managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh,
-# macos-dark-notify.sh}. If neither tmux has run yet nor the user has a
-# custom file, point starship at the dark variant so the prompt works on
-# first login.
-#
-# Two cases trigger the symlink creation:
-#   1. ~/.config/starship.toml does not exist at all (truly fresh).
-#   2. ~/.config/starship.toml is a broken symlink (target was moved/deleted).
-# A regular file or a working symlink is left alone.
-# We only create the symlink when the dark variant actually exists on disk
-# — otherwise we'd write a brand-new broken symlink that the bootstrap
-# would refuse to repair on the next shell start.
-__dotfiles_starship_default="$HOME/.config/starship/starship-dark.toml"
-__dotfiles_starship_active="$HOME/.config/starship.toml"
-if [ -f "$__dotfiles_starship_default" ]; then
-  if [ ! -e "$__dotfiles_starship_active" ] && [ ! -L "$__dotfiles_starship_active" ]; then
-    ln -sf "$__dotfiles_starship_default" "$__dotfiles_starship_active"
-  elif [ -L "$__dotfiles_starship_active" ] && [ ! -e "$__dotfiles_starship_active" ]; then
-    ln -sf "$__dotfiles_starship_default" "$__dotfiles_starship_active"
+# theme_mode — shared bash/zsh read API (uses `local`, not strict POSIX).
+# Behaviour matches local/bin/theme-mode but without forking.
+theme_mode()
+{
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+  local state_file="$state_dir/mode"
+  if [ -r "$state_file" ]; then
+    local m
+    read -r m < "$state_file"
+    if [ "$m" = "dark" ] || [ "$m" = "light" ]; then
+      printf '%s\n' "$m"
+      return 0
+    fi
   fi
+  # No state file. In an interactive shell we'll have already bootstrapped
+  # below via apply, so the file should exist. If it doesn't, default safely.
+  printf 'dark\n'
+}
+
+# theme-reapply — re-fire all theme handlers for the current mode (or
+# $1), bypassing apply's idempotency guard. Refreshes LS_COLORS in the
+# current shell from the dircolors handler's cache. Use after editing a
+# palette to see the result without restarting the shell.
+theme-reapply()
+{
+  local mode="${1:-$(theme_mode)}"
+  case "$mode" in
+    dark | light) ;;
+    *)
+      echo "theme-reapply: mode must be 'dark' or 'light' (got '$mode')" >&2
+      return 2
+      ;;
+  esac
+  local dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+  local handlers_dir="$dotfiles/config/theme/handlers.d"
+  if [ ! -d "$handlers_dir" ]; then
+    echo "theme-reapply: missing $handlers_dir" >&2
+    return 1
+  fi
+  local rc=0 h
+  for h in "$handlers_dir"/*; do
+    if [ -x "$h" ]; then
+      "$h" "$mode" || rc=1
+    fi
+  done
+  local cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
+  if [ -r "$cache" ]; then
+    # shellcheck source=/dev/null
+    . "$cache"
+  fi
+  echo "theme-reapply: applied $mode"
+  return $rc
+}
+
+# Theme orchestrator: bootstrap state + spawn watcher.
+# Skip the watcher fork in SSH sessions — the remote OS is the wrong
+# oracle; per-session OSC 11 via `apply $(theme-mode)` is the right
+# fallback. Skip in non-interactive shells too: `bash -c '...'` and
+# `bash -ic '...'` subshells don't need to fork a daemon and pay the
+# bootstrap cost on every invocation.
+case $- in
+  *i*) _theme_interactive=1 ;;
+  *) _theme_interactive=0 ;;
+esac
+if [ "$_theme_interactive" = 1 ] \
+  && [ -x "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" ]; then
+  if [ -z "${SSH_TTY:-}${SSH_CONNECTION:-}" ]; then
+    watcher="${DOTFILES:-$HOME/.dotfiles}/config/theme/watcher"
+    if [ -x "$watcher" ]; then
+      "$watcher" > /dev/null 2>&1 &
+      disown 2> /dev/null || true
+    fi
+  fi
+  m="$("${DOTFILES:-$HOME/.dotfiles}/local/bin/theme-mode")"
+  "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" "$m" > /dev/null 2>&1 || true
+  unset m watcher
 fi
-unset __dotfiles_starship_default __dotfiles_starship_active
+unset _theme_interactive
+
+# Source LS_COLORS cache produced by the dircolors handler.
+ls_cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
+[ -r "$ls_cache" ] && eval "$(cat "$ls_cache")"
+unset ls_cache
 
 # op (1Password cli) is present
 msg "Setting up 1Password CLI configuration"

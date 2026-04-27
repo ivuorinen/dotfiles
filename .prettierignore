@@ -16,3 +16,6 @@ local/bin/antigen.zsh
 local/bin/asdf
 tools
 config/gh/hosts.yml
+# Vendored theme palettes — keep upstream brace style (yamllint rejects
+# the brace-spacing prettier prefers).
+config/theme/palettes.d

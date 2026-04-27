@@ -83,17 +83,30 @@ which loads:
 - `config/exports` — environment variables, XDG dirs, PATH
 - `config/alias` — shell aliases
 
-Zsh additionally uses **antidote** (in `tools/antidote/`)
-for plugin management. All three shells (bash, zsh, fish) render
-their prompt with **starship** (`config/starship/starship-{dark,light}.toml`);
-the active config is `~/.config/starship.toml`, a symlink swapped by the
-tmux dark-light daemons (`config/tmux/_apply-theme.sh` is the shared
-library; `linux-dark-notify.sh` watches gsettings on Linux,
-`macos-dark-notify.sh` polls `defaults read` on macOS, both spawned by
-`run-shell` from `tmux.conf`) so the prompt flips on OS appearance change
-without a shell-side reload. **Limitation:** the chain requires tmux —
-fish-without-tmux sessions don't get appearance-driven prompt updates
-because no daemon owns the symlink in that mode.
+Zsh additionally uses **antidote** (in `tools/antidote/`) for plugin
+management. All three shells (bash, zsh, fish) render their prompt
+with **starship**.
+
+### Theme Orchestrator (`config/theme/`)
+
+Dark/light theming is owned by a stand-alone orchestrator:
+
+- `config/theme/watcher` — self-locking daemon, spawned from shell init
+  (skipped in SSH sessions). Subscribes to portal/gsettings on Linux,
+  polls `defaults read` on macOS.
+- `config/theme/apply <mode>` — actor; atomic-writes
+  `$XDG_STATE_HOME/dotfiles-theme/mode` and forks each
+  `handlers.d/<name>` in parallel under a 5s timeout.
+- `config/theme/handlers.d/{tmux,starship,fish,dircolors}` — per-app
+  flip executables. Add new apps by dropping a file here.
+- `config/theme/palettes.d/[app].[variant].[ext]` — theme assets,
+  consolidated in one place.
+- `local/bin/theme-mode` (and bash/fish functions) — public read API.
+- Fallback: `config/theme/probe-osc11` — OSC 11 query for SSH and
+  no-OS-source environments.
+
+Fish reacts to flips via `config/fish/conf.d/theme-switch.fish`,
+which watches the mode state file.
 
 ### msgr — Messaging Helper
 

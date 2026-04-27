@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# handlers.d/starship — swap ~/.config/starship.toml symlink to the
+# matching variant. Refuses to clobber a regular file (N-021 guard).
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/starship.${mode}.toml"
+dst="$HOME/.config/starship.toml"
+[[ -r "$src" ]] || {
+  echo "starship handler: missing palette $src" >&2
+  exit 1
+}
+
+mkdir -p -- "$(dirname -- "$dst")"
+_idempotent_ln_sf "$src" "$dst"
