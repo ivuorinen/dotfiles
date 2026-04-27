@@ -13,8 +13,13 @@ set -l mode_file "$state_dir/dotfiles-theme/mode"
 set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
 
 # Apply once at login so the shell starts in the correct state.
+# The cache file is bash-shaped (`LS_COLORS='val'; export LS_COLORS`)
+# because the dircolors handler runs `dircolors -b`. Fish cannot
+# `eval` that directly, so extract the value with `string match -rg`
+# and assign it via `set -gx`.
 if test -r $ls_cache
-    eval (cat $ls_cache | string replace -r '^export ' '' | string replace -r ';export.*$' '')
+    set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
+    test -n "$ls_value"; and set -gx LS_COLORS $ls_value
 end
 
 # Per-prompt cheap watcher: stat the mode file's mtime; only do real
@@ -37,7 +42,8 @@ function __theme_switch_check --on-event fish_prompt
         # prompt that would otherwise pollute the next prompt line.
         echo y | fish_config theme save "Catppuccin Mocha" >/dev/null 2>&1
         if test -r $ls_cache
-            eval (cat $ls_cache | string replace -r '^export ' '' | string replace -r ';export.*$' '')
+            set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
+            test -n "$ls_value"; and set -gx LS_COLORS $ls_value
         end
     end
 end
