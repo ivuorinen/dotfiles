@@ -27,7 +27,8 @@
       "!!**/local/bin/asdf",
       "!!**/tools/antidote",
       "!!**/tools/dotbot",
-      "!!**/node_modules"
+      "!!**/node_modules",
+      "!!**/cr.md"
     ]
   },
   "formatter": {
