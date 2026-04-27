@@ -27,10 +27,8 @@ esac
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
-# shellcheck disable=SC2034  # used by handler dispatch in task 4.3
 handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
 
-# Idempotent: skip everything if already in the requested mode.
 if [[ -r "$state_file" ]]; then
   current=""
   read -r current < "$state_file" || true
@@ -41,3 +39,39 @@ fi
 
 _atomic_write "$state_file" "$mode"
 _log "INFO actor flipped to $mode"
+
+# Fork each handler under a 5s timeout. Capture stderr per handler so
+# the actor can label the lines on the way to the log. We use plain
+# wait $pid + $? since `wait -n` is bash 4.3+ but easier here.
+declare -a pids names
+for h in "$handlers_dir"/*; do
+  [[ -x "$h" ]] || continue
+  name="$(basename -- "$h")"
+  errlog="$state_dir/.handler-$name.err"
+  : > "$errlog"
+  (timeout 5s "$h" "$mode" 2> "$errlog") &
+  pids+=("$!")
+  names+=("$name")
+done
+
+i=0
+for pid in "${pids[@]}"; do
+  set +e
+  wait "$pid"
+  rc=$?
+  set -e
+  name="${names[$i]}"
+  errlog="$state_dir/.handler-$name.err"
+  if ((rc != 0)); then
+    _log "WARN handler '$name' exit=$rc"
+    if [[ -s "$errlog" ]]; then
+      while IFS= read -r line; do
+        _log "WARN handler '$name': $line"
+      done < "$errlog"
+    fi
+  fi
+  rm -f "$errlog"
+  i=$((i + 1))
+done
+
+exit 0
