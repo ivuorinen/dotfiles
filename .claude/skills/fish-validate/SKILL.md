@@ -8,6 +8,8 @@ user-invocable: false
 allowed-tools: Bash, Read
 ---
 
+# Validate fish scripts
+
 After editing any `.fish` file in `config/fish/`, validate it:
 
 ## 1. Syntax check

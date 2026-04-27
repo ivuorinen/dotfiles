@@ -7,6 +7,8 @@ user-invocable: true
 allowed-tools: Bash, Read, Write, Edit
 ---
 
+# New fish function
+
 When creating a new fish function in `config/fish/functions/`:
 
 ## 1. Create the function file
