@@ -67,3 +67,26 @@ teardown()
   _idempotent_ln_sf "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
   [ "$(readlink "$TMPDIR_TEST/dst")" = "$TMPDIR_TEST/src" ]
 }
+
+@test "_acquire_lock: succeeds when no PID file exists" {
+  source "$THEME_LIB"
+  run _acquire_lock "$TMPDIR_TEST/lock.pid"
+  [ "$status" -eq 0 ]
+  [ -f "$TMPDIR_TEST/lock.pid" ]
+}
+
+@test "_acquire_lock: fails when live PID holds lock" {
+  source "$THEME_LIB"
+  echo $$ > "$TMPDIR_TEST/lock.pid"
+  run _acquire_lock "$TMPDIR_TEST/lock.pid"
+  [ "$status" -eq 1 ]
+}
+
+@test "_acquire_lock: reclaims stale PID file" {
+  source "$THEME_LIB"
+  # PID 99999 is overwhelmingly likely to be dead
+  echo 99999 > "$TMPDIR_TEST/lock.pid"
+  run _acquire_lock "$TMPDIR_TEST/lock.pid"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/lock.pid")" = "$$" ]
+}

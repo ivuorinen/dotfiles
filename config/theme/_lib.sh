@@ -29,3 +29,28 @@ _idempotent_ln_sf()
     ln -sf "$src" "$dst"
   fi
 }
+
+# Atomic, race-safe lock. ln(1) is the classic atomic create-if-not-exists
+# primitive on POSIX filesystems. A loser in a race silently fails the ln
+# and we return 1.
+_acquire_lock()
+{
+  local pidfile=$1 tmp
+  if [[ -e "$pidfile" ]]; then
+    local pid
+    pid=$(cat -- "$pidfile" 2> /dev/null || true)
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2> /dev/null; then
+      return 1
+    fi
+    # Stale: remove and continue.
+    rm -f -- "$pidfile"
+  fi
+  tmp="$(mktemp "${pidfile}.tmp.XXXXXX")"
+  printf '%s\n' "$$" > "$tmp"
+  if ln -- "$tmp" "$pidfile" 2> /dev/null; then
+    rm -f -- "$tmp"
+    return 0
+  fi
+  rm -f -- "$tmp"
+  return 1
+}
