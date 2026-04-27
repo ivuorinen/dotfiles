@@ -6,13 +6,18 @@
 # path and the literal content (no streaming yet — flips are short).
 _atomic_write()
 {
-  local dst="$1" content="$2" tmp
-  local dir
+  local dst="$1" content="$2" tmp dir
   dir="$(dirname -- "$dst")"
-  mkdir -p -- "$dir"
-  tmp="$(mktemp "${dst}.tmp.XXXXXX")"
-  printf '%s\n' "$content" > "$tmp"
-  mv -f -- "$tmp" "$dst"
+  mkdir -p -- "$dir" || return 1
+  tmp="$(mktemp "${dst}.tmp.XXXXXX")" || return 1
+  # No trap: bash trap is process-level, not function-local, and would
+  # clobber callers' EXIT traps. If printf or mv fails, remove the temp
+  # by hand so we don't leak orphaned .tmp.XXXXXX siblings of $dst.
+  if printf '%s\n' "$content" > "$tmp" && mv -f -- "$tmp" "$dst"; then
+    return 0
+  fi
+  rm -f -- "$tmp"
+  return 1
 }
 
 # Idempotent symlink: only ln(1)s when target actually changes. Refuses

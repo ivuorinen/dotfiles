@@ -1898,7 +1898,7 @@ git commit -m "feat(theme): bootstrap orchestrator + spawn watcher from config/e
 
 Run: `grep -n "run-shell\|linux-dark-notify\|macos-dark-notify\|theme-activate" config/tmux/tmux.conf`
 
-- [ ] **Step 2: Remove the linux/macos dark-notify run-shell lines and the theme-activate run-shell line**
+- [ ] **Step 2: Remove the linux/macOS dark-notify run-shell lines and the theme-activate run-shell line**
 
 Use Edit tool to delete those specific lines (they are typically a small block; keep all other run-shell entries unrelated to the theme chain).
 
