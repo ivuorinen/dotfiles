@@ -28,9 +28,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Ask the terminal. When INPUT is /dev/tty, the printf is what
-# triggers the reply. When INPUT is a fixture file, the file already
-# contains the synthesised reply.
+# triggers the reply, and we must put the tty into non-canonical /
+# no-echo mode first or `read -d $'\007'` waits for a newline that
+# never comes. When INPUT is a fixture file, the file already
+# contains the synthesised reply and stty manipulation is unnecessary
+# (and would fail outside an interactive context anyway).
 if [[ "$INPUT" = "/dev/tty" ]]; then
+  saved="$(stty -g < /dev/tty 2> /dev/null)" || exit 0
+  trap 'stty "$saved" < /dev/tty 2>/dev/null || true' EXIT
+  stty -icanon -echo min 0 time 0 < /dev/tty 2> /dev/null || exit 0
   printf '\033]11;?\007' > /dev/tty 2> /dev/null || exit 0
 fi
 
