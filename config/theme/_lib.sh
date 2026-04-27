@@ -14,3 +14,18 @@ _atomic_write()
   printf '%s\n' "$content" > "$tmp"
   mv -f -- "$tmp" "$dst"
 }
+
+# Idempotent symlink: only ln(1)s when target actually changes. Refuses
+# to overwrite a regular file at the destination — that's user data,
+# not something the orchestrator owns. Carries the N-021 guard from
+# the previous _apply-theme.sh.
+_idempotent_ln_sf()
+{
+  local src=$1 dst=$2
+  if [[ -e "$dst" && ! -L "$dst" ]]; then
+    return 0
+  fi
+  if [[ "$(readlink "$dst" 2> /dev/null)" != "$src" ]]; then
+    ln -sf "$src" "$dst"
+  fi
+}
