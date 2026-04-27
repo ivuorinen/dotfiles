@@ -1,4 +1,4 @@
-#:schema https://mise.en.dev/schema/mise.json
+#:schema https://mise.jdx.dev/schema/mise.json
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pipx.uvx = true

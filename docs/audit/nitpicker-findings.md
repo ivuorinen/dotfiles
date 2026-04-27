@@ -1,14 +1,16 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-04-26
-Scope of latest round: changed-files re-audit after the 5 commits on
-feat/unified-prompt-and-theme-chain (96ce5fd...452287b). Surfaced and
-fixed two new defects introduced by the branch (N-021, N-022).
+Last validated: 2026-04-27
+Scope of latest round (Pass 2): default-mode full-repo audit run on
+feat/theming-and-switching at 88b74c2. Re-validated all prior findings,
+hunted for new defects across mise/, scripts/, local/bin/, fish, neovim,
+tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
+4 sub-agent claims as Invalid after verification (N-030..N-033).
 
 ## Summary
 
-- Total: 19 | Open: 1 | Fixed: 16 | Invalid: 0 | Advisory: 2
+- Total: 30 | Open: 1 | Fixed: 23 | Advisory: 2 | Invalid: 4
 
 ## Open Findings
 
@@ -35,26 +37,19 @@ when no tmux session is detected and no other daemon owns the lock. Would
 update both `~/.config/starship.toml` and the tmux state symlink so a later
 tmux launch finds the right state.
 
+## Advisory
+
+#### [N-013] WezTerm Wayland appearance detection depends on xdg-desktop-portal version
+No change. If wezterm colors don't update on Linux, check wezterm version
+(>= 20240203-110809) and that `xdg-desktop-portal` is running.
+
+#### [N-020] oh-my-posh runtime still installed via mise
+No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
+The repo no longer references it, so it won't be reinstalled.
+
 ## Fixed
 
-#### [N-021] `_idempotent_ln_sf` clobbered regular files at the destination
-Fixed: 2026-04-26
-Notes: Added a guard to `_idempotent_ln_sf` in `config/tmux/_apply-theme.sh`:
-if the destination is a regular file (not a symlink), the helper returns
-early instead of replacing it with `ln -sf`. Reproduced before fix: a
-hand-rolled `~/.config/starship.toml` with custom content was silently
-destroyed on the next theme flip. Reproduced after fix: the regular file
-is preserved across daemon invocations; a working symlink is still
-left alone (mtime unchanged); a broken symlink is still repaired.
-
-#### [N-022] Dangling `@` separator when username shows but hostname doesn't
-Fixed: 2026-04-26
-Notes: Username had `format = "[$user]($style)[@](subtext0)"` which
-emitted `user@` even when the hostname module was suppressed (running
-as root locally with no SSH). Moved the `@` separator into the hostname
-format: `format = "[@](subtext0)[$hostname]($style) "`. Now the `@`
-only renders when the hostname does. Username keeps just `[$user]($style)`.
-Applied to both starship-dark.toml and starship-light.toml.
+### Pass 1 — 2026-04-26
 
 #### [N-001] macOS has no continuous appearance watcher
 Fixed: 2026-04-26
@@ -157,16 +152,129 @@ sync-required convention immediately. A generator script was deferred —
 the divergence risk is intentionally cosmetic and the comment is sufficient
 for a config-file pair this small.
 
-## Advisory
+#### [N-021] `_idempotent_ln_sf` clobbered regular files at the destination
+Fixed: 2026-04-26
+Notes: Added a guard to `_idempotent_ln_sf` in `config/tmux/_apply-theme.sh`:
+if the destination is a regular file (not a symlink), the helper returns
+early instead of replacing it with `ln -sf`. Reproduced before fix: a
+hand-rolled `~/.config/starship.toml` with custom content was silently
+destroyed on the next theme flip. Reproduced after fix: the regular file
+is preserved across daemon invocations; a working symlink is still
+left alone (mtime unchanged); a broken symlink is still repaired.
 
-#### [N-013] WezTerm Wayland appearance detection depends on xdg-desktop-portal version
-No change. If wezterm colors don't update on Linux, check wezterm version
-(>= 20240203-110809) and that `xdg-desktop-portal` is running.
+#### [N-022] Dangling `@` separator when username shows but hostname doesn't
+Fixed: 2026-04-26
+Notes: Username had `format = "[$user]($style)[@](subtext0)"` which
+emitted `user@` even when the hostname module was suppressed (running
+as root locally with no SSH). Moved the `@` separator into the hostname
+format: `format = "[@](subtext0)[$hostname]($style) "`. Now the `@`
+only renders when the hostname does. Username keeps just `[$user]($style)`.
+Applied to both starship-dark.toml and starship-light.toml.
 
-#### [N-020] oh-my-posh runtime still installed via mise
-No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
-The repo no longer references it, so it won't be reinstalled.
+### Pass 2 — 2026-04-27
+
+#### [N-023] Wrong mise schema URL (typo)
+Fixed: 2026-04-27
+Notes: `config/mise/config.toml:1` had
+`#:schema https://mise.en.dev/schema/mise.json`. The actual mise docs domain
+is `mise.jdx.dev` (cross-referenced by the repo's own
+`docs/superpowers/plans/2026-04-12-mise-python-precompiled-arch.md`). The
+broken URL silently no-ops in editors that respect `#:schema`, so schema
+validation never fired. Fixed to `https://mise.jdx.dev/schema/mise.json`.
+
+#### [N-024] `install-composer.sh` leaked files in cwd on installer failure under `set -e`
+Fixed: 2026-04-27
+Notes: With `set -euo pipefail`, a non-zero exit from
+`php composer-setup.php --quiet` aborted the script before reaching the
+cleanup `rm composer-setup.php` and the `mv composer.phar` lines. Net result:
+`composer-setup.php` and possibly a partial `composer.phar` were left in the
+caller's cwd. The `RESULT=$?` capture and the `if [[ $RESULT -eq 0 ]]; then mv...`
+branch was also dead code under `set -e` — `RESULT` could only ever be 0 by
+the time the if ran. Rewrote to `cd "$(mktemp -d)"` with `trap 'rm -rf "$tmpdir"' EXIT`
+and dropped the dead `RESULT` plumbing. Also added `mkdir -p ~/.local/bin`
+so the final `mv` doesn't fail on a fresh box.
+
+#### [N-025] `x-ssl-expiry-date` lacked signal-based tmp file cleanup
+Fixed: 2026-04-27
+Notes: `local/bin/x-ssl-expiry-date` only removed its `mktemp` on the
+success path or on openssl failure. SIGINT / SIGTERM / SIGHUP between the
+mktemp and the `rm -f` left the temp file under `/tmp` (or `$TMPDIR`).
+Added `trap 'rm -f "$tmp"' EXIT INT TERM HUP` after mktemp and a
+`trap - EXIT INT TERM HUP` after the explicit rm so the trap doesn't
+re-fire on the next loop iteration's mktemp.
+
+#### [N-026] `config.fish` PATH append for LM Studio inconsistent and dedup-broken
+Fixed: 2026-04-27
+Notes: Line 59 was `set -gx PATH $PATH $HOME/.lmstudio/bin` (raw append).
+Two practical issues: (a) APPENDS rather than prepending, so a system
+binary by the same name would shadow the user one; (b) re-sourcing
+config.fish duplicated the entry. Replaced with
+`fish_add_path $HOME/.lmstudio/bin`, matching the same idiom used at
+line 65 for opencode. `fish_add_path` defaults to prepending and dedupes.
+
+#### [N-027] `handleDesc` mutated caller's table when `desc` lacked `desc` key
+Fixed: 2026-04-27
+Notes: `config/nvim/lua/utils.lua` had
+`if not desc.desc then desc.desc = '?'; return desc end` — mutating the
+caller's table. Concrete failing scenario: a user passes a shared opts
+table to `K.n('a', cmdA, opts)` then `K.n('b', cmdB, opts)`; after the
+first call `opts.desc == '?'`, so the second call sees a populated `desc`
+and skips adding its own. Switched to
+`return vim.tbl_extend('force', desc, { desc = '?' })` so the function
+returns a clone with the default added. Caller's table is left intact.
+
+#### [N-028] `pushover.bats` did not assert that the curl stub was invoked
+Fixed: 2026-04-27
+Notes: `tests/pushover.bats` only checked `[ "$status" -eq 0 ]`. The stub
+returned a JSON success regardless of arguments, so a regression that
+short-circuited and never called curl would still pass. Made the stub
+`touch "$STUB_DIR/curl.called"` and added
+`[ -f "$STUB_DIR/curl.called" ]` to both success-path tests. Verified by
+running the full bats suite — all five tests still pass.
+
+#### [N-029] `tests/x-foreach.bats` cleanup leaked tmp dirs on test failure
+Fixed: 2026-04-27
+Notes: The original test had inline `tmpdir=$(mktemp -d)` and inline
+`rm -rf "$tmpdir"` at end of test. If any assertion in between failed,
+bats aborts the test before the `rm -rf` runs, leaking the tmp dir under
+`/tmp`. Extracted into bats `setup()` / `teardown()` (named `TMPDIR_TEST`
+to avoid colliding with the standard `TMPDIR` env var). Bats guarantees
+`teardown()` runs even on assertion failure.
 
 ## Invalid
 
-(none)
+### Pass 2 — 2026-04-27
+
+#### [N-030] (Rejected) "GitHub token in tracked exports-secret.fish"
+Notes: Sub-agent flagged a Critical "exposed token in tracked file"
+during the Pass-2 fish audit. Verified false: `.gitignore` lines 19 and
+32 explicitly exclude `**/exports-secret.fish` and
+`config/fish/secrets.d/*` (with allowlist for `*.example` and
+`README.md`). `git ls-files | grep -i secret` returns only the
+`*.example` files and `secrets.d/README.md`. The actual secret file is
+a local untracked file used per the design described in CLAUDE.md.
+
+#### [N-031] (Rejected) "set -gx in fish leaks across sessions universally"
+Notes: Sub-agent flagged Critical based on a misreading of fish scopes.
+`set -gx` creates a global, exported variable scoped to the current
+shell session. Universal would be `set -Ux` (different flag). Verified
+against fish documentation. Was a real (low-severity) issue with the
+specific PATH-append pattern at config.fish line 59 — captured under
+N-026 with correct severity (Low) and correct rationale (dedup +
+ordering, not session leak).
+
+#### [N-032] (Rejected) "fish_add_path appends instead of prepending"
+Notes: Sub-agent claimed `fish_add_path` puts user paths after system,
+shadowing user binaries. Verified false against fish's own
+`functions -d fish_add_path` output: "It defaults to keeping
+$fish_user_paths or creating a universal, prepending and ignoring
+existing entries." `fish_add_path` prepends by default. The append
+behaviour requires the explicit `--append` flag.
+
+#### [N-033] (Rejected) "GitHub Actions workflows missing top-level permissions: blocks"
+Notes: Sub-agent flagged 7 of 8 workflows as missing top-level
+`permissions:`. Verified false. All 8 workflows under `.github/workflows/`
+have a top-level `permissions:` block within the first 20 lines of the
+file (verified by `head -20 *.yml | grep -L '^permissions:'`). The
+sync-labels.yml file does have it at line 22. Per-job permissions are
+correctly used to elevate only where needed (e.g. issues: write).

@@ -5,6 +5,8 @@ setup()
   STUB_DIR="$(mktemp -d)"
   cat > "$STUB_DIR/curl" << 'STUB'
 #!/usr/bin/env sh
+# Mark that the stub was actually invoked so tests can assert on it.
+: > "${STUB_DIR}/curl.called"
 echo '{"status":1,"request":"stub-id"}'
 STUB
   chmod +x "$STUB_DIR/curl"
@@ -30,9 +32,11 @@ teardown()
 @test "pushover: exits 0 with message only and no optional flags" {
   run sh local/bin/pushover "hello world"
   [ "$status" -eq 0 ]
+  [ -f "$STUB_DIR/curl.called" ]
 }
 
 @test "pushover: exits 0 with title flag" {
   run sh local/bin/pushover -t "My Title" "hello"
   [ "$status" -eq 0 ]
+  [ -f "$STUB_DIR/curl.called" ]
 }

@@ -21,14 +21,10 @@ local function handleDesc(desc)
     -- If the string is empty, just return as an empty description
     return { desc = desc }
   elseif type(desc) == 'table' then
-    -- If desc doesn't have 'desc' key, combine it with
-    -- others with empty description
-    if not desc.desc then
-      desc.desc = '?'
-      return desc
-    end
-    -- Use the table as is
-    return desc
+    if desc.desc then return desc end
+    -- Clone instead of mutating: callers may share a single opts table
+    -- across multiple K.n() calls and we don't want a leftover desc='?'.
+    return vim.tbl_extend('force', desc, { desc = '?' })
   else
     -- Default to an empty table if `desc` is nil or an unsupported type
     return { desc = '?' }

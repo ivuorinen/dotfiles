@@ -61,9 +61,11 @@ for name in "$@"; do
     tmp=$(mktemp -t tmp)
   fi
 
+  # Always clean up the temp file, even on Ctrl+C between domains.
+  trap 'rm -f "$tmp"' EXIT INT TERM HUP
+
   # Download the certificate
   if (! echo "" | openssl s_client -connect "$name:$port" > "$tmp" 2> /dev/null); then
-    rm -f "$tmp"
     echo "Failed to get cert from https://$name:$port/"
     exit 3
   fi
@@ -73,6 +75,7 @@ for name in "$@"; do
 
   # Remove the temporary file
   rm -f "$tmp"
+  trap - EXIT INT TERM HUP
 
   # Convert the expiry date + todays date to seconds-past epoch
   # Try GNU syntax first, fall back to BSD
