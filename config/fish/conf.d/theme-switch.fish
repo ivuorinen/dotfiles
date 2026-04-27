@@ -36,5 +36,11 @@ function __theme_switch_check --on-event fish_prompt --description 'Refresh them
     # started (fish-then-tmux ordering) the initial choose ran without a tmux
     # state to consult — re-saving now is the safe action and costs only one
     # fish subprocess fork.
-    fish_config theme save "Catppuccin Mocha" 2>/dev/null
+    #
+    # `fish_config theme save` reads stdin for an interactive
+    # "Overwrite your current theme? [y/N]" confirmation
+    # (/usr/share/fish/functions/fish_config.fish line 224). Piping `y`
+    # bypasses the prompt; redirecting stdout silences the confirmation
+    # echo so it doesn't pollute the prompt line.
+    echo y | fish_config theme save "Catppuccin Mocha" >/dev/null 2>&1
 end
