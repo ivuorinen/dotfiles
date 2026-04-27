@@ -1,3 +1,4 @@
+#:schema https://mise.en.dev/schema/mise.json
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pipx.uvx = true
@@ -34,6 +35,20 @@ python = "3.14"
 go = "1.26.2"
 rust = "latest"
 uv = "latest"
+
+# shell
+"github:max-sixty/worktrunk" = "latest"
+bat = "latest"
+bats = "latest"
+choose = "latest"
+cmake = "4.3.2"
+github-cli = "2.91.0"
+gitui = "latest"
+jq = "latest"
+just = "latest"
+lazygit = "latest"
+starship = "latest"
+yq = "latest"
 
 # Pre-built binaries via aqua registry
 fd = "latest"
@@ -83,43 +98,35 @@ ruff = "latest"
 # .NET tools (via dotnet backend)
 "dotnet:coverlet.console" = "latest"
 "dotnet:csharpier" = "latest"
-"dotnet:ilspycmd" = "10.0.0.8330"
-"dotnet:dotnet-ef" = "10.0.7"
 
-# DevOps & security tools
+# Linting, DevOps & security tools
+"aqua:mpalmer/action-validator" = "latest"
 act = "latest"
+actionlint = "latest"
 age = "latest"
 checkov = "latest"
-grype = "0.111.1"
-pinact = "latest"
-snyk = "latest"
 cosign = "latest"
 gitleaks = "latest"
+grype = "0.111.1"
+hadolint = "latest"
+opengrep = "latest"
+pinact = "latest"
+semgrep = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+snyk = "latest"
+stylua = "latest"
 syft = "1.43.0"
+taplo = "latest"
+trivy = "latest"
+trufflehog = "latest"
 
 # Dev tools (pre-built binaries)
-gitui = "latest"
-lazygit = "latest"
-bat = "latest"
-bats = "latest"
-choose = "latest"
-cmake = "4.3.2"
-github-cli = "2.91.0"
-jq = "latest"
-hadolint = "latest"
-just = "latest"
-yq = "latest"
 "github:exercism/cli" = "latest"
 "github:projectdiscovery/katana" = "latest"
 "github:Legit-Labs/legitify" = "latest"
-shellcheck = "latest"
-shfmt = "latest"
-stylua = "latest"
-actionlint = "latest"
-"aqua:mpalmer/action-validator" = "latest"
 "github:o2sh/onefetch" = "latest"
 "github:wakatime/wakatime-cli" = "latest"
-"github:max-sixty/worktrunk" = "latest"
 
 # Terraform (replaces tfenv)
 terraform = "1.14.9"
@@ -128,9 +135,3 @@ tfsec = "latest"
 
 # Other useful tools
 usage = "3.2.1"
-taplo = "latest"
-semgrep = "latest"
-opengrep = "latest"
-trufflehog = "latest"
-trivy = "latest"
-starship = "latest"
