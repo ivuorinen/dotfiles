@@ -1,5 +1,4 @@
-# shellcheck shell=bash
-#
+#!/usr/bin/env bash
 # _apply-theme.sh — shared dark/light theme machinery for tmux daemons.
 #
 # Sourced (NOT executed) by:
