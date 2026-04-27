@@ -19,6 +19,8 @@ teardown()
 }
 
 @test "watcher: --source stub reads modes from a file and applies each" {
+  tmo="$(command -v timeout 2> /dev/null || command -v gtimeout 2> /dev/null || true)"
+  [ -n "$tmo" ] || skip "no timeout(1) on PATH"
   cat > "$THEME_HANDLERS_DIR/recorder" << 'STUB'
 #!/usr/bin/env bash
 echo "$1" >> "${TMPDIR_TEST}/recorded"
@@ -26,7 +28,7 @@ STUB
   chmod +x "$THEME_HANDLERS_DIR/recorder"
   printf 'dark\nlight\ndark\n' > "$TMPDIR_TEST/source-stub"
   export TMPDIR_TEST
-  run timeout 3 "$WATCHER" --source stub --stub-input "$TMPDIR_TEST/source-stub"
+  run "$tmo" 3 "$WATCHER" --source stub --stub-input "$TMPDIR_TEST/source-stub"
   [ "$status" -eq 0 ]
   [ "$(wc -l < "$TMPDIR_TEST/recorded")" -ge 3 ]
 }

@@ -41,6 +41,10 @@ teardown()
 }
 
 @test "dircolors handler: writes ls-colors cache atomically" {
+  if ! command -v dircolors > /dev/null 2>&1 \
+    && ! command -v gdircolors > /dev/null 2>&1; then
+    skip "neither dircolors nor gdircolors installed"
+  fi
   run "$HD/dircolors" dark
   [ "$status" -eq 0 ]
   [ -f "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
