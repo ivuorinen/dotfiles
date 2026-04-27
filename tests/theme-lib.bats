@@ -90,3 +90,21 @@ teardown()
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/lock.pid")" = "$$" ]
 }
+
+@test "_log: appends ISO8601-prefixed line" {
+  source "$THEME_LIB"
+  XDG_STATE_HOME="$TMPDIR_TEST" _log "INFO actor flipped to dark"
+  [ -f "$TMPDIR_TEST/dotfiles-theme/log" ]
+  grep -q 'INFO actor flipped to dark' "$TMPDIR_TEST/dotfiles-theme/log"
+  grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}T' "$TMPDIR_TEST/dotfiles-theme/log"
+}
+
+@test "_log: rotates to 200 lines when over threshold" {
+  source "$THEME_LIB"
+  export XDG_STATE_HOME="$TMPDIR_TEST"
+  for i in $(seq 1 220); do _log "line $i"; done
+  count=$(wc -l < "$TMPDIR_TEST/dotfiles-theme/log")
+  [ "$count" -le 200 ]
+  # Last line preserved
+  grep -q 'line 220' "$TMPDIR_TEST/dotfiles-theme/log"
+}

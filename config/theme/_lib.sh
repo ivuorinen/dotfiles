@@ -54,3 +54,28 @@ _acquire_lock()
   rm -f -- "$tmp"
   return 1
 }
+
+# Append a timestamped line to the orchestrator log. Single-writer
+# discipline: only `apply` and `watcher` call this directly. Handlers
+# print to stderr and the actor captures + labels.
+#
+# Rotation: when the file grows past 200 lines, replace with the last
+# 200 via mktemp + mv. Cheap; runs at most once per flip.
+_log()
+{
+  local msg="$*"
+  local dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+  local logfile="$dir/log"
+  mkdir -p -- "$dir"
+  printf '%sZ %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%S')" "$msg" >> "$logfile"
+  if [[ -f "$logfile" ]]; then
+    local n
+    n=$(wc -l < "$logfile" 2> /dev/null || echo 0)
+    if ((n > 200)); then
+      local tmp
+      tmp="$(mktemp "${logfile}.tmp.XXXXXX")"
+      tail -n 200 -- "$logfile" > "$tmp"
+      mv -f -- "$tmp" "$logfile"
+    fi
+  fi
+}
