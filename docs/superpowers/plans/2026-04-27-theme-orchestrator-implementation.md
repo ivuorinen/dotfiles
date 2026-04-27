@@ -71,6 +71,7 @@
 ### Task 0.1: Create directory skeleton
 
 **Files:**
+
 - Create: `config/theme/handlers.d/.gitkeep`
 - Create: `config/theme/palettes.d/.gitkeep`
 
@@ -86,6 +87,7 @@ touch config/theme/handlers.d/.gitkeep config/theme/palettes.d/.gitkeep
 ```bash
 ls -la config/theme/
 ```
+
 Expected: `handlers.d/`, `palettes.d/` present.
 
 - [ ] **Step 3: Commit**
@@ -102,6 +104,7 @@ git commit -m "chore(theme): scaffold config/theme/{handlers.d,palettes.d} skele
 ### Task 1.1: Failing test for `_atomic_write`
 
 **Files:**
+
 - Create: `tests/theme-lib.bats`
 
 - [ ] **Step 1: Write the failing test**
@@ -425,6 +428,7 @@ git commit -m "feat(theme): add _log with single-writer rotation"
 ### Task 2.1: Failing tests for parse + luminance
 
 **Files:**
+
 - Create: `tests/theme-probe-osc11.bats`
 
 - [ ] **Step 1: Write tests**
@@ -562,6 +566,7 @@ git commit -m "feat(theme): add probe-osc11 with luminance threshold and test se
 ### Task 3.1: Failing tests for `theme-mode`
 
 **Files:**
+
 - Create: `tests/theme-mode.bats`
 
 - [ ] **Step 1: Write tests**
@@ -674,6 +679,7 @@ git commit -m "feat(theme): add theme-mode read API command"
 ### Task 3.3: Add fish function `theme-mode`
 
 **Files:**
+
 - Create: `config/fish/functions/theme-mode.fish`
 
 - [ ] **Step 1: Write the function**
@@ -724,6 +730,7 @@ git commit -m "feat(theme): add fish theme-mode function (zero-fork)"
 ### Task 3.4: Add `theme_mode` POSIX function for bash/zsh
 
 **Files:**
+
 - Modify: `config/exports`
 
 - [ ] **Step 1: Read current state of `config/exports` near line 440 to anchor the insertion**
@@ -767,6 +774,7 @@ Expected: no new warnings on the inserted function.
 bash -c 'source config/exports >/dev/null 2>&1; type theme_mode; theme_mode'
 zsh -c 'source config/exports >/dev/null 2>&1; type theme_mode; theme_mode'
 ```
+
 Expected: function declared, prints `dark`.
 
 - [ ] **Step 5: Commit**
@@ -783,6 +791,7 @@ git commit -m "feat(theme): add theme_mode POSIX-portable bash/zsh function"
 ### Task 4.1: Failing tests for mode validation + atomic write
 
 **Files:**
+
 - Create: `tests/theme-actor.bats`
 
 - [ ] **Step 1: Write tests**
@@ -840,6 +849,7 @@ Expected: 3 failures (script missing).
 ### Task 4.2: Implement `apply` skeleton (validation + atomic-write + idempotency)
 
 **Files:**
+
 - Create: `config/theme/apply`
 
 - [ ] **Step 1: Write the script**
@@ -1063,6 +1073,7 @@ git commit -m "feat(theme): add parallel handler dispatch with timeout + isolati
 ### Task 5.1: Failing tests for stub source + lock
 
 **Files:**
+
 - Create: `tests/theme-watcher.bats`
 
 - [ ] **Step 1: Write tests**
@@ -1283,6 +1294,7 @@ cp config/starship/starship-light.toml config/theme/palettes.d/starship.light.to
 ```bash
 diff config/starship/starship-dark.toml config/theme/palettes.d/starship.dark.toml && diff config/starship/starship-light.toml config/theme/palettes.d/starship.light.toml
 ```
+
 Expected: no output.
 
 - [ ] **Step 3: Commit**
@@ -1417,6 +1429,7 @@ git commit -m "feat(theme): derive light variant of dircolors palette"
 ### Task 7.1: tmux handler
 
 **Files:**
+
 - Create: `config/theme/handlers.d/tmux`
 - Modify: `tests/theme-handlers.bats`
 
@@ -1695,6 +1708,7 @@ git commit -m "feat(theme): add fish handler (persists Catppuccin variant)"
 ### Task 8.1: Update fish event handler
 
 **Files:**
+
 - Modify: `config/fish/conf.d/theme-switch.fish`
 
 - [ ] **Step 1: Read current contents**
@@ -1766,6 +1780,7 @@ git commit -m "feat(theme): rewire fish theme-switch to watch mode state file"
 ### Task 8.2: Spawn watcher from `config/fish/config.fish`
 
 **Files:**
+
 - Modify: `config/fish/config.fish`
 
 - [ ] **Step 1: Read current bottom of file**
@@ -1812,6 +1827,7 @@ git commit -m "feat(theme): spawn watcher + bootstrap from fish config.fish"
 ### Task 8.3: Replace starship-bootstrap in `config/exports`
 
 **Files:**
+
 - Modify: `config/exports`
 
 - [ ] **Step 1: Locate the existing block**
@@ -1858,6 +1874,7 @@ Expected: no new warnings.
 ```bash
 bash -c 'export DOTFILES=$PWD; source config/exports >/dev/null; theme_mode'
 ```
+
 Expected: prints `dark`.
 
 - [ ] **Step 5: Commit**
@@ -1874,6 +1891,7 @@ git commit -m "feat(theme): bootstrap orchestrator + spawn watcher from config/e
 ### Task 9.1: Strip old daemon spawns; add bootstrap call
 
 **Files:**
+
 - Modify: `config/tmux/tmux.conf`
 
 - [ ] **Step 1: Locate run-shell entries**
@@ -1914,6 +1932,7 @@ git commit -m "feat(theme): replace tmux run-shell daemons with orchestrator boo
 ### Task 10.1: Verify dotbot already links `~/.config/theme`
 
 **Files:**
+
 - Read: `install.conf.yaml`
 
 The existing `~/.config/:` glob (`path: config/*`, `glob: true`,
@@ -1929,6 +1948,7 @@ satisfied by the pre-existing glob, not by a new YAML entry.
 ```bash
 grep -nE 'glob: true|path: config' install.conf.yaml
 ```
+
 Expected: shows the existing block with `glob: true` and
 `path: config/*` under `~/.config/:`. No edit needed.
 
@@ -1937,6 +1957,7 @@ Expected: shows the existing block with `glob: true` and
 ```bash
 ./install --only link 2>&1 | grep -E 'theme|skipped|target'
 ```
+
 Expected: line indicating `~/.config/theme` is linked (not skipped),
 or a creation/relink line for it. If absent, fall back to adding an
 explicit entry — see fallback below.
@@ -1978,6 +1999,7 @@ exec $SHELL -l
 theme-mode
 cat $XDG_STATE_HOME/dotfiles-theme/mode
 ```
+
 Expected: matches your current OS appearance.
 
 - [ ] **Step 2: Toggle OS appearance**
@@ -2011,6 +2033,7 @@ git rm config/tmux/theme-activate.sh
 grep -rn "_apply-theme\|linux-dark-notify\|macos-dark-notify\|theme-activate" . \
   --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=docs
 ```
+
 Expected: no hits.
 
 - [ ] **Step 3: Commit**
@@ -2045,6 +2068,7 @@ rmdir config/starship 2>/dev/null || true
 grep -rn "config/starship\|theme-dark.conf\|theme-light.conf\|config/dircolors" . \
   --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=docs
 ```
+
 Expected: no hits.
 
 - [ ] **Step 5: Commit**
@@ -2061,6 +2085,7 @@ git commit -m "refactor(theme): remove obsolete palette source files"
 ### Task 12.1: Update `CLAUDE.md`
 
 **Files:**
+
 - Modify: `CLAUDE.md`
 
 - [ ] **Step 1: Locate the "Shell Configuration Chain" section**
@@ -2121,11 +2146,13 @@ git commit -m "docs: replace tmux-coupled theme description with orchestrator se
 ### Task 12.2: Mark N-010 fixed in audit log
 
 **Files:**
+
 - Modify: `docs/audit/nitpicker-findings.md`
 
 - [ ] **Step 1: Move N-010 from Open to Fixed under a new Pass 3 header**
 
 Use Edit tool to:
+
 1. Delete the N-010 block under `## Open Findings → ### Medium`.
 2. Add `### Pass 3 — 2026-04-27` (or current date) under `## Fixed` with a single entry summarising the orchestrator's role in fixing the gap.
 3. Update the `Last validated:` line and the Summary counts.
@@ -2160,6 +2187,7 @@ git commit -m "docs(audit): mark N-010 fixed by theme orchestrator (Pass 3)"
 ```bash
 yarn test
 ```
+
 Expected: all bats tests pass, including the six new theme files.
 
 ### Task 13.2: Run pre-commit on all files
@@ -2169,6 +2197,7 @@ Expected: all bats tests pass, including the six new theme files.
 ```bash
 pre-commit run --all-files
 ```
+
 Expected: all checks pass.
 
 ### Task 13.3: Manual integration verification (recap)
@@ -2206,6 +2235,7 @@ the old machinery atomically.
 ## Self-review notes
 
 **Spec coverage:**
+
 - Decisions 1–5 → addressed in Phases 1–10 (lib, probe, read API, actor, watcher; SSH guard in 8.2/8.3; self-lock in 5.2; SSH-skip in shell init).
 - Components & layout → all 16 created files have a task; all 6 modified files have a task; all 8 deleted files have a task.
 - Naming convention `[app].[variant].[ext]` → applied in Phase 6 palette tasks.

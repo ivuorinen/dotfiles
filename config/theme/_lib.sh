@@ -23,6 +23,12 @@ _idempotent_ln_sf()
 {
   local src=$1 dst=$2
   if [[ -e "$dst" && ! -L "$dst" ]]; then
+    # Surface the skip so users notice their manual file is shadowing
+    # the orchestrator's symlink (e.g. ~/.config/eza/theme.yml left
+    # over from before the handler existed). rc=0 — this is intended,
+    # not a failure — but silent silence breaks debugging.
+    printf 'theme: skipping symlink %s -> %s (destination exists as a regular file)\n' \
+      "$dst" "$src" >&2
     return 0
   fi
   if [[ "$(readlink "$dst" 2> /dev/null)" != "$src" ]]; then

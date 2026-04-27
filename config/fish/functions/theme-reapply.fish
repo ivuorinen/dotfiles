@@ -33,6 +33,10 @@ function theme-reapply --description 'Re-fire theme handlers for the current mod
         test -n "$ls_value"; and set -gx LS_COLORS $ls_value
     end
 
-    echo "theme-reapply: applied $mode"
+    if test $rc -eq 0
+        echo "theme-reapply: applied $mode"
+    else
+        echo "theme-reapply: applied $mode (one or more handlers failed)" >&2
+    end
     return $rc
 end
