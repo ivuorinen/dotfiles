@@ -1,0 +1,182 @@
+# Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
+# theme), Catppuccin Latte (light).
+#
+# Mirror of starship-dark.toml with the palette swapped. The dark/light
+# variants are kept as separate complete files so the dark-light daemons
+# (config/tmux/_apply-theme.sh, linux-dark-notify.sh, macos-dark-notify.sh)
+# can switch them via a symlink at ~/.config/starship.toml. Starship reads
+# its config on every prompt subprocess invocation, so the swap takes
+# effect on the next prompt with no shell-side reload.
+#
+# MAINTAINER NOTE: any non-palette change made here MUST also be applied
+# to starship-dark.toml. The two files are intentionally identical except
+# for `palette = "..."` and the [palettes.*] block.
+#
+# Layout: line 1 = OS icon · user@host (SSH only) · path · git · terraform
+#                 · node · crystal · ruby · python
+#         line 2 = ➜ (green on success, red on non-zero exit)
+# Transient prompt collapses prior prompts to just `➜ ` (wired by
+# `enable_transience` in config/fish/config.fish and base/zshrc).
+#
+# Username is peach, hostname is lavender (your "differentiated colours"
+# request); both still hidden outside SSH per starship defaults.
+#
+# Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Latte)
+
+add_newline = true
+
+format = """
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$terraform\
+$nodejs\
+$crystal\
+$ruby\
+$python\
+$line_break\
+$character"""
+
+palette = "catppuccin_latte"
+
+[palettes.catppuccin_latte]
+rosewater = "#dc8a78"
+flamingo = "#dd7878"
+pink = "#ea76cb"
+mauve = "#8839ef"
+red = "#d20f39"
+maroon = "#e64553"
+peach = "#fe640b"
+yellow = "#df8e1d"
+green = "#40a02b"
+teal = "#179299"
+sky = "#04a5e5"
+sapphire = "#209fb5"
+blue = "#1e66f5"
+lavender = "#7287fd"
+text = "#4c4f69"
+subtext1 = "#5c5f77"
+subtext0 = "#6c6f85"
+overlay2 = "#7c7f93"
+overlay1 = "#8c8fa1"
+overlay0 = "#9ca0b0"
+surface2 = "#acb0be"
+surface1 = "#bcc0cc"
+surface0 = "#ccd0da"
+base = "#eff1f5"
+mantle = "#e6e9ef"
+crust = "#dce0e8"
+
+[os]
+disabled = false
+style = "sky"
+format = "[$symbol]($style) "
+
+# Nerd Font glyphs via \uXXXX escapes — the Write/Edit pipeline strips
+# bare BMP Private-Use-Area characters (U+E000-U+F8FF), so the literal
+# glyphs would arrive as empty strings. Escapes survive verbatim and the
+# TOML parser converts them at load time.
+[os.symbols]
+Macos = "\uF179"
+Linux = "\uF17C"
+Ubuntu = "\uF31B"
+Debian = "\uF306"
+Fedora = "\uF30A"
+Arch = "\uF303"
+Windows = "\uF17A"
+Alpine = "\uF300"
+NixOS = "\uF313"
+Raspbian = "\uF315"
+Manjaro = "\uF312"
+Pop = "\uF32A"
+
+# Username — only shown over SSH (or as root) per starship defaults.
+# Differentiated from hostname via peach. The "@" separator lives in
+# the hostname format below so it only appears when hostname renders
+# (avoids a dangling "root@" when running as root locally without SSH).
+[username]
+style_user = "peach"
+style_root = "red bold"
+format = "[$user]($style)"
+
+# Hostname — SSH-only by default; lavender so it contrasts with peach user.
+# trim_at = "." matches tide_context_hostname_parts = 1 (drop domain).
+# The "@" separator is part of this format (subtext0) so it only renders
+# when hostname renders.
+[hostname]
+ssh_only = true
+trim_at = "."
+style = "lavender"
+format = "[@](subtext0)[$hostname]($style) "
+
+# Path — sky (Catppuccin's cyan) matches omp's cyan path colour.
+[directory]
+style = "sky"
+truncation_length = 3
+truncation_symbol = "…/"
+format = "[$path]($style)[$read_only]($read_only_style) "
+read_only = " "
+read_only_style = "red"
+
+# Git — lightGreen in omp = green here; branch and status share the colour.
+[git_branch]
+symbol = "\uE725 "
+style = "green"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "green"
+format = "[$all_status$ahead_behind]($style) "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇡${ahead_count}⇣${behind_count} "
+conflicted = "= "
+deleted = "✘ "
+modified = "! "
+renamed = "» "
+staged = "+ "
+stashed = "≡ "
+untracked = "? "
+up_to_date = ""
+
+[git_state]
+style = "yellow"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+# Terraform — black on yellow in omp; bold yellow keeps the same "warning"
+# weight without forcing a background that fights the rest of the prompt.
+[terraform]
+symbol = "\U000F1062 "
+style = "bold yellow"
+format = "[$symbol$workspace]($style) "
+
+# Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
+
+[nodejs]
+symbol = "\uE718 "
+style = "green"
+format = "[$symbol$version]($style) "
+
+[crystal]
+symbol = "\uE62F "
+style = "blue"
+format = "[$symbol$version]($style) "
+
+[ruby]
+symbol = "\uE739 "
+style = "red"
+format = "[$symbol$version]($style) "
+
+[python]
+symbol = "\uE73C "
+style = "yellow"
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+# Status arrow on its own line. Green on success, red on non-zero exit.
+[character]
+success_symbol = "[➜](green)"
+error_symbol = "[➜](red)"
+vimcmd_symbol = "[❮](green)"
