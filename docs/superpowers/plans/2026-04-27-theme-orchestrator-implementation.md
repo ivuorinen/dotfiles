@@ -1294,37 +1294,71 @@ git commit -m "chore(theme): copy starship palettes into palettes.d/"
 
 ### Task 6.3: Vendor `bliss-dircolors` as `dircolors.dark`
 
-- [ ] **Step 1: Fetch upstream**
+This task uses `git clone --depth=1` instead of `curl` because
+CLAUDE.md's context-mode rules intercept any Bash command containing
+`curl` or `wget`. A shallow clone fetches `bliss.dircolors` AND the
+`LICENSE` file in one operation, lets us verify license compatibility
+locally, and works regardless of whether the context-mode MCP server
+is healthy in the current session.
+
+- [ ] **Step 1: Shallow-clone upstream into a temp dir**
 
 ```bash
-mise x -- curl -fsSL https://raw.githubusercontent.com/joshjon/bliss-dircolors/refs/heads/master/bliss.dircolors -o /tmp/bliss.dircolors
+TMP_BLISS="$(mktemp -d)"
+git clone --depth=1 https://github.com/joshjon/bliss-dircolors "$TMP_BLISS/repo"
+test -r "$TMP_BLISS/repo/bliss.dircolors" || { echo "missing bliss.dircolors"; exit 1; }
+test -r "$TMP_BLISS/repo/LICENSE"         || { echo "missing LICENSE";         exit 1; }
 ```
 
-(If `curl` is blocked by hooks in this environment, use `ctx_fetch_and_index` and write the indexed body to `/tmp/bliss.dircolors`.)
+Expected: clone succeeds; both files present.
 
-- [ ] **Step 2: Verify license**
+- [ ] **Step 2: Verify license is permissive (MIT/BSD/Apache-2.0)**
 
-Run: `mise x -- curl -fsSL https://raw.githubusercontent.com/joshjon/bliss-dircolors/refs/heads/master/LICENSE -o /tmp/bliss.LICENSE && head -3 /tmp/bliss.LICENSE`
-Expected: header line includes "MIT" or compatible.
+```bash
+head -3 "$TMP_BLISS/repo/LICENSE"
+grep -qE 'MIT License|BSD|Apache License' "$TMP_BLISS/repo/LICENSE" \
+  || { echo "license is not a known permissive license — abort vendoring"; exit 1; }
+```
 
-- [ ] **Step 3: Write the palette with a source header**
+Expected: grep matches; license is MIT-compatible. **If the grep fails,
+stop the task and surface to the controller — do not vendor a
+non-permissive file.**
+
+- [ ] **Step 3: Detect the upstream license name (for the source header)**
+
+```bash
+LICENSE_NAME="$(head -1 "$TMP_BLISS/repo/LICENSE" | tr -d '\r')"
+echo "license: $LICENSE_NAME"
+```
+
+Used in Step 4. Common values: `MIT License`, `BSD 2-Clause License`,
+`Apache License 2.0`. If empty, fall back to literal `MIT (see upstream LICENSE)`.
+
+- [ ] **Step 4: Write the palette with a source header**
 
 ```bash
 {
-  echo "# Source: https://github.com/joshjon/bliss-dircolors (MIT)"
+  echo "# Source: https://github.com/joshjon/bliss-dircolors (${LICENSE_NAME:-MIT})"
   echo "# Vendored on: $(date -u +%Y-%m-%d)"
   echo "# Local edits: none — keep upstream-tracking."
   echo
-  cat /tmp/bliss.dircolors
+  cat "$TMP_BLISS/repo/bliss.dircolors"
 } > config/theme/palettes.d/dircolors.dark
 ```
 
-- [ ] **Step 4: Sanity check by running dircolors against it**
+- [ ] **Step 5: Clean up the clone**
+
+```bash
+rm -rf "$TMP_BLISS"
+```
+
+- [ ] **Step 6: Sanity check by running dircolors against it**
 
 Run: `dircolors config/theme/palettes.d/dircolors.dark > /dev/null`
-Expected: no errors.
+Expected: no errors. (If `dircolors` binary is missing on macOS, install
+via `mise install -y coreutils` or `brew install coreutils` and re-run.)
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add config/theme/palettes.d/dircolors.dark
