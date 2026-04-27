@@ -44,7 +44,7 @@ zstyle ':omz:plugins:eza' 'prompt' yes
 FPATH="$ANTIDOTE_DIR/functions:$FPATH"
 autoload -Uz antidote
 if [[ ! "${ANTIDOTE_PLUGINS}.zsh" -nt "${ANTIDOTE_PLUGINS}.txt" ]]; then
-  antidote bundle <"${ANTIDOTE_PLUGINS}.txt" >|"${ANTIDOTE_PLUGINS}.zsh"
+  antidote bundle < "${ANTIDOTE_PLUGINS}.txt" >| "${ANTIDOTE_PLUGINS}.zsh"
 fi
 
 # Source your static plugins file.
