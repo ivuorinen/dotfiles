@@ -1,16 +1,12 @@
-# Source: bliss-dircolors (light variant — derived from dircolors.dark)
-# Vendored on: 2026-04-27
-# Light-mode tuning: 38;5;0..7 codes remapped for legibility on a
-# light terminal background.
-
-# Bliss theme for GNU dircolors
-# @author https://github.com/JoshJon
+# Source: derived from catppuccin/eza green variant (latte flavor).
+# Extension layout originally from https://github.com/joshjon/bliss-dircolors
+# (MIT). Palette remapped to catppuccin truecolor on 2026-04-27 so `ls`
+# and `eza` agree on file/category colors.
 #
-# More Information about Bliss dircolors at:
-# https://github.com/JoshJon/dircolors-bliss-macos
-#
-# For information on dircolors files refer to 'dir_colors - Linux Man Pages'
-# https://www.systutorials.com/docs/linux/man/5-dir_colors/
+# Truecolor (38;2;R;G;B) requires GNU coreutils >= 8.30 and a terminal
+# that advertises 24-bit colour. On macOS use `gdircolors` (Homebrew
+# coreutils). Modern terminals (WezTerm, iTerm2, Alacritty, Kitty,
+# Linux GUI emulators) all support it.
 
 # Term Section
 TERM Eterm
@@ -83,92 +79,75 @@ TERM xterm-color
 TERM xterm-debian
 TERM xterm-termite
 
-## Documentation
-# Reference: http://www.mail-archive.com/bug-coreutils@gnu.org/msg11030.html)
-#
-# standard colors
-#
-# Attribute codes:
-# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
-# Text color codes:
-# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
-# Background color codes:
-# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
-#
-# 256 colors
-#
-# Text 256 color coding:
-# 38;5;COLOR_NUMBER
-# Background 256 color coding:
-# 48;5;COLOR_NUMBER
-#
-# Example basic: 45;5;147;01 - lavender background, bold
-# Example 256: 48;5;167;38;5;193,01 - red background, lime-green text, underscore
-
+## Catppuccin Latte (green accent) reference
+#  text       76;79;105    subtext1 92;95;119    subtext0 140;143;161
+#  green      64;160;43    blue     30;102;245   teal     23;146;153
+#  maroon     230;69;83    red      210;15;57    yellow   223;142;29
+#  mauve      136;57;239   pink     234;118;203  sapphire 32;159;181
 
 ## Global defaults
 
 NORMAL 00  # no color
 RESET  0   # reset to "normal" color
 
-FILE 00                      # normal
-DIR  38;5;218;01             # pink bg, bold
-LINK 38;5;115                # green
-MULTIHARDLINK 04;38;5;115    # green
+FILE 00                                  # normal (terminal default fg)
+DIR  38;2;64;160;43;01                   # green (eza directory), bold
+LINK 38;2;30;102;245                     # blue (eza symlink)
+MULTIHARDLINK 04;38;2;30;102;245         # blue, underscore
 
-FIFO 48;5;137     # bronze bg, white
-SOCK 48;5;137     # bronze bg, white
-DOOR 48;5;137     # bronze bg, white
-BLK  38;5;222;04  # bronze bg, underscore
-CHR  38;5;222;01  # bronze, bold
+FIFO 38;2;92;95;119                      # subtext1 (eza pipe)
+SOCK 38;2;92;95;119                      # subtext1 (eza socket)
+DOOR 38;2;92;95;119                      # subtext1
+BLK  38;2;230;69;83;04                   # maroon (eza block_device), underscore
+CHR  38;2;230;69;83;01                   # maroon (eza char_device), bold
 
-EXEC 01 # normal, bold
+EXEC 38;2;64;160;43;01                   # green (eza executable), bold
 
-OTHER_WRITABLE        38;5;153;01  # blue, bold
-STICKY                48;5;67      # blue bg, white
-STICKY_OTHER_WRITABLE 48;5;30      # teal bg, white
+OTHER_WRITABLE        38;2;140;143;161   # subtext0 (eza file_type.crypto)
+STICKY                38;2;23;146;153    # teal (eza mount_point)
+STICKY_OTHER_WRITABLE 38;2;23;146;153    # teal
 
-ORPHAN 48;5;167;    # red bg, white
-SETUID 38;5;210;04  # red, underscore
-SETGID 38;5;180;04  # bronze, underscore
+ORPHAN 38;2;210;15;57;01                 # red (eza broken_symlink), bold
+SETUID 38;2;136;57;239;04                # mauve (eza perms.special_user_file)
+SETGID 38;2;136;57;239;04                # mauve
 
 # Unable to test capability on macOS
-CAPABILITY 00  # white
+CAPABILITY 00
 
-## Archive or compressed - lavender, bold
-.tar   38;5;147;01
-.tgz   38;5;147;01
-.arj   38;5;147;01
-.taz   38;5;147;01
-.lzh   38;5;147;01
-.lzma  38;5;147;01
-.tlz   38;5;147;01
-.txz   38;5;147;01
-.zip   38;5;147;01
-.z     38;5;147;01
-.Z     38;5;147;01
-.dz    38;5;147;01
-.gz    38;5;147;01
-.lz    38;5;147;01
-.xz    38;5;147;01
-.bz2   38;5;147;01
-.bz    38;5;147;01
-.tbz   38;5;147;01
-.tbz2  38;5;147;01
-.tz    38;5;147;01
-.deb   38;5;147;01
-.rpm   38;5;147;01
-.jar   38;5;147;01
-.rar   38;5;147;01
-.ace   38;5;147;01
-.zoo   38;5;147;01
-.cpio  38;5;147;01
-.7z    38;5;147;01
-.rz    38;5;147;01
-.apk   38;5;147;01
-.gem   38;5;147;01
+## Archive or compressed - pink (eza file_type.compressed), bold
+.tar   38;2;234;118;203;01
+.tgz   38;2;234;118;203;01
+.arj   38;2;234;118;203;01
+.taz   38;2;234;118;203;01
+.lzh   38;2;234;118;203;01
+.lzma  38;2;234;118;203;01
+.tlz   38;2;234;118;203;01
+.txz   38;2;234;118;203;01
+.zip   38;2;234;118;203;01
+.z     38;2;234;118;203;01
+.Z     38;2;234;118;203;01
+.dz    38;2;234;118;203;01
+.gz    38;2;234;118;203;01
+.lz    38;2;234;118;203;01
+.xz    38;2;234;118;203;01
+.bz2   38;2;234;118;203;01
+.bz    38;2;234;118;203;01
+.tbz   38;2;234;118;203;01
+.tbz2  38;2;234;118;203;01
+.tz    38;2;234;118;203;01
+.deb   38;2;234;118;203;01
+.rpm   38;2;234;118;203;01
+.jar   38;2;234;118;203;01
+.rar   38;2;234;118;203;01
+.ace   38;2;234;118;203;01
+.zoo   38;2;234;118;203;01
+.cpio  38;2;234;118;203;01
+.7z    38;2;234;118;203;01
+.rz    38;2;234;118;203;01
+.apk   38;2;234;118;203;01
+.gem   38;2;234;118;203;01
 
-# General file - normal
+# General file - normal (terminal default; eza file_type.document is text-colored)
 .tex             00
 .rdf             00
 .owl             00
@@ -205,105 +184,105 @@ CAPABILITY 00  # white
 .sql             00
 .csv             00
 
-# Image file - yellow
-.jpg   38;5;229
-.JPG   38;5;229
-.jpeg  38;5;229
-.gif   38;5;229
-.bmp   38;5;229
-.pbm   38;5;229
-.pgm   38;5;229
-.ppm   38;5;229
-.tga   38;5;229
-.xbm   38;5;229
-.xpm   38;5;229
-.tif   38;5;229
-.tiff  38;5;229
-.png   38;5;229
-.PNG   38;5;229
-.svg   38;5;229
-.svgz  38;5;229
-.mng   38;5;229
-.pcx   38;5;229
-.dl    38;5;229
-.xcf   38;5;229
-.xwd   38;5;229
-.yuv   38;5;229
-.cgm   38;5;229
-.emf   38;5;229
-.eps   38;5;229
-.CR2   38;5;229
-.ico   38;5;229
+# Image file - yellow (eza file_type.image)
+.jpg   38;2;223;142;29
+.JPG   38;2;223;142;29
+.jpeg  38;2;223;142;29
+.gif   38;2;223;142;29
+.bmp   38;2;223;142;29
+.pbm   38;2;223;142;29
+.pgm   38;2;223;142;29
+.ppm   38;2;223;142;29
+.tga   38;2;223;142;29
+.xbm   38;2;223;142;29
+.xpm   38;2;223;142;29
+.tif   38;2;223;142;29
+.tiff  38;2;223;142;29
+.png   38;2;223;142;29
+.PNG   38;2;223;142;29
+.svg   38;2;223;142;29
+.svgz  38;2;223;142;29
+.mng   38;2;223;142;29
+.pcx   38;2;223;142;29
+.dl    38;2;223;142;29
+.xcf   38;2;223;142;29
+.xwd   38;2;223;142;29
+.yuv   38;2;223;142;29
+.cgm   38;2;223;142;29
+.emf   38;2;223;142;29
+.eps   38;2;223;142;29
+.CR2   38;2;223;142;29
+.ico   38;2;223;142;29
 
-# Audio file - lime-green
-.aac   38;5;193
-.au    38;5;193
-.flac  38;5;193
-.mid   38;5;193
-.midi  38;5;193
-.mka   38;5;193
-.mp3   38;5;193
-.mpc   38;5;193
-.ogg   38;5;193
-.opus  38;5;193
-.ra    38;5;193
-.wav   38;5;193
-.m4a   38;5;193
-.axa   38;5;193
-.oga   38;5;193
-.spx   38;5;193
-.xspf  38;5;193
+# Audio file - green (eza file_type.music)
+.aac   38;2;64;160;43
+.au    38;2;64;160;43
+.flac  38;2;64;160;43
+.mid   38;2;64;160;43
+.midi  38;2;64;160;43
+.mka   38;2;64;160;43
+.mp3   38;2;64;160;43
+.mpc   38;2;64;160;43
+.ogg   38;2;64;160;43
+.opus  38;2;64;160;43
+.ra    38;2;64;160;43
+.wav   38;2;64;160;43
+.m4a   38;2;64;160;43
+.axa   38;2;64;160;43
+.oga   38;2;64;160;43
+.spx   38;2;64;160;43
+.xspf  38;2;64;160;43
 
-# Video file - orange
-.mov   38;5;222
-.MOV   38;5;222
-.mpg   38;5;222
-.mpeg  38;5;222
-.m2v   38;5;222
-.mkv   38;5;222
-.ogm   38;5;222
-.mp4   38;5;222
-.m4v   38;5;222
-.mp4v  38;5;222
-.vob   38;5;222
-.qt    38;5;222
-.nuv   38;5;222
-.wmv   38;5;222
-.asf   38;5;222
-.rm    38;5;222
-.rmvb  38;5;222
-.flc   38;5;222
-.avi   38;5;222
-.fli   38;5;222
-.flv   38;5;222
-.gl    38;5;222
-.m2ts  38;5;222
-.divx  38;5;222
-.webm  38;5;222
-.axv   38;5;222
-.anx   38;5;222
-.ogv   38;5;222
-.ogx   38;5;222
+# Video file - red (eza file_type.video)
+.mov   38;2;210;15;57
+.MOV   38;2;210;15;57
+.mpg   38;2;210;15;57
+.mpeg  38;2;210;15;57
+.m2v   38;2;210;15;57
+.mkv   38;2;210;15;57
+.ogm   38;2;210;15;57
+.mp4   38;2;210;15;57
+.m4v   38;2;210;15;57
+.mp4v  38;2;210;15;57
+.vob   38;2;210;15;57
+.qt    38;2;210;15;57
+.nuv   38;2;210;15;57
+.wmv   38;2;210;15;57
+.asf   38;2;210;15;57
+.rm    38;2;210;15;57
+.rmvb  38;2;210;15;57
+.flc   38;2;210;15;57
+.avi   38;2;210;15;57
+.fli   38;2;210;15;57
+.flv   38;2;210;15;57
+.gl    38;2;210;15;57
+.m2ts  38;2;210;15;57
+.divx  38;2;210;15;57
+.webm  38;2;210;15;57
+.axv   38;2;210;15;57
+.anx   38;2;210;15;57
+.ogv   38;2;210;15;57
+.ogx   38;2;210;15;57
 
-# 'unimportant' file e.g. logs and backups - grey
-.log         38;5;248
-.bak         38;5;248
-.aux         38;5;248
-.lof         38;5;248
-.lol         38;5;248
-.lot         38;5;248
-.out         38;5;248
-.toc         38;5;248
-.bbl         38;5;248
-.blg         38;5;248
-*~           38;5;248
-*#           38;5;248
-.part        38;5;248
-.incomplete  38;5;248
-.swp         38;5;248
-.tmp         38;5;248
-.temp        38;5;248
-.o           38;5;248
-.pyc         38;5;248
-.class       38;5;248
-.cache       38;5;248
+# 'unimportant' file e.g. logs and backups - subtext0 (muted, matches eza git.ignored)
+.log         38;2;140;143;161
+.bak         38;2;140;143;161
+.aux         38;2;140;143;161
+.lof         38;2;140;143;161
+.lol         38;2;140;143;161
+.lot         38;2;140;143;161
+.out         38;2;140;143;161
+.toc         38;2;140;143;161
+.bbl         38;2;140;143;161
+.blg         38;2;140;143;161
+*~           38;2;140;143;161
+*#           38;2;140;143;161
+.part        38;2;140;143;161
+.incomplete  38;2;140;143;161
+.swp         38;2;140;143;161
+.tmp         38;2;140;143;161
+.temp        38;2;140;143;161
+.o           38;2;140;143;161
+.pyc         38;2;140;143;161
+.class       38;2;140;143;161
+.cache       38;2;140;143;161
