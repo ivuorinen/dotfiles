@@ -426,6 +426,25 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
+# theme_mode — POSIX-portable read API. bash and zsh both source this
+# file. Behaviour matches local/bin/theme-mode but without forking.
+theme_mode()
+{
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+  local state_file="$state_dir/mode"
+  if [ -r "$state_file" ]; then
+    local m
+    read -r m < "$state_file"
+    if [ "$m" = "dark" ] || [ "$m" = "light" ]; then
+      printf '%s\n' "$m"
+      return 0
+    fi
+  fi
+  # No state file. In an interactive shell we'll have already bootstrapped
+  # below via apply, so the file should exist. If it doesn't, default safely.
+  printf 'dark\n'
+}
+
 # Starship bootstrap. The dark/light TOMLs live at
 # ~/.config/starship/starship-{dark,light}.toml (dotbot-linked from
 # config/starship/). The active config is the symlink ~/.config/starship.toml,
