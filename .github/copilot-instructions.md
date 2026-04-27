@@ -105,8 +105,9 @@ base/zshrc  ──┘                     └──▶ config/alias    (shell al
 Zsh additionally loads **antidote** (plugin manager, in `tools/antidote/`).
 All three shells (bash, zsh, fish) render their prompt with **starship**;
 configs at `config/starship/starship-{dark,light}.toml` are swapped via the
-`~/.config/starship.toml` symlink by the tmux dark-light daemon
-(`config/tmux/{theme-activate.sh,linux-dark-notify.sh}`).
+`~/.config/starship.toml` symlink by the tmux dark-light daemons
+(`config/tmux/{theme-activate.sh,linux-dark-notify.sh,macos-dark-notify.sh}`;
+shared logic in `config/tmux/_apply-theme.sh`).
 
 ### Key Scripts
 

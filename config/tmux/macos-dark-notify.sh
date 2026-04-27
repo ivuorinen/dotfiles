@@ -31,7 +31,11 @@ POLL_INTERVAL_SECONDS=2
 # =============================================================================
 
 TMUX_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
-_tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null || echo "default")"
+# basename(1) on an empty string returns empty with exit 0, so the
+# `|| echo "default"` fallback can't catch a missing TMUX env — split the
+# fallback into a parameter expansion that triggers on empty.
+_tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null)"
+_tmux_sock_name="${_tmux_sock_name:-default}"
 LOCK_FILE="${TMUX_STATE_DIR}/macos-dark-notify-${_tmux_sock_name}.lock"
 
 is_process_running()

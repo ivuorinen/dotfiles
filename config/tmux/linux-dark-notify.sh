@@ -25,7 +25,11 @@ set -o pipefail
 
 TMUX_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
 # Per-tmux-socket lock so multiple independent servers each get a daemon.
-_tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null || echo "default")"
+# basename(1) on an empty string returns empty with exit 0, so the
+# `|| echo "default"` fallback can't catch a missing TMUX env — split the
+# fallback into a parameter expansion that triggers on empty.
+_tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null)"
+_tmux_sock_name="${_tmux_sock_name:-default}"
 LOCK_FILE="${TMUX_STATE_DIR}/linux-dark-notify-${_tmux_sock_name}.lock"
 
 is_process_running()
@@ -92,7 +96,9 @@ daemon_mode()
 
   # Stream gsettings changes and re-apply theme on every color-scheme update.
   # Outer `while true` self-recovers if `gsettings monitor` exits (dbus
-  # restart, transient pipe close). Trailing `|| :` guards against errexit.
+  # restart, transient pipe close). Trailing `|| :` tolerates the inner
+  # pipeline returning non-zero under `set -o pipefail` — e.g. when grep
+  # matches nothing before the monitor stream closes.
   while true; do
     gsettings monitor org.gnome.desktop.interface 2> /dev/null \
       | grep --line-buffered '^color-scheme ' \

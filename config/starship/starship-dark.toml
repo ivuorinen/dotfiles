@@ -80,18 +80,18 @@ format = "[$symbol]($style) "
 # glyphs would arrive as empty strings. Escapes survive verbatim and the
 # TOML parser converts them at load time.
 [os.symbols]
-Macos = ""
-Linux = ""
-Ubuntu = ""
-Debian = ""
-Fedora = ""
-Arch = ""
-Windows = ""
-Alpine = ""
-NixOS = ""
-Raspbian = ""
-Manjaro = ""
-Pop = ""
+Macos = "\uF179"
+Linux = "\uF17C"
+Ubuntu = "\uF31B"
+Debian = "\uF306"
+Fedora = "\uF30A"
+Arch = "\uF303"
+Windows = "\uF17A"
+Alpine = "\uF300"
+NixOS = "\uF313"
+Raspbian = "\uF315"
+Manjaro = "\uF312"
+Pop = "\uF32A"
 
 # Username — only shown over SSH (or as root) per starship defaults.
 # Differentiated from hostname via peach. The "@" separator lives in
@@ -123,7 +123,7 @@ read_only_style = "red"
 
 # Git — lightGreen in omp = green here; branch and status share the colour.
 [git_branch]
-symbol = " "
+symbol = "\uE725 "
 style = "green"
 format = "[$symbol$branch]($style) "
 
@@ -149,29 +149,29 @@ format = '\([$state( $progress_current/$progress_total)]($style)\) '
 # Terraform — black on yellow in omp; bold yellow keeps the same "warning"
 # weight without forcing a background that fights the rest of the prompt.
 [terraform]
-symbol = "󱁢 "
+symbol = "\U000F1062 "
 style = "bold yellow"
 format = "[$symbol$workspace]($style) "
 
 # Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
 
 [nodejs]
-symbol = " "
+symbol = "\uE718 "
 style = "green"
 format = "[$symbol$version]($style) "
 
 [crystal]
-symbol = " "
+symbol = "\uE62F "
 style = "blue"
 format = "[$symbol$version]($style) "
 
 [ruby]
-symbol = " "
+symbol = "\uE739 "
 style = "red"
 format = "[$symbol$version]($style) "
 
 [python]
-symbol = " "
+symbol = "\uE73C "
 style = "yellow"
 format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 
