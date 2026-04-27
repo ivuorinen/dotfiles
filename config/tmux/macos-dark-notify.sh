@@ -87,12 +87,16 @@ daemon_mode()
 
   trap cleanup_and_exit SIGTERM SIGINT SIGHUP
 
-  # Skip the initial apply if theme-activate.sh already established the
-  # state symlink during config load (avoids racing it with potentially
-  # different answers).
+  # Skip the initial apply if theme-activate.sh already established a
+  # working state symlink during config load (avoids racing it with
+  # potentially different answers).
+  #
+  # `[[ ! -e ]]` catches BOTH cases that need fixing — absent symlink
+  # AND dangling symlink (target missing). `[[ ! -L ]]` would skip the
+  # dangling case and leave the broken state in place.
   local last_mode
   last_mode=$(get_current_theme)
-  if [[ ! -L "$THEME_LINK" ]]; then
+  if [[ ! -e "$THEME_LINK" ]]; then
     apply_theme "$last_mode" || true
   fi
 

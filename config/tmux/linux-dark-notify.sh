@@ -86,11 +86,15 @@ daemon_mode()
     cleanup_and_exit
   fi
 
-  # Skip the initial apply if theme-activate.sh already established the
-  # state symlink during config load (avoids the race where this daemon and
-  # theme-activate.sh both update the symlink at startup with potentially
-  # different answers from portal vs gsettings caches).
-  if [[ ! -L "$THEME_LINK" ]]; then
+  # Skip the initial apply if theme-activate.sh already established a
+  # working state symlink during config load (avoids the race where this
+  # daemon and theme-activate.sh both update the symlink at startup with
+  # potentially different answers from portal vs gsettings caches).
+  #
+  # `[[ ! -e ]]` catches BOTH cases that need fixing — absent symlink
+  # AND dangling symlink (target missing). `[[ ! -L ]]` would skip the
+  # dangling case and leave the broken state in place.
+  if [[ ! -e "$THEME_LINK" ]]; then
     apply_theme "$(get_current_theme)" || true
   fi
 
