@@ -92,3 +92,9 @@ local/man/man1/*.1
 !.claude/**
 .claude/**/*.log
 .claude/settings.local.json
+
+# Allow docs/superpowers/ (overrides global **/docs/superpowers/* ignore
+# from the host gitignore override). Plans in this dir are part of the PR
+# record and should be trackable without `git add -f`.
+!docs/superpowers/
+!docs/superpowers/**
