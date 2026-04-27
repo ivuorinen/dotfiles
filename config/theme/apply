@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# apply — the actor. Validates mode, atomic-writes state, forks each
+# handlers.d/<name> in parallel under a 5s timeout, logs any non-zero
+# exit, and returns 0 unless the input was malformed.
+#
+# Env overrides (test seams):
+#   THEME_HANDLERS_DIR  defaults to $DOTFILES/config/theme/handlers.d
+#   XDG_STATE_HOME      defaults to $HOME/.local/state
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/_lib.sh"
+
+if [[ $# -ne 1 ]]; then
+  echo "apply: usage: apply <dark|light>" >&2
+  exit 2
+fi
+
+mode="$1"
+case "$mode" in
+  dark | light) ;;
+  *)
+    echo "apply: unknown mode '$mode'; expected dark|light" >&2
+    exit 2
+    ;;
+esac
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+state_file="$state_dir/mode"
+# shellcheck disable=SC2034  # used by handler dispatch in task 4.3
+handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
+
+# Idempotent: skip everything if already in the requested mode.
+if [[ -r "$state_file" ]]; then
+  current=""
+  read -r current < "$state_file" || true
+  if [[ "$current" = "$mode" ]]; then
+    exit 0
+  fi
+fi
+
+_atomic_write "$state_file" "$mode"
+_log "INFO actor flipped to $mode"
