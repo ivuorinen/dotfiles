@@ -32,5 +32,11 @@ fi
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 mkdir -p -- "$state_dir"
+# Capture rc separately because $? clobbers after the test for empty content.
 content="$("$_dircolors_cmd" -b "$src")"
+rc=$?
+if ((rc != 0)) || [[ -z "$content" ]]; then
+  echo "dircolors handler: $_dircolors_cmd -b '$src' produced no output (rc=$rc)" >&2
+  exit 1
+fi
 _atomic_write "$state_dir/ls-colors" "$content"
