@@ -105,9 +105,13 @@ case "$SOURCE" in
       _log "INFO watcher: subscribing via busctl monitor (portal)"
       busctl --user --json=short monitor org.freedesktop.portal.Desktop 2> /dev/null \
         | while IFS= read -r line; do
+          # Anchor on the JSON variant token so we don't false-match
+          # timestamps or sequence numbers that happen to contain 1/2.
+          # busctl --json=short emits `"v":1` (dark) / `"v":2` (light)
+          # for the org.freedesktop.appearance color-scheme settings.
           case "$line" in
-            *color-scheme*1*) apply_mode dark ;;
-            *color-scheme*2*) apply_mode light ;;
+            *'"color-scheme"'*'"v":1'*) apply_mode dark ;;
+            *'"color-scheme"'*'"v":2'*) apply_mode light ;;
           esac
         done
     else
