@@ -29,8 +29,7 @@ if status is-interactive
     # mise version manager
     type -q mise; and mise activate fish | source
 
-    # Starship prompt — colours flip via ~/.config/starship.toml symlink
-    # swap managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+    # Starship prompt — colours flip via ~/.config/starship.toml symlink swap managed by the theme orchestrator (config/theme/handlers.d/starship).
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship

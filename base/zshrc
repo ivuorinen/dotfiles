@@ -38,7 +38,7 @@ compinit -d "$ZSH_COMPDUMP"
 bashcompinit
 
 # Starship prompt — colours flip via ~/.config/starship.toml symlink swap
-# managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+# managed by the theme orchestrator (config/theme/handlers.d/starship).
 # `enable_transience` collapses prior prompts to just the character symbol
 # so scrollback stays clean (matches tide --transient=Yes).
 if command -v starship > /dev/null 2>&1; then
