@@ -32,6 +32,7 @@ The repo no longer references it, so it won't be reinstalled.
 ### Pass 3 — 2026-04-27
 
 #### [N-010] No verification scenario for fish-without-tmux (wezterm direct)
+
 Fixed: 2026-04-27
 Notes: Replaced by the theme orchestrator. The watcher daemon is spawned
 from shell init (any flavour, with `_acquire_lock` ensuring single-instance),

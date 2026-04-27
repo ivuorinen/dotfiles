@@ -1382,7 +1382,7 @@ Open `config/theme/palettes.d/dircolors.light` in editor. Find every `38;5;X` wh
 
 Update the source-line header:
 
-```
+```text
 # Source: bliss-dircolors (light variant — derived from dircolors.dark)
 # Light-mode tuning: 38;5;0..7 codes remapped for legibility on a
 # light terminal background.
