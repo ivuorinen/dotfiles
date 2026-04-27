@@ -40,6 +40,33 @@ teardown()
   [ "$(cat "$HOME/.config/starship.toml")" = "user content" ]
 }
 
+@test "eza handler: swaps ~/.config/eza/theme.yml symlink" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza"
+  run "$HD/eza" light
+  [ "$status" -eq 0 ]
+  [ -L "$HOME/.config/eza/theme.yml" ]
+  target="$(readlink "$HOME/.config/eza/theme.yml")"
+  [[ "$target" == *"eza.light.yml" ]]
+}
+
+@test "eza handler: refuses to clobber a regular file" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza"
+  echo "user content" > "$HOME/.config/eza/theme.yml"
+  run "$HD/eza" dark
+  [ "$status" -eq 0 ]
+  [ ! -L "$HOME/.config/eza/theme.yml" ]
+  [ "$(cat "$HOME/.config/eza/theme.yml")" = "user content" ]
+}
+
+@test "eza handler: rejects invalid mode" {
+  run "$HD/eza" purple
+  [ "$status" -eq 2 ]
+}
+
 @test "dircolors handler: writes ls-colors cache atomically" {
   if ! command -v dircolors > /dev/null 2>&1 \
     && ! command -v gdircolors > /dev/null 2>&1; then
