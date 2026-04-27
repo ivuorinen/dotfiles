@@ -445,11 +445,53 @@ theme_mode()
   printf 'dark\n'
 }
 
+# theme-reapply — re-fire all theme handlers for the current mode (or
+# $1), bypassing apply's idempotency guard. Refreshes LS_COLORS in the
+# current shell from the dircolors handler's cache. Use after editing a
+# palette to see the result without restarting the shell.
+theme-reapply()
+{
+  local mode="${1:-$(theme_mode)}"
+  case "$mode" in
+    dark | light) ;;
+    *)
+      echo "theme-reapply: mode must be 'dark' or 'light' (got '$mode')" >&2
+      return 2
+      ;;
+  esac
+  local dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+  local handlers_dir="$dotfiles/config/theme/handlers.d"
+  if [ ! -d "$handlers_dir" ]; then
+    echo "theme-reapply: missing $handlers_dir" >&2
+    return 1
+  fi
+  local rc=0 h
+  for h in "$handlers_dir"/*; do
+    if [ -x "$h" ]; then
+      "$h" "$mode" || rc=1
+    fi
+  done
+  local cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
+  if [ -r "$cache" ]; then
+    # shellcheck source=/dev/null
+    . "$cache"
+  fi
+  echo "theme-reapply: applied $mode"
+  return $rc
+}
+
 # Theme orchestrator: bootstrap state + spawn watcher.
 # Skip the watcher fork in SSH sessions — the remote OS is the wrong
 # oracle; per-session OSC 11 via `apply $(theme-mode)` is the right
-# fallback.
-if [ -x "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" ]; then
+# fallback. Skip in non-interactive shells too: `bash -c '...'` and
+# `bash -ic '...'` subshells don't need to fork a daemon and pay the
+# bootstrap cost on every invocation.
+case $- in
+  *i*) _theme_interactive=1 ;;
+  *) _theme_interactive=0 ;;
+esac
+if [ "$_theme_interactive" = 1 ] \
+  && [ -x "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" ]; then
   if [ -z "${SSH_TTY:-}${SSH_CONNECTION:-}" ]; then
     watcher="${DOTFILES:-$HOME/.dotfiles}/config/theme/watcher"
     if [ -x "$watcher" ]; then
@@ -461,6 +503,7 @@ if [ -x "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" ]; then
   "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" "$m" > /dev/null 2>&1 || true
   unset m watcher
 fi
+unset _theme_interactive
 
 # Source LS_COLORS cache produced by the dircolors handler.
 ls_cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
