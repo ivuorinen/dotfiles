@@ -47,3 +47,16 @@ teardown()
   grep -q "LS_COLORS=" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
   grep -q "export LS_COLORS" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
 }
+
+@test "fish handler: returns 0 with valid mode (smoke test only)" {
+  if ! command -v fish > /dev/null 2>&1; then
+    skip "fish not installed"
+  fi
+  run "$HD/fish" dark
+  [ "$status" -eq 0 ]
+}
+
+@test "fish handler: rejects invalid mode" {
+  run "$HD/fish" purple
+  [ "$status" -eq 2 ]
+}
