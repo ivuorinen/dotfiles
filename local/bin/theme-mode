@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # theme-mode — print the orchestrator's current dark/light state.
+# @description Print the orchestrator's current dark/light state
 #
 # Resolution order:
 #   1. $XDG_STATE_HOME/dotfiles-theme/mode  (canonical state)
@@ -8,6 +9,15 @@
 #
 # Always exits 0 so callers can inline the result in conditionals.
 set -uo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+MSGR="$DOTFILES/local/bin/msgr"
+if [[ -f "$MSGR" ]]; then
+  set +u
+  # shellcheck source=msgr
+  source "$MSGR"
+  set -u
+fi
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
