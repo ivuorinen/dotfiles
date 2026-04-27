@@ -81,8 +81,7 @@ if status is-interactive
     if not set -q SSH_TTY; and not set -q SSH_CONNECTION
         set -l watcher "$DOTFILES/config/theme/watcher"
         if test -x $watcher
-            $watcher >/dev/null 2>&1 &
-            disown 2>/dev/null
+            $watcher >/dev/null 2>&1 & disown 2>/dev/null
         end
     end
     # Bootstrap mode so the prompt + LS_COLORS are right on first prompt.
