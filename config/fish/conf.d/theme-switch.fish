@@ -5,7 +5,7 @@
 # syntax colours + LS_COLORS in the running session.
 
 if not status is-interactive
-    exit 0
+    return
 end
 
 set -l state_dir (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
@@ -20,6 +20,13 @@ set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
 if test -r $ls_cache
     set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
     test -n "$ls_value"; and set -gx LS_COLORS $ls_value
+end
+
+# Seed the mtime tracker so the first prompt is a no-op (otherwise
+# `__theme_switch_last_mtime` is unset and the first fish_prompt
+# event always trips the "mtime changed" branch and re-saves the theme).
+if test -r $mode_file
+    set -g __theme_switch_last_mtime (stat -f %m $mode_file 2>/dev/null; or stat -c %Y $mode_file 2>/dev/null)
 end
 
 # Per-prompt cheap watcher: stat the mode file's mtime; only do real
