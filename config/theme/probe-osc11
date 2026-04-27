@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# probe-osc11 — query the terminal's background colour via OSC 11 and
+# print "dark" or "light" based on luminance. Prints nothing (and
+# exits 0) if no answer arrives within the timeout window.
+#
+# Test seams: --input <file> reads OSC 11 reply from a fixture instead
+# of /dev/tty; --timeout <seconds> overrides the default 0.2s.
+set -uo pipefail
+
+INPUT="/dev/tty"
+TIMEOUT="0.2"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --input)
+      INPUT="$2"
+      shift 2
+      ;;
+    --timeout)
+      TIMEOUT="$2"
+      shift 2
+      ;;
+    *)
+      echo "probe-osc11: unknown arg '$1'" >&2
+      exit 2
+      ;;
+  esac
+done
+
+# Ask the terminal. When INPUT is /dev/tty, the printf is what
+# triggers the reply. When INPUT is a fixture file, the file already
+# contains the synthesised reply.
+if [[ "$INPUT" = "/dev/tty" ]]; then
+  printf '\033]11;?\007' > /dev/tty 2> /dev/null || exit 0
+fi
+
+response=""
+read -t "$TIMEOUT" -r -d $'\007' response < "$INPUT" 2> /dev/null || exit 0
+
+# Format: \033]11;rgb:RRRR/GGGG/BBBB or rgb:RR/GG/BB
+if [[ "$response" =~ rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+) ]]; then
+  r="${BASH_REMATCH[1]}"
+  g="${BASH_REMATCH[2]}"
+  b="${BASH_REMATCH[3]}"
+  rn=$((16#${r:0:2}))
+  gn=$((16#${g:0:2}))
+  bn=$((16#${b:0:2}))
+  lum=$(((rn * 299 + gn * 587 + bn * 114) / 1000))
+  if ((lum < 128)); then
+    echo "dark"
+  else
+    echo "light"
+  fi
+fi
