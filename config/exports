@@ -426,8 +426,8 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
-# theme_mode — POSIX-portable read API. bash and zsh both source this
-# file. Behaviour matches local/bin/theme-mode but without forking.
+# theme_mode — shared bash/zsh read API (uses `local`, not strict POSIX).
+# Behaviour matches local/bin/theme-mode but without forking.
 theme_mode()
 {
   local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
