@@ -79,3 +79,19 @@ _log()
     fi
   fi
 }
+
+# Resolve a timeout(1) binary. Macs without coreutils have neither
+# `timeout` nor `gtimeout`; Homebrew's `coreutils` ships only `gtimeout`.
+# Prints the binary name on success, returns 1 when neither is present.
+_resolve_timeout_cmd()
+{
+  if command -v timeout > /dev/null 2>&1; then
+    printf 'timeout\n'
+    return 0
+  fi
+  if command -v gtimeout > /dev/null 2>&1; then
+    printf 'gtimeout\n'
+    return 0
+  fi
+  return 1
+}

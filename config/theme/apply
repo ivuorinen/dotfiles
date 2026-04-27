@@ -40,26 +40,38 @@ fi
 _atomic_write "$state_file" "$mode"
 _log "INFO actor flipped to $mode"
 
-# Fork each handler under a 5s timeout. Capture stderr per handler so
-# the actor can label the lines on the way to the log. We use plain
-# wait $pid + $? since `wait -n` is bash 4.3+ but easier here.
+# Resolve timeout(1) once. Bare-macOS hosts without coreutils have
+# neither `timeout` nor `gtimeout`; we fall back to running handlers
+# unbounded and log a single WARN so a wedged handler is diagnosable.
+TIMEOUT_CMD="$(_resolve_timeout_cmd || true)"
+if [[ -z "$TIMEOUT_CMD" ]]; then
+  _log "WARN actor: timeout(1) unavailable; running handlers unbounded"
+fi
+
+# Fork each handler under the resolved timeout. Capture stderr per handler
+# so the actor can label the lines on the way to the log.
 declare -a pids names
 for h in "$handlers_dir"/*; do
   [[ -x "$h" ]] || continue
   name="$(basename -- "$h")"
   errlog="$state_dir/.handler-$name.err"
   : > "$errlog"
-  (timeout 5s "$h" "$mode" 2> "$errlog") &
+  if [[ -n "$TIMEOUT_CMD" ]]; then
+    ("$TIMEOUT_CMD" 5s "$h" "$mode" 2> "$errlog") &
+  else
+    ("$h" "$mode" 2> "$errlog") &
+  fi
   pids+=("$!")
   names+=("$name")
 done
 
+# Script runs under `set -uo pipefail` (no `-e`), so a non-zero `wait`
+# does not abort the loop — `rc=$?` captures it cleanly. No errexit
+# toggle required.
 i=0
 for pid in "${pids[@]}"; do
-  set +e
   wait "$pid"
   rc=$?
-  set -e
   name="${names[$i]}"
   errlog="$state_dir/.handler-$name.err"
   if ((rc != 0)); then
