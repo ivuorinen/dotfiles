@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# handlers.d/dircolors — regenerate the LS_COLORS cache from the
+# palette matching the requested mode. Cache is sourced by shells via
+# `eval "$(< $cache/ls-colors)"`.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/dircolors.${mode}"
+[[ -r "$src" ]] || {
+  echo "dircolors handler: missing palette $src" >&2
+  exit 1
+}
+
+# On macOS, GNU dircolors ships as gdircolors (coreutils via Homebrew).
+_dircolors_cmd=""
+for _cmd in dircolors gdircolors; do
+  if command -v "$_cmd" > /dev/null 2>&1; then
+    _dircolors_cmd="$_cmd"
+    break
+  fi
+done
+
+if [[ -z "$_dircolors_cmd" ]]; then
+  echo "dircolors handler: neither dircolors nor gdircolors found in PATH" >&2
+  exit 1
+fi
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+mkdir -p -- "$state_dir"
+content="$("$_dircolors_cmd" -b "$src")"
+_atomic_write "$state_dir/ls-colors" "$content"

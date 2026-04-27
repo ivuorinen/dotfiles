@@ -39,3 +39,11 @@ teardown()
   [ ! -L "$HOME/.config/starship.toml" ]
   [ "$(cat "$HOME/.config/starship.toml")" = "user content" ]
 }
+
+@test "dircolors handler: writes ls-colors cache atomically" {
+  run "$HD/dircolors" dark
+  [ "$status" -eq 0 ]
+  [ -f "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
+  grep -q "LS_COLORS=" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
+  grep -q "export LS_COLORS" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
+}
