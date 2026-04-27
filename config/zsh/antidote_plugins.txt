@@ -10,11 +10,8 @@ zsh-users/zsh-completions kind:fpath path:src
 getantidote/use-omz        # handle OMZ dependencies
 ohmyzsh/ohmyzsh path:lib   # load OMZ's library
 
-# Theme
-# mafredri/zsh-async # for pure
-# sindresorhus/pure  # pure itself
-
-romkatv/powerlevel10k
+# Theme — prompt is rendered by starship (eval'd in base/zshrc).
+# Antidote stays plugin-only; no theme plugin loaded here.
 
 ohmyzsh/ohmyzsh path:plugins/colored-man-pages
 ohmyzsh/ohmyzsh path:plugins/brew

@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# linux-dark-notify.sh — watch GNOME color-scheme and switch tmux theme.
+# macos-dark-notify.sh — watch macOS appearance and switch tmux theme.
 #
-# Runs only on Linux; exits silently on other platforms. Uses
-# config/tmux/_apply-theme.sh as the single source of truth for theme
-# resolution and symlink updates so the macOS counterpart shares behaviour.
+# Runs only on Darwin; exits silently on other platforms. macOS doesn't
+# expose a clean event-stream for the AppleInterfaceStyle preference
+# without an extra binary, so this daemon polls `defaults read -g
+# AppleInterfaceStyle` every 2 s — cheap (a single defaults call), and the
+# user-perceptible delay is bounded.
+#
+# Uses config/tmux/_apply-theme.sh as the single source of truth for theme
+# resolution and symlink updates so behaviour matches linux-dark-notify.sh.
 #
 # Add to tmux.conf after theme-activate.sh:
-#   run-shell "$HOME/.dotfiles/config/tmux/linux-dark-notify.sh"
+#   run-shell "$HOME/.dotfiles/config/tmux/macos-dark-notify.sh"
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2025
 # License: MIT
@@ -14,23 +19,24 @@
 set -o pipefail
 [[ "${TRACE-0}" =~ ^(1|t|y|true|yes)$ ]] && set -o xtrace
 
-[[ "$(uname -s)" != "Linux" ]] && exit 0
+[[ "$(uname -s)" != "Darwin" ]] && exit 0
 
 # shellcheck source=config/tmux/_apply-theme.sh
 . "$HOME/.dotfiles/config/tmux/_apply-theme.sh"
+
+POLL_INTERVAL_SECONDS=2
 
 # =============================================================================
 # LOCK FILE MANAGEMENT
 # =============================================================================
 
 TMUX_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
-# Per-tmux-socket lock so multiple independent servers each get a daemon.
 # basename(1) on an empty string returns empty with exit 0, so the
 # `|| echo "default"` fallback can't catch a missing TMUX env — split the
 # fallback into a parameter expansion that triggers on empty.
 _tmux_sock_name="$(basename "${TMUX%%,*}" 2> /dev/null)"
 _tmux_sock_name="${_tmux_sock_name:-default}"
-LOCK_FILE="${TMUX_STATE_DIR}/linux-dark-notify-${_tmux_sock_name}.lock"
+LOCK_FILE="${TMUX_STATE_DIR}/macos-dark-notify-${_tmux_sock_name}.lock"
 
 is_process_running()
 {
@@ -81,35 +87,29 @@ daemon_mode()
 
   trap cleanup_and_exit SIGTERM SIGINT SIGHUP
 
-  if ! command -v gsettings > /dev/null 2>&1; then
-    echo "linux-dark-notify: gsettings(1) not found; theme monitoring unavailable." >&2
-    cleanup_and_exit
-  fi
-
   # Skip the initial apply if theme-activate.sh already established a
-  # working state symlink during config load (avoids the race where this
-  # daemon and theme-activate.sh both update the symlink at startup with
-  # potentially different answers from portal vs gsettings caches).
+  # working state symlink during config load (avoids racing it with
+  # potentially different answers).
   #
   # `[[ ! -e ]]` catches BOTH cases that need fixing — absent symlink
   # AND dangling symlink (target missing). `[[ ! -L ]]` would skip the
   # dangling case and leave the broken state in place.
+  local last_mode
+  last_mode=$(get_current_theme)
   if [[ ! -e "$THEME_LINK" ]]; then
-    apply_theme "$(get_current_theme)" || true
+    apply_theme "$last_mode" || true
   fi
 
-  # Stream gsettings changes and re-apply theme on every color-scheme update.
-  # Outer `while true` self-recovers if `gsettings monitor` exits (dbus
-  # restart, transient pipe close). Trailing `|| :` tolerates the inner
-  # pipeline returning non-zero under `set -o pipefail` — e.g. when grep
-  # matches nothing before the monitor stream closes.
+  # Poll loop. `defaults` is fast (subsecond) and the 2 s cadence keeps the
+  # user-perceived flip latency low while staying out of the way.
   while true; do
-    gsettings monitor org.gnome.desktop.interface 2> /dev/null \
-      | grep --line-buffered '^color-scheme ' \
-      | while IFS= read -r _line; do
-        apply_theme "$(get_current_theme)" || true
-      done || :
-    sleep 1
+    sleep "$POLL_INTERVAL_SECONDS"
+    local current_mode
+    current_mode=$(get_current_theme)
+    if [[ "$current_mode" != "$last_mode" ]]; then
+      apply_theme "$current_mode" || true
+      last_mode="$current_mode"
+    fi
   done
 
   cleanup_and_exit

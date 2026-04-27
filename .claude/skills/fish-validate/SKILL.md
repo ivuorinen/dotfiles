@@ -8,6 +8,8 @@ user-invocable: false
 allowed-tools: Bash, Read
 ---
 
+# Validate fish scripts
+
 After editing any `.fish` file in `config/fish/`, validate it:
 
 ## 1. Syntax check
@@ -31,8 +33,3 @@ If formatting differs, apply it:
 ```bash
 fish_indent -w <file>
 ```
-
-## Key files to never validate
-
-- Files inside `config/fish/functions/` prefixed with `_tide_`
-  (managed by the tide prompt plugin)

@@ -97,20 +97,6 @@ function commit \
     git commit -a -m "$commitMessage"
 end
 
-function configure_tide \
-    --description 'Configure tide with the lean style and my preferences'
-    tide configure \
-        --auto \
-        --style=Lean \
-        --prompt_colors='True color' \
-        --show_time=No \
-        --lean_prompt_height='Two lines' \
-        --prompt_connection=Disconnected \
-        --prompt_spacing=Sparse \
-        --icons='Many icons' \
-        --transient=Yes
-end
-
 # Navigation aliases
 abbr --add .. 'cd ..'
 abbr --add ... 'cd ../..'

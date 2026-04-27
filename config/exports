@@ -426,9 +426,31 @@ export GOBIN="$XDG_BIN_HOME"
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
-# oh-my-posh (omp) configuration
-msg "Setting up oh-my-posh configuration"
-export OHMYPOSH_CFG="$DOTFILES/config/omp/own.toml"
+# Starship bootstrap. The dark/light TOMLs live at
+# ~/.config/starship/starship-{dark,light}.toml (dotbot-linked from
+# config/starship/). The active config is the symlink ~/.config/starship.toml,
+# managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh,
+# macos-dark-notify.sh}. If neither tmux has run yet nor the user has a
+# custom file, point starship at the dark variant so the prompt works on
+# first login.
+#
+# Two cases trigger the symlink creation:
+#   1. ~/.config/starship.toml does not exist at all (truly fresh).
+#   2. ~/.config/starship.toml is a broken symlink (target was moved/deleted).
+# A regular file or a working symlink is left alone.
+# We only create the symlink when the dark variant actually exists on disk
+# — otherwise we'd write a brand-new broken symlink that the bootstrap
+# would refuse to repair on the next shell start.
+__dotfiles_starship_default="$HOME/.config/starship/starship-dark.toml"
+__dotfiles_starship_active="$HOME/.config/starship.toml"
+if [ -f "$__dotfiles_starship_default" ]; then
+  if [ ! -e "$__dotfiles_starship_active" ] && [ ! -L "$__dotfiles_starship_active" ]; then
+    ln -sf "$__dotfiles_starship_default" "$__dotfiles_starship_active"
+  elif [ -L "$__dotfiles_starship_active" ] && [ ! -e "$__dotfiles_starship_active" ]; then
+    ln -sf "$__dotfiles_starship_default" "$__dotfiles_starship_active"
+  fi
+fi
+unset __dotfiles_starship_default __dotfiles_starship_active
 
 # op (1Password cli) is present
 msg "Setting up 1Password CLI configuration"

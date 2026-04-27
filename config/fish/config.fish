@@ -4,6 +4,10 @@
 
 set -g fish_greeting
 
+# Catppuccin theme controls fish syntax/completion colours; the prompt
+# itself is rendered by starship (see below). The Catppuccin Mocha theme
+# file holds both [light] and [dark] palettes; conf.d/theme-switch.fish
+# re-saves it on dark/light flip so syntax colours follow the OS.
 fish_config theme choose "Catppuccin Mocha"
 
 test -e "$HOME/.config/fish/alias.fish" &&
@@ -24,6 +28,18 @@ if status is-interactive
 
     # mise version manager
     type -q mise; and mise activate fish | source
+
+    # Starship prompt — colours flip via ~/.config/starship.toml symlink
+    # swap managed by config/tmux/{theme-activate.sh,linux-dark-notify.sh}.
+    # `enable_transience` collapses prior prompts to just the character
+    # symbol so scrollback stays clean (matches tide --transient=Yes).
+    if type -q starship
+        starship init fish | source
+        function starship_transient_prompt_func
+            starship module character
+        end
+        enable_transience
+    end
 
     # Initialize other tools if available
     type -q zoxide; and zoxide init fish | source

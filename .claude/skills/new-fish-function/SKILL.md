@@ -7,6 +7,8 @@ user-invocable: true
 allowed-tools: Bash, Read, Write, Edit
 ---
 
+# New fish function
+
 When creating a new fish function in `config/fish/functions/`:
 
 ## 1. Create the function file
@@ -25,7 +27,6 @@ end
 
 ## 2. Conventions
 
-- Do NOT use `_tide_` prefix (reserved for tide prompt plugin)
 - Use `--wraps` if the function wraps an existing command
 - For abbreviation-like functions, prefer fish abbreviations
   in `config/fish/alias.fish` instead
