@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# theme-mode — print the orchestrator's current dark/light state.
+#
+# Resolution order:
+#   1. $XDG_STATE_HOME/dotfiles-theme/mode  (canonical state)
+#   2. probe-osc11 against /dev/tty         (interactive shells only)
+#   3. literal "dark"                       (fail-safe default)
+#
+# Always exits 0 so callers can inline the result in conditionals.
+set -uo pipefail
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+state_file="$state_dir/mode"
+
+if [[ -r "$state_file" ]]; then
+  read -r mode < "$state_file" || mode=""
+  if [[ "$mode" = "dark" || "$mode" = "light" ]]; then
+    printf '%s\n' "$mode"
+    exit 0
+  fi
+fi
+
+# No usable state file. Try OSC 11 only when stdin is a TTY (otherwise
+# /dev/tty either errors or blocks, e.g. in cron, CI, or piped scripts).
+if [[ -t 0 ]]; then
+  probe="$(dirname -- "$0")/../share/theme/probe-osc11"
+  # Fall back to the in-tree path if not installed yet (development).
+  [[ -x "$probe" ]] || probe="${DOTFILES:-$HOME/.dotfiles}/config/theme/probe-osc11"
+  if [[ -x "$probe" ]]; then
+    result="$("$probe" 2> /dev/null || true)"
+    if [[ "$result" = "dark" || "$result" = "light" ]]; then
+      printf '%s\n' "$result"
+      exit 0
+    fi
+  fi
+fi
+
+echo "dark"
