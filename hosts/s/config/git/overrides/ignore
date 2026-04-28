@@ -26,6 +26,7 @@ dfm.sh
 **/.serena/*
 **/docs/plans/*
 **/docs/superpowers/*
+**/docs/audit/*
 CLAUDE.md
 TODO.md
 specs.md
