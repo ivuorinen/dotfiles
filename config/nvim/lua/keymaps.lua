@@ -27,7 +27,16 @@ K.n('<Esc><Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
-K.nl('ba', function() vim.cmd '%bd|e#|bd#' end, 'Close all except current')
+K.nl('ba', function()
+  -- `%bd|e#|bd#` errors with E194 when there's no alternate buffer.
+  -- Iterate explicitly so single-buffer state is a no-op.
+  local cur = vim.api.nvim_get_current_buf()
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    if b ~= cur and vim.api.nvim_buf_is_loaded(b) then
+      pcall(vim.api.nvim_buf_delete, b, { force = false })
+    end
+  end
+end, 'Close all except current')
 K.nl('bd', '<cmd>lua MiniBufremove.delete()<CR>', 'Delete buf')
 K.nl('bh', '<cmd>bprev<CR>', 'Prev buf')
 K.nl('bj', '<cmd>bfirst<CR>', 'First buf')

@@ -171,9 +171,12 @@ autocmd('LspAttach', {
   end,
 })
 
--- Gracefully handle LSP requests the attached server doesn't support.
--- Nvim 0.11's default `grt`, `gri`, `grr`, `gra` keymaps call vim.lsp.buf.*
--- which spam "… is not supported" when the server lacks that capability.
+-- Gracefully handle the *less-universal* LSP requests when the attached
+-- server doesn't support them. nvim 0.11's default `grt` (type def) and
+-- `gri` (implementation) call vim.lsp.buf.* which spam "… is not supported"
+-- on servers like bashls/yamlls that lack those capabilities. The other two
+-- defaults (`grr` references, `gra` code action) are supported by virtually
+-- every LSP and don't need wrapping.
 local lsp_method_map = {
   grt = vim.lsp.protocol.Methods.textDocument_typeDefinition,
   gri = vim.lsp.protocol.Methods.textDocument_implementation,

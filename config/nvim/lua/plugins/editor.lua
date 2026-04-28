@@ -139,12 +139,16 @@ return {
         file = '',
       }
 
-      -- Auto-read session for cwd on startup (no file args)
+      -- Auto-read session for cwd on startup (no file args, interactive only).
+      -- Headless invocations (CI, scripts, :checkhealth) skip both read and
+      -- write to avoid polluting ~/.local/share/nvim/sessions/ with junk
+      -- entries for short-lived runs.
       vim.api.nvim_create_autocmd('VimEnter', {
         group = vim.api.nvim_create_augroup('auto-session', { clear = true }),
         nested = true,
         callback = function()
           if vim.fn.argc() > 0 then return end
+          if #vim.api.nvim_list_uis() == 0 then return end
           local cwd = vim.fn.getcwd()
           local name = cwd:gsub('[/\\]', '%%')
           local ok = pcall(sessions.read, name, { force = true })
@@ -155,10 +159,11 @@ return {
         end,
       })
 
-      -- Auto-write session for cwd on exit
+      -- Auto-write session for cwd on exit (interactive only)
       vim.api.nvim_create_autocmd('VimLeavePre', {
         group = vim.api.nvim_create_augroup('auto-session-write', { clear = true }),
         callback = function()
+          if #vim.api.nvim_list_uis() == 0 then return end
           local cwd = vim.fn.getcwd()
           local name = cwd:gsub('[/\\]', '%%')
           sessions.write(name, { force = true })

@@ -29,11 +29,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- ── Add mise shims and ~/.local/bin to the PATH ───────────────────────
-vim.env.PATH = vim.env.HOME
-  .. '/.local/share/mise/shims:'
-  .. vim.env.HOME
-  .. '/.local/bin:'
-  .. vim.env.PATH
+-- Guarded so `:source $MYVIMRC` doesn't duplicate entries each time.
+local function _path_prepend(p)
+  if vim.env.PATH:find(p, 1, true) == nil then vim.env.PATH = p .. ':' .. vim.env.PATH end
+end
+_path_prepend(vim.env.HOME .. '/.local/bin')
+_path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
 
 require 'options'
 require 'autogroups'

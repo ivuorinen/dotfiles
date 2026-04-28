@@ -1,9 +1,6 @@
 return {
-  {
-    'nvim-lua/plenary.nvim',
-    version = '*',
-    lazy = false,
-  },
+  -- plenary.nvim is pulled in transitively by telescope.nvim — no
+  -- standalone spec needed.
 
   -- Vim plugin for automatic time tracking and metrics
   -- generated from your programming activity.

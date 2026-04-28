@@ -17,10 +17,13 @@ return {
     opts = {
       auto_install = true,
       auto_update = true,
+      -- Servers enabled in init.lua but absent from this list are expected
+      -- to come from mise (or the system): `fish_lsp`, `taplo`. Keep this
+      -- list in sync with `vim.lsp.enable {...}` in init.lua plus those
+      -- mise/system exceptions.
       ensure_installed = {
         -- LSP servers (mason package names)
         'ansible-language-server',
-        'ast-grep',
         'bash-language-server',
         'css-lsp',
         'dockerfile-language-server',

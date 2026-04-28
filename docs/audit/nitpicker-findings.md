@@ -1,9 +1,17 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-04-27
-Scope of latest round (Pass 3): N-010 closed by theme orchestrator.
-Scope of previous round (Pass 2): default-mode full-repo audit run on
+Last validated: 2026-04-28
+Scope of latest round (Pass 4): nvim-focused audit run on main at 00357dc.
+Re-validated prior findings (0 open at entry). Read every Lua source under
+`config/nvim/`, sampled `lsp/*.lua` server defs, ran headless nvim probes
+to verify behaviour. Filed and fixed 9 new defects (N-034..N-042) covering
+stale documentation, never-set nerd-font globals, mini.sessions pollution
+on `--headless` invocations, dead LSP config, misleading comments, bogus
+opts_extend path, alt-buffer error in `<leader>ba`, duplicate plenary spec,
+and PATH-prepend duplication on `:source $MYVIMRC`. No Critical findings.
+Scope of previous round (Pass 3): N-010 closed by theme orchestrator.
+Scope of round before that (Pass 2): default-mode full-repo audit run on
 feat/theming-and-switching at 88b74c2. Re-validated all prior findings,
 hunted for new defects across mise/, scripts/, local/bin/, fish, neovim,
 tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
@@ -11,7 +19,7 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 30 | Open: 0 | Fixed: 24 | Advisory: 2 | Invalid: 4
+- Total: 39 | Open: 0 | Fixed: 33 | Advisory: 2 | Invalid: 4
 
 ## Open Findings
 
@@ -28,6 +36,118 @@ No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
 The repo no longer references it, so it won't be reinstalled.
 
 ## Fixed
+
+### Pass 4 — 2026-04-28
+
+#### [N-034] config/nvim/CLAUDE.md is multiply stale
+
+Fixed: 2026-04-28
+Notes: Rewrote three sections to match the current code. Plugin Files
+table now lists the 8 files actually present (`completion`, `editor`,
+`lsp`, `navigation`, `qa`, `tools`, `treesitter`, `ui`) with accurate
+purpose blurbs — `qa.lua` not `conform.lua`; `navigation.lua` is just
+telescope+trouble (neo-tree gone, mini.files replaces it; stickybuf gone,
+replaced by the `winfixbuf` autogroup); `ui.lua` lists render-markdown
+not the never-installed fff; `tools.lua` lost its plenary spec.
+Leader Key Groups table replaced with the 10 prefixes mini.clue actually
+declares: added `q` (Quit), `cb` (CommentBox), `cc` (Calls), `tm`
+(Toggle Options); removed phantom `<leader>a` (Automation) and
+`<leader>z` (TreeSitter) — runtime probe found 0 mappings under either.
+LSP Architecture rewritten to clarify that `vim.lsp.config('*', ...)`
+and `vim.lsp.enable {...}` live in `init.lua`, not `lsp.lua`, and that
+`lazydev.nvim` is not installed (lsp/lua_ls.lua sets workspace.library
+and diagnostics.globals manually). Documented that fish_lsp and taplo
+come from mise, not mason.
+
+#### [N-035] vim.g.have_nerd_font / vim.g.nerd_font_variant never set
+
+Fixed: 2026-04-28
+Notes: Added explicit `g.have_nerd_font = true` and
+`g.nerd_font_variant = 'mono'` near the top of `lua/options.lua`.
+Concrete failing scenario before fix: `lua/autogroups.lua:105-112` had
+`vim.g.have_nerd_font and {...} or {}`, so with the global nil the
+diagnostic config used `signs = {}` — empty signcolumn for diagnostics.
+Likewise `lua/plugins/completion.lua:17` always fell back to `'mono'`
+regardless of intent. Verified post-fix via headless probe: diagnostic
+`signs.text[ERROR]` is now `󰅚` (nerd-font glyph) instead of nil.
+
+#### [N-036] mini.sessions auto-write fires on --headless invocations
+
+Fixed: 2026-04-28
+Notes: Gated both the VimEnter session-read and the VimLeavePre
+session-write callbacks in `lua/plugins/editor.lua` on
+`#vim.api.nvim_list_uis() > 0`. Concrete evidence before fix:
+`~/.local/share/nvim/sessions/` had 31 entries including short-lived
+directories the user never intentionally saved (e.g. one-off Code/*
+dirs). Headless probes during the audit visibly created session files,
+seeing `(mini.sessions) Written session …` in stdout. Verified post-fix:
+`nvim --headless -c qall` exits with no session message and writes no
+new session file.
+
+#### [N-037] LSP enable list out of sync with mason ensure_installed and lsp/*.lua
+
+Fixed: 2026-04-28
+Notes: Removed `lsp/ast_grep.lua` (LSP config that was registered but
+never enabled in `init.lua`'s `vim.lsp.enable {...}` list) and
+`'ast-grep'` from mason `ensure_installed` in `lua/plugins/lsp.lua` (no
+longer needed for the LSP path; ast-grep can be reinstalled via mise or
+brew if wanted as a standalone CLI). Added a comment to the
+`ensure_installed` block stating that servers enabled in `init.lua` but
+absent from the list (`fish_lsp`, `taplo`) come from mise. Verified
+post-fix: `vim.lsp.config.ast_grep` is now nil and the enabled-server
+count is unchanged at 18.
+
+#### [N-038] LSP capability map only handles 2 of 4 default keys; comment lies
+
+Fixed: 2026-04-28
+Notes: Rewrote the comment block above `lsp_method_map` in
+`lua/autogroups.lua` to be honest: only the *less-universal* methods
+(textDocument_typeDefinition / `grt`, textDocument_implementation /
+`gri`) need the capability check, because references (`grr`) and code
+action (`gra`) are supported by virtually every LSP. The map itself is
+unchanged — the prior comment incorrectly implied all four nvim-0.11
+defaults were wrapped.
+
+#### [N-039] completion.lua opts_extend references non-existent path
+
+Fixed: 2026-04-28
+Notes: Removed the
+`opts_extend = { 'sources.completion.enabled_providers' }` line from
+`lua/plugins/completion.lua`. Runtime probe confirmed blink.cmp has no
+`sources.completion` table — the actual default-source list is at
+`sources.default`. The directive was a silent no-op. No alternate spec
+extends blink.cmp's source list, so the line was pure dead code.
+
+#### [N-040] keymaps.lua <leader>ba errors when no alternate buffer
+
+Fixed: 2026-04-28
+Notes: Replaced `vim.cmd '%bd|e#|bd#'` in `lua/keymaps.lua` with an
+explicit loop that walks `vim.api.nvim_list_bufs()` and deletes every
+loaded buffer except the current one, each delete wrapped in `pcall`
+so an unsavable modified buffer doesn't abort the rest. Failing scenario
+before fix: `nvim foo.txt` then `<leader>ba` → `E194: No alternate file
+name to substitute for '#'` after `%bd` removed the only buffer.
+Single-buffer state is now a no-op. Verified via headless probe: the
+mapping callback returns `true` (no error) on a fresh nvim.
+
+#### [N-041] tools.lua duplicate plenary.nvim spec
+
+Fixed: 2026-04-28
+Notes: Removed the standalone `nvim-lua/plenary.nvim` spec from
+`lua/plugins/tools.lua` — telescope already pulls it in transitively
+via its `dependencies` table in `lua/plugins/navigation.lua`. Replaced
+with a one-line comment so a future reader doesn't re-add it. Verified
+via headless probe: `require 'plenary'` still resolves cleanly.
+
+#### [N-042] init.lua PATH prepend duplicates entries on :source $MYVIMRC
+
+Fixed: 2026-04-28
+Notes: Wrapped the prepend in `lua/init.lua` in a local
+`_path_prepend(p)` helper that skips when `p` is already in
+`vim.env.PATH`. Each candidate path is now checked before being
+prepended. Verified via headless probe: `:source $MYVIMRC` followed by
+the original PATH length comparison shows growth of 0 chars (was
+previously growing by ~70 chars per re-source).
 
 ### Pass 3 — 2026-04-27
 

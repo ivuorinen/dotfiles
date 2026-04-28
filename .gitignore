@@ -98,3 +98,9 @@ local/man/man1/*.1
 # record and should be trackable without `git add -f`.
 !docs/superpowers/
 !docs/superpowers/**
+
+# Allow per-directory CLAUDE.md files in this repo (overrides the global
+# CLAUDE.md ignore from the host gitignore override). They document
+# subsystem conventions and should ship with the code they describe.
+!CLAUDE.md
+!**/CLAUDE.md
