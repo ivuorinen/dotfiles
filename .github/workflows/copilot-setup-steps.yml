@@ -46,6 +46,7 @@ jobs:
 
       - name: Install stylua
         run: |
+          # renovate: datasource=github-releases depName=JohnnyMorganz/StyLua
           STYLUA_VERSION="2.4.1"
           curl -sSL "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip" \
             -o /tmp/stylua.zip
