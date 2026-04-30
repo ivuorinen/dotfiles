@@ -14,7 +14,7 @@ module.exports = {
     { types: ['other', 'Other'], label: 'Other Changes' },
   ],
 
-  excludeTypes: [],
+  excludeTypes: ['style', 'codestyle', 'lint', 'test', 'tests'],
 
   renderTypeSection: (label, commits) => {
     let text = `\n## ${label}\n\n`
@@ -28,6 +28,8 @@ module.exports = {
   },
 
   renderChangelog: (release, changes) => {
+    // Uses wall-clock date at render time, not the tag's commit date.
+    // Backfilled or re-triggered releases will carry the current date.
     const now = new Date()
     const d = now.toISOString().substring(0, 10)
     const header = `# ${release} - ${d}\n`

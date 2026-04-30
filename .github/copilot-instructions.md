@@ -135,8 +135,8 @@ the `update-submodules.yml` GitHub Actions workflow.
 
 ### Host-specific Configs
 
-Machine overrides live in `hosts/<hostname>/` (current hosts: `air`, `lakka`,
-`s`, `tunkki`) with their own `base/`, `config/`, and `install.conf.yaml`.
+Machine overrides live in `hosts/<hostname>/` (run `ls hosts/` for current list)
+with their own `base/`, `config/`, and `install.conf.yaml`.
 
 ---
 
