@@ -16,9 +16,10 @@ see what interesting stuff you've done with it. Sharing is caring.
 ### First time setup
 
 1. Clone this repository to `$HOME/.dotfiles`
-2. `./install`
-3. ???
-4. Profit
+2. `git submodule update --init --recursive`
+3. `./install`
+4. ???
+5. Profit
 
 ### Updates
 
@@ -26,9 +27,9 @@ see what interesting stuff you've done with it. Sharing is caring.
 
 ## The looks
 
-![screenshot of light version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-light.png)
+![tmux with nvim, light theme](.github/screenshots/tmux-nvim-kickstart-light.png)
 
-![screenshot of dark version of tmux with nvim editing this repository](./screenshots/tmux-nvim-kickstart-dark.png)
+![tmux with nvim, dark theme](.github/screenshots/tmux-nvim-kickstart-dark.png)
 
 ## Interesting files and locations
 

@@ -1,8 +1,18 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-04-28
-Scope of latest round (Pass 4): nvim-focused audit run on main at 00357dc.
+Last validated: 2026-04-30
+Pass 5 fixes applied: 2026-04-30
+Scope of latest round (Pass 5): `.github/` folder and `.github/README.md` audit
+run on main at bec6529. Re-validated prior findings (0 open at entry). Read all
+workflow YAML files, `tag-changelog-config.js`, `renovate.json`, `copilot-instructions.md`,
+`SECURITY.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS`, and `.github/README.md`.
+Filed 14 new defects (N-043..N-056): missing `labels.yml`, debug-named production
+workflow, absent submodule-init step in setup guide, shell injection in echo step,
+wrong timezone comment, unpinned pre-commit, unmanaged stylua version, token spacing
+inconsistency, noisy changelog exclusion list, sparse security policy, non-standard
+README location, and three advisory items.
+Scope of previous round (Pass 4): nvim-focused audit run on main at 00357dc.
 Re-validated prior findings (0 open at entry). Read every Lua source under
 `config/nvim/`, sampled `lsp/*.lua` server defs, ran headless nvim probes
 to verify behaviour. Filed and fixed 9 new defects (N-034..N-042) covering
@@ -19,7 +29,7 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 39 | Open: 0 | Fixed: 33 | Advisory: 2 | Invalid: 4
+- Total: 53 | Open: 0 | Fixed: 45 | Advisory: 3 | Invalid: 5
 
 ## Open Findings
 
@@ -35,7 +45,81 @@ No change. If wezterm colors don't update on Linux, check wezterm version
 No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
 The repo no longer references it, so it won't be reinstalled.
 
+#### [N-056] `tag-changelog-config.js` `renderChangelog` uses wall-clock date, not tag date
+Area: `.github/tag-changelog-config.js`
+`new Date()` is called at render time. Backfilled or re-triggered releases will
+carry the current date, not the original tag date. A comment was added to document
+the limitation. Full fix requires passing the tag date from the calling workflow.
+
 ## Fixed
+
+### Pass 5 — 2026-04-30
+
+#### [N-043] `sync-labels.yml` watched `.github/labels.yml` which did not exist
+Fixed: 2026-04-30
+Notes: Removed `.github/labels.yml` path from the `push:` trigger in `sync-labels.yml`.
+The path trigger was a dead branch since the file was never present; the schedule and
+`workflow_dispatch` triggers are unaffected.
+
+#### [N-044] `changelog.yml` named "Debug Changelog" in production
+Fixed: 2026-04-30
+Notes: Deleted `.github/workflows/changelog.yml` entirely. The file was a
+`workflow_dispatch`-only debug artifact that echoed changelog output to the
+Actions log. No other workflow referenced it.
+
+#### [N-045] First-time setup omitted `git submodule update --init --recursive`
+Fixed: 2026-04-30
+Notes: Added `git submodule update --init --recursive` as step 2 (before `./install`)
+in the First-time setup section of `README.md`. Also applies to the now-deleted
+`.github/README.md`.
+
+#### [N-046] `changelog.yml` echo step injected expression directly into shell
+Fixed: 2026-04-30
+Notes: Closed by deletion of `changelog.yml` (N-044). No separate change needed.
+
+#### [N-047] `new-release.yml` cron comment wrong in winter
+Fixed: 2026-04-30
+Notes: Updated comment on `new-release.yml` line 8 from
+`# 00:00 at Europe/Helsinki` to `# 00:00 EEST (summer, UTC+3) / 23:00 EET (winter, UTC+2)`.
+
+#### [N-048] `pre-commit-autoupdate.yml` unpinned pre-commit version
+Fixed: 2026-04-30
+Notes: Changed `pip install pre-commit` to `pip install pre-commit==4.2.0` in
+`pre-commit-autoupdate.yml`, matching the version pinned in `copilot-setup-steps.yml`.
+
+#### [N-049] stylua version hardcoded without Renovate tracking
+Fixed: 2026-04-30
+Notes: Added `# renovate: datasource=github-releases depName=JohnnyMorganz/StyLua`
+annotation comment above `STYLUA_VERSION="2.4.1"` in `copilot-setup-steps.yml`.
+Effective if `ivuorinen/renovate-config` enables a matching `regexManagers` pattern.
+
+#### [N-050] `update-submodules.yml` token expression missing spaces
+Fixed: 2026-04-30
+Notes: Changed `${{secrets.GITHUB_TOKEN}}` to `${{ secrets.GITHUB_TOKEN }}` on
+`update-submodules.yml` line 31, consistent with all other workflow files.
+
+#### [N-051] `tag-changelog-config.js` `excludeTypes: []` surfaces style/test noise
+Fixed: 2026-04-30
+Notes: Set `excludeTypes: ['style', 'codestyle', 'lint', 'test', 'tests']`.
+`chore`, `ci`, and `build` are intentionally retained (user preference).
+
+#### [N-052] `SECURITY.md` provided no response SLA
+Fixed: 2026-04-30
+Notes: Added a paragraph committing to 7-day acknowledgement, 30-day resolution
+target, and 14-day public disclosure permission if no response.
+
+#### [N-053] Root `README.md` absent; canonical README was in `.github/`
+Fixed: 2026-04-30
+Notes: Created `README.md` at repository root with updated image paths
+(`.github/screenshots/...` instead of `./screenshots/...`). Deleted
+`.github/README.md` to eliminate the duplicate.
+
+#### [N-055] `copilot-instructions.md` hardcoded host list would become stale
+Fixed: 2026-04-30
+Notes: Replaced the explicit host name list in `copilot-instructions.md` with
+`run \`ls hosts/\` for current list`, removing the stale-on-update risk.
+
+## Invalid
 
 ### Pass 4 — 2026-04-28
 
@@ -389,3 +473,11 @@ have a top-level `permissions:` block within the first 20 lines of the
 file (verified by `head -20 *.yml | grep -L '^permissions:'`). The
 sync-labels.yml file does have it at line 22. Per-job permissions are
 correctly used to elevate only where needed (e.g. issues: write).
+
+### Pass 5 — 2026-04-30
+
+#### [N-054] (Rejected) "`renovate.json` extends only external private config"
+Notes: Finding assumed `local>ivuorinen/renovate-config` was a dependency risk.
+Confirmed by user: `ivuorinen/renovate-config` is the owner's own repository,
+intentionally shared across many repos as a centralised Renovate baseline.
+This is by design, not a fragility.
