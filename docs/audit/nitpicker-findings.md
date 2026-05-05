@@ -1,9 +1,15 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-04-30
-Pass 5 fixes applied: 2026-04-30
-Scope of latest round (Pass 5): `.github/` folder and `.github/README.md` audit
+Last validated: 2026-05-05
+Pass 6 fixes applied: 2026-05-05
+Scope of latest round (Pass 6): focused audit of sesh configuration —
+`config/sesh/sesh.toml`, `config/tmux/sesh.sh`, and
+`config/fish/completions/sesh.fish`. Re-validated prior open findings (0
+real-Open at entry; N-013/N-020/N-056 remain under Advisory). Filed 7
+new defects (N-057..N-063); fixed 5 (N-057, N-058, N-060, N-061, N-062);
+ruled 2 Invalid (N-059, N-063) per maintainer judgment.
+Scope of previous round (Pass 5): `.github/` folder and `.github/README.md` audit
 run on main at bec6529. Re-validated prior findings (0 open at entry). Read all
 workflow YAML files, `tag-changelog-config.js`, `renovate.json`, `copilot-instructions.md`,
 `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS`, and `.github/README.md`.
@@ -29,7 +35,12 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 53 | Open: 0 | Fixed: 45 | Advisory: 3 | Invalid: 5
+- Total: 68 | Open: 0 | Fixed: 57 | Advisory: 3 | Invalid: 8
+
+Pass 8 (2026-05-05): closed N-068 by running the four prerequisite
+audit skills (`arch-detector`, `arch-auditor`, `security-auditor`,
+`doc-auditor`); also fixed N-069 (still-open issue triaged from
+the now-deleted `docs/findings-todo.md`).
 
 ## Open Findings
 
@@ -52,6 +63,133 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 9 — 2026-05-05
+
+#### [N-070] `config/exports` lost shellcheck source-following hint after A-001 file move
+Fixed: 2026-05-05
+Notes: Replaced both `# shellcheck source=/dev/null` directives in
+`config/exports:620, 622` with the correct relative paths
+(`../hosts/lakka/config/exports-lakka` and
+`../hosts/lakka/config/exports-lakka-secret`). shellcheck now
+follows into the moved files for variable analysis.
+
+#### [N-071] Rules-lint and audit-findings-lint hooks false-positive on backtick / code-block content
+Fixed: 2026-05-05
+Notes: Both hooks now pre-filter the input through awk: fenced
+code blocks (`\`\`\` ... \`\`\``) are stripped, and inline
+backtick-wrapped tokens (`\`...\``) are removed from prose lines
+before pattern matching. Verified with four regression tests:
+- rule body `Never use the word \`consider\` in rule prose` →
+  exit 0 (was exit 2)
+- bare `Always try to be careful` → still exit 2
+- hedge inside a fenced code block → exit 0 (was exit 2)
+- real `## Open Findings` duplicate → still exit 2
+
+### Pass 8 — 2026-05-05
+
+#### [N-068] Three audit-artifact prerequisites absent
+Fixed: 2026-05-05
+Notes: Closed by running `arch-detector`, `arch-auditor`,
+`security-auditor`, and `doc-auditor` end-to-end. All four
+artifacts now exist in `docs/audit/`. Their findings have been
+triaged and applied in this same Pass-8 sweep (see
+arch-findings.md, security-findings.md, and doc-findings.md
+Pass 1 entries; claude-rules-auditor-findings.md Pass 4 entry
+for CR-005 close).
+
+#### [N-069] `x-compare-versions.py` empty-stdin returned silent success
+Fixed: 2026-05-05
+Notes: Pre-audit-framework finding from `docs/findings-todo.md`
+(MEDIUM, "Empty stdin input returns exit 0 (silent pass)").
+Triaged during Pass 4 of `claude-rules-auditor` (DOC-002 fix). Added
+`if len(words) < 3: return False` at the top of `vercmp` in
+`local/bin/x-compare-versions.py:27`. Empty or short input now
+exits non-zero, matching the function's documented contract.
+
+The other 9 entries in `docs/findings-todo.md` were verified as
+already-resolved in current code (initialised vars in pushover,
+moved CURL check, added directory/theme-file existence guards,
+mysqldump word-splitting via `# shellcheck disable=SC2046`,
+`brew list ... || true` for php-aliases, single yq parse path in
+x-env-list, `quota <= 0` continue in quota-usage.php) or accepted
+with a `# shellcheck disable` justification (the x-foreach eval).
+`docs/findings-todo.md` deleted; `docs/audit/` is now the single
+source of truth for findings.
+
+### Pass 7 — 2026-05-05
+
+#### [N-064] `nitpicker-findings.md` has two `## Invalid` h2 sections
+Fixed: 2026-05-05
+Notes: Pre-existing structural defect from Pass 2. The misplaced
+Pass-2 fixed block (N-023..N-029, originally nested under the first
+`## Invalid` header) was relocated under `## Fixed` with its own
+`### Pass 2` heading, and the duplicate `## Invalid` h2 at the old
+line 596 was removed. Pass-2 invalid entries (N-030..N-033) and the
+Pass-5 invalid (N-054) now share the single `## Invalid` h2.
+Verified by `grep -nE "^## (Open|Fixed|Invalid|Advisory)"` — one
+Invalid header at line 325.
+
+#### [N-065] `CLAUDE.md` Vendor-file bullet duplicates the migrated rule's imperative
+Fixed: 2026-05-05
+Notes: Reworded the bullet at `CLAUDE.md:180-181` from "Do not modify
+(`.claude/rules/vendored-files.md`)." to "Edit policy:
+`.claude/rules/vendored-files.md`." The imperative now lives only in
+the rule file.
+
+#### [N-066] `CLAUDE.md` "## Package Manager" was a 1-line stub after migration
+Fixed: 2026-05-05
+Notes: Removed the entire `## Package Manager` section (was 3 lines
+including heading and blank line). The no-npm mandate lives in
+`.claude/rules/no-npm.md`; CLAUDE.md no longer needs a pointer
+section for it. CLAUDE.md root drops to ~227 lines.
+
+#### [N-067] `config/tmux/sesh.sh` kept fzf-tmux in the cascade where it was unreachable
+Fixed: 2026-05-05
+Notes: Removed `pick_with_fzf_tmux` and its cascade branch entirely.
+Cascade is now `gum → fzf → select`. Top-of-file comment block
+explains why fzf-tmux was excluded (popup nesting). Verified with
+`bash -n` and `shellcheck` — both clean.
+
+### Pass 6 — 2026-05-05
+
+#### [N-057] Picker cascade prefers gum over fzf-tmux, losing rich UI
+Fixed: 2026-05-05
+Reverted: 2026-05-05
+Notes: Initial fix reordered the cascade to fzf-tmux → fzf → gum → select.
+This broke the picker entirely. Root cause missed during the original
+audit: `sesh.sh` is bound to `prefix + t` via `tmux display-popup -E`
+in `config/tmux/tmux.conf:96`, so by the time the script runs it is
+already inside a tmux popup. `fzf-tmux -p` then tries to open a second
+popup, which tmux does not support. gum filter renders inline inside
+the existing popup, which is why the original ordering put it first.
+Reverted the cascade and added an explanatory comment block at the
+top of `sesh.sh` documenting the popup-nesting constraint. The
+finding is reclassified as **Invalid** below — see Pass 6 Invalid.
+
+#### [N-058] `Downloads` startup_command `lsa` is fish-only
+Fixed: 2026-05-05
+Notes: Added `alias lsa="ls -lah"` to `config/alias` (line 46), which
+is sourced by both `base/bashrc` and `base/zshrc` via
+`config/shared.sh`. Now resolves in fish (existing function),
+bash, and zsh.
+
+#### [N-060] `~/Code/**` wildcard runs `git status` in non-git org dirs
+Fixed: 2026-05-05
+Notes: `startup_command` in the `~/Code/**` wildcard now guards with
+`git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git status || true`.
+Top-level org directories stay quiet; real repos still get the git
+status banner.
+
+#### [N-061] `pick_with_gum` uses `-i`; rest of file uses `--icons`
+Fixed: 2026-05-05
+Notes: Changed `sesh list -i` → `sesh list --icons` on
+`config/tmux/sesh.sh:19` for consistency with the six other call sites.
+
+#### [N-062] `config/fish/completions/sesh.fish` lacks provenance / regen comment
+Fixed: 2026-05-05
+Notes: Added a 3-line header marking the file as auto-generated by
+`sesh completion fish` and documenting the regen command.
 
 ### Pass 5 — 2026-04-30
 
@@ -119,7 +257,101 @@ Fixed: 2026-04-30
 Notes: Replaced the explicit host name list in `copilot-instructions.md` with
 `run \`ls hosts/\` for current list`, removing the stale-on-update risk.
 
+### Pass 2 — 2026-04-27
+
+#### [N-023] Wrong mise schema URL (typo)
+Fixed: 2026-04-27
+Notes: `config/mise/config.toml:1` had
+`#:schema https://mise.en.dev/schema/mise.json`. The actual mise docs domain
+is `mise.jdx.dev` (cross-referenced by the repo's own
+`docs/superpowers/plans/2026-04-12-mise-python-precompiled-arch.md`). The
+broken URL silently no-ops in editors that respect `#:schema`, so schema
+validation never fired. Fixed to `https://mise.jdx.dev/schema/mise.json`.
+
+#### [N-024] `install-composer.sh` leaked files in cwd on installer failure under `set -e`
+Fixed: 2026-04-27
+Notes: With `set -euo pipefail`, a non-zero exit from
+`php composer-setup.php --quiet` aborted the script before reaching the
+cleanup `rm composer-setup.php` and the `mv composer.phar` lines. Net result:
+`composer-setup.php` and possibly a partial `composer.phar` were left in the
+caller's cwd. The `RESULT=$?` capture and the `if [[ $RESULT -eq 0 ]]; then mv...`
+branch was also dead code under `set -e` — `RESULT` could only ever be 0 by
+the time the if ran. Rewrote to `cd "$(mktemp -d)"` with `trap 'rm -rf "$tmpdir"' EXIT`
+and dropped the dead `RESULT` plumbing. Also added `mkdir -p ~/.local/bin`
+so the final `mv` doesn't fail on a fresh box.
+
+#### [N-025] `x-ssl-expiry-date` lacked signal-based tmp file cleanup
+Fixed: 2026-04-27
+Notes: `local/bin/x-ssl-expiry-date` only removed its `mktemp` on the
+success path or on openssl failure. SIGINT / SIGTERM / SIGHUP between the
+mktemp and the `rm -f` left the temp file under `/tmp` (or `$TMPDIR`).
+Added `trap 'rm -f "$tmp"' EXIT INT TERM HUP` after mktemp and a
+`trap - EXIT INT TERM HUP` after the explicit rm so the trap doesn't
+re-fire on the next loop iteration's mktemp.
+
+#### [N-026] `config.fish` PATH append for LM Studio inconsistent and dedup-broken
+Fixed: 2026-04-27
+Notes: Line 59 was `set -gx PATH $PATH $HOME/.lmstudio/bin` (raw append).
+Two practical issues: (a) APPENDS rather than prepending, so a system
+binary by the same name would shadow the user one; (b) re-sourcing
+config.fish duplicated the entry. Replaced with
+`fish_add_path $HOME/.lmstudio/bin`, matching the same idiom used at
+line 65 for opencode. `fish_add_path` defaults to prepending and dedupes.
+
+#### [N-027] `handleDesc` mutated caller's table when `desc` lacked `desc` key
+Fixed: 2026-04-27
+Notes: `config/nvim/lua/utils.lua` had
+`if not desc.desc then desc.desc = '?'; return desc end` — mutating the
+caller's table. Concrete failing scenario: a user passes a shared opts
+table to `K.n('a', cmdA, opts)` then `K.n('b', cmdB, opts)`; after the
+first call `opts.desc == '?'`, so the second call sees a populated `desc`
+and skips adding its own. Switched to
+`return vim.tbl_extend('force', desc, { desc = '?' })` so the function
+returns a clone with the default added. Caller's table is left intact.
+
+#### [N-028] `pushover.bats` did not assert that the curl stub was invoked
+Fixed: 2026-04-27
+Notes: `tests/pushover.bats` only checked `[ "$status" -eq 0 ]`. The stub
+returned a JSON success regardless of arguments, so a regression that
+short-circuited and never called curl would still pass. Made the stub
+`touch "$STUB_DIR/curl.called"` and added
+`[ -f "$STUB_DIR/curl.called" ]` to both success-path tests. Verified by
+running the full bats suite — all five tests still pass.
+
+#### [N-029] `tests/x-foreach.bats` cleanup leaked tmp dirs on test failure
+Fixed: 2026-04-27
+Notes: The original test had inline `tmpdir=$(mktemp -d)` and inline
+`rm -rf "$tmpdir"` at end of test. If any assertion in between failed,
+bats aborts the test before the `rm -rf` runs, leaking the tmp dir under
+`/tmp`. Extracted into bats `setup()` / `teardown()` (named `TMPDIR_TEST`
+to avoid colliding with the standard `TMPDIR` env var). Bats guarantees
+`teardown()` runs even on assertion failure.
+
 ## Invalid
+
+### Pass 6 — 2026-05-05
+
+#### [N-057] Picker cascade prefers gum over fzf-tmux, losing rich UI
+Notes: Original premise wrong. The cascade prefers gum because
+`sesh.sh` is invoked via `tmux display-popup -E`, and `fzf-tmux -p`
+cannot nest another popup inside the existing one. gum filter renders
+inline and is the only rich-ish picker that works in this context.
+The "rich UI" the original finding lamented (preview, ctrl-a/t/g/x/f/d
+binds) is reachable only by running the script outside a popup — and
+the cascade still falls through to fzf-tmux/fzf there. No defect.
+
+#### [N-059] Host-specific SSH targets and personal paths in shared config
+Notes: Maintainer ruling — these dotfiles are personal, not a public
+template. The SSH FQDNs (`air.local`, `baal.antiprocess.net`,
+`purson.antiprocess.net`) and the `Code/ivuorinen` path describe the
+owner's own infrastructure on the owner's own repo. No fork
+isolation or recon concern applies. Kept in the shared
+`config/sesh/sesh.toml`.
+
+#### [N-063] `pick_with_select` uses `mapfile` (bash 4+)
+Notes: Maintainer ruling — bash 4 is installed via Homebrew on every
+machine the owner provisions, so the bash-3.2 fallback path is
+unreachable in practice. The `mapfile` line is left as-is.
 
 ### Pass 4 — 2026-04-28
 
@@ -366,77 +598,6 @@ format: `format = "[@](subtext0)[$hostname]($style) "`. Now the `@`
 only renders when the hostname does. Username keeps just `[$user]($style)`.
 Applied to both starship-dark.toml and starship-light.toml.
 
-### Pass 2 — 2026-04-27
-
-#### [N-023] Wrong mise schema URL (typo)
-Fixed: 2026-04-27
-Notes: `config/mise/config.toml:1` had
-`#:schema https://mise.en.dev/schema/mise.json`. The actual mise docs domain
-is `mise.jdx.dev` (cross-referenced by the repo's own
-`docs/superpowers/plans/2026-04-12-mise-python-precompiled-arch.md`). The
-broken URL silently no-ops in editors that respect `#:schema`, so schema
-validation never fired. Fixed to `https://mise.jdx.dev/schema/mise.json`.
-
-#### [N-024] `install-composer.sh` leaked files in cwd on installer failure under `set -e`
-Fixed: 2026-04-27
-Notes: With `set -euo pipefail`, a non-zero exit from
-`php composer-setup.php --quiet` aborted the script before reaching the
-cleanup `rm composer-setup.php` and the `mv composer.phar` lines. Net result:
-`composer-setup.php` and possibly a partial `composer.phar` were left in the
-caller's cwd. The `RESULT=$?` capture and the `if [[ $RESULT -eq 0 ]]; then mv...`
-branch was also dead code under `set -e` — `RESULT` could only ever be 0 by
-the time the if ran. Rewrote to `cd "$(mktemp -d)"` with `trap 'rm -rf "$tmpdir"' EXIT`
-and dropped the dead `RESULT` plumbing. Also added `mkdir -p ~/.local/bin`
-so the final `mv` doesn't fail on a fresh box.
-
-#### [N-025] `x-ssl-expiry-date` lacked signal-based tmp file cleanup
-Fixed: 2026-04-27
-Notes: `local/bin/x-ssl-expiry-date` only removed its `mktemp` on the
-success path or on openssl failure. SIGINT / SIGTERM / SIGHUP between the
-mktemp and the `rm -f` left the temp file under `/tmp` (or `$TMPDIR`).
-Added `trap 'rm -f "$tmp"' EXIT INT TERM HUP` after mktemp and a
-`trap - EXIT INT TERM HUP` after the explicit rm so the trap doesn't
-re-fire on the next loop iteration's mktemp.
-
-#### [N-026] `config.fish` PATH append for LM Studio inconsistent and dedup-broken
-Fixed: 2026-04-27
-Notes: Line 59 was `set -gx PATH $PATH $HOME/.lmstudio/bin` (raw append).
-Two practical issues: (a) APPENDS rather than prepending, so a system
-binary by the same name would shadow the user one; (b) re-sourcing
-config.fish duplicated the entry. Replaced with
-`fish_add_path $HOME/.lmstudio/bin`, matching the same idiom used at
-line 65 for opencode. `fish_add_path` defaults to prepending and dedupes.
-
-#### [N-027] `handleDesc` mutated caller's table when `desc` lacked `desc` key
-Fixed: 2026-04-27
-Notes: `config/nvim/lua/utils.lua` had
-`if not desc.desc then desc.desc = '?'; return desc end` — mutating the
-caller's table. Concrete failing scenario: a user passes a shared opts
-table to `K.n('a', cmdA, opts)` then `K.n('b', cmdB, opts)`; after the
-first call `opts.desc == '?'`, so the second call sees a populated `desc`
-and skips adding its own. Switched to
-`return vim.tbl_extend('force', desc, { desc = '?' })` so the function
-returns a clone with the default added. Caller's table is left intact.
-
-#### [N-028] `pushover.bats` did not assert that the curl stub was invoked
-Fixed: 2026-04-27
-Notes: `tests/pushover.bats` only checked `[ "$status" -eq 0 ]`. The stub
-returned a JSON success regardless of arguments, so a regression that
-short-circuited and never called curl would still pass. Made the stub
-`touch "$STUB_DIR/curl.called"` and added
-`[ -f "$STUB_DIR/curl.called" ]` to both success-path tests. Verified by
-running the full bats suite — all five tests still pass.
-
-#### [N-029] `tests/x-foreach.bats` cleanup leaked tmp dirs on test failure
-Fixed: 2026-04-27
-Notes: The original test had inline `tmpdir=$(mktemp -d)` and inline
-`rm -rf "$tmpdir"` at end of test. If any assertion in between failed,
-bats aborts the test before the `rm -rf` runs, leaking the tmp dir under
-`/tmp`. Extracted into bats `setup()` / `teardown()` (named `TMPDIR_TEST`
-to avoid colliding with the standard `TMPDIR` env var). Bats guarantees
-`teardown()` runs even on assertion failure.
-
-## Invalid
 
 ### Pass 2 — 2026-04-27
 
