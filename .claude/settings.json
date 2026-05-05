@@ -42,6 +42,16 @@
           },
           {
             "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-rules-lint.sh",
+            "statusMessage": "Linting .claude/rules/..."
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-audit-findings-lint.sh",
+            "statusMessage": "Validating audit findings structure..."
+          },
+          {
+            "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/async-bats.sh",
             "async": true,
             "statusMessage": "Running tests..."
