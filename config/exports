@@ -617,7 +617,9 @@ fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
 if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/exports-local"; fi
-# shellcheck source=./exports-lakka
+# Per-host exports — shipped from hosts/<hostname>/config/exports-<hostname>
+# via the dotbot host overlay, then sourced here when running on that host.
+# shellcheck source=../hosts/lakka/config/exports-lakka
 if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)"; fi
-# shellcheck source=./exports-lakka-secret
+# shellcheck source=../hosts/lakka/config/exports-lakka-secret
 if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"; fi
