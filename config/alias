@@ -43,6 +43,7 @@ alias .p='cd $HOME/Code/ivuorinen'
 # Shortcuts for listing
 alias ll="ls -la"
 alias l="ls -a"
+alias lsa="ls -lah"
 
 # Prevent common typos
 alias cd..="cd .."

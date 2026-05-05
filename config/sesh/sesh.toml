@@ -22,6 +22,12 @@ cache = true
 
 blacklist = ["^scratch$", "^_"]
 
+[[wildcard]]
+pattern = "~/Code/**"
+# Top-level org dirs (~/Code/<org>/) are not git repos; guard the call so the
+# new pane stays quiet there instead of printing "fatal: not a git repository".
+startup_command = "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git status || true"
+
 [[session]]
 name = "home (~)"
 path = "~"
@@ -56,3 +62,18 @@ startup_command = "lsa"
 [[session]]
 name = "Code/ivuorinen"
 path = "~/Code/ivuorinen/"
+
+[[session]]
+name = "ssh/air"
+path = "~/"
+startup_command = "ssh air.local"
+
+[[session]]
+name = "ssh/baal"
+path = "~/"
+startup_command = "ssh baal.antiprocess.net"
+
+[[session]]
+name = "ssh/purson"
+path = "~/"
+startup_command = "ssh purson.antiprocess.net"

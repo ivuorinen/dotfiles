@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # Unified sesh session picker with cascading tool detection:
-#   1. gum       — simple fuzzy filter
-#   2. fzf-tmux  — rich UI with keybinds, preview, session kill
-#   3. fzf       — same as fzf-tmux but inline
-#   4. select    — bare minimum numbered menu
+#   1. gum     — simple fuzzy filter (works inside the prefix+t popup)
+#   2. fzf     — rich UI inline; reachable when invoked outside a popup
+#   3. select  — bare minimum numbered menu
+#
+# `fzf-tmux` is intentionally omitted: this script is bound to
+# `prefix + t` via `display-popup -E` in config/tmux/tmux.conf, and
+# `fzf-tmux -p` cannot nest a second popup inside the existing one
+# (the failure mode that prompted N-057). Plain `fzf` covers the
+# direct-invocation case.
 
 set -euo pipefail
 
@@ -16,7 +21,7 @@ fi
 # Pick a sesh session using gum filter
 pick_with_gum()
 {
-  sesh list -i \
+  sesh list --icons \
     | gum filter \
       --limit 1 \
       --no-sort \
@@ -43,13 +48,6 @@ FZF_COMMON_OPTS=(
   --preview 'sesh preview {}'
 )
 
-# Pick a sesh session using fzf-tmux popup
-pick_with_fzf_tmux()
-{
-  sesh list --icons | fzf-tmux -p 80%,70% "${FZF_COMMON_OPTS[@]}"
-  return 0
-}
-
 # Pick a sesh session using fzf inline
 pick_with_fzf()
 {
@@ -74,11 +72,11 @@ pick_with_select()
   done
 }
 
-# Cascading tool detection
+# Cascading tool detection — gum first because the script is invoked
+# from inside a tmux popup (display-popup -E in tmux.conf); gum filter
+# is the only fuzzy picker that renders inline in that context.
 if command -v gum &> /dev/null; then
   selection=$(pick_with_gum)
-elif command -v fzf-tmux &> /dev/null; then
-  selection=$(pick_with_fzf_tmux)
 elif command -v fzf &> /dev/null; then
   selection=$(pick_with_fzf)
 else
