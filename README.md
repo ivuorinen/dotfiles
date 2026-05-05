@@ -50,12 +50,12 @@ is processed by Dotbot during installation.
 
 ### dotfile folders
 
-| Repo      | Destination | Description                                 |
-|-----------|-------------|---------------------------------------------|
-| `base/`   | `.*`        | `$HOME` level files.                        |
-| `config/` | `.config/`  | Configurations for applications.            |
-| `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `state` |
-| `ssh/`    | `.ssh/`     | SSH Configurations.                         |
+| Repo      | Destination | Description                               |
+|-----------|-------------|-------------------------------------------|
+| `base/`   | `.*`        | `$HOME` level files.                      |
+| `config/` | `.config/`  | Configurations for applications.          |
+| `local/`  | `.local/`   | XDG Base folder: `bin`, `share` and `man` |
+| `ssh/`    | `.ssh/`     | SSH Configurations.                       |
 
 ### `dfm` - the dotfiles manager
 
@@ -65,18 +65,19 @@ Running `dfm` gives you a list of available commands.
 
 #### Documentation generation
 
-`dfm docs` generates Markdown documentation under the `docs/` directory. The
-subcommands are:
+`dfm docs` regenerates the keybinding documentation under `docs/`. Available
+subcommands:
 
 ```bash
-dfm docs alias        # regenerate alias table
-dfm docs folders      # document interesting folders
-dfm docs keybindings  # update keybinding docs for tmux, nvim and others
-dfm docs all          # run every docs task
+dfm docs all      # regenerate every keybinding doc
+dfm docs tmux     # tmux keybindings only
+dfm docs nvim     # nvim keybindings only
+dfm docs wezterm  # wezterm keybindings only
 ```
 
-The `docs/` folder contains generated cheat sheets, keybindings and other
-reference files. New documentation can be added without modifying this README.
+The `docs/` folder also contains other reference files (alias table,
+folder layout, command catalogue) that are maintained directly rather
+than via `dfm`.
 
 ## Configuration
 
