@@ -134,4 +134,4 @@ tflint = "latest"
 tfsec = "latest"
 
 # Other useful tools
-usage = "3.2.1"
+usage = "3.3.0"
