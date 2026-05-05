@@ -24,6 +24,8 @@ str_to_operator = {
 def vercmp(expr):
     """Version Comparison function."""
     words = expr.split()
+    if len(words) < 3:
+        return False
     comparisons = [words[i : i + 3] for i in range(0, len(words) - 2, 2)]
     for left, op_str, right in comparisons:
         compare_op = str_to_operator[op_str]
