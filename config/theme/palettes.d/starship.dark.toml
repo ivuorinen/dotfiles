@@ -12,8 +12,8 @@
 # to starship-light.toml. The two files are intentionally identical except
 # for `palette = "..."` and the [palettes.*] block.
 #
-# Layout: line 1 = OS icon · user@host (SSH only) · path · git · terraform
-#                 · node · crystal · ruby · python
+# Layout: line 1 = OS icon · user@host (SSH only) · path · battery (≤45%)
+#                 · git · node · dotnet · php · ruby · python
 #         line 2 = ➜ (green on success, red on non-zero exit)
 # Transient prompt collapses prior prompts to just `➜ ` (wired by
 # `enable_transience` in config/fish/config.fish and base/zshrc).
@@ -22,6 +22,7 @@
 # request); both still hidden outside SSH per starship defaults.
 #
 # Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Mocha)
+"$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
 
@@ -30,11 +31,12 @@ $os\
 $username\
 $hostname\
 $directory\
+$battery\
 $git_branch\
 $git_status\
-$terraform\
 $nodejs\
-$crystal\
+$dotnet\
+$php\
 $ruby\
 $python\
 $line_break\
@@ -121,6 +123,21 @@ format = "[$path]($style)[$read_only]($read_only_style) "
 read_only = " "
 read_only_style = "red"
 
+# Battery — shows below 75% in soft yellow; visible most of the time so
+# the styling stays low-volume rather than alarming.
+# Symbols use Font Awesome Nerd Font glyphs (BMP, escape-encoded so the
+# Write/Edit pipeline does not strip them).
+[battery]
+full_symbol = "\uF240 "
+charging_symbol = "\uF0E7 "
+discharging_symbol = "\uF242 "
+unknown_symbol = "\uF128 "
+empty_symbol = "\uF244 "
+
+[[battery.display]]
+threshold = 75
+style = "yellow"
+
 # Git — lightGreen in omp = green here; branch and status share the colour.
 [git_branch]
 symbol = "\uE725 "
@@ -133,36 +150,36 @@ format = "[$all_status$ahead_behind]($style) "
 ahead = "⇡${count} "
 behind = "⇣${count} "
 diverged = "⇡${ahead_count}⇣${behind_count} "
-conflicted = "= "
-deleted = "✘ "
-modified = "! "
-renamed = "» "
-staged = "+ "
-stashed = "≡ "
-untracked = "? "
+conflicted = "=${count}"
+deleted = "✘${count}"
+modified = "!${count}"
+renamed = "»${count}"
+staged = "+${count}"
+stashed = "≡${count}"
+untracked = "?${count}"
 up_to_date = ""
 
 [git_state]
 style = "yellow"
 format = '\([$state( $progress_current/$progress_total)]($style)\) '
 
-# Terraform — black on yellow in omp; bold yellow keeps the same "warning"
-# weight without forcing a background that fights the rest of the prompt.
-[terraform]
-symbol = "\U000F1062 "
-style = "bold yellow"
-format = "[$symbol$workspace]($style) "
-
 # Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
 
 [nodejs]
 symbol = "\uE718 "
 style = "green"
+version_format = "${major}.${minor}"
 format = "[$symbol$version]($style) "
 
-[crystal]
-symbol = "\uE62F "
-style = "blue"
+[dotnet]
+symbol = "\uE77F "
+style = "mauve"
+version_format = "${major}"
+format = "[$symbol$version]($style) "
+
+[php]
+symbol = "\uE73D "
+style = "lavender"
 format = "[$symbol$version]($style) "
 
 [ruby]
