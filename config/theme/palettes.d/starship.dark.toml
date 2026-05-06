@@ -122,6 +122,7 @@ truncation_symbol = "…/"
 format = "[$path]($style)[$read_only]($read_only_style) "
 read_only = " "
 read_only_style = "red"
+fish_style_pwd_dir_length = 1
 
 # Battery — shows below 75% in soft yellow; visible most of the time so
 # the styling stays low-volume rather than alarming.
