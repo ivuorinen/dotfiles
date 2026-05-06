@@ -11,6 +11,13 @@ if x-have "ntfy"; then
   exit 0
 fi
 
+for dep in curl tar; do
+  if ! command -v "$dep" &> /dev/null; then
+    msgr warn "$dep not available, skipping ntfy install"
+    exit 0
+  fi
+done
+
 # Determine the architecture
 case $(dfm check arch) in
   Linux)

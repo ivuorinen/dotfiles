@@ -6,7 +6,7 @@ set -euo pipefail
 source "$DOTFILES/config/shared.sh"
 
 if ! command -v php &> /dev/null; then
-  msg_err "PHP Not Available, cannot install composer"
+  msgr warn "php not available, skipping composer install"
   exit 0
 fi
 

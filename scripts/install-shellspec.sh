@@ -5,6 +5,13 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"
 
+for dep in git make; do
+  if ! command -v "$dep" &> /dev/null; then
+    msgr warn "$dep not available, skipping shellspec install"
+    exit 0
+  fi
+done
+
 SHELLSPEC_REPO="https://github.com/shellspec/shellspec.git"
 SHELLSPEC_CACHE="$HOME/.cache/shellspec"
 

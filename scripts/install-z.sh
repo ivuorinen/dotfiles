@@ -5,6 +5,11 @@ set -euo pipefail
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"
 
+if ! command -v git &> /dev/null; then
+  msgr warn "git not available, skipping z install"
+  exit 0
+fi
+
 Z_GIT_PATH="https://github.com/rupa/z.git"
 Z_BIN_PATH="$XDG_BIN_HOME/z"
 
