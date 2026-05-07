@@ -135,3 +135,4 @@ tfsec = "latest"
 
 # Other useful tools
 usage = "3.3.0"
+tmux = "latest"
