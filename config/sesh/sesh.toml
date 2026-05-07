@@ -24,9 +24,7 @@ blacklist = ["^scratch$", "^_"]
 
 [[wildcard]]
 pattern = "~/Code/**"
-# Top-level org dirs (~/Code/<org>/) are not git repos; guard the call so the
-# new pane stays quiet there instead of printing "fatal: not a git repository".
-startup_command = "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git status || true"
+startup_command = "gh-set-profile" # Set the correct profile based on folder
 
 [[session]]
 name = "home (~)"

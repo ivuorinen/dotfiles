@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# @description Auto-apply git profile (home/work/masf) based on repo path
+
+set -euo pipefail
+
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel 2> /dev/null)"
+
+profile=""
+case "$repo_root" in
+  "$HOME/Code/s/"*) profile="work" ;;
+  "$HOME/Code/ivuorinen/"*) profile="home" ;;
+  "$HOME/Code/masf-fi/"*) profile="masf" ;;
+esac
+
+if [ -z "$profile" ]; then
+  exit 0
+fi
+
+git profile use "$profile"
