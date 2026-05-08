@@ -13,7 +13,7 @@
 # for `palette = "..."` and the [palettes.*] block.
 #
 # Layout: line 1 = OS icon · user@host (SSH only) · path · battery (≤45%)
-#                 · git · node · dotnet · php · ruby · python
+#                 · git · node · dotnet · go · php · ruby · python
 #         line 2 = ➜ (green on success, red on non-zero exit)
 # Transient prompt collapses prior prompts to just `➜ ` (wired by
 # `enable_transience` in config/fish/config.fish and base/zshrc).
@@ -36,6 +36,7 @@ $git_branch\
 $git_status\
 $nodejs\
 $dotnet\
+$golang\
 $php\
 $ruby\
 $python\
@@ -176,6 +177,12 @@ format = "[$symbol$version]($style) "
 symbol = "\uE77F "
 style = "mauve"
 version_format = "${major}"
+format = "[$symbol$version]($style) "
+
+[golang]
+symbol = "\uE626 "
+style = "teal"
+version_format = "${major}.${minor}.${patch}"
 format = "[$symbol$version]($style) "
 
 [php]
