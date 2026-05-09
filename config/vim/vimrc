@@ -18,7 +18,7 @@ endif
 
 let g:vim_bootstrap_langs = "go,html,javascript,lua,php,python,typescript"
 let g:vim_bootstrap_editor = "vim" " nvim or vim
-let g:vim_bootstrap_theme = "pencil"
+let g:vim_bootstrap_theme = "catppuccin_mocha"
 let g:vim_bootstrap_frams = "vuejs"
 
 " ale
@@ -211,7 +211,7 @@ set wrapscan                      " Searches wrap around the end of the file
 " Ignore these files in wildmenu
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
 
-colorscheme pencil                " Set the color scheme
+colorscheme catppuccin_mocha      " Set the color scheme
 filetype plugin indent on         " enable filetype detection, plugins and indenting
 
 " Set the shell
@@ -267,7 +267,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme = 'pencil'
+let g:airline_theme = 'catppuccin_mocha'
 
 " NERDTree configuration
 let g:NERDTreeChDirMode=2
