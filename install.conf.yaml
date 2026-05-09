@@ -43,7 +43,15 @@
       glob: true
       relink: true
       path: config/*
-      exclude: [config/op]
+      # Excluded paths are managed by the theme orchestrator (handlers
+      # write merged or flip-able files into ~/.config/<app>/), or are
+      # 1Password's split sub-paths below.
+      exclude:
+        - config/op
+        - config/bat
+        - config/cosmic-desktop
+        - config/gh-dash
+        - config/lazygit
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
@@ -51,6 +59,12 @@
     ~/.config/op/plugins:
       relink: true
       path: config/op/plugins
+    # bat: only the themes directory is repo-managed; the theme handler
+    # writes ~/.config/bat/config as a flip-able symlink alongside it.
+    ~/.config/bat/themes:
+      create: true
+      relink: true
+      path: config/bat/themes
     # Scripts
     ~/.local/bin:
       glob: true
