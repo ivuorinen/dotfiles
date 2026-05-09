@@ -1,0 +1,16 @@
+---
+# Base lazygit config (sections without `theme:`/`authorColors:` —
+# those are appended at flip time by config/theme/handlers.d/lazygit
+# from config/theme/palettes.d/lazygit.<mode>.theme.yml).
+gui:
+  showFileTree: true
+  showRandomTip: false
+  showCommandLog: false
+  scrollHeight: 4
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never --line-numbers --side-by-side
+  parseEmoji: true
+update:
+  method: prompt

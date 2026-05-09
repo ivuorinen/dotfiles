@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# handlers.d/lazygit — same shape as gh-dash. lazygit reads a single
+# config.yml with `gui.theme` inline; we concat base.yml + chosen
+# theme palette into ~/.config/lazygit/config.yml atomically.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+base="$dotfiles/config/lazygit/base.yml"
+theme="$dotfiles/config/theme/palettes.d/lazygit.${mode}.theme.yml"
+dst="$HOME/.config/lazygit/config.yml"
+
+for f in "$base" "$theme"; do
+  [[ -r "$f" ]] || {
+    echo "lazygit handler: missing $f" >&2
+    exit 1
+  }
+done
+
+# Defensive: a legacy `~/.config/lazygit` directory-symlink (from a
+# stray dotbot glob entry) would let _atomic_write's rename clobber
+# a repo file. Drop it before mkdir.
+_drop_legacy_repo_symlink "$(dirname -- "$dst")"
+if [[ -L "$dst" ]]; then
+  rm -f -- "$dst"
+fi
+
+mkdir -p -- "$(dirname -- "$dst")"
+content="$(
+  cat -- "$base"
+  printf '\n'
+  cat -- "$theme"
+)"
+_atomic_write "$dst" "$content"
