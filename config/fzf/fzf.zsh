@@ -12,3 +12,9 @@
 # ------------
 # shellcheck source=key-bindings.zsh
 source "$HOME/.dotfiles/config/fzf/key-bindings.zsh"
+
+# Catppuccin palette — see notes in fzf.bash. Same state-dir symlink,
+# zsh-compatible source.
+_fzf_active="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/fzf-active.sh"
+[[ -r "$_fzf_active" ]] && source "$_fzf_active"
+unset _fzf_active
