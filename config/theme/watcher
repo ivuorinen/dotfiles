@@ -68,6 +68,17 @@ apply_mode()
   "$apply_cmd" "$m" || true
 }
 
+# Map a gsettings color-scheme value to the corresponding mode and
+# apply it. Input is the raw `gsettings get` output (single-quoted).
+# Unrecognised or unset values are no-ops, matching prior behavior.
+apply_gsettings_scheme()
+{
+  case "$1" in
+    "'prefer-dark'") apply_mode dark ;;
+    "'default'" | "'prefer-light'") apply_mode light ;;
+  esac
+}
+
 # Seed the cached state from the OS *once* at startup. The Linux event
 # loops (gsettings / busctl monitor) only fire on change, so without
 # this a watcher started against a stale cache stays stale until the
@@ -78,12 +89,8 @@ seed_initial_state()
   local src="$1"
   case "$src" in
     gsettings)
-      local scheme
-      scheme="$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
-      case "$scheme" in
-        "'prefer-dark'") apply_mode dark ;;
-        "'default'" | "'prefer-light'") apply_mode light ;;
-      esac
+      apply_gsettings_scheme \
+        "$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
       ;;
     busctl)
       local initial
@@ -165,11 +172,8 @@ case "$SOURCE" in
         seed_initial_state gsettings
         gsettings monitor org.gnome.desktop.interface color-scheme 2> /dev/null \
           | while IFS= read -r _; do
-            scheme="$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
-            case "$scheme" in
-              "'prefer-dark'") apply_mode dark ;;
-              "'default'" | "'prefer-light'") apply_mode light ;;
-            esac
+            apply_gsettings_scheme \
+              "$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
           done
         ;;
       busctl)
