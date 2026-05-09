@@ -4,8 +4,12 @@
 # change.
 #
 # OS sources (auto-detected, override with --source):
-#   linux  : prefers `gsettings monitor`; falls back to `busctl monitor`
-#            for non-GNOME; exits 0 if neither reachable.
+#   linux  : on GNOME (XDG_CURRENT_DESKTOP matches *GNOME*) prefers
+#            `gsettings monitor`; on other DEs (COSMIC, KDE, …) prefers
+#            `busctl monitor` against the freedesktop portal, since
+#            those DEs leave `org.gnome.desktop.interface color-scheme`
+#            untouched. Falls back to whichever is available; exits 0
+#            if neither is.
 #   macos  : 2s `defaults read` polling.
 #   stub   : reads modes (one per line) from --stub-input. Test seam.
 set -uo pipefail
@@ -64,6 +68,49 @@ apply_mode()
   "$apply_cmd" "$m" || true
 }
 
+# Map a gsettings color-scheme value to the corresponding mode and
+# apply it. Input is the raw `gsettings get` output (single-quoted).
+# Unrecognised or unset values are no-ops, matching prior behavior.
+apply_gsettings_scheme()
+{
+  case "$1" in
+    "'prefer-dark'") apply_mode dark ;;
+    "'default'" | "'prefer-light'") apply_mode light ;;
+  esac
+}
+
+# Seed the cached state from the OS *once* at startup. The Linux event
+# loops (gsettings / busctl monitor) only fire on change, so without
+# this a watcher started against a stale cache stays stale until the
+# next user toggle. `apply_mode` → `apply` is idempotent, so this is a
+# no-op when the cache already agrees with the OS.
+seed_initial_state()
+{
+  local src="$1"
+  case "$src" in
+    gsettings)
+      apply_gsettings_scheme \
+        "$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
+      ;;
+    busctl)
+      local initial
+      initial="$(busctl --user --json=short call \
+        org.freedesktop.portal.Desktop \
+        /org/freedesktop/portal/desktop \
+        org.freedesktop.portal.Settings Read \
+        ss org.freedesktop.appearance color-scheme 2> /dev/null || true)"
+      # busctl --json=short types the integer as `"u"`, so the pattern
+      # `"u","data":N` is anchored on the type tag and won't false-match
+      # any other integer that happens to appear in the payload. data:0
+      # ("no preference") is intentionally ignored.
+      case "$initial" in
+        *'"u","data":1'*) apply_mode dark ;;
+        *'"u","data":2'*) apply_mode light ;;
+      esac
+      ;;
+  esac
+}
+
 case "$SOURCE" in
   stub)
     [[ -r "$STUB_INPUT" ]] || {
@@ -91,33 +138,64 @@ case "$SOURCE" in
     done
     ;;
   linux)
-    if command -v gsettings > /dev/null 2>&1; then
-      _log "INFO watcher: subscribing via gsettings monitor"
-      gsettings monitor org.gnome.desktop.interface color-scheme 2> /dev/null \
-        | while IFS= read -r _; do
-          scheme="$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
-          case "$scheme" in
-            "'prefer-dark'") apply_mode dark ;;
-            "'default'" | "'prefer-light'") apply_mode light ;;
-          esac
-        done
-    elif command -v busctl > /dev/null 2>&1; then
-      _log "INFO watcher: subscribing via busctl monitor (portal)"
-      busctl --user --json=short monitor org.freedesktop.portal.Desktop 2> /dev/null \
-        | while IFS= read -r line; do
-          # Anchor on the JSON variant token so we don't false-match
-          # timestamps or sequence numbers that happen to contain 1/2.
-          # busctl --json=short emits `"v":1` (dark) / `"v":2` (light)
-          # for the org.freedesktop.appearance color-scheme settings.
-          case "$line" in
-            *'"color-scheme"'*'"v":1'*) apply_mode dark ;;
-            *'"color-scheme"'*'"v":2'*) apply_mode light ;;
-          esac
-        done
-    else
-      _log "WARN watcher linux: neither gsettings nor busctl available; exiting"
-      exit 0
+    # Pick the event source. GNOME (and forks like ubuntu:GNOME) write
+    # to `org.gnome.desktop.interface color-scheme`, so `gsettings
+    # monitor` fires reliably there. Other DEs (COSMIC, KDE, …) leave
+    # that schema untouched even when `gsettings` is installed; their
+    # appearance toggle only updates the freedesktop portal. Default
+    # to busctl off-GNOME, gsettings on-GNOME, and fall back to the
+    # other when only one of the two is available.
+    have_gsettings=false
+    have_busctl=false
+    command -v gsettings > /dev/null 2>&1 && have_gsettings=true
+    command -v busctl > /dev/null 2>&1 && have_busctl=true
+
+    case "${XDG_CURRENT_DESKTOP:-}" in
+      *GNOME*) prefer="gsettings" ;;
+      *) prefer="busctl" ;;
+    esac
+
+    use=""
+    if [[ "$prefer" = "gsettings" ]] && "$have_gsettings"; then
+      use="gsettings"
+    elif [[ "$prefer" = "busctl" ]] && "$have_busctl"; then
+      use="busctl"
+    elif "$have_gsettings"; then
+      use="gsettings"
+    elif "$have_busctl"; then
+      use="busctl"
     fi
+
+    case "$use" in
+      gsettings)
+        _log "INFO watcher: subscribing via gsettings monitor"
+        seed_initial_state gsettings
+        gsettings monitor org.gnome.desktop.interface color-scheme 2> /dev/null \
+          | while IFS= read -r _; do
+            apply_gsettings_scheme \
+              "$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
+          done
+        ;;
+      busctl)
+        _log "INFO watcher: subscribing via busctl monitor (portal) — DE='${XDG_CURRENT_DESKTOP:-}'"
+        seed_initial_state busctl
+        busctl --user --json=short monitor org.freedesktop.portal.Desktop 2> /dev/null \
+          | while IFS= read -r line; do
+            # Anchor on the JSON variant token so we don't false-match
+            # timestamps or sequence numbers that happen to contain 1/2.
+            # busctl --json=short emits `"v":1` (dark) / `"v":2` (light)
+            # for the org.freedesktop.appearance color-scheme settings.
+            case "$line" in
+              *'"color-scheme"'*'"v":1'*) apply_mode dark ;;
+              *'"color-scheme"'*'"v":2'*) apply_mode light ;;
+            esac
+          done
+        ;;
+      *)
+        _log "WARN watcher linux: neither gsettings nor busctl available; exiting"
+        exit 0
+        ;;
+    esac
     ;;
   *)
     echo "watcher: unknown --source '$SOURCE'" >&2
