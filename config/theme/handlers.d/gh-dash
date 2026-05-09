@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# handlers.d/gh-dash — gh-dash reads a single config.yml, with the
+# `theme:` block inline. We can't symlink-swap because the file mixes
+# user sections (PR/issue queries) with the theme. Solution: cat a
+# stable base.yml + the chosen theme palette into a real
+# ~/.config/gh-dash/config.yml using _atomic_write so a partial flip
+# never leaves the file truncated.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+base="$dotfiles/config/gh-dash/base.yml"
+theme="$dotfiles/config/theme/palettes.d/gh-dash.${mode}.theme.yml"
+dst="$HOME/.config/gh-dash/config.yml"
+
+for f in "$base" "$theme"; do
+  [[ -r "$f" ]] || {
+    echo "gh-dash handler: missing $f" >&2
+    exit 1
+  }
+done
+
+# Older deployments had `config/gh-dash` in the dotbot glob, which
+# left ~/.config/gh-dash as a directory-symlink into the repo. Drop
+# both the legacy parent symlink and any inner config.yml symlink so
+# _atomic_write's rename doesn't silently overwrite a repo file.
+_drop_legacy_repo_symlink "$(dirname -- "$dst")"
+if [[ -L "$dst" ]]; then
+  rm -f -- "$dst"
+fi
+
+mkdir -p -- "$(dirname -- "$dst")"
+content="$(
+  cat -- "$base"
+  printf '\n'
+  cat -- "$theme"
+)"
+_atomic_write "$dst" "$content"

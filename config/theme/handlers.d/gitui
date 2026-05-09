@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# handlers.d/gitui — swap ~/.config/gitui/theme.ron symlink to the
+# matching variant. Refuses to clobber a regular file (N-021 guard).
+# gitui reads theme.ron on each launch, so no live-process refresh is
+# required.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/gitui.${mode}.ron"
+dst="$HOME/.config/gitui/theme.ron"
+[[ -r "$src" ]] || {
+  echo "gitui handler: missing palette $src" >&2
+  exit 1
+}
+
+mkdir -p -- "$(dirname -- "$dst")"
+_idempotent_ln_sf "$src" "$dst"

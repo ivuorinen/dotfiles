@@ -27,3 +27,8 @@ REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
 BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/fzf|config/zsh|config/tmux/plugins)
+# bash-exec checks for the executable bit on bash-shaped files. The
+# theme palettes under config/theme/palettes.d/ are sourced (bat config
+# directives, fzf FZF_DEFAULT_OPTS exports), not executed, so the
+# linter's expectation does not apply.
+BASH_EXEC_FILTER_REGEX_EXCLUDE: "config/theme/palettes\\.d/"
