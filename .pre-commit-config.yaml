@@ -44,6 +44,15 @@ repos:
         entry: yarn prettier --write
         language: system
         types_or: [yaml]
+      - id: v8r
+        name: v8r (JSON Schema validation)
+        entry: yarn run --silent v8r
+        language: system
+        # Schema-backed config files only. v8r resolves schemas via
+        # schemastore.org and fails the hook on any unknown property,
+        # which is the whole point of adding it — see
+        # .claude/rules/validate-config-schemas.md.
+        files: ^(\.mega-linter\.yml|\.pre-commit-config\.yaml|biome\.json|package\.json|\.markdownlint\.json)$
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
@@ -55,7 +64,7 @@ repos:
     rev: v3.13.1-1
     hooks:
       - id: shfmt
-        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
+        exclude: ^config/(bash/completions\.d/|zsh/completions\.d/|fzf/(key-bindings|completion)\.(bash|zsh)$)
         args: [-i, "2", -bn, -ci, -sr, -fn, -w]
 
   - repo: https://github.com/rhysd/actionlint

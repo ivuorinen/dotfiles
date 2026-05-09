@@ -17,7 +17,8 @@
     "lint:markdownlint": "markdownlint --ignore-path .markdownlintignore '**/*.md'",
     "lint:md-table": "git ls-files '*.md' | xargs markdown-table-formatter --check",
     "fix:md-table": "git ls-files '*.md' | xargs markdown-table-formatter",
-    "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec && yarn lint:md-table && yarn lint:markdownlint",
+    "lint:v8r": "v8r .mega-linter.yml .pre-commit-config.yaml biome.json package.json .markdownlint.json",
+    "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec && yarn lint:md-table && yarn lint:markdownlint && yarn lint:v8r",
     "fix": "yarn fix:biome && yarn fix:prettier && yarn fix:md-table"
   },
   "repository": {
@@ -42,7 +43,8 @@
     "markdown-table-formatter": "^1.7.0",
     "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.1",
-    "typescript": "^6.0.0"
+    "typescript": "^6.0.0",
+    "v8r": "^6.0.0"
   },
   "resolutions": {
     "minimatch": "^10.2.4"
