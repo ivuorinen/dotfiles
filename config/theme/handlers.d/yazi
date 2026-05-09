@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# handlers.d/yazi — swap ~/.config/yazi/theme.toml symlink to the
+# matching Catppuccin variant. The palette references a syntect theme
+# at ~/.config/yazi/Catppuccin-<flavor>.tmTheme; the same handler
+# symlinks those into place from the bat themes vendored under
+# config/bat/themes/ (single source of truth, no duplication).
+# Refuses to clobber regular files (N-021 guard).
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+case "$mode" in
+  dark) flavor="Mocha" ;;
+  light) flavor="Latte" ;;
+  *) exit 2 ;;
+esac
+
+dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+src="$dotfiles/config/theme/palettes.d/yazi.${mode}.toml"
+dst="$HOME/.config/yazi/theme.toml"
+[[ -r "$src" ]] || {
+  echo "yazi handler: missing palette $src" >&2
+  exit 1
+}
+
+mkdir -p -- "$(dirname -- "$dst")"
+_idempotent_ln_sf "$src" "$dst"
+
+# Provide both flavors of tmTheme up front so a flip never leaves
+# `syntect_theme = "~/.config/yazi/Catppuccin-<flavor>.tmTheme"`
+# pointing at a missing file (yazi falls back to a built-in scheme on
+# read failure, but the warning noise is undesirable).
+for f in Mocha Latte; do
+  tm_src="$dotfiles/config/bat/themes/Catppuccin ${f}.tmTheme"
+  tm_dst="$HOME/.config/yazi/Catppuccin-${f,,}.tmTheme"
+  [[ -r "$tm_src" ]] && _idempotent_ln_sf "$tm_src" "$tm_dst"
+done
+
+# Suppress unused warning when the only flavor used at flip time is
+# the active one — this keeps the lint clean for $flavor while still
+# honouring the case-statement validation above.
+: "${flavor}"
