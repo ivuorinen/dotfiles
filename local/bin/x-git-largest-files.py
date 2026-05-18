@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# USAGE about "Find largest files in git repository history"
-
 # Python script to find the largest files in a git repository.
 # The general method is based on the script in this blog post:
 # http://stubbisms.wordpress.com/2009/07/10/git-script-to-show-largest-pack-objects-and-trim-your-waist-line/

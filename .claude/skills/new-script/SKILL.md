@@ -32,7 +32,7 @@ set -euo pipefail
   discovers scripts by `grep -q '#USAGE\|//USAGE'`; scripts without it
   get no completions, markdown docs, or manpages
 - Add `#USAGE flag`, `#USAGE arg`, `#USAGE cmd` lines as needed
-  (see https://usage.jdx.dev/cli/scripts)
+  (see <https://usage.jdx.dev/cli/scripts>)
 - Use `msgr` functions for output: `msgr msg`, `msgr run`,
   `msgr yay`, `msgr err`, `msgr warn`
 - POSIX scripts (`/bin/sh`) should NOT source msgr
