@@ -4,7 +4,7 @@ Auto-apply a git profile based on the current repository's path.
 
 ## Usage
 
-```
+```sh
 gh-set-profile
 ```
 
