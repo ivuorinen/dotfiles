@@ -1,3 +1,8 @@
+---
+description: "Git and tool hook bypass prevention — no --no-verify or --no-gpg-sign flags."
+alwaysApply: true
+---
+
 # Never bypass project hooks
 
 Never invoke `git`, `npm`, `yarn`, `pre-commit`, or any other tool

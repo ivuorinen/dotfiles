@@ -1,3 +1,8 @@
+---
+description: "EditorConfig adherence is mandatory for every file edit in this repo."
+alwaysApply: true
+---
+
 # EditorConfig adherence
 
 Every edit and every write to a tracked file in this repo must

@@ -1,3 +1,14 @@
+---
+description: "Vendored fzf files must never be modified — update via submodule sync only."
+paths:
+  - "local/bin/fzf-tmux"
+  - "config/fzf/completion.bash"
+  - "config/fzf/completion.zsh"
+  - "config/fzf/key-bindings.bash"
+  - "config/fzf/key-bindings.zsh"
+  - "config/fzf/key-bindings.fish"
+---
+
 # Vendored files
 
 Never modify these files — they are vendored verbatim from
