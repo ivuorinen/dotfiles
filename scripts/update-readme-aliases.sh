@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # update-readme-aliases.sh
 # @description Update alias documentation in $DOTFILES/docs/alias.md
+#USAGE about "Update alias documentation in docs/alias.md"
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2025
 # License: MIT

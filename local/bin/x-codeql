@@ -1,4 +1,9 @@
 #!/bin/sh
+#USAGE about "CodeQL security scanning wrapper"
+#USAGE flag "--path <path>" help="Source path to analyze (default: current directory)"
+#USAGE flag "--parallel" help="Run language analyses in parallel"
+#USAGE flag "-h --help" help="Show help"
+#USAGE flag "-v --version" help="Show version"
 # x-codeql: CodeQL security scanning wrapper
 # POSIX-compatible shell script
 

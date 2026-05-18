@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Create a directory with verbose output"
+#USAGE arg "<path>" help="Directory path to create"
 # Create directory if it doesn't exist already
 #
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.

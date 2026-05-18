@@ -1,4 +1,84 @@
 #!/usr/bin/env bash
+#USAGE about "Dotfiles manager and install helper"
+#USAGE author "Ismo Vuorinen"
+#USAGE cmd "install" help="Install tools, packages, and configurations" {
+#USAGE   cmd "all" help="Install everything in the correct order"
+#USAGE   cmd "apt-packages" help="Install apt packages (Debian/Ubuntu)"
+#USAGE   cmd "cheat-databases" help="Install cheat external cheatsheet databases"
+#USAGE   cmd "composer" help="Install PHP Package Manager Composer"
+#USAGE   cmd "dnf-packages" help="Install dnf packages (Fedora/RHEL)"
+#USAGE   cmd "fonts" help="Install programming fonts"
+#USAGE   cmd "gh" help="Install GitHub CLI Extensions"
+#USAGE   cmd "imagick" help="Install ImageMagick CLI"
+#USAGE   cmd "macos" help="Setup nice macOS defaults"
+#USAGE   cmd "mise" help="Install tools via mise (runtimes + CLI tools)"
+#USAGE   cmd "mise-cleanup" help="Remove old version manager installations" {
+#USAGE     flag "--dry-run" help="Show what would be removed without removing"
+#USAGE   }
+#USAGE   cmd "ntfy" help="Install ntfy notification tool"
+#USAGE   cmd "python-libs" help="Install Python libraries (libtmux, pynvim)"
+#USAGE   cmd "shellspec" help="Install shellspec testing framework"
+#USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
+#USAGE   cmd "z" help="Install z directory jumper"
+#USAGE }
+#USAGE cmd "brew" help="Homebrew package management" {
+#USAGE   cmd "install" help="Install packages from Brewfile"
+#USAGE   cmd "update" help="Update Homebrew and packages"
+#USAGE   cmd "updatebundle" help="Update Brewfile with descriptions"
+#USAGE   cmd "autoupdate" help="Setup Homebrew auto-update"
+#USAGE   cmd "leaves" help="List installed-on-request packages"
+#USAGE   cmd "clean" help="Cleanup old versions"
+#USAGE   cmd "untracked" help="List packages not in Brewfile"
+#USAGE }
+#USAGE cmd "apt" help="APT package management (Debian/Ubuntu)" {
+#USAGE   cmd "upkeep" help="Full maintenance (update + upgrade + autoremove + clean)"
+#USAGE   cmd "install" help="Install packages from apt.txt"
+#USAGE   cmd "update" help="Update package lists"
+#USAGE   cmd "upgrade" help="Upgrade installed packages"
+#USAGE   cmd "autoremove" help="Remove unused packages"
+#USAGE   cmd "clean" help="Clean package cache"
+#USAGE }
+#USAGE cmd "check" help="System information checks" {
+#USAGE   cmd "arch" help="Get or check current architecture" {
+#USAGE     alias "a"
+#USAGE     arg "[arch]" help="Architecture to check against"
+#USAGE   }
+#USAGE   cmd "host" help="Get or check current hostname" {
+#USAGE     alias "h"
+#USAGE     alias "hostname"
+#USAGE     arg "[hostname]" help="Hostname to check against"
+#USAGE   }
+#USAGE }
+#USAGE cmd "dotfiles" help="Format and reset configurations" {
+#USAGE   cmd "fmt" help="Run all formatters"
+#USAGE   cmd "yamlfmt" help="Format YAML files"
+#USAGE   cmd "shfmt" help="Format shell scripts"
+#USAGE   cmd "reset_all" help="Reset everything"
+#USAGE   cmd "reset_nvim" help="Reset neovim state and config"
+#USAGE }
+#USAGE cmd "helpers" help="Display system information" {
+#USAGE   cmd "aliases" help="Show shell aliases" {
+#USAGE     arg "<shell>" help="Shell to show aliases for (bash, zsh, fish)"
+#USAGE   }
+#USAGE   cmd "colors" help="Show terminal color palette"
+#USAGE   cmd "env" help="Show environment variables"
+#USAGE   cmd "functions" help="Show shell functions"
+#USAGE   cmd "path" help="Show PATH entries"
+#USAGE }
+#USAGE cmd "docs" help="Generate documentation" {
+#USAGE   cmd "all" help="Update all keybindings docs"
+#USAGE   cmd "tmux" help="Update tmux keybindings"
+#USAGE   cmd "nvim" help="Update nvim keybindings"
+#USAGE   cmd "wezterm" help="Update wezterm keybindings"
+#USAGE }
+#USAGE cmd "scripts" help="Discover available scripts or run one from scripts/" {
+#USAGE   arg "[script]" help="Script name to run (without install- prefix); omit to list available"
+#USAGE }
+#USAGE cmd "tests" help="Test visualization helpers" {
+#USAGE   cmd "msgr" help="Show all msgr message types"
+#USAGE   cmd "params" help="List all parameters"
+#USAGE }
+#USAGE cmd "help" help="Show help"
 #
 # Dotfiles manager and install helper
 # (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Switch Alacritty color theme"
+#USAGE arg "<theme>" help="Theme name to apply"
 #
 # Adapted from https://gist.github.com/xqm32/17777d035930d622d0ff7530bfab61fd
 #

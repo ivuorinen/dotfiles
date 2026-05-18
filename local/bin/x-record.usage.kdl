@@ -1,5 +1,0 @@
-bin "x-record"
-about "Screen recording tool using ffmpeg"
-
-arg "<type>" help="Recording type: gif or mkv"
-arg "<scope>" help="Recording scope: size (window) or full (screen)"

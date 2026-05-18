@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # @description Generate shell completions, markdown docs, and manpages from usage specs
+#USAGE about "Generate shell completions, markdown docs, and manpages from usage specs"
 #
 # Requires: usage (https://usage.jdx.dev/) installed via mise
 # Generates: fish/bash/zsh completions, markdown docs, manpages
@@ -30,13 +31,10 @@ fi
 count=0
 errors=0
 
-# Process all .usage.kdl files
-for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; do
-  [[ -f "$spec" ]] || continue
-
-  # Extract bin name from filename: foo.usage.kdl -> foo, install-foo.sh.usage.kdl -> install-foo.sh
-  basename_spec=$(basename "$spec")
-  bin_name="${basename_spec%.usage.kdl}"
+generate_for_spec()
+{
+  local spec="$1"
+  local bin_name="$2"
 
   echo "Generating for: $bin_name"
 
@@ -84,6 +82,22 @@ for spec in "$DOTFILES"/local/bin/*.usage.kdl "$DOTFILES"/scripts/*.usage.kdl; d
   fi
 
   ((count++)) || true
+}
+
+# Process local/bin inline specs (#USAGE or //USAGE directives embedded in script)
+for spec in "$DOTFILES"/local/bin/*; do
+  [[ -f "$spec" ]] || continue
+  grep -q '#USAGE\|//USAGE' "$spec" 2> /dev/null || continue
+  bin_name=$(basename "$spec")
+  generate_for_spec "$spec" "$bin_name"
+done
+
+# Process scripts/ inline .sh specs (#USAGE directives embedded in script)
+for spec in "$DOTFILES"/scripts/*.sh; do
+  [[ -f "$spec" ]] || continue
+  bin_name=$(basename "$spec")
+  [[ "$bin_name" == "shared.sh" ]] && continue
+  generate_for_spec "$spec" "$bin_name"
 done
 
 echo ""

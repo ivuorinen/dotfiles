@@ -78,7 +78,7 @@ if (!empty($output)) {
         str_pad("Mount", $fsCharLenght),
         'Usage%',
         'Used/Total',
-        'Bar'
+        'Bar',
     );
     $headerWidth = strlen($header);
 
@@ -92,7 +92,7 @@ if (!empty($output)) {
             str_pad($i['fs'], $fsCharLenght),
             str_pad(round($i['used_percentage'], 1) . '%', 6, ' ', STR_PAD_LEFT),
             str_pad($i['used_gb'] . '/' . $i['quota_gb'], 10, ' ', STR_PAD_LEFT),
-            str_pad(str_repeat('#', $barUsed), 25, '_')
+            str_pad(str_repeat('#', $barUsed), 25, '_'),
         ) . "\n";
     }
 

@@ -1,2 +1,0 @@
-bin "cleanup-old-version-managers.sh"
-about "Remove old version manager installations (nvm, fnm, pyenv, goenv)"

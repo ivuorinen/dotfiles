@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install ntfy
+#USAGE about "Install ntfy notification tool"
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

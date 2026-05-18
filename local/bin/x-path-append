@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Append directories to PATH"
+#USAGE arg "<directory>" help="Directories to append" var=#true
 #
 # Thin wrapper — delegates to x-path append.
 # Can be sourced (PATH changes propagate) or executed.

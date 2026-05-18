@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "List open ports in Markdown or JSON format"
+#USAGE flag "--json" help="Output in JSON format"
+#USAGE flag "--help" help="Show help"
 #
 # List open (listened) ports in Markdown or JSON format.
 #

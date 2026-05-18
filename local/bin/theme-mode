@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # theme-mode — print the orchestrator's current dark/light state.
 # @description Print the orchestrator's current dark/light state
+#USAGE about "Print the theme orchestrator's current dark/light state"
 #
 # Resolution order:
 #   1. $XDG_STATE_HOME/dotfiles-theme/mode  (canonical state)

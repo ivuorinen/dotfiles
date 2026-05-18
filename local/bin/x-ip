@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#USAGE about "Show external IP address"
 #
 # Display external IP address.
 #

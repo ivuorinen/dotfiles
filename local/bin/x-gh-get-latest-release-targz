@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "Download latest GitHub release tarball"
+#USAGE flag "--get" help="Download the release"
+#USAGE arg "<repo>" help="GitHub repository (owner/repo)"
 #
 # Fetch the latest release version of a GitHub repository in tar.gz format (e.g. v1.0.0.tar.gz)
 # Usage: x-gh-get-latest-release-targz <repo> [--get]

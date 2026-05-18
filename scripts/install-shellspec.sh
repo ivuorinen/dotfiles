@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install shellspec testing framework
+#USAGE about "Install shellspec testing framework"
 #
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"

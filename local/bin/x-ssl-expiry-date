@@ -1,4 +1,8 @@
 #!/bin/sh
+#USAGE about "Check SSL certificate expiry date"
+#USAGE flag "-p <port>" help="Port number (default: 443)"
+#USAGE flag "-d <days>" help="Days threshold for expiry warning"
+#USAGE arg "<hostname>" help="Domain or hostname to check"
 #
 # About
 # -----

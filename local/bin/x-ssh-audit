@@ -1,4 +1,5 @@
 #!/bin/sh
+#USAGE about "Run SSH security audit and generate reports"
 #
 # POSIX-Compliant SSH Security Auditing and Management Script
 # Purpose: Audit and manage SSH security configurations across multiple hosts

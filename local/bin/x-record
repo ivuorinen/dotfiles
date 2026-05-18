@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "Screen recording tool using ffmpeg"
+#USAGE arg "<type>" help="Recording type: gif or mkv"
+#USAGE arg "<scope>" help="Recording scope: size (window) or full (screen)"
 #
 # DESCRIPTION:
 #   Simple recording tool and wrapper around giph (ffmpeg).
