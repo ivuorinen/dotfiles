@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#USAGE about "List environment variables grouped by prefix"
 #
 # List environment variables grouped by the first part before underscore
 # protecting environment variables that possibly contain sensitive information.

@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#USAGE about "Generate image thumbnails using ImageMagick"
+#USAGE flag "-h --help" help="Show help"
+#USAGE flag "-o <output_dir>" help="Output directory (default: same as source)"
+#USAGE flag "-s <suffix>" help="Thumbnail suffix (default: _thumb)"
+#USAGE arg "<source_dir>" help="Directory containing images"
 #
 # Generate thumbnails using ImageMagick (magick) with MIME type filtering.
 # https://imagemagick.org/script/download.php

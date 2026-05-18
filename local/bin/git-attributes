@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#USAGE about "Check .gitattributes coverage and suggest missing rules"
+#USAGE flag "-h --help" help="Show help"
+#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-e --exit" help="Exit with error if uncovered files found"
+#USAGE flag "-p --pattern" help="Show pattern matches for each file"
+#USAGE arg "[directory]" help="Directory to check (default: current)"
 #
 # Check git repo's files .gitattributes and ensure all of them are mapped.
 #

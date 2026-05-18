@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#USAGE about "Fuzzy tmux session manager"
 #
 # Credit to ThePrimeagen, Jess Archer
 # See https://github.com/jessarcher/dotfiles/blob/master/scripts/t

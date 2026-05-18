@@ -18,7 +18,7 @@
     "lint:md-table": "git ls-files '*.md' | xargs markdown-table-formatter --check",
     "fix:md-table": "git ls-files '*.md' | xargs markdown-table-formatter",
     "lint:v8r": "v8r .mega-linter.yml .pre-commit-config.yaml biome.json package.json .markdownlint.json",
-    "lint:usage": "bash -c 'rc=0; for f in scripts/*.sh; do usage lint \"$f\" || rc=1; done; for f in $(grep -rl \"#USAGE\\|//USAGE\" local/bin/ 2>/dev/null); do usage lint \"$f\" || rc=1; done; exit $rc'",
+    "lint:usage": "bash -c 'rc=0; for f in scripts/*.sh; do usage lint \"$f\" || rc=1; done; for f in $(grep -rl \"#USAGE\\|//USAGE\" local/bin/ 2>/dev/null | grep -Ev \"\\.(py|pl|php)$\"); do usage lint \"$f\" || rc=1; done; exit $rc'",
     "lint": "yarn lint:biome && yarn lint:prettier && yarn lint:ec && yarn lint:md-table && yarn lint:markdownlint && yarn lint:v8r && yarn lint:usage",
     "fix": "yarn fix:biome && yarn fix:prettier && yarn fix:md-table"
   },

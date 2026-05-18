@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "Fetch PR comments formatted for LLM analysis"
+#USAGE flag "--help" help="Show help"
+#USAGE arg "<pr>" help="PR number or full GitHub URL"
 
 # x-pr-comments - Fetch GitHub Pull Request comments and review suggestions
 # Copyright (c) 2025 - Licensed under MIT

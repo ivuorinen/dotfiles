@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Check if a command exists on the system"
+#USAGE arg "<command>" help="Command to check for"
 # Returns which status
 
 # Enable verbosity with VERBOSE=1

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# USAGE about "Find largest files in git repository history"
 
 # Python script to find the largest files in a git repository.
 # The general method is based on the script in this blog post:

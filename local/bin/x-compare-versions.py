@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# USAGE about "Compare semantic version strings"
 """
 Version Comparison tool for the CLI.
 

@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#USAGE about "Switch between PHP versions installed via Homebrew"
+#USAGE flag "--help" help="Show help"
+#USAGE flag "--installed" help="List installed PHP versions"
+#USAGE flag "--current" help="Show currently active version"
+#USAGE flag "--auto" help="Auto-switch based on .php-version file"
+#USAGE arg "[version]" help="PHP version (e.g., 7.4, 8.0) or 'latest'"
 #
 # Brew PHP Switcher
 #

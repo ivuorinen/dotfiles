@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "Backup a folder with a timestamp"
+#USAGE arg "<folder>" help="Folder to backup"
+#USAGE arg "[filename]" help="Custom output filename (default: folder name)"
 #
 # Backup a folder with a timestamp
 # Usage: x-backup-folder folder_to_backup [filename]

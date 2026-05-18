@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+#USAGE about "Unified PATH manipulation tool"
+#USAGE cmd "append" help="Append directory to PATH" {
+#USAGE   arg "<directory>" help="Directory to append"
+#USAGE }
+#USAGE cmd "prepend" help="Prepend directory to PATH" {
+#USAGE   arg "<directory>" help="Directory to prepend"
+#USAGE }
+#USAGE cmd "remove" help="Remove directory from PATH" {
+#USAGE   arg "<directory>" help="Directory to remove"
+#USAGE }
+#USAGE cmd "check" help="Check if directory is in PATH" {
+#USAGE   arg "<directory>" help="Directory to check"
+#USAGE }
 #
 # x-path: A unified script to manipulate the PATH variable.
 #

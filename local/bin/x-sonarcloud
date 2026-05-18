@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+#USAGE about "Fetch SonarCloud issues for LLM analysis"
+#USAGE flag "--pr <number>" help="PR-specific issues"
+#USAGE flag "--branch <name>" help="Branch-specific issues"
+#USAGE flag "--org <org>" help="Organization name"
+#USAGE flag "--project-key <key>" help="Project key"
+#USAGE flag "--severities <severities>" help="Filter by severity (BLOCKER,CRITICAL,MAJOR,MINOR,INFO)"
+#USAGE flag "--types <types>" help="Filter by type (BUG,VULNERABILITY,CODE_SMELL,SECURITY_HOTSPOT)"
+#USAGE flag "--statuses <statuses>" help="Filter by status (OPEN,CONFIRMED,REOPENED)"
+#USAGE flag "--resolved" help="Include resolved issues"
+#USAGE flag "-h --help" help="Show help"
 
 # x-sonarcloud - Fetch SonarCloud issues for LLM analysis
 # Copyright (c) 2025 - Licensed under MIT

@@ -1,4 +1,5 @@
 #!/usr/bin/env php
+//USAGE about "Display disk quota usage information"
 <?php
 
 /**

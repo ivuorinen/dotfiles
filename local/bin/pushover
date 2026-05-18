@@ -1,4 +1,19 @@
 #!/usr/bin/env sh
+#USAGE about "Send Pushover notifications from the command line"
+#USAGE flag "-c <callback>" help="Callback URL"
+#USAGE flag "-d <device>" help="Target device"
+#USAGE flag "-D <timestamp>" help="Delivery timestamp"
+#USAGE flag "-e <expire>" help="Expiration time in seconds"
+#USAGE flag "-H <html>" help="Enable HTML formatting (1 or 0)"
+#USAGE flag "-m <message>" help="Message body"
+#USAGE flag "-p <priority>" help="Priority (-2 to 2)"
+#USAGE flag "-r <retry>" help="Retry interval in seconds"
+#USAGE flag "-s <sound>" help="Notification sound"
+#USAGE flag "-t <title>" help="Message title"
+#USAGE flag "-T <token>" help="API token (overrides PUSHOVER_TOKEN env var)"
+#USAGE flag "-u <user>" help="User/group key (overrides PUSHOVER_USER env var)"
+#USAGE flag "-U <url>" help="Supplementary URL"
+#USAGE flag "-l <url_title>" help="URL title"
 #
 # Send Pushover messages from cli
 # Based on https://github.com/mrusme/dotfiles/blob/master/usr/local/bin/pushover

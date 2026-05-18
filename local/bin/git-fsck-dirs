@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#USAGE about "Run git fsck on all git repos in subdirectories"
+#USAGE flag "--help" help="Display help"
+#USAGE flag "--version" help="Display version"
+#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-q --quiet" help="Quiet output"
 # FSCK subfolders git projects.
 #
 # Actions taken: git fsck --no-dangling --full

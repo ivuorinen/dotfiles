@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Cache PHP installations and generate shell aliases"
+#USAGE flag "--prefix" help="Show Homebrew prefix"
 # -----------------------------------------------------------------------------
 # This script caches the list of PHP installations via Homebrew and generates
 # shell aliases for each installation. Both the brew list and the generated

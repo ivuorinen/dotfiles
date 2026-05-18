@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#USAGE about "Wait for host to come online, then execute command"
+#USAGE arg "<host>" help="Host to monitor"
+#USAGE arg "<command>" help="Command to execute when host is up" var=#true
 set -euo pipefail
 #
 # Wait until a given host is online (determined by ping) then execute the

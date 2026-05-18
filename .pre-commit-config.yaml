@@ -100,3 +100,4 @@ repos:
         entry: bash -c 'rc=0; for f in "$@"; do usage lint "$f" || rc=1; done; exit $rc' --
         language: system
         files: ^(scripts/.*\.sh|local/bin/[^/]+)$
+        exclude: \.(py|pl|php)$

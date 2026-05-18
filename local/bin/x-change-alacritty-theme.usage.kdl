@@ -1,4 +1,0 @@
-bin "x-change-alacritty-theme"
-about "Switch Alacritty color theme"
-
-arg "<theme>" help="Theme name to apply"

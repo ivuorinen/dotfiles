@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+#USAGE about "Ping multiple hosts and display results"
+#USAGE flag "--help" help="Show help"
+#USAGE flag "--verbose" help="Verbose output"
+#USAGE flag "--loop" help="Loop indefinitely"
+#USAGE flag "--forever" help="Loop indefinitely (alias)"
+#USAGE flag "--sleep <seconds>" help="Sleep between iterations (default: 1)"
+#USAGE arg "<hostnames>" help="Hostnames to ping" var=#true
 # x-multi-ping: Multi-protocol ping wrapper in Bash
 #
 # Description:

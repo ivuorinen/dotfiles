@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+#USAGE about "Multi-protocol ping utility (Perl version)"
 
 =head1 NAME
 

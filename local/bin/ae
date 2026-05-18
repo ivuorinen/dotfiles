@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # age encrypt file with github keys
+#USAGE about "Encrypt a file using age with GitHub SSH keys"
+#USAGE arg "<file>" help="File to encrypt"
 
 # Use ENV or default values for keys file and source
 KEYS_FILE="${AGE_KEYSFILE:-$HOME/.ssh/keys.txt}"

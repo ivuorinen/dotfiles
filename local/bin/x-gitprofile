@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # @description Set up mise enter hooks for git-profile auto-switching
+#USAGE about "Set git profile configuration hooks"
+#USAGE arg "[profile]" help="Profile name"
+#USAGE arg "[directory]" help="Directory to configure"
 set -euo pipefail
 
 DEFAULTS=(
