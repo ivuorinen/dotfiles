@@ -36,6 +36,9 @@ end
 _path_prepend(vim.env.HOME .. '/.local/bin')
 _path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
 
+-- nvim 0.12+ niceness
+require('vim._core.ui2').enable {}
+
 require 'options'
 require 'autogroups'
 require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
