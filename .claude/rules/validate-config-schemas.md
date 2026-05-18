@@ -1,3 +1,12 @@
+---
+description: "Run v8r schema validation before committing any structured config file change."
+paths:
+  - "**/*.yml"
+  - "**/*.yaml"
+  - "**/*.json"
+  - "**/*.toml"
+---
+
 # Validate config schemas before guessing keys
 
 When adding or changing a key in any structured-config file (YAML,
@@ -32,8 +41,11 @@ committing.
 | `install.conf.yaml` (Dotbot)                   | `dotbot-validate` skill                |
 | Generic YAML without a schema                  | `yamllint` (already in pre-commit)     |
 
-If `v8r` says "no schema found", the file is not schema-backed — fall
-back to the project's existing linter (yamllint, biome, ruff, …).
+If `v8r` says "no schema found", the file is not schema-backed — run the
+project's existing syntax linter (yamllint, biome, ruff, …) to catch
+formatting errors. Key-name guessing is still strictly prohibited; see
+`no-schema-guessing.md` for what evidence is required before writing any
+key name into a schema-less file.
 
 ## When extrapolation is fine
 

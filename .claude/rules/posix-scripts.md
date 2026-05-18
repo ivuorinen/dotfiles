@@ -1,3 +1,13 @@
+---
+description: "POSIX script validation — validate with sh -n not bash -n for these five scripts."
+paths:
+  - "local/bin/x-ssh-audit"
+  - "local/bin/x-codeql"
+  - "local/bin/x-until-error"
+  - "local/bin/x-until-success"
+  - "local/bin/x-ssl-expiry-date"
+---
+
 # POSIX shell scripts
 
 Validate POSIX shell scripts with `sh -n`, never `bash -n`.

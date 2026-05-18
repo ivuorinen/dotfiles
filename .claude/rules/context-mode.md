@@ -1,3 +1,8 @@
+---
+description: "MCP routing rules for context window protection — curl, WebFetch, Bash, and Read tool routing."
+alwaysApply: true
+---
+
 # context-mode — mandatory routing rules
 
 context-mode MCP tools protect the context window from flooding. A
@@ -32,15 +37,11 @@ query the indexed content.
 
 ## REDIRECTED tools — use sandbox equivalents
 
-### Bash (>20 lines output)
+### Bash shell commands
 
-Bash is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`,
-`pip install`, and other short-output commands. For everything else:
-
-- `ctx_batch_execute(commands, queries)` — run multiple commands +
-  search in ONE call
-- `ctx_execute(language: "shell", code: "...")` — run in sandbox; only
-  stdout enters context
+The authoritative Bash routing rule is in `.claude/rules/bash-routing.md`.
+`ctx_batch_execute` is the default for any command that produces output you intend to read.
+See `bash-routing.md` for the complete list of allowed Bash exceptions.
 
 ### Read for analysis
 

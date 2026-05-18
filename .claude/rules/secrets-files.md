@@ -1,3 +1,9 @@
+---
+description: "Fish secrets in secrets.d must never be committed or read directly — edit example files only."
+paths:
+  - "config/fish/secrets.d/**"
+---
+
 # Fish secrets
 
 Never commit anything under `config/fish/secrets.d/` except `*.example`

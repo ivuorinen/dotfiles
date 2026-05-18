@@ -1,9 +1,22 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-05-05
-Pass 6 fixes applied: 2026-05-05
-Scope of latest round (Pass 6): focused audit of sesh configuration —
+Last validated: 2026-05-18
+Pass 13 applied: 2026-05-18
+Scope of latest round (Pass 13): Follow-up security fix — `*.example.fish` bypass in
+pre-edit-block.sh. Fixed 1 (N-086).
+Scope of previous round (Pass 12): PR-review pass — rebased on origin/main; addressed all
+Copilot and CodeRabbitAI comments on chore/claude-rules. Fixed 5 (N-081..N-085). No open
+findings remain.
+Scope of previous round (Pass 11): Closed N-080 — `validate-config-schemas.md` guessing loophole.
+Fixed 1 (N-080). No open findings remain.
+Scope of previous round (Pass 10): `.claude/` hardening — hooks, rules, skills, agents, and
+settings audited against the official hooks reference. New findings: context-mode npm→yarn fix,
+Read-tool secrets blocking, rules frontmatter, settings.json permission enforcement.
+Fixed 8 (N-072..N-077, N-079); 1 Invalid (N-078). No prior open findings to re-validate.
+Scope of previous round (Pass 9): `config/exports` shellcheck source-following and
+rules/audit-findings lint false-positive fixes.
+Scope of previous round (Pass 6): focused audit of sesh configuration —
 `config/sesh/sesh.toml`, `config/tmux/sesh.sh`, and
 `config/fish/completions/sesh.fish`. Re-validated prior open findings (0
 real-Open at entry; N-013/N-020/N-056 remain under Advisory). Filed 7
@@ -35,8 +48,21 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 68 | Open: 0 | Fixed: 57 | Advisory: 3 | Invalid: 8
+- Total: 83 | Open: 0 | Fixed: 71 | Advisory: 3 | Invalid: 9
 
+Pass 13 (2026-05-18): Filed and fixed N-086 — `*.example.fish` bypass in pre-edit-block.sh.
+Pass 12 (2026-05-18): PR-review pass (chore/claude-rules). Fixed 5 (N-081..N-085): fail-closed
+jq parsing in pre-edit-block.sh, MultiEdit gap in PreToolUse matcher, over-constrained "exactly
+one" in no-schema-guessing.md, conflicting Bash summary in context-mode.md, invalid
+`WebFetch(*)` deny entry in settings.json.
+Pass 11 (2026-05-18): Filed and fixed N-080 — `validate-config-schemas.md` fallback line
+implied yamllint suffices for schema-less files; new rule `no-schema-guessing.md` codifies
+that key-name guessing is prohibited when no schema or key-name validator exists.
+Pass 10 (2026-05-18): `.claude/` hardening — fixed npm loophole in context-mode.md (N-072),
+added secrets-read blocking to pre-edit-block.sh (N-073), frontmatter to all 14 rules files
+(N-074, N-077), Read to PreToolUse matcher (N-075), permissions.deny to settings.json (N-076).
+All 6 criteria satisfied. Filed N-078 (Invalid — `paths:` is correct per official docs). Filed
+and fixed N-079: 4 rule files added in Pass 10 used `globs:` instead of `paths:`.
 Pass 8 (2026-05-05): closed N-068 by running the four prerequisite
 audit skills (`arch-detector`, `arch-auditor`, `security-auditor`,
 `doc-auditor`); also fixed N-069 (still-open issue triaged from
@@ -63,6 +89,131 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 13 — 2026-05-18
+
+#### [N-086] `pre-edit-block.sh` `*.example.fish` exception allows secrets bypass
+
+Category: security
+Area: `.claude/hooks/pre-edit-block.sh`
+Fixed: 2026-05-18
+Notes: Both the Read block (line 18) and Edit/Write block (line 43) contained the
+exception `*.example.fish | *.fish.example`. The `*.example.fish` half matches any
+file ending in `.example.fish` — e.g., `prod.example.fish` in `secrets.d/`, which
+fish auto-sources as a `*.fish` file and which `.gitignore` treats as a secret. That
+file would pass the exception and be readable/editable despite containing credentials.
+The tracked example naming convention is `*.fish.example` only (e.g.,
+`github.fish.example`). Removed `*.example.fish |` from both case branches so only
+`*.fish.example` files are exempted. Copilot report PR #376 r3262054215.
+
+### Pass 12 — 2026-05-18
+
+#### [N-081] `pre-edit-block.sh` exits 0 on malformed JSON hook payload
+
+Fixed: 2026-05-18
+Notes: `jq -r '.tool_input.file_path // empty'` returned empty string and exit 0 on
+malformed JSON input, so the hook allowed all subsequent blocking logic to be bypassed.
+Replaced with `jq -er '.tool_input.file_path'` inside `if !`; the hook now exits 2 with
+a BLOCKED message when the payload is missing `tool_input.file_path` or is not valid JSON.
+CodeRabbitAI report on PR #376.
+
+#### [N-082] `MultiEdit` not included in PreToolUse file-guard matcher
+
+Fixed: 2026-05-18
+Notes: `settings.json` matcher was `Edit|Write|Read`, leaving `MultiEdit` (which also
+carries `file_path`) outside the `pre-edit-block.sh` guard. Vendor, submodule, and secrets
+edit blocks could be bypassed via MultiEdit. Matcher updated to `Edit|Write|Read|MultiEdit`.
+Copilot report on PR #376.
+
+#### [N-083] `no-schema-guessing.md` "exactly one" over-constrains valid multi-evidence cases
+
+Fixed: 2026-05-18
+Notes: "Before writing any key … exactly one of the following must be true" made the rule
+logically unsatisfiable when two sources corroborated the same key (e.g., user-provided key
+also confirmed by fetched docs). Changed to "at least one". Copilot report on PR #376.
+
+#### [N-084] `context-mode.md` Bash summary contradicts `bash-routing.md`
+
+Fixed: 2026-05-18
+Notes: "Bash is reserved for side-effect-only operations that produce no output" conflicted
+with bash-routing.md, which also permits in-place formatters, streaming package installs,
+and one-line user-requested commands. Replaced the summary sentence with "See
+`bash-routing.md` for the complete list of allowed Bash exceptions." Copilot report on PR #376.
+
+#### [N-085] `settings.json` `"WebFetch(*)"` fails v8r schema pattern
+
+Fixed: 2026-05-18
+Notes: The schemastore pattern for deny entries requires the parenthetical argument to
+contain at least one character that is not `)`, `*`, or `?` (lookahead `(?=.*[^)*?])`).
+`WebFetch(*)` contains only `*` as the argument, so the lookahead fails. Changed to `"WebFetch"`
+(no parens), which matches the bare-tool-name branch and denies all WebFetch calls. v8r now
+reports `.claude/settings.json is valid`.
+
+### Pass 11 — 2026-05-18
+
+#### [N-080] `validate-config-schemas.md` fallback implied yamllint suffices; key-name guessing loophole open
+Fixed: 2026-05-18
+Notes: The fallback line "fall back to the project's existing linter (yamllint, biome,
+ruff, …)" implied that a passing syntax linter permitted proceeding without evidence for
+key names. yamllint validates syntax, not key names. Created `no-schema-guessing.md`
+to prohibit all forms of guessing/extrapolation for schema-less files and to define the
+four acceptable evidence sources (fetched docs, tool help output, user-provided key,
+tool error message). Updated the fallback line in `validate-config-schemas.md` to
+cross-reference `no-schema-guessing.md` explicitly. Canonical failure mode: N-078.
+
+### Pass 10 — 2026-05-18
+
+#### [N-072] `context-mode.md` listed `npm install` and `pip install` as acceptable Bash
+Fixed: 2026-05-18
+Notes: `.claude/rules/context-mode.md` line 37-38 declared `npm install` and `pip install`
+as acceptable Bash commands. `npm` is explicitly prohibited by `no-npm.md`; `pip install` has
+no role in this repo's tool management (mise handles Python). Changed to `yarn install,
+brew install` — the two package install commands that belong in Bash per no-npm.md and
+bash-routing.md. Verified with `grep npm .claude/rules/context-mode.md` → no results.
+
+#### [N-073] `pre-edit-block.sh` did not block Read tool on secrets files
+Fixed: 2026-05-18
+Notes: The hook only guarded `Edit|Write` operations. The `Read` tool could read any file
+under `config/fish/secrets.d/` without interception. Updated `pre-edit-block.sh` to:
+(a) buffer stdin with `input=$(cat)` so `tool_name` and `file_path` can both be extracted,
+(b) detect `tool == "Read"` and apply a secrets-only block with an appropriate message
+("do not read … it contains secrets"), (c) skip the vendor/submodule blocks for Read (those
+files are readable, just not editable). Verified: `shellcheck` clean, `editorconfig-checker`
+clean. Note: the hook fires only when settings.json matcher includes `Read` — see N-075.
+
+#### [N-074] Eight rules files lacked YAML frontmatter
+Fixed: 2026-05-18
+Notes: Added frontmatter to `bash-routing.md` (alwaysApply), `context-mode.md` (alwaysApply),
+`no-npm.md` (alwaysApply), `editorconfig.md` (alwaysApply), `host-specific-config.md`,
+`posix-scripts.md` (globs for 5 POSIX scripts), `secrets-files.md` (globs for secrets.d),
+`vendored-files.md` (globs for vendored fzf files). Remaining 3 files resolved under N-077.
+
+#### [N-075] `settings.json` PreToolUse matcher excluded Read — secrets-read block inert
+Fixed: 2026-05-18
+Notes: Changed `"Edit|Write"` to `"Edit|Write|Read"` in the PreToolUse hook matcher in
+`.claude/settings.json`. The pre-edit-block.sh Read-blocking logic was already in place
+(N-073); this change activates it. Verified: matcher now reads `"Edit|Write|Read"`.
+
+#### [N-076] `settings.json` had no `permissions.deny` — curl/WebFetch unrestricted at permission layer
+Fixed: 2026-05-18
+Notes: Added `"permissions": {"deny": ["Bash(curl:*)", "Bash(wget:*)", "WebFetch(*)"]}` to
+`.claude/settings.json`. These three denies enforce at the permission layer what `context-mode.md`
+and `bash-routing.md` mandate at the instruction layer. Project-level deny overrides the global
+`~/.claude/settings.json` allow entries for curl and WebFetch domains.
+
+#### [N-077] Two rules files lacked frontmatter — `commit-format.md`, `validate-config-schemas.md`
+Fixed: 2026-05-18
+Notes: `no-hook-bypass.md` was fixed in an earlier Write attempt in this pass (alwaysApply: true).
+`commit-format.md` (alwaysApply: true) and `validate-config-schemas.md` (paths for yml/yaml/json/toml)
+were fixed after the user switched from auto-mode, which unblocked the self-modification guard.
+All 14 rules files now have YAML frontmatter.
+
+#### [N-079] Four rules files added in Pass 10 used `globs:` — correct key is `paths:`
+Fixed: 2026-05-18
+Notes: `posix-scripts.md`, `secrets-files.md`, `vendored-files.md`, and
+`validate-config-schemas.md` were written with `globs:` as the file-scoping frontmatter key.
+Official docs (`code.claude.com/docs/en/memory`) confirm the correct key is `paths:`. Renamed
+in all four files. Also corrected the erroneous `globs:` mention in N-077 notes.
 
 ### Pass 9 — 2026-05-05
 
@@ -328,6 +479,15 @@ to avoid colliding with the standard `TMPDIR` env var). Bats guarantees
 `teardown()` runs even on assertion failure.
 
 ## Invalid
+
+### Pass 10 — 2026-05-18
+
+#### [N-078] Three existing rule files use `paths:` frontmatter key — correct key is `globs:`
+Notes: Premise wrong. Official Claude Code docs (`code.claude.com/docs/en/memory`,
+"Path-specific rules" section) use `paths:` as the correct YAML frontmatter key for
+file-scoped rules. The three files (`shell-scripts.md`, `keymap-descriptions.md`,
+`lsp-list-parity.md`) were already correct. The finding was filed based on a mistaken
+belief that `globs:` (used by the context-mode superpowers plugin) was the schema key.
 
 ### Pass 6 — 2026-05-05
 

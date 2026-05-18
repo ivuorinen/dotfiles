@@ -6,6 +6,7 @@ config/op/plugins/used_plugins/*
 config/vim/*
 docs/*
 local/bin/asdf/*
+local/md/*
 node_modules/*
 tools/*
 # Code-review export pasted from GitHub PR comments — not authored here.
