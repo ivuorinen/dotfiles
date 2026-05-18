@@ -2,12 +2,16 @@
 
 Generated: 2026-04-26
 Last validated: 2026-05-18
-Pass 10 applied: 2026-05-18
-Scope of latest round (Pass 10): `.claude/` hardening — hooks, rules, skills, agents, and
+Pass 12 applied: 2026-05-18
+Scope of latest round (Pass 12): PR-review pass — rebased on origin/main; addressed all
+Copilot and CodeRabbitAI comments on chore/claude-rules. Fixed 5 (N-081..N-085). No open
+findings remain.
+Scope of previous round (Pass 11): Closed N-080 — `validate-config-schemas.md` guessing loophole.
+Fixed 1 (N-080). No open findings remain.
+Scope of previous round (Pass 10): `.claude/` hardening — hooks, rules, skills, agents, and
 settings audited against the official hooks reference. New findings: context-mode npm→yarn fix,
 Read-tool secrets blocking, rules frontmatter, settings.json permission enforcement.
-Fixed 3 (N-072..N-074); filed 3 Open requiring user action on protected files (N-075..N-077);
-1 Advisory (N-078). No prior open findings to re-validate.
+Fixed 8 (N-072..N-077, N-079); 1 Invalid (N-078). No prior open findings to re-validate.
 Scope of previous round (Pass 9): `config/exports` shellcheck source-following and
 rules/audit-findings lint false-positive fixes.
 Scope of previous round (Pass 6): focused audit of sesh configuration —
@@ -42,8 +46,12 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 77 | Open: 0 | Fixed: 65 | Advisory: 3 | Invalid: 9
+- Total: 82 | Open: 0 | Fixed: 70 | Advisory: 3 | Invalid: 9
 
+Pass 12 (2026-05-18): PR-review pass (chore/claude-rules). Fixed 5 (N-081..N-085): fail-closed
+jq parsing in pre-edit-block.sh, MultiEdit gap in PreToolUse matcher, over-constrained "exactly
+one" in no-schema-guessing.md, conflicting Bash summary in context-mode.md, invalid
+`WebFetch(*)` deny entry in settings.json.
 Pass 11 (2026-05-18): Filed and fixed N-080 — `validate-config-schemas.md` fallback line
 implied yamllint suffices for schema-less files; new rule `no-schema-guessing.md` codifies
 that key-name guessing is prohibited when no schema or key-name validator exists.
@@ -78,6 +86,49 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 12 — 2026-05-18
+
+#### [N-081] `pre-edit-block.sh` exits 0 on malformed JSON hook payload
+
+Fixed: 2026-05-18
+Notes: `jq -r '.tool_input.file_path // empty'` returned empty string and exit 0 on
+malformed JSON input, so the hook allowed all subsequent blocking logic to be bypassed.
+Replaced with `jq -er '.tool_input.file_path'` inside `if !`; the hook now exits 2 with
+a BLOCKED message when the payload is missing `tool_input.file_path` or is not valid JSON.
+CodeRabbitAI report on PR #376.
+
+#### [N-082] `MultiEdit` not included in PreToolUse file-guard matcher
+
+Fixed: 2026-05-18
+Notes: `settings.json` matcher was `Edit|Write|Read`, leaving `MultiEdit` (which also
+carries `file_path`) outside the `pre-edit-block.sh` guard. Vendor, submodule, and secrets
+edit blocks could be bypassed via MultiEdit. Matcher updated to `Edit|Write|Read|MultiEdit`.
+Copilot report on PR #376.
+
+#### [N-083] `no-schema-guessing.md` "exactly one" over-constrains valid multi-evidence cases
+
+Fixed: 2026-05-18
+Notes: "Before writing any key … exactly one of the following must be true" made the rule
+logically unsatisfiable when two sources corroborated the same key (e.g., user-provided key
+also confirmed by fetched docs). Changed to "at least one". Copilot report on PR #376.
+
+#### [N-084] `context-mode.md` Bash summary contradicts `bash-routing.md`
+
+Fixed: 2026-05-18
+Notes: "Bash is reserved for side-effect-only operations that produce no output" conflicted
+with bash-routing.md, which also permits in-place formatters, streaming package installs,
+and one-line user-requested commands. Replaced the summary sentence with "See
+`bash-routing.md` for the complete list of allowed Bash exceptions." Copilot report on PR #376.
+
+#### [N-085] `settings.json` `"WebFetch(*)"` fails v8r schema pattern
+
+Fixed: 2026-05-18
+Notes: The schemastore pattern for deny entries requires the parenthetical argument to
+contain at least one character that is not `)`, `*`, or `?` (lookahead `(?=.*[^)*?])`).
+`WebFetch(*)` contains only `*` as the argument, so the lookahead fails. Changed to `"WebFetch"`
+(no parens), which matches the bare-tool-name branch and denies all WebFetch calls. v8r now
+reports `.claude/settings.json is valid`.
 
 ### Pass 11 — 2026-05-18
 
