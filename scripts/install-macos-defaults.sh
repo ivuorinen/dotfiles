@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 # @description Sets macOS Defaults that I like
+#USAGE about "Configure macOS system defaults"
 #
 # This script contains large portions from following scripts:
 # - https://github.com/freekmurze/dotfiles/blob/main/macos/set-defaults.sh

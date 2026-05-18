@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install essential apt packages for development.
+#USAGE about "Install essential apt packages for development"
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

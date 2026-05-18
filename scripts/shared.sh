@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Shared bash functions and helpers.
+#USAGE about "Shared bash functions and helpers for install scripts"
 
 # Helper env variables. Use like this: VERBOSE=1 ./script.sh
 : "${VERBOSE:=0}"

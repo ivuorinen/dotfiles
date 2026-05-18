@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install Python libraries via uv pip (tools are managed by mise).
+#USAGE about "Install Python libraries via uv pip"
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

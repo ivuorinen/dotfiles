@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description  Update pure-bash-bible cheatsheets
+#USAGE about "Update pure-bash-bible cheatsheet database"
 # shellcheck disable=SC2231,SC2034,SC2181,SC2068
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"

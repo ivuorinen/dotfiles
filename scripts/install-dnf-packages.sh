@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install essential dnf packages for development.
+#USAGE about "Install essential dnf packages for development"
 #
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"

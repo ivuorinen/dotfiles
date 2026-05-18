@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install GitHub CLI extensions
+#USAGE about "Install GitHub CLI extensions"
 #
 # shellcheck source="shared.sh"
 source "${DOTFILES}/config/shared.sh"
