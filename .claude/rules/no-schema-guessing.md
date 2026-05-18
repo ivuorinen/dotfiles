@@ -28,7 +28,7 @@ key names:
 
 ## What is required instead
 
-Before writing any key or value in a schema-less file, exactly one of the
+Before writing any key or value in a schema-less file, at least one of the
 following must be true:
 
 1. **Docs fetched in this session**: call `ctx_fetch_and_index` on the

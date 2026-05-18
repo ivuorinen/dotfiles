@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "deny": ["Bash(curl:*)", "Bash(wget:*)", "WebFetch(*)"]
+    "deny": ["Bash(curl:*)", "Bash(wget:*)", "WebFetch"]
   },
   "hooks": {
     "SessionStart": [
@@ -16,7 +16,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|Read",
+        "matcher": "Edit|Write|Read|MultiEdit",
         "hooks": [
           {
             "type": "command",

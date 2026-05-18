@@ -41,7 +41,7 @@ query the indexed content.
 
 The authoritative Bash routing rule is in `.claude/rules/bash-routing.md`.
 `ctx_batch_execute` is the default for any command that produces output you intend to read.
-Bash is reserved for side-effect-only operations that produce no output.
+See `bash-routing.md` for the complete list of allowed Bash exceptions.
 
 ### Read for analysis
 
