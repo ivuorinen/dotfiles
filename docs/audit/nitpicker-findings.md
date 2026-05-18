@@ -2,8 +2,10 @@
 
 Generated: 2026-04-26
 Last validated: 2026-05-18
-Pass 12 applied: 2026-05-18
-Scope of latest round (Pass 12): PR-review pass — rebased on origin/main; addressed all
+Pass 13 applied: 2026-05-18
+Scope of latest round (Pass 13): Follow-up security fix — `*.example.fish` bypass in
+pre-edit-block.sh. Fixed 1 (N-086).
+Scope of previous round (Pass 12): PR-review pass — rebased on origin/main; addressed all
 Copilot and CodeRabbitAI comments on chore/claude-rules. Fixed 5 (N-081..N-085). No open
 findings remain.
 Scope of previous round (Pass 11): Closed N-080 — `validate-config-schemas.md` guessing loophole.
@@ -46,8 +48,9 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 82 | Open: 0 | Fixed: 70 | Advisory: 3 | Invalid: 9
+- Total: 83 | Open: 0 | Fixed: 71 | Advisory: 3 | Invalid: 9
 
+Pass 13 (2026-05-18): Filed and fixed N-086 — `*.example.fish` bypass in pre-edit-block.sh.
 Pass 12 (2026-05-18): PR-review pass (chore/claude-rules). Fixed 5 (N-081..N-085): fail-closed
 jq parsing in pre-edit-block.sh, MultiEdit gap in PreToolUse matcher, over-constrained "exactly
 one" in no-schema-guessing.md, conflicting Bash summary in context-mode.md, invalid
@@ -86,6 +89,22 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 13 — 2026-05-18
+
+#### [N-086] `pre-edit-block.sh` `*.example.fish` exception allows secrets bypass
+
+Category: security
+Area: `.claude/hooks/pre-edit-block.sh`
+Fixed: 2026-05-18
+Notes: Both the Read block (line 18) and Edit/Write block (line 43) contained the
+exception `*.example.fish | *.fish.example`. The `*.example.fish` half matches any
+file ending in `.example.fish` — e.g., `prod.example.fish` in `secrets.d/`, which
+fish auto-sources as a `*.fish` file and which `.gitignore` treats as a secret. That
+file would pass the exception and be readable/editable despite containing credentials.
+The tracked example naming convention is `*.fish.example` only (e.g.,
+`github.fish.example`). Removed `*.example.fish |` from both case branches so only
+`*.fish.example` files are exempted. Copilot report PR #376 r3262054215.
 
 ### Pass 12 — 2026-05-18
 

@@ -15,7 +15,7 @@ if [ "$tool" = "Read" ]; then
   case "$fp" in
     */secrets.d/*.fish)
       case "$(basename "$fp")" in
-        *.example.fish | *.fish.example) exit 0 ;;
+        *.fish.example) exit 0 ;;
       esac
       echo "BLOCKED: do not read $fp — it contains secrets. Ask the user instead." >&2
       exit 2
@@ -40,7 +40,7 @@ case "$fp" in
     ;;
   */secrets.d/*.fish)
     case "$(basename "$fp")" in
-      *.example.fish | *.fish.example) exit 0 ;;
+      *.fish.example) exit 0 ;;
     esac
     echo "BLOCKED: do not edit $fp directly — it is gitignored." >&2
     echo "Copy the matching .fish.example file and edit that locally." >&2
