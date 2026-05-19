@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install XCode CLI Tools with osascript magic.
+#USAGE about "Install Xcode Command Line Tools (macOS)"
 # Ismo Vuorinen <https://github.com/ivuorinen> 2018
 #
 # shellcheck source=../config/shared.sh

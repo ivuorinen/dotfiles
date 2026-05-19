@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#USAGE about "Compare two files by SHA256 hash"
+#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-h --help" help="Show help"
+#USAGE arg "<file1>" help="First file"
+#USAGE arg "<file2>" help="Second file"
 #
 # x-sha256sum-matcher
 #

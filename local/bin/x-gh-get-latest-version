@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+#USAGE about "Get latest GitHub release version for a repository"
+#USAGE flag "--branch" help="Get latest branch name"
+#USAGE flag "--tag" help="Get latest tag (default)"
+#USAGE flag "--commit" help="Get latest commit SHA"
+#USAGE flag "--json" help="Output as JSON"
+#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "--oldest" help="Get oldest instead of latest"
+#USAGE flag "--prereleases" help="Include pre-releases"
+#USAGE arg "<repo>" help="GitHub repository (owner/repo)"
 #
 # Get latest release version, branch tag, or latest commit from GitHub
 # Usage: x-gh-get-latest-version <repo> [options]

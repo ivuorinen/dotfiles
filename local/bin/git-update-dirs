@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#USAGE about "Pull and rebase all git repos in subdirectories"
+#USAGE flag "--help" help="Display help"
+#USAGE flag "--version" help="Display version"
+#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-q --quiet" help="Quiet output"
+#USAGE flag "--force" help="Force operations"
 #
 # Updates subfolders git projects.
 #

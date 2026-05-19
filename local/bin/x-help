@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # x-help — Browse and display dotfiles documentation
 # @description Browse and display dotfiles documentation
+#USAGE about "Browse and display dotfiles documentation"
+#USAGE flag "--source-only" help="Show raw source instead of rendered output"
+#USAGE arg "[name]" help="Script name to look up (interactive fzf if omitted)"
 
 set -euo pipefail
 

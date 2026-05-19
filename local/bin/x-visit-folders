@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#USAGE about "Register subdirectories with zoxide"
+#USAGE flag "--dry-run" help="Show what would be registered"
+#USAGE flag "--verbose" help="Verbose output"
+#USAGE flag "--help" help="Show help"
+#USAGE arg "[directory]" help="Target directory (default: current)"
 #
 # Register level-1 subdirectories with zoxide so they appear
 # in `z` completions.

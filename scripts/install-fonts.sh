@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install fonts from GitHub releases (cross-platform)
+#USAGE about "Install programming fonts from GitHub releases"
+#USAGE flag "--force" help="Re-download and reinstall all fonts"
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 

@@ -1,4 +1,46 @@
 #!/usr/bin/env bash
+#USAGE about "Colored message output helper for shell scripts"
+#USAGE cmd "msg" help="Print a message with arrow marker" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "yay" help="Print a celebration message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "yay_done" help="Print a celebration with checkmark" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "done" help="Print a completion checkmark" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "run" help="Print a running-task message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "run_done" help="Print a running-task with checkmark" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "ok" help="Print a success message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "warn" help="Print a warning message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "err" help="Print an error message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "prompt" help="Print a prompt-style message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "prompt_done" help="Print a prompt with checkmark" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "nested" help="Print an indented message" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "nested_done" help="Print an indented message with checkmark" {
+#USAGE   arg "<message>" help="Message text"
+#USAGE }
+#USAGE cmd "test" help="Show all message types"
+#USAGE cmd "help" help="Show help"
 # msgr / Messenger helper
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 # MIT License, https://opensource.org/license/mit/

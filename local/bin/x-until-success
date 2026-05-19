@@ -1,4 +1,8 @@
 #!/bin/sh
+#USAGE about "Retry a command until it succeeds"
+#USAGE flag "--sleep <seconds>" help="Sleep between retries"
+#USAGE flag "--help" help="Show help"
+#USAGE arg "<command>" help="Command to run" var=#true
 #
 # x-until-success: Repeat the command until it succeeds - always run at least once.
 #

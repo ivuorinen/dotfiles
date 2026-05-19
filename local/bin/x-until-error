@@ -1,4 +1,8 @@
 #!/bin/sh
+#USAGE about "Run a command repeatedly until it fails"
+#USAGE flag "--sleep <seconds>" help="Sleep between iterations"
+#USAGE flag "--help" help="Show help"
+#USAGE arg "<command>" help="Command to run" var=#true
 #
 # x-until-error: Repeatedly execute a command until it fails (non-zero exit status)
 #

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Install z
+#USAGE about "Install z directory jumper"
 #
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"

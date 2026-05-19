@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#USAGE about "Update tmux keybindings documentation"
 #
 # x-xterm-update-keybindings
 # Updates $HOME/.dotfiles/docs/tmux.md with my keybindings.

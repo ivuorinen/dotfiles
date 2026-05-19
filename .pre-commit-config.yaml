@@ -92,3 +92,12 @@ repos:
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
       - id: ruff-format
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
+
+  - repo: local
+    hooks:
+      - id: usage-lint
+        name: usage lint (scripts/ and local/bin/)
+        entry: bash -c 'rc=0; for f in "$@"; do grep -q "#USAGE\|//USAGE" "$f" 2>/dev/null || continue; usage lint "$f" || rc=1; done; exit $rc' --
+        language: system
+        files: ^(scripts/.*\.sh|local/bin/[^/]+)$
+        exclude: \.(py|pl|php)$

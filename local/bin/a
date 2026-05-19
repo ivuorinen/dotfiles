@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 # A script for encrypting and decrypting files or directories with age and SSH keys
+#USAGE about "Encrypt and decrypt files or directories with age and SSH keys"
+#USAGE version "1.1.0"
+#USAGE flag "-v --verbose" help="Print log messages to console"
+#USAGE flag "--delete" help="Delete original files after encryption"
+#USAGE flag "-f --force" help="Overwrite existing output files"
+#USAGE cmd "encrypt" help="Encrypt a file or directory" {
+#USAGE   alias "e"
+#USAGE   alias "enc"
+#USAGE   arg "<target>" help="File or directory to encrypt"
+#USAGE }
+#USAGE cmd "decrypt" help="Decrypt a file or directory" {
+#USAGE   alias "d"
+#USAGE   alias "dec"
+#USAGE   arg "<target>" help="File or directory to decrypt"
+#USAGE }
+#USAGE cmd "help" help="Show help"
+#USAGE cmd "version" help="Show version"
 
 set -euo pipefail
 

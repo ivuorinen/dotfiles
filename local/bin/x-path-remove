@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Remove directories from PATH"
+#USAGE arg "<directory>" help="Directories to remove" var=#true
 #
 # Thin wrapper — delegates to x-path remove.
 # Can be sourced (PATH changes propagate) or executed.

@@ -1,2 +1,0 @@
-bin "git-fsck-dirs"
-about "Run git fsck on all git repositories in subdirectories"

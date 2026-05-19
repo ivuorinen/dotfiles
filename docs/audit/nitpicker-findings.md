@@ -1,9 +1,13 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-05-18
+Last validated: 2026-05-19
+Pass 14 applied: 2026-05-19
+Scope of latest round (Pass 14): `scripts/` and `local/bin/` usage-spec migration — replaced
+74 `.usage.kdl` sidecar files with inline `#USAGE`/`//USAGE` directives; updated tooling,
+lint pipeline, and `new-script` skill. Fixed 4 (N-087..N-090).
 Pass 13 applied: 2026-05-18
-Scope of latest round (Pass 13): Follow-up security fix — `*.example.fish` bypass in
+Scope of previous round (Pass 13): Follow-up security fix — `*.example.fish` bypass in
 pre-edit-block.sh. Fixed 1 (N-086).
 Scope of previous round (Pass 12): PR-review pass — rebased on origin/main; addressed all
 Copilot and CodeRabbitAI comments on chore/claude-rules. Fixed 5 (N-081..N-085). No open
@@ -48,8 +52,11 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 83 | Open: 0 | Fixed: 71 | Advisory: 3 | Invalid: 9
+- Total: 87 | Open: 0 | Fixed: 75 | Advisory: 3 | Invalid: 9
 
+Pass 14 (2026-05-19): Filed and fixed N-087..N-090 — `.usage.kdl` sidecar files replaced with
+inline `#USAGE` directives in 74 files (scripts/ and local/bin/); tooling and lint pipeline updated;
+`new-script` skill template updated to include `#USAGE about` and correct Step 3 docs instructions.
 Pass 13 (2026-05-18): Filed and fixed N-086 — `*.example.fish` bypass in pre-edit-block.sh.
 Pass 12 (2026-05-18): PR-review pass (chore/claude-rules). Fixed 5 (N-081..N-085): fail-closed
 jq parsing in pre-edit-block.sh, MultiEdit gap in PreToolUse matcher, over-constrained "exactly
@@ -89,6 +96,61 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 14 — 2026-05-19
+
+#### [N-087] `scripts/` and `local/bin/` usage specs were sidecar `.kdl` files, not inline
+
+Category: maintainability
+Area: `scripts/*.usage.kdl`, `local/bin/*.usage.kdl` (74 files)
+Fixed: 2026-05-19
+Notes: The usage CLI v3+ supports inline `#USAGE` comment directives embedded directly in
+scripts, eliminating the need for paired `.kdl` sidecar files. 18 sidecar files under
+`scripts/` and 56 under `local/bin/` were replaced by injecting `#USAGE about "..."` (and
+`flag`/`arg`/`cmd`/`alias` blocks where the KDL carried them) immediately after the shebang
+and `# @description` line in each script. PHP scripts use `//USAGE` (PHP line-comment
+prefix). All 74 KDL files were deleted. The `# @description` tag was preserved in all scripts
+that carried it — it is consumed by `dfm get_script_description()` independently of usage.
+
+#### [N-088] `install-completions.sh` scanned for `.kdl` globs instead of inline-annotated scripts
+
+Category: correctness
+Area: `scripts/install-completions.sh`
+Fixed: 2026-05-19
+Notes: The completion generator looped over `**/*.usage.kdl` globs and passed the KDL sidecar
+path to `usage generate -f`. After the migration to inline specs, no `.kdl` files exist and
+the script generated nothing. Refactored into a `generate_for_spec(spec, bin_name)` helper
+function that runs the five generators (fish/bash/zsh completions, markdown, manpage). Two
+replacement loops: `local/bin/` uses `grep -q '#USAGE\|//USAGE'` as a self-filter so only
+scripts with inline directives are processed; `scripts/*.sh` iterates all `.sh` files,
+skipping `shared.sh` (library). `usage generate -f` accepts inline-annotated scripts directly.
+
+#### [N-090] `new-script` skill template missing `#USAGE about` directive and stale Step 3 docs
+
+Category: docs
+Area: `.claude/skills/new-script/SKILL.md`
+Fixed: 2026-05-19
+Notes: The scaffold template did not include a `#USAGE about` line. `install-completions.sh`
+discovers scripts via `grep -q '#USAGE\|//USAGE'`; any script created from the old template
+would be silently skipped — no completions, markdown docs, or manpages generated. Step 3 told
+users to run `dfm docs script <name>`, which is the old pre-migration workflow. Added
+`#USAGE about "<one-line description>"` immediately after `# @description` in the template,
+added bullet points explaining both tags' purposes, and replaced Step 3 with
+`scripts/install-completions.sh` as the correct regen entry point.
+
+#### [N-089] No `usage lint` quality gate in lint pipeline or pre-commit hooks
+
+Category: reliability
+Area: `package.json`, `.pre-commit-config.yaml`
+Fixed: 2026-05-19
+Notes: The `usage lint` command validates inline `#USAGE` directives against the spec, but it
+was not wired into the quality pipeline. Two additions: (1) `package.json` gained a
+`lint:usage` script (`bash -c '...'` loop over `scripts/*.sh` and `grep -rl`-discovered
+`local/bin/` files) included in the `lint` aggregate; (2) `.pre-commit-config.yaml` gained a
+local `usage-lint` hook with `files: ^(scripts/.*\.sh|local/bin/[^/]+)$` that runs
+`usage lint "$f"` per matched file. The pre-commit entry pattern uses `bash -c '...' --` so
+matched filenames land in `"$@"` (not `$0`). Verified: `yarn lint` exits 0 with 74× "No
+issues found."
 
 ### Pass 13 — 2026-05-18
 

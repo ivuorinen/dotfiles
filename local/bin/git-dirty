@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Recursively check for dirty git repositories"
+#USAGE flag "-v --verbose" help="Verbose output"
 # Get git repository status for all subdirectories
 # recursively in specified dir.
 #

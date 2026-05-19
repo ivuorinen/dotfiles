@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#USAGE about "Display local IP addresses"
+#USAGE flag "--help" help="Show help"
+#USAGE flag "--version" help="Show version"
+#USAGE flag "--ipv4" help="Show only IPv4 addresses"
+#USAGE flag "--ipv6" help="Show only IPv6 addresses"
+#USAGE arg "[interface]" help="Specific network interface"
 #
 # x-localip: script to display the local IP addresses of the system
 #

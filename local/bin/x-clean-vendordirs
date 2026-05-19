@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Remove vendor and node_modules directories recursively"
+#USAGE arg "[directory]" help="Directory to clean (default: current)"
 # vim: ft=bash sw=2 ts=2 et
 #
 # Removes vendor and node_modules directories from the

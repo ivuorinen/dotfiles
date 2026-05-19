@@ -1,4 +1,5 @@
 # only care about files that are directly under our control
+.claude/**
 .git/*
 config/cheat/cheatsheets/community/*
 config/cheat/cheatsheets/tldr/*

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#USAGE about "Display 24-bit terminal color test"
 #
 # Display 24-bit terminal color test.
 #

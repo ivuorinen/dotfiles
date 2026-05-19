@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Remove old version manager installations replaced by mise.
+#USAGE about "Remove old version manager installations (nvm, fnm, pyenv, goenv)"
 # This script targets specific known directories — NOT which/command -v,
 # because nvim's Mason installs some of the same tool names.
 #

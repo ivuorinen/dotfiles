@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # @description Create file containing key mappings for Neovim
+#USAGE about "Generate Neovim keybindings documentation"
 # Usage: ./create-nvim-keymaps.sh
 #
 # shellcheck source=shared.sh
