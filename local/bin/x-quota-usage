@@ -1,0 +1,48 @@
+#!/bin/sh
+# shellcheck shell=sh
+# @description Display disk quota usage information
+
+set -eu
+
+quota_output=$(quota -w 2> /dev/null) || true
+if [ -z "$quota_output" ]; then
+  printf 'quota was empty\n' >&2
+  exit 1
+fi
+
+printf '%s\n' "$quota_output" | awk '
+BEGIN { n = 0; fs_max = 5 }
+NR <= 2 { next }
+NF != 4 { next }
+{
+  if ($3 + 0 <= 0) next
+  if (length($1) > fs_max) fs_max = length($1)
+  row_fs[n] = $1
+  row_used[n] = $2 + 0
+  row_quota[n] = $3 + 0
+  n++
+}
+END {
+  if (n == 0) exit 0
+  header = sprintf("%-*s | %-6s | %-10s | %s", fs_max, "Mount", "Usage%", "Used/Total", "Bar")
+  printf "\n%s\n", header
+  sep_len = length(header) + 24
+  for (i = 0; i < sep_len; i++) printf "-"
+  printf "\n"
+  for (i = 0; i < n; i++) {
+    used_pct = row_used[i] / row_quota[i] * 100
+    used_gb  = row_used[i] / 1024 / 1024
+    quota_gb = row_quota[i] / 1024 / 1024
+    bar_count = int(used_pct / 4 + 0.5)
+    if (bar_count > 25) bar_count = 25
+    bar = ""
+    for (j = 0; j < bar_count; j++) bar = bar "#"
+    while (length(bar) < 25) bar = bar "_"
+    printf "%-*s | %6s | %10s | [%s]\n", fs_max, row_fs[i],
+      sprintf("%.1f%%", used_pct),
+      sprintf("%.2f/%.2f", used_gb, quota_gb),
+      bar
+  }
+  printf "\n\n"
+}
+'
