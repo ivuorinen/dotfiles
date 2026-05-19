@@ -28,10 +28,10 @@ module.exports = {
   },
 
   renderChangelog: (release, changes) => {
-    // Uses wall-clock date at render time, not the tag's commit date.
-    // Backfilled or re-triggered releases will carry the current date.
-    const now = new Date()
-    const d = now.toISOString().substring(0, 10)
+    // Extract date from the release tag (fregante/daily-version-action: YYYY.MM.DD).
+    // Falls back to wall-clock only if the tag carries no recognisable date.
+    const m = release.match(/(\d{4})[.-](\d{2})[.-](\d{2})/)
+    const d = m ? `${m[1]}-${m[2]}-${m[3]}` : new Date().toISOString().substring(0, 10)
     const header = `# ${release} - ${d}\n`
     return `${header}${changes}\n\n`
   },
