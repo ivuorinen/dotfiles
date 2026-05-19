@@ -1,0 +1,6 @@
+# shellcheck shell=bash
+# GitHub Personal Access Token
+# Copy this file to github.sh (remove .example) and set your token
+# Generate token at: https://github.com/settings/tokens
+
+export GITHUB_TOKEN=""

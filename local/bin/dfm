@@ -48,6 +48,12 @@
 #USAGE     alias "hostname"
 #USAGE     arg "[hostname]" help="Hostname to check against"
 #USAGE   }
+#USAGE   cmd "all" help="Run all health checks in sequence"
+#USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
+#USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
+#USAGE   cmd "mise" help="Run mise doctor to check mise health"
+#USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
+#USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
 #USAGE }
 #USAGE cmd "dotfiles" help="Format and reset configurations" {
 #USAGE   cmd "fmt" help="Run all formatters"
@@ -77,6 +83,17 @@
 #USAGE cmd "tests" help="Test visualization helpers" {
 #USAGE   cmd "msgr" help="Show all msgr message types"
 #USAGE   cmd "params" help="List all parameters"
+#USAGE }
+#USAGE cmd "secrets" help="Create shell secrets files" {
+#USAGE   cmd "github" help="Create GITHUB_TOKEN secrets for all shells"
+#USAGE }
+#USAGE cmd "cleanup" help="Remove old installs, caches, and unused packages" {
+#USAGE   cmd "all" help="Run old-vms, brew, mise, and caches cleanup in sequence"
+#USAGE   cmd "brew" help="brew cleanup --prune=all and autoremove unused deps"
+#USAGE   cmd "caches" help="Clear mise and uv caches"
+#USAGE   cmd "docker" help="Remove stopped containers and dangling images"
+#USAGE   cmd "mise" help="Prune unused tool versions and clear mise download cache"
+#USAGE   cmd "old-vms" help="Remove old version manager directories replaced by mise"
 #USAGE }
 #USAGE cmd "help" help="Show help"
 #
@@ -260,6 +277,18 @@ section_install()
         }
         export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
       fi
+      if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+        msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
+        msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
+        read -rp "Create GITHUB_TOKEN secrets now? [y/N] " _answer
+        if [[ "${_answer:-N}" =~ ^[Yy]$ ]]; then
+          $0 secrets github
+          # shellcheck disable=SC1090
+          [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
+            && source "$DOTFILES/config/secrets.d/github.sh"
+        fi
+        unset _answer
+      fi
       mise install --yes || {
         msgr err "mise install failed"
         exit 1
@@ -289,8 +318,8 @@ section_install()
       ;;
 
     ntfy)
-      msgr run "Installing ntfy..."
-      bash "$DOTFILES/scripts/install-ntfy.sh" \
+      msgr run "Installing ntfy via mise..."
+      mise install "github:binwiederhier/ntfy" \
         && msgr yay "ntfy installed!"
       ;;
 
@@ -676,6 +705,12 @@ section_check()
   MENU=(
     "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
     "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
+    "all:Run brew, mise, tools, updates, and disk checks in sequence"
+    "brew:Verify all Brewfile packages are installed"
+    "disk:Show disk usage for mise installs and brew cache"
+    "mise:Run mise doctor to check mise health"
+    "tools:Verify essential CLI tools are available in PATH"
+    "updates:Show available updates for mise tools and brew packages"
   )
 
   case "$1" in
@@ -687,6 +722,77 @@ section_check()
     h | host | hostname)
       [[ $2 == "" ]] && echo "$X_HOSTNAME" && return 0
       [[ $X_HOSTNAME == "$2" ]] && return 0 || return 1
+      ;;
+
+    all)
+      section_check brew
+      section_check mise
+      section_check tools
+      section_check updates
+      section_check disk
+      ;;
+
+    brew)
+      if ! command -v brew > /dev/null 2>&1; then
+        msgr warn "brew not found — skipping"
+        return 0
+      fi
+      local brewfile="$DOTFILES/config/homebrew/Brewfile"
+      msgr run "Checking Brewfile..."
+      if ! brew bundle check --file="$brewfile" --no-upgrade; then
+        msgr err "Some Brewfile packages missing — run 'dfm brew install' to sync"
+        return 1
+      fi
+      msgr yay "All Brewfile packages installed"
+      ;;
+
+    disk)
+      local mise_installs="${XDG_DATA_HOME:-$HOME/.local/share}/mise/installs"
+      msgr msg "Disk usage for tool stores:"
+      if [[ -d "$mise_installs" ]]; then
+        msgr nested "mise installs: $(du -sh "$mise_installs" 2> /dev/null | cut -f1)"
+      fi
+      if command -v brew > /dev/null 2>&1; then
+        msgr nested "brew cache:    $(du -sh "$(brew --cache)" 2> /dev/null | cut -f1)"
+      fi
+      if command -v uv > /dev/null 2>&1; then
+        local uv_cache
+        uv_cache=$(uv cache dir 2> /dev/null)
+        [[ -n "$uv_cache" ]] \
+          && msgr nested "uv cache:      $(du -sh "$uv_cache" 2> /dev/null | cut -f1)"
+      fi
+      ;;
+
+    mise)
+      if ! command -v mise > /dev/null 2>&1; then
+        msgr warn "mise not found"
+        return 1
+      fi
+      mise doctor
+      ;;
+
+    tools)
+      local missing=()
+      local tool
+      for tool in git mise fish starship fzf tmux nvim rg fd eza delta zoxide; do
+        command -v "$tool" > /dev/null 2>&1 || missing+=("$tool")
+      done
+      if [[ ${#missing[@]} -gt 0 ]]; then
+        msgr err "Missing tools: ${missing[*]}"
+        return 1
+      fi
+      msgr yay "All essential tools found in PATH"
+      ;;
+
+    updates)
+      if command -v mise > /dev/null 2>&1; then
+        msgr msg "mise outdated:"
+        mise outdated || true
+      fi
+      if command -v brew > /dev/null 2>&1; then
+        msgr msg "brew outdated:"
+        brew outdated || true
+      fi
       ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
@@ -761,6 +867,131 @@ section_tests()
   esac
 }
 
+# Handle secrets creation commands
+section_secrets()
+{
+  USAGE_PREFIX="$SCRIPT secrets <command>"
+
+  MENU=(
+    "github:Create GITHUB_TOKEN secrets for all shells"
+  )
+
+  case "$1" in
+    github)
+      local fish_secret="$DOTFILES/config/fish/secrets.d/github.fish"
+      local sh_secret="$DOTFILES/config/secrets.d/github.sh"
+
+      if [[ -f "$fish_secret" ]] || [[ -f "$sh_secret" ]]; then
+        msgr warn "Secrets files already exist — they will be overwritten"
+      fi
+
+      local token
+      read -rsp "Enter GITHUB_TOKEN (input hidden): " token
+      echo
+
+      if [[ -z "$token" ]]; then
+        msgr err "No token provided"
+        return 1
+      fi
+
+      mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
+
+      printf '# GitHub Personal Access Token\nset -x GITHUB_TOKEN "%s"\n' "$token" > "$fish_secret"
+      printf '# GitHub Personal Access Token\nexport GITHUB_TOKEN="%s"\n' "$token" > "$sh_secret"
+
+      msgr yay "GITHUB_TOKEN secrets created"
+      msgr nested "fish:     $fish_secret"
+      msgr nested "bash/zsh: $sh_secret"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+section_cleanup()
+{
+  USAGE_PREFIX="$SCRIPT cleanup <command>"
+
+  MENU=(
+    "all:Run old-vms, brew, mise, and caches cleanup in sequence"
+    "brew:brew cleanup --prune=all and autoremove unused deps"
+    "caches:Clear mise and uv caches"
+    "docker:Remove stopped containers and dangling images (docker system prune)"
+    "mise:Prune unused tool versions and clear mise download cache"
+    "old-vms:Remove old version manager directories replaced by mise"
+  )
+
+  case "$1" in
+    all)
+      msgr msg "Running all cleanup tasks..."
+      section_cleanup old-vms
+      section_cleanup brew
+      section_cleanup mise
+      section_cleanup caches
+      msgr yay "All cleanup tasks complete"
+      ;;
+
+    brew)
+      if ! command -v brew > /dev/null 2>&1; then
+        msgr warn "brew not found — skipping"
+        return 0
+      fi
+      msgr run "Running brew cleanup..."
+      brew cleanup --prune=all
+      msgr run "Running brew autoremove..."
+      brew autoremove
+      msgr yay "Homebrew cleanup complete"
+      ;;
+
+    caches)
+      msgr run "Clearing caches..."
+      if command -v mise > /dev/null 2>&1; then
+        msgr nested "mise cache..."
+        mise cache clean
+      fi
+      if command -v uv > /dev/null 2>&1; then
+        msgr nested "uv cache..."
+        uv cache clean
+      fi
+      msgr yay "Cache cleanup complete"
+      ;;
+
+    docker)
+      if ! command -v docker > /dev/null 2>&1; then
+        msgr warn "docker not found — skipping"
+        return 0
+      fi
+      msgr run "Running docker system prune..."
+      docker system prune -f
+      msgr yay "Docker cleanup complete"
+      ;;
+
+    mise)
+      if ! command -v mise > /dev/null 2>&1; then
+        msgr warn "mise not found — skipping"
+        return 0
+      fi
+      msgr run "Pruning unused mise tool versions..."
+      mise prune --yes
+      msgr run "Clearing mise download cache..."
+      mise cache clean
+      msgr yay "mise cleanup complete"
+      ;;
+
+    old-vms)
+      local script="$DOTFILES/scripts/cleanup-old-version-managers.sh"
+      if [[ ! -f "$script" ]]; then
+        msgr err "cleanup-old-version-managers.sh not found: $script"
+        return 1
+      fi
+      msgr run "Removing old version manager installs..."
+      bash "$script"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
 # Display main usage information for all sections
 usage()
 {
@@ -769,6 +1000,10 @@ usage()
   echo "  Empty <command> prints <section> help."
   echo ""
   section_install
+  echo ""
+  section_secrets
+  echo ""
+  section_cleanup
   echo ""
   section_apt
   echo ""
@@ -800,6 +1035,8 @@ main()
     helpers) section_helpers "$@" ;;
     docs) section_docs "$@" ;;
     scripts) section_scripts "$@" ;;
+    cleanup) section_cleanup "$@" ;;
+    secrets) section_secrets "$@" ;;
     tests) section_tests "$@" ;;
     *) usage && return 0 ;;
   esac
