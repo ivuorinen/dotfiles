@@ -215,10 +215,6 @@ brew "php@8.1"
 brew "php@8.2", link: true
 # General-purpose scripting language
 brew "php@8.3"
-# Execute binaries from Python packages in isolated environments
-brew "pipx"
-# Easily download, build, install, upgrade, and uninstall Python packages
-brew "python-setuptools"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
 # Interpreted, interactive, object-oriented programming language
@@ -229,8 +225,6 @@ brew "re2c"
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
-# Terminal multiplexer
-brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Executes a program periodically, showing output fullscreen
