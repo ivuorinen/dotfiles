@@ -142,7 +142,9 @@ LUAEOF
   KEYMAPS_DEST="$DEST" nvim --headless -c "luafile $tmpfile" 2> /dev/null
 
   rm -f "$tmpfile"
-  npx --yes markdown-table-formatter "$DEST"
+  if command -v markdown-table-formatter > /dev/null; then
+    markdown-table-formatter "$DEST"
+  fi
 
   msg "Neovim keybindings documentation generated at $DEST"
   return 0

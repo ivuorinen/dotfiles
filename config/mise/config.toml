@@ -76,12 +76,20 @@ glow = "latest"
 fzf = "latest"
 gum = "latest"
 
-# npm-based tools
+# npm-based tools — kept here so hook scripts and shell sessions get
+# the binary on PATH without depending on yarn's node_modules/.bin shim.
+# package.json devDependencies are reserved for build-time TypeScript
+# tooling that needs version pinning per-project.
 editorconfig-checker = "latest"
+biome = "2.4.12"                            # pinned to match biome.json $schema; bump both together
 "npm:github-release-notes" = "latest"
-"npm:neovim" = "latest"               # Node.js client for Neovim's RPC API (required by plugins)
+"npm:neovim" = "latest"                     # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "latest"
 "npm:fish-lsp" = "latest"
+"npm:markdown-table-formatter" = "latest"
+"npm:markdownlint-cli" = "latest"
+"npm:prettier" = "latest"
+"npm:v8r" = "latest"
 
 # Python tools (via pipx backend)
 # Disabled: mise pipx backend can't find uvx when uv is mise-managed

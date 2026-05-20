@@ -23,12 +23,12 @@ repos:
     hooks:
       - id: biome-check
         name: Biome Check
-        entry: yarn biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
+        entry: biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
         files: \.(js|ts|jsx|tsx|json)$
       - id: markdown-table-formatter
         name: Markdown Table Formatter
-        entry: yarn markdown-table-formatter
+        entry: markdown-table-formatter
         language: system
         types: [markdown]
 
@@ -41,12 +41,12 @@ repos:
     hooks:
       - id: prettier
         name: Prettier (YAML)
-        entry: yarn prettier --write
+        entry: prettier --write
         language: system
         types_or: [yaml]
       - id: v8r
         name: v8r (JSON Schema validation)
-        entry: yarn run --silent v8r
+        entry: v8r
         language: system
         # Schema-backed config files only. v8r resolves schemas via
         # schemastore.org and fails the hook on any unknown property,
