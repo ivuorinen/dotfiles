@@ -41,12 +41,19 @@ canonical 3. A wrapped bullet under a numbered list indents
 ## Per-filetype overrides
 
 - `[*.{php,fish}]` — 4-space indent
+- `[*.fish]` — 120-char line length
 - `[.git{ignore,modules}]` — tab indent, `indent_size = 1`
 - `[*.plist]`, `[config/git/**]`, `[**/config/git/**]` — tab
   indent, `indent_size = 1`
 - `[*.py]` — 4-space indent, 120-char line length
 - `[*.lua]` — 90-char line length (handled by stylua, but the
   ceiling is the editorconfig)
+- `[*.hwdb]` — `indent_size = 1`
+- `[plan]` — literal filename match for `base/plan`:
+  `trim_trailing_whitespace = false`, `max_line_length = off`
+- `[base/hammerspoon/hammerspoon.types.lua]` — `max_line_length =
+  off` (overrides the `[*.lua]` 90-char ceiling for the generated
+  Hammerspoon type stubs)
 
 ## Shell scripts (`[{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]`)
 

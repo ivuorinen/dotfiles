@@ -34,8 +34,11 @@ following must be true:
 1. **Docs fetched in this session**: call `ctx_fetch_and_index` on the
     tool's official reference page and quote the exact key from the returned
     content. A previous session's fetch does not count — fetch again.
-2. **Tool's own help output**: run `<tool> --help`, `<tool> schema`, or
-    equivalent via `ctx_batch_execute` and quote the key from that output.
+2. **Tool's schema dump or man page**: run `<tool> schema`, `<tool>
+    --print-schema`, or `man <tool>` and quote the key from that output.
+    `--help` output is supporting evidence only — most tools document a
+    subset of accepted options there. Use `--help` to corroborate a key
+    already validated by one of the four sources, never as the sole source.
 3. **User-provided key name**: the user typed or pasted the key name in
     this session.
 4. **Tool-reported error**: the tool itself printed the correct key name in

@@ -43,12 +43,17 @@ Only these narrow cases:
     `fish_indent --write <file>`, `shfmt -w <file>`.
 3. **Package installations that must stream output interactively:**
     `yarn install`, `yarn add <pkg>`, `brew install <pkg>`.
-4. **One-line commands the user explicitly asks for** during a
-    conversation (e.g., "run `yarn build`").
+4. **A single one-line command the user names by tool (e.g. "run
+    `yarn build`") whose expected output is under twenty lines.** A
+    user instruction does not waive the routing rule for unbounded
+    output. If the named command can emit more than ~twenty lines
+    (`find /`, `rg` without `--max-count`, `git log` without `-n`),
+    route it through `ctx_batch_execute` even when the user asked
+    for it explicitly.
 
-If you find yourself piping through `head`, `tail`, or `grep` to truncate
-output, you should be using `ctx_batch_execute` instead. The truncation
-is a tell that the raw output is bigger than you want in chat context.
+If you pipe through `head`, `tail`, or `grep` to truncate output, route
+the command through `ctx_batch_execute` instead. The truncation is a
+tell that the raw output is bigger than you want in chat context.
 
 ## Forbidden patterns
 

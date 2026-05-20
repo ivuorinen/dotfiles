@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # PostToolUse on Edit|Write: lint .claude/rules/*.md for hedge
 # words that violate the rules-auditor's "unconditional imperatives"
-# requirement (try, consider, prefer, might, generally, when possible).
-# Skips fenced code blocks and backtick-wrapped tokens so a rule
-# can quote a forbidden word without tripping the check.
+# requirement (try, consider, prefer, might, generally, when possible,
+# should). Skips fenced code blocks and backtick-wrapped tokens so a
+# rule can quote a forbidden word without tripping the check.
+#
+# Deliberately excluded: "may", "could", "sometimes", "often",
+# "usually", "typically", "recommended". These appear in rule prose as
+# factual qualifications ("the file may contain X", "the parser may
+# reject Y") rather than as normative weakening of an imperative.
+# Reviewers should flag normative uses by hand. Add a word to the
+# pattern only after a regression where the missing entry let a
+# weakened rule land.
 # Receives tool input JSON on stdin.
 
 set -euo pipefail
@@ -18,7 +26,7 @@ esac
 
 [ -f "$fp" ] || exit 0
 
-pattern='\b(try|consider|prefer|might|generally|when possible)\b'
+pattern='\b(try|consider|prefer|might|generally|when possible|should)\b'
 
 # Strip fenced code blocks (```...```) and inline backtick spans (`...`)
 # so quoted forbidden words don't false-positive. Preserve original line

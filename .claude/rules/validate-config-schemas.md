@@ -32,14 +32,19 @@ the schema from `schemastore.org` for most well-known formats. Run
 it after any edit to a file with a known schema and before
 committing.
 
-| File pattern                                   | Validator                              |
-|------------------------------------------------|----------------------------------------|
-| `.mega-linter.yml`                             | `yarn dlx v8r .mega-linter.yml`        |
-| `.github/workflows/*.yml`                      | `actionlint` (already in pre-commit)   |
-| `package.json`, `biome.json`, `tsconfig*.json` | `yarn dlx v8r <file>`                  |
-| `.pre-commit-config.yaml`                      | `yarn dlx v8r .pre-commit-config.yaml` |
-| `install.conf.yaml` (Dotbot)                   | `dotbot-validate` skill                |
-| Generic YAML without a schema                  | `yamllint` (already in pre-commit)     |
+| File pattern                                   | Tool                                   | Checks                   |
+|------------------------------------------------|----------------------------------------|--------------------------|
+| `.mega-linter.yml`                             | `yarn dlx v8r .mega-linter.yml`        | JSON Schema              |
+| `.github/workflows/*.yml`                      | `actionlint` (already in pre-commit)   | GHA grammar (not schema) |
+| `package.json`, `biome.json`, `tsconfig*.json` | `yarn dlx v8r <file>`                  | JSON Schema              |
+| `.pre-commit-config.yaml`                      | `yarn dlx v8r .pre-commit-config.yaml` | JSON Schema              |
+| `install.conf.yaml` (Dotbot)                   | `dotbot-validate` skill                | YAML + link targets      |
+| Generic YAML without a schema                  | `yamllint` (already in pre-commit)     | Syntax/style only        |
+
+`actionlint` and `yamllint` are not JSON-Schema validators; they
+catch grammar and formatting problems, and a misspelt key passes
+both unflagged. For schema-less files the `no-schema-guessing.md`
+rule is the only safety net.
 
 If `v8r` says "no schema found", the file is not schema-backed — run the
 project's existing syntax linter (yamllint, biome, ruff, …) to catch

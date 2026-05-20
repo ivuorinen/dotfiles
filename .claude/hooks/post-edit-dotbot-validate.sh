@@ -18,7 +18,9 @@ if command -v yamllint > /dev/null; then
     exit 2
   fi
 elif command -v python3 > /dev/null; then
-  if ! output=$(python3 -c "import yaml; yaml.safe_load(open('$fp'))" 2>&1); then
+  # Pass $fp as argv so a path containing apostrophes or other quoting
+  # characters cannot terminate the Python string literal early.
+  if ! output=$(python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1]))' "$fp" 2>&1); then
     echo "Dotbot config YAML parse error in $fp:" >&2
     echo "$output" >&2
     exit 2

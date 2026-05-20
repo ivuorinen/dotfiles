@@ -35,24 +35,20 @@ if ! $YARN_BIN install --no-immutable; then
   exit 2
 fi
 
-output=$($YARN_BIN lint:biome 2>&1 && $YARN_BIN lint:prettier 2>&1 && $YARN_BIN lint:md-table 2>&1)
+# Run the full lint chain defined in package.json's "lint" script.
+# Network-aware special-case: editorconfig-checker's first invocation
+# downloads a binary from GitHub; on rate-limit we record a non-zero
+# status (no silent skip) and surface the error to the user.
+output=$($YARN_BIN lint 2>&1)
 status=$?
 
-# Run ec separately; skip if it fails due to binary download issues (network/rate-limit)
-ec_output=$($YARN_BIN lint:ec 2>&1)
-ec_status=$?
-if [[ $ec_status -ne 0 ]]; then
-  if echo "$ec_output" | grep -Eq "rate limit|Failed to download|HttpError"; then
-    echo "Warning: editorconfig-checker skipped (binary download failed — GitHub rate limit)" >&2
-  else
-    output="$output
-$ec_output"
-    status=$ec_status
-  fi
-fi
-
 if [[ $status -ne 0 ]]; then
-  echo "Lint failed — fix before finishing:" >&2
+  if echo "$output" | grep -Eq "rate limit|Failed to download|HttpError"; then
+    echo "Lint failed — editorconfig-checker binary download was rate-limited." >&2
+    echo "Retry after the rate-limit window, or cache the ec binary locally." >&2
+  else
+    echo "Lint failed — fix before finishing:" >&2
+  fi
   echo "$output" >&2
   exit 2
 fi

@@ -1,9 +1,25 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-05-19
+Last validated: 2026-05-20
+Pass 18 applied: 2026-05-20
+Scope of latest round (Pass 18): Applied fixes for all 24 findings from Passes 15-17.
+Fixed 21 (N-091..N-101, N-105..N-114); revalidated and updated 3 wording-only items
+(N-102 confirmed actual commitlint header-max is 100, not 72; rule rewritten).
+Pass 17 applied: 2026-05-20
+Scope of previous round (Pass 17): `config/theme/` orchestrator + `local/bin/{msgr,dfm}`
+spot-check. No findings — orchestrator is clean.
+Pass 16 applied: 2026-05-20
+Scope of previous round (Pass 16): `.claude/hooks/`, `.claude/agents/`, root config
+sweep. Filed N-105..N-114.
+Pass 15 applied: 2026-05-20
+Scope of previous round (Pass 15): `.claude/rules/` loophole audit — read all 15 rule files;
+cross-checked against `.claude/settings.json`, `.claude/hooks/`, `.editorconfig`,
+`.pre-commit-config.yaml`, and the official Claude Code hooks reference. Re-validated 3
+existing Advisory entries (N-013/N-020/N-056 unchanged). Filed 14 new defects
+(N-091..N-104): 1 High, 5 Medium, 5 Low, 3 Advisory.
 Pass 14 applied: 2026-05-19
-Scope of latest round (Pass 14): `scripts/` and `local/bin/` usage-spec migration — replaced
+Scope of previous round (Pass 14): `scripts/` and `local/bin/` usage-spec migration — replaced
 74 `.usage.kdl` sidecar files with inline `#USAGE`/`//USAGE` directives; updated tooling,
 lint pipeline, and `new-script` skill. Fixed 4 (N-087..N-090).
 Pass 13 applied: 2026-05-18
@@ -52,8 +68,31 @@ tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
 
 ## Summary
 
-- Total: 87 | Open: 0 | Fixed: 75 | Advisory: 3 | Invalid: 9
+- Total: 111 | Open: 0 | Fixed: 99 | Advisory: 3 | Invalid: 9
 
+Pass 18 (2026-05-20): Applied fixes for all 24 findings from Passes 15-17. Validated
+with full `yarn lint` (all checks pass) plus per-hook shellcheck and rules-lint with
+extended pattern. The Advisory items N-013/N-020/N-056 remain Advisory (informational —
+no action required); all new findings closed.
+Pass 17 (2026-05-20): `config/theme/` orchestrator + `local/bin/{msgr,dfm}` boundaries
+spot-check. No new findings — `_atomic_write` is mktemp+rename, `_acquire_lock` uses `ln`
+for atomic existence, handlers run under a 5s timeout with stderr capture per handler,
+`probe-osc11` saves and restores stty state via trap. Audited but clean.
+Pass 16 (2026-05-20): `.claude/hooks/`, `.claude/agents/`, `.claude/skills/`, and root-level
+config sweep. Filed N-105..N-114. Four Medium (osascript injection in notify-idle.sh,
+bats runner path mismatch, Stop-gate lint chain diverges from `yarn lint`, Stop-gate
+silent skip on editorconfig-checker download error), three Low (shfmt regex matches
+`zsh`, dotbot-validate Python interpolation hazard, install.conf.yaml swallows
+submodule errors), three Advisory (rules-lint hedge pattern incomplete, failure log
+unbounded, code-reviewer agent lacks rules linkage).
+Pass 15 (2026-05-20): `.claude/rules/` loophole audit. Filed N-091..N-104. One High
+(vendored-files hook coverage gap), five Medium (no-hook-bypass self-contradiction,
+host-specific-config inert frontmatter, lsp-list-parity broken verify command,
+bash-routing unbounded "explicit ask" escape hatch, lsp-list-parity grep over-matches),
+five Low (editorconfig docs omit four sections, validate-config-schemas mislabels
+validators, vendored-files lacks submodule sync path, posix-scripts macOS sh
+limitation, no-hook-bypass plugin-hooks gap), three Advisory (commit-format claim
+unverified, keymap-descriptions unenforced, no-schema-guessing tool-help incomplete).
 Pass 14 (2026-05-19): Filed and fixed N-087..N-090 — `.usage.kdl` sidecar files replaced with
 inline `#USAGE` directives in 74 files (scripts/ and local/bin/); tooling and lint pipeline updated;
 `new-script` skill template updated to include `#USAGE about` and correct Step 3 docs instructions.
@@ -96,6 +135,154 @@ carry the current date, not the original tag date. A comment was added to docume
 the limitation. Full fix requires passing the tag date from the calling workflow.
 
 ## Fixed
+
+### Pass 18 — 2026-05-20
+
+#### [N-091] `pre-edit-block.sh` only blocked `local/bin/fzf-tmux`, not the five other vendored fzf files
+Fixed: 2026-05-20
+Notes: Added a new case branch in `.claude/hooks/pre-edit-block.sh` covering
+`config/fzf/completion.bash`, `config/fzf/completion.zsh`,
+`config/fzf/key-bindings.bash`, `config/fzf/key-bindings.zsh`, and
+`config/fzf/key-bindings.fish`. All six files listed in `vendored-files.md`
+are now hook-protected.
+
+#### [N-092] `no-hook-bypass.md` self-contradicted on "unconditional" vs user authorisation
+Fixed: 2026-05-20
+Notes: Reworded the closing paragraph to make the user-authorisation route the
+named single exception. Removed the contradictory "unconditional" wording.
+
+#### [N-093] `host-specific-config.md` frontmatter was inert (`alwaysApply: false`, no `paths:`)
+Fixed: 2026-05-20
+Notes: Replaced `alwaysApply: false` with `paths: ["config/**", "hosts/**",
+"base/**", "ssh/**"]`. The rule now activates on edits to those trees.
+
+#### [N-094] `lsp-list-parity.md` verify command lacked `config/nvim/` prefix
+Fixed: 2026-05-20
+Notes: Verification snippet now wraps the diff in `cd config/nvim &&` and
+uses `awk` range patterns to scope the grep to the relevant tables.
+
+#### [N-095] `bash-routing.md` "one-line user-asked" exception was unbounded
+Fixed: 2026-05-20
+Notes: Exception 4 now requires the named command's expected output to be
+under ~20 lines; unbounded commands route through `ctx_batch_execute` even
+when the user asks for them by name.
+
+#### [N-096] `lsp-list-parity.md` grep regex `"[a-z_]+"` matched any quoted lowercase token
+Fixed: 2026-05-20
+Notes: Verification command now uses `awk` range patterns to scope grep to
+the `ensure_installed = {…}` and `vim.lsp.enable {…}` tables only.
+
+#### [N-097] `editorconfig.md` omitted four `.editorconfig` sections
+Fixed: 2026-05-20
+Notes: Added entries for `[*.fish]` (120-char), `[*.hwdb]` (indent_size=1),
+`[plan]` (literal `base/plan`), and
+`[base/hammerspoon/hammerspoon.types.lua]` (max_line_length=off) to the
+per-filetype overrides section.
+
+#### [N-098] `validate-config-schemas.md` mislabeled actionlint/yamllint as validators
+Fixed: 2026-05-20
+Notes: Renamed the table column to "Tool" and added a "Checks" column.
+Added a paragraph stating actionlint and yamllint catch grammar/style only
+and that `no-schema-guessing.md` is the safety net for schema-less files.
+
+#### [N-099] `vendored-files.md` did not name the submodule path or refresh command
+Fixed: 2026-05-20
+Notes: Replaced the false "submodule sync" claim with the actual
+mechanism (manual fetch from upstream). Added the refresh `curl` snippet
+for human operators, with a note that Claude itself is blocked from `curl`.
+
+#### [N-100] `posix-scripts.md` did not warn about macOS `/bin/sh` being bash-in-sh-mode
+Fixed: 2026-05-20
+Notes: Added a "macOS caveat" section recommending `dash -n` for strict
+bashism-leak checks; `sh -n` remains the syntax-level smoke test.
+
+#### [N-101] `no-hook-bypass.md` referenced only `.claude/settings.json` hooks
+Fixed: 2026-05-20
+Notes: Bullet now also names plugin-supplied `hooks.json` (e.g. the
+context-mode plugin) as part of the protected hook chain.
+
+#### [N-105] `notify-idle.sh` shell-interpolated `$msg` into AppleScript code
+Fixed: 2026-05-20
+Notes: Rewrote the `osascript` call to pass `$msg` as `argv[1]`. The
+AppleScript reads it via `item 1 of argv`, bypassing string-construction
+entirely. Closes the command-injection vector.
+
+#### [N-106] `async-bats.sh` used `node_modules/.bin/bats` instead of mise-PATH bats
+Fixed: 2026-05-20
+Notes: Replaced the hard-coded path with bare `bats` plus a
+`command -v bats` guard. Aligns with the recorded user preference.
+
+#### [N-107] `stop-lint-gate.sh` lint chain diverged from `yarn lint`
+Fixed: 2026-05-20
+Notes: Replaced the explicit `lint:biome && lint:prettier && lint:md-table
+&& lint:ec` chain with `$YARN_BIN lint`. markdownlint, v8r, and usage-lint
+now run as part of the Stop gate.
+
+#### [N-108] `stop-lint-gate.sh` silently degraded on `ec` download failure
+Fixed: 2026-05-20
+Notes: Network-aware branch now prints a specific error and exits with
+non-zero status. The download failure no longer slips through as a
+warning.
+
+#### [N-109] `post-edit-format.sh` shfmt shebang regex matched `zsh`
+Fixed: 2026-05-20
+Notes: Anchored the regex to `(/|env )(bash|sh)( |$)` so `zsh`, `fish`,
+and `python3` shebangs no longer route through shfmt.
+
+#### [N-110] `post-edit-dotbot-validate.sh` Python fallback interpolated `$fp`
+Fixed: 2026-05-20
+Notes: Switched to `python3 -c '... sys.argv[1] ...' "$fp"` so the path
+is passed as argv and cannot break out of the source literal.
+
+#### [N-111] `install.conf.yaml` swallowed submodule errors with `|| true`
+Fixed: 2026-05-20
+Notes: Removed the `|| true` so a failed `add-submodules.sh` halts the
+install instead of leaving a half-installed tree for the subsequent
+`git submodule update` to operate on.
+
+#### [N-102] `commit-format.md` "under 72 characters" claim was unverified
+Fixed: 2026-05-20
+Notes: Fetched `@ivuorinen/commitlint-config` `index.cjs` from upstream —
+it extends `@commitlint/config-conventional` (default `header-max-length:
+100`) plus `body-leading-blank: [2, always]`. Rule now distinguishes the
+72-char target (discipline) from the 100-char hard limit (enforcement),
+and documents the body-leading-blank override.
+
+#### [N-103] `keymap-descriptions.md` had no automated enforcement
+Fixed: 2026-05-20
+Notes: Added a "Manual verification" section with a grep regex that
+catches two-argument `K.*` calls missing the opts/desc argument,
+excluding `utils.lua` where the K-table itself is defined.
+
+#### [N-104] `no-schema-guessing.md` accepted `--help` as primary schema evidence
+Fixed: 2026-05-20
+Notes: Demoted `--help` to supporting evidence only. Promoted `<tool>
+schema`, `<tool> --print-schema`, and `man <tool>` as the primary
+non-docs-fetch evidence sources.
+
+#### [N-112] `post-edit-rules-lint.sh` hedge-word pattern was incomplete
+Fixed: 2026-05-20
+Notes: Extended the pattern to include `should` (the RFC 2119
+weakening). Documented in the hook header why other modal verbs (`may`,
+`could`, `usually`) stay excluded: they appear in rule prose as factual
+qualifications rather than as normative weakening. Rewrote the one
+occurrence of `should` in `bash-routing.md` that the extension would
+have flagged.
+
+#### [N-113] `.claude/hook-failures.log` was never rotated
+Fixed: 2026-05-20
+Notes: `log-failures.sh` now tail-rotates the file at 1000 lines using a
+temp-file + rename so a concurrent appender cannot observe a
+half-truncated log. `.gitignore`'s `*.log` rule keeps the file out of
+the working tree.
+
+#### [N-114] `.claude/agents/code-reviewer.md` did not reference `.claude/rules/`
+Fixed: 2026-05-20
+Notes: Rewrote the agent prompt to point at the specific rule files
+(`shell-scripts.md`, `posix-scripts.md`, `editorconfig.md`,
+`keymap-descriptions.md`, `lsp-list-parity.md`, `commit-format.md`,
+`vendored-files.md`, `no-schema-guessing.md`). The agent now reviews
+against the project's rule set, not generic conventions.
 
 ### Pass 14 — 2026-05-19
 

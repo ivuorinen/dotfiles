@@ -1,6 +1,10 @@
 ---
 description: "Machine-specific config must live under hosts/<hostname>/, never in the shared config/ tree."
-alwaysApply: false
+paths:
+  - "config/**"
+  - "hosts/**"
+  - "base/**"
+  - "ssh/**"
 ---
 
 # Host-specific configuration

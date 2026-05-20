@@ -9,5 +9,6 @@ name=$(basename "$fp")
 test_file="$CLAUDE_PROJECT_DIR/tests/${name}.bats"
 [ ! -f "$test_file" ] && exit 0
 
+command -v bats > /dev/null || exit 0
 echo "Running $test_file ..."
-"$CLAUDE_PROJECT_DIR/node_modules/.bin/bats" "$test_file"
+bats "$test_file"

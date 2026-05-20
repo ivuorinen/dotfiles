@@ -30,6 +30,13 @@ case "$fp" in
     echo "BLOCKED: $fp is a vendor/lock file — do not edit directly" >&2
     exit 2
     ;;
+  */config/fzf/completion.bash | */config/fzf/completion.zsh | \
+    */config/fzf/key-bindings.bash | */config/fzf/key-bindings.zsh | \
+    */config/fzf/key-bindings.fish)
+    echo "BLOCKED: $fp is a vendored fzf file — update via submodule sync" >&2
+    echo "See .claude/rules/vendored-files.md." >&2
+    exit 2
+    ;;
   */tools/dotbot/* | */tools/dotbot-include/* | */tools/antidote/*)
     echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
     exit 2

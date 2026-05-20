@@ -7,7 +7,10 @@ fp=$(jq -r '.tool_input.file_path // empty')
 
 case "$fp" in
   *.sh | */bin/*)
-    head -1 "$fp" | grep -qE '^#!.*(ba)?sh' \
+    # Anchor the shebang match to bash/sh interpreters so zsh/fish/python
+    # scripts in */bin/* do not get shfmt'd. shfmt does not support zsh
+    # and would mangle (( )) expansion forms and glob qualifiers.
+    head -1 "$fp" | grep -qE '^#!.*(/|env )(bash|sh)( |$)' \
       && command -v shfmt > /dev/null \
       && shfmt -i 2 -bn -ci -sr -fn -w "$fp"
     ;;

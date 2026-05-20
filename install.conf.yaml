@@ -88,8 +88,11 @@
       force: true
 
 - shell:
-    # Add Git submodules and remove old ones
-    - bash add-submodules.sh || true
+    # Add Git submodules and remove old ones. A non-zero exit here
+    # leaves the tree in a half-installed state — fail loudly so the
+    # subsequent `git submodule update` is not run against a broken
+    # state.
+    - bash add-submodules.sh
     # Update submodules recursively
     - git submodule update --init --recursive --force
 

@@ -22,6 +22,17 @@ When adding a server: add it to `vim.lsp.enable {...}` AND to
 When removing a server: drop it from BOTH lists and delete the
 matching `lsp/<name>.lua`.
 
-Verification: `diff <(grep -oE '\"[a-z_]+\"' lua/plugins/lsp.lua)
-<(grep -oE '\"[a-z_]+\"' init.lua)` should differ only by the
-mise-managed exceptions.
+Verification (run from the repo root):
+
+```bash
+cd config/nvim && diff \
+  <(awk '/ensure_installed = \{/,/^[[:space:]]*\}/' lua/plugins/lsp.lua \
+      | grep -oE '"[a-z_]+"' | sort -u) \
+  <(awk '/vim\.lsp\.enable \{/,/^[[:space:]]*\}/' init.lua \
+      | grep -oE '"[a-z_]+"' | sort -u)
+```
+
+The diff must contain only the mise-managed exceptions (currently
+`fish_lsp` and `taplo`). The `awk` range scopes the grep to the
+relevant table so settings keys, log levels, and unrelated string
+literals do not appear as false drift.

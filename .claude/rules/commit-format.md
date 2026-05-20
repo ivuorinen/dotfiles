@@ -10,8 +10,19 @@ Use Conventional Commits: `type(scope): summary`.
 Allowed types are the commitlint defaults: `feat`, `fix`, `chore`,
 `docs`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`.
 Scope is the affected area in lowercase (e.g. `tmux`, `nvim`,
-`starship`, `dotfiles`). Summary is imperative mood, under 72
-characters, no trailing period.
+`starship`, `dotfiles`). Summary is imperative mood, no trailing
+period.
+
+Header length: target 72 characters (matches `git log --oneline`
+width). The actual hard limit from `@ivuorinen/commitlint-config`
+(which extends `@commitlint/config-conventional`) is 100 characters
+— commitlint rejects only above 100. Keep the 72-char target as a
+discipline; anything 73–100 passes the hook but reads poorly in
+short-log views.
+
+Body: separated from the header by a single blank line
+(`body-leading-blank: [2, always]` is the only override added by
+`@ivuorinen/commitlint-config` on top of conventional defaults).
 
 Examples:
 
