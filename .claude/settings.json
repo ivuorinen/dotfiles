@@ -27,6 +27,16 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "mcp__plugin_context-mode_context-mode__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-tool-context-mode-check.sh",
+            "statusMessage": "Checking context-mode health..."
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write",
         "hooks": [
           {
