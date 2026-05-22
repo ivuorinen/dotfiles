@@ -129,7 +129,7 @@ trufflehog = "latest"
 "github:wakatime/wakatime-cli" = "latest"
 
 # Terraform (replaces tfenv)
-terraform = "1.15.3"
+terraform = "1.15.4"
 tflint = "latest"
 tfsec = "latest"
 
