@@ -67,7 +67,7 @@ difftastic = "0.69.0"
 
 # Go-compiled tools (no registry binary available)
 "go:github.com/joshmedeski/sesh/v2" = "2.26.2"
-"go:github.com/dotzero/git-profile" = "1.7.2"
+"go:github.com/dotzero/git-profile" = "1.7.3"
 
 # Registry shorthands (aqua binaries)
 yamlfmt = "0.21.0"
