@@ -22,12 +22,22 @@ command=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2> /dev/null)
 
 [ -z "$command" ] && exit 0
 
-# Skip if the user has the magic opt-out marker as the first token of the
-# command. This lets the user say "claude, run this even though the hook would
-# block: BASH_OK rg foo" without editing settings. Only matches at the start so
-# a command that incidentally contains "BASH_OK" as a value or symbol name
-# doesn't bypass.
+# Magic opt-out marker as the first token of the command. The escape strips
+# the BASH_OK prefix via `updatedInput` and returns `allow` so the underlying
+# command actually runs (the shell would otherwise try to execute BASH_OK as a
+# command name and fail with "command not found"). Only the leading marker
+# triggers the escape — a command that incidentally contains BASH_OK as a
+# value or symbol name doesn't bypass.
 if printf '%s' "$command" | grep -qE '^[[:space:]]*BASH_OK[[:space:]]+'; then
+  stripped=$(printf '%s' "$command" | sed -E 's/^[[:space:]]*BASH_OK[[:space:]]+//')
+  jq -n --arg cmd "$stripped" '{
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      permissionDecision: "allow",
+      permissionDecisionReason: "BASH_OK escape — bypassing bash-routing.md hook for this one call.",
+      updatedInput: { command: $cmd }
+    }
+  }'
   exit 0
 fi
 
