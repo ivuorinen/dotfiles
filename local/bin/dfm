@@ -904,9 +904,12 @@ section_secrets()
 
       mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
 
+      local old_umask
+      old_umask=$(umask)
+      umask 077
       printf '# GitHub Personal Access Token\nset -x GITHUB_TOKEN "%s"\n' "$token" > "$fish_secret"
       printf '# GitHub Personal Access Token\nexport GITHUB_TOKEN="%s"\n' "$token" > "$sh_secret"
-      chmod 600 "$fish_secret" "$sh_secret"
+      umask "$old_umask"
 
       msgr yay "GITHUB_TOKEN secrets created"
       msgr nested "fish:     $fish_secret"
