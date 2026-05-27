@@ -280,14 +280,18 @@ section_install()
       if [[ -z "${GITHUB_TOKEN:-}" ]]; then
         msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
         msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
-        read -rp "Create GITHUB_TOKEN secrets now? [y/N] " _answer
-        if [[ "${_answer:-N}" =~ ^[Yy]$ ]]; then
-          $0 secrets github
-          # shellcheck disable=SC1090
-          [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
-            && source "$DOTFILES/config/secrets.d/github.sh"
+        if [[ -t 0 ]]; then
+          read -rp "Create GITHUB_TOKEN secrets now? [y/N] " _answer
+          if [[ "${_answer:-N}" =~ ^[Yy]$ ]]; then
+            $0 secrets github
+            # shellcheck disable=SC1090
+            [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
+              && source "$DOTFILES/config/secrets.d/github.sh"
+          fi
+          unset _answer
+        else
+          msgr nested "Non-interactive shell; skipping token prompt"
         fi
-        unset _answer
       fi
       mise install --yes || {
         msgr err "mise install failed"
@@ -613,9 +617,11 @@ section_docs()
 
   case "$1" in
     all)
-      $0 docs tmux
-      $0 docs nvim
-      $0 docs wezterm
+      local rc=0
+      $0 docs tmux || rc=1
+      $0 docs nvim || rc=1
+      $0 docs wezterm || rc=1
+      return "$rc"
       ;;
     tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
@@ -725,11 +731,13 @@ section_check()
       ;;
 
     all)
-      section_check brew
-      section_check mise
-      section_check tools
-      section_check updates
-      section_check disk
+      local rc=0
+      section_check brew || rc=1
+      section_check mise || rc=1
+      section_check tools || rc=1
+      section_check updates || rc=1
+      section_check disk || rc=1
+      return "$rc"
       ;;
 
     brew)
@@ -898,6 +906,7 @@ section_secrets()
 
       printf '# GitHub Personal Access Token\nset -x GITHUB_TOKEN "%s"\n' "$token" > "$fish_secret"
       printf '# GitHub Personal Access Token\nexport GITHUB_TOKEN="%s"\n' "$token" > "$sh_secret"
+      chmod 600 "$fish_secret" "$sh_secret"
 
       msgr yay "GITHUB_TOKEN secrets created"
       msgr nested "fish:     $fish_secret"
@@ -923,12 +932,18 @@ section_cleanup()
 
   case "$1" in
     all)
+      local rc=0
       msgr msg "Running all cleanup tasks..."
-      section_cleanup old-vms
-      section_cleanup brew
-      section_cleanup mise
-      section_cleanup caches
-      msgr yay "All cleanup tasks complete"
+      section_cleanup old-vms || rc=1
+      section_cleanup brew || rc=1
+      section_cleanup mise || rc=1
+      section_cleanup caches || rc=1
+      if [[ $rc -eq 0 ]]; then
+        msgr yay "All cleanup tasks complete"
+      else
+        msgr warn "Cleanup finished with errors"
+      fi
+      return "$rc"
       ;;
 
     brew)
