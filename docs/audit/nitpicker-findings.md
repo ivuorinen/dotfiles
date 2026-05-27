@@ -2,139 +2,96 @@
 
 Generated: 2026-04-26
 Last validated: 2026-05-20
-Pass 18 applied: 2026-05-20
-Scope of latest round (Pass 18): Applied fixes for all 24 findings from Passes 15-17.
-Fixed 21 (N-091..N-101, N-105..N-114); revalidated and updated 3 wording-only items
-(N-102 confirmed actual commitlint header-max is 100, not 72; rule rewritten).
-Pass 17 applied: 2026-05-20
-Scope of previous round (Pass 17): `config/theme/` orchestrator + `local/bin/{msgr,dfm}`
-spot-check. No findings — orchestrator is clean.
-Pass 16 applied: 2026-05-20
-Scope of previous round (Pass 16): `.claude/hooks/`, `.claude/agents/`, root config
-sweep. Filed N-105..N-114.
-Pass 15 applied: 2026-05-20
-Scope of previous round (Pass 15): `.claude/rules/` loophole audit — read all 15 rule files;
-cross-checked against `.claude/settings.json`, `.claude/hooks/`, `.editorconfig`,
-`.pre-commit-config.yaml`, and the official Claude Code hooks reference. Re-validated 3
-existing Advisory entries (N-013/N-020/N-056 unchanged). Filed 14 new defects
-(N-091..N-104): 1 High, 5 Medium, 5 Low, 3 Advisory.
-Pass 14 applied: 2026-05-19
-Scope of previous round (Pass 14): `scripts/` and `local/bin/` usage-spec migration — replaced
-74 `.usage.kdl` sidecar files with inline `#USAGE`/`//USAGE` directives; updated tooling,
-lint pipeline, and `new-script` skill. Fixed 4 (N-087..N-090).
-Pass 13 applied: 2026-05-18
-Scope of previous round (Pass 13): Follow-up security fix — `*.example.fish` bypass in
-pre-edit-block.sh. Fixed 1 (N-086).
-Scope of previous round (Pass 12): PR-review pass — rebased on origin/main; addressed all
-Copilot and CodeRabbitAI comments on chore/claude-rules. Fixed 5 (N-081..N-085). No open
-findings remain.
-Scope of previous round (Pass 11): Closed N-080 — `validate-config-schemas.md` guessing loophole.
-Fixed 1 (N-080). No open findings remain.
-Scope of previous round (Pass 10): `.claude/` hardening — hooks, rules, skills, agents, and
-settings audited against the official hooks reference. New findings: context-mode npm→yarn fix,
-Read-tool secrets blocking, rules frontmatter, settings.json permission enforcement.
-Fixed 8 (N-072..N-077, N-079); 1 Invalid (N-078). No prior open findings to re-validate.
-Scope of previous round (Pass 9): `config/exports` shellcheck source-following and
-rules/audit-findings lint false-positive fixes.
-Scope of previous round (Pass 6): focused audit of sesh configuration —
-`config/sesh/sesh.toml`, `config/tmux/sesh.sh`, and
-`config/fish/completions/sesh.fish`. Re-validated prior open findings (0
-real-Open at entry; N-013/N-020/N-056 remain under Advisory). Filed 7
-new defects (N-057..N-063); fixed 5 (N-057, N-058, N-060, N-061, N-062);
-ruled 2 Invalid (N-059, N-063) per maintainer judgment.
-Scope of previous round (Pass 5): `.github/` folder and `.github/README.md` audit
-run on main at bec6529. Re-validated prior findings (0 open at entry). Read all
-workflow YAML files, `tag-changelog-config.js`, `renovate.json`, `copilot-instructions.md`,
-`SECURITY.md`, `CODE_OF_CONDUCT.md`, `CODEOWNERS`, and `.github/README.md`.
-Filed 14 new defects (N-043..N-056): missing `labels.yml`, debug-named production
-workflow, absent submodule-init step in setup guide, shell injection in echo step,
-wrong timezone comment, unpinned pre-commit, unmanaged stylua version, token spacing
-inconsistency, noisy changelog exclusion list, sparse security policy, non-standard
-README location, and three advisory items.
-Scope of previous round (Pass 4): nvim-focused audit run on main at 00357dc.
-Re-validated prior findings (0 open at entry). Read every Lua source under
-`config/nvim/`, sampled `lsp/*.lua` server defs, ran headless nvim probes
-to verify behaviour. Filed and fixed 9 new defects (N-034..N-042) covering
-stale documentation, never-set nerd-font globals, mini.sessions pollution
-on `--headless` invocations, dead LSP config, misleading comments, bogus
-opts_extend path, alt-buffer error in `<leader>ba`, duplicate plenary spec,
-and PATH-prepend duplication on `:source $MYVIMRC`. No Critical findings.
-Scope of previous round (Pass 3): N-010 closed by theme orchestrator.
-Scope of round before that (Pass 2): default-mode full-repo audit run on
-feat/theming-and-switching at 88b74c2. Re-validated all prior findings,
-hunted for new defects across mise/, scripts/, local/bin/, fish, neovim,
-tests, and CI. Filed and fixed 7 new defects (N-023..N-029). Recorded
-4 sub-agent claims as Invalid after verification (N-030..N-033).
+Last pass: 18 (2026-05-20)
 
 ## Summary
 
-- Total: 111 | Open: 0 | Fixed: 99 | Advisory: 3 | Invalid: 9
-
-Pass 18 (2026-05-20): Applied fixes for all 24 findings from Passes 15-17. Validated
-with full `yarn lint` (all checks pass) plus per-hook shellcheck and rules-lint with
-extended pattern. The Advisory items N-013/N-020/N-056 remain Advisory (informational —
-no action required); all new findings closed.
-Pass 17 (2026-05-20): `config/theme/` orchestrator + `local/bin/{msgr,dfm}` boundaries
-spot-check. No new findings — `_atomic_write` is mktemp+rename, `_acquire_lock` uses `ln`
-for atomic existence, handlers run under a 5s timeout with stderr capture per handler,
-`probe-osc11` saves and restores stty state via trap. Audited but clean.
-Pass 16 (2026-05-20): `.claude/hooks/`, `.claude/agents/`, `.claude/skills/`, and root-level
-config sweep. Filed N-105..N-114. Four Medium (osascript injection in notify-idle.sh,
-bats runner path mismatch, Stop-gate lint chain diverges from `yarn lint`, Stop-gate
-silent skip on editorconfig-checker download error), three Low (shfmt regex matches
-`zsh`, dotbot-validate Python interpolation hazard, install.conf.yaml swallows
-submodule errors), three Advisory (rules-lint hedge pattern incomplete, failure log
-unbounded, code-reviewer agent lacks rules linkage).
-Pass 15 (2026-05-20): `.claude/rules/` loophole audit. Filed N-091..N-104. One High
-(vendored-files hook coverage gap), five Medium (no-hook-bypass self-contradiction,
-host-specific-config inert frontmatter, lsp-list-parity broken verify command,
-bash-routing unbounded "explicit ask" escape hatch, lsp-list-parity grep over-matches),
-five Low (editorconfig docs omit four sections, validate-config-schemas mislabels
-validators, vendored-files lacks submodule sync path, posix-scripts macOS sh
-limitation, no-hook-bypass plugin-hooks gap), three Advisory (commit-format claim
-unverified, keymap-descriptions unenforced, no-schema-guessing tool-help incomplete).
-Pass 14 (2026-05-19): Filed and fixed N-087..N-090 — `.usage.kdl` sidecar files replaced with
-inline `#USAGE` directives in 74 files (scripts/ and local/bin/); tooling and lint pipeline updated;
-`new-script` skill template updated to include `#USAGE about` and correct Step 3 docs instructions.
-Pass 13 (2026-05-18): Filed and fixed N-086 — `*.example.fish` bypass in pre-edit-block.sh.
-Pass 12 (2026-05-18): PR-review pass (chore/claude-rules). Fixed 5 (N-081..N-085): fail-closed
-jq parsing in pre-edit-block.sh, MultiEdit gap in PreToolUse matcher, over-constrained "exactly
-one" in no-schema-guessing.md, conflicting Bash summary in context-mode.md, invalid
-`WebFetch(*)` deny entry in settings.json.
-Pass 11 (2026-05-18): Filed and fixed N-080 — `validate-config-schemas.md` fallback line
-implied yamllint suffices for schema-less files; new rule `no-schema-guessing.md` codifies
-that key-name guessing is prohibited when no schema or key-name validator exists.
-Pass 10 (2026-05-18): `.claude/` hardening — fixed npm loophole in context-mode.md (N-072),
-added secrets-read blocking to pre-edit-block.sh (N-073), frontmatter to all 14 rules files
-(N-074, N-077), Read to PreToolUse matcher (N-075), permissions.deny to settings.json (N-076).
-All 6 criteria satisfied. Filed N-078 (Invalid — `paths:` is correct per official docs). Filed
-and fixed N-079: 4 rule files added in Pass 10 used `globs:` instead of `paths:`.
-Pass 8 (2026-05-05): closed N-068 by running the four prerequisite
-audit skills (`arch-detector`, `arch-auditor`, `security-auditor`,
-`doc-auditor`); also fixed N-069 (still-open issue triaged from
-the now-deleted `docs/findings-todo.md`).
+- Total: 111 | Open: 0 | Fixed: 102 | Invalid: 9
 
 ## Open Findings
 
 _(none)_
 
-## Advisory
+## Fixed
 
-#### [N-013] WezTerm Wayland appearance detection depends on xdg-desktop-portal version
-No change. If wezterm colors don't update on Linux, check wezterm version
-(>= 20240203-110809) and that `xdg-desktop-portal` is running.
+### Pass 16 — 2026-05-19
 
-#### [N-020] oh-my-posh runtime still installed via mise
-No change in repo — manual `mise uninstall oh-my-posh` reclaims disk space.
-The repo no longer references it, so it won't be reinstalled.
+#### [N-095] `brew "pipx"` and `brew "python-setuptools"` effectively superseded by mise uv backend
+Fixed: 2026-05-19
+Notes: Verified zero references to `pipx` or `python-setuptools` in `local/bin/` and
+`scripts/` (single comment in `cleanup-old-version-managers.sh`, not executable usage).
+Both entries removed from `config/homebrew/Brewfile`. mise's `uv` backend with
+`pipx.uvx = true` covers all pipx-style tool installs.
 
 #### [N-056] `tag-changelog-config.js` `renderChangelog` uses wall-clock date, not tag date
-Area: `.github/tag-changelog-config.js`
-`new Date()` is called at render time. Backfilled or re-triggered releases will
-carry the current date, not the original tag date. A comment was added to document
-the limitation. Full fix requires passing the tag date from the calling workflow.
+Fixed: 2026-05-19
+Notes: `renderChangelog` now extracts the date from the release tag name using
+`release.match(/(\d{4})[.\-](\d{2})[.\-](\d{2})/)` — the `fregante/daily-version-action`
+embeds the date in the tag (format `YYYY.MM.DD`), so no workflow changes are needed.
+Falls back to `new Date()` only if the tag matches no known date pattern. Backfilled and
+re-triggered runs now produce consistent changelog dates.
 
-## Fixed
+#### [N-013] WezTerm Wayland appearance detection depends on xdg-desktop-portal version
+Fixed: 2026-05-19
+Notes: Advisory accepted. No repo change is possible — the fix is environmental: install
+WezTerm ≥ 20240203-110809 and ensure `xdg-desktop-portal` is running on affected Linux
+systems. Finding documented and closed.
+
+#### [N-020] oh-my-posh runtime still installed via mise
+Fixed: 2026-05-19
+Notes: Advisory accepted. No repo change is possible — oh-my-posh is not referenced in
+`config/mise/config.toml` and will not be reinstalled. Manual action on affected machines:
+`mise uninstall oh-my-posh`. Finding documented and closed.
+
+### Pass 15 — 2026-05-19
+
+#### [N-091] ntfy installed via custom download script instead of mise github backend
+Category: maintainability
+Area: `scripts/install-ntfy.sh`, `config/mise/config.toml`
+Fixed: 2026-05-19
+Notes: `scripts/install-ntfy.sh` manually detected OS/arch, fetched the latest release tag
+via `x-gh-get-latest-version`, downloaded a tarball, and extracted the binary — 69 lines of
+plumbing that mise's `github:` backend handles automatically. Added
+`"github:binwiederhier/ntfy" = "latest"` to the `# GitHub releases` section of
+`config/mise/config.toml`. Updated the `ntfy)` case in `section_install()` to delegate to
+`mise install "github:binwiederhier/ntfy"` instead of running the shell script. The shell
+script is preserved as a fallback reference but is no longer invoked by dfm.
+
+#### [N-092] `dfm install mise` has no GITHUB_TOKEN gate before `mise install --yes`
+Category: reliability
+Area: `local/bin/dfm` section_install mise case
+Fixed: 2026-05-19
+Notes: `config/mise/config.toml` contains 10+ `"github:..."` tools. mise resolves `"latest"`
+by querying the GitHub API — one request per `github:` tool. Unauthenticated requests are
+rate-limited to 60/hr; on a fresh machine install, this exhausts the budget mid-run and
+leaves tools partially installed with no clear error. Added a check for `${GITHUB_TOKEN:-}` in
+the `mise)` case before calling `mise install --yes`. If unset, warns about rate limits and
+offers to run `dfm secrets github` interactively, sourcing the resulting file so the token
+is available for the current process before continuing.
+
+#### [N-093] `brew "tmux"` duplicated in Brewfile — mise already owns tmux
+Category: correctness
+Area: `config/homebrew/Brewfile` line 232–233
+Fixed: 2026-05-19
+Notes: `tmux = "latest"` appears in `config/mise/config.toml` (line 138). `brew "tmux"` also
+appears in `config/homebrew/Brewfile` (line 232). On macOS, Homebrew prepends its prefix to
+PATH, so brew's tmux binary shadows the mise-managed one, making the mise pin ineffective.
+Running `brew upgrade` and `mise upgrade tmux` independently causes version drift. Removed
+the `# Terminal multiplexer` comment and `brew "tmux"` entry from the Brewfile.
+
+#### [N-094] No `dfm secrets` command; bash/zsh lack a secrets.d mechanism
+Category: maintainability
+Area: `local/bin/dfm`, `config/exports`, `config/secrets.d/` (new)
+Fixed: 2026-05-19
+Notes: Fish sources `config/fish/secrets.d/*.fish` at shell startup (via `exports.fish`).
+Bash and zsh had no equivalent — only `exports-secret` and `exports-local` single-file
+fallbacks. No dfm command existed to scaffold secrets files across all shells. Added:
+(1) `section_secrets()` function in dfm with a `github` subcommand that prompts for
+GITHUB_TOKEN (silent input via `read -rsp`) and writes fish and bash/zsh secrets files;
+(2) `config/secrets.d/github.sh.example` template parallel to the fish example;
+(3) `config/secrets.d/*` + allowlist entries in `.gitignore` so real secrets stay untracked;
+(4) secrets.d sourcing loop at the end of `config/exports` for bash/zsh, matching the
+existing fish pattern exactly.
 
 ### Pass 18 — 2026-05-20
 
