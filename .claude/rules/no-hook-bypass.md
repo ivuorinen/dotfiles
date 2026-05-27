@@ -15,6 +15,11 @@ flags include — but are not limited to:
 - Any option that disables a configured PreToolUse / PostToolUse /
   Stop hook in `.claude/settings.json` or in any active plugin's
   `hooks.json` (e.g. the context-mode plugin)
+- Workarounds for `pre-bash-route.sh` other than the documented
+  `BASH_OK` prefix (see `bash-routing.md`). Editing the hook script
+  to broaden its allow list, removing the hook entry from
+  `.claude/settings.json`, or using `Bash -c '…'` / heredoc tricks to
+  hide a denied command inside an allowed one all count as bypass
 
 If a hook fails, fix the underlying problem. The hook chain
 (commitlint, shellcheck, shfmt, biome, prettier, yamllint,

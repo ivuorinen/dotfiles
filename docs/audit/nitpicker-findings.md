@@ -1,12 +1,12 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-05-20
-Last pass: 18 (2026-05-20)
+Last validated: 2026-05-27
+Last pass: 23 (2026-05-27)
 
 ## Summary
 
-- Total: 112 | Open: 0 | Fixed: 103 | Invalid: 9
+- Total: 123 | Open: 0 | Fixed: 114 | Invalid: 9
 
 ## Open Findings
 
@@ -14,17 +14,106 @@ _(none)_
 
 ## Fixed
 
-### Pass 17 — 2026-05-19
+### Pass 23 — 2026-05-27
 
-#### [N-096] `scripts/install-ntfy.sh` dead code preserved after mise migration
+#### [N-123] No programmatic enforcement of `bash-routing.md` Bash→ctx_batch_execute routing
+Fixed: 2026-05-27
+Notes: `bash-routing.md` listed the patterns that belong in `ctx_batch_execute` but
+nothing in `.claude/` actually blocked them — only `curl`/`wget`/`WebFetch` were in
+`settings.json permissions.deny`. Added `.claude/hooks/pre-bash-route.sh` (PreToolUse,
+matcher `Bash`) that inspects every Bash invocation and denies it with an educational
+`permissionDecisionReason` when it matches the routing rules. `deny` (not `ask`) was
+chosen so the reason reaches Claude in-context and teaches it to route correctly next
+turn; `ask` would only prompt the user silently.
+
+#### [N-124] `bash-routing.md` "explicit ask" exception had no temporal bound
+Fixed: 2026-05-27
+Notes: Item #4 in "When Bash is acceptable" was already bounded to "under twenty
+lines" but said nothing about WHICH conversation turn the user named the command in.
+Authorisation from earlier in the session or from a prior conversation could be
+rationalised as a current "explicit ask". Tightened to "user names by tool in their
+most recent message" + explicit "authorisation does not carry over from earlier in
+the session or from another conversation."
+
+#### [N-125] `context-mode.md` Bash section was a pointer, not a list
+Fixed: 2026-05-27
+Notes: The "Bash shell commands" subsection just said "see bash-routing.md" without
+naming any commands. Models had to read two files to know which patterns are denied.
+Inlined the categories (searches, lint/format checkers, file readers, git readers,
+dotfiles manager, pipeline variants) and the allow list (state mutations, in-place
+formatters, package installs, short interactive ops). `bash-routing.md` still carries
+the rationale and the BASH_OK escape hatch.
+
+#### [N-126] `no-hook-bypass.md` didn't enumerate the new pre-bash-route hook
+Fixed: 2026-05-27
+Notes: Without explicit naming, a model could rationalise editing `pre-bash-route.sh`,
+removing the entry from `settings.json`, or using `bash -c`/heredoc tricks as
+"reasonable workarounds". Added a fifth bullet to the forbidden list calling out
+each of these specific bypass paths.
+
+#### [N-127] Pipes, subshells, and chains bypassed first-word command matching
+Fixed: 2026-05-27
+Notes: A regex like `^[[:space:]]*rg\b` matches `rg foo` but misses `git status |
+grep foo`, `echo $(rg pattern)`, `false || cat file`, and similar. The hook splits
+the command on pipeline separators (`|`, `&&`, `||`, `;`) and command substitutions
+(`$( )`, backticks) using awk, then checks each segment's first word.
+
+#### [N-128] `VAR=val cmd` (inline assignment, no `env` prefix) evaded the env-strip
+Fixed: 2026-05-27
+Notes: `strip_env_prefix` originally only handled `env VAR=val cmd`. Bash also
+permits `VAR=val cmd` and `A=1 B=2 cmd` without `env`. First-word check on `FOO=bar`
+isn't on any list → fell through to allow. Extended the strip regex to handle both
+forms with and without the `env` keyword.
+
+#### [N-129] `bash -c '<denied>'` and `bash <<EOF<denied>EOF` heredocs bypassed routing
+Fixed: 2026-05-27
+Notes: `bash`/`sh`/`zsh`/`dash`/`ksh` as first word was "unknown" and fell through
+to allow. Added them all to the deny list so subshell wrappers can't hide denied
+commands inside their `-c` argument or heredoc body. `no-hook-bypass.md` now also
+explicitly forbids this pattern.
+
+#### [N-130] `env cmd` (without VAR=val tokens) bypassed routing
+Fixed: 2026-05-27
+Notes: `env grep foo` (just `env` + command, no assignments) → strip regex required
+`+` (one or more VAR=val) → didn't strip → first_word `env` was unknown → allowed.
+Changed the env-strip regex from `+` to `*` so `env` alone also peels off.
+
+#### [N-131] BASH_OK escape matched anywhere in the command string
+Fixed: 2026-05-27
+Notes: The marker check was `(^|[[:space:]])BASH_OK([[:space:]]|$)` — matched
+`BASH_OK` as a word anywhere, including `rg BASH_OK src/` (an accidental bypass if
+the user grepped for a symbol literally called BASH_OK). Tightened to
+`^[[:space:]]*BASH_OK[[:space:]]+` so only a leading marker triggers the escape.
+
+### Pass 22 — 2026-05-27
+
+#### [N-122] Race window between secret-file write and `chmod 600` in `dfm secrets github`
+Fixed: 2026-05-27
+Notes: Replaced post-write `chmod 600` with a `umask 077`-scoped block in
+`section_secrets()`. The two `printf > "$..."` writes now create the files at mode
+`0600` from the start (no intermediate `0644` state). Old umask captured and
+restored after the writes to avoid affecting later commands in the same shell.
+
+#### [N-115] Rebase reused six finding IDs (N-091..N-096) across branches
+Fixed: 2026-05-27
+Notes: After rebasing `chore/mise-tools` onto `main`, six finding IDs each described two
+different defects: main's Pass 18 owned N-091..N-099 (rules-loophole work) while this
+branch's Passes 15-17 independently used N-091..N-096 (ntfy/mise/secrets work). Renumbered
+this branch's IDs to N-116..N-121 and Pass headers to Pass 19/20/21 (next available after
+main's N-114 and Pass 18). Updated the cross-reference inside Pass 21's note
+("N-091 migrated" → "N-116 migrated") and synced the JSON sidecar.
+
+### Pass 21 — 2026-05-19
+
+#### [N-121] `scripts/install-ntfy.sh` dead code preserved after mise migration
 Fixed: 2026-05-19
-Notes: N-091 migrated `dfm install ntfy` to `mise install "github:binwiederhier/ntfy"` but
+Notes: N-116 migrated `dfm install ntfy` to `mise install "github:binwiederhier/ntfy"` but
 kept the shell script as "a fallback reference". The script was not called from anywhere;
 `scripts/install-ntfy.md` was empty. Both files removed with `git rm`.
 
-### Pass 16 — 2026-05-19
+### Pass 20 — 2026-05-19
 
-#### [N-095] `brew "pipx"` and `brew "python-setuptools"` effectively superseded by mise uv backend
+#### [N-120] `brew "pipx"` and `brew "python-setuptools"` effectively superseded by mise uv backend
 Fixed: 2026-05-19
 Notes: Verified zero references to `pipx` or `python-setuptools` in `local/bin/` and
 `scripts/` (single comment in `cleanup-old-version-managers.sh`, not executable usage).
@@ -51,9 +140,9 @@ Notes: Advisory accepted. No repo change is possible — oh-my-posh is not refer
 `config/mise/config.toml` and will not be reinstalled. Manual action on affected machines:
 `mise uninstall oh-my-posh`. Finding documented and closed.
 
-### Pass 15 — 2026-05-19
+### Pass 19 — 2026-05-19
 
-#### [N-091] ntfy installed via custom download script instead of mise github backend
+#### [N-116] ntfy installed via custom download script instead of mise github backend
 Category: maintainability
 Area: `scripts/install-ntfy.sh`, `config/mise/config.toml`
 Fixed: 2026-05-19
@@ -65,7 +154,7 @@ plumbing that mise's `github:` backend handles automatically. Added
 `mise install "github:binwiederhier/ntfy"` instead of running the shell script. The shell
 script is preserved as a fallback reference but is no longer invoked by dfm.
 
-#### [N-092] `dfm install mise` has no GITHUB_TOKEN gate before `mise install --yes`
+#### [N-117] `dfm install mise` has no GITHUB_TOKEN gate before `mise install --yes`
 Category: reliability
 Area: `local/bin/dfm` section_install mise case
 Fixed: 2026-05-19
@@ -77,7 +166,7 @@ the `mise)` case before calling `mise install --yes`. If unset, warns about rate
 offers to run `dfm secrets github` interactively, sourcing the resulting file so the token
 is available for the current process before continuing.
 
-#### [N-093] `brew "tmux"` duplicated in Brewfile — mise already owns tmux
+#### [N-118] `brew "tmux"` duplicated in Brewfile — mise already owns tmux
 Category: correctness
 Area: `config/homebrew/Brewfile` line 232–233
 Fixed: 2026-05-19
@@ -87,7 +176,7 @@ PATH, so brew's tmux binary shadows the mise-managed one, making the mise pin in
 Running `brew upgrade` and `mise upgrade tmux` independently causes version drift. Removed
 the `# Terminal multiplexer` comment and `brew "tmux"` entry from the Brewfile.
 
-#### [N-094] No `dfm secrets` command; bash/zsh lack a secrets.d mechanism
+#### [N-119] No `dfm secrets` command; bash/zsh lack a secrets.d mechanism
 Category: maintainability
 Area: `local/bin/dfm`, `config/exports`, `config/secrets.d/` (new)
 Fixed: 2026-05-19

@@ -43,17 +43,44 @@ Only these narrow cases:
     `fish_indent --write <file>`, `shfmt -w <file>`.
 3. **Package installations that must stream output interactively:**
     `yarn install`, `yarn add <pkg>`, `brew install <pkg>`.
-4. **A single one-line command the user names by tool (e.g. "run
-    `yarn build`") whose expected output is under twenty lines.** A
-    user instruction does not waive the routing rule for unbounded
-    output. If the named command can emit more than ~twenty lines
-    (`find /`, `rg` without `--max-count`, `git log` without `-n`),
-    route it through `ctx_batch_execute` even when the user asked
-    for it explicitly.
+4. **A single one-line command the user names by tool in their most
+    recent message** (e.g. they typed "run `yarn build`" in the
+    immediately preceding turn) **whose expected output is under
+    twenty lines.** A user instruction does not waive the routing
+    rule for unbounded output. If the named command can emit more
+    than ~twenty lines (`find /`, `rg` without `--max-count`,
+    `git log` without `-n`), route it through `ctx_batch_execute`
+    even when the user asked for it explicitly. Authorisation does
+    not carry over from earlier in the session or from another
+    conversation.
 
 If you pipe through `head`, `tail`, or `grep` to truncate output, route
 the command through `ctx_batch_execute` instead. The truncation is a
 tell that the raw output is bigger than you want in chat context.
+
+## Programmatic enforcement
+
+A `PreToolUse` hook (`.claude/hooks/pre-bash-route.sh`, registered in
+`.claude/settings.json` under matcher `Bash`) inspects every `Bash`
+invocation and denies the call with an educational reason when the
+command matches the routing rules above. The hook splits the command
+on pipeline separators (`|`, `&&`, `||`, `;`) and command
+substitutions (`$( … )`, backticks) and checks each segment, so
+`git status | grep modified` and `echo $(rg foo src/)` are both
+caught — first-word matchers alone would miss those.
+
+The hook denies (not asks) so that `permissionDecisionReason` reaches
+the model in-context, teaching it to route correctly on the next
+turn. `ask` would only prompt the user silently and Claude would
+learn nothing.
+
+To override the hook for a single one-off call (case #4 above),
+prepend `BASH_OK` to the command. The hook recognises this marker and
+passes the call through. Use sparingly — it is the documented escape
+hatch for the "user named it in this turn" case, not a general
+opt-out. Settings.json `permissions.allow` entries do **not** override
+the hook — the hook's `deny` takes precedence so user-allowlisted
+patterns from earlier sessions are still routed through context-mode.
 
 ## Forbidden patterns
 

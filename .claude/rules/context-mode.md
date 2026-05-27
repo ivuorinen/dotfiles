@@ -39,9 +39,41 @@ query the indexed content.
 
 ### Bash shell commands
 
-The authoritative Bash routing rule is in `.claude/rules/bash-routing.md`.
-`ctx_batch_execute` is the default for any command that produces output you intend to read.
-See `bash-routing.md` for the complete list of allowed Bash exceptions.
+The authoritative Bash routing rule is in `.claude/rules/bash-routing.md`,
+and it is enforced programmatically by the `.claude/hooks/pre-bash-route.sh`
+`PreToolUse` hook. `ctx_batch_execute` is the default for any command that
+produces output you intend to read.
+
+The following invocations are denied by the hook and must be routed through
+`ctx_batch_execute` (or `ctx_execute(language: "shell", …)` for a single
+command):
+
+- Searches — `rg`, `grep`, `fd`, `find`
+- Lint/format checkers — `shellcheck`, `shfmt --diff`, `fish_indent --check`,
+  `biome check`, `yamllint`, `actionlint`, `stylua --check`, `ruff check`,
+  `ruff format --check`, `pre-commit run`, `yarn lint`/`yarn test`/`yarn check`
+- File readers — `cat`, `head`, `tail`, `wc`, `ls`, `tree`, `less`, `more`,
+  `awk`, `sed`, `jq` (when emitting output to read)
+- Git readers — `git log`, `git diff`, `git show`, `git blame`, `git status`
+  (any flag)
+- Dotfiles manager — `dfm <subcommand>` for any subcommand
+- Pipeline/subshell variants of the above (`git status | grep …`,
+  `echo $(rg …)`, `false || cat file`) — the hook splits on `|`, `&&`,
+  `||`, `;`, `$( )`, and backticks before matching.
+
+These pass through the hook unchanged (state mutations, in-place formatters,
+package installs, short interactive ops):
+
+- `git add`/`commit`/`mv`/`rm`/`checkout`/`push`/`fetch`/`reset`/`stash`/
+  `tag`/`merge`/`remote`/`submodule`/etc. (mutation subcommands only)
+- `mkdir`, `chmod`, `chown`, `mv`, `rm`, `cp`, `touch`, `ln`
+- `fish_indent --write`, `shfmt -w`
+- `yarn install`/`add`/`remove`/`dlx`, `brew install`/`upgrade`,
+  `mise install`/`upgrade`
+- `cd`, `pwd`, `whoami`, `date`, `echo`, `printf`, `export`, `source`
+
+`bash-routing.md` carries the full rationale and the one-off `BASH_OK`
+escape hatch for the "user named it in this turn" case.
 
 ### Read for analysis
 
