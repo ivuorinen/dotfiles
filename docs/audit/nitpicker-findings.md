@@ -6,13 +6,21 @@ Last pass: 18 (2026-05-20)
 
 ## Summary
 
-- Total: 111 | Open: 0 | Fixed: 102 | Invalid: 9
+- Total: 112 | Open: 0 | Fixed: 103 | Invalid: 9
 
 ## Open Findings
 
 _(none)_
 
 ## Fixed
+
+### Pass 17 — 2026-05-19
+
+#### [N-096] `scripts/install-ntfy.sh` dead code preserved after mise migration
+Fixed: 2026-05-19
+Notes: N-091 migrated `dfm install ntfy` to `mise install "github:binwiederhier/ntfy"` but
+kept the shell script as "a fallback reference". The script was not called from anywhere;
+`scripts/install-ntfy.md` was empty. Both files removed with `git rm`.
 
 ### Pass 16 — 2026-05-19
 
