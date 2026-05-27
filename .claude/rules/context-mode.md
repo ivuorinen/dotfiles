@@ -82,6 +82,11 @@ in context). Reading to **analyze, explore, or summarize** → use
 `ctx_execute_file(path, language, code)` instead. Only your printed
 summary enters context.
 
+Full Read-vs-sandbox routing rules live in
+`.claude/rules/read-routing.md`, including the three narrow cases
+where Read remains correct, the forbidden patterns, and the cost
+model. That file is to Read what `bash-routing.md` is to Bash.
+
 ### Grep with large results
 
 Grep results can flood context. Use
