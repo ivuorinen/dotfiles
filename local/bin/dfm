@@ -393,7 +393,6 @@ section_brew()
       brew bundle dump \
         --force \
         --file="$BREWFILE" \
-        --cleanup \
         --tap \
         --formula \
         --cask \
