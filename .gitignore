@@ -32,6 +32,9 @@ config/fish/fish_variables.*
 config/fish/secrets.d/*
 !config/fish/secrets.d/*.example
 !config/fish/secrets.d/README.md
+config/secrets.d/*
+!config/secrets.d/*.example
+!config/secrets.d/README.md
 config/gh/hosts.yml
 config/git/credentials
 config/git/local.d/*

@@ -1,46 +1,9 @@
 tap "1password/tap"
-tap "anchore/grype"
-tap "caarlos0/tap"
 tap "cormacrelf/tap"
-tap "dagger/tap"
-tap "ddosify/tap"
-tap "dm3ch/tap"
 tap "doron-cohen/tap"
-tap "gesquive/tap"
-tap "github/gh"
-tap "golangci/tap"
-tap "homebrew/autoupdate"
-tap "ivuorinen/tap"
-tap "jesseduffield/lazygit"
-tap "k8sgpt-ai/k8sgpt"
-tap "keith/formulae"
 tap "koekeishiya/formulae"
-tap "mongodb/brew"
-tap "nikitabobko/tap"
-tap "pantheon-systems/external"
-tap "reviewdog/tap"
 tap "shivammathur/extensions"
 tap "shivammathur/php"
-tap "snyk/tap"
-tap "tabbyml/tabby"
-tap "teamookla/speedtest"
-tap "xwmx/taps"
-# Generic-purpose lossless compression algorithm by Google
-brew "brotli"
-# Library and utilities for processing GIFs
-brew "giflib"
-# Performance-portable, length-agnostic SIMD with runtime dispatch
-brew "highway"
-# Library of 2D and 3D vector, matrix, and math operations
-brew "imath"
-# JPEG image codec that aids compression and decompression
-brew "jpeg-turbo"
-# Library for manipulating PNG images
-brew "libpng"
-# Zstandard is a real-time compression algorithm
-brew "zstd"
-# New file format for still image compression
-brew "jpeg-xl"
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
 # Apache Portable Runtime library
@@ -75,8 +38,12 @@ brew "ncurses"
 brew "bash"
 # Parser generator
 brew "bison"
+# Generic-purpose lossless compression algorithm by Google
+brew "brotli"
 # Freely available high-quality data compressor
 brew "bzip2"
+# Library for manipulating PNG images
+brew "libpng"
 # Software library to render fonts
 brew "freetype"
 # XML-based font configuration API for X Windows
@@ -85,14 +52,32 @@ brew "fontconfig"
 brew "glib"
 # Mozilla CA bundle for Python
 brew "certifi"
+# JPEG image codec that aids compression and decompression
+brew "jpeg-turbo"
+# Zstandard is a real-time compression algorithm
+brew "zstd"
+# Library and utilities for processing GIFs
+brew "giflib"
+# OpenType text shaping engine
+brew "harfbuzz"
+# Performance-portable, length-agnostic SIMD with runtime dispatch
+brew "highway"
+# Library of 2D and 3D vector, matrix, and math operations
+brew "imath"
+# New file format for still image compression
+brew "jpeg-xl"
+# Framework for layout and rendering of i18n text
+brew "pango"
+# Library to render SVG files using Cairo
+brew "librsvg"
+# Versatile and fast Unicode/ASCII/ANSI graphics renderer
+brew "chafa"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
-# OpenType text shaping engine
-brew "harfbuzz"
 # OWASP dependency-check
 brew "dependency-check"
 # Lightweight DNS forwarder and DHCP server
@@ -117,18 +102,20 @@ brew "freetds"
 brew "fswatch"
 # Graphics library to dynamically manipulate images
 brew "gd"
-# Conversion library
-brew "libiconv"
+# Secure hashing function
+brew "libb2"
+# Interpreter for PostScript and PDF
+brew "ghostscript"
 # Distributed revision control system
 brew "git"
 # Small git utilities
 brew "git-extras"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
-# Validating, recursive, caching DNS resolver
-brew "unbound"
 # GNU Transport Layer Security (TLS) Library
 brew "gnutls"
+# Validating, recursive, caching DNS resolver
+brew "unbound"
 # GNU Privacy Guard (OpenPGP)
 brew "gnupg"
 # Library access to GnuPG
@@ -137,18 +124,14 @@ brew "gpgme"
 brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
-# Framework for layout and rendering of i18n text
-brew "pango"
-# Library to render SVG files using Cairo
-brew "librsvg"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
 # Graph visualization software from AT&T and Bell Labs
 brew "graphviz"
 # GNU grep, egrep and fgrep
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
-# Secure hashing function
-brew "libb2"
 # Improved top (interactive process viewer)
 brew "htop"
 # Portable abstraction of the hierarchical topology of modern architectures
@@ -187,22 +170,10 @@ brew "libzip"
 brew "luarocks"
 # LZMA-based compression program similar to gzip or bzip2
 brew "lzip"
-# Swiss Army Knife for macOS
-brew "m-cli"
-# Cross platform, open source .NET development framework
-brew "mono"
+# Deep clean and optimize your Mac
+brew "mole"
 # Collection of tools that nobody wrote when UNIX was young
 brew "moreutils"
-# NCurses Disk Usage
-brew "ncdu"
-# HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
-brew "nginx"
-# Port scanning utility for large networks
-brew "nmap"
-# Libraries for security-enabled client and server applications
-brew "nss"
-# General-purpose speech recognition model
-brew "openai-whisper"
 # Open source suite of directory software
 brew "openldap"
 # ISO-C API and CLI for generating UUIDs
@@ -210,27 +181,13 @@ brew "ossp-uuid"
 # General-purpose scripting language
 brew "php", link: false
 # General-purpose scripting language
-brew "php@8.1"
-# General-purpose scripting language
-brew "php@8.2", link: true
-# General-purpose scripting language
 brew "php@8.3"
-# Execute binaries from Python packages in isolated environments
-brew "pipx"
-# Easily download, build, install, upgrade, and uninstall Python packages
-brew "python-setuptools"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.13"
 # Generate C-based recognizers from regular expressions
 brew "re2c"
 # Send macOS User Notifications from the command-line
 brew "terminal-notifier"
 # Tool which checks for the support of TLS/SSL ciphers and flaws
 brew "testssl"
-# Terminal multiplexer
-brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Executes a program periodically, showing output fullscreen
@@ -243,14 +200,12 @@ brew "zlib"
 brew "cormacrelf/tap/dark-notify"
 # Cleans up your $HOME from those pesky dotfiles
 brew "doron-cohen/tap/antidot"
-# lets you quickly switch between multiple git user profiles
-brew "gesquive/tap/git-user"
 # Simple hotkey-daemon for macOS.
 brew "koekeishiya/formulae/skhd"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.1"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.2"
+# A tiling window manager for macOS based on binary space partitioning.
+brew "koekeishiya/formulae/yabai"
+# Igbinary PHP extension
+brew "shivammathur/extensions/igbinary@8.3"
 # Imagick PHP extension
 brew "shivammathur/extensions/imagick@8.3"
 # Imagick PHP extension
@@ -260,19 +215,11 @@ brew "shivammathur/extensions/mcrypt@8.3"
 # Msgpack PHP extension
 brew "shivammathur/extensions/msgpack@8.3"
 # PCOV PHP extension
-brew "shivammathur/extensions/pcov@8.1"
-# PCOV PHP extension
-brew "shivammathur/extensions/pcov@8.2"
-# PCOV PHP extension
 brew "shivammathur/extensions/pcov@8.3"
 # Redis PHP extension
 brew "shivammathur/extensions/phpredis@8.3"
 # Uuid PHP extension
 brew "shivammathur/extensions/uuid@8.3"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.1"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.2"
 # Xdebug PHP extension
 brew "shivammathur/extensions/xdebug@8.4"
 # Xdebug PHP extension
@@ -282,13 +229,11 @@ brew "shivammathur/extensions/yaml@8.3"
 # General-purpose scripting language
 brew "shivammathur/php/php-debug", link: false
 # General-purpose scripting language
-brew "shivammathur/php/php@8.1-debug"
-# General-purpose scripting language
-brew "shivammathur/php/php@8.2-debug"
-# General-purpose scripting language
 brew "shivammathur/php/php@8.4"
 # Command-line interface for 1Password
 cask "1password-cli"
+# Anthropic's official Claude AI desktop app
+cask "claude"
 # Semantic code analysis engine
 cask "codeql"
 # Universal database tool and SQL client

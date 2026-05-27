@@ -623,3 +623,12 @@ if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/export
 if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)"; fi
 # shellcheck source=../hosts/lakka/config/exports-lakka-secret
 if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"; fi
+
+# Source secret environment variables from secrets.d directory
+if [ -d "$DOTFILES/config/secrets.d" ]; then
+  for _secret_file in "$DOTFILES/config/secrets.d"/*.sh; do
+    # shellcheck source=/dev/null
+    [ -f "$_secret_file" ] && source "$_secret_file"
+  done
+  unset _secret_file
+fi
