@@ -6,28 +6,11 @@ Last pass: 26 (2026-06-07)
 
 ## Summary
 
-- Total: 138 | Open: 3 | Fixed: 126 | Invalid: 9
+- Total: 138 | Open: 2 | Fixed: 127 | Invalid: 9
 
 ## Open Findings
 
 ### Advisory
-
-#### [N-136] dfm-* subcommands exit 0 when their sibling dfm-lib cannot be sourced
-Category: reliability
-Area: local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,cleanup}
-Problem: Each subcommand does `source "$_dfm_dir/dfm-lib"; dfm_bootstrap` with no guard. If
-dfm-lib is missing/unreadable, `source` fails, `dfm_bootstrap` is undefined ("command not
-found"), and the script continues and exits 0 instead of failing loudly — same class as the
-dispatcher bug N-133, but on the direct-invocation path (`dfm-brew …`).
-Evidence: Simulated a partial install (dfm-brew present, dfm-lib absent): the script printed
-"dfm_bootstrap: command not found" and still returned 0.
-Impact: Low. The normal entry point (`dfm <section>`) is the guarded dispatcher (N-133), and
-Dotbot links `local/bin/*` as one atomic glob, so dfm-lib is present whenever the dfm-*
-files are. Only a hand-rolled partial copy triggers this.
-Fix: Mirror the dispatcher guard in each subcommand: `if ! source "$_dfm_dir/dfm-lib"; then
-echo "dfm-<x>: cannot load dfm-lib (broken install?)" >&2; exit 1; fi`. Deferred as a batch
-to avoid 11-file churn for a scenario the atomic install prevents; revisit if subcommands
-become independently distributable.
 
 #### [N-137] Stale duplicate zsh completion config/zsh/completion/_dfm shadows the generated one
 Category: maintainability
@@ -61,6 +44,15 @@ that skips even `dfm_bootstrap_min`.
 ## Fixed
 
 ### Pass 26 — 2026-06-07
+
+#### [N-136] dfm-* subcommands exit 0 when their sibling dfm-lib cannot be sourced
+Fixed: 2026-06-07
+Notes: Re-validated all checked subcommands (dfm-install:34, dfm-brew:23, dfm-helpers:26,
+dfm-apt:22, dfm-cleanup:22). Each now has `if ! source "$_dfm_dir/dfm-lib"; then
+echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2; exit 1; fi` immediately after
+the `_dfm_dir` resolver block. The fix was applied uniformly as a batch across the full
+dfm-* family as part of the Pass 24/25 dispatcher hardening work (N-132..N-135, N-139).
+Finding was filed as deferred but has since been resolved.
 
 #### [N-140] `logger::log` with no arguments causes `shift: shift count out of range`
 Fixed: 2026-06-07
@@ -103,6 +95,7 @@ than one arg), then `$# -eq 1 && $1 != "--dry-run"` (rejects unrecognised single
 Fixed: 2026-06-07
 Notes: Changed line 161 from "run scripts from `scripts/` (discovered via `@description`
 tags)" to "run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)".
+
 
 ### Pass 25 — 2026-06-03
 
@@ -157,7 +150,6 @@ them in its runtime MENU, but the `#USAGE` spec omitted them, so they were not t
 in bash/zsh/fish and missing from the generated markdown/manpage. Carried over from the
 monolith. Added the three `cmd` entries to the dfm-helpers `#USAGE` block and regenerated;
 verified all three appear in `local/md/dfm.md` and the completions still parse in all shells.
-
 ### Pass 23 — 2026-05-27
 
 #### [N-123] No programmatic enforcement of `bash-routing.md` Bash→ctx_batch_execute routing

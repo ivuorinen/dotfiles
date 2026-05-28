@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # shellcheck source=shared.sh
 source "${DOTFILES}/config/shared.sh"
-DEST="$HOME/.dotfiles/docs/nvim-keybindings.md"
+DEST="${DOTFILES}/docs/nvim-keybindings.md"
 
 # Generate Neovim keybindings documentation
 main()
@@ -141,9 +141,7 @@ f:close()
 vim.cmd("q")
 LUAEOF
 
-  KEYMAPS_DEST="$DEST" nvim --headless -c "luafile $tmpfile" 2> /dev/null
-
-  rm -f "$tmpfile"
+  KEYMAPS_DEST="$DEST" nvim --headless -c "luafile $tmpfile"
   if command -v markdown-table-formatter > /dev/null; then
     markdown-table-formatter "$DEST"
   fi

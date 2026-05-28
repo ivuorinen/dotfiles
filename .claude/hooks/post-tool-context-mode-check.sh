@@ -13,16 +13,18 @@ set -uo pipefail
 
 input=$(cat)
 
-# Never block the upgrade and doctor tools themselves — they ARE
-# the remediation. The upgrade banner naturally appears in their
-# output, so the signature match would otherwise create a deadlock
-# (cannot upgrade because the upgrade response says you need to
-# upgrade).
+# Only inspect responses from context-mode tools. Any other tool (e.g.
+# ctx_execute_file returning a file whose content mentions these patterns)
+# would false-positive. The upgrade/doctor/stats/purge tools are also
+# excluded — they ARE the remediation and their output naturally contains
+# the banner that would otherwise deadlock the check.
 tool=$(printf '%s' "$input" | jq -r '.tool_name // empty' 2> /dev/null)
 case "$tool" in
   *ctx_upgrade* | *ctx_doctor* | *ctx_stats* | *ctx_purge*)
     exit 0
     ;;
+  *context-mode* | *ctx_*) ;;
+  *) exit 0 ;;
 esac
 
 # Stringify the tool response so we can grep it regardless of

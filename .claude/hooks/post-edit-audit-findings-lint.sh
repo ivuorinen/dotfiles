@@ -144,7 +144,10 @@ last_pass_num="${last_pass_num%% (*}"
 last_pass_date="${last_pass_line##*(}"
 last_pass_date="${last_pass_date%\)}"
 
-summary_line=$(grep '^- Total: ' "$fp")
+summary_line=$(grep '^- Total: ' "$fp" || {
+  printf 'BLOCKED: summary line "- Total: N | ..." not found in %s\n' "$fp" >&2
+  exit 2
+})
 total=$(printf '%s\n' "$summary_line" | grep -oE 'Total: [0-9]+' | grep -oE '[0-9]+')
 open=$(printf '%s\n' "$summary_line" | grep -oE 'Open: [0-9]+' | grep -oE '[0-9]+')
 fixed=$(printf '%s\n' "$summary_line" | grep -oE 'Fixed: [0-9]+' | grep -oE '[0-9]+')
