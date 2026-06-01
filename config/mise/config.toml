@@ -137,7 +137,7 @@ trufflehog = "3.95.3"
 "github:projectdiscovery/katana" = "1.6.1"
 "github:Legit-Labs/legitify" = "1.0.11"
 "github:o2sh/onefetch" = "2.27.1"
-"github:wakatime/wakatime-cli" = "2.14.5"
+"github:wakatime/wakatime-cli" = "2.15.0"
 
 # Terraform (replaces tfenv)
 terraform = "1.15.5"
