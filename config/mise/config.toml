@@ -102,7 +102,7 @@ biome = "2.4.12"                            # pinned to match biome.json $schema
 yamllint = "1.38.0"
 # ansible = "13.4.0"
 # "pipx:ansible-lint" = "latest"
-ruff = "0.15.14"
+ruff = "0.15.15"
 # "pipx:openapi-python-client" = "latest"
 # "pipx:python-lsp-server[websockets]" = "latest"
 
