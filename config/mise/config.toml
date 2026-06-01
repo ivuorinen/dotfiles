@@ -65,7 +65,7 @@ difftastic = "0.69.0"
 "github:binwiederhier/ntfy" = "2.23.0"
 "github:dimo414/bkt" = "0.8.2"
 "github:jgm/pandoc" = "3.9.0.2"
-"github:jrmoulton/tmux-sessionizer" = "0.5.0"
+"github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # Go-compiled tools (no registry binary available)
 "go:github.com/joshmedeski/sesh/v2" = "2.26.2"
