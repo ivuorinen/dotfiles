@@ -35,7 +35,7 @@ jobs:
       - name: Create changelog text
         if: steps.daily-version.outputs.created
         id: changelog
-        uses: loopwerk/tag-changelog@8dd150d55fbf1fe93e0ea00a29a6153aaeb81912 # v1.5.0
+        uses: loopwerk/tag-changelog@5935b306b0f84d4ebd40175b182a0b7175509ebe # v1.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config_file: .github/tag-changelog-config.js
