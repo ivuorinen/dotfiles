@@ -85,6 +85,7 @@
 #USAGE   cmd "params" help="List all parameters"
 #USAGE }
 #USAGE cmd "secrets" help="Create shell secrets files" {
+#USAGE   cmd "create" help="Create secrets for an env var: create <ENV_NAME> [filename]"
 #USAGE   cmd "github" help="Create GITHUB_TOKEN secrets for all shells"
 #USAGE }
 #USAGE cmd "cleanup" help="Remove old installs, caches, and unused packages" {
@@ -874,46 +875,116 @@ section_tests()
   esac
 }
 
+# Derive a secrets filename from an env var name.
+# Lowercases the name, then strips a trailing credential-type suffix.
+# GITHUB_TOKEN -> github, SONAR_TOKEN -> sonar, FOO_API_KEY -> foo.
+# Callers can override the result by passing an explicit filename to
+# secrets_create (e.g. SONAR_TOKEN is stored as sonarcloud).
+secrets_filename_from_env()
+{
+  local name
+  name=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  case "$name" in
+    *_api_key) name=${name%_api_key} ;;
+    *_token) name=${name%_token} ;;
+    *_secret) name=${name%_secret} ;;
+    *_password) name=${name%_password} ;;
+    *_key) name=${name%_key} ;;
+    *_pat) name=${name%_pat} ;;
+  esac
+  printf '%s' "$name"
+}
+
+# Create fish + bash/zsh secrets files for an environment variable.
+# Usage: secrets_create <ENV_NAME> [filename]
+# The value is read from a hidden prompt so it never reaches the
+# terminal, shell history, or the process table. Files are written with
+# a 077 umask so only the owner can read them.
+secrets_create()
+{
+  local env_name="$1"
+  local filename="$2"
+
+  if [[ -z "$env_name" ]]; then
+    msgr err "Usage: $SCRIPT secrets create <ENV_NAME> [filename]"
+    return 1
+  fi
+
+  # Reject anything that is not a valid POSIX shell identifier; otherwise
+  # the generated set/export lines would be syntactically broken.
+  if [[ ! "$env_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    msgr err "Invalid environment variable name: $env_name"
+    msgr nested "Expected a shell identifier, e.g. GITHUB_TOKEN"
+    return 1
+  fi
+
+  [[ -z "$filename" ]] && filename=$(secrets_filename_from_env "$env_name")
+
+  # Guard against empty or path-traversing filenames so the secret can
+  # only ever land inside the two secrets.d directories.
+  if [[ ! "$filename" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    msgr err "Invalid secrets filename: $filename"
+    msgr nested "Allowed characters: letters, digits, '.', '_', '-'"
+    return 1
+  fi
+
+  local fish_secret="$DOTFILES/config/fish/secrets.d/$filename.fish"
+  local sh_secret="$DOTFILES/config/secrets.d/$filename.sh"
+
+  if [[ -f "$fish_secret" ]] || [[ -f "$sh_secret" ]]; then
+    msgr warn "Secrets files already exist — they will be overwritten"
+  fi
+
+  local secret
+  read -rsp "Enter $env_name (input hidden): " secret
+  echo
+
+  if [[ -z "$secret" ]]; then
+    msgr err "No value provided"
+    return 1
+  fi
+
+  mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
+
+  # Store the value single-quoted so secrets containing $, ", \, or
+  # backticks are written verbatim instead of being expanded or
+  # breaking the file. Each shell has different single-quote rules:
+  #   POSIX sh — fully literal; only ' must be escaped as '\''.
+  #   fish     — literal except \ and ', each escaped with a backslash.
+  local sh_value fish_value
+  sh_value=${secret//\'/\'\\\'\'}
+  fish_value=${secret//\\/\\\\}
+  fish_value=${fish_value//\'/\\\'}
+
+  local old_umask
+  old_umask=$(umask)
+  umask 077
+  printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret"
+  printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"
+  umask "$old_umask"
+
+  msgr yay "$env_name secrets created"
+  msgr nested "fish:     $fish_secret"
+  msgr nested "bash/zsh: $sh_secret"
+}
+
 # Handle secrets creation commands
 section_secrets()
 {
   USAGE_PREFIX="$SCRIPT secrets <command>"
 
   MENU=(
+    "create:Create secrets for an env var: create <ENV_NAME> [filename]"
     "github:Create GITHUB_TOKEN secrets for all shells"
   )
 
   case "$1" in
-    github)
-      local fish_secret="$DOTFILES/config/fish/secrets.d/github.fish"
-      local sh_secret="$DOTFILES/config/secrets.d/github.sh"
-
-      if [[ -f "$fish_secret" ]] || [[ -f "$sh_secret" ]]; then
-        msgr warn "Secrets files already exist — they will be overwritten"
-      fi
-
-      local token
-      read -rsp "Enter GITHUB_TOKEN (input hidden): " token
-      echo
-
-      if [[ -z "$token" ]]; then
-        msgr err "No token provided"
-        return 1
-      fi
-
-      mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
-
-      local old_umask
-      old_umask=$(umask)
-      umask 077
-      printf '# GitHub Personal Access Token\nset -x GITHUB_TOKEN "%s"\n' "$token" > "$fish_secret"
-      printf '# GitHub Personal Access Token\nexport GITHUB_TOKEN="%s"\n' "$token" > "$sh_secret"
-      umask "$old_umask"
-
-      msgr yay "GITHUB_TOKEN secrets created"
-      msgr nested "fish:     $fish_secret"
-      msgr nested "bash/zsh: $sh_secret"
+    create)
+      shift
+      secrets_create "$@"
       ;;
+
+    github) secrets_create GITHUB_TOKEN github ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
