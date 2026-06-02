@@ -3,6 +3,7 @@
 setup()
 {
   STUB_DIR="$(mktemp -d)"
+  REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
 
   # mysql stub: returns two table names after the header
   cat > "$STUB_DIR/mysql" << 'STUB'
@@ -22,7 +23,12 @@ STUB
   chmod +x "$STUB_DIR/mysqldump"
 
   export PATH="$STUB_DIR:$PATH"
-  export STUB_DIR
+  export STUB_DIR REPO_ROOT
+
+  # The script writes its <db>_<name>_<timestamp>.sql dump to the current
+  # directory. Run from inside STUB_DIR so that artifact lands there and is
+  # removed by teardown instead of polluting the repo root.
+  cd "$STUB_DIR" || return 1
 }
 
 teardown()
@@ -31,7 +37,7 @@ teardown()
 }
 
 @test "x-backup-mysql-with-prefix: passes each table as a separate argument" {
-  run bash local/bin/x-backup-mysql-with-prefix wp_ mysite wordpress
+  run bash "$REPO_ROOT/local/bin/x-backup-mysql-with-prefix" wp_ mysite wordpress
   [ "$status" -eq 0 ]
   local argc
   argc=$(cat "$STUB_DIR/argc.txt")
@@ -40,6 +46,6 @@ teardown()
 }
 
 @test "x-backup-mysql-with-prefix: exits 1 without required arguments" {
-  run bash local/bin/x-backup-mysql-with-prefix
+  run bash "$REPO_ROOT/local/bin/x-backup-mysql-with-prefix"
   [ "$status" -eq 1 ]
 }

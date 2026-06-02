@@ -5,6 +5,7 @@
 *.socket
 *.swp
 *.old
+*.sql
 *cache
 .env
 .idea
