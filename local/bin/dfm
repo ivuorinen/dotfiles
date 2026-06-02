@@ -905,6 +905,15 @@ secrets_filename_from_env()
   printf '%s' "$name"
 }
 
+# True when NAME is a safe secrets filename. It must start with an
+# alphanumeric and contain only letters, digits, '.', '_' or '-'. This
+# rejects empty names, '.'/'..', leading-dot names (which would create a
+# hidden file the listing glob skips) and anything with a path separator.
+secrets_valid_name()
+{
+  [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]
+}
+
 # Create fish + bash/zsh secrets files for an environment variable.
 # Usage: secrets_create <ENV_NAME> [filename]
 # The value is read from a hidden prompt so it never reaches the
@@ -930,11 +939,17 @@ secrets_create()
 
   [[ -z "$filename" ]] && filename=$(secrets_filename_from_env "$env_name")
 
-  # Guard against empty or path-traversing filenames so the secret can
-  # only ever land inside the two secrets.d directories.
-  if [[ ! "$filename" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  # Stripping a suffix can leave nothing (e.g. env name "_TOKEN").
+  if [[ -z "$filename" ]]; then
+    msgr err "Could not derive a filename from '$env_name' — pass one explicitly"
+    return 1
+  fi
+
+  # Guard the filename so the secret can only land inside the two
+  # secrets.d directories, never as a traversal path or hidden file.
+  if ! secrets_valid_name "$filename"; then
     msgr err "Invalid secrets filename: $filename"
-    msgr nested "Allowed characters: letters, digits, '.', '_', '-'"
+    msgr nested "Use letters, digits, '.', '_', '-'; must start alphanumeric"
     return 1
   fi
 
@@ -954,8 +969,6 @@ secrets_create()
     return 1
   fi
 
-  mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
-
   # Store the value single-quoted so secrets containing $, ", \, or
   # backticks are written verbatim instead of being expanded or
   # breaking the file. Each shell has different single-quote rules:
@@ -966,9 +979,12 @@ secrets_create()
   fish_value=${secret//\\/\\\\}
   fish_value=${fish_value//\'/\\\'}
 
+  # Create the directories and files under a 077 umask so both the
+  # secrets.d directories (0700) and the files (0600) are owner-only.
   local old_umask
   old_umask=$(umask)
   umask 077
+  mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
   printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret"
   printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"
   umask "$old_umask"
@@ -1060,7 +1076,7 @@ secrets_show()
     return 1
   fi
 
-  if [[ ! "$name" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  if ! secrets_valid_name "$name"; then
     msgr err "Invalid secrets name: $name"
     return 1
   fi
@@ -1094,7 +1110,7 @@ secrets_remove()
     return 1
   fi
 
-  if [[ ! "$name" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  if ! secrets_valid_name "$name"; then
     msgr err "Invalid secrets name: $name"
     return 1
   fi

@@ -349,3 +349,54 @@ fake_dotfiles()
   [ "$status" -eq 1 ]
   [[ "$output" == *"Invalid secrets name"* ]]
 }
+
+@test "dfm secrets create derives the filename by stripping the suffix" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create SONAR_TOKEN
+  [ -f "$tmp/config/fish/secrets.d/sonar.fish" ]
+  [ -f "$tmp/config/secrets.d/sonar.sh" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets create rejects a dot-only filename" {
+  run bash -c "printf 'tok\n' | bash local/bin/dfm secrets create FOO ."
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid secrets filename"* ]]
+}
+
+@test "dfm secrets create errors when the env name derives to nothing" {
+  run bash -c "printf 'tok\n' | bash local/bin/dfm secrets create _TOKEN"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Could not derive a filename"* ]]
+}
+
+@test "dfm secrets show rejects a path-traversing name" {
+  run bash local/bin/dfm secrets show ../evil
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid secrets name"* ]]
+}
+
+@test "dfm secrets create writes secrets.d directories owner-only" {
+  local tmp perms
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  perms="$(stat -f '%Lp' "$tmp/config/secrets.d" 2> /dev/null \
+    || stat -c '%a' "$tmp/config/secrets.d")"
+  [ "$perms" = "700" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets remove deletes a secret present in only one shell" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  rm -f "$tmp/config/fish/secrets.d/github.fish"
+  run bash -c "printf 'y\n' | DOTFILES='$tmp' bash local/bin/dfm secrets remove github"
+  [ "$status" -eq 0 ]
+  [ ! -f "$tmp/config/secrets.d/github.sh" ]
+  rm -rf "$tmp"
+}

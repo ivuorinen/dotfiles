@@ -41,7 +41,9 @@ printf '%s\n' "/dev/disk1  500000   1000000  1200000"
 STUB
   chmod +x "$STUB_DIR/quota"
 
-  run local/bin/x-quota-usage
+  # Force LC_ALL=C so the awk "%.1f" percentage uses a '.' decimal
+  # separator regardless of the host locale (e.g. fi_FI prints "50,0").
+  run env LC_ALL=C local/bin/x-quota-usage
   [ "$status" -eq 0 ]
   [[ "$output" == *"Mount"* ]]
   [[ "$output" == *"50.0%"* ]]
