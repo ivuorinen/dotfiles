@@ -47,6 +47,8 @@ STUB
   [ "$status" -eq 0 ]
   [[ "$output" == *"Mount"* ]]
   [[ "$output" == *"50.0%"* ]]
+  # The 25-char bar of '#'/'_' inside brackets must actually render.
+  [[ "$output" =~ \[[#_]{25}\] ]]
 }
 
 @test "x-quota-usage: exits 1 when quota output is empty" {

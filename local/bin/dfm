@@ -960,8 +960,10 @@ secrets_create()
     msgr warn "Secrets files already exist — they will be overwritten"
   fi
 
+  # IFS= preserves leading/trailing whitespace and -r preserves
+  # backslashes, so the secret is captured exactly as typed.
   local secret
-  read -rsp "Enter $env_name (input hidden): " secret
+  IFS= read -rsp "Enter $env_name (input hidden): " secret
   echo
 
   if [[ -z "$secret" ]]; then
@@ -979,14 +981,28 @@ secrets_create()
   fish_value=${secret//\\/\\\\}
   fish_value=${fish_value//\'/\\\'}
 
-  # Create the directories and files under a 077 umask so both the
-  # secrets.d directories (0700) and the files (0600) are owner-only.
+  # Create the directories and files under a 077 umask so newly created
+  # paths are owner-only from the start. Every write is checked so a
+  # failure (e.g. full disk) is a hard error, never a silent success.
   local old_umask
   old_umask=$(umask)
   umask 077
-  mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")"
-  printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret"
-  printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"
+  if ! mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
+    || ! printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret" \
+    || ! printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"; then
+    umask "$old_umask"
+    msgr err "Failed to write secret files"
+    return 1
+  fi
+
+  # umask only governs newly created paths; re-tighten explicitly so a
+  # pre-existing dir/file with broader perms (e.g. 0755/0644) is fixed.
+  if ! chmod 700 "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
+    || ! chmod 600 "$fish_secret" "$sh_secret"; then
+    umask "$old_umask"
+    msgr err "Failed to set secret file permissions"
+    return 1
+  fi
   umask "$old_umask"
 
   msgr yay "$env_name secrets created"

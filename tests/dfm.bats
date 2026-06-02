@@ -218,6 +218,20 @@ fake_dotfiles()
   rm -rf "$tmp"
 }
 
+@test "dfm secrets create preserves leading and trailing whitespace" {
+  local tmp value
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  # IFS= read must not trim surrounding spaces from the secret value.
+  value="  spaced value  "
+  printf '%s\n' "$value" > "$tmp/in"
+  run bash -c 'DOTFILES="$1" bash local/bin/dfm secrets create MY_SECRET < "$2"' _ "$tmp" "$tmp/in"
+  [ "$status" -eq 0 ]
+  run bash -c '. "$1"; printf "%s" "$MY_SECRET"' _ "$tmp/config/secrets.d/my.sh"
+  [ "$output" = "$value" ]
+  rm -rf "$tmp"
+}
+
 @test "dfm secrets create writes files readable only by owner" {
   local tmp perms
   tmp="$(mktemp -d)"
@@ -386,6 +400,26 @@ fake_dotfiles()
   perms="$(stat -f '%Lp' "$tmp/config/secrets.d" 2> /dev/null \
     || stat -c '%a' "$tmp/config/secrets.d")"
   [ "$perms" = "700" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets create re-tightens pre-existing broad permissions" {
+  local tmp fperms dperms
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  # Simulate a secret created the old way, world-readable.
+  mkdir -p "$tmp/config/fish/secrets.d" "$tmp/config/secrets.d"
+  printf 'old\n' > "$tmp/config/secrets.d/github.sh"
+  printf 'old\n' > "$tmp/config/fish/secrets.d/github.fish"
+  chmod 644 "$tmp/config/secrets.d/github.sh" "$tmp/config/fish/secrets.d/github.fish"
+  chmod 755 "$tmp/config/secrets.d"
+  printf 'newtok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  fperms="$(stat -f '%Lp' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
+    || stat -c '%a' "$tmp/config/secrets.d/github.sh")"
+  dperms="$(stat -f '%Lp' "$tmp/config/secrets.d" 2> /dev/null \
+    || stat -c '%a' "$tmp/config/secrets.d")"
+  [ "$fperms" = "600" ]
+  [ "$dperms" = "700" ]
   rm -rf "$tmp"
 }
 
