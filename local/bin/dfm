@@ -84,8 +84,18 @@
 #USAGE   cmd "msgr" help="Show all msgr message types"
 #USAGE   cmd "params" help="List all parameters"
 #USAGE }
-#USAGE cmd "secrets" help="Create shell secrets files" {
-#USAGE   cmd "create" help="Create secrets for an env var: create <ENV_NAME> [filename]"
+#USAGE cmd "secrets" help="Manage shell secrets files" {
+#USAGE   cmd "create" help="Create secrets for an env var" {
+#USAGE     arg "<env_name>" help="Environment variable name, e.g. GITHUB_TOKEN"
+#USAGE     arg "[filename]" help="Secrets filename (derived from env name if omitted)"
+#USAGE   }
+#USAGE   cmd "list" help="List configured secrets"
+#USAGE   cmd "show" help="Show a secret's contents" {
+#USAGE     arg "<name>" help="Secret name (filename without extension)"
+#USAGE   }
+#USAGE   cmd "remove" help="Remove a secret" {
+#USAGE     arg "<name>" help="Secret name (filename without extension)"
+#USAGE   }
 #USAGE   cmd "github" help="Create GITHUB_TOKEN secrets for all shells"
 #USAGE }
 #USAGE cmd "cleanup" help="Remove old installs, caches, and unused packages" {
@@ -968,13 +978,169 @@ secrets_create()
   msgr nested "bash/zsh: $sh_secret"
 }
 
-# Handle secrets creation commands
+# Print the environment variable name(s) defined across the given secret
+# files, comma-separated and de-duplicated, WITHOUT revealing any values.
+secrets_env_names()
+{
+  local file line name out=""
+  for file in "$@"; do
+    [[ -f "$file" ]] || continue
+    while IFS= read -r line; do
+      name=""
+      case "$line" in
+        "set -x "*)
+          name=${line#set -x }
+          name=${name%% *}
+          ;;
+        "export "*)
+          name=${line#export }
+          name=${name%%=*}
+          ;;
+        *) continue ;;
+      esac
+      [[ -z "$name" ]] && continue
+      case ",$out," in
+        *",$name,"*) ;;
+        *) out="${out:+$out,}$name" ;;
+      esac
+    done < "$file"
+  done
+  printf '%s' "$out"
+}
+
+# List configured secrets: one row per name with the env var(s) it defines
+# and which shells have a file. Values are never printed.
+secrets_list()
+{
+  local fish_dir="$DOTFILES/config/fish/secrets.d"
+  local sh_dir="$DOTFILES/config/secrets.d"
+
+  local -A names=()
+  local f base
+  for f in "$fish_dir"/*.fish; do
+    [[ -e "$f" ]] || continue
+    base=$(basename "$f" .fish)
+    names["$base"]=1
+  done
+  for f in "$sh_dir"/*.sh; do
+    [[ -e "$f" ]] || continue
+    base=$(basename "$f" .sh)
+    names["$base"]=1
+  done
+
+  if [[ ${#names[@]} -eq 0 ]]; then
+    msgr msg "No secrets configured"
+    return 0
+  fi
+
+  local -a sorted
+  mapfile -t sorted < <(printf '%s\n' "${!names[@]}" | sort)
+
+  msgr msg "Configured secrets:"
+  local name fish_file sh_file shells env_names
+  for name in "${sorted[@]}"; do
+    fish_file="$fish_dir/$name.fish"
+    sh_file="$sh_dir/$name.sh"
+    shells=""
+    [[ -f "$fish_file" ]] && shells="fish"
+    [[ -f "$sh_file" ]] && shells="${shells:+$shells,}sh"
+    env_names=$(secrets_env_names "$fish_file" "$sh_file")
+    msgr nested "$(printf '%-20s %-24s [%s]' "$name" "${env_names:-?}" "$shells")"
+  done
+}
+
+# Show the contents of a secret's files. This intentionally reveals the
+# stored value — it is the user inspecting their own secret.
+secrets_show()
+{
+  local name="$1"
+
+  if [[ -z "$name" ]]; then
+    msgr err "Usage: $SCRIPT secrets show <name>"
+    return 1
+  fi
+
+  if [[ ! "$name" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    msgr err "Invalid secrets name: $name"
+    return 1
+  fi
+
+  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
+  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
+
+  if [[ ! -f "$fish_file" ]] && [[ ! -f "$sh_file" ]]; then
+    msgr err "No secret named '$name'"
+    msgr nested "Run '$SCRIPT secrets list' to see configured secrets"
+    return 1
+  fi
+
+  local f line
+  for f in "$fish_file" "$sh_file"; do
+    [[ -f "$f" ]] || continue
+    msgr msg "$f"
+    while IFS= read -r line; do
+      msgr nested "$line"
+    done < "$f"
+  done
+}
+
+# Remove a secret's fish + bash/zsh files after confirmation.
+secrets_remove()
+{
+  local name="$1"
+
+  if [[ -z "$name" ]]; then
+    msgr err "Usage: $SCRIPT secrets remove <name>"
+    return 1
+  fi
+
+  if [[ ! "$name" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    msgr err "Invalid secrets name: $name"
+    return 1
+  fi
+
+  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
+  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
+
+  local -a targets=()
+  [[ -f "$fish_file" ]] && targets+=("$fish_file")
+  [[ -f "$sh_file" ]] && targets+=("$sh_file")
+
+  if [[ ${#targets[@]} -eq 0 ]]; then
+    msgr err "No secret named '$name'"
+    return 1
+  fi
+
+  msgr warn "About to remove:"
+  local t
+  for t in "${targets[@]}"; do
+    msgr nested "$t"
+  done
+
+  local answer
+  read -rp "Remove these files? [y/N] " answer
+  case "$answer" in
+    [yY] | [yY][eE][sS])
+      rm -f "${targets[@]}"
+      msgr yay "Removed secret '$name'"
+      ;;
+    *)
+      msgr msg "Aborted — nothing removed"
+      return 0
+      ;;
+  esac
+}
+
+# Handle secrets management commands
 section_secrets()
 {
   USAGE_PREFIX="$SCRIPT secrets <command>"
 
   MENU=(
     "create:Create secrets for an env var: create <ENV_NAME> [filename]"
+    "list:List configured secrets"
+    "show:Show a secret's contents: show <name>"
+    "remove:Remove a secret: remove <name>"
     "github:Create GITHUB_TOKEN secrets for all shells"
   )
 
@@ -982,6 +1148,18 @@ section_secrets()
     create)
       shift
       secrets_create "$@"
+      ;;
+
+    list) secrets_list ;;
+
+    show)
+      shift
+      secrets_show "$@"
+      ;;
+
+    remove)
+      shift
+      secrets_remove "$@"
       ;;
 
     github) secrets_create GITHUB_TOKEN github ;;

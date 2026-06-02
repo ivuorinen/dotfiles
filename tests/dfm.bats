@@ -152,10 +152,13 @@ fake_dotfiles()
   : > "$dir/config/shared.sh"
 }
 
-@test "dfm secrets menu lists create and github" {
+@test "dfm secrets menu lists all subcommands" {
   run bash local/bin/dfm secrets
   [ "$status" -eq 0 ]
   [[ "$output" == *"create"* ]]
+  [[ "$output" == *"list"* ]]
+  [[ "$output" == *"show"* ]]
+  [[ "$output" == *"remove"* ]]
   [[ "$output" == *"github"* ]]
 }
 
@@ -260,4 +263,89 @@ fake_dotfiles()
   [ -f "$tmp/config/secrets.d/github.sh" ]
   [[ "$(cat "$tmp/config/secrets.d/github.sh")" == *"export GITHUB_TOKEN='ghtok'"* ]]
   rm -rf "$tmp"
+}
+
+@test "dfm secrets list reports nothing when no secrets exist" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  run bash -c "DOTFILES='$tmp' bash local/bin/dfm secrets list"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No secrets configured"* ]]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets list shows configured names and env vars without values" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'topsecret\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  run bash -c "DOTFILES='$tmp' bash local/bin/dfm secrets list"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"github"* ]]
+  [[ "$output" == *"GITHUB_TOKEN"* ]]
+  # The value must never appear in the listing.
+  [[ "$output" != *"topsecret"* ]]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets show displays the stored value" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'mytok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  run bash -c "DOTFILES='$tmp' bash local/bin/dfm secrets show github"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"GITHUB_TOKEN"* ]]
+  [[ "$output" == *"mytok"* ]]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets show errors for an unknown secret" {
+  run bash local/bin/dfm secrets show nope
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"No secret named"* ]]
+}
+
+@test "dfm secrets show with no name errors" {
+  run bash local/bin/dfm secrets show
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Usage"* ]]
+}
+
+@test "dfm secrets remove deletes both files after confirmation" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  run bash -c "printf 'y\n' | DOTFILES='$tmp' bash local/bin/dfm secrets remove github"
+  [ "$status" -eq 0 ]
+  [ ! -f "$tmp/config/fish/secrets.d/github.fish" ]
+  [ ! -f "$tmp/config/secrets.d/github.sh" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets remove keeps files when not confirmed" {
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  run bash -c "printf 'n\n' | DOTFILES='$tmp' bash local/bin/dfm secrets remove github"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Aborted"* ]]
+  [ -f "$tmp/config/fish/secrets.d/github.fish" ]
+  [ -f "$tmp/config/secrets.d/github.sh" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets remove errors for an unknown secret" {
+  run bash local/bin/dfm secrets remove nope
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"No secret named"* ]]
+}
+
+@test "dfm secrets remove rejects a path-traversing name" {
+  run bash local/bin/dfm secrets remove ../evil
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid secrets name"* ]]
 }

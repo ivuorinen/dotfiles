@@ -43,6 +43,14 @@ Or create a `.fish` file in this directory by hand with your environment variabl
 set -x OPENAI_API_KEY "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
+## Managing Secrets
+
+```sh
+dfm secrets list           # list configured secrets (names + env vars, no values)
+dfm secrets show github    # print a secret's contents (reveals the value)
+dfm secrets remove github  # delete a secret's fish + bash/zsh files (asks first)
+```
+
 Common secret patterns:
 
 - `github.fish` - GitHub Personal Access Token (`GITHUB_TOKEN`)
