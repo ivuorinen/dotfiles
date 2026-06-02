@@ -24,11 +24,31 @@ This directory contains sensitive environment variables like API tokens and cred
 
 ## Adding New Secret Files
 
-Create a new `.fish` file in this directory with your environment variables:
+The easiest way is `dfm secrets create`, which prompts for the value without echoing it and writes both the
+fish file here and the matching bash/zsh file under `config/secrets.d/`, each with `0600` permissions:
+
+```sh
+# Filename is derived from the env name (GITHUB_TOKEN -> github):
+dfm secrets create GITHUB_TOKEN
+
+# Or pass an explicit filename when the derived one doesn't fit
+# (SONAR_TOKEN is conventionally stored as sonarcloud):
+dfm secrets create SONAR_TOKEN sonarcloud
+```
+
+Or create a `.fish` file in this directory by hand with your environment variables:
 
 ```fish
 # Example: openai.fish
 set -x OPENAI_API_KEY "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+## Managing Secrets
+
+```sh
+dfm secrets list           # list configured secrets (names + env vars, no values)
+dfm secrets show github    # print a secret's contents (reveals the value)
+dfm secrets remove github  # delete a secret's fish + bash/zsh files (asks first)
 ```
 
 Common secret patterns:

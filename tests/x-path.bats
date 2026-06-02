@@ -1,5 +1,19 @@
 #!/usr/bin/env bats
 
+# These tests deliberately shrink PATH to assert path-manipulation behavior.
+# On macOS rm lives in /bin, so a test leaving PATH="/usr/bin" breaks bats'
+# own post-test cleanup (rm). Save the real PATH and restore it in teardown,
+# which runs before that cleanup.
+setup()
+{
+  REAL_PATH="$PATH"
+}
+
+teardown()
+{
+  PATH="$REAL_PATH"
+}
+
 @test "x-path-append adds directory" {
   mkdir -p "$BATS_TMPDIR/dir"
   PATH="/usr/bin"
