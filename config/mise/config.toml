@@ -130,7 +130,7 @@ stylua = "2.5.2"
 syft = "1.44.0"
 taplo = "0.10.0"
 trivy = "0.70.0"
-trufflehog = "3.95.3"
+trufflehog = "3.95.5"
 
 # Dev tools (pre-built binaries)
 "github:exercism/cli" = "3.5.8"
