@@ -91,3 +91,6 @@ if status is-interactive
         $apply $m >/dev/null 2>&1
     end
 end
+
+# Added by get-aspire-cli.sh
+fish_add_path $HOME/.aspire/bin
