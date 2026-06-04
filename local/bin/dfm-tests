@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#USAGE cmd "tests" help="Test visualization helpers" {
+#USAGE   cmd "msgr" help="Show all msgr message types"
+#USAGE   cmd "params" help="List all parameters"
+#USAGE }
+#
+# @description Visualization helpers for msgr output and parameters (dfm tests)
+# dfm tests — visualization helpers for msgr output and parameters.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap
+
+# Secret menu for visual tests
+dfm_tests()
+{
+  USAGE_PREFIX="$SCRIPT tests <command>"
+
+  MENU=(
+    "msgr:List all available msgr message types"
+    "params:List all parameters"
+  )
+
+  case "$1" in
+    params)
+      echo "All parameters:"
+      for i in "$@"; do
+        echo "  $i"
+      done
+      ;;
+    msgr)
+      # shellcheck disable=SC1010
+      msgr done "msgr done"
+      msgr done_suffix "msgr done_suffix"
+      msgr err "msgr err"
+      msgr nested "msgr nested"
+      msgr nested_done "msgr nested_done"
+      msgr ok "msgr ok"
+      msgr prompt "msgr prompt"
+      msgr prompt_done "msgr prompt_done"
+      msgr run "msgr run" "second_param"
+      msgr run_done "msgr run_done" "second_param"
+      msgr warn "msgr warn"
+      msgr yay "msgr yay"
+      msgr yay_done "msgr yay_done"
+      ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_tests "$@"

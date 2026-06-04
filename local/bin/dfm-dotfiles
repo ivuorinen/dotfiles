@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#USAGE cmd "dotfiles" help="Format and reset configurations" {
+#USAGE   cmd "fmt" help="Run all formatters"
+#USAGE   cmd "yamlfmt" help="Format YAML files"
+#USAGE   cmd "shfmt" help="Format shell scripts"
+#USAGE   cmd "reset_all" help="Reset everything"
+#USAGE   cmd "reset_nvim" help="Reset neovim state and config"
+#USAGE }
+#
+# @description Format and reset dotfiles configurations (dfm dotfiles)
+# dfm dotfiles — format and reset configurations.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap
+
+# Handle dotfiles formatting and reset commands
+dfm_dotfiles()
+{
+  USAGE_PREFIX="$SCRIPT dotfiles <command>"
+
+  MENU=(
+    "fmt:Run all formatters"
+    "yamlfmt:Run yamlfmt to all dotfiles, which are in our control"
+    "shfmt:Run shfmt to all dotfiles"
+    "reset_all:Reset everything, runs all configured reset actions"
+    "reset_nvim:Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
+  )
+
+  case "$1" in
+    fmt)
+      msgr run "Running all formatters"
+      dfm_dotfiles yamlfmt \
+        && dfm_dotfiles shfmt \
+        && msgr run_done "...done!"
+      ;;
+
+    reset_all)
+      msgr ok "Running all reset commands"
+      dfm_dotfiles reset_nvim
+      ;;
+
+    reset_nvim)
+      msgr run "Cleaning nvim state, cache and config"
+      rm -rf \
+        ~/.local/share/nvim \
+        ~/.local/state/nvim \
+        ~/.cache/nvim \
+        ~/.config/nvim \
+        && msgr ok "Deleted old nvim files (share, state and cache + config)"
+      if ! ln -s "$DOTFILES/config/nvim" ~/.config/nvim; then
+        msgr err "Failed to link nvim config"
+        exit 1
+      fi
+      msgr ok "Linked nvim and astronvim"
+      "$DFM" install mise || {
+        msgr err "Failed to install mise tools"
+        exit 1
+      }
+      msgr ok "Installed packages"
+      msgr run_done "nvim reset!"
+      ;;
+
+    yamlfmt)
+      # format yaml files
+      x-have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt"
+      ! x-have yamlfmt && msgr err "yamlfmt not found"
+      ;;
+
+    shfmt)
+      # If the system doesn't have fd or shfmt, stop here instead of
+      # falling through and running the formatter without its tools.
+      if ! x-have fd; then
+        msgr err "fd not found, install it to continue"
+        return 1
+      fi
+      if ! x-have shfmt; then
+        msgr err "shfmt not found, install it to continue"
+        return 1
+      fi
+      # Format shell scripts according to following rules.
+      fd --search-path "$DOTFILES" -tx \
+        --hidden \
+        -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
+        -E 'test' -E '**/tldr/*' \
+        -x shfmt \
+        --language-dialect bash \
+        --func-next-line --list --write \
+        --indent 2 --case-indent --space-redirects \
+        --binary-next-line {} \; \
+        && msgr yay "dotfiles have been shfmt formatted!"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_dotfiles "$@"

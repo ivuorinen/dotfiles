@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#USAGE cmd "docs" help="Generate documentation" {
+#USAGE   cmd "all" help="Update all keybindings docs"
+#USAGE   cmd "tmux" help="Update tmux keybindings"
+#USAGE   cmd "nvim" help="Update nvim keybindings"
+#USAGE   cmd "wezterm" help="Update wezterm keybindings"
+#USAGE }
+#
+# @description Generate keybinding documentation (dfm docs)
+# dfm docs — generate keybinding documentation.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap
+
+# Handle documentation generation commands
+dfm_docs()
+{
+  USAGE_PREFIX="$SCRIPT docs <command>"
+
+  MENU=(
+    "all:Update all keybindings documentations"
+    "tmux:Update tmux keybindings documentation"
+    "nvim:Update nvim keybindings documentation"
+    "wezterm:Update wezterm keybindings documentation"
+  )
+
+  case "$1" in
+    all)
+      local rc=0
+      dfm_docs tmux || rc=1
+      dfm_docs nvim || rc=1
+      dfm_docs wezterm || rc=1
+      return "$rc"
+      ;;
+    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
+    nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
+    wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_docs "$@"

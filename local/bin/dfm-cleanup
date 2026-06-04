@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+#USAGE cmd "cleanup" help="Remove old installs, caches, and unused packages" {
+#USAGE   cmd "all" help="Run old-vms, brew, mise, and caches cleanup in sequence"
+#USAGE   cmd "brew" help="brew cleanup --prune=all and autoremove unused deps"
+#USAGE   cmd "caches" help="Clear mise and uv caches"
+#USAGE   cmd "docker" help="Remove stopped containers and dangling images"
+#USAGE   cmd "mise" help="Prune unused tool versions and clear mise download cache"
+#USAGE   cmd "old-vms" help="Remove old version manager directories replaced by mise"
+#USAGE }
+#
+# @description Remove old installs, caches, and unused packages (dfm cleanup)
+# dfm cleanup — remove old installs, caches, and unused packages.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap
+
+dfm_cleanup()
+{
+  USAGE_PREFIX="$SCRIPT cleanup <command>"
+
+  MENU=(
+    "all:Run old-vms, brew, mise, and caches cleanup in sequence"
+    "brew:brew cleanup --prune=all and autoremove unused deps"
+    "caches:Clear mise and uv caches"
+    "docker:Remove stopped containers and dangling images (docker system prune)"
+    "mise:Prune unused tool versions and clear mise download cache"
+    "old-vms:Remove old version manager directories replaced by mise"
+  )
+
+  case "$1" in
+    all)
+      local rc=0
+      msgr msg "Running all cleanup tasks..."
+      dfm_cleanup old-vms || rc=1
+      dfm_cleanup brew || rc=1
+      dfm_cleanup mise || rc=1
+      dfm_cleanup caches || rc=1
+      if [[ $rc -eq 0 ]]; then
+        msgr yay "All cleanup tasks complete"
+      else
+        msgr warn "Cleanup finished with errors"
+      fi
+      return "$rc"
+      ;;
+
+    brew)
+      if ! command -v brew > /dev/null 2>&1; then
+        msgr warn "brew not found — skipping"
+        return 0
+      fi
+      msgr run "Running brew cleanup..."
+      brew cleanup --prune=all
+      msgr run "Running brew autoremove..."
+      brew autoremove
+      msgr yay "Homebrew cleanup complete"
+      ;;
+
+    caches)
+      msgr run "Clearing caches..."
+      if command -v mise > /dev/null 2>&1; then
+        msgr nested "mise cache..."
+        mise cache clean
+      fi
+      if command -v uv > /dev/null 2>&1; then
+        msgr nested "uv cache..."
+        uv cache clean
+      fi
+      msgr yay "Cache cleanup complete"
+      ;;
+
+    docker)
+      if ! command -v docker > /dev/null 2>&1; then
+        msgr warn "docker not found — skipping"
+        return 0
+      fi
+      msgr run "Running docker system prune..."
+      docker system prune -f
+      msgr yay "Docker cleanup complete"
+      ;;
+
+    mise)
+      if ! command -v mise > /dev/null 2>&1; then
+        msgr warn "mise not found — skipping"
+        return 0
+      fi
+      msgr run "Pruning unused mise tool versions..."
+      mise prune --yes
+      msgr run "Clearing mise download cache..."
+      mise cache clean
+      msgr yay "mise cleanup complete"
+      ;;
+
+    old-vms)
+      local script="$DOTFILES/scripts/cleanup-old-version-managers.sh"
+      if [[ ! -f "$script" ]]; then
+        msgr err "cleanup-old-version-managers.sh not found: $script"
+        return 1
+      fi
+      msgr run "Removing old version manager installs..."
+      bash "$script"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_cleanup "$@"

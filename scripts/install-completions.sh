@@ -89,8 +89,43 @@ for spec in "$DOTFILES"/local/bin/*; do
   [[ -f "$spec" ]] || continue
   grep -q '#USAGE\|//USAGE' "$spec" 2> /dev/null || continue
   bin_name=$(basename "$spec")
+  # The dfm dispatcher and its dfm-* subcommands are handled by the
+  # dedicated assembly step below: each dfm-* carries only a nested
+  # "cmd <section> { ... }" fragment, which is not a valid standalone
+  # root spec, so they must be stitched into one combined dfm spec
+  # rather than generated individually.
+  case "$bin_name" in
+    dfm | dfm-*) continue ;;
+  esac
   generate_for_spec "$spec" "$bin_name"
 done
+
+# Assemble the unified dfm dispatcher spec from per-subcommand fragments.
+# Each dfm-* owns its own "cmd <section> { ... }" #USAGE subtree; stitched
+# under the dispatcher's root directives (about/author + the dispatcher-
+# level help command) they form one spec, so the single `dfm` completion,
+# markdown, and manpage still cover every section.
+if [[ -f "$DOTFILES/local/bin/dfm" ]]; then
+  # The combined spec must be named "dfm" (usage derives the spec's
+  # name/bin from the file's basename) and lead with a shebang (usage
+  # only extracts #USAGE directives when the file looks like a script;
+  # a file starting with #USAGE is parsed as raw KDL and rejected).
+  dfm_spec_dir=$(mktemp -d)
+  dfm_spec="$dfm_spec_dir/dfm"
+  {
+    printf '#!/usr/bin/env bash\n'
+    # `|| true`: under `set -e` a grep with no match exits 1 and would abort
+    # the whole generator. A dfm-* with no #USAGE simply contributes nothing.
+    grep '^#USAGE' "$DOTFILES/local/bin/dfm" || true
+    for section in install brew apt check dotfiles helpers docs scripts tests secrets cleanup; do
+      sub="$DOTFILES/local/bin/dfm-$section"
+      [[ -f "$sub" ]] || continue
+      grep '^#USAGE' "$sub" || true
+    done
+  } > "$dfm_spec"
+  generate_for_spec "$dfm_spec" "dfm"
+  rm -rf "$dfm_spec_dir"
+fi
 
 # Process scripts/ inline .sh specs (#USAGE directives embedded in script)
 for spec in "$DOTFILES"/scripts/*.sh; do

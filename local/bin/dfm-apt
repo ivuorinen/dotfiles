@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#USAGE cmd "apt" help="APT package management (Debian/Ubuntu)" {
+#USAGE   cmd "upkeep" help="Full maintenance (update + upgrade + autoremove + clean)"
+#USAGE   cmd "install" help="Install packages from apt.txt"
+#USAGE   cmd "update" help="Update package lists"
+#USAGE   cmd "upgrade" help="Upgrade installed packages"
+#USAGE   cmd "autoremove" help="Remove unused packages"
+#USAGE   cmd "clean" help="Clean package cache"
+#USAGE }
+#
+# @description APT package management for Debian/Ubuntu (dfm apt)
+# dfm apt — APT package management (Debian/Ubuntu).
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap
+
+# Handle apt package manager commands
+dfm_apt()
+{
+  USAGE_PREFIX="$SCRIPT apt <command>"
+  MENU=(
+    "upkeep:Run update, upgrade, autoremove and clean"
+    'install:Install packages from $DOTFILES/tools/apt.txt'
+    "update:Update apt packages"
+    "upgrade:Upgrade apt packages"
+    "autoremove:Remove unused apt packages"
+    "clean:Clean apt cache"
+  )
+
+  if ! x-have apt; then
+    msgr warn "apt not available, skipping"
+    return 0
+  fi
+
+  case "$1" in
+    upkeep)
+      sudo apt update \
+        && sudo apt upgrade -y \
+        && sudo apt autoremove -y \
+        && sudo apt clean
+      ;;
+
+    install)
+      # if apt.txt is not found, return with error
+      if [[ ! -f "$DOTFILES/tools/apt.txt" ]]; then
+        msgr err "apt.txt not found"
+        return 1
+      fi
+
+      # Load apt.txt, remove comments (even if trailing comment) and empty lines.
+      #
+      # Ignoring "Quote this to prevent word splitting."
+      # shellcheck disable=SC2046
+      sudo apt install \
+        -y $(
+          grep -vE '^\s*#' "$DOTFILES/tools/apt.txt" \
+            | sed -e 's/#.*//' \
+            | tr '\n' ' '
+        )
+
+      # If there's a apt.txt file under hosts/$hostname/apt.txt,
+      # run install on those lines too.
+      HOSTNAME=$(hostname -s)
+      HOST_APT="$DOTFILES/hosts/$HOSTNAME/apt.txt"
+      [[ -f "$HOST_APT" ]] && {
+        # shellcheck disable=SC2046
+        sudo apt install -y $(
+          grep -vE '^\s*#' "$HOST_APT" \
+            | sed -e 's/#.*//' \
+            | tr '\n' ' '
+        )
+      }
+
+      # Try this for an alternative way to install packages
+      # xargs -a <(awk '! /^ *(#|$)/' "$packagelist") -r -- sudo apt-get install -y
+      ;;
+
+    update) sudo apt update ;;
+    upgrade) sudo apt upgrade -y ;;
+    autoremove) sudo apt autoremove -y ;;
+    clean) sudo apt clean ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_apt "$@"

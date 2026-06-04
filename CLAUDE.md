@@ -86,7 +86,28 @@ and most scripts in `local/bin/`.
 
 ### dfm — Dotfiles Manager
 
-`local/bin/dfm` is the main management script. Key commands:
+`local/bin/dfm` is a thin **git-style dispatcher**: `dfm <section>
+<args>` resolves and execs `dfm-<section>` (sibling of the dispatcher
+first, then `$PATH`), mirroring how git finds `git-<command>`. The
+dispatcher resolves `$0` through any symlinks first, so "the folder it
+is in" is the script's real location (the repo's `local/bin`) even when
+invoked via a `~/.local/bin/dfm` symlink — dropping a new `dfm-<sub>`
+into `local/bin/` works immediately, before `./install` links it. Each
+section lives in its own executable:
+
+- `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,cleanup}`
+  — one file per section, each carrying its own `#USAGE` subtree.
+- `local/bin/dfm-lib` — sourced (non-executable) shared library:
+  `dfm_bootstrap` (env + msgr/shared.sh + bash-4 guard), `menu_builder`,
+  `get_script_description`, and the `secrets_*` family. The missing exec
+  bit keeps `dfm lib` from matching it and signals "source, don't run".
+  Subcommands re-dispatch across sections via the `$DFM` variable it
+  exports; same-section fan-out uses local function calls.
+
+Completions/docs/manpages: `scripts/install-completions.sh` stitches the
+per-section `#USAGE` fragments into one `dfm` spec (skipping `dfm`/`dfm-*`
+in its per-file loop), so the single `dfm` completion tree still covers
+every section. Key commands:
 
 - `dfm install all` — install everything in tiered stages
 - `dfm brew install` / `dfm brew update` — Homebrew management
