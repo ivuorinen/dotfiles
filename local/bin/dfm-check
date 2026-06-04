@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+#USAGE cmd "check" help="System information checks" {
+#USAGE   cmd "arch" help="Get or check current architecture" {
+#USAGE     alias "a"
+#USAGE     arg "[arch]" help="Architecture to check against"
+#USAGE   }
+#USAGE   cmd "host" help="Get or check current hostname" {
+#USAGE     alias "h"
+#USAGE     alias "hostname"
+#USAGE     arg "[hostname]" help="Hostname to check against"
+#USAGE   }
+#USAGE   cmd "all" help="Run all health checks in sequence"
+#USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
+#USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
+#USAGE   cmd "mise" help="Run mise doctor to check mise health"
+#USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
+#USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
+#USAGE }
+#
+# dfm check — system information checks (arch, hostname, health).
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib"
+dfm_bootstrap
+
+# Handle system check commands (arch, hostname)
+dfm_check()
+{
+  USAGE_PREFIX="$SCRIPT check <command>"
+  X_HOSTNAME=$(hostname)
+  X_ARCH=$(uname)
+
+  MENU=(
+    "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
+    "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
+    "all:Run brew, mise, tools, updates, and disk checks in sequence"
+    "brew:Verify all Brewfile packages are installed"
+    "disk:Show disk usage for mise installs and brew cache"
+    "mise:Run mise doctor to check mise health"
+    "tools:Verify essential CLI tools are available in PATH"
+    "updates:Show available updates for mise tools and brew packages"
+  )
+
+  case "$1" in
+    a | arch)
+      [[ $2 == "" ]] && echo "$X_ARCH" && return 0
+      [[ $X_ARCH == "$2" ]] && return 0 || return 1
+      ;;
+
+    h | host | hostname)
+      [[ $2 == "" ]] && echo "$X_HOSTNAME" && return 0
+      [[ $X_HOSTNAME == "$2" ]] && return 0 || return 1
+      ;;
+
+    all)
+      local rc=0
+      dfm_check brew || rc=1
+      dfm_check mise || rc=1
+      dfm_check tools || rc=1
+      dfm_check updates || rc=1
+      dfm_check disk || rc=1
+      return "$rc"
+      ;;
+
+    brew)
+      if ! command -v brew > /dev/null 2>&1; then
+        msgr warn "brew not found — skipping"
+        return 0
+      fi
+      local brewfile="$DOTFILES/config/homebrew/Brewfile"
+      msgr run "Checking Brewfile..."
+      if ! brew bundle check --file="$brewfile" --no-upgrade; then
+        msgr err "Some Brewfile packages missing — run 'dfm brew install' to sync"
+        return 1
+      fi
+      msgr yay "All Brewfile packages installed"
+      ;;
+
+    disk)
+      local mise_installs="${XDG_DATA_HOME:-$HOME/.local/share}/mise/installs"
+      msgr msg "Disk usage for tool stores:"
+      if [[ -d "$mise_installs" ]]; then
+        msgr nested "mise installs: $(du -sh "$mise_installs" 2> /dev/null | cut -f1)"
+      fi
+      if command -v brew > /dev/null 2>&1; then
+        msgr nested "brew cache:    $(du -sh "$(brew --cache)" 2> /dev/null | cut -f1)"
+      fi
+      if command -v uv > /dev/null 2>&1; then
+        local uv_cache
+        uv_cache=$(uv cache dir 2> /dev/null)
+        [[ -n "$uv_cache" ]] \
+          && msgr nested "uv cache:      $(du -sh "$uv_cache" 2> /dev/null | cut -f1)"
+      fi
+      ;;
+
+    mise)
+      if ! command -v mise > /dev/null 2>&1; then
+        msgr warn "mise not found"
+        return 1
+      fi
+      mise doctor
+      ;;
+
+    tools)
+      local missing=()
+      local tool
+      for tool in git mise fish starship fzf tmux nvim rg fd eza delta zoxide; do
+        command -v "$tool" > /dev/null 2>&1 || missing+=("$tool")
+      done
+      if [[ ${#missing[@]} -gt 0 ]]; then
+        msgr err "Missing tools: ${missing[*]}"
+        return 1
+      fi
+      msgr yay "All essential tools found in PATH"
+      ;;
+
+    updates)
+      if command -v mise > /dev/null 2>&1; then
+        msgr msg "mise outdated:"
+        mise outdated || true
+      fi
+      if command -v brew > /dev/null 2>&1; then
+        msgr msg "brew outdated:"
+        brew outdated || true
+      fi
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_check "$@"

@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+#USAGE cmd "brew" help="Homebrew package management" {
+#USAGE   cmd "install" help="Install packages from Brewfile"
+#USAGE   cmd "update" help="Update Homebrew and packages"
+#USAGE   cmd "updatebundle" help="Update Brewfile with descriptions"
+#USAGE   cmd "autoupdate" help="Setup Homebrew auto-update"
+#USAGE   cmd "leaves" help="List installed-on-request packages"
+#USAGE   cmd "clean" help="Cleanup old versions"
+#USAGE   cmd "untracked" help="List packages not in Brewfile"
+#USAGE }
+#
+# dfm brew — Homebrew package management.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib"
+dfm_bootstrap
+
+# Handle Homebrew section commands
+dfm_brew()
+{
+  USAGE_PREFIX="$SCRIPT brew <command>"
+
+  MENU=(
+    "install:Installs items defined in Brewfile"
+    "update:Updates and upgrades brew packages"
+    "updatebundle:Updates Brewfile with descriptions"
+    "autoupdate:Setups brew auto-update and runs it immediately"
+    "leaves:List brew leaves (installed on request)"
+    "clean:Clean up brew packages"
+    "untracked:List untracked brew packages"
+  )
+
+  if ! x-have brew; then
+    msgr warn "brew not available, skipping"
+    return 0
+  fi
+
+  case "$1" in
+    install)
+      brew bundle install --file="$BREWFILE" --force --quiet && msgr yay "Done!"
+      ;;
+
+    update)
+      if brew update && brew outdated && brew upgrade && brew cleanup; then
+        msgr yay "Done!"
+      else
+        msgr err "brew update failed"
+      fi
+      ;;
+
+    updatebundle)
+      # Updates .dotfiles/homebrew/Brewfile with descriptions
+      brew bundle dump \
+        --force \
+        --file="$BREWFILE" \
+        --tap \
+        --formula \
+        --cask \
+        --describe && msgr yay "Done!"
+      ;;
+
+    leaves)
+      brew leaves --installed-on-request
+      ;;
+
+    untracked)
+      declare -a BREW_LIST_ALL
+      while IFS= read -r line; do
+        BREW_LIST_ALL+=("$line")
+      done < <(brew list --formula --installed-on-request -1 --full-name)
+      while IFS= read -r c; do
+        BREW_LIST_ALL+=("$c")
+      done < <(brew list --cask -1 --full-name)
+
+      # Remove entries that are installed as dependencies
+      declare -a BREW_LIST_DEPENDENCIES
+      while IFS= read -r l; do
+        BREW_LIST_DEPENDENCIES+=("$l")
+      done < <(brew list -1 --installed-as-dependency)
+
+      declare -a BREW_LIST_BUNDLED
+      while IFS= read -r b; do
+        BREW_LIST_BUNDLED+=("$b")
+      done < <(brew bundle list --all --file="$BREWFILE")
+
+      declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
+      for f in "${BREW_LIST_ALL[@]}"; do
+        # shellcheck disable=SC2199
+        if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
+          BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
+        fi
+      done
+
+      array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
+
+      # If there are no untracked packages, return
+      if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
+        msgr yay "No untracked packages found!"
+        return 0
+      fi
+
+      echo "Untracked:"
+      for f in "${BREW_LIST_UNTRACKED[@]}"; do
+        echo "  $f"
+      done
+      ;;
+
+    autoupdate)
+      brew autoupdate delete
+      brew autoupdate start 43200 --upgrade --cleanup --immediate
+      ;;
+
+    clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_brew "$@"

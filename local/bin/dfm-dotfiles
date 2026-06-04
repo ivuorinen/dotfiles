@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+#USAGE cmd "dotfiles" help="Format and reset configurations" {
+#USAGE   cmd "fmt" help="Run all formatters"
+#USAGE   cmd "yamlfmt" help="Format YAML files"
+#USAGE   cmd "shfmt" help="Format shell scripts"
+#USAGE   cmd "reset_all" help="Reset everything"
+#USAGE   cmd "reset_nvim" help="Reset neovim state and config"
+#USAGE }
+#
+# dfm dotfiles — format and reset configurations.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib"
+dfm_bootstrap
+
+# Handle dotfiles formatting and reset commands
+dfm_dotfiles()
+{
+  USAGE_PREFIX="$SCRIPT dotfiles <command>"
+
+  MENU=(
+    "fmt:Run all formatters"
+    "yamlfmt:Run yamlfmt to all dotfiles, which are in our control"
+    "shfmt:Run shfmt to all dotfiles"
+    "reset_all:Reset everything, runs all configured reset actions"
+    "reset_nvim:Resets nvim. Deletes caches, removes nvim folders and relinks nvim folders"
+  )
+
+  case "$1" in
+    fmt)
+      msgr run "Running all formatters"
+      dfm_dotfiles yamlfmt \
+        && dfm_dotfiles shfmt \
+        && msgr run_done "...done!"
+      ;;
+
+    reset_all)
+      msgr ok "Running all reset commands"
+      dfm_dotfiles reset_nvim
+      ;;
+
+    reset_nvim)
+      msgr run "Cleaning nvim state, cache and config"
+      rm -rf \
+        ~/.local/share/nvim \
+        ~/.local/state/nvim \
+        ~/.cache/nvim \
+        ~/.config/nvim \
+        && msgr ok "Deleted old nvim files (share, state and cache + config)"
+      ln -s "$DOTFILES/config/nvim" ~/.config/nvim \
+        && msgr ok "Linked nvim and astronvim"
+      "$DFM" install mise || {
+        msgr err "Failed to install mise tools"
+        exit 1
+      }
+      msgr ok "Installed packages"
+      msgr run_done "nvim reset!"
+      ;;
+
+    yamlfmt)
+      # format yaml files
+      x-have yamlfmt && yamlfmt -conf "$DOTFILES/.yamlfmt"
+      ! x-have yamlfmt && msgr err "yamlfmt not found"
+      ;;
+
+    shfmt)
+      # If system doesn't have fd or shfmt installed, exit
+      ! x-have fd && msgr err "fd not found, install it to continue"
+      ! x-have shfmt && msgr err "shfmt not found, install it to continue"
+      # Format shell scripts according to following rules.
+      fd --full-path "$DOTFILES" -tx \
+        --hidden \
+        -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
+        -E 'test' -E '**/tldr/*' \
+        -x shfmt \
+        --language-dialect bash \
+        --func-next-line --list --write \
+        --indent 2 --case-indent --space-redirects \
+        --binary-next-line {} \; \
+        && msgr yay "dotfiles have been shfmt formatted!"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_dotfiles "$@"

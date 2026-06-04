@@ -1,0 +1,373 @@
+# shellcheck shell=bash
+#
+# dfm-lib — shared helpers for the dfm command family.
+#
+# Sourced by the dfm dispatcher and every dfm-* subcommand; it is NOT
+# executable on purpose. Keeping the exec bit off means `command -v
+# dfm-lib` never matches it (so `dfm lib` cleanly reports "not a dfm
+# command") and signals "source me, don't run me".
+#
+# (c) Ismo Vuorinen <https://github.com/ivuorinen> 2022
+# Licensed under MIT, see LICENSE
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+# Directory this library lives in — also the home of the dfm dispatcher
+# and every dfm-* subcommand. Resolved from BASH_SOURCE so it is correct
+# regardless of which script sourced us or what DOTFILES points at.
+_dfm_libdir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd
+)
+
+# Path to the dispatcher. Subcommands re-dispatch ACROSS sections via
+# "$DFM <section> <command>" (same-section fan-out uses local function
+# calls instead). Routing through the dispatcher keeps the git-style
+# lookup in one place.
+DFM="$_dfm_libdir/dfm"
+export DFM
+
+# Bootstrap shared environment and dependencies. Call once near the top
+# of the dispatcher and each dfm-* subcommand, after sourcing this file.
+dfm_bootstrap()
+{
+  # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
+  : "${VERBOSE:=0}"
+  : "${DOTFILES:=$HOME/.dotfiles}"
+  : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
+  : "${HOSTFILES:=$DOTFILES/hosts}"
+  export DOTFILES BREWFILE HOSTFILES
+
+  # Every dfm-* binary presents itself under the public "dfm" name, so
+  # help/usage text reads "dfm brew <command>" no matter which binary is
+  # actually executing.
+  SCRIPT="dfm"
+
+  # Require bash 4.0+ for associative arrays and mapfile
+  if ((BASH_VERSINFO[0] < 4)); then
+    echo "dfm requires bash 4.0+, found ${BASH_VERSION}"
+    if [[ "$(uname)" == "Darwin" ]]; then
+      if ! command -v brew &> /dev/null; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      fi
+      echo "Installing modern bash via Homebrew..."
+      brew install bash
+      echo "Done. Restart your shell and run dfm again."
+    else
+      echo "Install bash 4.0+ and try again."
+    fi
+    exit 1
+  fi
+
+  # shellcheck disable=SC1091
+  source "$DOTFILES/config/shared.sh"
+  # shellcheck disable=SC1090
+  source "${DOTFILES}/local/bin/msgr"
+}
+
+# Get description from a script file's @description tag
+get_script_description()
+{
+  local file="$1"
+  local desc
+  desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
+  echo "${desc:-No description available}"
+}
+
+# Menu builder
+menu_builder()
+{
+  local title=$1
+  local commands=("${@:2}")
+  local width=60
+
+  printf "\n%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
+  printf "%-${width}s\n" "  $title"
+  printf "%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
+
+  for cmd in "${commands[@]}"; do
+    local name=${cmd%%:*}
+    local desc=${cmd#*:}
+    printf "  %-20s %s\n" "$name" "$desc"
+  done
+}
+
+# Derive a secrets filename from an env var name.
+# Lowercases the name, then strips a trailing credential-type suffix.
+# GITHUB_TOKEN -> github, SONAR_TOKEN -> sonar, FOO_API_KEY -> foo.
+# Callers can override the result by passing an explicit filename to
+# secrets_create (e.g. SONAR_TOKEN is stored as sonarcloud).
+secrets_filename_from_env()
+{
+  local name
+  name=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  case "$name" in
+    *_api_key) name=${name%_api_key} ;;
+    *_token) name=${name%_token} ;;
+    *_secret) name=${name%_secret} ;;
+    *_password) name=${name%_password} ;;
+    *_key) name=${name%_key} ;;
+    *_pat) name=${name%_pat} ;;
+  esac
+  printf '%s' "$name"
+}
+
+# True when NAME is a safe secrets filename. It must start with an
+# alphanumeric and contain only letters, digits, '.', '_' or '-'. This
+# rejects empty names, '.'/'..', leading-dot names (which would create a
+# hidden file the listing glob skips) and anything with a path separator.
+secrets_valid_name()
+{
+  [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]
+}
+
+# Create fish + bash/zsh secrets files for an environment variable.
+# Usage: secrets_create <ENV_NAME> [filename]
+# The value is read from a hidden prompt so it never reaches the
+# terminal, shell history, or the process table. Files are written with
+# a 077 umask so only the owner can read them.
+secrets_create()
+{
+  local env_name="$1"
+  local filename="$2"
+
+  if [[ -z "$env_name" ]]; then
+    msgr err "Usage: $SCRIPT secrets create <ENV_NAME> [filename]"
+    return 1
+  fi
+
+  # Reject anything that is not a valid POSIX shell identifier; otherwise
+  # the generated set/export lines would be syntactically broken.
+  if [[ ! "$env_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    msgr err "Invalid environment variable name: $env_name"
+    msgr nested "Expected a shell identifier, e.g. GITHUB_TOKEN"
+    return 1
+  fi
+
+  [[ -z "$filename" ]] && filename=$(secrets_filename_from_env "$env_name")
+
+  # Stripping a suffix can leave nothing (e.g. env name "_TOKEN").
+  if [[ -z "$filename" ]]; then
+    msgr err "Could not derive a filename from '$env_name' — pass one explicitly"
+    return 1
+  fi
+
+  # Guard the filename so the secret can only land inside the two
+  # secrets.d directories, never as a traversal path or hidden file.
+  if ! secrets_valid_name "$filename"; then
+    msgr err "Invalid secrets filename: $filename"
+    msgr nested "Use letters, digits, '.', '_', '-'; must start alphanumeric"
+    return 1
+  fi
+
+  local fish_secret="$DOTFILES/config/fish/secrets.d/$filename.fish"
+  local sh_secret="$DOTFILES/config/secrets.d/$filename.sh"
+
+  if [[ -f "$fish_secret" ]] || [[ -f "$sh_secret" ]]; then
+    msgr warn "Secrets files already exist — they will be overwritten"
+  fi
+
+  # IFS= preserves leading/trailing whitespace and -r preserves
+  # backslashes, so the secret is captured exactly as typed.
+  local secret
+  IFS= read -rsp "Enter $env_name (input hidden): " secret
+  echo
+
+  if [[ -z "$secret" ]]; then
+    msgr err "No value provided"
+    return 1
+  fi
+
+  # Store the value single-quoted so secrets containing $, ", \, or
+  # backticks are written verbatim instead of being expanded or
+  # breaking the file. Each shell has different single-quote rules:
+  #   POSIX sh — fully literal; only ' must be escaped as '\''.
+  #   fish     — literal except \ and ', each escaped with a backslash.
+  local sh_value fish_value
+  sh_value=${secret//\'/\'\\\'\'}
+  fish_value=${secret//\\/\\\\}
+  fish_value=${fish_value//\'/\\\'}
+
+  # Create the directories and files under a 077 umask so newly created
+  # paths are owner-only from the start. Every write is checked so a
+  # failure (e.g. full disk) is a hard error, never a silent success.
+  local old_umask
+  old_umask=$(umask)
+  umask 077
+  if ! mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
+    || ! printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret" \
+    || ! printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"; then
+    umask "$old_umask"
+    msgr err "Failed to write secret files"
+    return 1
+  fi
+
+  # umask only governs newly created paths; re-tighten explicitly so a
+  # pre-existing dir/file with broader perms (e.g. 0755/0644) is fixed.
+  if ! chmod 700 "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
+    || ! chmod 600 "$fish_secret" "$sh_secret"; then
+    umask "$old_umask"
+    msgr err "Failed to set secret file permissions"
+    return 1
+  fi
+  umask "$old_umask"
+
+  msgr yay "$env_name secrets created"
+  msgr nested "fish:     $fish_secret"
+  msgr nested "bash/zsh: $sh_secret"
+}
+
+# Print the environment variable name(s) defined across the given secret
+# files, comma-separated and de-duplicated, WITHOUT revealing any values.
+secrets_env_names()
+{
+  local file line name out=""
+  for file in "$@"; do
+    [[ -f "$file" ]] || continue
+    while IFS= read -r line; do
+      name=""
+      case "$line" in
+        "set -x "*)
+          name=${line#set -x }
+          name=${name%% *}
+          ;;
+        "export "*)
+          name=${line#export }
+          name=${name%%=*}
+          ;;
+        *) continue ;;
+      esac
+      [[ -z "$name" ]] && continue
+      case ",$out," in
+        *",$name,"*) ;;
+        *) out="${out:+$out,}$name" ;;
+      esac
+    done < "$file"
+  done
+  printf '%s' "$out"
+}
+
+# List configured secrets: one row per name with the env var(s) it defines
+# and which shells have a file. Values are never printed.
+secrets_list()
+{
+  local fish_dir="$DOTFILES/config/fish/secrets.d"
+  local sh_dir="$DOTFILES/config/secrets.d"
+
+  local -A names=()
+  local f base
+  for f in "$fish_dir"/*.fish; do
+    [[ -e "$f" ]] || continue
+    base=$(basename "$f" .fish)
+    names["$base"]=1
+  done
+  for f in "$sh_dir"/*.sh; do
+    [[ -e "$f" ]] || continue
+    base=$(basename "$f" .sh)
+    names["$base"]=1
+  done
+
+  if [[ ${#names[@]} -eq 0 ]]; then
+    msgr msg "No secrets configured"
+    return 0
+  fi
+
+  local -a sorted
+  mapfile -t sorted < <(printf '%s\n' "${!names[@]}" | sort)
+
+  msgr msg "Configured secrets:"
+  local name fish_file sh_file shells env_names
+  for name in "${sorted[@]}"; do
+    fish_file="$fish_dir/$name.fish"
+    sh_file="$sh_dir/$name.sh"
+    shells=""
+    [[ -f "$fish_file" ]] && shells="fish"
+    [[ -f "$sh_file" ]] && shells="${shells:+$shells,}sh"
+    env_names=$(secrets_env_names "$fish_file" "$sh_file")
+    msgr nested "$(printf '%-20s %-24s [%s]' "$name" "${env_names:-?}" "$shells")"
+  done
+}
+
+# Show the contents of a secret's files. This intentionally reveals the
+# stored value — it is the user inspecting their own secret.
+secrets_show()
+{
+  local name="$1"
+
+  if [[ -z "$name" ]]; then
+    msgr err "Usage: $SCRIPT secrets show <name>"
+    return 1
+  fi
+
+  if ! secrets_valid_name "$name"; then
+    msgr err "Invalid secrets name: $name"
+    return 1
+  fi
+
+  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
+  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
+
+  if [[ ! -f "$fish_file" ]] && [[ ! -f "$sh_file" ]]; then
+    msgr err "No secret named '$name'"
+    msgr nested "Run '$SCRIPT secrets list' to see configured secrets"
+    return 1
+  fi
+
+  local f line
+  for f in "$fish_file" "$sh_file"; do
+    [[ -f "$f" ]] || continue
+    msgr msg "$f"
+    while IFS= read -r line; do
+      msgr nested "$line"
+    done < "$f"
+  done
+}
+
+# Remove a secret's fish + bash/zsh files after confirmation.
+secrets_remove()
+{
+  local name="$1"
+
+  if [[ -z "$name" ]]; then
+    msgr err "Usage: $SCRIPT secrets remove <name>"
+    return 1
+  fi
+
+  if ! secrets_valid_name "$name"; then
+    msgr err "Invalid secrets name: $name"
+    return 1
+  fi
+
+  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
+  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
+
+  local -a targets=()
+  [[ -f "$fish_file" ]] && targets+=("$fish_file")
+  [[ -f "$sh_file" ]] && targets+=("$sh_file")
+
+  if [[ ${#targets[@]} -eq 0 ]]; then
+    msgr err "No secret named '$name'"
+    return 1
+  fi
+
+  msgr warn "About to remove:"
+  local t
+  for t in "${targets[@]}"; do
+    msgr nested "$t"
+  done
+
+  local answer
+  read -rp "Remove these files? [y/N] " answer
+  case "$answer" in
+    [yY] | [yY][eE][sS])
+      rm -f "${targets[@]}"
+      msgr yay "Removed secret '$name'"
+      ;;
+    *)
+      msgr msg "Aborted — nothing removed"
+      return 0
+      ;;
+  esac
+}

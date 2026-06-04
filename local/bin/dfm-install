@@ -1,0 +1,229 @@
+#!/usr/bin/env bash
+#USAGE cmd "install" help="Install tools, packages, and configurations" {
+#USAGE   cmd "all" help="Install everything in the correct order"
+#USAGE   cmd "apt-packages" help="Install apt packages (Debian/Ubuntu)"
+#USAGE   cmd "cheat-databases" help="Install cheat external cheatsheet databases"
+#USAGE   cmd "composer" help="Install PHP Package Manager Composer"
+#USAGE   cmd "dnf-packages" help="Install dnf packages (Fedora/RHEL)"
+#USAGE   cmd "fonts" help="Install programming fonts"
+#USAGE   cmd "gh" help="Install GitHub CLI Extensions"
+#USAGE   cmd "imagick" help="Install ImageMagick CLI"
+#USAGE   cmd "macos" help="Setup nice macOS defaults"
+#USAGE   cmd "mise" help="Install tools via mise (runtimes + CLI tools)"
+#USAGE   cmd "mise-cleanup" help="Remove old version manager installations" {
+#USAGE     flag "--dry-run" help="Show what would be removed without removing"
+#USAGE   }
+#USAGE   cmd "ntfy" help="Install ntfy notification tool"
+#USAGE   cmd "python-libs" help="Install Python libraries (libtmux, pynvim)"
+#USAGE   cmd "shellspec" help="Install shellspec testing framework"
+#USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
+#USAGE   cmd "z" help="Install z directory jumper"
+#USAGE }
+#
+# dfm install — install tools, packages, and configurations.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib"
+dfm_bootstrap
+
+# Handle install section commands
+dfm_install()
+{
+  USAGE_PREFIX="$SCRIPT install <command>"
+
+  MENU=(
+    "all:Installs everything in the correct order"
+    "apt-packages:Install apt packages (Debian/Ubuntu)"
+    "cheat-databases:Install cheat external cheatsheet databases"
+    "composer:Install composer"
+    "dnf-packages:Install dnf packages (Fedora/RHEL)"
+    "fonts:Install programming fonts"
+    "gh:Install GitHub CLI Extensions"
+    "imagick:Install ImageMagick CLI"
+    "macos:Setup nice macOS defaults"
+    "mise:Install tools via mise (runtimes + CLI tools)"
+    "mise-cleanup:Remove old version manager installations (--dry-run supported)"
+    "ntfy:Install ntfy notification tool"
+    "python-libs:Install Python libraries (libtmux, pynvim)"
+    "shellspec:Install shellspec testing framework"
+    "xcode-cli-tools:Install Xcode CLI tools (macOS)"
+    "z:Install z"
+  )
+
+  case "$1" in
+    all)
+      msgr msg "Starting to install all and reloading configurations..."
+
+      # Tier 0: Platform foundations (OS packages, build tools)
+      [[ "$(uname)" == "Darwin" ]] && dfm_install macos
+      [[ "$(uname)" == "Darwin" ]] && dfm_install xcode-cli-tools
+      command -v apt &> /dev/null && dfm_install apt-packages
+      command -v dnf &> /dev/null && dfm_install dnf-packages
+
+      # Tier 1: Package managers & fonts
+      "$DFM" brew install
+      dfm_install fonts
+
+      # Tier 2: Runtimes and CLI tools via mise, then remaining installers
+      dfm_install mise || exit 1
+      dfm_install composer || exit 1
+      dfm_install python-libs || exit 1
+
+      # Tier 3: Tool-dependent installers
+      dfm_install cheat-databases
+      dfm_install gh
+      dfm_install ntfy
+
+      # Tier 4: Independent utilities
+      dfm_install shellspec
+      dfm_install z
+
+      # Tier 5: Generate completions, docs, and manpages from usage specs
+      msgr run "Generating completions and docs from usage specs..."
+      if bash "$DOTFILES/scripts/install-completions.sh"; then
+        msgr run_done "Completions and docs generated!"
+      else
+        msgr warn "Some completions/docs failed to generate (non-fatal)"
+      fi
+
+      msgr msg "Reloading configurations again..."
+      # shellcheck disable=SC1091
+      source "$DOTFILES/config/shared.sh"
+      msgr yay "All done!"
+      ;;
+
+    cheat-databases)
+      msgr run "Installing cheat databases..."
+      for database in "$DOTFILES"/scripts/install-cheat-*.sh; do
+        bash "$database" \
+          && msgr run_done "Cheat: $database run"
+      done
+      ;;
+
+    composer)
+      msgr run "Installing composer..."
+      bash "$DOTFILES/scripts/install-composer.sh" \
+        && msgr run_done "composer installed!"
+      ;;
+
+    fonts)
+      msgr run "Installing fonts..."
+      bash "$DOTFILES/scripts/install-fonts.sh" \
+        && msgr yay "Installed fonts!"
+      ;;
+
+    gh)
+      msgr run "Installing GitHub CLI Extensions..."
+      bash "$DOTFILES/scripts/install-gh-extensions.sh" \
+        && msgr yay "github cli extensions installed!"
+      ;;
+
+    imagick)
+      msgr run "Downloading and installing ImageMagick CLI..."
+      curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
+        && chmod +x "$XDG_BIN_HOME/magick" \
+        && msgr yay "imagick downloaded and installed!"
+      ;;
+
+    macos)
+      msgr run "Setting up macOS defaults..."
+      bash "$DOTFILES/scripts/install-macos-defaults.sh" \
+        && msgr yay "macOS defaults set!"
+      ;;
+
+    mise)
+      msgr run "Installing tools via mise..."
+      if ! command -v mise &> /dev/null; then
+        msgr nested "Installing mise..."
+        curl -fsSL https://mise.run | sh || {
+          msgr err "Failed to install mise"
+          exit 1
+        }
+        export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
+      fi
+      if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+        msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
+        msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
+        if [[ -t 0 ]]; then
+          read -rp "Create GITHUB_TOKEN secrets now? [y/N] " _answer
+          if [[ "${_answer:-N}" =~ ^[Yy]$ ]]; then
+            "$DFM" secrets github
+            # shellcheck disable=SC1090
+            [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
+              && source "$DOTFILES/config/secrets.d/github.sh"
+          fi
+          unset _answer
+        else
+          msgr nested "Non-interactive shell; skipping token prompt"
+        fi
+      fi
+      mise install --yes || {
+        msgr err "mise install failed"
+        exit 1
+      }
+      mise reshim || {
+        msgr err "mise reshim failed"
+        exit 1
+      }
+      msgr yay "mise tools installed!"
+      ;;
+
+    mise-cleanup)
+      msgr run "Cleaning up old version manager installations..."
+      bash "$DOTFILES/scripts/cleanup-old-version-managers.sh" "${@:2}"
+      ;;
+
+    apt-packages)
+      msgr run "Installing apt packages..."
+      bash "$DOTFILES/scripts/install-apt-packages.sh" \
+        && msgr yay "apt packages installed!"
+      ;;
+
+    dnf-packages)
+      msgr run "Installing dnf packages..."
+      bash "$DOTFILES/scripts/install-dnf-packages.sh" \
+        && msgr yay "dnf packages installed!"
+      ;;
+
+    ntfy)
+      msgr run "Installing ntfy via mise..."
+      mise install "github:binwiederhier/ntfy" \
+        && msgr yay "ntfy installed!"
+      ;;
+
+    python-libs)
+      msgr run "Installing Python libraries..."
+      bash "$DOTFILES/scripts/install-python-packages.sh" \
+        && msgr yay "Python libraries installed!"
+      ;;
+
+    xcode-cli-tools)
+      msgr run "Installing Xcode CLI tools..."
+      bash "$DOTFILES/scripts/install-xcode-cli-tools.sh" \
+        && msgr yay "Xcode CLI tools installed!"
+      ;;
+
+    shellspec)
+      msgr run "Installing shellspec..."
+      bash "$DOTFILES/scripts/install-shellspec.sh" \
+        && msgr yay "shellspec has been installed!"
+      ;;
+
+    z)
+      msgr run "Installing z..."
+      bash "$DOTFILES/scripts/install-z.sh" \
+        && msgr yay "z has been installed!"
+      ;;
+
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_install "$@"

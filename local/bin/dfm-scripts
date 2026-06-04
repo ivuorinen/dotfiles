@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#USAGE cmd "scripts" help="Discover available scripts or run one from scripts/" {
+#USAGE   arg "[script]" help="Script name to run (without install- prefix); omit to list available"
+#USAGE }
+#
+# dfm scripts — discover available scripts or run one from scripts/.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib"
+dfm_bootstrap
+
+# Handle install script execution
+dfm_scripts()
+{
+  USAGE_PREFIX="$SCRIPT scripts <command>"
+
+  # Collect scripts and their descriptions
+  local menu_items=()
+  for script in "$DOTFILES/scripts/install-"*.sh; do
+    if [ -f "$script" ]; then
+      name=$(basename "$script" .sh | sed 's/install-//')
+      desc=$(get_script_description "$script")
+      menu_items+=("$name:$desc")
+    fi
+  done
+
+  case "$1" in
+    "")
+      menu_builder "$USAGE_PREFIX" "${menu_items[@]}"
+      ;;
+    *)
+      # Run the chosen script
+      script_path="$DOTFILES/scripts/install-$1.sh"
+      if [ -f "$script_path" ]; then
+        bash "$script_path"
+      else
+        msgr err "Script not found: $1"
+      fi
+      ;;
+  esac
+}
+
+dfm_scripts "$@"
