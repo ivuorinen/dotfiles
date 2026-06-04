@@ -82,8 +82,6 @@ brew "curl"
 brew "dependency-check"
 # Lightweight DNS forwarder and DHCP server
 brew "dnsmasq"
-# .NET Core
-brew "dotnet@8", link: true
 # Spellchecker wrapping library
 brew "enchant"
 # Perl lib for reading and writing EXIF metadata
