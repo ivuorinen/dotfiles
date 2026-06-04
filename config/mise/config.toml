@@ -84,7 +84,7 @@ gum = "0.17.0"
 # tooling that needs version pinning per-project.
 editorconfig-checker = "3.7.0"
 biome = "2.4.12"                            # pinned to match biome.json $schema; bump both together
-"npm:ccusage" = "20.0.5"
+"npm:ccusage" = "20.0.6"
 "npm:github-release-notes" = "0.17.3"
 "npm:neovim" = "5.4.0"                      # Node.js client for Neovim's RPC API (required by plugins)
 "npm:corepack" = "0.35.0"
