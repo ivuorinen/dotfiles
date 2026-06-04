@@ -78,9 +78,16 @@ dfm_dotfiles()
       ;;
 
     shfmt)
-      # If system doesn't have fd or shfmt installed, exit
-      ! x-have fd && msgr err "fd not found, install it to continue"
-      ! x-have shfmt && msgr err "shfmt not found, install it to continue"
+      # If the system doesn't have fd or shfmt, stop here instead of
+      # falling through and running the formatter without its tools.
+      if ! x-have fd; then
+        msgr err "fd not found, install it to continue"
+        return 1
+      fi
+      if ! x-have shfmt; then
+        msgr err "shfmt not found, install it to continue"
+        return 1
+      fi
       # Format shell scripts according to following rules.
       fd --search-path "$DOTFILES" -tx \
         --hidden \
