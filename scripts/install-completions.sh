@@ -114,10 +114,13 @@ if [[ -f "$DOTFILES/local/bin/dfm" ]]; then
   dfm_spec="$dfm_spec_dir/dfm"
   {
     printf '#!/usr/bin/env bash\n'
-    grep '^#USAGE' "$DOTFILES/local/bin/dfm"
+    # `|| true`: under `set -e` a grep with no match exits 1 and would abort
+    # the whole generator. A dfm-* with no #USAGE simply contributes nothing.
+    grep '^#USAGE' "$DOTFILES/local/bin/dfm" || true
     for section in install brew apt check dotfiles helpers docs scripts tests secrets cleanup; do
       sub="$DOTFILES/local/bin/dfm-$section"
-      [[ -f "$sub" ]] && grep '^#USAGE' "$sub"
+      [[ -f "$sub" ]] || continue
+      grep '^#USAGE' "$sub" || true
     done
   } > "$dfm_spec"
   generate_for_spec "$dfm_spec" "dfm"

@@ -12,6 +12,7 @@
 #USAGE   cmd "wezterm" help="Show wezterm keybindings"
 #USAGE }
 #
+# @description Display system information helpers (dfm helpers)
 # dfm helpers — display system information.
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -22,7 +23,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle helper utility commands
@@ -47,8 +51,8 @@ dfm_helpers()
 
   case "$CMD" in
     path)
-      # shellcheck disable=2001
-      for i in $(echo "$PATH" | sed 's/:/ /g'); do echo "$i"; done
+      # Split on ':' only, so PATH entries containing spaces stay intact.
+      printf '%s\n' "$PATH" | tr ':' '\n'
       ;;
 
     aliases)

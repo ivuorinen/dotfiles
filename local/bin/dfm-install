@@ -20,6 +20,7 @@
 #USAGE   cmd "z" help="Install z directory jumper"
 #USAGE }
 #
+# @description Install tools, packages, and configurations (dfm install)
 # dfm install — install tools, packages, and configurations.
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -30,7 +31,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle install section commands

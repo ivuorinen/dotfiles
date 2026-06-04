@@ -6,6 +6,7 @@
 #USAGE   cmd "wezterm" help="Update wezterm keybindings"
 #USAGE }
 #
+# @description Generate keybinding documentation (dfm docs)
 # dfm docs — generate keybinding documentation.
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -16,7 +17,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle documentation generation commands

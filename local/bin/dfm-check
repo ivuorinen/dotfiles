@@ -17,6 +17,7 @@
 #USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
 #USAGE }
 #
+# @description System information and health checks (dfm check)
 # dfm check — system information checks (arch, hostname, health).
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -27,7 +28,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle system check commands (arch, hostname)

@@ -7,6 +7,7 @@
 #USAGE   cmd "reset_nvim" help="Reset neovim state and config"
 #USAGE }
 #
+# @description Format and reset dotfiles configurations (dfm dotfiles)
 # dfm dotfiles — format and reset configurations.
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -17,7 +18,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle dotfiles formatting and reset commands
@@ -54,8 +58,11 @@ dfm_dotfiles()
         ~/.cache/nvim \
         ~/.config/nvim \
         && msgr ok "Deleted old nvim files (share, state and cache + config)"
-      ln -s "$DOTFILES/config/nvim" ~/.config/nvim \
-        && msgr ok "Linked nvim and astronvim"
+      if ! ln -s "$DOTFILES/config/nvim" ~/.config/nvim; then
+        msgr err "Failed to link nvim config"
+        exit 1
+      fi
+      msgr ok "Linked nvim and astronvim"
       "$DFM" install mise || {
         msgr err "Failed to install mise tools"
         exit 1
@@ -75,7 +82,7 @@ dfm_dotfiles()
       ! x-have fd && msgr err "fd not found, install it to continue"
       ! x-have shfmt && msgr err "shfmt not found, install it to continue"
       # Format shell scripts according to following rules.
-      fd --full-path "$DOTFILES" -tx \
+      fd --search-path "$DOTFILES" -tx \
         --hidden \
         -E '*.pl' -E '*.php' -E '*.py' -E '*.zsh' -E 'plugins' -E 'fzf' -E 'dotbot' \
         -E 'test' -E '**/tldr/*' \

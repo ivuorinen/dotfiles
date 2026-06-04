@@ -21,7 +21,7 @@ git-style subcommand executables: `dfm brew` → `local/bin/dfm-brew`,
 
 ## File inventory
 
-```
+```text
 local/bin/dfm           # dispatcher + root #USAGE (name/bin/about/author)
 local/bin/dfm-lib       # sourced shared library — NON-executable (0644)
 local/bin/dfm-install   # internal case: all|fonts|mise|macos|composer|…

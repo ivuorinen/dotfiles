@@ -8,6 +8,7 @@
 #USAGE   cmd "old-vms" help="Remove old version manager directories replaced by mise"
 #USAGE }
 #
+# @description Remove old installs, caches, and unused packages (dfm cleanup)
 # dfm cleanup — remove old installs, caches, and unused packages.
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -18,7 +19,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 dfm_cleanup()

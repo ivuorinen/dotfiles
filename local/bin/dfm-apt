@@ -8,6 +8,7 @@
 #USAGE   cmd "clean" help="Clean package cache"
 #USAGE }
 #
+# @description APT package management for Debian/Ubuntu (dfm apt)
 # dfm apt — APT package management (Debian/Ubuntu).
 #
 # vim: ft=bash ts=2 sw=2 et
@@ -18,7 +19,10 @@ _dfm_dir=$(
   cd -- "$(dirname -- "$0")" && pwd
 )
 # shellcheck source=local/bin/dfm-lib
-source "$_dfm_dir/dfm-lib"
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
 dfm_bootstrap
 
 # Handle apt package manager commands
@@ -49,7 +53,7 @@ dfm_apt()
 
     install)
       # if apt.txt is not found, return with error
-      if [ ! -f "$DOTFILES/tools/apt.txt" ]; then
+      if [[ ! -f "$DOTFILES/tools/apt.txt" ]]; then
         msgr err "apt.txt not found"
         return 1
       fi
@@ -69,7 +73,7 @@ dfm_apt()
       # run install on those lines too.
       HOSTNAME=$(hostname -s)
       HOST_APT="$DOTFILES/hosts/$HOSTNAME/apt.txt"
-      [[ -f $HOST_APT ]] && {
+      [[ -f "$HOST_APT" ]] && {
         # shellcheck disable=SC2046
         sudo apt install -y $(
           grep -vE '^\s*#' "$HOST_APT" \
