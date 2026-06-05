@@ -37,7 +37,7 @@ rust = "1.95.0"
 uv = "0.11.16"
 
 # shell
-"github:max-sixty/worktrunk" = "0.55.0"
+"github:max-sixty/worktrunk" = "0.56.0"
 bat = "0.26.1"
 bats = "1.13.0"
 choose = "1.3.7"
