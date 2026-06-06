@@ -23,7 +23,7 @@ if ! source "$_dfm_dir/dfm-lib"; then
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
 fi
-dfm_bootstrap
+dfm_bootstrap_for "$@"
 
 # Handle apt package manager commands
 dfm_apt()
@@ -38,8 +38,14 @@ dfm_apt()
     "clean:Clean apt cache"
   )
 
-  if ! x-have apt; then
-    msgr warn "apt not available, skipping"
+  # apt exists only on Debian/Ubuntu. Without it there is nothing to list
+  # or run, so emit just this notice and stop — this gates the menu too.
+  # `dfm` omits the whole section on such systems (see dfm_section_requires
+  # in the dispatcher); a direct `dfm apt` lands here and shows only this.
+  # command -v (not x-have) keeps the check working under the cheap
+  # menu-path bootstrap, which does not source shared.sh.
+  if ! command -v apt > /dev/null 2>&1; then
+    msgr warn "apt not available on this system"
     return 0
   fi
 
