@@ -9,6 +9,11 @@
 DOTFILES_CURRENT_SHELL=$(basename "$SHELL")
 export DOTFILES_CURRENT_SHELL
 
+# Centralized logging + error-handling helpers (logger::*, lib::*).
+# Side-effect-free on load — safe to source into interactive shells.
+# shellcheck source=lib.sh
+source "$DOTFILES/config/lib.sh"
+
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 # Enable debugging with DEBUG=1

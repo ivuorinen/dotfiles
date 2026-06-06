@@ -18,8 +18,8 @@ if [[ $# -gt 0 ]]; then
   if [[ "$1" = "--dry-run" ]]; then
     DRY_RUN="--dry-run"
   else
-    echo "Usage: $0 [--dry-run]" >&2
-    exit 1
+    logger::error "Usage: $0 [--dry-run]"
+    exit "$LIB_E_INVALID_ARGUMENT"
   fi
 fi
 

@@ -14,7 +14,8 @@ fi
 # Run the installer in an ephemeral temp dir so partial state never leaks
 # into the caller's cwd if php (or the network) fails mid-install.
 tmpdir="$(mktemp -d)"
-trap 'rm -rf "$tmpdir"' EXIT
+lib::register_cleanup "$tmpdir"
+lib::trap_cleanup
 
 cd "$tmpdir"
 
@@ -23,8 +24,8 @@ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
 
 if [[ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]]; then
-  echo >&2 'ERROR: Invalid installer checksum'
-  exit 1
+  logger::error "Invalid installer checksum"
+  exit "$LIB_E_EXECUTION_FAILED"
 fi
 
 php composer-setup.php --quiet

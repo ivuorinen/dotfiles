@@ -50,12 +50,39 @@ Enforced at hook time by commitlint extending
 Both `base/bashrc` and `base/zshrc` source `config/shared.sh`,
 which loads:
 
+- `config/lib.sh` — centralized logging + error/cleanup helpers
 - `config/exports` — environment variables, XDG dirs, PATH
 - `config/alias` — shell aliases
 
 Zsh additionally uses **antidote** (in `tools/antidote/`) for plugin
 management. All three shells (bash, zsh, fish) render their prompt
 with **starship**.
+
+### Centralized Logging (`config/lib.sh`)
+
+`config/shared.sh` sources `config/lib.sh` first, so the helpers below
+are available in every interactive shell and in every script that
+sources `shared.sh` (including all `dfm-*` subcommands, which reach it
+through `dfm_bootstrap`). Adapted from the dfm `common.sh` logging
+functions and made portable across bash 3.2+, bash 5, and zsh (severities
+map via a `case` statement, not a bash-only associative array).
+
+- `logger::log <LEVEL> <msg>` and the `logger::{debug,info,warn,error}`
+  wrappers — level-filtered, timestamped output to stderr, gated by
+  `$LOG_LEVEL` (DEBUG < INFO < WARN < ERROR; default `INFO`). The level
+  tag is colorized when stderr is a TTY.
+- `lib::log` / `lib::error` — unconditional timestamped lines.
+- `LIB_E_*` — named exit codes (`LIB_E_INVALID_ARGUMENT`,
+  `LIB_E_COMMAND_NOT_FOUND`, …) for `exit`/`return`.
+- `lib::strict` — opt-in `set -euo pipefail` + ERR trap via
+  `lib::error::handle`. `lib::register_cleanup <path>` +
+  `lib::trap_cleanup` — opt-in EXIT cleanup of temp paths.
+
+**Load-time invariant:** because it lands in interactive shells,
+`lib.sh` is side-effect-free on source — it only defines functions and
+constants. It never runs `set -e`, installs traps, or calls `exit` at
+the top level; scripts opt into those via `lib::strict` /
+`lib::trap_cleanup`. Covered by `tests/lib.bats`.
 
 ### Theme Orchestrator (`config/theme/`)
 
