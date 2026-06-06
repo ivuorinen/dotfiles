@@ -43,7 +43,7 @@ dfm_docs()
       dfm_docs wezterm || rc=1
       return "$rc"
       ;;
-    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
+    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-tmux-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
     wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
