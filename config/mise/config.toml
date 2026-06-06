@@ -141,7 +141,7 @@ trufflehog = "3.95.5"
 
 # Terraform (replaces tfenv)
 terraform = "1.15.5"
-tflint = "0.62.1"
+tflint = "0.63.1"
 tfsec = "1.28.14"
 
 # Other useful tools
