@@ -21,7 +21,7 @@ if ! source "$_dfm_dir/dfm-lib"; then
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
 fi
-dfm_bootstrap
+dfm_bootstrap_for "$@"
 
 # Handle documentation generation commands
 dfm_docs()
@@ -43,7 +43,7 @@ dfm_docs()
       dfm_docs wezterm || rc=1
       return "$rc"
       ;;
-    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-xterm-keybindings" ;;
+    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-tmux-keybindings" ;;
     nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
     wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;

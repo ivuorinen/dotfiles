@@ -14,13 +14,16 @@ fi
 source "$DOTFILES/config/shared.sh"
 
 DRY_RUN=""
-if [[ $# -gt 0 ]]; then
-  if [[ "$1" = "--dry-run" ]]; then
-    DRY_RUN="--dry-run"
-  else
-    echo "Usage: $0 [--dry-run]" >&2
-    exit 1
+if [[ $# -gt 1 ]]; then
+  logger::error "Usage: $0 [--dry-run]"
+  exit "$LIB_E_INVALID_ARGUMENT"
+fi
+if [[ $# -eq 1 ]]; then
+  if [[ "$1" != "--dry-run" ]]; then
+    logger::error "Usage: $0 [--dry-run]"
+    exit "$LIB_E_INVALID_ARGUMENT"
   fi
+  DRY_RUN="--dry-run"
 fi
 
 remove_dir()

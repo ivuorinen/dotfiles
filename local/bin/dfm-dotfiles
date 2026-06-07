@@ -22,7 +22,7 @@ if ! source "$_dfm_dir/dfm-lib"; then
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
 fi
-dfm_bootstrap
+dfm_bootstrap_for "$@"
 
 # Handle dotfiles formatting and reset commands
 dfm_dotfiles()

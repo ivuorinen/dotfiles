@@ -50,12 +50,39 @@ Enforced at hook time by commitlint extending
 Both `base/bashrc` and `base/zshrc` source `config/shared.sh`,
 which loads:
 
+- `config/lib.sh` — centralized logging + error/cleanup helpers
 - `config/exports` — environment variables, XDG dirs, PATH
 - `config/alias` — shell aliases
 
 Zsh additionally uses **antidote** (in `tools/antidote/`) for plugin
 management. All three shells (bash, zsh, fish) render their prompt
 with **starship**.
+
+### Centralized Logging (`config/lib.sh`)
+
+`config/shared.sh` sources `config/lib.sh` first, so the helpers below
+are available in every interactive shell and in every script that
+sources `shared.sh` (including all `dfm-*` subcommands, which reach it
+through `dfm_bootstrap`). Adapted from the dfm `common.sh` logging
+functions and made portable across bash 3.2+, bash 5, and zsh (severities
+map via a `case` statement, not a bash-only associative array).
+
+- `logger::log <LEVEL> <msg>` and the `logger::{debug,info,warn,error}`
+  wrappers — level-filtered, timestamped output to stderr, gated by
+  `$LOG_LEVEL` (DEBUG < INFO < WARN < ERROR; default `INFO`). The level
+  tag is colorized when stderr is a TTY.
+- `lib::log` / `lib::error` — unconditional timestamped lines.
+- `LIB_E_*` — named exit codes (`LIB_E_INVALID_ARGUMENT`,
+  `LIB_E_COMMAND_NOT_FOUND`, …) for `exit`/`return`.
+- `lib::strict` — opt-in `set -euo pipefail` + ERR trap via
+  `lib::error::handle`. `lib::register_cleanup <path>` +
+  `lib::trap_cleanup` — opt-in EXIT cleanup of temp paths.
+
+**Load-time invariant:** because it lands in interactive shells,
+`lib.sh` is side-effect-free on source — it only defines functions and
+constants. It never runs `set -e`, installs traps, or calls `exit` at
+the top level; scripts opt into those via `lib::strict` /
+`lib::trap_cleanup`. Covered by `tests/lib.bats`.
 
 ### Theme Orchestrator (`config/theme/`)
 
@@ -98,11 +125,26 @@ section lives in its own executable:
 - `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,cleanup}`
   — one file per section, each carrying its own `#USAGE` subtree.
 - `local/bin/dfm-lib` — sourced (non-executable) shared library:
-  `dfm_bootstrap` (env + msgr/shared.sh + bash-4 guard), `menu_builder`,
-  `get_script_description`, and the `secrets_*` family. The missing exec
-  bit keeps `dfm lib` from matching it and signals "source, don't run".
-  Subcommands re-dispatch across sections via the `$DFM` variable it
-  exports; same-section fan-out uses local function calls.
+  the bootstrap family, `menu_builder`, `get_script_description`, and the
+  `secrets_*` family. The missing exec bit keeps `dfm lib` from matching
+  it and signals "source, don't run". Subcommands re-dispatch across
+  sections via the `$DFM` variable it exports; same-section fan-out uses
+  local function calls.
+  - Bootstrap is split for speed: `dfm_bootstrap_min` (env + msgr only)
+    serves menu/help paths, while `dfm_bootstrap` adds the bash-4 guard
+    and sources `config/shared.sh` (which pulls in `config/exports` —
+    `mise activate`, `brew shellenv`, etc.). Each subcommand calls
+    `dfm_bootstrap_for "$@"`, which picks the cheap path for no-arg/help
+    invocations and the full path for real actions. This keeps `dfm` and
+    `dfm <section>` listings fast (no environment sourcing per section).
+  - Tool-gated sections (`dfm-apt`, `dfm-brew`) are omitted from the `dfm`
+    listing entirely on systems lacking the tool: `dfm_section_requires`
+    maps the section to its command and `usage()` skips it when
+    `command -v` finds nothing (no bootstrap needed). A direct
+    `dfm apt`/`dfm brew` on such a system prints only a "not available on
+    this system" notice — the check sits first in the section function and
+    gates the menu too. `command -v` (not `x-have`) is used so the gate
+    works under the cheap menu-path bootstrap.
 
 Completions/docs/manpages: `scripts/install-completions.sh` stitches the
 per-section `#USAGE` fragments into one `dfm` spec (skipping `dfm`/`dfm-*`
@@ -116,7 +158,7 @@ every section. Key commands:
 - `dfm helpers <name>` — inspect aliases, colors, env, functions, path
 - `dfm docs all` — regenerate documentation under `docs/`
 - `dfm check arch` / `dfm check host` — system info
-- `dfm scripts` — run scripts from `scripts/` (discovered via `@description` tags)
+- `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers
 
 ### mise — Unified Tool Manager

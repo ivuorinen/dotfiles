@@ -108,6 +108,70 @@ setup()
   [[ "$output" == *"params"* ]]
 }
 
+# A tool-gated section (apt, brew) only makes sense when its tool exists.
+# `dfm <section>` shows the menu when the tool is present, or ONLY a
+# not-available notice when it is absent. The bare `dfm` listing omits
+# such a section entirely when its tool is missing, and never prints a
+# notice — absent sections are skipped, not run. These assertions branch
+# on the host so they hold on both Debian (apt present) and macOS (absent).
+@test "dfm apt shows menu when apt present, notice-only when absent" {
+  run bash local/bin/dfm apt
+  [ "$status" -eq 0 ]
+  if command -v apt > /dev/null 2>&1; then
+    [[ "$output" == *"upkeep"* ]]
+    [[ "$output" != *"not available"* ]]
+  else
+    [[ "$output" == *"apt not available"* ]]
+    [[ "$output" != *"upkeep"* ]]
+  fi
+}
+
+@test "dfm brew shows menu when brew present, notice-only when absent" {
+  run bash local/bin/dfm brew
+  [ "$status" -eq 0 ]
+  if command -v brew > /dev/null 2>&1; then
+    [[ "$output" == *"untracked"* ]]
+    [[ "$output" != *"not available"* ]]
+  else
+    [[ "$output" == *"brew not available"* ]]
+    [[ "$output" != *"untracked"* ]]
+  fi
+}
+
+@test "bare dfm omits tool-gated sections whose tool is absent" {
+  run bash local/bin/dfm
+  [ "$status" -eq 0 ]
+  # Absent sections are skipped, not run, so no notice ever leaks here.
+  [[ "$output" != *"not available"* ]]
+  if command -v apt > /dev/null 2>&1; then
+    [[ "$output" == *"dfm apt"* ]]
+  else
+    [[ "$output" != *"dfm apt"* ]]
+  fi
+  if command -v brew > /dev/null 2>&1; then
+    [[ "$output" == *"dfm brew"* ]]
+  else
+    [[ "$output" != *"dfm brew"* ]]
+  fi
+}
+
+# config/exports emits `msg "Setting up …"` for many tools, guarded by
+# VERBOSE. A full-bootstrap action must keep that guard intact. A prior
+# regression sourced msgr (whose bare msg() prints unconditionally)
+# before shared.sh, so the guarded definitions were skipped and every
+# setup line leaked onto stdout. See dfm_bootstrap's ordering in dfm-lib.
+@test "a full-bootstrap action does not leak exports setup messages" {
+  run bash local/bin/dfm helpers path
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"Setting up"* ]]
+}
+
+@test "VERBOSE=1 still surfaces exports setup messages on demand" {
+  run env VERBOSE=1 bash local/bin/dfm helpers path
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Setting up"* ]]
+}
+
 # ── Group 4: Check commands ───────────────────────────────────
 
 @test "dfm check arch returns current arch" {

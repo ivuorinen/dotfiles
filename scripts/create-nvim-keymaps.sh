@@ -15,6 +15,8 @@ main()
 
   local tmpfile
   tmpfile=$(mktemp /tmp/nvim-keymaps-XXXX.lua)
+  lib::register_cleanup "$tmpfile"
+  lib::trap_cleanup
 
   cat > "$tmpfile" << 'LUAEOF'
 local dest = vim.env.KEYMAPS_DEST

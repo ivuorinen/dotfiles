@@ -1,12 +1,12 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-06-03
-Last pass: 25 (2026-06-03)
+Last validated: 2026-06-07
+Last pass: 26 (2026-06-07)
 
 ## Summary
 
-- Total: 131 | Open: 3 | Fixed: 119 | Invalid: 9
+- Total: 138 | Open: 3 | Fixed: 126 | Invalid: 9
 
 ## Open Findings
 
@@ -44,20 +44,65 @@ Fix: Delete `config/zsh/completion/_dfm` (and ideally the singular dir if unused
 to the generator's managed outputs. Left as Advisory pending confirmation that nothing in the
 antidote/omz chain consumes `ZSH_CUSTOM_COMPLETION_PATH`.
 
-#### [N-138] `dfm help` spawns one subprocess per section (≈11) versus the monolith's in-process menus
+#### [N-138] `dfm help` spawns one subprocess per section (≈11) with cheap per-child bootstrap
 Category: performance
 Area: local/bin/dfm (usage)
-Problem: The dispatcher's `usage()` renders the full help by exec-ing each `dfm-<section>`
-with no arguments; each child re-sources `config/shared.sh` + `msgr` via `dfm_bootstrap`. The
-pre-split monolith printed every menu from in-process shell functions with a single source.
-Evidence: `usage()` loops `DFM_SECTIONS` (10 entries) running `"$_dfm_selfdir/dfm-$s"`, plus
-the dispatcher's own bootstrap — ~11 `shared.sh` sourcings for one `dfm help`.
-Impact: Advisory. `dfm help` is an interactive, non-hot path; the self-locking theme watcher
-and other shared.sh side effects are idempotent. Accepted cost of the per-file menu design.
-Fix: None required. If it ever matters, cache rendered menus or have each subcommand expose a
-`--menu` fast path that skips `dfm_bootstrap`.
+Problem: The dispatcher's `usage()` renders the full help by exec-ing each `dfm-<section>` with
+no arguments. Each child runs `dfm_bootstrap_min` (msgr only — no `shared.sh`/`mise activate`).
+This is acceptable, but still ≈11 subprocesses per `dfm help`.
+Evidence: `usage()` loops `DFM_SECTIONS` (10 entries) running `"$_dfm_selfdir/dfm-$s"`. The
+branch improved this significantly — the expensive `shared.sh` sourcing is now skipped on the
+listing path. Subprocess count is unchanged but per-subprocess cost dropped substantially.
+Impact: Advisory. `dfm help` is an interactive, non-hot path. Accepted cost of the per-file
+menu design; the expensive sourcing regression is now resolved.
+Fix: None required. Noted for completeness. If it ever matters, expose a `--menu` fast path
+that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 26 — 2026-06-07
+
+#### [N-140] `logger::log` with no arguments causes `shift: shift count out of range`
+Fixed: 2026-06-07
+Notes: Added `[[ $# -ge 1 ]] || { lib::error "logger::log: missing level argument"; return
+"$LIB_E_INVALID_ARGUMENT"; }` guard before the `shift` in `logger::log`. Added a bats test
+(test 10) that calls bare `logger::log` and asserts non-zero exit and the error message.
+
+#### [N-141] `LOG_LEVEL` set to an invalid value after sourcing bypasses the level filter
+Fixed: 2026-06-07
+Notes: Added runtime re-validation of `$LOG_LEVEL` inside `logger::log`: if `threshold` is -1
+(invalid), `LOG_LEVEL` is silently reset to INFO and `threshold` to 1. Added bats test 11 to
+confirm that `LOG_LEVEL=BOGUS` set after sourcing still suppresses DEBUG messages.
+
+#### [N-142] `lib::strict` ERR trap references `BASH_COMMAND` undefined in zsh
+Fixed: 2026-06-07
+Notes: Changed the ERR trap in `lib::strict` from `"${BASH_COMMAND}"` to `"${BASH_COMMAND-?}"`.
+The `${var-default}` expansion is handled identically in bash and zsh; zsh gets `?` as a safe
+placeholder when `BASH_COMMAND` is unset, preventing the `set -u` crash.
+
+#### [N-143] `create-nvim-keymaps.sh` removed EXIT trap without replacement, leaking tmpfile
+Fixed: 2026-06-07
+Notes: Added `lib::register_cleanup "$tmpfile"; lib::trap_cleanup` immediately after the
+`mktemp` call, matching the `install-composer.sh` migration pattern from the same branch.
+The inline `rm -f` on the clean-exit path remains; `lib::cleanup` is idempotent (checks
+file existence before removal), so both coexist safely.
+
+#### [N-144] `tests/lib.bats` missing test for `logger::log` called with no arguments
+Fixed: 2026-06-07
+Notes: Added two tests: (10) bare `logger::log` returns non-zero and emits "missing level
+argument"; (11) `LOG_LEVEL=BOGUS` set after sourcing still suppresses DEBUG. Both cover the
+runtime behaviour validated by the fixes for N-140 and N-141.
+
+#### [N-145] `cleanup-old-version-managers.sh` silently accepts extra positional arguments
+Fixed: 2026-06-07
+Notes: Restructured argument parsing to check `$# -gt 1` first (rejects any call with more
+than one arg), then `$# -eq 1 && $1 != "--dry-run"` (rejects unrecognised single arg). Only
+`$# -eq 0` or exactly `--dry-run` now proceeds.
+
+#### [N-146] CLAUDE.md misattributes `dfm scripts` discovery to `@description` tags
+Fixed: 2026-06-07
+Notes: Changed line 161 from "run scripts from `scripts/` (discovered via `@description`
+tags)" to "run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)".
 
 ### Pass 25 — 2026-06-03
 

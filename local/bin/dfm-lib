@@ -28,9 +28,10 @@ _dfm_libdir=$(
 DFM="$_dfm_libdir/dfm"
 export DFM
 
-# Bootstrap shared environment and dependencies. Call once near the top
-# of the dispatcher and each dfm-* subcommand, after sourcing this file.
-dfm_bootstrap()
+# Shared variable setup used by every bootstrap path. Kept sourcing-free
+# and separate so the full path can control the shared.sh / msgr order
+# (see dfm_bootstrap).
+dfm_bootstrap_vars()
 {
   # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
   : "${VERBOSE:=0}"
@@ -43,6 +44,31 @@ dfm_bootstrap()
   # help/usage text reads "dfm brew <command>" no matter which binary is
   # actually executing.
   SCRIPT="dfm"
+}
+
+# Minimal bootstrap for menu/help paths. Sets the shared variables and
+# sources msgr (cheap — just colour-function definitions) but
+# deliberately SKIPS config/shared.sh. shared.sh pulls in config/exports,
+# which runs `mise activate` and `brew shellenv` (each forks a subprocess
+# and costs hundreds of milliseconds). Rendering a static menu needs none
+# of that, so the listing path stays fast. Action paths use dfm_bootstrap
+# (full) instead. Call once near the top of a subcommand via
+# dfm_bootstrap_for, after sourcing this file. msgr's bare msg() prints
+# unconditionally, but this path never sources config/exports, so there
+# are no `msg "Setting up …"` calls to leak.
+dfm_bootstrap_min()
+{
+  dfm_bootstrap_vars
+
+  # shellcheck disable=SC1090
+  source "${DOTFILES}/local/bin/msgr"
+}
+
+# Full bootstrap for action paths: the variable setup plus the bash-4
+# guard and the (expensive) shared shell environment.
+dfm_bootstrap()
+{
+  dfm_bootstrap_vars
 
   # Require bash 4.0+ for associative arrays and mapfile
   if ((BASH_VERSINFO[0] < 4)); then
@@ -61,10 +87,34 @@ dfm_bootstrap()
     exit 1
   fi
 
+  # Order matters: shared.sh MUST be sourced before msgr. shared.sh
+  # defines a VERBOSE-guarded msg() and then sources config/exports, which
+  # calls `msg "Setting up …"` for many tools. msgr also defines a bare
+  # msg() that prints unconditionally; if msgr were sourced first those
+  # setup messages would bleed onto stdout (e.g. `dfm helpers tmux`).
+  # Sourcing shared.sh first keeps the guarded msg() active while exports
+  # runs; msgr then loads its colour helpers for the action code.
   # shellcheck disable=SC1091
   source "$DOTFILES/config/shared.sh"
   # shellcheck disable=SC1090
   source "${DOTFILES}/local/bin/msgr"
+}
+
+# Bootstrap appropriately for the subcommand's ARGS. A menu/help
+# invocation (no args or a help flag) gets the cheap dfm_bootstrap_min;
+# anything else gets the full dfm_bootstrap. This keeps `dfm` and
+# `dfm <section>` listings fast while real actions still load the
+# complete shell environment.
+dfm_bootstrap_for()
+{
+  case "${1:-}" in
+    "" | help | -h | --help)
+      dfm_bootstrap_min
+      ;;
+    *)
+      dfm_bootstrap
+      ;;
+  esac
 }
 
 # Get description from a script file's @description tag

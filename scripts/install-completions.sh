@@ -24,8 +24,8 @@ mkdir -p "$FISH_DIR" "$BASH_DIR" "$ZSH_DIR" "$MD_DIR" "$MAN_DIR"
 
 # Check for usage CLI
 if ! command -v usage &> /dev/null; then
-  echo "Error: usage CLI not found. Install with: mise use -g usage" >&2
-  exit 1
+  logger::error "usage CLI not found. Install with: mise use -g usage"
+  exit "$LIB_E_COMMAND_NOT_FOUND"
 fi
 
 count=0
@@ -36,13 +36,13 @@ generate_for_spec()
   local spec="$1"
   local bin_name="$2"
 
-  echo "Generating for: $bin_name"
+  logger::info "Generating for: $bin_name"
 
   # Completions
   if usage generate completion fish "$bin_name" -f "$spec" > "$FISH_DIR/$bin_name.fish" 2>&1; then
     :
   else
-    echo "  WARN: fish completion failed for $bin_name" >&2
+    logger::warn "fish completion failed for $bin_name"
     rm -f "$FISH_DIR/$bin_name.fish"
     ((errors++)) || true
   fi
@@ -50,7 +50,7 @@ generate_for_spec()
   if usage generate completion bash "$bin_name" -f "$spec" > "$BASH_DIR/$bin_name.bash" 2>&1; then
     :
   else
-    echo "  WARN: bash completion failed for $bin_name" >&2
+    logger::warn "bash completion failed for $bin_name"
     rm -f "$BASH_DIR/$bin_name.bash"
     ((errors++)) || true
   fi
@@ -58,7 +58,7 @@ generate_for_spec()
   if usage generate completion zsh "$bin_name" -f "$spec" > "$ZSH_DIR/_$bin_name" 2>&1; then
     :
   else
-    echo "  WARN: zsh completion failed for $bin_name" >&2
+    logger::warn "zsh completion failed for $bin_name"
     rm -f "$ZSH_DIR/_$bin_name"
     ((errors++)) || true
   fi
@@ -67,7 +67,7 @@ generate_for_spec()
   if usage generate markdown -f "$spec" --out-file "$MD_DIR/$bin_name.md" 2>&1; then
     :
   else
-    echo "  WARN: markdown generation failed for $bin_name" >&2
+    logger::warn "markdown generation failed for $bin_name"
     rm -f "$MD_DIR/$bin_name.md"
     ((errors++)) || true
   fi
@@ -76,7 +76,7 @@ generate_for_spec()
   if usage generate manpage -f "$spec" --out-file "$MAN_DIR/$bin_name.1" 2>&1; then
     :
   else
-    echo "  WARN: manpage generation failed for $bin_name" >&2
+    logger::warn "manpage generation failed for $bin_name"
     rm -f "$MAN_DIR/$bin_name.1"
     ((errors++)) || true
   fi
@@ -135,9 +135,8 @@ for spec in "$DOTFILES"/scripts/*.sh; do
   generate_for_spec "$spec" "$bin_name"
 done
 
-echo ""
-echo "Done: processed $count specs ($errors warnings)"
+logger::info "Done: processed $count specs ($errors warnings)"
 
 if ((errors > 0)); then
-  exit 1
+  exit "$LIB_E_EXECUTION_FAILED"
 fi

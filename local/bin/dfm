@@ -53,20 +53,43 @@ fi
 # reachable as `dfm tests` because dfm-tests exists on disk.
 DFM_SECTIONS=(install secrets cleanup apt brew check dotfiles docs scripts helpers)
 
+# The command a section needs to be useful at all, or empty when the
+# section is not tool-gated. Sections whose tool is absent are omitted
+# from the listing entirely (apt on macOS, brew on a minimal Linux box) —
+# every one of their subcommands needs that tool, so there is nothing to
+# show. A case statement (not an associative array) keeps this working on
+# the cheap listing path, which skips the bash-4 guard.
+dfm_section_requires()
+{
+  case "$1" in
+    apt) printf 'apt' ;;
+    brew) printf 'brew' ;;
+    *) printf '' ;;
+  esac
+}
+
 # Display main usage information by asking each subcommand to print its
 # own menu (invoking it with no arguments hits its menu_builder branch).
 usage()
 {
-  # Bootstrap (env + msgr) is deferred to the usage/unknown paths: the
-  # dispatch fast-path execs the subcommand, which bootstraps itself, so
-  # sourcing shared.sh/msgr here avoids doing it twice on every call.
-  dfm_bootstrap
+  # The listing only renders static menus, so use the cheap bootstrap
+  # (msgr only, no shared.sh/exports). The dispatch fast-path execs the
+  # subcommand, which bootstraps itself, so this never runs on the action
+  # path. Each dfm-* invoked below also takes the cheap path because it is
+  # called with no arguments.
+  dfm_bootstrap_min
   echo ""
   msgr prompt "Usage: $SCRIPT <section> <command>"
   echo "  Empty <command> prints <section> help."
   echo ""
-  local s
+  local s req
   for s in "${DFM_SECTIONS[@]}"; do
+    # Skip a tool-gated section when its tool is missing — `command -v`
+    # needs no shell-environment bootstrap, so the listing stays fast.
+    req=$(dfm_section_requires "$s")
+    if [[ -n "$req" ]] && ! command -v "$req" > /dev/null 2>&1; then
+      continue
+    fi
     "$_dfm_selfdir/dfm-$s"
     echo ""
   done
