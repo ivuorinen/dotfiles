@@ -145,6 +145,6 @@ tflint = "0.63.1"
 tfsec = "1.28.14"
 
 # Other useful tools
-usage = "3.3.0"
+usage = "3.4.0"
 tmux = "3.6a"
 yazi = "26.5.6"
