@@ -239,7 +239,7 @@ check_repository()
   msg "Checking if repository exists: $api_url"
 
   local response
-  response=$(api_request "$api_url")
+  response=$(api_request "$api_url") || exit $?
 
   # If we got here, the repository exists (otherwise api_request would have exited)
   msg "Repository found: $(echo "$response" | jq -r '.full_name')"
@@ -267,7 +267,7 @@ get_release_version()
     "(Include prereleases: $include_prereleases, Oldest: $oldest_release)"
 
   local json_response
-  json_response=$(api_request "$api_url")
+  json_response=$(api_request "$api_url") || exit $?
 
   local version=""
   local prerelease_version=""
@@ -324,7 +324,7 @@ get_latest_branch_tag()
   msg "Fetching latest tag for branch '$branch' from: $api_url"
 
   local json_response
-  json_response=$(api_request "$api_url")
+  json_response=$(api_request "$api_url") || exit $?
 
   local version
   version=$(echo "$json_response" \
@@ -348,7 +348,7 @@ get_latest_git_tag()
   msg "Fetching latest Git tag from: $api_url"
 
   local json_response
-  json_response=$(api_request "$api_url")
+  json_response=$(api_request "$api_url") || exit $?
 
   local version
   version=$(echo "$json_response" \
@@ -373,7 +373,7 @@ get_latest_commit()
   msg "Fetching latest commit SHA from: $api_url"
 
   local json_response
-  json_response=$(api_request "$api_url")
+  json_response=$(api_request "$api_url") || exit $?
 
   local sha
   sha=$(echo "$json_response" | jq -r '.sha // empty')
@@ -511,13 +511,13 @@ parse_arguments()
         ;;
       -*)
         echo "Error: Unknown option: $1" >&2
-        usage
+        exit 1
         ;;
       *)
         # If repository is already set, this is an error
         if [[ -n $REPOSITORY ]]; then
           echo "Error: Unexpected argument: $1" >&2
-          usage
+          exit 1
         fi
         REPOSITORY="$1"
         shift
@@ -550,7 +550,7 @@ main()
 
   # Validate repository existence and get normalized repository name
   local repo_fullname
-  repo_fullname=$(check_repository "$REPOSITORY")
+  repo_fullname=$(check_repository "$REPOSITORY") || exit $?
 
   # If --all specified, get all information types
   if [[ $COMBINED -eq 1 ]]; then
