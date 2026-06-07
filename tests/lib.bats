@@ -79,6 +79,19 @@ setup()
   [[ "$output" == *"LL=INFO"* ]]
 }
 
+@test "logger::log with no arguments returns non-zero and emits an error" {
+  run bash -c 'source "$LIB"; logger::log 2>&1'
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"missing level argument"* ]]
+}
+
+@test "LOG_LEVEL set to invalid value after sourcing still filters correctly" {
+  run bash -c 'source "$LIB"; LOG_LEVEL=BOGUS; logger::debug hidden; logger::info shown'
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"hidden"* ]]
+  [[ "$output" == *"shown"* ]]
+}
+
 # ── Error codes ───────────────────────────────────────────────
 
 @test "named error codes are exported with expected values" {

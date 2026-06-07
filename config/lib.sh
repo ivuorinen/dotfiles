@@ -112,6 +112,10 @@ lib::error()
 #   logger::log INFO "Initialization complete"
 logger::log()
 {
+  [[ $# -ge 1 ]] || {
+    lib::error "logger::log: missing level argument"
+    return "$LIB_E_INVALID_ARGUMENT"
+  }
   local level=$1
   shift
   local lvl_num threshold
@@ -121,6 +125,10 @@ logger::log()
     return "$LIB_E_INVALID_ARGUMENT"
   fi
   threshold=$(lib::_level_num "$LOG_LEVEL")
+  if [[ "$threshold" -lt 0 ]]; then
+    LOG_LEVEL=INFO
+    threshold=1
+  fi
   [[ "$lvl_num" -lt "$threshold" ]] && return 0
 
   local color='' reset=''
@@ -245,5 +253,5 @@ lib::trap_cleanup()
 lib::strict()
 {
   set -euo pipefail
-  trap 'lib::error::handle "${LINENO}" "${BASH_COMMAND}"' ERR
+  trap 'lib::error::handle "${LINENO}" "${BASH_COMMAND-?}"' ERR
 }

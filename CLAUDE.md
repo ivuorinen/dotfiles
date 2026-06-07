@@ -158,7 +158,7 @@ every section. Key commands:
 - `dfm helpers <name>` — inspect aliases, colors, env, functions, path
 - `dfm docs all` — regenerate documentation under `docs/`
 - `dfm check arch` / `dfm check host` — system info
-- `dfm scripts` — run scripts from `scripts/` (discovered via `@description` tags)
+- `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers
 
 ### mise — Unified Tool Manager
