@@ -2,11 +2,11 @@
 
 Generated: 2026-04-26
 Last validated: 2026-06-08
-Last pass: 30 (2026-06-08)
+Last pass: 31 (2026-06-08)
 
 ## Summary
 
-- Total: 160 | Open: 5 | Fixed: 146 | Invalid: 9
+- Total: 164 | Open: 6 | Fixed: 149 | Invalid: 9
 
 ## Open Findings
 
@@ -98,6 +98,24 @@ Fix: None required. Noted for completeness. If it ever matters, expose a `--menu
 that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 31 — 2026-06-08
+
+#### [N-170] `mini.sessions` `autowrite = true` duplicates the manual `VimLeavePre` session write
+Fixed: 2026-06-08
+Notes: Set `autowrite = false` in `sessions.setup {}` in `init.lua`. The explicit
+`VimLeavePre` autocmd in `autogroups.lua` handles session writes with the correct
+headless guard (`#vim.api.nvim_list_uis() == 0`). Summary count corrected: Pass 30 logged
+Open:5 but 6 findings were open (N-137, N-138, N-162, N-163, N-164, N-166); corrected to 6.
+
+#### [N-171] Stale comment in `keymaps.lua` references deleted `editor.lua`
+Fixed: 2026-06-08
+Notes: Updated `keymaps.lua:28` comment from `(editor.lua)` to `(init.lua Editor section)`.
+
+#### [N-172] `PackChanged` autocmd registered without an augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('pack-changed', { clear = true }),` to the `PackChanged`
+autocmd in `autogroups.lua`. Now consistent with every other autocmd in the file.
 
 ### Pass 30 — 2026-06-08
 

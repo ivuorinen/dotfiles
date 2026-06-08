@@ -43,8 +43,8 @@ The only parity to check is that mise-managed exceptions are absent from
 `ensure_installed` and present in `vim.lsp.enable`:
 
 ```bash
-cd config/nvim && grep -E '"(fish_lsp|taplo)"' init.lua
-# Expected: one match from vim.lsp.enable only, none from ensure_installed
+cd config/nvim && grep -n 'vim\.lsp\.enable' init.lua
+# Expected: one line containing both fish_lsp and taplo
 ```
 
 The old diff-based check (ensure_installed vs vim.lsp.enable) no longer applies

@@ -25,7 +25,7 @@ K.n('<C-s>', '<cmd>w!<CR>', { desc = 'Save', noremap = true })
 K.n('<Esc><Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 
 -- Disable arrow keys in normal mode; use hjkl or count motions instead.
--- mini.keymap (editor.lua) nudges away from hjkl spam with notifications.
+-- mini.keymap (init.lua Editor section) nudges away from hjkl spam with notifications.
 for _, key in ipairs {
   '<Up>',
   '<Down>',
@@ -95,7 +95,7 @@ K.ld('cws', 'n', function()
   if Snacks then Snacks.picker.lsp_workspace_symbols() end
 end, 'Workspace Symbols')
 K.ld('cwd', 'n', function()
-  if Snacks then Snacks.picker.lsp_workspace_symbols { filter = { needle = true } } end
+  if Snacks then Snacks.picker.lsp_workspace_symbols() end
 end, 'Dynamic Workspace Symbols')
 
 -- ── CommentBox operations ───────────────────────────────────────────

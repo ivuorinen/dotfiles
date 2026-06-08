@@ -74,7 +74,7 @@ vim.api.nvim_create_user_command('PackList', function()
   for _, line in ipairs(lines) do
     max_len = math.max(max_len, #line)
   end
-  local w = math.min(math.max(max_len + 4, 34), vim.o.columns - 4)
+  local w = math.max(1, math.min(math.max(max_len + 4, 34), vim.o.columns - 4))
   local h = math.max(1, math.min(#lines, vim.o.lines - 6))
 
   local buf = vim.api.nvim_create_buf(false, true)

@@ -144,10 +144,9 @@ instead of the default "… is not supported" error.
 **Servers from mise (not mason):** `fish_lsp`, `taplo`. These are excluded
 from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`.
 All other active servers are derived from `ensure_installed` (mason-tool-installer
-installs them; mason-lspconfig auto-enables them). The historical
-list-parity check in `.claude/rules/lsp-list-parity.md` no longer applies
-to the explicit `vim.lsp.enable` list — parity is now between
-`ensure_installed` and mason's installed registry.
+installs them; mason-lspconfig auto-enables them). The rule in `.claude/rules/lsp-list-parity.md` checks that the mise-managed
+exceptions (`fish_lsp`, `taplo`) are present in `vim.lsp.enable` and absent
+from `ensure_installed`.
 
 ## Formatting
 

@@ -1,10 +1,10 @@
 # Neovim Plugin Reference
 
-Plugin manager: **vim.pack** (Neovim 0.12+ built-in). Plugins load from `plugin/*.lua`
-files alphabetically at step 11 of `:h initialization`. Each file calls `vim.pack.add {}`
-then configures its plugins immediately.
+Plugin manager: **vim.pack** (Neovim 0.12+ built-in). All plugins are loaded via a single
+`vim.pack.add {}` call in `init.lua` at step 7b of `:h initialization`. Plugin configuration
+lives inline in `init.lua` in named sections (`-- Completion`, `-- Editor`, `-- LSP`, etc.).
 
-User commands from `plugin/pack.lua`: `:PackUpdate`, `:PackRemove`, `:PackList`.
+User commands (`PackUpdate`, `PackRemove`, `PackList`) live in `lua/pack.lua`.
 
 ## Completion
 

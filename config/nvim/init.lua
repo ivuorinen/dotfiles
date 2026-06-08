@@ -8,7 +8,10 @@ vim.loader.enable()
 -- ── Add mise shims and ~/.local/bin to the PATH ─────────────────────
 -- Guarded so `:source $MYVIMRC` doesn't duplicate entries each time.
 local function _path_prepend(p)
-  if vim.env.PATH:find(p, 1, true) == nil then vim.env.PATH = p .. ':' .. vim.env.PATH end
+  local wrapped = ':' .. vim.env.PATH .. ':'
+  if not wrapped:find(':' .. p .. ':', 1, true) then
+    vim.env.PATH = p .. ':' .. vim.env.PATH
+  end
 end
 _path_prepend(vim.env.HOME .. '/.local/bin')
 _path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
@@ -214,7 +217,7 @@ require('mini.diff').setup()
 -- Session management (auto per-directory)
 local sessions = require 'mini.sessions'
 sessions.setup {
-  autowrite = true,
+  autowrite = false,
   directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
   file = '',
 }
@@ -455,6 +458,8 @@ require('trouble').setup {
 local conform = require 'conform'
 
 vim.g.autoformat_enabled = true
+
+function _G.autoformat_status() return vim.g.autoformat_enabled and 'fmt' or '' end
 
 conform.setup {
   formatters_by_ft = {

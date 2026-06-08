@@ -207,7 +207,9 @@ autocmd('LspAttach', {
 autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Set filetype for SSH config directory',
   pattern = {
-    '*/.ssh/{config,shared,local}.d/*',
+    '*/.ssh/config.d/*',
+    '*/.ssh/shared.d/*',
+    '*/.ssh/local.d/*',
     '*/.ssh/config.local',
     '*/.ssh/config.work',
   },
@@ -218,6 +220,7 @@ autocmd({ 'BufRead', 'BufNewFile' }, {
 -- autogroups.lua is required before vim.pack.add in init.lua, so
 -- PackChanged is registered in time to fire on first-install events.
 autocmd('PackChanged', {
+  group = augroup('pack-changed', { clear = true }),
   callback = function(ev)
     local name, kind = ev.data.spec.name, ev.data.kind
     if name == 'nvim-treesitter' and (kind == 'install' or kind == 'update') then
