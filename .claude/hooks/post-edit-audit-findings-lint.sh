@@ -14,14 +14,14 @@
 set -euo pipefail
 
 fp=$(jq -r '.tool_input.file_path // empty')
-[ -z "$fp" ] && exit 0
+[[ -z "$fp" ]] && exit 0
 
 case "$fp" in
   */docs/audit/*-findings.md) ;;
   *) exit 0 ;;
 esac
 
-[ -f "$fp" ] || exit 0
+[[ -f "$fp" ]] || exit 0
 
 fail=0
 
@@ -60,7 +60,7 @@ dups=$(printf '%s\n' "$filtered" \
   | awk '/^## (Open Findings|Fixed|Invalid)$/ { print }' \
   | sort | uniq -c | awk '$1 > 1 { print }')
 
-if [ -n "$dups" ]; then
+if [[ -n "$dups" ]]; then
   printf 'BLOCKED: duplicate top-level section in %s.\n' "$fp" >&2
   printf 'Each of "## Open Findings", "## Fixed", "## Invalid" must appear at most once.\n' >&2
   printf 'Sub-divide passes with "### Pass N — YYYY-MM-DD" h3 headers under a single h2.\n' >&2
@@ -134,7 +134,8 @@ printf '%s\n' "$filtered" | awk '
 ' || fail=1
 
 # Regenerate .claude/nitpicker-status.json only when all checks passed
-[ "$fail" -ne 0 ] && exit "$fail"
+[[ "$fail" -ne 0 ]] && exit "$fail"
+_NUM_PAT='[0-9]+'
 
 generated=$(grep '^Generated: ' "$fp" | awk '{print $2}')
 last_validated=$(grep '^Last validated: ' "$fp" | awk '{print $3}')
@@ -148,10 +149,10 @@ summary_line=$(grep '^- Total: ' "$fp" || {
   printf 'BLOCKED: summary line "- Total: N | ..." not found in %s\n' "$fp" >&2
   exit 2
 })
-total=$(printf '%s\n' "$summary_line" | grep -oE 'Total: [0-9]+' | grep -oE '[0-9]+')
-open=$(printf '%s\n' "$summary_line" | grep -oE 'Open: [0-9]+' | grep -oE '[0-9]+')
-fixed=$(printf '%s\n' "$summary_line" | grep -oE 'Fixed: [0-9]+' | grep -oE '[0-9]+')
-invalid=$(printf '%s\n' "$summary_line" | grep -oE 'Invalid: [0-9]+' | grep -oE '[0-9]+')
+total=$(printf '%s\n' "$summary_line" | grep -oE 'Total: [0-9]+' | grep -oE "$_NUM_PAT")
+open=$(printf '%s\n' "$summary_line" | grep -oE 'Open: [0-9]+' | grep -oE "$_NUM_PAT")
+fixed=$(printf '%s\n' "$summary_line" | grep -oE 'Fixed: [0-9]+' | grep -oE "$_NUM_PAT")
+invalid=$(printf '%s\n' "$summary_line" | grep -oE 'Invalid: [0-9]+' | grep -oE "$_NUM_PAT")
 
 # Project root is three levels up from docs/audit/<file>
 project_dir=$(dirname "$(dirname "$(dirname "$fp")")")

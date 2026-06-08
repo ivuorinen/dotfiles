@@ -17,14 +17,14 @@
 set -euo pipefail
 
 fp=$(jq -r '.tool_input.file_path // empty')
-[ -z "$fp" ] && exit 0
+[[ -z "$fp" ]] && exit 0
 
 case "$fp" in
   */.claude/rules/*.md) ;;
   *) exit 0 ;;
 esac
 
-[ -f "$fp" ] || exit 0
+[[ -f "$fp" ]] || exit 0
 
 pattern='\b(try|consider|prefer|might|generally|when possible|should)\b'
 

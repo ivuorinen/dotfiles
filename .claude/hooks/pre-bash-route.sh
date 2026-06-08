@@ -20,7 +20,7 @@ fi
 input=$(cat)
 command=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2> /dev/null)
 
-[ -z "$command" ] && exit 0
+[[ -z "$command" ]] && exit 0
 
 # Magic opt-out marker as the first token of the command. The escape strips
 # the BASH_OK prefix via `updatedInput` and returns `allow` so the underlying
@@ -76,7 +76,8 @@ deny_compound_res=(
 # substitution (BSD sed does not support \n in the replacement).
 split_segments()
 {
-  printf '%s' "$1" | awk '
+  local cmd=$1
+  printf '%s' "$cmd" | awk '
     {
       gsub(/\$\(/, "\n")
       gsub(/`/, "\n")
@@ -93,12 +94,15 @@ split_segments()
       }
     }
   '
+  return 0
 }
 
 # Extract the first word (the command name) of a pipeline segment.
 first_word()
 {
-  printf '%s' "$1" | awk '{print $1}'
+  local segment=$1
+  printf '%s' "$segment" | awk '{print $1}'
+  return 0
 }
 
 # Strip a leading wrapper prefix so we match the real command. Handles:
@@ -108,19 +112,21 @@ first_word()
 #   VAR=a BAR=b cmd       — chained assignments
 strip_env_prefix()
 {
-  printf '%s' "$1" | sed -E '
+  local segment=$1
+  printf '%s' "$segment" | sed -E '
     s/^env[[:space:]]+([A-Z_][A-Z_0-9]*=[^[:space:]]+[[:space:]]+)*//
     s/^([A-Z_][A-Z_0-9]*=[^[:space:]]+[[:space:]]+)+//
   '
+  return 0
 }
 
 deny_reason=""
 
 while IFS= read -r segment; do
-  [ -z "$segment" ] && continue
+  [[ -z "$segment" ]] && continue
   segment=$(strip_env_prefix "$segment")
   fw=$(first_word "$segment")
-  [ -z "$fw" ] && continue
+  [[ -z "$fw" ]] && continue
 
   # Compound checks run first — `yarn install` (allow) must beat `yarn` allow-first-word.
   for re in "${deny_compound_res[@]}"; do
@@ -137,9 +143,9 @@ while IFS= read -r segment; do
   fi
 
   # Specific git subcommand check: `git log` denied, `git add` allowed.
-  if [ "$fw" = "git" ]; then
+  if [[ "$fw" = "git" ]]; then
     git_sub=$(printf '%s' "$segment" | awk '{print $2}')
-    if [ -n "$git_sub" ] && ! printf '%s' "$git_sub" | grep -qE "$allow_git_subcmd_re"; then
+    if [[ -n "$git_sub" ]] && ! printf '%s' "$git_sub" | grep -qE "$allow_git_subcmd_re"; then
       deny_reason="git subcommand '$git_sub' is not on the allow list (output-reader)"
       break
     fi
@@ -155,7 +161,7 @@ while IFS= read -r segment; do
   # the model's judgement call.
 done < <(split_segments "$command")
 
-if [ -n "$deny_reason" ]; then
+if [[ -n "$deny_reason" ]]; then
   jq -n --arg cmd "$command" --arg why "$deny_reason" '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
