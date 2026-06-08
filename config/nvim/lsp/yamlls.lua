@@ -5,9 +5,6 @@ local SCHEMA_COMPOSE = 'https://raw.githubusercontent.com/compose-spec/'
   .. 'compose-spec/master/schema/compose-spec.json'
 
 return {
-  cmd = { 'yaml-language-server', '--stdio' },
-  filetypes = { 'yaml', 'yaml.docker-compose' },
-  root_markers = { '.git' },
   settings = {
     -- redhat.telemetry is read top-level by yaml-language-server
     redhat = { telemetry = { enabled = false } },

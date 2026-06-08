@@ -1,18 +1,10 @@
+-- Expose the Neovim runtime API and enable all inlay hints.
 return {
-  cmd = { 'lua-language-server' },
-  filetypes = { 'lua' },
-  root_markers = {
-    '.luarc.json',
-    '.luarc.jsonc',
-    '.stylua.toml',
-    'stylua.toml',
-    '.git',
-  },
   settings = {
     Lua = {
       runtime = { version = 'LuaJIT' },
       diagnostics = {
-        globals = { 'vim' },
+        -- globals list is authoritative in .luarc.json
         disable = { 'missing-fields' },
       },
       completion = { callSnippet = 'Replace' },
