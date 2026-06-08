@@ -8,9 +8,9 @@ vim.loader.enable()
 -- ── Add mise shims and ~/.local/bin to the PATH ─────────────────────
 -- Guarded so `:source $MYVIMRC` doesn't duplicate entries each time.
 local function _path_prepend(p)
-  local wrapped = ':' .. vim.env.PATH .. ':'
-  if not wrapped:find(':' .. p .. ':', 1, true) then
-    vim.env.PATH = p .. ':' .. vim.env.PATH
+  local path = vim.env.PATH or ''
+  if not (':' .. path .. ':'):find(':' .. p .. ':', 1, true) then
+    vim.env.PATH = p .. (path ~= '' and ':' .. path or '')
   end
 end
 _path_prepend(vim.env.HOME .. '/.local/bin')
