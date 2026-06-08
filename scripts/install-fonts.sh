@@ -98,6 +98,7 @@ find_asset_url()
           echo "$url"
           return 0
           ;;
+        *) ;;
       esac
     done
 }
