@@ -27,6 +27,9 @@ require 'keymaps'
 require 'pack'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
+-- version = vim.version.range '*' is set only on plugins that publish
+-- semver-tagged releases (blink.cmp, snacks.nvim). The remaining plugins
+-- have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
   { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '*' },
   'https://github.com/nvim-mini/mini.nvim',
@@ -88,9 +91,6 @@ require('blink.cmp').setup {
       'omni',
     },
   },
-
-  -- Force Lua implementation; 'prefer_rust_with_warning' is the default.
-  fuzzy = { implementation = 'lua' },
 
   -- Inline signature help while typing; disabled by default in blink.cmp.
   signature = { enabled = true },
@@ -531,6 +531,7 @@ require('snacks').setup {
   -- Inline image rendering (requires terminal with graphics protocol support:
   -- Kitty, WezTerm, iTerm2, or similar). force=false (default) means it degrades
   -- silently when the terminal does not support graphics.
+  -- PDF/SVG/math preview additionally requires imagemagick in $PATH.
   image = { enabled = true },
 
   -- Replaces vim.ui.input with a styled floating prompt
