@@ -43,7 +43,7 @@ vim.pack.add {
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
   'https://github.com/LudoPinelli/comment-box.nvim',
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', branch = 'main' },
+  'https://github.com/arborist-ts/arborist.nvim',
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
@@ -589,26 +589,18 @@ require('shellspec').setup {
 require('comment-box').setup {}
 
 -- ── Treesitter ────────────────────────────────────────────────────────
--- Highlight, edit, and navigate code
--- https://github.com/nvim-treesitter/nvim-treesitter
+-- Parser manager for Neovim 0.12+ (highlight, indent, folds via built-in API)
+-- https://github.com/arborist-ts/arborist.nvim
 
-require('nvim-treesitter').setup {
-  auto_install = true,
+require('arborist').setup {
+  -- install_popular covers lua, markdown, markdown_inline, html, yaml and more.
+  install_popular = true,
 
-  install_dir = vim.fn.stdpath 'data' .. '/site',
-
+  -- Parsers not in the popular set but needed for injection queries.
   ensure_installed = {
-    'html',
-    'lua',
     'luadoc',
-    'markdown',
-    'markdown_inline',
     'regex',
-    'yaml',
   },
-
-  highlight = { enable = true },
-  indent = { enable = true },
 }
 
 -- ── UI ───────────────────────────────────────────────────────────────

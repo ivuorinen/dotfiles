@@ -35,7 +35,7 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 | `-- QA`         | conform.nvim (format-on-save) + nvim-lint                       |
 | `-- Snacks`     | snacks.nvim: picker, notifier, terminal, input, rename, bigfile |
 | `-- Tools`      | wakatime, shellspec, comment-box                                |
-| `-- Treesitter` | nvim-treesitter                                                 |
+| `-- Treesitter` | arborist.nvim (parser manager, Neovim 0.12+)                    |
 | `-- UI`         | catppuccin, auto-dark-mode, colorizer, render-markdown          |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
