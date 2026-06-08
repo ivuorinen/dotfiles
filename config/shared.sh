@@ -104,7 +104,7 @@ if ! declare -f msg_err > /dev/null; then
   {
     local message="$1"
     msgr err "$message" >&2
-    exit 1
+    return 1
   }
 fi
 

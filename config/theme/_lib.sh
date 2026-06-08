@@ -89,6 +89,7 @@ _log()
       mv -f -- "$tmp" "$logfile"
     fi
   fi
+  return 0
 }
 
 # Drop a legacy `~/.config/<app>` directory-symlink that older dotbot
@@ -106,6 +107,7 @@ _drop_legacy_repo_symlink()
   target=$(readlink -- "$path" 2> /dev/null || true)
   case "$target" in
     "$repo"/*) rm -f -- "$path" ;;
+    *) ;;
   esac
 }
 
