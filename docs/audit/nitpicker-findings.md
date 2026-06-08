@@ -2,47 +2,19 @@
 
 Generated: 2026-04-26
 Last validated: 2026-06-08
-Last pass: 29 (2026-06-08)
+Last pass: 30 (2026-06-08)
 
 ## Summary
 
-- Total: 158 | Open: 6 | Fixed: 143 | Invalid: 9
+- Total: 160 | Open: 5 | Fixed: 146 | Invalid: 9
 
 ## Open Findings
-
-### Medium
-
-#### [N-165] `lsp-list-parity.md` check script produces false violations after mason-lspconfig migration
-Category: maintainability
-Area: `.claude/rules/lsp-list-parity.md`, `config/nvim/plugin/lsp.lua`
-Problem: The rule's verification script diffs `ensure_installed` (mason-tool-installer)
-against `vim.lsp.enable` in `plugin/lsp.lua`. After introducing mason-lspconfig with
-`automatic_enable = true`, the explicit `vim.lsp.enable` block was reduced to only
-`{ 'fish_lsp', 'taplo' }`. Running the check script now shows 16 servers in
-`ensure_installed` that are absent from `vim.lsp.enable` — all false violations.
-Evidence:
-```bash
-cd config/nvim && diff \
-  <(awk '/ensure_installed = \{/,/^[[:space:]]*\}/' plugin/lsp.lua \
-      | grep -oE '"[a-z_]+"' | sort -u) \
-  <(awk '/vim\.lsp\.enable\(\{/,/^\}\)/' plugin/lsp.lua \
-      | grep -oE '"[a-z_]+"' | sort -u)
-# Output: 16 servers listed as only in ensure_installed — all false positives.
-```
-Impact: A future maintainer running the check sees violations and might "fix" them by
-adding all servers back to `vim.lsp.enable`, silently double-enabling mason-installed
-servers and defeating the mason-lspconfig architecture. The CLAUDE.md now documents the
-change, but the rule file is the canonical source of truth for this check.
-Fix: Update `.claude/rules/lsp-list-parity.md` to describe the new architecture:
-mason-lspconfig `automatic_enable` takes the place of the explicit server list, and
-the only parity to verify is that mise-managed exceptions (`fish_lsp`, `taplo`) remain
-absent from `ensure_installed` and present in the bare `vim.lsp.enable` call.
 
 ### Advisory
 
 #### [N-166] snacks `image` snack has undocumented `imagemagick` dependency for PDF/SVG rendering
 Category: docs
-Area: `config/nvim/plugin/snacks.lua:18`
+Area: `config/nvim/init.lua` (Snacks section)
 Problem: `image = { enabled = true }` activates the image snack. The snacks.nvim docs
 show that `convert.magick` is used for PDF, SVG, and math expression rendering. This
 requires `imagemagick` to be installed on the system. No documentation in the neovim
@@ -57,7 +29,7 @@ Fix (advisory): Add a comment in `snacks.lua` noting the `imagemagick` dependenc
 
 #### [N-162] blink.cmp forced to Lua fuzzy implementation with no stated justification
 Category: performance
-Area: `config/nvim/plugin/completion.lua:43`
+Area: `config/nvim/init.lua` (Completion section)
 Problem: `fuzzy = { implementation = 'lua' }` forces the Lua fuzzy-finder instead
 of the default `prefer_rust_with_warning`. The comment says "Force Lua
 implementation" but gives no reason.
@@ -69,7 +41,7 @@ Fix (if Rust is available): Remove the `fuzzy` key or set
 
 #### [N-163] `branch = 'main'` for nvim-treesitter tracks HEAD with no version pin
 Category: reliability
-Area: `config/nvim/plugin/treesitter.lua:18`
+Area: `config/nvim/init.lua` (vim.pack.add block)
 Problem: `{ src = '...nvim-treesitter', branch = 'main' }` means each `:PackUpdate`
 pulls the HEAD of nvim-treesitter's main branch. Any breaking API change
 propagates immediately on next update.
@@ -83,12 +55,13 @@ monitor nvim-treesitter announcements closely after each `:PackUpdate`.
 
 #### [N-164] `version = vim.version.range '*'` specified for some plugins but not others
 Category: conventions
-Area: `config/nvim/plugin/completion.lua:4`, `config/nvim/plugin/snacks.lua:7`
+Area: `config/nvim/init.lua` (vim.pack.add block)
 Problem: blink.cmp and snacks.nvim specify `version = vim.version.range '*'` while
 all other plugins (mini.nvim, trouble.nvim, lspconfig, mason, treesitter,
 catppuccin, etc.) omit the `version` field entirely.
-Evidence: editor.lua, navigation.lua, lsp.lua, ui.lua, tools.lua, treesitter.lua
-all use plain URL strings. Only completion.lua and snacks.lua use the range form.
+Evidence: mini.nvim, trouble.nvim, lspconfig, mason, nvim-treesitter, catppuccin, and
+all other plugins use plain URL strings in `vim.pack.add`. Only blink.cmp and
+snacks.nvim use `version = vim.version.range '*'`.
 Impact: Unclear whether the field is required, optional, or advisory for new
 plugins. Template ambiguity leads to inconsistent future additions.
 Fix (advisory): Document WHY blink.cmp and snacks.nvim carry the version field
@@ -125,6 +98,25 @@ Fix: None required. Noted for completeness. If it ever matters, expose a `--menu
 that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 30 — 2026-06-08
+
+#### [N-167] `lsp-list-parity.md` paths and verification command reference deleted `plugin/lsp.lua`
+Fixed: 2026-06-08
+Notes: Updated `paths:` to `["config/nvim/init.lua", "config/nvim/lsp/*.lua"]`.
+Replaced `plugin/lsp.lua` references in rule body and verification command with
+`init.lua`. Verification command now greps `init.lua` directly.
+
+#### [N-168] `ToggleFormat` user command missing `desc` field
+Fixed: 2026-06-08
+Notes: Added `desc = 'Toggle autoformat on save'` to the attributes table in
+`lua/autogroups.lua`.
+
+#### [N-169] `_pack_names()` reads and parses the lockfile on every completion keypress
+Fixed: 2026-06-08
+Notes: Added module-level `_names_cache` in `lua/pack.lua`. `_pack_names()` returns
+the cached table on subsequent calls; the cache is session-scoped (Lua module cache
+persists for the lifetime of the Neovim session).
 
 ### Pass 29 — 2026-06-08
 

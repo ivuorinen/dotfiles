@@ -298,4 +298,4 @@ autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
 vim.api.nvim_create_user_command('ToggleFormat', function()
   vim.g.autoformat_enabled = not vim.g.autoformat_enabled
   vim.notify('Autoformat: ' .. (vim.g.autoformat_enabled and 'on' or 'off'))
-end, {})
+end, { desc = 'Toggle autoformat on save' })

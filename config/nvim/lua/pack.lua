@@ -1,12 +1,16 @@
 -- vim.pack management commands
 
--- List plugin names from nvim-pack-lock.json for tab-completion.
+local _names_cache = nil
+
+-- List plugin names from nvim-pack-lock.json for tab-completion (session-cached).
 local function _pack_names()
+  if _names_cache then return _names_cache end
   local lock = vim.fn.stdpath 'config' .. '/nvim-pack-lock.json'
   if vim.fn.filereadable(lock) == 0 then return {} end
   local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(lock), '\n'))
   if not ok or type(data) ~= 'table' or type(data.plugins) ~= 'table' then return {} end
-  return vim.tbl_keys(data.plugins)
+  _names_cache = vim.tbl_keys(data.plugins)
+  return _names_cache
 end
 
 local function _complete(lead)
