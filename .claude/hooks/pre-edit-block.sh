@@ -11,15 +11,17 @@ fi
 tool=$(printf '%s' "$input" | jq -r '.tool_name // empty' 2> /dev/null)
 
 # Read-only block: secrets files must not be read — they contain credentials.
-if [ "$tool" = "Read" ]; then
+if [[ "$tool" = "Read" ]]; then
   case "$fp" in
     */secrets.d/*.fish)
       case "$(basename "$fp")" in
         *.fish.example) exit 0 ;;
+        *) ;;
       esac
       echo "BLOCKED: do not read $fp — it contains secrets. Ask the user instead." >&2
       exit 2
       ;;
+    *) ;;
   esac
   exit 0
 fi
@@ -48,11 +50,13 @@ case "$fp" in
   */secrets.d/*.fish)
     case "$(basename "$fp")" in
       *.fish.example) exit 0 ;;
+      *) ;;
     esac
     echo "BLOCKED: do not edit $fp directly — it is gitignored." >&2
     echo "Copy the matching .fish.example file and edit that locally." >&2
     exit 2
     ;;
+  *) ;;
 esac
 
 exit 0

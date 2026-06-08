@@ -98,13 +98,13 @@ fi
 
 if ! declare -f msg_err > /dev/null; then
   msg "msg_err was not defined, defined it now"
-  # Function to print error messages and exit
+  # Function to print error messages and return 1
   # $1 - error message (string)
   msg_err()
   {
     local message="$1"
     msgr err "$message" >&2
-    exit 1
+    return 1
   }
 fi
 

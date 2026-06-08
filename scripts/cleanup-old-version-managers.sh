@@ -13,17 +13,18 @@ fi
 # shellcheck source=shared.sh
 source "$DOTFILES/config/shared.sh"
 
+readonly _DRY_RUN_FLAG='--dry-run'
 DRY_RUN=""
 if [[ $# -gt 1 ]]; then
   logger::error "Usage: $0 [--dry-run]"
   exit "$LIB_E_INVALID_ARGUMENT"
 fi
 if [[ $# -eq 1 ]]; then
-  if [[ "$1" != "--dry-run" ]]; then
+  if [[ "$1" != "$_DRY_RUN_FLAG" ]]; then
     logger::error "Usage: $0 [--dry-run]"
     exit "$LIB_E_INVALID_ARGUMENT"
   fi
-  DRY_RUN="--dry-run"
+  DRY_RUN="$_DRY_RUN_FLAG"
 fi
 
 remove_dir()
@@ -33,7 +34,7 @@ remove_dir()
     msgr ok "$label not found (already clean): $dir"
     return 0
   fi
-  if [[ "$DRY_RUN" = "--dry-run" ]]; then
+  if [[ "$DRY_RUN" = "$_DRY_RUN_FLAG" ]]; then
     msgr warn "[DRY RUN] Would remove $label: $dir"
   else
     msgr run "Removing $label: $dir"
@@ -47,7 +48,7 @@ remove_file()
 {
   local file="$1" label="$2"
   [[ ! -f "$file" ]] && return 0
-  if [[ "$DRY_RUN" = "--dry-run" ]]; then
+  if [[ "$DRY_RUN" = "$_DRY_RUN_FLAG" ]]; then
     msgr warn "[DRY RUN] Would remove $label: $file"
   else
     rm -f "$file"
@@ -124,7 +125,7 @@ if command -v brew &> /dev/null; then
   )
   for pkg in "${BREW_REMOVE[@]}"; do
     if brew list "$pkg" &> /dev/null; then
-      if [[ "$DRY_RUN" = "--dry-run" ]]; then
+      if [[ "$DRY_RUN" = "$_DRY_RUN_FLAG" ]]; then
         msgr warn "[DRY RUN] Would brew uninstall $pkg"
       else
         msgr run "Uninstalling brew package: $pkg"
@@ -139,7 +140,7 @@ if command -v brew &> /dev/null; then
   done
 
   # Clean up orphaned dependencies left after the removals above
-  if [[ "$DRY_RUN" = "--dry-run" ]]; then
+  if [[ "$DRY_RUN" = "$_DRY_RUN_FLAG" ]]; then
     msgr warn "[DRY RUN] Would run: brew autoremove"
   else
     msgr run "Removing orphaned brew dependencies..."

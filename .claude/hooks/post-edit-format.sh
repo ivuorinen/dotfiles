@@ -3,7 +3,7 @@
 # Receives tool output JSON on stdin.
 
 fp=$(jq -r '.tool_input.file_path // empty')
-[ -z "$fp" ] || [ ! -f "$fp" ] && exit 0
+[[ -z "$fp" ]] || [[ ! -f "$fp" ]] && exit 0
 
 case "$fp" in
   *.sh | */bin/*)
@@ -28,6 +28,7 @@ case "$fp" in
   *.yml | *.yaml)
     command -v prettier > /dev/null && prettier --write "$fp" 2> /dev/null
     ;;
+  *) ;;
 esac
 
 exit 0

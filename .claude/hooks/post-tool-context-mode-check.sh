@@ -31,7 +31,7 @@ esac
 # whether the MCP server returned a JSON object, an array, or a
 # plain string.
 response=$(printf '%s' "$input" | jq -r '.tool_response // empty' 2> /dev/null)
-if [ -z "$response" ]; then
+if [[ -z "$response" ]]; then
   exit 0
 fi
 
@@ -55,7 +55,7 @@ if printf '%s' "$response" | grep -Eq "$batch_re"; then
   hits="${hits}- batch execution failed inside context-mode runtime\n"
 fi
 
-if [ -n "$hits" ]; then
+if [[ -n "$hits" ]]; then
   printf 'BLOCKED: context-mode reported an issue.\n%b' "$hits" >&2
   printf 'Stop and tell the user to run /ctx-upgrade before continuing.\n' >&2
   printf 'See .claude/rules/context-mode-issues.md.\n' >&2

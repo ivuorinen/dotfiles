@@ -96,6 +96,7 @@ for spec in "$DOTFILES"/local/bin/*; do
   # rather than generated individually.
   case "$bin_name" in
     dfm | dfm-*) continue ;;
+    *) ;;
   esac
   generate_for_spec "$spec" "$bin_name"
 done

@@ -39,6 +39,8 @@ LIB_E_FILE_NOT_FOUND=5
 export LIB_E_SUCCESS LIB_E_INVALID_ARGUMENT LIB_E_COMMAND_NOT_FOUND
 export LIB_E_FUNCTION_NOT_FOUND LIB_E_EXECUTION_FAILED LIB_E_FILE_NOT_FOUND
 
+_LIB_DATE_FMT='+%Y-%m-%d %H:%M:%S'
+
 # ╭──────────────────────────────────────────────────────────╮
 # │ Log levels                                               │
 # ╰──────────────────────────────────────────────────────────╯
@@ -56,13 +58,15 @@ export LIB_E_FUNCTION_NOT_FOUND LIB_E_EXECUTION_FAILED LIB_E_FILE_NOT_FOUND
 #   The numeric severity on stdout (-1 for an unknown level).
 lib::_level_num()
 {
-  case "$1" in
+  local level_name=$1
+  case "$level_name" in
     DEBUG) printf '0' ;;
     INFO) printf '1' ;;
     WARN) printf '2' ;;
     ERROR) printf '3' ;;
     *) printf -- '-1' ;;
   esac
+  return 0
 }
 
 # Validate $LOG_LEVEL once, at load. An invalid value falls back to INFO
@@ -70,7 +74,7 @@ lib::_level_num()
 # sourced us.
 if [[ "$(lib::_level_num "$LOG_LEVEL")" -lt 0 ]]; then
   printf '[%s] ERROR: Invalid LOG_LEVEL: %s (falling back to INFO)\n' \
-    "$(date '+%Y-%m-%d %H:%M:%S')" "$LOG_LEVEL" >&2
+    "$(date "$_LIB_DATE_FMT")" "$LOG_LEVEL" >&2
   LOG_LEVEL=INFO
 fi
 
@@ -85,7 +89,8 @@ fi
 #   lib::log "Server started"   # [2024-02-28 09:45:00] Server started
 lib::log()
 {
-  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"
+  printf '[%s] %s\n' "$(date "$_LIB_DATE_FMT")" "$*"
+  return 0
 }
 
 # Log a timestamped error message to stderr.
@@ -96,7 +101,8 @@ lib::log()
 #   lib::error "Failed to read the configuration file."
 lib::error()
 {
-  printf '[%s] ERROR: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >&2
+  printf '[%s] ERROR: %s\n' "$(date "$_LIB_DATE_FMT")" "$*" >&2
+  return 0
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -138,33 +144,39 @@ logger::log()
       INFO) color=$'\033[34m' ;;
       WARN) color=$'\033[33m' ;;
       ERROR) color=$'\033[31m' ;;
+      *) ;;
     esac
     reset=$'\033[0m'
   fi
 
   printf '[%s] [%s%s%s]: %s\n' \
-    "$(date '+%Y-%m-%d %H:%M:%S')" "$color" "$level" "$reset" "$*" >&2
+    "$(date "$_LIB_DATE_FMT")" "$color" "$level" "$reset" "$*" >&2
+  return 0
 }
 
 # Convenience wrappers around logger::log, one per severity.
 logger::debug()
 {
   logger::log DEBUG "$@"
+  return 0
 }
 
 logger::info()
 {
   logger::log INFO "$@"
+  return 0
 }
 
 logger::warn()
 {
   logger::log WARN "$@"
+  return 0
 }
 
 logger::error()
 {
   logger::log ERROR "$@"
+  return 0
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -198,6 +210,9 @@ lib::error::handle()
     "$LIB_E_EXECUTION_FAILED")
       lib::error "Execution failed at line $line_no in command '$command'"
       ;;
+    "$LIB_E_FILE_NOT_FOUND")
+      lib::error "File not found at line $line_no in command '$command'"
+      ;;
     *)
       lib::error "Unknown error ($exit_code) at line $line_no in command '$command'"
       ;;
@@ -220,6 +235,7 @@ LIB_CLEANUP_PATHS=()
 lib::register_cleanup()
 {
   LIB_CLEANUP_PATHS+=("$@")
+  return 0
 }
 
 # Remove queued temporary paths. Also honors a legacy $TEMP_DIR variable
@@ -234,6 +250,7 @@ lib::cleanup()
     [[ -n "$path" && -e "$path" ]] && rm -rf "$path"
   done
   LIB_CLEANUP_PATHS=()
+  return 0
 }
 
 # Install an EXIT trap that runs lib::cleanup. Call from a script (never
@@ -242,6 +259,7 @@ lib::cleanup()
 lib::trap_cleanup()
 {
   trap 'lib::cleanup' EXIT
+  return 0
 }
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -254,4 +272,5 @@ lib::strict()
 {
   set -euo pipefail
   trap 'lib::error::handle "${LINENO}" "${BASH_COMMAND-?}"' ERR
+  return 0
 }

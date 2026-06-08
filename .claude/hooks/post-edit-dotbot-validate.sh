@@ -3,7 +3,7 @@
 # Checks YAML syntax and verifies link targets exist.
 
 fp=$(jq -r '.tool_input.file_path // empty')
-[ -z "$fp" ] || [ ! -f "$fp" ] && exit 0
+[[ -z "$fp" ]] || [[ ! -f "$fp" ]] && exit 0
 
 case "$fp" in
   *install.conf.yaml) ;;

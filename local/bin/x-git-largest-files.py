@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Python script to find the largest files in a git repository.
 # The general method is based on the script in this blog post:
 # http://stubbisms.wordpress.com/2009/07/10/git-script-to-show-largest-pack-objects-and-trim-your-waist-line/
@@ -31,6 +31,7 @@
 # vim:tw=120:ts=4:ft=python:norl:
 
 import argparse
+import functools
 import glob
 import signal
 import sys
@@ -39,6 +40,7 @@ from subprocess import PIPE, Popen, check_output  # nosec B404
 sortByOnDiskSize = False
 
 
+@functools.total_ordering
 class Blob:
     sha1 = ""
     size = 0
@@ -52,11 +54,15 @@ class Blob:
     def __repr__(self):
         return f"{self.sha1} - {self.size} - {self.packed_size} - {self.path}"
 
+    def __eq__(self, other):
+        if sortByOnDiskSize:
+            return self.size == other.size
+        return self.packed_size == other.packed_size
+
     def __lt__(self, other):
         if sortByOnDiskSize:
             return self.size < other.size
-        else:
-            return self.packed_size < other.packed_size
+        return self.packed_size < other.packed_size
 
     def csv_line(self):
         return f"{self.size / 1024},{self.packed_size / 1024},{self.sha1},{self.path}"

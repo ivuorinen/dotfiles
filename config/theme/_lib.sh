@@ -39,6 +39,7 @@ _idempotent_ln_sf()
   if [[ "$(readlink "$dst" 2> /dev/null)" != "$src" ]]; then
     ln -sf "$src" "$dst"
   fi
+  return 0
 }
 
 # Atomic, race-safe lock. ln(1) is the classic atomic create-if-not-exists
@@ -77,7 +78,10 @@ _log()
   local msg="$*"
   local dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
   local logfile="$dir/log"
-  mkdir -p -- "$dir"
+  if ! mkdir -p -- "$dir"; then
+    printf 'theme: _log: cannot create log dir %s\n' "$dir" >&2
+    return 0
+  fi
   printf '%sZ %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%S')" "$msg" >> "$logfile"
   if [[ -f "$logfile" ]]; then
     local n
@@ -89,6 +93,7 @@ _log()
       mv -f -- "$tmp" "$logfile"
     fi
   fi
+  return 0
 }
 
 # Drop a legacy `~/.config/<app>` directory-symlink that older dotbot
@@ -106,6 +111,7 @@ _drop_legacy_repo_symlink()
   target=$(readlink -- "$path" 2> /dev/null || true)
   case "$target" in
     "$repo"/*) rm -f -- "$path" ;;
+    *) ;;
   esac
 }
 
