@@ -114,8 +114,8 @@ strip_env_prefix()
 {
   local segment=$1
   printf '%s' "$segment" | sed -E '
-    s/^env[[:space:]]+([A-Z_][A-Z_0-9]*=[^[:space:]]+[[:space:]]+)*//
-    s/^([A-Z_][A-Z_0-9]*=[^[:space:]]+[[:space:]]+)+//
+    s/^env[[:space:]]+([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)*//
+    s/^([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)+//
   '
   return 0
 }

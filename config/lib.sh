@@ -210,6 +210,9 @@ lib::error::handle()
     "$LIB_E_EXECUTION_FAILED")
       lib::error "Execution failed at line $line_no in command '$command'"
       ;;
+    "$LIB_E_FILE_NOT_FOUND")
+      lib::error "File not found at line $line_no in command '$command'"
+      ;;
     *)
       lib::error "Unknown error ($exit_code) at line $line_no in command '$command'"
       ;;

@@ -2,11 +2,11 @@
 
 Generated: 2026-04-26
 Last validated: 2026-06-08
-Last pass: 32 (2026-06-08)
+Last pass: 33 (2026-06-08)
 
 ## Summary
 
-- Total: 167 | Open: 6 | Fixed: 152 | Invalid: 9
+- Total: 172 | Open: 6 | Fixed: 157 | Invalid: 9
 
 ## Open Findings
 
@@ -98,6 +98,41 @@ Fix: None required. Noted for completeness. If it ever matters, expose a `--menu
 that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 33 — 2026-06-08
+
+#### [N-176] `_idempotent_ln_sf` missing `return 0` at end of function body
+Fixed: 2026-06-08
+Notes: Added `return 0` before the closing `}` of `_idempotent_ln_sf` in
+`config/theme/_lib.sh`. Ensures the function always returns 0 on the
+symlink-up-to-date and symlink-updated code paths.
+
+#### [N-177] `lib::error::handle` missing case for `LIB_E_FILE_NOT_FOUND`
+Fixed: 2026-06-08
+Notes: Added `"$LIB_E_FILE_NOT_FOUND")` branch to the `case` in
+`lib::error::handle` in `config/lib.sh`. ERR trap now logs "File not found"
+instead of "Unknown error (5)" when a script exits with code 5.
+
+#### [N-178] `_log()` silent failure when `mkdir -p` fails
+Fixed: 2026-06-08
+Notes: Changed `_log()` in `config/theme/_lib.sh` to be best-effort: on
+`mkdir -p` failure it now emits a warning to stderr and returns 0 (logging
+is advisory — callers should not need to check its return value). Prevents
+the silent failed `printf` redirect while keeping `_log`'s return contract
+consistent (always 0).
+
+#### [N-179] `x-git-largest-files.py` shebang updated to `python3`
+Fixed: 2026-06-08
+Notes: Changed `#!/usr/bin/env python` to `#!/usr/bin/env python3` in
+`local/bin/x-git-largest-files.py`. Script now runs on macOS 12.3+ and
+systems where `python` is absent but `python3` is available.
+
+#### [N-180] `strip_env_prefix` extended to cover lowercase env-var prefixes
+Fixed: 2026-06-08
+Notes: Extended the two `sed -E` patterns in `strip_env_prefix` from
+`[A-Z_]`/`[A-Z_0-9]` to `[A-Za-z_]`/`[A-Za-z_0-9]` in
+`.claude/hooks/pre-bash-route.sh`. Lowercase assignments like `debug=1 rg file`
+are now stripped before the routing check.
 
 ### Pass 32 — 2026-06-08
 
