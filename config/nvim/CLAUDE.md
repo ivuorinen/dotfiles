@@ -5,31 +5,38 @@ when working with code in this repository.
 
 ## Overview
 
-Neovim configuration using **lazy.nvim** for plugin management,
-**catppuccin** as the default colorscheme, and **mini.nvim** as
+Neovim configuration using **vim.pack** (Neovim 0.12+ built-in) for plugin
+management, **catppuccin** as the default colorscheme, and **mini.nvim** as
 the foundation for many core features.
 
 ## Load Order
 
-`init.lua` bootstraps lazy.nvim, then loads modules in this order:
+All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 1. `lua/options.lua` — vim options, leader key (Space), nerd font flag
-2. `lua/autogroups.lua` — autocmds (yank highlight, close-with-q, filetype tweaks)
-3. `lazy.setup('plugins')` — auto-discovers all `lua/plugins/*.lua` specs
+2. `lua/autogroups.lua` — autocmds (yank highlight, close-with-q, filetype tweaks,
+    PackChanged, sessions, linting trigger)
+3. `lua/utils.lua` — registers K, HasConfig, Gated, TOOL_CONFIGS globals
 4. `lua/keymaps.lua` — all non-plugin keybindings
+5. `lua/pack.lua` — PackUpdate / PackRemove / PackList user commands (vim.pack built-in,
+    no plugin dependency)
+6. `vim.pack.add {}` — loads all plugins onto the rtp
+7. Plugin configuration — inline sections in `init.lua` in this order:
+    Completion → Editor → LSP → Navigation → QA → Snacks → Tools → Treesitter → UI
 
-## Plugin Files (one per concern)
+## init.lua Sections
 
-| File             | Purpose                                                                      |
-|------------------|------------------------------------------------------------------------------|
-| `completion.lua` | blink.cmp completion engine (lsp / path / snippets / buffer / omni)          |
-| `editor.lua`     | mini.nvim modules + vim-sleuth + hardtime                                    |
-| `lsp.lua`        | mason + mason-tool-installer + mason-conform (servers enabled in `init.lua`) |
-| `navigation.lua` | telescope, trouble                                                           |
-| `qa.lua`         | conform.nvim (format-on-save) + nvim-lint                                    |
-| `tools.lua`      | wakatime, shellspec, comment-box                                             |
-| `treesitter.lua` | nvim-treesitter (syntax highlighting + auto_install)                         |
-| `ui.lua`         | catppuccin, auto-dark-mode, colorizer, noice, render-markdown                |
+| Section         | Content                                                         |
+|-----------------|-----------------------------------------------------------------|
+| `-- Completion` | blink.cmp (lsp / path / snippets / buffer / omni)               |
+| `-- Editor`     | mini.nvim suite + vim-sleuth                                    |
+| `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`               |
+| `-- Navigation` | trouble.nvim                                                    |
+| `-- QA`         | conform.nvim (format-on-save) + nvim-lint                       |
+| `-- Snacks`     | snacks.nvim: picker, notifier, terminal, input, rename, bigfile |
+| `-- Tools`      | wakatime, shellspec, comment-box                                |
+| `-- Treesitter` | arborist.nvim (parser manager, Neovim 0.12+)                    |
+| `-- UI`         | catppuccin, auto-dark-mode, colorizer, render-markdown          |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is
@@ -64,7 +71,7 @@ Three globals gate tools on the presence of a project config file:
   (`{ condition = ... }`) suitable for `conform.setup`'s `formatters`
   table. Shallow-merged by conform, so built-in cmd/args are preserved.
 
-Usage in `lua/plugins/qa.lua`:
+Usage in `init.lua` (QA section):
 
 ```lua
 -- Formatter gating (conform)
@@ -86,47 +93,60 @@ from TOOL_CONFIGS: `shfmt`, `fish_indent`, `gofmt`, `goimports`,
 
 ## Leader Key Groups (mini.clue)
 
-| Prefix       | Group          |
-|--------------|----------------|
-| `<leader>b`  | Buffers        |
-| `<leader>c`  | Code           |
-| `<leader>cb` | CommentBox     |
-| `<leader>cc` | Calls          |
-| `<leader>q`  | Quit           |
-| `<leader>s`  | Telescope      |
-| `<leader>t`  | Toggle         |
-| `<leader>tm` | Toggle Options |
-| `<leader>x`  | Trouble        |
-| `<leader>?`  | Help           |
+| Prefix       | Group                  |
+|--------------|------------------------|
+| `<leader>b`  | Buffers                |
+| `<leader>c`  | Code                   |
+| `<leader>cb` | CommentBox             |
+| `<leader>cc` | Calls                  |
+| `<leader>q`  | Quit                   |
+| `<leader>s`  | Search (snacks.picker) |
+| `<leader>t`  | Toggle                 |
+| `<leader>tm` | Toggle Options         |
+| `<leader>x`  | Trouble                |
+| `<leader>?`  | Help                   |
 
-Source of truth: the `clues` table in `lua/plugins/editor.lua`.
+Source of truth: the `clues` table in the `-- Editor` section of `init.lua`.
 
 ## LSP Architecture
 
-**Stack:** mason (installs binaries via `mason-tool-installer`) +
-native `lsp/*.lua` files (auto-discovered server definitions) +
-`vim.lsp.config('*', ...)` and `vim.lsp.enable {...}` in `init.lua`,
-with capabilities from blink.cmp.
+**Stack:** `nvim-lspconfig` (default server definitions) +
+mason (installs binaries via `mason-tool-installer`) +
+`mason-lspconfig` (auto-enables all mason-installed servers via `vim.lsp.enable`) +
+native `lsp/*.lua` files (customizations only) +
+`vim.lsp.config('*', ...)` in the `-- LSP` section of `init.lua`, with capabilities from blink.cmp.
 
-**Server config pattern:** Each server has a `lsp/<name>.lua` file
-returning `{ cmd, filetypes, root_markers, settings? }`. Neovim 0.11+
-auto-loads these into `vim.lsp.config[<name>]`. Global capabilities
-and the enable list live at the bottom of `init.lua` (NOT in
-`lua/plugins/lsp.lua`, which only configures mason).
+**How it works:** The `-- LSP` section of `init.lua` calls `require('lspconfig')` to populate
+`vim.lsp.config` with nvim-lspconfig's defaults for all servers. Any
+`lsp/<name>.lua` file that exists is deep-merged on top. Only servers with
+genuine customizations have a `lsp/` file; the rest run on defaults.
+`mason-lspconfig` with `automatic_enable = true` calls `vim.lsp.enable()` for
+every server mason has installed; `fish_lsp` and `taplo` (from mise) are enabled
+explicitly via a bare `vim.lsp.enable {}` call.
+
+**Server config pattern:** `lsp/<name>.lua` files return only the fields
+that differ from nvim-lspconfig's defaults — typically `settings`,
+`init_options`, `cmd_env`, or narrowed `filetypes`/`root_markers`.
+7 files remain: `eslint`, `fish_lsp`, `gopls`, `intelephense`, `lua_ls`,
+`tailwindcss`, `yamlls`.
 
 **Lua API completions:** `lsp/lua_ls.lua` sets `workspace.library = { vim.env.VIMRUNTIME }`
-and `diagnostics.globals = { 'vim' }` directly. `lazydev.nvim` is not installed.
+directly. Known globals are declared in `.luarc.json` (`diagnostics.globals`). `lazydev.nvim`
+is not installed.
 
 **Default keymaps** (nvim 0.11): `grn` (rename), `gra` (code action),
 `grr` (references), `gri` (implementations) work out of the box.
-`<leader>c*` keymaps in `lua/keymaps.lua` provide telescope-powered
+`<leader>c*` keymaps in `lua/keymaps.lua` provide snacks.picker-powered
 variants. `lua/autogroups.lua` wraps `grt` and `gri` with a
 capability check so unsupported servers get a friendly notification
 instead of the default "… is not supported" error.
 
-**Servers from mise (not mason):** `fish_lsp`, `taplo`. List-parity
-maintenance rule: `.claude/rules/lsp-list-parity.md` (path-scoped to
-the lsp config files).
+**Servers from mise (not mason):** `fish_lsp`, `taplo`. These are excluded
+from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`.
+All other active servers are derived from `ensure_installed` (mason-tool-installer
+installs them; mason-lspconfig auto-enables them). The rule in `.claude/rules/lsp-list-parity.md` checks that the mise-managed
+exceptions (`fish_lsp`, `taplo`) are present in `vim.lsp.enable` and absent
+from `ensure_installed`.
 
 ## Formatting
 
@@ -152,8 +172,6 @@ found by neovim without a login shell.
 - **Intelephense license**: `GetIntelephenseLicense()` in
   `utils.lua` reads `~/intelephense/license.txt`. Falls back to
   `$INTELEPHENSE_LICENSE` env var.
-- **Dev plugins path**: `~/Code/nvim` is configured as the lazy.nvim
-  dev path — plugins there override registry versions.
 - **Format toggle state**: `vim.g.autoformat_enabled` tracks
   the toggle; `_G.autoformat_status()` exposes it for statusline.
 

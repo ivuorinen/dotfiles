@@ -1,16 +1,72 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-06-07
-Last pass: 27 (2026-06-07)
+Last validated: 2026-06-08
+Last pass: 32 (2026-06-08)
 
 ## Summary
 
-- Total: 141 | Open: 2 | Fixed: 130 | Invalid: 9
+- Total: 167 | Open: 6 | Fixed: 152 | Invalid: 9
 
 ## Open Findings
 
 ### Advisory
+
+#### [N-166] snacks `image` snack has undocumented `imagemagick` dependency for PDF/SVG rendering
+Category: docs
+Area: `config/nvim/init.lua` (Snacks section)
+Problem: `image = { enabled = true }` activates the image snack. The snacks.nvim docs
+show that `convert.magick` is used for PDF, SVG, and math expression rendering. This
+requires `imagemagick` to be installed on the system. No documentation in the neovim
+config or `config/mise/config.toml` mentions this dependency.
+Evidence: snacks image defaults include `convert.magick` entries for `default`, `vector`,
+`math`, and `pdf` image types. Any attempt to preview a PDF or SVG image will silently
+fail if `magick` is not in `$PATH`.
+Impact: PDFs and SVGs show no preview with no error message (unless `debug.notify = true`
+is set). Users who rely on image preview for these formats are silently broken.
+Fix (advisory): Add a comment in `snacks.lua` noting the `imagemagick` dependency, or add
+`imagemagick` to `config/mise/config.toml` under tools.
+
+#### [N-162] blink.cmp forced to Lua fuzzy implementation with no stated justification
+Category: performance
+Area: `config/nvim/init.lua` (Completion section)
+Problem: `fuzzy = { implementation = 'lua' }` forces the Lua fuzzy-finder instead
+of the default `prefer_rust_with_warning`. The comment says "Force Lua
+implementation" but gives no reason.
+Evidence: blink.cmp's Rust implementation is measurably faster for large completion
+lists. `prefer_rust_with_warning` is the upstream default for good reason.
+Impact: Slower completion on all systems where the Rust binary compiles fine.
+Fix (if Rust is available): Remove the `fuzzy` key or set
+`implementation = 'prefer_rust_with_warning'`.
+
+#### [N-163] `branch = 'main'` for nvim-treesitter tracks HEAD with no version pin
+Category: reliability
+Area: `config/nvim/init.lua` (vim.pack.add block)
+Problem: `{ src = '...nvim-treesitter', branch = 'main' }` means each `:PackUpdate`
+pulls the HEAD of nvim-treesitter's main branch. Any breaking API change
+propagates immediately on next update.
+Evidence: nvim-treesitter has made breaking changes on main in the past (e.g. the
+`setup()` signature migration). The `PackChanged` hook handles parser re-install
+but not API breaks.
+Impact: After an unsupervised `:PackUpdate`, treesitter may stop working until the
+config is updated. No version guard exists.
+Fix (advisory): Pin to a git tag if stability is preferred over latest. Otherwise
+monitor nvim-treesitter announcements closely after each `:PackUpdate`.
+
+#### [N-164] `version = vim.version.range '*'` specified for some plugins but not others
+Category: conventions
+Area: `config/nvim/init.lua` (vim.pack.add block)
+Problem: blink.cmp and snacks.nvim specify `version = vim.version.range '*'` while
+all other plugins (mini.nvim, trouble.nvim, lspconfig, mason, treesitter,
+catppuccin, etc.) omit the `version` field entirely.
+Evidence: mini.nvim, trouble.nvim, lspconfig, mason, nvim-treesitter, catppuccin, and
+all other plugins use plain URL strings in `vim.pack.add`. Only blink.cmp and
+snacks.nvim use `version = vim.version.range '*'`.
+Impact: Unclear whether the field is required, optional, or advisory for new
+plugins. Template ambiguity leads to inconsistent future additions.
+Fix (advisory): Document WHY blink.cmp and snacks.nvim carry the version field
+(e.g. they publish tagged releases that vim.pack can pin), or apply the pattern
+consistently across all `vim.pack.add` calls.
 
 #### [N-137] Stale duplicate zsh completion config/zsh/completion/_dfm shadows the generated one
 Category: maintainability
@@ -42,6 +98,135 @@ Fix: None required. Noted for completeness. If it ever matters, expose a `--menu
 that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 32 — 2026-06-08
+
+#### [N-173] `BufEnter/BufWinEnter/TabEnter` numberwidth autocmd missing augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('numberwidth-adjust', { clear = true })` to the
+autocmd in `autogroups.lua`. Without a group the autocmd accumulates duplicate
+listeners on every `:source $MYVIMRC`.
+
+#### [N-174] `BufRead/BufNewFile` SSH filetype autocmd missing augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('ssh-filetype', { clear = true })` to the SSH
+autocmd in `autogroups.lua`. Same duplicate-listener issue as N-173.
+
+#### [N-175] `<leader>cws` and `<leader>cwd` identical after Fix 9 removed invalid filter
+Fixed: 2026-06-08
+Notes: Removed the `cwd` binding from `keymaps.lua`. After Fix 9 stripped
+`{ filter = { needle = true } }`, both bindings called
+`Snacks.picker.lsp_workspace_symbols()` with no arguments. The redundant binding
+was removed; `<leader>cws` covers workspace symbol search.
+
+### Pass 31 — 2026-06-08
+
+#### [N-170] `mini.sessions` `autowrite = true` duplicates the manual `VimLeavePre` session write
+Fixed: 2026-06-08
+Notes: Set `autowrite = false` in `sessions.setup {}` in `init.lua`. The explicit
+`VimLeavePre` autocmd in `autogroups.lua` handles session writes with the correct
+headless guard (`#vim.api.nvim_list_uis() == 0`). Summary count corrected: Pass 30 logged
+Open:5 but 6 findings were open (N-137, N-138, N-162, N-163, N-164, N-166); corrected to 6.
+
+#### [N-171] Stale comment in `keymaps.lua` references deleted `editor.lua`
+Fixed: 2026-06-08
+Notes: Updated `keymaps.lua:28` comment from `(editor.lua)` to `(init.lua Editor section)`.
+
+#### [N-172] `PackChanged` autocmd registered without an augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('pack-changed', { clear = true }),` to the `PackChanged`
+autocmd in `autogroups.lua`. Now consistent with every other autocmd in the file.
+
+### Pass 30 — 2026-06-08
+
+#### [N-167] `lsp-list-parity.md` paths and verification command reference deleted `plugin/lsp.lua`
+Fixed: 2026-06-08
+Notes: Updated `paths:` to `["config/nvim/init.lua", "config/nvim/lsp/*.lua"]`.
+Replaced `plugin/lsp.lua` references in rule body and verification command with
+`init.lua`. Verification command now greps `init.lua` directly.
+
+#### [N-168] `ToggleFormat` user command missing `desc` field
+Fixed: 2026-06-08
+Notes: Added `desc = 'Toggle autoformat on save'` to the attributes table in
+`lua/autogroups.lua`.
+
+#### [N-169] `_pack_names()` reads and parses the lockfile on every completion keypress
+Fixed: 2026-06-08
+Notes: Added module-level `_names_cache` in `lua/pack.lua`. `_pack_names()` returns
+the cached table on subsequent calls; the cache is session-scoped (Lua module cache
+persists for the lifetime of the Neovim session).
+
+### Pass 29 — 2026-06-08
+
+#### [N-165] `lsp-list-parity.md` check script produces false violations after mason-lspconfig migration
+Fixed: 2026-06-08
+Notes: Rewrote `.claude/rules/lsp-list-parity.md` to document the new architecture:
+mason-lspconfig `automatic_enable` owns the mason-managed server list; the explicit
+`vim.lsp.enable` block is mise-exceptions only. Replaced the old diff-based check
+with a targeted grep that verifies only `fish_lsp`/`taplo` parity. Added explicit
+warning not to run the old diff.
+
+### Pass 28 — 2026-06-08
+
+#### [N-150] Private Neovim internal API called without error protection
+Fixed: 2026-06-08
+Notes: Wrapped `require('vim._core.ui2').enable {}` in `pcall` in `init.lua:17`
+so a future API removal degrades gracefully instead of aborting init.
+
+#### [N-151] SSH autocmd filetype pattern uses `|` instead of `,` as alternative separator
+Fixed: 2026-06-08
+Notes: Changed `{config|shared|local}` to `{config,shared,local}` in
+`lua/autogroups.lua`. Also simplified `*/?.ssh/` to `*/.ssh/`.
+
+#### [N-152] Invalid LuaLS annotation `---@modules` (plural) silently disables type resolution
+Fixed: 2026-06-08
+Notes: Corrected both occurrences in `plugin/editor.lua` to `---@module 'mini.clue'`
+and `---@module 'mini.statusline'` (singular, with module name in quotes).
+
+#### [N-153] `PackUpdate` passes a raw string to `vim.pack.update` — inconsistent with `PackRemove`
+Fixed: 2026-06-08
+Notes: Updated `plugin/pack.lua` to wrap the single-plugin name in a table:
+`opts.args ~= '' and { opts.args } or nil`, matching the `PackRemove` pattern.
+
+#### [N-154] CLAUDE.md claims `mini.cmdline` is active in editor.lua — it is not
+Fixed: 2026-06-08
+Notes: Removed "cmdline" from the `editor.lua` row in the Plugin Files table in
+`config/nvim/CLAUDE.md`.
+
+#### [N-155] `lazy-lock.json` is an orphan file from the removed lazy.nvim setup
+Fixed: 2026-06-08
+Notes: Deleted `config/nvim/lazy-lock.json`.
+
+#### [N-156] `.luarc.json` missing `TOOL_CONFIGS`, `HasConfig`, `Gated` from `diagnostics.globals`
+Fixed: 2026-06-08
+Notes: Added `TOOL_CONFIGS`, `HasConfig`, and `Gated` to `"diagnostics.globals"`
+in `config/nvim/.luarc.json`.
+
+#### [N-157] `PackList` float window height can be zero — `nvim_open_win` will error
+Fixed: 2026-06-08
+Notes: Added `math.max(1, ...)` lower-bound guard to the height calculation in
+`plugin/pack.lua`.
+
+#### [N-158] `<leader>tf` keymap in qa.lua bypasses the `K` helper — violates project convention
+Fixed: 2026-06-08
+Notes: Removed bare `vim.keymap.set` from `plugin/qa.lua`; added
+`K.nl('tf', '<cmd>ToggleFormat<CR>', 'Toggle autoformat on save')` to
+`lua/keymaps.lua`.
+
+#### [N-159] All `Snacks.*` keymaps have no nil-check if snacks fails to load
+Fixed: 2026-06-08
+Notes: Wrapped all 14 Snacks callback bodies in `if Snacks then ... end` guards
+in `lua/keymaps.lua`.
+
+#### [N-160] `require 'utils'` at top of an LSP config return-file is unconventional
+Fixed: 2026-06-08
+Notes: Removed `require 'utils'` from `lsp/intelephense.lua`. The global
+`GetIntelephenseLicense` is already available from utils being loaded in `init.lua`.
+
+#### [N-161] `lsp/lua_ls.lua` `diagnostics.globals` is a redundant subset of `.luarc.json`
+Fixed: 2026-06-08
+Notes: Removed `diagnostics.globals` from `lsp/lua_ls.lua`; added a comment
+pointing to `.luarc.json` as the authoritative source.
 
 ### Pass 27 — 2026-06-07
 

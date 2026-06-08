@@ -18,6 +18,7 @@ autocmd('TextYankPost', {
 -- This fixes the issue where the line numbers jump
 -- around when moving between lines relative line numbers enabled.
 autocmd({ 'BufEnter', 'BufWinEnter', 'TabEnter' }, {
+  group = augroup('numberwidth-adjust', { clear = true }),
   callback = function()
     local max_line_count = vim.fn.line '$'
     -- Only adjust if the file is large enough to matter
@@ -35,8 +36,8 @@ autocmd('FileType', {
     'help',
     'lspinfo',
     'man',
-    'notify',
     'qf',
+    'snacks_notif',
     'startuptime',
   },
   callback = function(event)
@@ -65,7 +66,7 @@ autocmd('FileType', {
     'help',
     'man',
     'lspinfo',
-    'notify',
+    'snacks_notif',
     'startuptime',
   },
   callback = function() vim.wo.winfixbuf = true end,
@@ -205,11 +206,101 @@ autocmd('LspAttach', {
 -- .dotfiles/ssh/config.d/*, .ssh/config.local, .ssh/config.work,
 -- .ssh/shared.d/*, .ssh/local.d/*
 autocmd({ 'BufRead', 'BufNewFile' }, {
+  group = augroup('ssh-filetype', { clear = true }),
   desc = 'Set filetype for SSH config directory',
   pattern = {
-    '*/?.ssh/{config|shared|local}.d/*',
-    '*/?.ssh/config.local',
-    '*/?.ssh/config.work',
+    '*/.ssh/config.d/*',
+    '*/.ssh/shared.d/*',
+    '*/.ssh/local.d/*',
+    '*/.ssh/config.local',
+    '*/.ssh/config.work',
   },
   command = 'set filetype=sshconfig',
 })
+
+-- ── vim.pack Lifecycle ───────────────────────────────────────────────
+-- autogroups.lua is required before vim.pack.add in init.lua, so
+-- PackChanged is registered in time to fire on first-install events.
+autocmd('PackChanged', {
+  group = augroup('pack-changed', { clear = true }),
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if name == 'arborist' and (kind == 'install' or kind == 'update') then
+      if not ev.data.active then vim.cmd.packadd 'arborist' end
+      vim.cmd 'ArboristUpdate'
+    end
+  end,
+})
+
+-- ── Sessions (mini.sessions) ─────────────────────────────────────────
+-- Auto-read session for cwd on startup (no file args, interactive only).
+-- Headless invocations (CI, scripts, :checkhealth) skip both read and
+-- write to avoid polluting ~/.local/share/nvim/sessions/ with junk entries.
+autocmd('VimEnter', {
+  group = augroup('auto-session', { clear = true }),
+  nested = true,
+  callback = function()
+    if vim.fn.argc() > 0 then return end
+    if #vim.api.nvim_list_uis() == 0 then return end
+    local sessions = require 'mini.sessions'
+    local cwd = vim.fn.getcwd()
+    local name = cwd:gsub('[/\\]', '%%')
+    local ok = pcall(sessions.read, name, { force = true })
+    if not ok then
+      -- No session yet — will be created on exit
+      vim.g.mini_sessions_current = name
+    end
+  end,
+})
+
+-- Auto-write session for cwd on exit (interactive only)
+autocmd('VimLeavePre', {
+  group = augroup('auto-session-write', { clear = true }),
+  callback = function()
+    if #vim.api.nvim_list_uis() == 0 then return end
+    local sessions = require 'mini.sessions'
+    local cwd = vim.fn.getcwd()
+    local name = cwd:gsub('[/\\]', '%%')
+    sessions.write(name, { force = true })
+  end,
+})
+
+-- ── Linting (nvim-lint) ──────────────────────────────────────────────
+-- Linter name → TOOL_CONFIGS key. Linters absent from this map run unconditionally.
+local LINTER_GATES = {
+  ansible_lint = 'ansible_lint',
+  golangci_lint = 'golangci_lint',
+  hadolint = 'hadolint',
+  ruff = 'ruff',
+  tflint = 'tflint',
+  yamllint = 'yamllint',
+}
+-- Filetypes where biome applies
+local biome_fts = {
+  javascript = true,
+  javascriptreact = true,
+  typescript = true,
+  typescriptreact = true,
+  json = true,
+  jsonc = true,
+}
+autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
+  group = augroup('nvim-lint', { clear = true }),
+  callback = function(args)
+    local lint = require 'lint'
+    local ft = vim.bo[args.buf].filetype
+    if biome_fts[ft] and HasConfig('biome', args.buf) then lint.try_lint 'biomejs' end
+    local names = {}
+    for _, name in ipairs(lint.linters_by_ft[ft] or {}) do
+      local gate = LINTER_GATES[name]
+      if gate == nil or HasConfig(gate, args.buf) then table.insert(names, name) end
+    end
+    if #names > 0 then lint.try_lint(names) end
+  end,
+})
+
+-- ── Formatting commands ──────────────────────────────────────────────
+vim.api.nvim_create_user_command('ToggleFormat', function()
+  vim.g.autoformat_enabled = not vim.g.autoformat_enabled
+  vim.notify('Autoformat: ' .. (vim.g.autoformat_enabled and 'on' or 'off'))
+end, { desc = 'Toggle autoformat on save' })

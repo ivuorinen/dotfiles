@@ -24,6 +24,21 @@ K.d('<C-j>', { 'n', 'v' }, "<cmd>m '>+1<CR>gv=gv", 'Move Block Down')
 K.n('<C-s>', '<cmd>w!<CR>', { desc = 'Save', noremap = true })
 K.n('<Esc><Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 
+-- Disable arrow keys in normal mode; use hjkl or count motions instead.
+-- mini.keymap (init.lua Editor section) nudges away from hjkl spam with notifications.
+for _, key in ipairs {
+  '<Up>',
+  '<Down>',
+  '<Left>',
+  '<Right>',
+  '<C-Up>',
+  '<C-Down>',
+  '<C-Left>',
+  '<C-Right>',
+} do
+  K.d(key, 'n', '<Nop>', 'Disabled (use hjkl / word motions)')
+end
+
 -- ── Buffer operations ───────────────────────────────────────────────
 -- Mappings for buffer management operations like switching, deleting, etc.
 -- Convention: All mappings start with 'b' followed by the operation
@@ -50,21 +65,35 @@ K.nl('bw', '<cmd>lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 -- Convention: All mappings start with 'c' followed by the operation
 -- unless it's a generic operation like signature help or hover
 
-local b = function() return require 'telescope.builtin' end
-local lws = function() return b().lsp_workspace_symbols() end
-local ldws = function() return b().lsp_dynamic_workspace_symbols() end
-
 K.n('<C-l>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature' })
-K.ld('cci', 'n', function() b().lsp_incoming_calls() end, 'Incoming calls')
-K.ld('cco', 'n', function() b().lsp_outgoing_calls() end, 'Outgoing calls')
-K.ld('cd', 'n', function() b().lsp_definitions() end, 'Definitions')
+K.ld('cci', 'n', function()
+  if Snacks then Snacks.picker.lsp_incoming_calls() end
+end, 'Incoming calls')
+K.ld('cco', 'n', function()
+  if Snacks then Snacks.picker.lsp_outgoing_calls() end
+end, 'Outgoing calls')
+K.ld('cd', 'n', function()
+  if Snacks then Snacks.picker.lsp_definitions() end
+end, 'Definitions')
 K.ld('cf', { 'n', 'x' }, '<cmd>lua vim.lsp.buf.format()<CR>', 'Format')
-K.ld('ci', 'n', function() b().lsp_implementations() end, 'Implementations')
-K.ld('cp', 'n', function() b().lsp_type_definitions() end, 'Type Definition')
-K.ld('cs', 'n', '<cmd>Telescope lsp_document_symbols<CR>', 'LSP Document Symbols')
-K.ld('ct', 'n', function() b().treesitter() end, 'treesitter')
-K.ld('cws', 'n', function() lws() end, 'Workspace Symbols')
-K.ld('cwd', 'n', function() ldws() end, 'Dynamic Workspace Symbols')
+K.ld('ci', 'n', function()
+  if Snacks then Snacks.picker.lsp_implementations() end
+end, 'Implementations')
+K.ld('cp', 'n', function()
+  if Snacks then Snacks.picker.lsp_type_definitions() end
+end, 'Type Definition')
+K.ld('cr', 'n', function()
+  if Snacks then Snacks.rename.rename_file() end
+end, 'Rename file')
+K.ld('cs', 'n', function()
+  if Snacks then Snacks.picker.lsp_symbols() end
+end, 'LSP Document Symbols')
+K.ld('ct', 'n', function()
+  if Snacks then Snacks.picker.treesitter() end
+end, 'Treesitter')
+K.ld('cws', 'n', function()
+  if Snacks then Snacks.picker.lsp_workspace_symbols() end
+end, 'Workspace Symbols')
 
 -- ── CommentBox operations ───────────────────────────────────────────
 -- Mappings for creating and managing comment boxes
@@ -75,29 +104,45 @@ K.nl('cbl', '<Cmd>CBline<CR>', 'CB: Simple Line')
 K.nl('cbm', '<Cmd>CBllbox14<CR>', 'CB: Marked')
 K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
 
--- ── Telescope operations ────────────────────────────────────────────
--- Mappings for Telescope operations like finding files, buffers, etc.
--- Convention: All mappings start with 's' followed by the operation
--- unless it's a generic operation like searching or finding buffers
+-- ── Search / Picker operations ──────────────────────────────────────
+-- Powered by snacks.picker (replaces telescope).
+-- Convention: All mappings start with 's' followed by the operation,
+-- or generic 'f' for files and ',' for buffers.
 
-local lazy_plugins = function()
-  return require('telescope').extensions.lazy_plugins.lazy_plugins()
-end
+K.nl('f', function()
+  if Snacks then Snacks.picker.files() end
+end, 'Find Files')
+K.nl(',', function()
+  if Snacks then Snacks.picker.buffers() end
+end, 'Find existing buffers')
 
-K.nl('f', '<cmd>Telescope find_files<CR>', 'Find Files')
-K.nl(',', '<cmd>Telescope buffers<CR>', 'Find existing buffers')
-
-K.nl('sd', '<cmd>Telescope diagnostics<CR>', 'Search Diagnostics')
-K.nl('sf', '<cmd>Telescope grep_string<CR>', 'Grep String')
-K.nl('sg', '<cmd>Telescope live_grep<CR>', 'Live Grep')
-K.nl('sh', '<cmd>Telescope help_tags<CR>', 'Help tags')
-K.nl('sk', '<cmd>Telescope keymaps<CR>', 'Search Keymaps')
-K.nl('sn', '<cmd>Noice telescope<CR>', 'Noice Messages')
-K.nl('so', '<cmd>Telescope oldfiles<CR>', 'Old Files')
-K.nl('sp', function() lazy_plugins() end, 'Lazy Plugins')
-K.nl('sq', '<cmd>Telescope quickfix<CR>', 'Quickfix')
-K.nl('ss', '<cmd>Telescope treesitter<CR>', 'Treesitter')
-K.nl('sx', '<cmd>Telescope import<CR>', 'Telescope: Import')
+K.nl('sd', function()
+  if Snacks then Snacks.picker.diagnostics() end
+end, 'Search Diagnostics')
+K.nl('sf', function()
+  if Snacks then Snacks.picker.grep_word() end
+end, 'Grep String')
+K.nl('sg', function()
+  if Snacks then Snacks.picker.grep() end
+end, 'Live Grep')
+K.nl('sh', function()
+  if Snacks then Snacks.picker.help() end
+end, 'Help tags')
+K.nl('sk', function()
+  if Snacks then Snacks.picker.keymaps() end
+end, 'Search Keymaps')
+K.nl('sn', function()
+  if Snacks then Snacks.picker.notifications() end
+end, 'Notification History')
+K.nl('so', function()
+  if Snacks then Snacks.picker.recent() end
+end, 'Old Files')
+K.nl('sq', function()
+  if Snacks then Snacks.picker.qflist() end
+end, 'Quickfix')
+K.nl('ss', function()
+  if Snacks then Snacks.picker.lines() end
+end, 'Search Buffer Lines')
 
 -- ── Trouble operations ──────────────────────────────────────────────
 -- Convention is 'x' followed by the operation
@@ -109,6 +154,7 @@ K.nl('xx', '<cmd>Trouble diagnostics<CR>', 'Diagnostics')
 
 -- ── Toggle settings ─────────────────────────────────────────────────
 -- Convention is 't' followed by the operation
+K.nl('tf', '<cmd>ToggleFormat<CR>', 'Toggle autoformat on save')
 K.nl('te', function()
   if MiniFiles then MiniFiles.open() end
 end, 'File Explorer (cwd)')
@@ -116,7 +162,12 @@ K.n('-', function()
   if MiniFiles then MiniFiles.open(vim.api.nvim_buf_get_name(0)) end
 end, { desc = 'File Explorer (current file)' })
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
-K.nl('tn', '<cmd>Noice dismiss<CR>', 'Noice: Dismiss Notification')
+K.nl('tn', function()
+  if Snacks then Snacks.notifier.hide() end
+end, 'Dismiss Notifications')
+K.nl('tt', function()
+  if Snacks then Snacks.terminal() end
+end, 'Toggle Terminal')
 
 -- ── Option toggles ────────────────────────────────────────────────────
 -- Convention is 'tm' followed by the option letter

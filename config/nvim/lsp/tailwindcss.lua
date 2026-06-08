@@ -1,5 +1,7 @@
+-- Narrower filetypes than nvim-lspconfig defaults (which include 30+ types
+-- such as markdown, svelte, vue). Only activate where Tailwind is practical.
+-- Root markers scope it further to actual Tailwind projects.
 return {
-  cmd = { 'tailwindcss-language-server', '--stdio' },
   filetypes = {
     'html',
     'css',

@@ -4,8 +4,12 @@
     "K",
     "MiniBufremove",
     "MiniFiles",
+    "Snacks",
     "ToggleBackground",
-    "GetIntelephenseLicense"
+    "GetIntelephenseLicense",
+    "TOOL_CONFIGS",
+    "HasConfig",
+    "Gated"
   ],
   "runtime.version": "LuaJIT",
   "workspace.library": ["${3rd}/luv/library"]

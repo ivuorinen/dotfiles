@@ -1,38 +1,51 @@
 ---
 paths:
-  - "config/nvim/lua/plugins/lsp.lua"
   - "config/nvim/init.lua"
   - "config/nvim/lsp/*.lua"
 ---
 
 # LSP list parity
 
-The `ensure_installed` list in `config/nvim/lua/plugins/lsp.lua`
-(mason-tool-installer) and the `vim.lsp.enable {...}` list in
-`config/nvim/init.lua` must stay in sync, modulo the mise-installed
-servers — currently `fish_lsp` and `taplo`, which are present in the
-`vim.lsp.enable` list but not in `ensure_installed` because mise
-manages their binaries.
+The `-- LSP` section of `init.lua` uses `mason-lspconfig` with
+`automatic_enable = true`, which calls `vim.lsp.enable()` for every server mason
+has installed. The explicit `vim.lsp.enable` block therefore contains **only** the
+mise-managed exceptions — currently `fish_lsp` and `taplo`.
 
-When adding a server: add it to `vim.lsp.enable {...}` AND to
-`ensure_installed` (unless it comes from mise). Drop a matching
-`config/nvim/lsp/<name>.lua` if the server needs custom `cmd`,
-`filetypes`, `root_markers`, or `settings`.
+## Active server set
 
-When removing a server: drop it from BOTH lists and delete the
-matching `lsp/<name>.lua`.
+The active set of LSP servers is determined by two sources:
+1. **`ensure_installed` in mason-tool-installer** — all mason-managed servers
+    (using mason package names, e.g. `'bash-language-server'`).
+2. **`vim.lsp.enable { 'fish_lsp', 'taplo' }`** — mise-managed servers only.
 
-Verification (run from the repo root):
+Do NOT add mason-managed servers to the bare `vim.lsp.enable` call. They are
+auto-enabled by mason-lspconfig; adding them explicitly would double-enable them
+(harmless but confusing).
+
+## When adding a server
+
+- If managed by mason: add it to `ensure_installed` (mason package name).
+  mason-lspconfig will auto-enable it. Drop a `config/nvim/lsp/<name>.lua`
+  only if the server needs custom `cmd`, `filetypes`, `root_markers`, or
+  `settings`.
+- If managed by mise: add the lspconfig server name to the bare
+  `vim.lsp.enable { ... }` call in the `-- LSP` section of `init.lua`. Do NOT
+  add it to `ensure_installed`.
+
+## When removing a server
+
+- If mason-managed: remove from `ensure_installed` and delete `lsp/<name>.lua`.
+- If mise-managed: remove from `vim.lsp.enable` and delete `lsp/<name>.lua`.
+
+## Verification
+
+The only parity to check is that mise-managed exceptions are absent from
+`ensure_installed` and present in `vim.lsp.enable`:
 
 ```bash
-cd config/nvim && diff \
-  <(awk '/ensure_installed = \{/,/^[[:space:]]*\}/' lua/plugins/lsp.lua \
-      | grep -oE '"[a-z_]+"' | sort -u) \
-  <(awk '/vim\.lsp\.enable \{/,/^[[:space:]]*\}/' init.lua \
-      | grep -oE '"[a-z_]+"' | sort -u)
+cd config/nvim && grep -n 'vim\.lsp\.enable' init.lua
+# Expected: one line containing both fish_lsp and taplo
 ```
 
-The diff must contain only the mise-managed exceptions (currently
-`fish_lsp` and `taplo`). The `awk` range scopes the grep to the
-relevant table so settings keys, log levels, and unrelated string
-literals do not appear as false drift.
+The old diff-based check (ensure_installed vs vim.lsp.enable) no longer applies
+and will produce false violations — do not run it.

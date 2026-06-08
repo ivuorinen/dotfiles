@@ -1,7 +1,5 @@
+-- Inlay hints are off by default in gopls; turn them all on.
 return {
-  cmd = { 'gopls' },
-  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-  root_markers = { 'go.work', 'go.mod', '.git' },
   settings = {
     gopls = {
       hints = {

@@ -1,11 +1,6 @@
+-- Extended root_markers: nvim-lspconfig defaults omit several eslint
+-- config variants (.eslintrc, config.mjs, config.ts).
 return {
-  cmd = { 'vscode-eslint-language-server', '--stdio' },
-  filetypes = {
-    'javascript',
-    'javascriptreact',
-    'typescript',
-    'typescriptreact',
-  },
   root_markers = {
     '.eslintrc',
     '.eslintrc.js',
