@@ -2,11 +2,11 @@
 
 Generated: 2026-04-26
 Last validated: 2026-06-08
-Last pass: 31 (2026-06-08)
+Last pass: 32 (2026-06-08)
 
 ## Summary
 
-- Total: 164 | Open: 6 | Fixed: 149 | Invalid: 9
+- Total: 167 | Open: 6 | Fixed: 152 | Invalid: 9
 
 ## Open Findings
 
@@ -98,6 +98,26 @@ Fix: None required. Noted for completeness. If it ever matters, expose a `--menu
 that skips even `dfm_bootstrap_min`.
 
 ## Fixed
+
+### Pass 32 — 2026-06-08
+
+#### [N-173] `BufEnter/BufWinEnter/TabEnter` numberwidth autocmd missing augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('numberwidth-adjust', { clear = true })` to the
+autocmd in `autogroups.lua`. Without a group the autocmd accumulates duplicate
+listeners on every `:source $MYVIMRC`.
+
+#### [N-174] `BufRead/BufNewFile` SSH filetype autocmd missing augroup
+Fixed: 2026-06-08
+Notes: Added `group = augroup('ssh-filetype', { clear = true })` to the SSH
+autocmd in `autogroups.lua`. Same duplicate-listener issue as N-173.
+
+#### [N-175] `<leader>cws` and `<leader>cwd` identical after Fix 9 removed invalid filter
+Fixed: 2026-06-08
+Notes: Removed the `cwd` binding from `keymaps.lua`. After Fix 9 stripped
+`{ filter = { needle = true } }`, both bindings called
+`Snacks.picker.lsp_workspace_symbols()` with no arguments. The redundant binding
+was removed; `<leader>cws` covers workspace symbol search.
 
 ### Pass 31 — 2026-06-08
 

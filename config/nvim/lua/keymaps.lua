@@ -94,9 +94,6 @@ end, 'Treesitter')
 K.ld('cws', 'n', function()
   if Snacks then Snacks.picker.lsp_workspace_symbols() end
 end, 'Workspace Symbols')
-K.ld('cwd', 'n', function()
-  if Snacks then Snacks.picker.lsp_workspace_symbols() end
-end, 'Dynamic Workspace Symbols')
 
 -- ── CommentBox operations ───────────────────────────────────────────
 -- Mappings for creating and managing comment boxes

@@ -18,6 +18,7 @@ autocmd('TextYankPost', {
 -- This fixes the issue where the line numbers jump
 -- around when moving between lines relative line numbers enabled.
 autocmd({ 'BufEnter', 'BufWinEnter', 'TabEnter' }, {
+  group = augroup('numberwidth-adjust', { clear = true }),
   callback = function()
     local max_line_count = vim.fn.line '$'
     -- Only adjust if the file is large enough to matter
@@ -205,6 +206,7 @@ autocmd('LspAttach', {
 -- .dotfiles/ssh/config.d/*, .ssh/config.local, .ssh/config.work,
 -- .ssh/shared.d/*, .ssh/local.d/*
 autocmd({ 'BufRead', 'BufNewFile' }, {
+  group = augroup('ssh-filetype', { clear = true }),
   desc = 'Set filetype for SSH config directory',
   pattern = {
     '*/.ssh/config.d/*',
