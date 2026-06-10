@@ -62,7 +62,7 @@ delta = "0.19.2"
 difftastic = "0.69.0"
 
 # GitHub releases (no aqua entry)
-"github:binwiederhier/ntfy" = "2.23.0"
+"github:binwiederhier/ntfy" = "2.24.0"
 "github:dimo414/bkt" = "0.8.2"
 "github:jgm/pandoc" = "3.10"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
