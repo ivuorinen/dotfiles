@@ -43,5 +43,5 @@
   "resolutions": {
     "minimatch": "^10.2.4"
   },
-  "packageManager": "yarn@4.15.0"
+  "packageManager": "yarn@4.16.0"
 }
