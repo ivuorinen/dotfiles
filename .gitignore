@@ -7,6 +7,11 @@
 *.old
 *.sql
 *cache
+
+# Stray exported GPG public keys. gopass keeps the authoritative copy in
+# its store's .public-keys/ (synced via the store's own remote) and the
+# keyring holds the importable copy, so loose exports never belong here.
+*.pub.key
 .env
 .idea
 .nfs*
