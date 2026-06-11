@@ -12,10 +12,12 @@ yarn install   # Install dependencies (required before lint/test)
 ## Linting
 
 ```bash
-yarn lint              # Run biome + prettier + editorconfig-checker
+yarn lint              # biome + prettier + editorconfig-checker + md-table
 yarn lint:biome        # Biome only
+yarn lint:prettier     # Prettier (YAML) check only
 yarn lint:ec           # EditorConfig checker only
 yarn lint:md-table     # Markdown table formatting check
+yarn fix               # Autofix everything (biome + prettier + md-table)
 yarn fix:md-table      # Auto-fix markdown tables
 ```
 
@@ -31,8 +33,8 @@ yarn format:yaml   # Format YAML files with prettier
 ## Testing
 
 ```bash
-yarn test                                    # Run all tests in tests/
-./node_modules/.bin/bats tests/dfm.bats      # Run a single test file
+yarn test                  # Run all tests (bash test-all.sh)
+bats tests/dfm.bats        # Run a single test file (bats from PATH, via mise)
 ```
 
 ## Shell / Lua

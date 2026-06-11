@@ -1,12 +1,12 @@
 # Documentation Audit Findings
 
 Generated: 2026-05-05
-Last validated: 2026-05-05
+Last validated: 2026-06-11
 
 ## Summary
 
-- Total: 4 | Open: 0 | Fixed: 4 | Invalid: 0
-- Pass 1 fixes applied: 2026-05-05.
+- Total: 7 | Open: 0 | Fixed: 7 | Invalid: 0
+- Pass 1 fixes applied: 2026-05-05; Pass 2 applied: 2026-06-11.
 
 Sources scanned: `README.md`, `docs/folders.md`, `docs/alias.md`,
 `docs/findings-todo.md`, `docs/commands.md`, `docs/*-keybindings.md`,
@@ -59,6 +59,33 @@ naming the canonical home for the files
 `# shellcheck source=./exports-lakka(-secret)?` hints to
 `source=/dev/null` since the moved file is no longer a sibling.
 
+### Pass 2 — 2026-06-11
+
+#### [DOC-005] `docs/alias.md` stale and table malformed
+Fixed: 2026-06-11
+Notes: Documented 43 of 53 aliases in `config/alias` — missing `.p`,
+`.s`, `afk`, `cat`, `code_scanner`, `emptytrash`, `flushdns`, `ls`,
+`lsa`, `p`. The header separator row declared three columns for a
+two-column table, and the `ips`/`pubkey` rows had unescaped pipes
+creating phantom cells. Regenerated the full 53-entry table with
+escaped pipes, dropped the rot-prone hardcoded "Last updated" date,
+and added a note that the file mirrors `config/alias`.
+
+#### [DOC-006] `docs/commands.md` recommended vendored bats path
+Fixed: 2026-06-11
+Notes: Changed `./node_modules/.bin/bats tests/dfm.bats` to
+`bats tests/dfm.bats` (bats is mise-managed and on PATH; the vendored
+path is the rejected approach). Corrected the `yarn lint` description
+to include md-table, added `yarn lint:prettier` and the `yarn fix`
+umbrella, and noted `yarn test` runs `bash test-all.sh`.
+
+#### [DOC-007] Keybinding docs stale vs generators
+Fixed: 2026-06-11
+Notes: Ran `dfm docs all`. `docs/nvim-keybindings.md` and
+`docs/wezterm-keybindings.md` were stale (wezterm had space-indented
+rows where the generator now emits tabs); regenerated both.
+`docs/tmux-keybindings.md` was already current.
+
 ## Invalid
 
-_(none — first pass)_
+_(none)_
