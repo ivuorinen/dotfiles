@@ -12,6 +12,11 @@ if type -q bat
     alias cat='bat'
 end
 
+# gopass password manager shortcut (resolves via PATH / mise shim)
+if type -q gopass
+    alias p='gopass'
+end
+
 # eza aliases if eza is installed
 if type -q eza >/dev/null
     function eza_git -d "Use eza and its git options if in a git repo"

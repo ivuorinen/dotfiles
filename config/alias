@@ -11,6 +11,11 @@ x-have bat && {
   alias cat="bat"
 }
 
+# gopass password manager shortcut (resolves via PATH / mise shim)
+x-have gopass && {
+  alias p="gopass"
+}
+
 # Easier navigation: .., ..., ....
 alias ..="cd .."
 alias ...="cd ../.."
