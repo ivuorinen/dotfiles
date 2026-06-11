@@ -77,7 +77,7 @@ lazygit = "0.62.2"
 delta = "0.19.2"
 difftastic = "0.69.0"
 "github:dotzero/git-profile" = "1.7.3"             # ships macOS-all universal binary
-"github:max-sixty/worktrunk" = "0.56.0"
+"github:max-sixty/worktrunk" = "0.57.0"
 "npm:github-release-notes" = "0.17.3"
 
 # Editors & language servers
