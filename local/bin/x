@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# @description Git-style dispatcher for x-* utility scripts
+#USAGE about "Git-style dispatcher for x-* utility scripts"
+#USAGE arg "[command]" help="x-* subcommand to run (omit to list all)"
+#USAGE arg "[args...]" help="Arguments passed to the subcommand"
+#
+# `x <command> [args...]` resolves and execs `x-<command>` (sibling of
+# this script first, then $PATH), mirroring how git finds git-<command>.
+#
+# (c) Ismo Vuorinen <https://github.com/ivuorinen> 2026
+# Licensed under MIT, see LICENSE
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+# Resolve real directory through symlinks (macOS/BSD-portable, no readlink -f).
+# When `x` is invoked via a ~/.local/bin/x symlink a plain dirname "$0" would
+# yield ~/.local/bin, missing any newly added x-* siblings in the repo's
+# local/bin. Following the symlink chain makes `x <new-sub>` work the moment
+# the file is dropped in — no re-link needed.
+_x_src="$0"
+while [ -h "$_x_src" ]; do
+  _x_link_dir=$(
+    unset CDPATH
+    cd -P -- "$(dirname -- "$_x_src")" && pwd
+  )
+  _x_src=$(readlink "$_x_src")
+  case "$_x_src" in
+    /*) ;;
+    *) _x_src="$_x_link_dir/$_x_src" ;;
+  esac
+done
+_x_selfdir=$(
+  unset CDPATH
+  cd -P -- "$(dirname -- "$_x_src")" && pwd
+)
+
+# shellcheck source=local/bin/msgr
+. "$_x_selfdir/msgr"
+
+SCRIPT="${0##*/}"
+
+# Extract the first description line from a script file.
+# Prefers #USAGE about over # @description for consistency.
+_x_desc()
+{
+  local f="$1" line desc
+  while IFS= read -r line; do
+    case "$line" in
+      '#USAGE about "'*)
+        desc="${line#'#USAGE about "'}"
+        printf '%s' "${desc%'"'}"
+        return
+        ;;
+      '# @description '*)
+        printf '%s' "${line#'# @description '}"
+        return
+        ;;
+    esac
+  done < "$f"
+}
+
+usage()
+{
+  echo ""
+  msgr prompt "Usage: $SCRIPT <command> [args...]"
+  echo ""
+  echo "  Available x-* commands:"
+  echo ""
+
+  local f name desc maxlen=0
+  local -a entries=()
+
+  for f in "$_x_selfdir"/x-*; do
+    [ -x "$f" ] || continue
+    name="${f##*/x-}"
+    # Skip files with extensions (e.g. x-foo.py, x-foo.pl, x-foo.md)
+    case "$name" in *.*) continue ;; esac
+    [ ${#name} -gt "$maxlen" ] && maxlen=${#name}
+    desc=$(_x_desc "$f")
+    entries+=("$name|$desc")
+  done
+
+  if [ ${#entries[@]} -eq 0 ]; then
+    echo "  (no x-* commands found in $_x_selfdir)"
+    echo ""
+    return
+  fi
+
+  local entry
+  local -a sorted_entries
+  mapfile -t sorted_entries < <(printf '%s\n' "${entries[@]}" | sort)
+
+  for entry in "${sorted_entries[@]}"; do
+    printf '    %-*s  %s\n' "$maxlen" "${entry%%|*}" "${entry#*|}"
+  done
+  echo ""
+}
+
+main()
+{
+  local sub="${1:-}"
+  [ $# -gt 0 ] && shift
+
+  case "$sub" in
+    "" | help | -h | --help)
+      usage
+      return 0
+      ;;
+  esac
+
+  # Sibling-first lookup, then $PATH (git-style). The -x guard ensures we
+  # never try to exec a non-executable file (e.g. an .md sidecar).
+  local cand="$_x_selfdir/x-$sub"
+  if [ -x "$cand" ]; then
+    exec "$cand" "$@"
+  fi
+
+  local resolved
+  resolved=$(command -v "x-$sub" 2> /dev/null)
+  if [ -n "$resolved" ] && [ -x "$resolved" ]; then
+    exec "$resolved" "$@"
+  fi
+
+  msgr err "$SCRIPT: unknown command '$sub'"
+  usage
+  return 1
+}
+
+main "$@"
