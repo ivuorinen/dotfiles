@@ -84,6 +84,32 @@ generate_for_spec()
   ((count++)) || true
 }
 
+generate_docs_only()
+{
+  local spec="$1"
+  local bin_name="$2"
+
+  logger::info "Generating docs for: $bin_name"
+
+  if usage generate markdown -f "$spec" --out-file "$MD_DIR/$bin_name.md" 2>&1; then
+    :
+  else
+    logger::warn "markdown generation failed for $bin_name"
+    rm -f "$MD_DIR/$bin_name.md"
+    ((errors++)) || true
+  fi
+
+  if usage generate manpage -f "$spec" --out-file "$MAN_DIR/$bin_name.1" 2>&1; then
+    :
+  else
+    logger::warn "manpage generation failed for $bin_name"
+    rm -f "$MAN_DIR/$bin_name.1"
+    ((errors++)) || true
+  fi
+
+  ((count++)) || true
+}
+
 # Process local/bin inline specs (#USAGE or //USAGE directives embedded in script)
 for spec in "$DOTFILES"/local/bin/*; do
   [[ -f "$spec" ]] || continue
@@ -96,6 +122,7 @@ for spec in "$DOTFILES"/local/bin/*; do
   # rather than generated individually.
   case "$bin_name" in
     dfm | dfm-*) continue ;;
+    x) continue ;; # hand-crafted completion; docs generated below
     *) ;;
   esac
   generate_for_spec "$spec" "$bin_name"
@@ -126,6 +153,12 @@ if [[ -f "$DOTFILES/local/bin/dfm" ]]; then
   } > "$dfm_spec"
   generate_for_spec "$dfm_spec" "dfm"
   rm -rf "$dfm_spec_dir"
+fi
+
+# x: generate docs + manpage only — fish completion is hand-crafted in
+# config/fish/completions/x.fish because subcommands are discovered dynamically.
+if [[ -f "$DOTFILES/local/bin/x" ]]; then
+  generate_docs_only "$DOTFILES/local/bin/x" "x"
 fi
 
 # Process scripts/ inline .sh specs (#USAGE directives embedded in script)
