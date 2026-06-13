@@ -98,6 +98,13 @@ autocmd({ 'FileType' }, {
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
+-- Disable mini.completion in Snacks.picker buffers (input + list)
+autocmd('FileType', {
+  group = augroup('minicompletion-picker-disable', { clear = true }),
+  pattern = { 'snacks_picker_input', 'snacks_picker_list' },
+  callback = function(event) vim.b[event.buf].minicompletion_disable = true end,
+})
+
 -- ── Diagnostic Config ────────────────────────────────────────────────
 vim.diagnostic.config {
   severity_sort = true,
