@@ -12,11 +12,10 @@ local o = vim.opt -- A table to store global options
 g.mapleader = ' ' -- Space as the leader key
 g.maplocalleader = ' ' -- Space as the local leader key
 
--- Nerd Font is installed (Brewfile / fonts) — used by mini.icons, blink.cmp,
+-- Nerd Font is installed (Brewfile / fonts) — used by mini.icons
 -- and the diagnostic-sign branch in lua/autogroups.lua. Set explicitly so
 -- the nil-fallback paths don't silently disable nerd-font glyphs.
 g.have_nerd_font = true
-g.nerd_font_variant = 'mono' -- 'mono' or 'normal' (blink.cmp appearance)
 
 g.editorconfig = true -- Make sure editorconfig support is enabled
 g.loaded_perl_provider = 0 -- Disable perl provider

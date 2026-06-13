@@ -28,10 +28,9 @@ require 'pack'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
 -- version = vim.version.range '*' is set only on plugins that publish
--- semver-tagged releases (blink.cmp, snacks.nvim). The remaining plugins
+-- semver-tagged releases (snacks.nvim). The remaining plugins
 -- have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
-  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '*' },
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/tpope/vim-sleuth',
   'https://github.com/neovim/nvim-lspconfig',
@@ -45,56 +44,16 @@ vim.pack.add {
   { src = 'https://github.com/folke/snacks.nvim', version = vim.version.range '*' },
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
-  'https://github.com/LudoPinelli/comment-box.nvim',
   'https://github.com/arborist-ts/arborist.nvim',
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
-  'https://github.com/MeanderingProgrammer/render-markdown.nvim',
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
--- Performant, batteries-included completion plugin for Neovim
--- https://github.com/saghen/blink.cmp
-
----@module 'blink.cmp'
-require('blink.cmp').setup {
-  keymap = {
-    ['<C-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
-  },
-
-  appearance = {
-    use_nvim_cmp_as_default = true,
-  },
-
-  completion = {
-    menu = {
-      draw = {
-        columns = {
-          { 'label', 'label_description', gap = 1 },
-          { 'kind_icon', 'kind', gap = 1 },
-        },
-      },
-    },
-  },
-
-  sources = {
-    default = {
-      'lsp',
-      'path',
-      'snippets',
-      'buffer',
-      -- Wraps &omnifunc via blink.cmp.sources.complete_func. Built-in
-      -- `enabled` guard skips when omnifunc is the LSP handler, so no
-      -- duplication with the `lsp` source. Catches filetypes without
-      -- an LSP (gitcommit, help, plugin-provided completefuncs).
-      'omni',
-    },
-  },
-
-  -- Inline signature help while typing; disabled by default in blink.cmp.
-  signature = { enabled = true },
-}
+-- Lightweight LSP-aware completion from mini.nvim
+-- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-completion.md
+require('mini.completion').setup()
 
 -- ── Editor ───────────────────────────────────────────────────────────
 -- mini.nvim suite + vim-sleuth
@@ -200,7 +159,6 @@ miniclue.setup {
     miniclue.gen_clues.z(),
     { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
     { mode = 'n', keys = '<Leader>c', desc = '+Code' },
-    { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
     { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
     { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
     { mode = 'n', keys = '<Leader>s', desc = '+Search' },
@@ -357,11 +315,10 @@ require 'lspconfig'
 
 require('mason').setup {}
 
--- blink.cmp is loaded by vim.pack.add earlier in this file.
 -- Set capabilities before mason-lspconfig enables servers so the config store
 -- is fully populated regardless of enable timing.
 vim.lsp.config('*', {
-  capabilities = require('blink.cmp').get_lsp_capabilities(),
+  capabilities = vim.lsp.protocol.make_client_capabilities(),
 })
 
 -- Automatically calls vim.lsp.enable() for every server mason has installed.
@@ -585,9 +542,9 @@ require('shellspec').setup {
   indent_comments = true,
 }
 
--- Clarify and beautify your comments using boxes and lines.
--- https://github.com/LudoPinelli/comment-box.nvim
-require('comment-box').setup {}
+-- Toggle comments (gc operator, gcc for line)
+-- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-comment.md
+require('mini.comment').setup()
 
 -- ── Treesitter ────────────────────────────────────────────────────────
 -- Parser manager for Neovim 0.12+ (highlight, indent, folds via built-in API)
@@ -644,14 +601,6 @@ require('colorizer').setup {
   user_default_options = {
     names = false,
   },
-}
-
--- ── Render Markdown ──────────────────────────────────────────────────
--- Render markdown inline (tables, headings, code blocks)
--- https://github.com/MeanderingProgrammer/render-markdown.nvim
-require('render-markdown').setup {
-  -- html and yaml parsers are in treesitter ensure_installed; latex is not.
-  latex = { enabled = false },
 }
 
 -- vim: set ts=2 sts=2 sw=2 wrap et :
