@@ -93,7 +93,7 @@ just = "1.51.0"
 # Linters & formatters
 editorconfig-checker = "3.7.0"
 biome = "2.4.12"                            # pinned to match biome.json $schema; bump both together
-"npm:prettier" = "3.8.3"
+"npm:prettier" = "3.8.4"
 "npm:markdownlint-cli" = "0.48.0"
 "npm:markdown-table-formatter" = "1.7.0"
 "npm:v8r" = "6.1.0"
