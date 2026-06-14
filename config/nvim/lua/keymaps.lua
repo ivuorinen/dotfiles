@@ -125,8 +125,10 @@ K.nl('qQ', function()
 end, 'Force quit without saving')
 
 -- ── Snacks keymaps ──────────────────────────────────────────────────
--- All keymaps below require Snacks. Defined only when it is available.
-if Snacks then
+-- Deferred: keymaps.lua loads before vim.pack.add, so Snacks is not yet
+-- available at require time. vim.schedule runs after init.lua completes.
+vim.schedule(function()
+  if not Snacks then return end
   local s = Snacks
   local sp = Snacks.picker
 
@@ -159,6 +161,6 @@ if Snacks then
   -- Toggle (Snacks-powered)
   K.nl('tn', function() s.notifier.hide() end, 'Dismiss Notifications')
   K.nl('tt', function() s.terminal() end, 'Toggle Terminal')
-end
+end)
 
 -- That concludes the keymaps section of the config.
