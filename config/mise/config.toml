@@ -140,7 +140,7 @@ bottom = "0.12.3"
 "github:o2sh/onefetch" = "2.27.1"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.6"
-"github:ZenNotes/zennotes" = "v2.2.0"
+"github:ZenNotes/zennotes" = "v2.3.0"
 prek = "latest"
 
 # Disabled — mise pipx backend can't find uvx when uv is mise-managed
