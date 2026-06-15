@@ -9,11 +9,6 @@ return {
     -- redhat.telemetry is read top-level by yaml-language-server
     redhat = { telemetry = { enabled = false } },
     yaml = {
-      keyOrdering = false,
-      format = { enable = true, singleQuote = false, bracketSpacing = true },
-      validate = true,
-      hover = true,
-      completion = true,
       schemaStore = {
         enable = true,
         url = 'https://www.schemastore.org/api/json/catalog.json',

@@ -1,5 +1,6 @@
 return {
   init_options = {
-    licenceKey = vim.env.INTELEPHENSE_LICENSE or GetIntelephenseLicense() or nil,
+    -- Chain: $INTELEPHENSE_LICENSE env var → ~/intelephense/license.txt → nil (free tier)
+    licenceKey = vim.env.INTELEPHENSE_LICENSE or GetIntelephenseLicense(),
   },
 }

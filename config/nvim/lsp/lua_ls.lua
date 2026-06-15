@@ -7,9 +7,9 @@ return {
         -- globals list is authoritative in .luarc.json
         disable = { 'missing-fields' },
       },
-      completion = { callSnippet = 'Replace' },
+      completion = { callSnippet = 'Replace' }, -- show full call snippet, not just name
       workspace = {
-        checkThirdParty = false,
+        checkThirdParty = false, -- suppress "Do you want to configure this?" prompts
         library = { vim.env.VIMRUNTIME },
       },
       hint = {
@@ -18,8 +18,8 @@ return {
         await = true,
         paramName = 'All',
         paramType = true,
-        semicolon = 'SameLine',
-        setType = false,
+        semicolon = 'SameLine', -- show ; hint on same line as single-expr returns
+        setType = false, -- type on assignment is visible from the rhs; skip the hint
       },
     },
   },
