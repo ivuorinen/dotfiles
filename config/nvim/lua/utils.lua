@@ -1,12 +1,8 @@
--- These are my utility functions
--- I use to make my life bit easier
-
 -- ╭─────────────────────────────────────────────────────────╮
 -- │            Function shortcuts for keymap set            │
 -- ╰─────────────────────────────────────────────────────────╯
 
 -- Keymap set shortcut
---@type vim.keymap.set
 local s = vim.keymap.set
 
 -- Keymap shortcut functions
@@ -17,8 +13,6 @@ K = {}
 ---@return table -- The description as a table.
 local function handleDesc(desc)
   if type(desc) == 'string' then
-    -- Convert string to table with `desc` as a key
-    -- If the string is empty, just return as an empty description
     return { desc = desc }
   elseif type(desc) == 'table' then
     if desc.desc then return desc end
@@ -26,8 +20,7 @@ local function handleDesc(desc)
     -- across multiple K.n() calls and we don't want a leftover desc='?'.
     return vim.tbl_extend('force', desc, { desc = '?' })
   else
-    -- Default to an empty table if `desc` is nil or an unsupported type
-    return { desc = '?' }
+    return { desc = '?' } -- nil or unsupported type: surface as unlabelled binding
   end
 end
 
@@ -102,7 +95,7 @@ end
 -- Marker files per tool, keyed by logical name. Used to detect whether
 -- a project has opted into a given formatter/linter before running it.
 -- Shared between conform (via Gated()) and nvim-lint (via HasConfig()
--- in lua/plugins/qa.lua's LINTER_GATES). Extend this table to gate a
+-- in lua/autogroups.lua's LINTER_GATES). Extend this table to gate a
 -- new tool; keys are referenced by string from consumers.
 ---@type table<string, string[]>
 TOOL_CONFIGS = {

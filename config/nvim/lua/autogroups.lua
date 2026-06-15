@@ -50,13 +50,6 @@ autocmd('FileType', {
   end,
 })
 
--- make it easier to close man-files when opened inline
-autocmd('FileType', {
-  group = augroup('man_unlisted', { clear = true }),
-  pattern = { 'man' },
-  callback = function(event) vim.bo[event.buf].buflisted = false end,
-})
-
 -- Pin special buffers to their window (replaces stickybuf.nvim)
 autocmd('FileType', {
   group = augroup('winfixbuf', { clear = true }),
@@ -86,8 +79,7 @@ autocmd('FileType', {
     'tex',
   },
   callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.spell = true
+    vim.opt_local.spell = true -- default is off; text buffers always want spellcheck
   end,
 })
 
@@ -119,9 +111,8 @@ vim.diagnostic.config {
     },
   } or {},
   virtual_text = {
-    source = 'if_many',
-    spacing = 2,
-    format = function(diagnostic) return diagnostic.message end,
+    source = 'if_many', -- show [source] prefix when multiple LSPs active
+    spacing = 2, -- default is 4; 2 keeps it compact
   },
 }
 
@@ -249,6 +240,7 @@ autocmd('VimEnter', {
   callback = function()
     if vim.fn.argc() > 0 then return end
     if #vim.api.nvim_list_uis() == 0 then return end
+    ---@module 'mini.sessions'
     local sessions = require 'mini.sessions'
     local cwd = vim.fn.getcwd()
     local name = cwd:gsub('[/\\]', '%%')
@@ -265,6 +257,7 @@ autocmd('VimLeavePre', {
   group = augroup('auto-session-write', { clear = true }),
   callback = function()
     if #vim.api.nvim_list_uis() == 0 then return end
+    ---@module 'mini.sessions'
     local sessions = require 'mini.sessions'
     local cwd = vim.fn.getcwd()
     local name = cwd:gsub('[/\\]', '%%')
@@ -294,6 +287,7 @@ local biome_fts = {
 autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
   group = augroup('nvim-lint', { clear = true }),
   callback = function(args)
+    ---@module 'lint'
     local lint = require 'lint'
     local ft = vim.bo[args.buf].filetype
     if biome_fts[ft] and HasConfig('biome', args.buf) then lint.try_lint 'biomejs' end
