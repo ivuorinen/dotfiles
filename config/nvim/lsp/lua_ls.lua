@@ -13,13 +13,8 @@ return {
         library = { vim.env.VIMRUNTIME },
       },
       hint = {
-        enable = true,
-        arrayIndex = 'Auto',
-        await = true,
-        paramName = 'All',
-        paramType = true,
-        semicolon = 'SameLine', -- show ; hint on same line as single-expr returns
-        setType = false, -- type on assignment is visible from the rhs; skip the hint
+        enable = true, -- hints are off by default; enable globally
+        paramType = true, -- show type hint on assignment rhs (default false)
       },
     },
   },
