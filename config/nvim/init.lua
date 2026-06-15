@@ -162,6 +162,7 @@ miniclue.setup {
     { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
     { mode = 'n', keys = '<Leader>c', desc = '+Code' },
     { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
+    { mode = 'n', keys = '<Leader>p', desc = '+Pack' },
     { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
     { mode = 'n', keys = '<Leader>s', desc = '+Search' },
     { mode = 'n', keys = '<Leader>t', desc = '+Toggle' },
