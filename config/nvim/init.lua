@@ -25,6 +25,7 @@ require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
 
 require 'keymaps'
 require 'pack'
+require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
 -- version = vim.version.range '*' is set only on plugins that publish
@@ -65,6 +66,7 @@ require('mini.completion').setup()
 --  - va)  - [V]isually select [A]round [)]paren
 --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
 --  - ci'  - [C]hange [I]nside [']quote
+-- n_lines=750: look further for text-objects in long functions (default 50)
 require('mini.ai').setup { n_lines = 750 }
 
 -- Text edit operators
@@ -173,11 +175,13 @@ miniclue.setup {
 require('mini.diff').setup()
 
 -- Session management (auto per-directory)
+---@module 'mini.sessions'
 local sessions = require 'mini.sessions'
 sessions.setup {
-  autowrite = false,
+  autowrite = false, -- VimLeavePre in autogroups.lua writes manually; avoid double-write
+  -- falls back to stdpath('data')/sessions when vim.g.sessions_dir is not set
   directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
-  file = '',
+  file = '', -- '' disables per-directory Session.vim; only directory-based sessions used
 }
 
 -- ── Appearance ───────────────────────────────────────────────────────
@@ -189,6 +193,7 @@ require('mini.animate').setup()
 require('mini.cursorword').setup()
 
 -- Highlight patterns in text
+---@module 'mini.hipatterns'
 local hp = require 'mini.hipatterns'
 hp.setup {
   highlighters = {
@@ -237,6 +242,7 @@ require('mini.icons').setup {
 require('mini.icons').mock_nvim_web_devicons()
 
 -- Visualize and work with indent scope
+---@module 'mini.indentscope'
 local iscope = require 'mini.indentscope'
 iscope.setup {
   draw = { animation = iscope.gen_animation.none() },
@@ -246,8 +252,9 @@ iscope.setup {
 ---@module 'mini.statusline'
 local sl = require 'mini.statusline'
 sl.setup {
-  use_icons = true,
-  set_vim_settings = true,
+  -- set_vim_settings=false: prevent mini.statusline from overriding laststatus=3
+  -- (its default true hard-codes laststatus=2 and ruler=false, undoing options.lua)
+  set_vim_settings = false,
   content = {
     active = function()
       local mode, mode_hl = sl.section_mode { trunc_width = 100 }
@@ -313,6 +320,7 @@ map_combo('t', 'kj', '<BS><BS><C-\\><C-n>')
 -- The local lsp/*.lua files merge on top, so only customizations live there.
 require 'lspconfig'
 
+-- Mason manages LSP server binary downloads and installations
 require('mason').setup {}
 
 -- Set capabilities before mason-lspconfig enables servers so the config store
@@ -335,19 +343,14 @@ require('mason-tool-installer').setup {
   -- and enabled explicitly via vim.lsp.enable below.
   ensure_installed = {
     -- LSP servers (mason package names)
-    'ansible-language-server',
     'bash-language-server',
-    'css-lsp',
-    'dockerfile-language-server',
     'eslint-lsp',
     'gopls',
     'html-lsp',
-    'intelephense',
     'json-lsp',
     'lua-language-server',
     'pyright',
     'tailwindcss-language-server',
-    'terraform-ls',
     'typescript-language-server',
     'vim-language-server',
     'yaml-language-server',
@@ -373,15 +376,15 @@ vim.lsp.enable { 'fish_lsp', 'taplo' }
 
 -- https://github.com/folke/trouble.nvim
 require('trouble').setup {
-  auto_close = true,
+  auto_close = true, -- close the list when no items remain
   preview = { type = 'main', scratch = true },
   keys = {
-    j = 'next',
+    j = 'next', -- jump to next item (skips non-item lines unlike raw j)
     k = 'prev',
   },
   modes = {
     diagnostics = {
-      auto_open = false,
+      auto_open = false, -- don't open on :w; open explicitly with <leader>xx
     },
     test = {
       mode = 'diagnostics',
@@ -412,10 +415,12 @@ require('trouble').setup {
 
 -- ── Formatting ───────────────────────────────────────────────────────
 
+---@module 'conform'
 local conform = require 'conform'
 
-vim.g.autoformat_enabled = true
+vim.g.autoformat_enabled = true -- initial state; toggled by <leader>tf
 
+-- Exposed to mini.statusline content function for the fmt indicator
 function _G.autoformat_status() return vim.g.autoformat_enabled and 'fmt' or '' end
 
 conform.setup {
@@ -441,6 +446,7 @@ conform.setup {
     taplo = Gated 'taplo',
   },
   default_format_opts = {
+    -- 'fallback': use LSP formatting if no conform formatter handles the filetype
     lsp_format = 'fallback',
   },
   format_on_save = function(bufnr)
@@ -453,13 +459,14 @@ conform.setup {
 
     return { timeout_ms = 500 }
   end,
-  notify_on_error = true,
 }
 
+-- Delegate gq/gw range formatting to conform (falls back to LSP)
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
 
 -- ── Linting ──────────────────────────────────────────────────────────
 
+---@module 'lint'
 local lint = require 'lint'
 
 lint.linters_by_ft = {
@@ -583,7 +590,7 @@ vim.cmd.colorscheme 'catppuccin'
 -- ── Auto dark mode ───────────────────────────────────────────────────
 -- https://github.com/f-person/auto-dark-mode.nvim
 require('auto-dark-mode').setup {
-  update_interval = 1000,
+  update_interval = 1000, -- poll every 1s (default 3000)
   -- stylua: ignore
   set_dark_mode = function()
     vim.api.nvim_set_option_value('background', 'dark', {})
@@ -599,7 +606,7 @@ require('auto-dark-mode').setup {
 -- https://github.com/catgoose/nvim-colorizer.lua
 require('colorizer').setup {
   user_default_options = {
-    names = false,
+    names = false, -- don't highlight CSS color names ('red', 'blue', etc.)
   },
 }
 

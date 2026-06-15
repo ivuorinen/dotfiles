@@ -111,6 +111,9 @@ K.nl(
 K.nl('tms', function() vim.o.spell = not vim.o.spell end, 'Toggle spell')
 K.nl('tmw', function() vim.o.wrap = not vim.o.wrap end, 'Toggle wrap')
 
+-- ── Pack UI ─────────────────────────────────────────────────────────
+K.nl('pp', '<cmd>Pack<cr>', 'Open plugin manager')
+
 -- ── Quit operations ─────────────────────────────────────────────────
 -- Convention is 'q' followed by the operation
 K.nl('qf', '<cmd>q<CR>', 'Quicker close split')
@@ -162,5 +165,3 @@ vim.schedule(function()
   K.nl('tn', function() s.notifier.hide() end, 'Dismiss Notifications')
   K.nl('tt', function() s.terminal() end, 'Toggle Terminal')
 end)
-
--- That concludes the keymaps section of the config.
