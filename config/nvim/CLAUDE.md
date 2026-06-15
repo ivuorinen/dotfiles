@@ -28,15 +28,15 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 | Section         | Content                                                         |
 |-----------------|-----------------------------------------------------------------|
-| `-- Completion` | blink.cmp (lsp / path / snippets / buffer / omni)               |
+| `-- Completion` | mini.completion (LSP-aware, from mini.nvim)                     |
 | `-- Editor`     | mini.nvim suite + vim-sleuth                                    |
 | `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`               |
 | `-- Navigation` | trouble.nvim                                                    |
 | `-- QA`         | conform.nvim (format-on-save) + nvim-lint                       |
 | `-- Snacks`     | snacks.nvim: picker, notifier, terminal, input, rename, bigfile |
-| `-- Tools`      | wakatime, shellspec, comment-box                                |
+| `-- Tools`      | wakatime, shellspec, mini.comment                               |
 | `-- Treesitter` | arborist.nvim (parser manager, Neovim 0.12+)                    |
-| `-- UI`         | catppuccin, auto-dark-mode, colorizer, render-markdown          |
+| `-- UI`         | catppuccin, auto-dark-mode, colorizer                           |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is
@@ -97,7 +97,6 @@ from TOOL_CONFIGS: `shfmt`, `fish_indent`, `gofmt`, `goimports`,
 |--------------|------------------------|
 | `<leader>b`  | Buffers                |
 | `<leader>c`  | Code                   |
-| `<leader>cb` | CommentBox             |
 | `<leader>cc` | Calls                  |
 | `<leader>q`  | Quit                   |
 | `<leader>s`  | Search (snacks.picker) |
@@ -114,7 +113,7 @@ Source of truth: the `clues` table in the `-- Editor` section of `init.lua`.
 mason (installs binaries via `mason-tool-installer`) +
 `mason-lspconfig` (auto-enables all mason-installed servers via `vim.lsp.enable`) +
 native `lsp/*.lua` files (customizations only) +
-`vim.lsp.config('*', ...)` in the `-- LSP` section of `init.lua`, with capabilities from blink.cmp.
+`vim.lsp.config('*', ...)` in the `-- LSP` section of `init.lua`.
 
 **How it works:** The `-- LSP` section of `init.lua` calls `require('lspconfig')` to populate
 `vim.lsp.config` with nvim-lspconfig's defaults for all servers. Any

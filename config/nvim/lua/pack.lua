@@ -43,60 +43,25 @@ vim.api.nvim_create_user_command(
   }
 )
 
--- List all plugins in a floating window; inactive (orphans) shown first.
-vim.api.nvim_create_user_command('PackList', function()
-  local all = vim.pack.get(nil, { info = false })
-  local inactive, active = {}, {}
-  for _, p in ipairs(all) do
-    if p.active then
-      table.insert(active, p.spec.name)
-    else
-      table.insert(inactive, p.spec.name)
-    end
-  end
-  table.sort(inactive)
-  table.sort(active)
-
-  local lines = {}
-  if #inactive > 0 then
-    table.insert(lines, ('NOT USED (%d):'):format(#inactive))
-    for _, n in ipairs(inactive) do
-      table.insert(lines, '  ' .. n)
-    end
-    if #active > 0 then table.insert(lines, '') end
-  end
-  table.insert(lines, ('USED (%d):'):format(#active))
-  for _, n in ipairs(active) do
-    table.insert(lines, '  ' .. n)
-  end
-
-  local max_len = 0
-  for _, line in ipairs(lines) do
-    max_len = math.max(max_len, #line)
-  end
-  local w = math.max(1, math.min(math.max(max_len + 4, 34), vim.o.columns - 4))
-  local h = math.max(1, math.min(#lines, vim.o.lines - 6))
-
-  local buf = vim.api.nvim_create_buf(false, true)
-  vim.bo[buf].bufhidden = 'wipe'
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-  vim.bo[buf].modifiable = false
-
-  vim.api.nvim_open_win(buf, true, {
-    relative = 'editor',
-    width = w,
-    height = h,
-    row = math.floor((vim.o.lines - h) / 2),
-    col = math.floor((vim.o.columns - w) / 2),
-    style = 'minimal',
-    border = 'rounded',
-    title = ' PackList ',
-    title_pos = 'center',
-  })
-  vim.keymap.set(
-    'n',
-    'q',
-    '<cmd>close<cr>',
-    { buffer = buf, silent = true, desc = 'Close' }
-  )
-end, { desc = 'List vim.pack plugins; inactive (orphans) first' })
+-- Close the vim.pack confirm buffer (filetype nvim-pack) with q or Esc.
+-- :w confirms and runs the update; closing cancels via Neovim's own on_cancel.
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('nvim_pack_close', { clear = true }),
+  pattern = 'nvim-pack',
+  callback = function(event)
+    local close = '<cmd>close<cr>'
+    local opts = { buffer = event.buf, silent = true }
+    vim.keymap.set(
+      'n',
+      'q',
+      close,
+      vim.tbl_extend('force', opts, { desc = 'Cancel update' })
+    )
+    vim.keymap.set(
+      'n',
+      '<Esc>',
+      close,
+      vim.tbl_extend('force', opts, { desc = 'Cancel update' })
+    )
+  end,
+})

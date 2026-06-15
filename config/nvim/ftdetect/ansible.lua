@@ -1,3 +1,5 @@
+-- Detect yaml.ansible filetype by directory path conventions.
+-- ansible-language-server uses this compound type to activate.
 vim.filetype.add {
   pattern = {
     ['.*/playbooks?/.*%.ya?ml'] = 'yaml.ansible',

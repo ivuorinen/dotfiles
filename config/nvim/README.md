@@ -8,20 +8,22 @@ User commands (`PackUpdate`, `PackRemove`, `PackList`) live in `lua/pack.lua`.
 
 ## Completion
 
-**blink.cmp** — `https://github.com/saghen/blink.cmp`
+**mini.completion** — part of `https://github.com/nvim-mini/mini.nvim`
 
-Completion engine with sources: `lsp`, `path`, `snippets`, `buffer`, `omni`.
-Inline signature help enabled. Lua fuzzy matcher (`fuzzy.implementation = 'lua'`).
-`<C-x>` toggles the completion menu and documentation popup.
+LSP-aware completion via `completefunc`. `<C-Space>` triggers manually;
+completion fires automatically after a short delay. `<Tab>`/`<S-Tab>` navigate,
+`<CR>` confirms, `<C-e>` dismisses.
 
 ## Editor
 
 ### mini.nvim — `https://github.com/nvim-mini/mini.nvim`
 
-17 independent modules from a single plugin:
+19 independent modules from a single plugin:
 
 | Module           | Role                                                                  |
 |------------------|-----------------------------------------------------------------------|
+| mini.completion  | LSP-aware completion via `completefunc`; auto-trigger + `<C-Space>`   |
+| mini.comment     | `gc` toggle comment operator; `gcc` for current line                  |
 | mini.ai          | Textobjects: `va)`, `yinq`, `ci'`; 750-line lookahead                 |
 | mini.operators   | `g=` evaluate, `gx` exchange, `gm` duplicate, `gR` replace, `gs` sort |
 | mini.splitjoin   | Split/join arguments and lists (`gS`)                                 |
@@ -57,8 +59,8 @@ URLs: `github.com/neovim/nvim-lspconfig` · `github.com/williamboman/mason.nvim`
 `github.com/williamboman/mason-lspconfig.nvim` ·
 `github.com/WhoIsSethDaniel/mason-tool-installer.nvim`
 
-blink.cmp capabilities are registered on `vim.lsp.config('*', ...)` before
-mason-lspconfig enables servers. `fish_lsp` and `taplo` are mise-managed and
+`vim.lsp.protocol.make_client_capabilities()` is registered on `vim.lsp.config('*', ...)`
+before mason-lspconfig enables servers. `fish_lsp` and `taplo` are mise-managed and
 enabled explicitly via `vim.lsp.enable { 'fish_lsp', 'taplo' }`.
 
 ### LSP Servers
@@ -169,14 +171,13 @@ Multi-feature plugin; each snack is independently toggleable:
 
 ## Tools
 
-| Plugin           | Role                                                     |
-|------------------|----------------------------------------------------------|
-| vim-wakatime     | Automatic coding time tracking via WakaTime              |
-| nvim-shellspec   | ShellSpec filetype support (auto-format, 2-space indent) |
-| comment-box.nvim | Comment boxes and separators (`<leader>cb*` keymaps)     |
+| Plugin         | Role                                                     |
+|----------------|----------------------------------------------------------|
+| vim-wakatime   | Automatic coding time tracking via WakaTime              |
+| nvim-shellspec | ShellSpec filetype support (auto-format, 2-space indent) |
+| mini.comment   | Toggle comments via `gc`/`gcc` (from mini.nvim)          |
 
-URLs: `github.com/wakatime/vim-wakatime` · `github.com/ivuorinen/nvim-shellspec` ·
-`github.com/LudoPinelli/comment-box.nvim`
+URLs: `github.com/wakatime/vim-wakatime` · `github.com/ivuorinen/nvim-shellspec`
 
 ## Treesitter
 
@@ -191,16 +192,14 @@ Core parsers always installed: `html`, `lua`, `luadoc`, `markdown`,
 
 ## UI
 
-| Plugin               | Role                                                                 |
-|----------------------|----------------------------------------------------------------------|
-| catppuccin/nvim      | Colorscheme; `auto_integrations` picks up mini.nvim; dim_inactive on |
-| auto-dark-mode.nvim  | Polls OS every 1 s; syncs `background` with system dark/light state  |
-| nvim-colorizer.lua   | Highlights hex color codes in-buffer; named colors disabled          |
-| render-markdown.nvim | Renders markdown headings, tables, code blocks inline; LaTeX off     |
+| Plugin              | Role                                                                 |
+|---------------------|----------------------------------------------------------------------|
+| catppuccin/nvim     | Colorscheme; `auto_integrations` picks up mini.nvim; dim_inactive on |
+| auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state  |
+| nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled          |
 
 URLs: `github.com/catppuccin/nvim` · `github.com/f-person/auto-dark-mode.nvim` ·
-`github.com/catgoose/nvim-colorizer.lua` ·
-`github.com/MeanderingProgrammer/render-markdown.nvim`
+`github.com/catgoose/nvim-colorizer.lua`
 
 ## Installed Tools (mason-tool-installer)
 

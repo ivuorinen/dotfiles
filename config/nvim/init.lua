@@ -25,13 +25,13 @@ require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
 
 require 'keymaps'
 require 'pack'
+require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
 -- version = vim.version.range '*' is set only on plugins that publish
--- semver-tagged releases (blink.cmp, snacks.nvim). The remaining plugins
+-- semver-tagged releases (snacks.nvim). The remaining plugins
 -- have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
-  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '*' },
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/tpope/vim-sleuth',
   'https://github.com/neovim/nvim-lspconfig',
@@ -45,56 +45,16 @@ vim.pack.add {
   { src = 'https://github.com/folke/snacks.nvim', version = vim.version.range '*' },
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
-  'https://github.com/LudoPinelli/comment-box.nvim',
   'https://github.com/arborist-ts/arborist.nvim',
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
-  'https://github.com/MeanderingProgrammer/render-markdown.nvim',
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
--- Performant, batteries-included completion plugin for Neovim
--- https://github.com/saghen/blink.cmp
-
----@module 'blink.cmp'
-require('blink.cmp').setup {
-  keymap = {
-    ['<C-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
-  },
-
-  appearance = {
-    use_nvim_cmp_as_default = true,
-  },
-
-  completion = {
-    menu = {
-      draw = {
-        columns = {
-          { 'label', 'label_description', gap = 1 },
-          { 'kind_icon', 'kind', gap = 1 },
-        },
-      },
-    },
-  },
-
-  sources = {
-    default = {
-      'lsp',
-      'path',
-      'snippets',
-      'buffer',
-      -- Wraps &omnifunc via blink.cmp.sources.complete_func. Built-in
-      -- `enabled` guard skips when omnifunc is the LSP handler, so no
-      -- duplication with the `lsp` source. Catches filetypes without
-      -- an LSP (gitcommit, help, plugin-provided completefuncs).
-      'omni',
-    },
-  },
-
-  -- Inline signature help while typing; disabled by default in blink.cmp.
-  signature = { enabled = true },
-}
+-- Lightweight LSP-aware completion from mini.nvim
+-- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-completion.md
+require('mini.completion').setup()
 
 -- ── Editor ───────────────────────────────────────────────────────────
 -- mini.nvim suite + vim-sleuth
@@ -106,6 +66,7 @@ require('blink.cmp').setup {
 --  - va)  - [V]isually select [A]round [)]paren
 --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
 --  - ci'  - [C]hange [I]nside [']quote
+-- n_lines=750: look further for text-objects in long functions (default 50)
 require('mini.ai').setup { n_lines = 750 }
 
 -- Text edit operators
@@ -200,8 +161,8 @@ miniclue.setup {
     miniclue.gen_clues.z(),
     { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
     { mode = 'n', keys = '<Leader>c', desc = '+Code' },
-    { mode = 'n', keys = '<Leader>cb', desc = '+CommentBox' },
     { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
+    { mode = 'n', keys = '<Leader>p', desc = '+Pack' },
     { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
     { mode = 'n', keys = '<Leader>s', desc = '+Search' },
     { mode = 'n', keys = '<Leader>t', desc = '+Toggle' },
@@ -215,11 +176,13 @@ miniclue.setup {
 require('mini.diff').setup()
 
 -- Session management (auto per-directory)
+---@module 'mini.sessions'
 local sessions = require 'mini.sessions'
 sessions.setup {
-  autowrite = false,
+  autowrite = false, -- VimLeavePre in autogroups.lua writes manually; avoid double-write
+  -- falls back to stdpath('data')/sessions when vim.g.sessions_dir is not set
   directory = vim.g.sessions_dir or vim.fn.stdpath 'data' .. '/sessions',
-  file = '',
+  file = '', -- '' disables per-directory Session.vim; only directory-based sessions used
 }
 
 -- ── Appearance ───────────────────────────────────────────────────────
@@ -231,6 +194,7 @@ require('mini.animate').setup()
 require('mini.cursorword').setup()
 
 -- Highlight patterns in text
+---@module 'mini.hipatterns'
 local hp = require 'mini.hipatterns'
 hp.setup {
   highlighters = {
@@ -279,6 +243,7 @@ require('mini.icons').setup {
 require('mini.icons').mock_nvim_web_devicons()
 
 -- Visualize and work with indent scope
+---@module 'mini.indentscope'
 local iscope = require 'mini.indentscope'
 iscope.setup {
   draw = { animation = iscope.gen_animation.none() },
@@ -288,8 +253,9 @@ iscope.setup {
 ---@module 'mini.statusline'
 local sl = require 'mini.statusline'
 sl.setup {
-  use_icons = true,
-  set_vim_settings = true,
+  -- set_vim_settings=false: prevent mini.statusline from overriding laststatus=3
+  -- (its default true hard-codes laststatus=2 and ruler=false, undoing options.lua)
+  set_vim_settings = false,
   content = {
     active = function()
       local mode, mode_hl = sl.section_mode { trunc_width = 100 }
@@ -355,13 +321,13 @@ map_combo('t', 'kj', '<BS><BS><C-\\><C-n>')
 -- The local lsp/*.lua files merge on top, so only customizations live there.
 require 'lspconfig'
 
+-- Mason manages LSP server binary downloads and installations
 require('mason').setup {}
 
--- blink.cmp is loaded by vim.pack.add earlier in this file.
 -- Set capabilities before mason-lspconfig enables servers so the config store
 -- is fully populated regardless of enable timing.
 vim.lsp.config('*', {
-  capabilities = require('blink.cmp').get_lsp_capabilities(),
+  capabilities = vim.lsp.protocol.make_client_capabilities(),
 })
 
 -- Automatically calls vim.lsp.enable() for every server mason has installed.
@@ -378,19 +344,14 @@ require('mason-tool-installer').setup {
   -- and enabled explicitly via vim.lsp.enable below.
   ensure_installed = {
     -- LSP servers (mason package names)
-    'ansible-language-server',
     'bash-language-server',
-    'css-lsp',
-    'dockerfile-language-server',
     'eslint-lsp',
     'gopls',
     'html-lsp',
-    'intelephense',
     'json-lsp',
     'lua-language-server',
     'pyright',
     'tailwindcss-language-server',
-    'terraform-ls',
     'typescript-language-server',
     'vim-language-server',
     'yaml-language-server',
@@ -416,15 +377,15 @@ vim.lsp.enable { 'fish_lsp', 'taplo' }
 
 -- https://github.com/folke/trouble.nvim
 require('trouble').setup {
-  auto_close = true,
+  auto_close = true, -- close the list when no items remain
   preview = { type = 'main', scratch = true },
   keys = {
-    j = 'next',
+    j = 'next', -- jump to next item (skips non-item lines unlike raw j)
     k = 'prev',
   },
   modes = {
     diagnostics = {
-      auto_open = false,
+      auto_open = false, -- don't open on :w; open explicitly with <leader>xx
     },
     test = {
       mode = 'diagnostics',
@@ -455,10 +416,12 @@ require('trouble').setup {
 
 -- ── Formatting ───────────────────────────────────────────────────────
 
+---@module 'conform'
 local conform = require 'conform'
 
-vim.g.autoformat_enabled = true
+vim.g.autoformat_enabled = true -- initial state; toggled by <leader>tf
 
+-- Exposed to mini.statusline content function for the fmt indicator
 function _G.autoformat_status() return vim.g.autoformat_enabled and 'fmt' or '' end
 
 conform.setup {
@@ -484,6 +447,7 @@ conform.setup {
     taplo = Gated 'taplo',
   },
   default_format_opts = {
+    -- 'fallback': use LSP formatting if no conform formatter handles the filetype
     lsp_format = 'fallback',
   },
   format_on_save = function(bufnr)
@@ -496,13 +460,14 @@ conform.setup {
 
     return { timeout_ms = 500 }
   end,
-  notify_on_error = true,
 }
 
+-- Delegate gq/gw range formatting to conform (falls back to LSP)
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
 
 -- ── Linting ──────────────────────────────────────────────────────────
 
+---@module 'lint'
 local lint = require 'lint'
 
 lint.linters_by_ft = {
@@ -585,9 +550,9 @@ require('shellspec').setup {
   indent_comments = true,
 }
 
--- Clarify and beautify your comments using boxes and lines.
--- https://github.com/LudoPinelli/comment-box.nvim
-require('comment-box').setup {}
+-- Toggle comments (gc operator, gcc for line)
+-- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-comment.md
+require('mini.comment').setup()
 
 -- ── Treesitter ────────────────────────────────────────────────────────
 -- Parser manager for Neovim 0.12+ (highlight, indent, folds via built-in API)
@@ -626,7 +591,7 @@ vim.cmd.colorscheme 'catppuccin'
 -- ── Auto dark mode ───────────────────────────────────────────────────
 -- https://github.com/f-person/auto-dark-mode.nvim
 require('auto-dark-mode').setup {
-  update_interval = 1000,
+  update_interval = 1000, -- poll every 1s (default 3000)
   -- stylua: ignore
   set_dark_mode = function()
     vim.api.nvim_set_option_value('background', 'dark', {})
@@ -642,16 +607,8 @@ require('auto-dark-mode').setup {
 -- https://github.com/catgoose/nvim-colorizer.lua
 require('colorizer').setup {
   user_default_options = {
-    names = false,
+    names = false, -- don't highlight CSS color names ('red', 'blue', etc.)
   },
-}
-
--- ── Render Markdown ──────────────────────────────────────────────────
--- Render markdown inline (tables, headings, code blocks)
--- https://github.com/MeanderingProgrammer/render-markdown.nvim
-require('render-markdown').setup {
-  -- html and yaml parsers are in treesitter ensure_installed; latex is not.
-  latex = { enabled = false },
 }
 
 -- vim: set ts=2 sts=2 sw=2 wrap et :

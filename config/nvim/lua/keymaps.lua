@@ -66,83 +66,7 @@ K.nl('bw', '<cmd>lua MiniBufremove.wipeout()<CR>', 'Wipeout')
 -- unless it's a generic operation like signature help or hover
 
 K.n('<C-l>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', { desc = 'Signature' })
-K.ld('cci', 'n', function()
-  if Snacks then Snacks.picker.lsp_incoming_calls() end
-end, 'Incoming calls')
-K.ld('cco', 'n', function()
-  if Snacks then Snacks.picker.lsp_outgoing_calls() end
-end, 'Outgoing calls')
-K.ld('cd', 'n', function()
-  if Snacks then Snacks.picker.lsp_definitions() end
-end, 'Definitions')
 K.ld('cf', { 'n', 'x' }, '<cmd>lua vim.lsp.buf.format()<CR>', 'Format')
-K.ld('ci', 'n', function()
-  if Snacks then Snacks.picker.lsp_implementations() end
-end, 'Implementations')
-K.ld('cp', 'n', function()
-  if Snacks then Snacks.picker.lsp_type_definitions() end
-end, 'Type Definition')
-K.ld('cr', 'n', function()
-  if Snacks then Snacks.rename.rename_file() end
-end, 'Rename file')
-K.ld('cs', 'n', function()
-  if Snacks then Snacks.picker.lsp_symbols() end
-end, 'LSP Document Symbols')
-K.ld('ct', 'n', function()
-  if Snacks then Snacks.picker.treesitter() end
-end, 'Treesitter')
-K.ld('cws', 'n', function()
-  if Snacks then Snacks.picker.lsp_workspace_symbols() end
-end, 'Workspace Symbols')
-
--- ── CommentBox operations ───────────────────────────────────────────
--- Mappings for creating and managing comment boxes
--- Convention: All mappings start with 'cb' followed by the box type
-K.nl('cbb', '<Cmd>CBccbox<CR>', 'CB: Box Title')
-K.nl('cbd', '<Cmd>CBd<CR>', 'CB: Remove a box')
-K.nl('cbl', '<Cmd>CBline<CR>', 'CB: Simple Line')
-K.nl('cbm', '<Cmd>CBllbox14<CR>', 'CB: Marked')
-K.nl('cbt', '<Cmd>CBllline<CR>', 'CB: Titled Line')
-
--- ── Search / Picker operations ──────────────────────────────────────
--- Powered by snacks.picker (replaces telescope).
--- Convention: All mappings start with 's' followed by the operation,
--- or generic 'f' for files and ',' for buffers.
-
-K.nl('f', function()
-  if Snacks then Snacks.picker.files() end
-end, 'Find Files')
-K.nl(',', function()
-  if Snacks then Snacks.picker.buffers() end
-end, 'Find existing buffers')
-
-K.nl('sd', function()
-  if Snacks then Snacks.picker.diagnostics() end
-end, 'Search Diagnostics')
-K.nl('sf', function()
-  if Snacks then Snacks.picker.grep_word() end
-end, 'Grep String')
-K.nl('sg', function()
-  if Snacks then Snacks.picker.grep() end
-end, 'Live Grep')
-K.nl('sh', function()
-  if Snacks then Snacks.picker.help() end
-end, 'Help tags')
-K.nl('sk', function()
-  if Snacks then Snacks.picker.keymaps() end
-end, 'Search Keymaps')
-K.nl('sn', function()
-  if Snacks then Snacks.picker.notifications() end
-end, 'Notification History')
-K.nl('so', function()
-  if Snacks then Snacks.picker.recent() end
-end, 'Old Files')
-K.nl('sq', function()
-  if Snacks then Snacks.picker.qflist() end
-end, 'Quickfix')
-K.nl('ss', function()
-  if Snacks then Snacks.picker.lines() end
-end, 'Search Buffer Lines')
 
 -- ── Trouble operations ──────────────────────────────────────────────
 -- Convention is 'x' followed by the operation
@@ -162,12 +86,6 @@ K.n('-', function()
   if MiniFiles then MiniFiles.open(vim.api.nvim_buf_get_name(0)) end
 end, { desc = 'File Explorer (current file)' })
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
-K.nl('tn', function()
-  if Snacks then Snacks.notifier.hide() end
-end, 'Dismiss Notifications')
-K.nl('tt', function()
-  if Snacks then Snacks.terminal() end
-end, 'Toggle Terminal')
 
 -- ── Option toggles ────────────────────────────────────────────────────
 -- Convention is 'tm' followed by the option letter
@@ -192,7 +110,9 @@ K.nl(
 )
 K.nl('tms', function() vim.o.spell = not vim.o.spell end, 'Toggle spell')
 K.nl('tmw', function() vim.o.wrap = not vim.o.wrap end, 'Toggle wrap')
-K.nl('tmm', '<cmd>RenderMarkdown toggle<CR>', 'Toggle markdown render')
+
+-- ── Pack UI ─────────────────────────────────────────────────────────
+K.nl('pp', '<cmd>Pack<cr>', 'Open plugin manager')
 
 -- ── Quit operations ─────────────────────────────────────────────────
 -- Convention is 'q' followed by the operation
@@ -207,4 +127,41 @@ K.nl('qQ', function()
   end
 end, 'Force quit without saving')
 
--- That concludes the keymaps section of the config.
+-- ── Snacks keymaps ──────────────────────────────────────────────────
+-- Deferred: keymaps.lua loads before vim.pack.add, so Snacks is not yet
+-- available at require time. vim.schedule runs after init.lua completes.
+vim.schedule(function()
+  if not Snacks then return end
+  local s = Snacks
+  local sp = Snacks.picker
+
+  -- Code & LSP (Snacks-powered pickers + rename)
+  -- Convention: 'c' prefix, matching the non-Snacks LSP keymaps above
+  K.ld('cci', 'n', function() sp.lsp_incoming_calls() end, 'Incoming calls')
+  K.ld('cco', 'n', function() sp.lsp_outgoing_calls() end, 'Outgoing calls')
+  K.ld('cd', 'n', function() sp.lsp_definitions() end, 'Definitions')
+  K.ld('ci', 'n', function() sp.lsp_implementations() end, 'Implementations')
+  K.ld('cp', 'n', function() sp.lsp_type_definitions() end, 'Type Definition')
+  K.ld('cr', 'n', function() s.rename.rename_file() end, 'Rename file')
+  K.ld('cs', 'n', function() sp.lsp_symbols() end, 'LSP Document Symbols')
+  K.ld('ct', 'n', function() sp.treesitter() end, 'Treesitter')
+  K.ld('cws', 'n', function() sp.lsp_workspace_symbols() end, 'Workspace Symbols')
+
+  -- Search / Picker
+  -- Convention: 's' prefix; 'f' and ',' for the two most common pickers
+  K.nl('f', function() sp.files() end, 'Find Files')
+  K.nl(',', function() sp.buffers() end, 'Find existing buffers')
+  K.nl('sd', function() sp.diagnostics() end, 'Search Diagnostics')
+  K.nl('sf', function() sp.grep_word() end, 'Grep String')
+  K.nl('sg', function() sp.grep() end, 'Live Grep')
+  K.nl('sh', function() sp.help() end, 'Help tags')
+  K.nl('sk', function() sp.keymaps() end, 'Search Keymaps')
+  K.nl('sn', function() sp.notifications() end, 'Notification History')
+  K.nl('so', function() sp.recent() end, 'Old Files')
+  K.nl('sq', function() sp.qflist() end, 'Quickfix')
+  K.nl('ss', function() sp.lines() end, 'Search Buffer Lines')
+
+  -- Toggle (Snacks-powered)
+  K.nl('tn', function() s.notifier.hide() end, 'Dismiss Notifications')
+  K.nl('tt', function() s.terminal() end, 'Toggle Terminal')
+end)

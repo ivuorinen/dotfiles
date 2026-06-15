@@ -8,18 +8,9 @@
       "rev": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df",
       "src": "https://github.com/f-person/auto-dark-mode.nvim"
     },
-    "blink.cmp": {
-      "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
-      "src": "https://github.com/saghen/blink.cmp",
-      "version": ">=0.0.0"
-    },
     "catppuccin": {
       "rev": "0303a7208dba448c459767486a38a6ec05c4216b",
       "src": "https://github.com/catppuccin/nvim"
-    },
-    "comment-box.nvim": {
-      "rev": "06bb771690bc9df0763d14769b779062d8f12bc5",
-      "src": "https://github.com/LudoPinelli/comment-box.nvim"
     },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
@@ -60,10 +51,6 @@
     "nvim-shellspec": {
       "rev": "94bbbf796dfafb0798298835ab715e1650f0de25",
       "src": "https://github.com/ivuorinen/nvim-shellspec"
-    },
-    "render-markdown.nvim": {
-      "rev": "5adf0895310c1904e5abfaad40a2baad7fe44a07",
-      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "snacks.nvim": {
       "rev": "e6fd58c82f2f3fcddd3fe81703d47d6d48fc7b9f",
