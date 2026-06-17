@@ -84,7 +84,7 @@ difftastic = "0.69.0"
 neovim = "0.12.3"
 tree-sitter = "0.26.9"
 "npm:neovim" = "5.4.0"                      # Node.js client for Neovim's RPC API (required by plugins)
-"npm:fish-lsp" = "1.1.3"
+"npm:fish-lsp" = "1.1.4"
 
 # Task runners & caching
 just = "1.52.0"
