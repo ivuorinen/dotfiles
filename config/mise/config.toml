@@ -43,7 +43,7 @@ python = "3.14"
 go = "1.26.4"
 rust = "1.96.0"
 uv = "0.11.21"
-cmake = "4.3.3"
+cmake = "4.3.4"
 
 # Shell, prompt & terminal sessions
 starship = "1.25.1"
