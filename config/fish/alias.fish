@@ -8,9 +8,20 @@ if type -q nvim
     alias vi='nvim'
 end
 
-if type -q bat
-    alias cat='bat'
-end
+# Git, taken from ville6000
+abbr --add gau git add -u
+abbr --add gaa git add -A
+abbr --add gcv git commit -v
+abbr --add gst git status
+abbr --add glg git log
+abbr --add gwa git worktree add
+abbr --add gwr git worktree remove
+abbr --add gwl git worktree list
+abbr --add gl 'git log --pretty=format:"%C(yellow)%h%Creset %C(cyan)%an%Creset %Cgreen(%ad)%Creset %s" --date=short'
+
+# .NET, also taken from ville6000
+abbr --add dt dotnet test
+abbr --add dw dotnet watch
 
 # gopass password manager shortcut (resolves via PATH / mise shim)
 if type -q gopass
