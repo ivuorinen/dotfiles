@@ -54,14 +54,7 @@ else
     type -q mise; and mise activate fish --shims | source
 end
 
-# Added by LM Studio CLI (lms)
-fish_add_path $HOME/.lmstudio/bin
-# End of LM Studio CLI section
-
 # vim: ft=fish ts=4 sw=4 et:
-
-# opencode
-fish_add_path $HOME/.opencode/bin
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
