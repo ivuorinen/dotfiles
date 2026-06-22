@@ -14,7 +14,7 @@ set -q DOTFILES; or set -x DOTFILES "$HOME/.dotfiles"
 
 # Editor settings
 set -q EDITOR; or set -x EDITOR nvim
-set -q VISUAL; or set -x VISUAL code
+set -q VISUAL; or set -x VISUAL nvim
 set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 
 # Add local bin to path
@@ -60,22 +60,6 @@ set -q ANSIBLE_GALAXY_CACHE_DIR; or set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
-# AWS configuration
-set -q AWS_CONFIG_FILE; or set -x AWS_CONFIG_FILE "$XDG_STATE_HOME/aws/config"
-set -q AWS_SHARED_CREDENTIALS_FILE; or set -x AWS_SHARED_CREDENTIALS_FILE "$XDG_STATE_HOME/aws/credentials"
-set -q AWS_SESSION_TOKEN; or set -x AWS_SESSION_TOKEN "$XDG_STATE_HOME/aws/session_token"
-set -q AWS_DATA_PATH; or set -x AWS_DATA_PATH "$XDG_DATA_HOME/aws"
-set -q AWS_DEFAULT_OUTPUT; or set -x AWS_DEFAULT_OUTPUT table
-set -q AWS_CONFIGURE_KEYS; or set -x AWS_CONFIGURE_KEYS true
-set -q AWS_CONFIGURE_SESSION; or set -x AWS_CONFIGURE_SESSION true
-set -q AWS_CONFIGURE_SESSION_DURATION; or set -x AWS_CONFIGURE_SESSION_DURATION 7200
-set -q AWS_CONFIGURE_SESSION_MFA; or set -x AWS_CONFIGURE_SESSION_MFA true
-set -q AWS_CONFIGURE_REGION; or set -x AWS_CONFIGURE_REGION true
-set -q AWS_CONFIGURE_OUTPUT; or set -x AWS_CONFIGURE_OUTPUT true
-set -q AWS_CONFIGURE_PROFILE; or set -x AWS_CONFIGURE_PROFILE true
-set -q AWS_CONFIGURE_PROMPT; or set -x AWS_CONFIGURE_PROMPT true
-set -q AWS_CONFIGURE_PROMPT_DEFAULT; or set -x AWS_CONFIGURE_PROMPT_DEFAULT true
-
 # Brew configuration
 set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS true
 set -q HOMEBREW_NO_ENV_HINTS; or set -x HOMEBREW_NO_ENV_HINTS true
@@ -86,9 +70,6 @@ set -q HOMEBREW_BUNDLE_FILE; or set -x HOMEBREW_BUNDLE_FILE "$XDG_CONFIG_HOME/ho
 set -q COMPOSER_HOME; or set -x COMPOSER_HOME "$XDG_STATE_HOME/composer"
 set -q COMPOSER_BIN; or set -x COMPOSER_BIN "$COMPOSER_HOME/vendor/bin"
 fish_add_path "$COMPOSER_BIN"
-
-# direnv configuration
-set -q DIRENV_LOG_FORMAT; or set -x DIRENV_LOG_FORMAT ''
 
 # Docker configuration
 set -q DOCKER_CONFIG; or set -x DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
@@ -147,11 +128,6 @@ set -q SONARLINT_HOME; or set -x SONARLINT_HOME "$XDG_DATA_HOME/sonarlint"
 set -q SONARLINT_BIN; or set -x SONARLINT_BIN "$XDG_BIN_HOME"
 set -q SONARLINT_USER_HOME; or set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
 
-# Terraform configuration
-set -q TF_DATA_DIR; or set -x TF_DATA_DIR "$XDG_STATE_HOME/terraform"
-set -q TF_CLI_CONFIG_FILE; or set -x TF_CLI_CONFIG_FILE "$XDG_CONFIG_HOME/terraform/terraformrc"
-set -q TF_PLUGIN_CACHE_DIR; or set -x TF_PLUGIN_CACHE_DIR "$XDG_CACHE_HOME/terraform/plugin-cache"
-
 # tmux configuration
 set -q TMUX_TMPDIR; or set -x TMUX_TMPDIR "$XDG_STATE_HOME/tmux"
 set -q TMUX_CONF_DIR; or set -x TMUX_CONF_DIR "$XDG_CONFIG_HOME/tmux"
@@ -178,9 +154,6 @@ set -q MANPAGER; or set -x MANPAGER "less -X"
 
 # sonarqube-cli
 fish_add_path "$XDG_DATA_HOME/sonarqube-cli/bin"
-
-# Lando
-fish_add_path "$HOME/.lando/bin"
 
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
