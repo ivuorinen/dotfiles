@@ -4,7 +4,7 @@ description = "Browse local node_modules dependencies"
 requirements = ["node"]
 
 [source]
-command = "ls -d node_modules/*/ 2>/dev/null | sed 's|node_modules/||;s|/$||' | grep -v '^\\.'"
+command = "{ ls -d node_modules/[^@]*/ 2>/dev/null; ls -d node_modules/@*/*/ 2>/dev/null; } | sed 's|node_modules/||;s|/$||' | grep -v '^\\.'"
 output = "{}"
 
 [preview]
@@ -17,5 +17,5 @@ mode = "execute"
 
 [actions.homepage]
 description = "Open the package homepage"
-command = "node -e \"const p=require('./node_modules/{}/package.json'); const u=p.homepage||'https://www.npmjs.com/package/'+p.name; require('child_process').exec('xdg-open '+u)\""
+command = "node -e \"const p=require('./node_modules/{}/package.json'); const u=p.homepage||'https://www.npmjs.com/package/'+p.name; require('child_process').exec('xdg-open \\\"'+u+'\\\" 2>/dev/null || open \\\"'+u+'\\\"', {shell:true})\""
 mode = "fork"

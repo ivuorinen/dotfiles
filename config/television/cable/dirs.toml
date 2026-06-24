@@ -12,6 +12,7 @@ command = "eza -la --color=always '{}'"
 [keybindings]
 shortcut = "f2"
 ctrl-s = "cycle_sources"
+enter = "actions:cd"
 
 [actions.cd]
 description = "Open a shell in the selected directory"

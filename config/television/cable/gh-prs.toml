@@ -15,6 +15,7 @@ command = '''gh pr view '{split:#:1|split: :0}' --json number,title,body,state,a
 [keybindings]
 enter = "actions:open"
 ctrl-o = "actions:checkout"
+ctrl-y = "actions:merge"
 
 [actions.open]
 description = "Open the PR in the browser"

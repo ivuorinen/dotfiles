@@ -14,6 +14,9 @@ command = '''echo 'Schedule: {split: :..5}' && echo '' && echo 'Command:' && ech
 layout = "portrait"
 preview_panel = { size = 30 }
 
+[keybindings]
+enter = "actions:edit"
+
 [actions.edit]
 description = "Open crontab for editing"
 command = "crontab -e"

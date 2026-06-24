@@ -4,7 +4,7 @@ description = "A channel to select from git branches"
 requirements = ["git"]
 
 [source]
-command = "git --no-pager branch --all --format=\"%(refname:short)\""
+command = "git --no-pager branch --all --format=\"%(refname:short)\" | grep -v '/HEAD'"
 output = "{split: :0}"
 
 [preview]
@@ -13,7 +13,7 @@ command = "git show -p --stat --pretty=fuller --color=always '{0}'"
 [keybindings]
 enter = "actions:checkout"
 ctrl-d = "actions:delete"
-ctrl-m = "actions:merge"
+ctrl-y = "actions:merge"
 ctrl-r = "actions:rebase"
 
 [actions.checkout]

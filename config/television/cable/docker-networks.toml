@@ -14,6 +14,9 @@ command = "docker network inspect '{split:\t:0}' | jq -C '.[0] | {Name, Driver, 
 [ui]
 layout = "portrait"
 
+[keybindings]
+ctrl-d = "actions:remove"
+
 [actions.remove]
 description = "Remove the selected network"
 command = "docker network rm '{split:\t:0}'"

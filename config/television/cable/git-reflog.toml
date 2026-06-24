@@ -5,13 +5,13 @@ requirements = ["git"]
 
 [source]
 command = "git reflog --decorate --color=always"
-output = "{0|strip_ansi}"
+output = "{strip_ansi|split: :0}"
 ansi = true
 no_sort = true
 frecency = false
 
 [preview]
-command = "git show -p --stat --pretty=fuller --color=always '{0|strip_ansi}'"
+command = "git show -p --stat --pretty=fuller --color=always '{strip_ansi|split: :0}'"
 
 [keybindings]
 ctrl-o = "actions:checkout"
@@ -19,10 +19,10 @@ ctrl-r = "actions:reset"
 
 [actions.checkout]
 description = "Checkout the selected reflog entry"
-command = "git checkout '{0|strip_ansi}'"
+command = "git checkout '{strip_ansi|split: :0}'"
 mode = "execute"
 
 [actions.reset]
 description = "Reset --hard to the selected reflog entry"
-command = "git reset --hard '{0|strip_ansi}'"
+command = "git reset --hard '{strip_ansi|split: :0}'"
 mode = "execute"

@@ -11,6 +11,12 @@ output = "{split:\t:1}"
 [preview]
 command = "docker compose logs --tail=30 --no-log-prefix '{split:\t:1}'"
 
+[keybindings]
+ctrl-u = "actions:up"
+f2 = "actions:down"
+ctrl-r = "actions:restart"
+ctrl-l = "actions:logs"
+
 [actions.up]
 description = "Start the selected service"
 command = "docker compose up -d '{split:\t:1}'"

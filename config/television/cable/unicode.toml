@@ -14,7 +14,7 @@ Gentoo: app-i18n/unicode-data
 NixOS: unicode/unicode-data
 openSUSE: unicode-ucd
 
-UnicodData.txt may also aleady be provided by:
+UnicodeData.txt may also already be provided by:
 
 1) Many java packages
 2) Latex packages

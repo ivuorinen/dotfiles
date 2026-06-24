@@ -55,8 +55,8 @@ This registers `Ctrl-r` and `Ctrl-t` in the shell and enables channel triggers.
 |-----------------------|------------------|
 | `Ctrl-n` / `↓`        | Next entry       |
 | `Ctrl-p` / `↑`        | Previous entry   |
-| `Ctrl-d` / `PageDown` | Next page        |
-| `Ctrl-u` / `PageUp`   | Previous page    |
+| `Ctrl-d` / `PageDown` | Half page down   |
+| `Ctrl-u` / `PageUp`   | Half page up     |
 | `Enter`               | Confirm / action |
 | `Esc` / `Ctrl-c`      | Quit             |
 
@@ -231,6 +231,7 @@ Preview: PR detail (title, status, author, review decision, age, labels, body)
 |----------|--------------------|
 | `Enter`  | Open PR in browser |
 | `Ctrl-o` | `gh pr checkout`   |
+| `Ctrl-y` | `gh pr merge`      |
 
 ---
 

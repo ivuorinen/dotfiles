@@ -6,6 +6,7 @@ requirements = ["df", "awk"]
 [source]
 command = "df -h --output=target,fstype,size,used,avail,pcent 2>/dev/null | tail -n +2"
 display = "{split: :0}"
+output = "{split: :0}"
 
 [preview]
 command = "df -h '{}' && echo && ls -la '{}' 2>/dev/null | head -20"
@@ -15,5 +16,5 @@ enter = "actions:cd"
 
 [actions.cd]
 description = "Open a shell in the selected mount point"
-command = "cd {} && $SHELL"
+command = "cd '{}' && $SHELL"
 mode = "execute"

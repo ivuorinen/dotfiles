@@ -16,10 +16,10 @@ test -e "$HOME/.config/fish/alias.fish" &&
 test -e "$HOME/.config/fish/exports.fish" &&
     source "$HOME/.config/fish/exports.fish"
 
-type -q tv; and tv init fish | source
-
 if status is-interactive
     # Commands to run in interactive shell
+
+    type -q tv; and tv init fish | source
 
     # 1Password plugins if op command is available
     type -q op; and test -e "$HOME/.config/op/plugins.sh" &&

@@ -4,7 +4,7 @@ description = "List available cargo commands and extensions"
 requirements = ["cargo"]
 
 [source]
-command = "cargo --list 2>/dev/null | tail -n +2 | awk '{print $1}'"
+command = "cargo --list 2>/dev/null | awk '/^    / { print $1 }'"
 
 [preview]
 command = "cargo {} --help 2>/dev/null | head -50"

@@ -10,12 +10,12 @@ file="$1"
 case "$file" in
   *.md | *.MD | *.markdown | *.mkd)
     if command -v glow > /dev/null 2>&1; then
-      glow -s "$(theme-mode 2> /dev/null || echo dark)" "$file"
+      glow -s "$(theme-mode 2> /dev/null || echo dark)" -- "$file"
     else
-      bat -n --color=always "$file"
+      bat -n --color=always -- "$file"
     fi
     ;;
   *)
-    bat -n --color=always "$file"
+    bat -n --color=always -- "$file"
     ;;
 esac

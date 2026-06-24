@@ -21,4 +21,4 @@ mapfile -t paths < <(
   fd --type d --max-depth 1 . "${HOME}" 2> /dev/null
 )
 
-[[ ${#paths[@]} -gt 0 ]] && zoxide add "${paths[@]}"
+[[ ${#paths[@]} -gt 0 ]] && zoxide add -- "${paths[@]}"
