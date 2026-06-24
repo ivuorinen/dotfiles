@@ -228,8 +228,6 @@ brew "shivammathur/extensions/yaml@8.3"
 brew "shivammathur/php/php-debug", link: false
 # General-purpose scripting language
 brew "shivammathur/php/php@8.4"
-# Command-line interface for 1Password
-cask "1password-cli"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Semantic code analysis engine
