@@ -1,16 +1,72 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-06-08
-Last pass: 34 (2026-06-08)
+Last validated: 2026-06-24
+Last pass: 38 (2026-06-24)
 
 ## Summary
 
-- Total: 172 | Open: 0 | Fixed: 163 | Invalid: 9
+- Total: 184 | Open: 0 | Fixed: 175 | Invalid: 9
 
 ## Open Findings
 
 ## Fixed
+
+### Pass 38 — 2026-06-24
+
+#### [N-191] Stale escape-encoding comment in both starship TOML files contradicts literal-character migration
+Fixed: 2026-06-24
+Notes: Comment was correct — the Write/Edit pipeline does strip bare PUA chars. The prior migration that replaced `\uXXXX` escapes with literal glyphs was reverted. Both `starship.dark.toml` and `starship.light.toml` restored to `\uXXXX` form for `[os.symbols]`, `[git_branch]`, and all language module symbols.
+
+#### [N-192] `1password-cli` dual-managed by mise and Homebrew Cask — silent version drift
+Fixed: 2026-06-24
+Notes: Removed `cask "1password-cli"` and its preceding comment from `config/homebrew/Brewfile`. mise at `config/mise/config.toml` (`1password-cli = "2.34.1"`) is authoritative.
+
+### Pass 37 — 2026-06-24
+
+#### [N-190] Battery `text_fg` and `icon_fg` not unset on theme switch — invisible text in both directions
+Fixed: 2026-06-24
+Notes: `catppuccin/tmux` `status_module.conf` uses `set -ogqF` (only-if-not-set) for `text_fg` and `icon_fg`. On a dark→light switch, Mocha's `text_fg` (`#cdd6f4`, near-white) persisted because the palette files only unset those variables for `directory`, `session`, `application`, and `date_time` modules — not `battery`. This left near-white text over the transparent status background (terminal white in Latte), making battery text invisible. The reverse (light→dark) had the same bug: Latte's dark `text_fg` (`#4c4f69`) persisted in Mocha, rendering dark text on a dark terminal background. Fixed by adding `set -Ugq @catppuccin_status_battery_text_fg` and `set -Ugq @catppuccin_status_battery_icon_fg` to the unset block in both `config/theme/palettes.d/tmux.light.conf` and `config/theme/palettes.d/tmux.dark.conf`, matching the existing pattern for the other four modules.
+
+### Pass 36 — 2026-06-20
+
+#### [N-189] Four tools in `config/mise/config.toml` pinned to `"latest"` instead of an explicit version
+Fixed: 2026-06-20
+Notes: Replaced `"latest"` with the resolved version for each tool: `prek = "0.4.5"`, `github:shhac/git-hunk = "0.14.3"`, `1password-cli = "2.34.1"`, `github:modem-dev/hunk = "0.15.3"`. With `lockfile = true` in settings, the lockfile records the resolved version at install time, but the config itself should also be explicit so intent is visible without consulting the lockfile. Schema validated with `v8r`.
+
+### Pass 35 — 2026-06-20
+
+#### [N-181] `display-time 0` comment says "Hide clock" — wrong option, wrong semantics
+Fixed: 2026-06-20
+Notes: Changed comment to `# Messages persist until a key is pressed`.
+
+#### [N-182] `status-keys vi` comment says "vi keys to move between panes" — wrong
+Fixed: 2026-06-20
+Notes: Changed comment to `# vi keys for status-line command editing`.
+
+#### [N-183] Prefix comment "keeping the default of C-b intact" is misleading
+Fixed: 2026-06-20
+Notes: Collapsed two-line comment to `# Replace C-b with C-Space as prefix. C-Space C-Space sends the prefix to a nested session.`
+
+#### [N-184] `setw` alias used on line 82 while `set -w` is used on line 36
+Fixed: 2026-06-20
+Notes: Changed `setw -g mode-keys vi` to `set -wg mode-keys vi`.
+
+#### [N-185] Config-reload and sesh bindings use hardcoded paths instead of `$DOTFILES`
+Fixed: 2026-06-20
+Notes: Changed reload bind to `source-file ~/.config/tmux/tmux.conf` and sesh bind to `~/.config/tmux/sesh.sh` — both use the XDG symlink path that dotbot creates, portable regardless of dotfiles install location.
+
+#### [N-186] `Y` copy-mode binding pipes to `tmux paste-buffer` which ignores stdin
+Fixed: 2026-06-20
+Notes: Replaced `copy-pipe-and-cancel "tmux paste-buffer"` with `copy-selection-and-cancel \; paste-buffer` — the canonical tmux command-chaining form.
+
+#### [N-187] TPM bootstrap emits an error on first launch if network is unavailable
+Fixed: 2026-06-20
+Notes: Wrapped the unconditional `run '~/.local/share/tmux/plugins/tpm/tpm'` in `if "test -f ~/.local/share/tmux/plugins/tpm/tpm" "run '...'"` to suppress the error when tpm is absent after a failed first-launch clone.
+
+#### [N-188] Battery script paths hardcode `$HOME/.local/share/tmux/plugins` instead of `$TMUX_PLUGIN_MANAGER_PATH`
+Fixed: 2026-06-20
+Notes: Replaced the two hardcoded absolute paths in `@catppuccin_battery_icon` and `@catppuccin_battery_text` with `$TMUX_PLUGIN_MANAGER_PATH/tmux-battery/scripts/...`. `TMUX_PLUGIN_MANAGER_PATH` is already set via `set-environment -g` on the preceding line and is inherited by `#()` shell invocations, so both variables now track the configured plugin path automatically.
 
 ### Pass 34 — 2026-06-08
 

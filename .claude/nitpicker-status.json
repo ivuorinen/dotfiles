@@ -1,12 +1,12 @@
 {
   "generated": "2026-04-26",
-  "last_validated": "2026-06-08",
-  "last_pass": 34,
-  "last_pass_date": "2026-06-08",
+  "last_validated": "2026-06-24",
+  "last_pass": 38,
+  "last_pass_date": "2026-06-24",
   "summary": {
-    "total": 172,
+    "total": 184,
     "open": 0,
-    "fixed": 163,
+    "fixed": 175,
     "invalid": 9
   }
 }

@@ -25,3 +25,4 @@ dfm.sh
 **/.claude/settings.local.json
 **/.serena/cache
 .playwright-mcp/*
+.claude/worktrees
