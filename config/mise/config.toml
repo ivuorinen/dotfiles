@@ -87,7 +87,7 @@ tree-sitter = "0.26.9"
 "npm:fish-lsp" = "1.1.4"
 
 # Task runners & caching
-just = "1.53.0"
+just = "1.54.0"
 "github:dimo414/bkt" = "0.8.2"
 
 # Linters & formatters
