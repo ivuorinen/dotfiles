@@ -111,7 +111,7 @@ hadolint = "2.14.0"
 
 # Security & supply chain
 age = "1.3.1"
-gopass = "1.16.1"                           # pass-compatible password manager (gopasspw/gopass)
+gopass = "1.16.1"                          # pass-compatible password manager (gopasspw/gopass)
 cosign = "3.1.1"
 gitleaks = "8.30.1"
 trufflehog = "3.95.6"
@@ -141,13 +141,7 @@ bottom = "0.12.3"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.14"
 "github:ZenNotes/zennotes" = "v2.3.0"
-prek = "latest"
-
-# Disabled — mise pipx backend can't find uvx when uv is mise-managed
-# See https://github.com/jdx/mise/discussions/7477
-# "pipx:detect-secrets" = "latest"
-# "pipx:git-filter-repo" = "latest"
-# "pipx:ansible-lint" = "latest"
-# ansible = "13.4.0"
-# "pipx:openapi-python-client" = "latest"
-# "pipx:python-lsp-server[websockets]" = "latest"
+prek = "0.4.5"
+"github:shhac/git-hunk" = "0.14.3"
+1password-cli = "2.34.1"
+"github:modem-dev/hunk" = "0.15.3"
