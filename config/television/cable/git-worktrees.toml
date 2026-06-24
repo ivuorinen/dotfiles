@@ -15,7 +15,7 @@ ctrl-d = "actions:remove"
 
 [actions.cd]
 description = "Open a shell in the selected worktree"
-command = "cd '{}' && $SHELL"
+command = "cd '{}' && \"$SHELL\""
 mode = "execute"
 
 [actions.remove]
