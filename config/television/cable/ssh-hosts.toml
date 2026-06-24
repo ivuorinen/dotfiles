@@ -1,0 +1,38 @@
+[metadata]
+name = "ssh-hosts"
+description = "Select SSH hosts from shared.d and local.d config files"
+requirements = ["grep", "awk", "find"]
+
+[source]
+command = '''grep -rh '^Host ' $HOME/.ssh/shared.d/ $HOME/.ssh/local.d/ 2>/dev/null | awk '{for(i=2;i<=NF;i++) if($i != "*") print $i}'
+'''
+
+[preview]
+command = '''awk '
+BEGIN { found=0; n=0; maxlen=0; hname="" }
+/^Host /  { found=0 }
+/^Host (.*[[:space:]])?'{}'([[:space:]].*)?$/ { found=1; hname=$0; next }
+found && /^[[:space:]]+[^#]/ {
+  line=$0; sub(/^[[:space:]]+/,"",line)
+  key=line; sub(/[[:space:]].*/, "",key)
+  val=line; sub(/^[^[:space:]]+[[:space:]]*/,"",val)
+  if (key!="" && val!="") {
+    keys[n]=key; vals[n]=val
+    if (length(key)>maxlen) maxlen=length(key)
+    n++
+  }
+}
+END {
+  if (hname!="") { print hname; print "" }
+  for (i=0;i<n;i++) printf "  %-*s  %s\n", maxlen, keys[i], vals[i]
+}
+' $(find -L $HOME/.ssh/shared.d $HOME/.ssh/local.d -maxdepth 1 -type f 2>/dev/null; echo /dev/null)
+'''
+
+[keybindings]
+enter = "actions:connect"
+
+[actions.connect]
+description = "Connect via SSH"
+command = "ssh '{}'"
+mode = "execute"

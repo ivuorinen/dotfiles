@@ -1,0 +1,23 @@
+[metadata]
+name = "dotfiles"
+description = "Select from dotfiles — active configs in ~/.config or source in ~/.dotfiles"
+requirements = ["fd", "bat"]
+
+[source]
+command = [
+  "fd -t f . $HOME/.config",
+  "fd -t f . $HOME/.dotfiles --exclude .git --exclude node_modules --exclude worktrees",
+]
+
+[preview]
+command = "tv-preview '{}'"
+
+[keybindings]
+enter = "actions:edit"
+ctrl-s = "cycle_sources"
+
+[actions.edit]
+description = "Edit the selected dotfile"
+command = "${EDITOR:-nvim} '{}'"
+shell = "bash"
+mode = "execute"

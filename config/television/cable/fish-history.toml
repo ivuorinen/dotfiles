@@ -1,0 +1,18 @@
+[metadata]
+name = "fish-history"
+description = "Fish shell command history (newest first, deduplicated)"
+requirements = ["fish"]
+
+[source]
+command = "fish -c 'builtin history'"
+
+[preview]
+command = "echo '{}'"
+
+[keybindings]
+enter = "actions:run"
+
+[actions.run]
+description = "Execute the selected command"
+command = "{}"
+mode = "execute"

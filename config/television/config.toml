@@ -1,0 +1,76 @@
+history_size = 200
+global_history = false
+
+# Shell is auto-detected from $SHELL (fish); override only if needed
+# shell = "bash"
+
+[ui.preview_panel]
+size = 65
+scrollbar = true
+border_type = "rounded"
+hidden = false
+
+[ui.results_panel]
+border_type = "rounded"
+
+[keybindings]
+# Preview panel control
+ctrl-d = "scroll_preview_half_page_down"
+ctrl-u = "scroll_preview_half_page_up"
+ctrl-f = "cycle_previews"
+# Data operations
+ctrl-y = "copy_entry_to_clipboard"
+ctrl-s = "cycle_sources"
+# Input field actions
+backspace = "delete_prev_char"
+ctrl-w = "delete_prev_word"
+delete = "delete_next_char"
+left = "go_to_prev_char"
+right = "go_to_next_char"
+
+[shell_integration]
+fallback_channel = "files"
+
+[shell_integration.keybindings]
+"smart_autocomplete" = "ctrl-t"
+"command_history" = "ctrl-r"
+
+[shell_integration.channel_triggers]
+"alias" = ["alias", "unalias"]
+"env" = ["export", "unset"]
+"dirs" = ["cd", "ls", "rmdir", "z"]
+"files" = [
+  "cat",
+  "less",
+  "head",
+  "tail",
+  "vim",
+  "nano",
+  "bat",
+  "cp",
+  "mv",
+  "rm",
+  "touch",
+  "chmod",
+  "chown",
+  "ln",
+  "tar",
+  "zip",
+  "unzip",
+  "gzip",
+  "gunzip",
+  "xz",
+]
+"git-diff" = ["git add", "git restore"]
+"git-branch" = [
+  "git checkout",
+  "git branch",
+  "git merge",
+  "git rebase",
+  "git pull",
+  "git push",
+]
+"git-log" = ["git log", "git show"]
+"git-repos" = ["nvim", "hx", "git clone"]
+"ssh-hosts" = ["ssh", "scp"]
+"tmux-sessions" = ["tmux new-session", "tmux attach-session"]

@@ -16,8 +16,7 @@ test -e "$HOME/.config/fish/alias.fish" &&
 test -e "$HOME/.config/fish/exports.fish" &&
     source "$HOME/.config/fish/exports.fish"
 
-test -e "$HOME/.dotfiles/config/fzf/key-bindings.fish" &&
-    source "$HOME/.dotfiles/config/fzf/key-bindings.fish"
+type -q tv; and tv init fish | source
 
 if status is-interactive
     # Commands to run in interactive shell
