@@ -134,7 +134,7 @@ act = "0.2.89"
 "dotnet:coverlet.console" = "10.0.1"
 
 # System monitoring & misc utilities
-bottom = "0.12.3"
+bottom = "0.14.1"
 "github:binwiederhier/ntfy" = "2.24.0"
 "github:wakatime/wakatime-cli" = "2.21.0"
 "github:o2sh/onefetch" = "2.27.1"
