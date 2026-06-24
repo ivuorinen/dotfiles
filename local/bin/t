@@ -27,12 +27,15 @@ fi
 # Check for required dependencies
 check_dependencies()
 {
-  local T_DEPS=(tmux fzf find)
+  local T_DEPS=(tmux find)
   for cmd in "${T_DEPS[@]}"; do
     if ! command -v "$cmd" &> /dev/null; then
       error_exit "$cmd is not installed."
     fi
   done
+  if ! command -v tv &> /dev/null && ! command -v fzf &> /dev/null; then
+    error_exit "Neither tv nor fzf is installed."
+  fi
 }
 
 check_dependencies
@@ -100,7 +103,7 @@ get_sessions()
   echo -e "# Sessions\n$T_TMUX_SESSIONS"
 }
 
-# Determine selection from command-line argument or interactive fzf menu
+# Determine selection from command-line argument or interactive picker
 if [[ $# -eq 1 ]]; then
   selected="$1"
 else
@@ -108,8 +111,17 @@ else
   T_ITEMS="$(get_sessions | sort)
 $(get_directories | sort)"
 
-  # Use sort to order the entries and fzf for interactive selection
-  selected=$(echo "$T_ITEMS" | fzf) || exit 0
+  if command -v tv &> /dev/null; then
+    T_TMPFILE=$(mktemp)
+    echo "$T_ITEMS" | grep -v '^#' > "$T_TMPFILE"
+    selected=$(tv --no-sort -s "cat $T_TMPFILE") || {
+      rm -f "$T_TMPFILE"
+      exit 0
+    }
+    rm -f "$T_TMPFILE"
+  else
+    selected=$(echo "$T_ITEMS" | fzf) || exit 0
+  fi
 fi
 
 # Reject selection if it is a header line

@@ -1,0 +1,18 @@
+[metadata]
+name = "wt"
+description = "List worktrunk worktrees"
+requirements = ["wt", "jq", "git"]
+
+[source]
+command = "wt list --format json | jq -r '.[].branch'"
+
+[preview]
+command = "git log --oneline -10 --color=always '{}' 2>/dev/null || echo 'No log for branch: {}'"
+
+[keybindings]
+enter = "actions:switch"
+
+[actions.switch]
+description = "Switch to the selected worktree"
+command = "wt switch '{}'"
+mode = "execute"

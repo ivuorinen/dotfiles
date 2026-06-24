@@ -12,13 +12,6 @@
 set -uo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
-MSGR="$DOTFILES/local/bin/msgr"
-if [[ -f "$MSGR" ]]; then
-  set +u
-  # shellcheck source=msgr
-  source "$MSGR"
-  set -u
-fi
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"

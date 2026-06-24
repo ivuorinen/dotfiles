@@ -1,0 +1,33 @@
+[metadata]
+name = "gh-prs"
+description = "List GitHub PRs for the current repo"
+requirements = ["gh", "jq"]
+
+[source]
+command = '''gh pr list --state open --limit 100 --json number,title,createdAt,author,labels | jq -r 'sort_by(.createdAt) | reverse | .[] | "#" + (.number | tostring) + "  " + .title + "  @" + .author.login + (if (.labels | length) > 0 then "  [" + (.labels | map(.name) | join(", ")) + "]" else "" end)'
+'''
+output = "{split:#:1|split: :0}"
+
+[preview]
+command = '''gh pr view '{split:#:1|split: :0}' --json number,title,body,state,author,createdAt,updatedAt,labels,reviewDecision | jq -r '"  " + .title, "  #" + (.number | tostring), "", "  Status:  " + .state, "  Author:  @" + .author.login, "  Review:  " + (.reviewDecision // "PENDING"), "  Created: " + (.createdAt | fromdateiso8601 | (now - .) | if . < 3600 then (./60|floor|tostring) + " min ago" elif . < 86400 then (./3600|floor|tostring) + " hours ago" else (./86400|floor|tostring) + " days ago" end), (if (.labels | length) > 0 then "  Labels:  " + (.labels | map(.name) | join(", ")) else "" end), "", (.body // "")'
+'''
+
+[keybindings]
+enter = "actions:open"
+ctrl-o = "actions:checkout"
+ctrl-y = "actions:merge"
+
+[actions.open]
+description = "Open the PR in the browser"
+command = "gh pr view {split:#:1|split: :0} --web"
+mode = "execute"
+
+[actions.merge]
+description = "Merge the selected PR"
+command = "gh pr merge {split:#:1|split: :0}"
+mode = "execute"
+
+[actions.checkout]
+description = "Check out the PR branch locally"
+command = "gh pr checkout {split:#:1|split: :0}"
+mode = "execute"

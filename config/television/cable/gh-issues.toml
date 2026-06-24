@@ -1,0 +1,21 @@
+[metadata]
+name = "gh-issues"
+description = "List GitHub issues for the current repo"
+requirements = ["gh", "jq"]
+
+[source]
+command = '''gh issue list --state open --limit 100 --json number,title,state,createdAt,author,labels | jq -r 'sort_by(.createdAt) | reverse | .[] | "#" + (.number | tostring) + "  " + .title + "  @" + .author.login + (if (.labels | length) > 0 then "  [" + (.labels | map(.name) | join(", ")) + "]" else "" end)'
+'''
+output = "{split:#:1|split: :0}"
+
+[preview]
+command = '''gh issue view '{split:#:1|split: :0}' --json number,title,body,state,author,createdAt,updatedAt,labels,assignees | jq -r '"  " + .title, "  #" + (.number | tostring), "", "  Status:  " + .state, "  Author:  @" + .author.login, "  Created: " + (.createdAt | fromdateiso8601 | (now - .) | if . < 3600 then (./60|floor|tostring) + " min ago" elif . < 86400 then (./3600|floor|tostring) + " hours ago" else (./86400|floor|tostring) + " days ago" end), (if (.labels | length) > 0 then "  Labels:  " + (.labels | map(.name) | join(", ")) else "" end), "", (.body // "")'
+'''
+
+[keybindings]
+enter = "actions:open"
+
+[actions.open]
+description = "Open the issue in the browser"
+command = "gh issue view {split:#:1|split: :0} --web"
+mode = "execute"

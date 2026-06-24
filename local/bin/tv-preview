@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# tv-preview — file preview dispatcher for television cables.
+# Renders markdown with glow; falls back to bat for everything else.
+# Falls back to bat when glow is not installed.
+
+set -uo pipefail
+
+file="$1"
+
+case "$file" in
+  *.md | *.MD | *.markdown | *.mkd)
+    if command -v glow > /dev/null 2>&1; then
+      glow -s "$(theme-mode 2> /dev/null || echo dark)" -- "$file"
+    else
+      bat -n --color=always -- "$file"
+    fi
+    ;;
+  *)
+    bat -n --color=always -- "$file"
+    ;;
+esac
