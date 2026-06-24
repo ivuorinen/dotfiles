@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Unified sesh session picker with cascading tool detection:
-#   1. gum     — simple fuzzy filter (works inside the prefix+t popup)
-#   2. fzf     — rich UI inline; reachable when invoked outside a popup
+#   1. tv      — television fuzzy finder; full TUI, renders in popup
+#   2. fzf     — rich UI inline with dynamic reload bindings
 #   3. select  — bare minimum numbered menu
 #
 # `fzf-tmux` is intentionally omitted: this script is bound to
@@ -18,19 +18,8 @@ if ! command -v sesh &> /dev/null; then
   exit 0
 fi
 
-# Pick a sesh session using gum filter
-pick_with_gum()
-{
-  sesh list --icons \
-    | gum filter \
-      --limit 1 \
-      --no-sort \
-      --fuzzy \
-      --placeholder 'Pick a sesh' \
-      --height 50 \
-      --prompt='⚡'
-  return 0
-}
+# Seed zoxide in the background for fresh list -z results
+command -v zoxide-seed > /dev/null 2>&1 && zoxide-seed > /dev/null 2>&1 &
 
 FZF_COMMON_OPTS=(
   --no-sort --ansi
@@ -47,6 +36,12 @@ FZF_COMMON_OPTS=(
   --preview-window 'right:55%'
   --preview 'sesh preview {}'
 )
+
+# Pick a sesh session using television
+pick_with_tv()
+{
+  tv sesh
+}
 
 # Pick a sesh session using fzf inline
 pick_with_fzf()
@@ -72,11 +67,11 @@ pick_with_select()
   done
 }
 
-# Cascading tool detection — gum first because the script is invoked
-# from inside a tmux popup (display-popup -E in tmux.conf); gum filter
-# is the only fuzzy picker that renders inline in that context.
-if command -v gum &> /dev/null; then
-  selection=$(pick_with_gum)
+# Cascading tool detection — tv is the primary picker; fzf provides the
+# richer dynamic reload bindings as fallback. Both render correctly
+# inside a tmux popup (display-popup -E in tmux.conf).
+if command -v tv &> /dev/null; then
+  selection=$(pick_with_tv)
 elif command -v fzf &> /dev/null; then
   selection=$(pick_with_fzf)
 else
