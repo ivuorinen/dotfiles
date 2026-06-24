@@ -97,7 +97,7 @@ done
 # Only remove from $GOPATH/bin if it differs from XDG_BIN_HOME.
 GO_BIN="${XDG_DATA_HOME}/go/bin"
 GO_MANAGED_TOOLS=(
-  yamlfmt cheat glow fzf gum sesh git-profile
+  yamlfmt cheat glow fzf sesh git-profile
 )
 if [[ "$GO_BIN" != "$XDG_BIN_HOME" ]] && [[ -d "$GO_BIN" ]]; then
   for tool in "${GO_MANAGED_TOOLS[@]}"; do
