@@ -12,7 +12,7 @@
 # to starship-dark.toml. The two files are intentionally identical except
 # for `palette = "..."` and the [palettes.*] block.
 #
-# Layout: line 1 = OS icon · user@host (SSH only) · path · battery (≤45%)
+# Layout: line 1 = OS icon · user@host (SSH only) · path
 #                 · git · node · dotnet · go · php · ruby · python
 #         line 2 = ➜ (green on success, red on non-zero exit)
 # Transient prompt collapses prior prompts to just `➜ ` (wired by
@@ -32,7 +32,6 @@ $os\
 $username\
 $hostname\
 $directory\
-$battery\
 $git_branch\
 $git_status\
 $nodejs\
@@ -125,21 +124,6 @@ format = "[$path]($style)[$read_only]($read_only_style) "
 read_only = " "
 read_only_style = "red"
 fish_style_pwd_dir_length = 1
-
-# Battery — shows below 75% in soft yellow; visible most of the time so
-# the styling stays low-volume rather than alarming.
-# Symbols use Font Awesome Nerd Font glyphs (BMP, escape-encoded so the
-# Write/Edit pipeline does not strip them).
-[battery]
-full_symbol = "\uF240 "
-charging_symbol = "\uF0E7 "
-discharging_symbol = "\uF242 "
-unknown_symbol = "\uF128 "
-empty_symbol = "\uF244 "
-
-[[battery.display]]
-threshold = 75
-style = "yellow"
 
 # Git — lightGreen in omp = green here; branch and status share the colour.
 [git_branch]
