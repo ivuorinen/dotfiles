@@ -27,7 +27,6 @@
 *.tmp.*
 Brewfile.lock.json
 antidote_plugins.zsh
-config/alacritty/theme-active.toml
 config/cheat/cheatsheets/pure-bash-bible/*
 config/cheat/cheatsheets/tldr/*
 config/fish/completions/asdf.fish

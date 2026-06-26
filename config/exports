@@ -91,23 +91,6 @@ have()
   bkt -- which "$1" &> /dev/null
 }
 
-# Function to run dark-notify and change alacritty theme
-# It uses flock to prevent running multiple instances.
-# Install flock with `brew install flock` on macOS.
-darknotify_alacritty()
-{
-  x-have flock && [[ -f /tmp/dark-notify-alacritty.lock ]] && return
-  x-have dark-notify && {
-    # subprocess is used to prevent the command from showing it was backgrounded
-    (
-      flock /tmp/dark-notify-alacritty.lock dark-notify \
-        -c "$HOME/.dotfiles/local/bin/x-change-alacritty-theme" &
-    ) &> /dev/null
-  }
-  return 0
-}
-# darknotify_alacritty
-
 # Function to list installed Homebrew packages using bkt caching
 brew_installed()
 {
@@ -127,7 +110,7 @@ have_brew()
   fi
 }
 
-# Alacritty preexec hook to update dynamic title
+# zsh preexec hook to update the dynamic terminal title
 preexec()
 {
   print -n -P "\e]0;$1%~\a"
