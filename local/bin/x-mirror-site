@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# @description Mirror a website with wget
+#USAGE about "Mirror a website with wget"
+#USAGE arg "<url>" help="URL to mirror"
+
+set -euo pipefail
+
+if [ "$#" -eq 0 ]; then
+  echo "Usage: x-mirror-site <url>" >&2
+  exit 1
+fi
+
+exec wget -m -k -K -E -e robots=off "$@"

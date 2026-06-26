@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# @description Copy the SSH public key to the clipboard
+#USAGE about "Copy the SSH public key to the clipboard"
+#USAGE arg "[keyfile]" help="Public key file (default: ~/.ssh/id_rsa.pub)"
+
+set -euo pipefail
+
+keyfile="${1:-$HOME/.ssh/id_rsa.pub}"
+
+if [ ! -f "$keyfile" ]; then
+  echo "pubkey: no such key file: $keyfile" >&2
+  exit 1
+fi
+
+pbcopy < "$keyfile"
+echo "=> Public key copied to pasteboard."

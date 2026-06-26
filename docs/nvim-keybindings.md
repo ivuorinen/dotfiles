@@ -4,7 +4,6 @@
 
 | Key          | Description                                                                                | Command                                                 |
 |--------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| ` ,`         | Find existing buffers                                                                      | `<Lua callback>`                                        |
 | ` ba`        | Close all except current                                                                   | `<Lua callback>`                                        |
 | ` bd`        | Delete buf                                                                                 | `<Cmd>lua MiniBufremove.delete()<CR>`                   |
 | ` bh`        | Prev buf                                                                                   | `<Cmd>bprev<CR>`                                        |
@@ -13,35 +12,12 @@
 | ` bl`        | Next buf                                                                                   | `<Cmd>bnext<CR>`                                        |
 | ` bn`        | New buf                                                                                    | `<Cmd>enew<CR>`                                         |
 | ` bw`        | Wipeout                                                                                    | `<Cmd>lua MiniBufremove.wipeout()<CR>`                  |
-| ` cbb`       | CB: Box Title                                                                              | `<Cmd>CBccbox<CR>`                                      |
-| ` cbd`       | CB: Remove a box                                                                           | `<Cmd>CBd<CR>`                                          |
-| ` cbl`       | CB: Simple Line                                                                            | `<Cmd>CBline<CR>`                                       |
-| ` cbm`       | CB: Marked                                                                                 | `<Cmd>CBllbox14<CR>`                                    |
-| ` cbt`       | CB: Titled Line                                                                            | `<Cmd>CBllline<CR>`                                     |
-| ` cci`       | Incoming calls                                                                             | `<Lua callback>`                                        |
-| ` cco`       | Outgoing calls                                                                             | `<Lua callback>`                                        |
-| ` cd`        | Definitions                                                                                | `<Lua callback>`                                        |
 | ` cf`        | Format                                                                                     | `<Cmd>lua vim.lsp.buf.format()<CR>`                     |
-| ` ci`        | Implementations                                                                            | `<Lua callback>`                                        |
-| ` cp`        | Type Definition                                                                            | `<Lua callback>`                                        |
-| ` cr`        | Rename file                                                                                | `<Lua callback>`                                        |
-| ` cs`        | LSP Document Symbols                                                                       | `<Lua callback>`                                        |
-| ` ct`        | Treesitter                                                                                 | `<Lua callback>`                                        |
-| ` cws`       | Workspace Symbols                                                                          | `<Lua callback>`                                        |
-| ` f`         | Find Files                                                                                 | `<Lua callback>`                                        |
+| ` pp`        | Open plugin manager                                                                        | `<Cmd>Pack<CR>`                                         |
 | ` qQ`        | Force quit without saving                                                                  | `<Lua callback>`                                        |
 | ` qf`        | Quicker close split                                                                        | `<Cmd>q<CR>`                                            |
 | ` qq`        | Quit with force saving                                                                     | `<Lua callback>`                                        |
 | ` qw`        | Write and quit                                                                             | `<Cmd>wq<CR>`                                           |
-| ` sd`        | Search Diagnostics                                                                         | `<Lua callback>`                                        |
-| ` sf`        | Grep String                                                                                | `<Lua callback>`                                        |
-| ` sg`        | Live Grep                                                                                  | `<Lua callback>`                                        |
-| ` sh`        | Help tags                                                                                  | `<Lua callback>`                                        |
-| ` sk`        | Search Keymaps                                                                             | `<Lua callback>`                                        |
-| ` sn`        | Notification History                                                                       | `<Lua callback>`                                        |
-| ` so`        | Old Files                                                                                  | `<Lua callback>`                                        |
-| ` sq`        | Quickfix                                                                                   | `<Lua callback>`                                        |
-| ` ss`        | Search Buffer Lines                                                                        | `<Lua callback>`                                        |
 | ` te`        | File Explorer (cwd)                                                                        | `<Lua callback>`                                        |
 | ` tf`        | Toggle autoformat on save                                                                  | `<Cmd>ToggleFormat<CR>`                                 |
 | ` tl`        | Toggle Light/Dark Mode                                                                     | `<Lua callback>`                                        |
@@ -50,13 +26,10 @@
 | ` tmd`       | Toggle diagnostics                                                                         | `<Lua callback>`                                        |
 | ` tmh`       | Toggle hlsearch                                                                            | `<Lua callback>`                                        |
 | ` tml`       | Toggle list                                                                                | `<Lua callback>`                                        |
-| ` tmm`       | Toggle markdown render                                                                     | `<Cmd>RenderMarkdown toggle<CR>`                        |
 | ` tmn`       | Toggle number                                                                              | `<Lua callback>`                                        |
 | ` tmr`       | Toggle relativenumber                                                                      | `<Lua callback>`                                        |
 | ` tms`       | Toggle spell                                                                               | `<Lua callback>`                                        |
 | ` tmw`       | Toggle wrap                                                                                | `<Lua callback>`                                        |
-| ` tn`        | Dismiss Notifications                                                                      | `<Lua callback>`                                        |
-| ` tt`        | Toggle Terminal                                                                            | `<Lua callback>`                                        |
 | ` xc`        | Cascade (most severe)                                                                      | `<Cmd>Trouble cascade<CR>`                              |
 | ` xl`        | Location List                                                                              | `<Cmd>Trouble loclist<CR>`                              |
 | ` xq`        | Quickfix                                                                                   | `<Cmd>Trouble quickfix<CR>`                             |
@@ -140,8 +113,8 @@
 | `gX`         | Opens filepath or URI under cursor with the system handler (file explorer, web browser, …) | `<Lua callback>`                                        |
 | `g[`         | Move to left "around"                                                                      | `<Lua callback>`                                        |
 | `g]`         | Move to right "around"                                                                     | `<Lua callback>`                                        |
-| `gc`         | Toggle comment                                                                             | `<Lua callback>`                                        |
-| `gcc`        | Toggle comment line                                                                        | `<Lua callback>`                                        |
+| `gc`         | Comment                                                                                    | `<Lua callback>`                                        |
+| `gcc`        | Comment line                                                                               | `<Lua callback>`                                        |
 | `gh`         | Apply hunks                                                                                | `<Lua callback>`                                        |
 | `gm`         | Multiply                                                                                   | `v:lua.MiniOperators.multiply()`                        |
 | `gmm`        | Multiply line                                                                              | `gm_`                                                   |
@@ -177,13 +150,17 @@
 
 ## Insert Mode
 
-| Key       | Description                                         | Command          |
-|-----------|-----------------------------------------------------|------------------|
-| `<C-S>`   | vim.lsp.buf.signature_help()                        | `<Lua callback>` |
-| `<C-U>`   | :help i_CTRL-U-default                              | `<C-G>u<C-U>`    |
-| `<C-W>`   | :help i_CTRL-W-default                              | `<C-G>u<C-W>`    |
-| `<S-Tab>` | vim.snippet.jump if active, otherwise &lt;S-Tab&gt; | `<Lua callback>` |
-| `<Tab>`   | vim.snippet.jump if active, otherwise &lt;Tab&gt;   | `<Lua callback>` |
+| Key         | Description                                         | Command          |
+|-------------|-----------------------------------------------------|------------------|
+| `<C-B>`     | Scroll info/signature up                            | `<Lua callback>` |
+| `<C-F>`     | Scroll info/signature down                          | `<Lua callback>` |
+| `<C-S>`     | vim.lsp.buf.signature_help()                        | `<Lua callback>` |
+| `<C-Space>` | Complete with two-stage                             | `<Lua callback>` |
+| `<C-U>`     | :help i_CTRL-U-default                              | `<C-G>u<C-U>`    |
+| `<C-W>`     | :help i_CTRL-W-default                              | `<C-G>u<C-W>`    |
+| `<M-Space>` | Complete with fallback                              | `<Lua callback>` |
+| `<S-Tab>`   | vim.snippet.jump if active, otherwise &lt;S-Tab&gt; | `<Lua callback>` |
+| `<Tab>`     | vim.snippet.jump if active, otherwise &lt;Tab&gt;   | `<Lua callback>` |
 
 ## Visual + Select Mode
 
@@ -204,11 +181,13 @@
 | `Q`       | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                   |
 | `[%`      | Previous unmatched group (matchit)                                                         | `<Plug>(MatchitVisualMultiBackward)`                                                 |
 | `[H`      | First hunk                                                                                 | `<Cmd>lua MiniDiff.goto_hunk('first')<CR>`                                           |
+| `[N`      | Select previous sibling node                                                               | `<Lua callback>`                                                                     |
 | `[h`      | Previous hunk                                                                              | `<Cmd>lua MiniDiff.goto_hunk('prev')<CR>`                                            |
 | `[i`      | Go to indent scope top                                                                     | `<Cmd>lua MiniIndentscope.operator('top')<CR>`                                       |
 | `[n`      | Select previous node                                                                       | `<Lua callback>`                                                                     |
 | `]%`      | Next unmatched group (matchit)                                                             | `<Plug>(MatchitVisualMultiForward)`                                                  |
 | `]H`      | Last hunk                                                                                  | `<Cmd>lua MiniDiff.goto_hunk('last')<CR>`                                            |
+| `]N`      | Select next sibling node                                                                   | `<Lua callback>`                                                                     |
 | `]h`      | Next hunk                                                                                  | `<Cmd>lua MiniDiff.goto_hunk('next')<CR>`                                            |
 | `]i`      | Go to indent scope bottom                                                                  | `<Cmd>lua MiniIndentscope.operator('bottom')<CR>`                                    |
 | `]n`      | Select next node                                                                           | `<Lua callback>`                                                                     |
@@ -225,7 +204,7 @@
 | `gX`      | Opens filepath or URI under cursor with the system handler (file explorer, web browser, …) | `<Lua callback>`                                                                     |
 | `g[`      | Move to left "around"                                                                      | `<Lua callback>`                                                                     |
 | `g]`      | Move to right "around"                                                                     | `<Lua callback>`                                                                     |
-| `gc`      | Toggle comment                                                                             | `<Lua callback>`                                                                     |
+| `gc`      | Comment selection                                                                          | `<Lua callback>`                                                                     |
 | `gh`      | Apply hunks                                                                                | `<Lua callback>`                                                                     |
 | `gm`      | Multiply selection                                                                         | `<Cmd>lua MiniOperators.multiply('visual')<CR>`                                      |
 | `gra`     | vim.lsp.buf.code_action()                                                                  | `<Lua callback>`                                                                     |
@@ -260,11 +239,13 @@
 | `Q`     | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                   |
 | `[%`    | Previous unmatched group (matchit)                                                         | `<Plug>(MatchitVisualMultiBackward)`                                                 |
 | `[H`    | First hunk                                                                                 | `<Cmd>lua MiniDiff.goto_hunk('first')<CR>`                                           |
+| `[N`    | Select previous sibling node                                                               | `<Lua callback>`                                                                     |
 | `[h`    | Previous hunk                                                                              | `<Cmd>lua MiniDiff.goto_hunk('prev')<CR>`                                            |
 | `[i`    | Go to indent scope top                                                                     | `<Cmd>lua MiniIndentscope.operator('top')<CR>`                                       |
 | `[n`    | Select previous node                                                                       | `<Lua callback>`                                                                     |
 | `]%`    | Next unmatched group (matchit)                                                             | `<Plug>(MatchitVisualMultiForward)`                                                  |
 | `]H`    | Last hunk                                                                                  | `<Cmd>lua MiniDiff.goto_hunk('last')<CR>`                                            |
+| `]N`    | Select next sibling node                                                                   | `<Lua callback>`                                                                     |
 | `]h`    | Next hunk                                                                                  | `<Cmd>lua MiniDiff.goto_hunk('next')<CR>`                                            |
 | `]i`    | Go to indent scope bottom                                                                  | `<Cmd>lua MiniIndentscope.operator('bottom')<CR>`                                    |
 | `]n`    | Select next node                                                                           | `<Lua callback>`                                                                     |
@@ -281,7 +262,7 @@
 | `gX`    | Opens filepath or URI under cursor with the system handler (file explorer, web browser, …) | `<Lua callback>`                                                                     |
 | `g[`    | Move to left "around"                                                                      | `<Lua callback>`                                                                     |
 | `g]`    | Move to right "around"                                                                     | `<Lua callback>`                                                                     |
-| `gc`    | Toggle comment                                                                             | `<Lua callback>`                                                                     |
+| `gc`    | Comment selection                                                                          | `<Lua callback>`                                                                     |
 | `gh`    | Apply hunks                                                                                | `<Lua callback>`                                                                     |
 | `gm`    | Multiply selection                                                                         | `<Cmd>lua MiniOperators.multiply('visual')<CR>`                                      |
 | `gra`   | vim.lsp.buf.code_action()                                                                  | `<Lua callback>`                                                                     |
@@ -332,7 +313,7 @@
 | `g%`  | Reverse matching bracket (matchit) | `<Plug>(MatchitOperationBackward)`                |
 | `g[`  | Move to left "around"              | `<Lua callback>`                                  |
 | `g]`  | Move to right "around"             | `<Lua callback>`                                  |
-| `gc`  | Comment textobject                 | `<Lua callback>`                                  |
+| `gc`  | Comment textobject                 | `<Cmd>lua MiniComment.textobject()<CR>`           |
 | `gh`  | Hunk range textobject              | `<Cmd>lua MiniDiff.textobject()<CR>`              |
 | `i`   | Inside textobject                  | `<Lua callback>`                                  |
 | `ii`  | Object scope                       | `<Cmd>lua MiniIndentscope.textobject(false)<CR>`  |
@@ -346,4 +327,4 @@
 | `sfl` | Find previous right surrounding    | `<Lua callback>`                                  |
 | `sfn` | Find next right surrounding        | `<Lua callback>`                                  |
 
-- Generated on 2026-06-11
+- Generated on 2026-06-26

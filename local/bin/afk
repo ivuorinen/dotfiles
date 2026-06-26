@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# @description Lock the screen (macOS or Linux)
+#USAGE about "Lock the screen (macOS or Linux)"
+
+set -euo pipefail
+
+case "$(uname -s)" in
+  Darwin)
+    osascript -e 'tell application "System Events" to keystroke "q" using {command down, control down}'
+    ;;
+  Linux)
+    if command -v loginctl > /dev/null 2>&1; then
+      loginctl lock-session
+    elif command -v xdg-screensaver > /dev/null 2>&1; then
+      xdg-screensaver lock
+    elif command -v swaylock > /dev/null 2>&1; then
+      swaylock
+    else
+      echo "afk: no supported screen locker found (loginctl/xdg-screensaver/swaylock)" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "afk: unsupported OS: $(uname -s)" >&2
+    exit 1
+    ;;
+esac

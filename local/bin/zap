@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# @description Delete junk files (.DS_Store, .pyc) recursively from the current tree
+#USAGE about "Delete junk files recursively from the current tree"
+#USAGE arg "<target>" help="What to delete: ds, pyc, or all"
+
+set -euo pipefail
+
+zap_ds()
+{
+  find . -name ".DS_Store" -print -delete
+}
+
+zap_pyc()
+{
+  find . -type f -name '*.pyc' -ls -delete
+}
+
+case "${1:-}" in
+  ds)
+    zap_ds
+    ;;
+  pyc)
+    zap_pyc
+    ;;
+  all)
+    zap_ds
+    zap_pyc
+    ;;
+  *)
+    echo "Usage: zap {ds|pyc|all}" >&2
+    exit 1
+    ;;
+esac

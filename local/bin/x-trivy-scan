@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# @description Run the Trivy container image scanner
+#USAGE about "Run the Trivy container image scanner"
+#USAGE arg "[args]" help="Arguments passed through to trivy" var=#true
+
+set -euo pipefail
+
+exec docker run \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$HOME/Library/Caches:/root/.cache/" \
+  aquasec/trivy "$@"

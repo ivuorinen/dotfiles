@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# @description Laravel artisan shortcut (project artisan or vendor/bin/artisan)
+#USAGE about "Laravel artisan shortcut (project artisan or vendor/bin/artisan)"
+#USAGE arg "[args]" help="Arguments passed through to artisan" var=#true
+
+set -euo pipefail
+
+if [ -f artisan ]; then
+  exec php artisan "$@"
+else
+  exec php vendor/bin/artisan "$@"
+fi

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# @description Laravel Sail shortcut (project sail or vendor/bin/sail)
+#USAGE about "Laravel Sail shortcut (project sail or vendor/bin/sail)"
+#USAGE arg "[args]" help="Arguments passed through to sail" var=#true
+
+set -euo pipefail
+
+if [ -f sail ]; then
+  exec bash sail "$@"
+else
+  exec bash vendor/bin/sail "$@"
+fi
