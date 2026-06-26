@@ -7,14 +7,21 @@ x-have eza && {
   alias ls="eza -h -s=type --git --icons --group-directories-first"
 }
 
-x-have bat && {
-  alias cat="bat"
-}
-
 # gopass password manager shortcut (resolves via PATH / mise shim)
 x-have gopass && {
   alias p="gopass"
 }
+
+# Git shortcuts (aligned with fish alias.fish; override the OMZ git plugin)
+alias gau='git add -u'
+alias gaa='git add -A'
+alias gcv='git commit -v'
+alias gst='git status'
+alias glg='git log'
+alias gwa='git worktree add'
+alias gwr='git worktree remove'
+alias gwl='git worktree list'
+alias gl='git log --pretty=format:"%C(yellow)%h%Creset %C(cyan)%an%Creset %Cgreen(%ad)%Creset %s" --date=short'
 
 # Easier navigation: .., ..., ....
 alias ..="cd .."
@@ -78,8 +85,18 @@ alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
 alias x-timestamp="date +'%s'"
 
 # nvim aliases
+alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
+
+# .NET shortcuts (aligned with fish alias.fish abbreviations)
+alias dt='dotnet test'
+alias dw='dotnet watch'
+
+# onefetch repo stats (aligned with fish alias.fish abbreviation)
+x-have onefetch && {
+  alias stats="onefetch --nerd-fonts --true-color never"
+}
 
 # xdg-ninja aliases for better experience
 alias xdg='xdg-ninja --skip-ok --skip-unsupported'
@@ -140,13 +157,18 @@ if [[ $(uname) == 'Darwin' ]]; then
   # x-set-php-aliases
 fi
 
-X_ALIAS_FILES=(
-  "$HOME/.config/alias-secret"
-  "$HOME/.config/alias-$(hostname)"
-  "$HOME/.config/alias-$(hostname)-secret"
-)
-for aliasFile in "${X_ALIAS_FILES[@]}"; do
-  # shellcheck source=$HOME/.config/alias-secret
-  [ -f "$aliasFile" ] && source "$aliasFile" && msgr ok "Sourced $aliasFile"
-done
-unset X_ALIAS_FILES
+# Guarded so re-sourcing this file (e.g. zshrc re-applies it after antidote so
+# our git aliases win over the OMZ git plugin) does not re-load secret files.
+if [ -z "${X_ALIAS_FILES_SOURCED:-}" ]; then
+  X_ALIAS_FILES=(
+    "$HOME/.config/alias-secret"
+    "$HOME/.config/alias-$(hostname)"
+    "$HOME/.config/alias-$(hostname)-secret"
+  )
+  for aliasFile in "${X_ALIAS_FILES[@]}"; do
+    # shellcheck source=$HOME/.config/alias-secret
+    [ -f "$aliasFile" ] && source "$aliasFile" && msgr ok "Sourced $aliasFile"
+  done
+  unset X_ALIAS_FILES
+  X_ALIAS_FILES_SOURCED=1
+fi

@@ -153,3 +153,121 @@ alias x-timestamp="date +'%s'"
 if type -q onefetch
     abbr --add stats onefetch --nerd-fonts --true-color never
 end
+
+# ── Ported from config/alias (bash/zsh parity) ──────────────────────
+# `.` (cd $HOME) is intentionally not ported: fish reserves `.` for `source`.
+
+# Prevent common typos
+abbr --add cd.. 'cd ..'
+alias sl='ls'
+
+# IP addresses
+alias x-ip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias localip='ipconfig getifaddr en1'
+function ips --description 'list IPv4/IPv6 addresses'
+    ifconfig -a |
+        grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' |
+        sed -e 's/inet6* //' |
+        sort
+end
+
+# Show/hide hidden files in Finder
+alias show='defaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder'
+alias hide='defaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder'
+
+# Pipe public key to clipboard
+function pubkey --description 'copy SSH public key to clipboard'
+    more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'
+end
+
+# Flush Directory Service cache
+alias flush='dscacheutil -flushcache'
+
+# Update locatedb
+alias updatedb='sudo /usr/libexec/locate.updatedb'
+
+# xdg-ninja for a better experience
+alias xdg='xdg-ninja --skip-ok --skip-unsupported'
+
+# watch with: differences, precise, beep and color
+alias watchx='watch -dpbc'
+
+# delete .DS_Store files
+alias zapds='find . -name ".DS_Store" -print -delete'
+# Recursively delete .pyc files
+alias zappyc="find . -type f -name '*.pyc' -ls -delete"
+# Run all zaps
+alias zapall='zapds && zappyc'
+
+# directory usage, total only
+alias dn='du -chd1'
+
+# Mirror site with wget
+alias mirror_site='wget -m -k -K -E -e robots=off'
+
+# Mirror stdout to stderr (see data going through a pipe)
+function peek --description 'tee to stderr'
+    tee /dev/stderr $argv
+end
+
+# Open dotfiles with $EDITOR
+alias zedit='$EDITOR ~/.dotfiles'
+
+# XDG-aware overrides (use `command` to avoid recursing into the function)
+function wget --description 'wget with XDG hsts file'
+    command wget --hsts-file=$XDG_DATA_HOME/wget-hsts $argv
+end
+function svn --description 'svn with XDG config dir'
+    command svn --config-dir $XDG_CONFIG_HOME/subversion $argv
+end
+function irssi --description 'irssi with XDG config/home'
+    command irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi $argv
+end
+
+# GitLab code quality scanner
+function code_scanner --description 'GitLab code quality scanner'
+    set -q CODEQUALITY_VERSION; or set -l CODEQUALITY_VERSION latest
+    docker run \
+        --env SOURCE_CODE=$PWD \
+        --volume $PWD:/code \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        registry.gitlab.com/gitlab-org/ci-cd/codequality:$CODEQUALITY_VERSION \
+        /code $argv
+end
+
+# Trivy container image scanner
+function trivy_scan --description 'Trivy image scanner'
+    docker run -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy $argv
+end
+
+# Laravel artisan shortcut
+function art --description 'Laravel artisan'
+    if test -f artisan
+        php artisan $argv
+    else
+        php vendor/bin/artisan $argv
+    end
+end
+
+# Laravel Sail shortcut
+function sail --description 'Laravel Sail'
+    if test -f sail
+        bash sail $argv
+    else
+        bash vendor/bin/sail $argv
+    end
+end
+
+# macOS-only helpers
+if test (uname) = Darwin
+    alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+    function afk --description 'lock the screen'
+        osascript -e 'tell application "System Events" to keystroke "q" using {command down,control down}'
+    end
+    function emptytrash --description 'empty trash on all volumes'
+        sudo rm -rfv /Volumes/*/.Trashes
+        sudo rm -rfv ~/.Trash
+        sudo rm -rfv /private/var/log/asl/*.asl
+    end
+end

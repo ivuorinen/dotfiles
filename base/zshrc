@@ -17,6 +17,11 @@ ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
 source "$DOTFILES/config/zsh/antidote.zsh"
 
+# config/alias is sourced via shared.sh (above) before antidote, so the OMZ
+# git plugin's aliases would otherwise shadow ours. Re-apply the alias file so
+# config/alias stays authoritative (the secret-file loop is guarded to run once).
+source "$DOTFILES/config/alias"
+
 # Function to source FZF configuration
 source_fzf_config()
 {
