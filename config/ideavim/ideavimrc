@@ -45,6 +45,10 @@ set notimeout
 " Map esc to :noh
 map <esc> :noh<cr>
 
+" Neovim parity: keep selection when indenting (config/nvim/lua/keymaps.lua)
+xnoremap < <gv
+xnoremap > >gv
+
 nmap <leader>j :tabnext<CR>
 nmap <leader>k :tabprevious<CR>
 

@@ -279,10 +279,12 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 50
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*node_modules/,*vendor/
 nnoremap <silent> <F2> :NERDTreeFind<CR>
-nnoremap <silent> <leader>t :NERDTreeToggle<CR>
+" <leader>te = file explorer (nvim parity; frees <leader>t as Toggle group)
+nnoremap <silent> <leader>te :NERDTreeToggle<CR>
 
 " grep.vim configuration
-nnoremap <silent> <leader>f :Rgrep<CR>
+" <leader>sg = live grep (nvim parity: Search Grep)
+nnoremap <silent> <leader>sg :Rgrep<CR>
 let Grep_Default_Options = '-IR'
 let Grep_Skip_Files = '*.log *.db .DS_Store'
 let Grep_Skip_Dirs = '.git node_modules vendor plugged'
@@ -303,7 +305,8 @@ function! s:auto_format()
         call CocActionAsync('format')
     endif
 endfunction
-noremap <silent> <leader>f :call <SID>auto_format()<cr>
+" <leader>cf = format (nvim parity: Code Format)
+noremap <silent> <leader>cf :call <SID>auto_format()<cr>
 " jump to diagnostics or the documentation
 nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
 nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
@@ -349,8 +352,9 @@ inoremap <silent><expr> <Tab>
       \ exists('b:_copilot.suggestions') ? copilot#Accept("\<CR>") : ""
 " automatically fix diagnostics and/or refactor
 noremap <silent> <leader>d :CocList diagnostics<cr>
-nmap <leader>c <Plug>(coc-codeaction)
-xmap <leader>c <Plug>(coc-codeaction-selected)
+" <leader>ca = code action (nvim parity: Code group, frees <leader>c)
+nmap <leader>ca <Plug>(coc-codeaction)
+xmap <leader>ca <Plug>(coc-codeaction-selected)
 
 let g:wordy#ring = [
     \ 'weak',
@@ -365,6 +369,60 @@ let g:wordy#ring = [
     \ 'adjectives',
     \ 'adverbs',
     \ ]
+
+"*****************************************************************************
+"" Neovim parity (config/nvim/lua/keymaps.lua is the source of truth)
+"*****************************************************************************
+" Plugin-bound nvim maps (snacks picker, mini, trouble, LSP) have no plain-vim
+" equivalent and are already covered above by coc/fzf/NERDTree. This block is
+" guarded to vim only — IdeaVim keeps its own IDE-action scheme (set notimeout
+" plus <leader> prefixes for bookmarks/debug/refactor would clash otherwise).
+if !has('ideavim')
+  " Find files (nvim <leader>f) — fzf
+  nnoremap <silent> <leader>f :Files<CR>
+
+  " Save / clear search highlight
+  nnoremap <silent> <C-s> :w!<CR>
+  nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
+
+  " Keep selection when indenting
+  xnoremap < <gv
+  xnoremap > >gv
+
+  " Wrap-aware vertical motion
+  nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+  nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+
+  " Window resize
+  nnoremap <silent> <C-w>, :vertical resize -10<CR>
+  nnoremap <silent> <C-w>. :vertical resize +10<CR>
+  nnoremap <silent> <C-w>- :resize -10<CR>
+  nnoremap <silent> <C-w>+ :resize +10<CR>
+
+  " Buffers (<leader>b…)
+  nnoremap <silent> <leader>bh :bprevious<CR>
+  nnoremap <silent> <leader>bl :bnext<CR>
+  nnoremap <silent> <leader>bj :bfirst<CR>
+  nnoremap <silent> <leader>bk :blast<CR>
+  nnoremap <silent> <leader>bn :enew<CR>
+  nnoremap <silent> <leader>bd :bdelete<CR>
+
+  " Quit (<leader>q…)
+  nnoremap <silent> <leader>qf :q<CR>
+  nnoremap <silent> <leader>qw :wq<CR>
+  nnoremap <silent> <leader>qq :wq!<CR>
+  nnoremap <silent> <leader>qQ :confirm q<CR>
+
+  " Toggle options (<leader>tm…)
+  nnoremap <silent> <leader>tmc :set cursorline!<CR>
+  nnoremap <silent> <leader>tmC :set cursorcolumn!<CR>
+  nnoremap <silent> <leader>tmh :set hlsearch!<CR>
+  nnoremap <silent> <leader>tml :set list!<CR>
+  nnoremap <silent> <leader>tmn :set number!<CR>
+  nnoremap <silent> <leader>tmr :set relativenumber!<CR>
+  nnoremap <silent> <leader>tms :set spell!<CR>
+  nnoremap <silent> <leader>tmw :set wrap!<CR>
+endif
 
 "*****************************************************************************
 "" Commands
