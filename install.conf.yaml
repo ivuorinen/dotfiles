@@ -51,7 +51,6 @@
         - config/bat
         - config/cosmic-desktop
         - config/gh-dash
-        - config/lazygit
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
