@@ -19,7 +19,7 @@
 
 # Editor settings
 [ -z "${EDITOR:-}" ] && export EDITOR="nvim"
-[ -z "${VISUAL:-}" ] && export VISUAL="code"
+[ -z "${VISUAL:-}" ] && export VISUAL="nvim"
 
 # Bootstrap: ensure local/bin is on PATH so x-path is available
 PATH="$DOTFILES/local/bin:$PATH"
@@ -337,26 +337,6 @@ export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
 x-dc "$ANSIBLE_HOME"
 x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
-# aws
-# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
-# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
-# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
-msg "Setting up AWS configuration"
-export AWS_CONFIG_FILE="${XDG_STATE_HOME}/aws/config"
-export AWS_SHARED_CREDENTIALS_FILE="${XDG_STATE_HOME}/aws/credentials"
-export AWS_DATA_PATH="${XDG_DATA_HOME}/aws"
-export AWS_DEFAULT_OUTPUT="table"
-export AWS_CONFIGURE_KEYS=true
-export AWS_CONFIGURE_REGION=true
-export AWS_CONFIGURE_OUTPUT=true
-export AWS_CONFIGURE_PROFILE=true
-export AWS_CONFIGURE_PROMPT=true
-export AWS_CONFIGURE_PROMPT_DEFAULT="default"
-export AWS_SESSION_TOKEN_FILE="${XDG_STATE_HOME}/aws/session_token"
-export AWS_CONFIGURE_SESSION=true
-export AWS_CONFIGURE_SESSION_DURATION=7200
-export AWS_CONFIGURE_SESSION_MFA=true
-
 # Mason (nvim package manager)
 msg "Setting up Mason configuration"
 export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
@@ -536,14 +516,6 @@ export POETRY_HOME="$XDG_DATA_HOME/poetry"
 msg "Setting up Sonarlint configuration"
 export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
 
-# terraform
-# https://www.terraform.io/docs/cli/config/config-file.html
-# https://www.terraform.io/docs/cli/config/environment-variables.html
-msg "Setting up Terraform configuration"
-export TF_DATA_DIR="$XDG_STATE_HOME/terraform"
-export TF_CLI_CONFIG_FILE="$XDG_CONFIG_HOME/terraform/terraformrc"
-export TF_PLUGIN_CACHE_DIR="$XDG_CACHE_HOME/terraform/plugin-cache"
-
 # tmux
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
@@ -567,10 +539,6 @@ msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
 
-# LM Studio CLI
-msg "Setting up LM Studio configuration"
-export PATH="$PATH:$HOME/.lmstudio/bin"
-
 # Screen
 msg "Setting up screen configuration"
 export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
@@ -592,7 +560,6 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 [ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
 [ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
-[ -d "$HOME/.opencode/bin" ] && export PATH="$PATH:$HOME/.opencode/bin"
 
 # sonarqube-cli
 [ -d "$HOME/.local/share/sonarqube-cli/bin" ] && export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
