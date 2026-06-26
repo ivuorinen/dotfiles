@@ -1,16 +1,30 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-06-24
-Last pass: 38 (2026-06-24)
+Last validated: 2026-06-26
+Last pass: 39 (2026-06-26)
 
 ## Summary
 
-- Total: 184 | Open: 0 | Fixed: 175 | Invalid: 9
+- Total: 187 | Open: 0 | Fixed: 178 | Invalid: 9
 
 ## Open Findings
 
 ## Fixed
+
+### Pass 39 — 2026-06-26
+
+#### [N-193] Tool-removal cleanup applied to fish chain only; bash/zsh exports still define the same entries
+Fixed: 2026-06-26
+Notes: Mirrored the fish removals into `config/exports` — deleted the AWS block (former 345-358), the Terraform block (former 543-545), the LM Studio block (former 570-572), and the opencode PATH entry (former 595). `shellcheck -x config/exports` and `shfmt --diff config/exports` both clean; grep confirms no AWS_/TF_/lmstudio/opencode references remain.
+
+#### [N-194] VISUAL editor diverges between shells after the fish change
+Fixed: 2026-06-26
+Notes: `config/exports:22` default changed from `code` to `nvim`, matching `config/fish/exports.fish`.
+
+#### [N-195] LM Studio PATH entry is unguarded and prints startup noise
+Fixed: 2026-06-26
+Notes: Resolved by removing the LM Studio block entirely as part of N-193; the unguarded PATH append and the startup `msg` line are both gone.
 
 ### Pass 38 — 2026-06-24
 
