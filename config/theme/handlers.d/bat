@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
-# handlers.d/bat — symlink ~/.config/bat/config to the matching palette
-# and ensure the custom themes are registered with `bat cache --build`.
-# Refuses to clobber a regular file at the destination (N-021 guard).
+# handlers.d/bat — publish the active Catppuccin theme NAME to the theme
+# state dir; shells export it as BAT_THEME (config/exports and
+# config/fish/exports.fish). bat reads BAT_THEME at exec time, so theming
+# never writes into ~/.config/bat — config/bat is a plain dotbot symlink
+# with no install.conf exclude. Also (re)builds the syntect cache once so
+# the vendored Catppuccin *.tmTheme files under ~/.config/bat/themes/
+# resolve by name.
 set -uo pipefail
 
 # shellcheck disable=SC1091
 source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
-[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+case "$mode" in
+  dark) theme="Catppuccin Mocha" ;;
+  light) theme="Catppuccin Latte" ;;
+  *) exit 2 ;;
+esac
 
-src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/bat.${mode}.config"
-dst="$HOME/.config/bat/config"
-[[ -r "$src" ]] || {
-  echo "bat handler: missing palette $src" >&2
-  exit 1
-}
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+_atomic_write "$state_dir/bat-theme" "$theme"
 
-mkdir -p -- "$(dirname -- "$dst")"
-_idempotent_ln_sf "$src" "$dst"
-
-# Custom themes (Catppuccin *.tmTheme) live under ~/.config/bat/themes/
-# and are only picked up after `bat cache --build`. Run lazily when the
-# cache is missing so we don't re-syntect on every flip. A bat-less host
-# (or a transient build error) must not poison the orchestrator's
+# Custom themes are only picked up after `bat cache --build`. Build lazily
+# when the cache is missing so we don't re-syntect on every flip. A bat-less
+# host (or a transient build error) must not poison the orchestrator's
 # parallel-handler aggregation, so failures are silenced.
 if command -v bat > /dev/null 2>&1; then
   cache_dir="$(bat --cache-dir 2> /dev/null || true)"

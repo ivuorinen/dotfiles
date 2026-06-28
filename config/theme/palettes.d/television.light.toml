@@ -1,0 +1,4 @@
+# television light palette — Catppuccin Latte (mauve accent), the Latte
+# counterpart to television.dark.toml. Appended to base.toml by the handler.
+[ui]
+theme = "catppuccin-latte-mauve.toml"

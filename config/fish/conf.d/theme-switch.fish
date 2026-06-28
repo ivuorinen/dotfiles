@@ -22,6 +22,12 @@ if test -r $ls_cache
     test -n "$ls_value"; and set -gx LS_COLORS $ls_value
 end
 
+# bat — export the active Catppuccin theme name published by the bat
+# handler so bat (and bat-driven previews) honour the current mode. The
+# state file holds the bare theme name, so a plain `cat` is enough.
+set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
+test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
+
 # Seed the mtime tracker so the first prompt is a no-op (otherwise
 # `__theme_switch_last_mtime` is unset and the first fish_prompt
 # event always trips the "mtime changed" branch and re-saves the theme).
@@ -52,5 +58,7 @@ function __theme_switch_check --on-event fish_prompt
             set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
             test -n "$ls_value"; and set -gx LS_COLORS $ls_value
         end
+        set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
+        test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
     end
 end

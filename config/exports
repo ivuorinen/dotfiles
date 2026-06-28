@@ -439,6 +439,8 @@ theme-reapply()
     # shellcheck source=/dev/null
     . "$cache"
   fi
+  local bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"
+  [ -r "$bat_theme_file" ] && BAT_THEME="$(cat "$bat_theme_file")" && export BAT_THEME
   echo "theme-reapply: applied $mode"
   return $rc
 }
@@ -472,6 +474,20 @@ unset _theme_interactive
 ls_cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
 [ -r "$ls_cache" ] && eval "$(cat "$ls_cache")"
 unset ls_cache
+
+# bat — export the active Catppuccin theme published by the bat theme
+# handler so bat (and bat-driven previews) honour the current mode without
+# any file under ~/.config/bat. Mirrors the LS_COLORS cache above.
+bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"
+[ -r "$bat_theme_file" ] && BAT_THEME="$(cat "$bat_theme_file")" && export BAT_THEME
+unset bat_theme_file
+
+# gh-dash and television read their theme-composed config from the theme
+# state dir, so config/gh-dash and config/television stay plain dotbot
+# symlinks with no install.conf exclude. The paths are stable; the theme
+# handlers rewrite the files they point at on every flip.
+export GH_DASH_CONFIG="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/gh-dash-config.yml"
+export TELEVISION_CONFIG="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/television"
 
 # op (1Password cli) is present
 msg "Setting up 1Password CLI configuration"

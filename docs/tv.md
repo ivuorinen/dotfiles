@@ -1,8 +1,11 @@
 # Television (tv)
 
 Rust-based TUI fuzzy finder — channel-driven, shell-integrated.
-Config: `config/television/config.toml` → `~/.config/television/config.toml`
-Cables: `config/television/cable/` → `~/.config/television/cable/`
+Config: `config/television/base.toml` + the active Catppuccin palette are
+composed by the theme handler into
+`$XDG_STATE_HOME/dotfiles-theme/television/config.toml`; shells point tv there
+via `TELEVISION_CONFIG`, so `config/television` itself is a plain symlink.
+Cables: `config/television/cable/` (symlinked into the same config dir).
 
 ## Config
 

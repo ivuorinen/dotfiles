@@ -43,14 +43,14 @@
       glob: true
       relink: true
       path: config/*
-      # Excluded paths are managed by the theme orchestrator (handlers
-      # write merged or flip-able files into ~/.config/<app>/), or are
-      # 1Password's split sub-paths below.
+      # Themed apps are NOT excluded: every theme handler writes into
+      # $XDG_STATE_HOME/dotfiles-theme/ and the app is pointed there via an
+      # env var (BAT_THEME, GH_DASH_CONFIG, TELEVISION_CONFIG, …), so their
+      # config dirs are plain symlinks. The remaining excludes are 1Password's
+      # split sub-paths (below) and cosmic-desktop's runtime-written state.
       exclude:
         - config/op
-        - config/bat
         - config/cosmic-desktop
-        - config/gh-dash
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
@@ -58,12 +58,6 @@
     ~/.config/op/plugins:
       relink: true
       path: config/op/plugins
-    # bat: only the themes directory is repo-managed; the theme handler
-    # writes ~/.config/bat/config as a flip-able symlink alongside it.
-    ~/.config/bat/themes:
-      create: true
-      relink: true
-      path: config/bat/themes
     # Scripts
     ~/.local/bin:
       glob: true

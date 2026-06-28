@@ -108,3 +108,11 @@ local/man/man1/*.1
 # subsystem conventions and should ship with the code they describe.
 !CLAUDE.md
 !**/CLAUDE.md
+
+# The theme handler composes television's config.toml into the theme state
+# dir ($XDG_STATE_HOME/dotfiles-theme/television/) and shells point tv there
+# via TELEVISION_CONFIG. base.toml is the tracked source. But ~/.config/
+# television is a plain symlink into this repo, so a `tv` launched without
+# TELEVISION_CONFIG set (a non-dotfiles shell) would dump its default
+# config.toml here — never track it.
+config/television/config.toml

@@ -1,0 +1,6 @@
+# television dark palette — Catppuccin Mocha (mauve accent). The theme
+# file is vendored under config/television/themes/ and linked into
+# ~/.config/television/themes/; television resolves `[ui] theme` by
+# filename from that directory. Appended to base.toml by the handler.
+[ui]
+theme = "catppuccin-mocha-mauve.toml"

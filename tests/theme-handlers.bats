@@ -91,3 +91,60 @@ teardown()
   run "$HD/fish" purple
   [ "$status" -eq 2 ]
 }
+
+@test "bat handler: publishes theme name to the state dir, not ~/.config" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config"
+  run "$HD/bat" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Catppuccin Mocha" ]
+  run "$HD/bat" light
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Catppuccin Latte" ]
+  # The reorg invariant: nothing is written under ~/.config.
+  [ ! -e "$HOME/.config/bat/config" ]
+  [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
+}
+
+@test "bat handler: rejects invalid mode" {
+  run "$HD/bat" purple
+  [ "$status" -eq 2 ]
+}
+
+@test "gh-dash handler: composes config into the state dir, not ~/.config" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config"
+  run "$HD/gh-dash" dark
+  [ "$status" -eq 0 ]
+  [ -f "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml" ]
+  # base.yml content + the theme palette are both present.
+  grep -q "prSections" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  grep -q "theme" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  [ ! -e "$HOME/.config/gh-dash/config.yml" ]
+  [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
+}
+
+@test "gh-dash handler: rejects invalid mode" {
+  run "$HD/gh-dash" purple
+  [ "$status" -eq 2 ]
+}
+
+@test "television handler: composes config dir in the state dir, not ~/.config" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config"
+  run "$HD/television" light
+  [ "$status" -eq 0 ]
+  [ -f "$TMPDIR_TEST/dotfiles-theme/television/config.toml" ]
+  grep -q "catppuccin-latte-mauve" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
+  [ -L "$TMPDIR_TEST/dotfiles-theme/television/cable" ]
+  [ -L "$TMPDIR_TEST/dotfiles-theme/television/themes" ]
+  [ ! -e "$HOME/.config/television/config.toml" ]
+  [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
+}
+
+@test "television handler: rejects invalid mode" {
+  run "$HD/television" purple
+  [ "$status" -eq 2 ]
+}

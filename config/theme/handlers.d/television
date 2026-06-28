@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# handlers.d/television — television reads a single config.toml that mixes
+# user settings (keybindings, panels, shell integration) with the `[ui]
+# theme` key, so we can't symlink-swap. Compose base.toml + the chosen
+# Catppuccin palette into a television config DIR inside the theme state
+# dir, alongside symlinks to the repo's cable/ and themes/. Shells point
+# television at it via TELEVISION_CONFIG (config/exports,
+# config/fish/exports.fish), which television honours as its config
+# directory. Writing outside ~/.config keeps config/television a plain
+# dotbot symlink with no install.conf exclude.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+base="$dotfiles/config/television/base.toml"
+theme="$dotfiles/config/theme/palettes.d/television.${mode}.toml"
+tvdir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/television"
+
+for f in "$base" "$theme"; do
+  [[ -r "$f" ]] || {
+    echo "television handler: missing $f" >&2
+    exit 1
+  }
+done
+
+content="$(
+  cat -- "$base"
+  printf '\n'
+  cat -- "$theme"
+)"
+_atomic_write "$tvdir/config.toml" "$content"
+
+# television resolves cable channels and user themes relative to its config
+# dir; point both at the repo's single source of truth.
+_idempotent_ln_sf "$dotfiles/config/television/cable" "$tvdir/cable"
+_idempotent_ln_sf "$dotfiles/config/television/themes" "$tvdir/themes"

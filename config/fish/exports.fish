@@ -82,6 +82,14 @@ set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
 set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
     '--height 40% --tmux bottom,40% --layout reverse --border top'
 
+# gh-dash / television — read their theme-composed config from the theme
+# state dir so config/gh-dash and config/television stay plain symlinks with
+# no install.conf exclude. Paths are stable; the theme handlers rewrite the
+# files behind them on every flip. (BAT_THEME is mode-driven and lives in
+# conf.d/theme-switch.fish alongside LS_COLORS.)
+set -gx GH_DASH_CONFIG "$XDG_STATE_HOME/dotfiles-theme/gh-dash-config.yml"
+set -gx TELEVISION_CONFIG "$XDG_STATE_HOME/dotfiles-theme/television"
+
 # GnuPG configuration
 set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 

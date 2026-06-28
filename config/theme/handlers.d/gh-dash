@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# handlers.d/gh-dash — gh-dash reads a single config.yml, with the
-# `theme:` block inline. We can't symlink-swap because the file mixes
-# user sections (PR/issue queries) with the theme. Solution: cat a
-# stable base.yml + the chosen theme palette into a real
-# ~/.config/gh-dash/config.yml using _atomic_write so a partial flip
-# never leaves the file truncated.
+# handlers.d/gh-dash — gh-dash reads a single config.yml that mixes user
+# sections (PR/issue queries) with the inline `theme:` block, so we can't
+# symlink-swap. Concat base.yml + the chosen theme palette into the theme
+# state dir and let shells point gh-dash at it via GH_DASH_CONFIG
+# (config/exports, config/fish/exports.fish). Writing outside ~/.config
+# keeps config/gh-dash a plain dotbot symlink with no install.conf exclude.
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -16,7 +16,7 @@ mode="${1:-}"
 dotfiles="${DOTFILES:-$HOME/.dotfiles}"
 base="$dotfiles/config/gh-dash/base.yml"
 theme="$dotfiles/config/theme/palettes.d/gh-dash.${mode}.theme.yml"
-dst="$HOME/.config/gh-dash/config.yml"
+dst="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/gh-dash-config.yml"
 
 for f in "$base" "$theme"; do
   [[ -r "$f" ]] || {
@@ -25,16 +25,6 @@ for f in "$base" "$theme"; do
   }
 done
 
-# Older deployments had `config/gh-dash` in the dotbot glob, which
-# left ~/.config/gh-dash as a directory-symlink into the repo. Drop
-# both the legacy parent symlink and any inner config.yml symlink so
-# _atomic_write's rename doesn't silently overwrite a repo file.
-_drop_legacy_repo_symlink "$(dirname -- "$dst")"
-if [[ -L "$dst" ]]; then
-  rm -f -- "$dst"
-fi
-
-mkdir -p -- "$(dirname -- "$dst")"
 content="$(
   cat -- "$base"
   printf '\n'

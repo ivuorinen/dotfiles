@@ -32,6 +32,9 @@ function theme-reapply --description 'Re-fire theme handlers for the current mod
         set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
         test -n "$ls_value"; and set -gx LS_COLORS $ls_value
     end
+    # Refresh BAT_THEME from the name the bat handler just wrote.
+    set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
+    test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
 
     if test $rc -eq 0
         echo "theme-reapply: applied $mode"

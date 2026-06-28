@@ -96,25 +96,6 @@ _log()
   return 0
 }
 
-# Drop a legacy `~/.config/<app>` directory-symlink that older dotbot
-# runs created when the app was still in the global glob. After
-# excluding the path from install.conf.yaml, dotbot's clean phase
-# leaves the (still-alive) symlink behind, so the orchestrator's
-# write into the dir would silently land in the repo. Only removes
-# when the symlink target is inside the dotfiles repo — never touches
-# user-created symlinks pointing elsewhere.
-_drop_legacy_repo_symlink()
-{
-  local path=$1 repo=${DOTFILES:-$HOME/.dotfiles}
-  [[ -L "$path" ]] || return 0
-  local target
-  target=$(readlink -- "$path" 2> /dev/null || true)
-  case "$target" in
-    "$repo"/*) rm -f -- "$path" ;;
-    *) ;;
-  esac
-}
-
 # Resolve a timeout(1) binary. Macs without coreutils have neither
 # `timeout` nor `gtimeout`; Homebrew's `coreutils` ships only `gtimeout`.
 # Prints the binary name on success, returns 1 when neither is present.
