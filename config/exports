@@ -390,7 +390,10 @@ export GOBIN="$XDG_BIN_HOME"
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 
 # theme_mode — shared bash/zsh read API (uses `local`, not strict POSIX).
-# Behaviour matches local/bin/theme-mode but without forking.
+# The cheap path: reads the state file only and defaults to dark. Unlike
+# local/bin/theme-mode it does NOT run the OSC 11 probe, so it is safe on
+# hot paths (prompts, theme-reapply) with no per-call tty I/O. Detection
+# (the probe) lives in the shell bootstrap below and local/bin/theme-mode.
 theme_mode()
 {
   local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
@@ -447,8 +450,10 @@ theme-reapply()
 
 # Theme orchestrator: bootstrap state + spawn watcher.
 # Skip the watcher fork in SSH sessions — the remote OS is the wrong
-# oracle; per-session OSC 11 via `apply $(theme-mode)` is the right
-# fallback. Skip in non-interactive shells too: `bash -c '...'` and
+# oracle, and a cached mode goes stale with no watcher to refresh it.
+# There we probe the viewing terminal via OSC 11 each session instead
+# of reading the (unmaintained) state file, falling back to dark.
+# Skip in non-interactive shells too: `bash -c '...'` and
 # `bash -ic '...'` subshells don't need to fork a daemon and pay the
 # bootstrap cost on every invocation.
 case $- in
@@ -457,16 +462,24 @@ case $- in
 esac
 if [ "$_theme_interactive" = 1 ] \
   && [ -x "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" ]; then
+  _dotfiles="${DOTFILES:-$HOME/.dotfiles}"
   if [ -z "${SSH_TTY:-}${SSH_CONNECTION:-}" ]; then
-    watcher="${DOTFILES:-$HOME/.dotfiles}/config/theme/watcher"
+    # Local machine: the OS watcher keeps the state file authoritative.
+    watcher="$_dotfiles/config/theme/watcher"
     if [ -x "$watcher" ]; then
       "$watcher" > /dev/null 2>&1 &
       disown 2> /dev/null || true
     fi
+    m="$("$_dotfiles/local/bin/theme-mode")"
+  else
+    # SSH/headless: no watcher maintains the state file, so a cached mode
+    # goes stale. Probe the viewing terminal via OSC 11 each session and
+    # fall back to the dark default when it does not answer.
+    m="$("$_dotfiles/config/theme/probe-osc11" 2> /dev/null)"
+    [ "$m" = dark ] || [ "$m" = light ] || m="dark"
   fi
-  m="$("${DOTFILES:-$HOME/.dotfiles}/local/bin/theme-mode")"
-  "${DOTFILES:-$HOME/.dotfiles}/config/theme/apply" "$m" > /dev/null 2>&1 || true
-  unset m watcher
+  "$_dotfiles/config/theme/apply" "$m" > /dev/null 2>&1 || true
+  unset m watcher _dotfiles
 fi
 unset _theme_interactive
 
