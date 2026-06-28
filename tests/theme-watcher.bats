@@ -201,6 +201,30 @@ run_watcher_linux()
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/mode")" = "light" ]
 }
 
+@test "watcher linux: gsettings 'default' (no preference) seeds dark" {
+  [ -n "$TIMEOUT_BIN" ] || skip "no timeout(1) on PATH"
+  fake_gsettings "'default'"
+
+  run run_watcher_linux GNOME
+  [ "$status" -eq 0 ]
+
+  grep -q '^gsettings ' "$BIN/calls"
+  [ "$(cat "$TMPDIR_TEST/recorded")" = "dark" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/mode")" = "dark" ]
+}
+
+@test "watcher linux: busctl no-preference (data:0) seeds dark" {
+  [ -n "$TIMEOUT_BIN" ] || skip "no timeout(1) on PATH"
+  fake_busctl 0 # data:0 = no preference -> dark
+
+  run run_watcher_linux COSMIC
+  [ "$status" -eq 0 ]
+
+  grep -q '^busctl --user --json=short call ' "$BIN/calls"
+  [ "$(cat "$TMPDIR_TEST/recorded")" = "dark" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/mode")" = "dark" ]
+}
+
 @test "watcher linux: neither gsettings nor busctl -> exit 0 with WARN" {
   [ -n "$TIMEOUT_BIN" ] || skip "no timeout(1) on PATH"
 

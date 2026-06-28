@@ -74,8 +74,11 @@ apply_mode()
 apply_gsettings_scheme()
 {
   case "$1" in
-    "'prefer-dark'") apply_mode dark ;;
-    "'default'" | "'prefer-light'") apply_mode light ;;
+    # `default` is GNOME's "no explicit preference"; we treat that as
+    # dark (the orchestrator's default mode). Only an explicit
+    # prefer-light selects light.
+    "'prefer-dark'" | "'default'") apply_mode dark ;;
+    "'prefer-light'") apply_mode light ;;
   esac
 }
 
@@ -102,10 +105,11 @@ seed_initial_state()
       # busctl --json=short types the integer as `"u"`, so the pattern
       # `"u","data":N` is anchored on the type tag and won't false-match
       # any other integer that happens to appear in the payload. data:0
-      # ("no preference") is intentionally ignored.
+      # ("no preference") defaults to dark, matching the GNOME path.
       case "$initial" in
         *'"u","data":1'*) apply_mode dark ;;
         *'"u","data":2'*) apply_mode light ;;
+        *'"u","data":0'*) apply_mode dark ;;
       esac
       ;;
   esac
@@ -182,12 +186,14 @@ case "$SOURCE" in
         busctl --user --json=short monitor org.freedesktop.portal.Desktop 2> /dev/null \
           | while IFS= read -r line; do
             # Anchor on the JSON variant token so we don't false-match
-            # timestamps or sequence numbers that happen to contain 1/2.
-            # busctl --json=short emits `"v":1` (dark) / `"v":2` (light)
-            # for the org.freedesktop.appearance color-scheme settings.
+            # timestamps or sequence numbers that happen to contain 0/1/2.
+            # busctl --json=short emits `"v":1` (dark) / `"v":2` (light) /
+            # `"v":0` (no preference → dark) for the
+            # org.freedesktop.appearance color-scheme settings.
             case "$line" in
               *'"color-scheme"'*'"v":1'*) apply_mode dark ;;
               *'"color-scheme"'*'"v":2'*) apply_mode light ;;
+              *'"color-scheme"'*'"v":0'*) apply_mode dark ;;
             esac
           done
         ;;
