@@ -36,6 +36,14 @@ content="$(
 _atomic_write "$tvdir/config.toml" "$content"
 
 # television resolves cable channels and user themes relative to its config
-# dir; point both at the repo's single source of truth.
+# dir; point both at the repo's single source of truth. $tvdir is state we
+# fully own, so reclaim a stale real cable/ or themes/ dir (e.g. left behind
+# by a manual `tv update-channels`, which shadows the repo's channels and is
+# what makes `tv <channel>` report "Channel not found") before relinking —
+# _idempotent_ln_sf deliberately skips a non-symlink dst, which would never
+# heal it here.
+for link in cable themes; do
+  [[ -e "$tvdir/$link" && ! -L "$tvdir/$link" ]] && rm -rf -- "${tvdir:?}/$link"
+done
 _idempotent_ln_sf "$dotfiles/config/television/cable" "$tvdir/cable"
 _idempotent_ln_sf "$dotfiles/config/television/themes" "$tvdir/themes"
