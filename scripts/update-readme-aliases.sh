@@ -1,87 +1,143 @@
 #!/usr/bin/env bash
 # update-readme-aliases.sh
-# @description Update alias documentation in $DOTFILES/docs/alias.md
-#USAGE about "Update alias documentation in docs/alias.md"
+# @description Generate grouped alias documentation in docs/aliases.md
+#USAGE about "Generate grouped alias documentation in docs/aliases.md"
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2025
 # License: MIT
+#
+# Collects aliases from config/alias (bash & zsh) and config/fish/alias.fish
+# (fish), then writes docs/aliases.md: shared aliases first, then the aliases
+# unique to a shell group under their own heading. Invoked via
+# `dfm helpers docs-aliases`.
 
 set -euo pipefail
 
-# Paths
-ALIAS_FILE="$DOTFILES/config/alias"
-OUTPUT_FILE="$DOTFILES/docs/alias.md"
+BASHZSH_FILE="$DOTFILES/config/alias"
+FISH_FILE="$DOTFILES/config/fish/alias.fish"
+OUTPUT_FILE="$DOTFILES/docs/aliases.md"
 
-# Check if alias file exists
-if [[ ! -f $ALIAS_FILE ]]; then
-  echo "Alias file not found: $ALIAS_FILE"
-  exit 1
-fi
+for f in "$BASHZSH_FILE" "$FISH_FILE"; do
+  [[ -f $f ]] || {
+    echo "Alias file not found: $f" >&2
+    exit 1
+  }
+done
 
-# Declare associative array
-declare -a alias_table
+declare -A bz fish
 
-echo "Parsing aliases..."
-while IFS= read -r line; do
-  # Skip all lines that do not start with 'alias'
-  if [[ ! $line =~ ^alias\  ]]; then
-    continue
-  fi
+# Print "name<TAB>command", escaping | so the value survives the markdown table
+# without double-escaping a pipe the source already escaped (grep BRE `\|`).
+emit_alias()
+{
+  local cmd="${2//|/\\|}"
+  cmd="${cmd//\\\\|/\\|}"
+  printf '%s\t%s\n' "$1" "$cmd"
+}
 
-  # Split alias and command and handle both ' and "
-  if [[ $line =~ ^alias\ ([^=]+)=[\'\"](.*)[\'\"]$ ]]; then
-    alias_name="${BASH_REMATCH[1]}"
-    alias_command="${BASH_REMATCH[2]//|/\\|}" # fix markdown table separator
+# Emit "name<TAB>command" for every alias, fish abbreviation and fish function
+# in a file. Handles leading indentation and both ' and " quoting. Fish
+# `abbr --add NAME CMD` expands a whole command, so it is treated like an alias.
+# A fish `function` that backs an alias is labelled by its `--wraps` command
+# (which matches the equivalent bash alias and groups as shared) or, failing
+# that, its `--description`; a function with neither is a private helper and is
+# skipped. Standalone utilities (e.g. `ips`) live in `local/bin/x-*` instead,
+# reachable as `x <name>` in every shell, so they need no per-shell alias.
+collect()
+{
+  local file="$1" line name
+  while IFS= read -r line; do
+    line="${line#"${line%%[![:space:]]*}"}" # strip leading whitespace
+    if [[ $line =~ ^alias\ ([^=]+)=[\'\"](.*)[\'\"]$ ]]; then
+      emit_alias "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
+    elif [[ $line =~ ^abbr\ (--add|-a)\ ([^ ]+)\ (.*)$ ]]; then
+      name="${BASH_REMATCH[2]}"
+      local cmd="${BASH_REMATCH[3]}"
+      case $cmd in # strip surrounding quotes from the expansion
+        \'*\') cmd="${cmd#\'}" cmd="${cmd%\'}" ;;
+        \"*\") cmd="${cmd#\"}" cmd="${cmd%\"}" ;;
+      esac
+      emit_alias "$name" "$cmd"
+    elif [[ $line =~ ^function\ ([^ ]+) ]]; then
+      name="${BASH_REMATCH[1]}"
+      if [[ $line =~ --wraps=[\'\"]([^\'\"]*)[\'\"] ]]; then
+        emit_alias "$name" "${BASH_REMATCH[1]}"
+      elif [[ $line =~ --description\ [\'\"]([^\'\"]*)[\'\"] ]]; then
+        emit_alias "$name" "${BASH_REMATCH[1]}"
+      fi
+    fi
+  done < "$file"
+}
 
-    # Save alias to table
-    alias_table+=("\`$alias_name\`␟\`$alias_command\`")
+# First definition wins: an alias guarded by `if type -q eza … else …` is listed
+# as its primary (eza) form, not the fallback that appears later in the file.
+while IFS=$'\t' read -r name cmd; do
+  [[ -n ${bz[$name]+x} ]] || bz["$name"]="$cmd"
+done < <(collect "$BASHZSH_FILE")
+while IFS=$'\t' read -r name cmd; do
+  [[ -n ${fish[$name]+x} ]] || fish["$name"]="$cmd"
+done < <(collect "$FISH_FILE")
+
+# Partition names by which shells define them identically (name + command).
+shared=() bzonly=() fishonly=()
+for name in "${!bz[@]}"; do
+  if [[ -n ${fish[$name]+set} && ${fish[$name]} == "${bz[$name]}" ]]; then
+    shared+=("$name")
   else
-    echo "Warning: Could not parse line: $line"
+    bzonly+=("$name")
   fi
-
-done < "$ALIAS_FILE"
-
-# Sort array by alias name
-# shellcheck disable=SC2207
-IFS=$'\n' sorted_aliases=($(sort <<< "${alias_table[*]}"))
-unset IFS
-
-# Calculate cell max lengths
-max_alias_length=5   # "Alias" min length
-max_command_length=7 # "Command" min length
-
-for entry in "${sorted_aliases[@]}"; do
-  IFS=$'␟' read -r alias_name alias_command <<< "$entry"
-  max_alias_length=$((${#alias_name} > max_alias_length ? ${#alias_name} : max_alias_length))
-  max_command_length=$((${#alias_command} > max_command_length ? ${#alias_command} : max_command_length))
+done
+for name in "${!fish[@]}"; do
+  if [[ -z ${bz[$name]+set} || ${bz[$name]} != "${fish[$name]}" ]]; then
+    fishonly+=("$name")
+  fi
 done
 
-# Empty the markdown file and add header
-printf "# Alias Commands\n\nThis file lists all aliases defined in \`config/alias\`.\n\n" > "$OUTPUT_FILE"
+total=$((${#shared[@]} + ${#bzonly[@]} + ${#fishonly[@]}))
 
-# Add table header
-printf "| %-*s | %-*s |\n" \
-  "$max_alias_length" "Alias" \
-  "$max_command_length" "Command" >> "$OUTPUT_FILE"
-
-# Add table header separator
-printf "| %-*s | %-*s |\n" \
-  "$max_alias_length" "$(printf '%0.s-' $(seq 1 $max_alias_length))" \
-  "$max_command_length" "$(printf '%0.s-' $(seq 1 $max_command_length))" >> "$OUTPUT_FILE"
-
-# Create table with max cell lengths
-for entry in "${sorted_aliases[@]}"; do
-  IFS=$'␟' read -r alias_name alias_command <<< "$entry"
-  printf "| %-*s | %-*s |\n" \
-    "$max_alias_length" "$alias_name" \
-    "$max_command_length" "$alias_command" >> "$OUTPUT_FILE"
-done
+# emit_section <title> <source: bz|fish> <name>...
+# Appends a sorted markdown table to OUTPUT_FILE; no-op when no names given.
+emit_section()
+{
+  local title="$1" src="$2"
+  shift 2
+  (($# == 0)) && return
+  local names cmd name
+  mapfile -t names < <(printf '%s\n' "$@" | LC_ALL=C sort)
+  {
+    printf '## %s\n\n' "$title"
+    printf '| Alias | Command |\n| --- | --- |\n'
+    for name in "${names[@]}"; do
+      if [[ $src == fish ]]; then cmd="${fish[$name]}"; else cmd="${bz[$name]}"; fi
+      printf '| `%s` | `%s` |\n' "$name" "$cmd"
+    done
+    printf '\n'
+  } >> "$OUTPUT_FILE"
+}
 
 {
-  printf "\n"
-  printf "Total aliases: %d\n" "${#sorted_aliases[@]}"
-  printf "Last updated: %s\n" "$(date)"
-} >> "$OUTPUT_FILE"
+  printf '# Shell Aliases\n\n'
+  printf 'Generated by `dfm helpers docs-aliases`. Lists aliases from `config/alias`\n'
+  printf '(bash and zsh) and `config/fish/alias.fish` (fish). Shared aliases come\n'
+  printf 'first; aliases unique to a shell group follow under their own heading.\n'
+  printf 'For simplicity, fish abbreviations (`abbr`) are included as fish aliases,\n'
+  printf 'since they expand to a whole command. Fish `function` definitions that back\n'
+  printf 'an alias (e.g. `.c`, `cdgr`) are listed via their `--wraps` command or, if\n'
+  printf 'absent, their `--description`. Standalone utilities (e.g. `x ip`,\n'
+  printf '`x ips`) and macOS-specific commands (e.g. `x macos-show`,\n'
+  printf '`x macos-flushdns`) live in `local/bin/x-*` instead of an alias, so they\n'
+  printf 'are the same in every shell and are not listed here.\n\n'
+} > "$OUTPUT_FILE"
 
-# Announce process completion
+emit_section "Shared (bash, zsh, fish)" bz ${shared[@]+"${shared[@]}"}
+emit_section "Bash & Zsh" bz ${bzonly[@]+"${bzonly[@]}"}
+emit_section "Fish" fish ${fishonly[@]+"${fishonly[@]}"}
+
+printf 'Total aliases: %d\n' "$total" >> "$OUTPUT_FILE"
+
+# Align table columns so the output satisfies markdown-table-formatter (lint:md-table).
+if command -v markdown-table-formatter > /dev/null; then
+  markdown-table-formatter "$OUTPUT_FILE"
+fi
+
 echo "Alias documentation updated: $OUTPUT_FILE"

@@ -23,6 +23,6 @@ rather than a Homebrew path.
 
 - `dfm help` — the dotfiles manager (install, brew/apt, checks, docs).
 - [../commands.md](../commands.md) — repo lint/format/test workflows.
-- [../alias.md](../alias.md) — every shell alias defined in `config/alias`.
+- [../aliases.md](../aliases.md) — every shell alias across bash, zsh, and fish.
 - `config/cheat/cheatsheets/` — `cheat <tool>` cheatsheets for many of
   these tools.

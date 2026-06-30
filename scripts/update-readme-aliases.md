@@ -1,6 +1,7 @@
 # update-readme-aliases
 
-Regenerates the alias table located at `docs/alias.md`.
+Regenerates the grouped alias documentation at `docs/aliases.md`. Usually
+invoked as `dfm helpers docs-aliases`.
 
 ## Usage
 
@@ -8,4 +9,6 @@ Regenerates the alias table located at `docs/alias.md`.
 scripts/update-readme-aliases.sh
 ```
 
-This script parses `config/alias` and writes the markdown table to the docs.
+Parses `config/alias` (bash and zsh) and `config/fish/alias.fish` (fish),
+then writes `docs/aliases.md`: shared aliases first, then the aliases unique
+to a shell group under their own heading.

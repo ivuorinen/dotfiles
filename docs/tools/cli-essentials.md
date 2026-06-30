@@ -60,4 +60,4 @@ tools that dislike bat's decorations.
 - Versions and backends: `config/mise/config.toml`.
 - Cheatsheets: `cheat <tool>` (e.g. `cheat fd`, `cheat rg`), backed by
   `config/cheat/cheatsheets/`.
-- All aliases: [../alias.md](../alias.md).
+- All aliases: [../aliases.md](../aliases.md).
