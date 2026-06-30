@@ -51,7 +51,7 @@ fi
 # Sections listed in the top-level help, in display order. `tests` is
 # intentionally omitted — it is an internal visual-test helper, still
 # reachable as `dfm tests` because dfm-tests exists on disk.
-DFM_SECTIONS=(install secrets cleanup apt brew check dotfiles docs scripts helpers)
+DFM_SECTIONS=(install secrets ssh cleanup apt brew check dotfiles docs scripts helpers)
 
 # The command a section needs to be useful at all, or empty when the
 # section is not tool-gated. Sections whose tool is absent are omitted

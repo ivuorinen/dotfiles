@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+#USAGE cmd "ssh" help="SSH signing-key helpers (allowed_signers, GitHub)" {
+#USAGE   cmd "signers" help="Append local public keys missing from allowed_signers, then compare with GitHub" {
+#USAGE     alias "s"
+#USAGE   }
+#USAGE   cmd "check" help="Dry run: show what would be appended and the GitHub overlap, write nothing" {
+#USAGE     alias "c"
+#USAGE   }
+#USAGE   cmd "github" help="Compare local public keys against github.com/<user>.keys" {
+#USAGE     alias "gh"
+#USAGE     arg "[user]" help="GitHub username (default: git config github.user, else ivuorinen)"
+#USAGE   }
+#USAGE }
+#
+# @description SSH signing-key helpers — keep allowed_signers in sync (dfm ssh)
+# dfm ssh — make sure every local public key (both ~/.ssh/*.pub files and
+# ssh-agent / 1Password keys) is present in ssh/allowed_signers, append-only,
+# and compare the set against a GitHub user's published keys.
+#
+# Why the agent too: signing keys managed by 1Password have no .pub file on
+# disk but are exposed via `ssh-add -L`; without them the signing key would
+# never land in allowed_signers and commit verification stays "No principal
+# matched".
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap_for "$@"
+
+# Config — override via env.
+: "${DFM_SSH_PUBDIR:=$HOME/.ssh}"
+: "${DFM_SSH_SIGNERS:=$DOTFILES/ssh/allowed_signers}"
+: "${DFM_SSH_GITHUB_USER:=$(git config --global --get github.user 2> /dev/null || echo ivuorinen)}"
+# 1Password's SSH agent socket — used as a fallback when the ambient
+# SSH_AUTH_SOCK is unset/empty (non-login shells, cron) so the signing key
+# managed by 1Password is still discovered. macOS default; override per host.
+: "${DFM_SSH_AGENT_SOCK:=$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock}"
+# git-profile config (dotzero/git-profile) — the source of every email you
+# commit under. Its user.email values become the combined principal list on
+# each appended allowed_signers line, so one key verifies commits made under
+# any profile (work, home, masf, github).
+: "${DFM_SSH_GITPROFILE:=$DOTFILES/base/gitprofile}"
+
+# Every email this identity commits under, from the git-profile config.
+# allowed_signers matches the committer email, so listing all of them as the
+# principal makes one key verify commits made under any profile.
+_ssh_emails()
+{
+  [[ -r "$DFM_SSH_GITPROFILE" ]] || return 0
+  jq -r '.profiles[][]? | select(.key == "user.email") | .value' \
+    "$DFM_SSH_GITPROFILE" 2> /dev/null | awk 'NF' | sort -u
+}
+
+# Principal written on auto-appended lines: the comma-joined git-profile
+# emails (so the key is allowed for all of them). Falls back to the configured
+# git email, then a placeholder. Override wholesale with DFM_SSH_PRINCIPAL.
+_ssh_principal()
+{
+  local p="${DFM_SSH_PRINCIPAL:-}"
+  [[ -z "$p" ]] && p=$(_ssh_emails | paste -sd, -)
+  [[ -z "$p" ]] && p=$(git config --global --get user.email 2> /dev/null)
+  [[ -z "$p" ]] && p="CHANGE_ME@example.com"
+  printf '%s' "$p"
+}
+
+# Emit every available local public key as "<type> <base64> <source>",
+# deduped by the base64 blob (keys can appear both as a file and in the
+# agent). Sources: *.pub files, then the running ssh-agent (1Password).
+_ssh_local()
+{
+  {
+    local f
+    for f in "$DFM_SSH_PUBDIR"/*.pub; do
+      [[ -e "$f" ]] || continue
+      awk -v s="${f##*/}" 'NF>=2 && $1 ~ /^(ssh-|sk-|ecdsa-)/ {print $1" "$2" "s}' "$f"
+    done
+    # Union the ambient agent with 1Password's socket — the ambient
+    # SSH_AUTH_SOCK may point at a different, non-empty agent (forwarded,
+    # limited) that lacks the 1Password-managed signing key. Querying both
+    # and deduping by base64 (outer awk) guarantees the signing key is found.
+    local agent_out=""
+    ssh-add -L > /dev/null 2>&1 && agent_out=$(ssh-add -L 2> /dev/null)
+    if [[ -S "$DFM_SSH_AGENT_SOCK" ]]; then
+      agent_out=$(printf '%s\n%s\n' "$agent_out" \
+        "$(SSH_AUTH_SOCK="$DFM_SSH_AGENT_SOCK" ssh-add -L 2> /dev/null)")
+    fi
+    printf '%s\n' "$agent_out" \
+      | awk 'NF>=2 && $1 ~ /^(ssh-|sk-|ecdsa-)/ {print $1" "$2" agent:"($3==""?"-":$3)}'
+  } | awk '!seen[$2]++'
+}
+
+# "<type> <base64>" lines, sorted-unique — for set comparison with comm.
+_ssh_local_blobs()
+{
+  _ssh_local | awk '{print $1" "$2}' | sort -u
+}
+_ssh_github_blobs()
+{
+  curl -fsSL "https://github.com/${1}.keys" 2> /dev/null \
+    | awk 'NF>=2 {print $1" "$2}' | sort -u
+}
+
+# Append local keys missing from allowed_signers. First arg "dry" => preview.
+dfm_ssh_signers()
+{
+  local dry="${1:-}"
+  local signers="$DFM_SSH_SIGNERS" principal
+  principal=$(_ssh_principal)
+
+  if [[ ! -f "$signers" ]]; then
+    msgr warn "allowed_signers not found: $signers"
+    [[ $dry == dry ]] || : > "$signers"
+  fi
+
+  msgr msg "Reconciling local public keys -> $signers"
+  local appended=0 type b64 src
+  while read -r type b64 src; do
+    [[ -z "$b64" ]] && continue
+    if grep -qF "$b64" "$signers" 2> /dev/null; then
+      msgr nested "present: $src ($type)"
+      continue
+    fi
+    if [[ $dry == dry ]]; then
+      msgr run "would append: $src ($type) as '$principal'"
+    else
+      printf '%s namespaces="git" %s %s\n' "$principal" "$type" "$b64" >> "$signers"
+      msgr yay "appended: $src ($type) as '$principal'"
+    fi
+    appended=$((appended + 1))
+  done < <(_ssh_local)
+
+  if [[ $appended -eq 0 ]]; then
+    msgr ok "allowed_signers already covers every local public key"
+  elif [[ $dry == dry ]]; then
+    msgr warn "$appended key(s) would be appended — re-run 'dfm ssh signers' to apply"
+  else
+    msgr warn "$appended key(s) appended with principal '$principal' — edit $signers if any key signs under a different email"
+  fi
+}
+
+# Compare local public keys against github.com/<user>.keys.
+dfm_ssh_github()
+{
+  local user="${1:-$DFM_SSH_GITHUB_USER}"
+  msgr run "Comparing local keys with https://github.com/${user}.keys"
+  local gh local_blobs
+  gh=$(_ssh_github_blobs "$user")
+  if [[ -z "$gh" ]]; then
+    msgr err "No keys fetched for '$user' (network error or user has no public keys)"
+    return 1
+  fi
+  local_blobs=$(_ssh_local_blobs)
+  if [[ -z "$local_blobs" ]]; then
+    msgr warn "No local public keys found (looked in $DFM_SSH_PUBDIR and ssh-agent)"
+    return 1
+  fi
+
+  _ssh_report()
+  {
+    local label="$1" data="$2"
+    msgr msg "$label"
+    if [[ -z "$data" ]]; then
+      msgr nested "(none)"
+      return
+    fi
+    local t k
+    while read -r t k; do
+      [[ -z "$t" ]] && continue
+      msgr nested "$t ${k:0:24}…"
+    done <<< "$data"
+  }
+
+  _ssh_report "Present in BOTH local and GitHub:" \
+    "$(comm -12 <(printf '%s\n' "$local_blobs") <(printf '%s\n' "$gh"))"
+  _ssh_report "Local only (not published on GitHub):" \
+    "$(comm -23 <(printf '%s\n' "$local_blobs") <(printf '%s\n' "$gh"))"
+  _ssh_report "GitHub only (not present locally):" \
+    "$(comm -13 <(printf '%s\n' "$local_blobs") <(printf '%s\n' "$gh"))"
+}
+
+dfm_ssh()
+{
+  USAGE_PREFIX="$SCRIPT ssh <command>"
+  MENU=(
+    "signers:Append local public keys missing from allowed_signers, then compare with GitHub"
+    "check:Dry run — show what would be appended and the GitHub overlap, write nothing"
+    "github <user>:Compare local public keys against github.com/<user>.keys"
+  )
+  case "${1:-}" in
+    s | signers)
+      dfm_ssh_signers
+      echo ""
+      dfm_ssh_github
+      ;;
+    c | check)
+      dfm_ssh_signers dry
+      echo ""
+      dfm_ssh_github
+      ;;
+    gh | github)
+      shift
+      dfm_ssh_github "${1:-}"
+      ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_ssh "$@"
