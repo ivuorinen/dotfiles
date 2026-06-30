@@ -10,7 +10,14 @@ file="$1"
 case "$file" in
   *.md | *.MD | *.markdown | *.mkd)
     if command -v glow > /dev/null 2>&1; then
-      glow -s "$(theme-mode 2> /dev/null || echo dark)" -- "$file"
+      # terminal.json uses the active terminal palette, so it tracks
+      # dark/light automatically — no need to switch styles by theme-mode.
+      style="${XDG_CONFIG_HOME:-$HOME/.config}/glow/terminal.json"
+      if [ -f "$style" ]; then
+        glow -s "$style" -- "$file"
+      else
+        glow -- "$file"
+      fi
     else
       bat -n --color=always -- "$file"
     fi

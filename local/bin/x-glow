@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#USAGE about "Render markdown with the terminal-palette glow style"
+#
+# Run glow with the terminal-palette style when it is present, otherwise plain
+# glow. Backs the shell-agnostic `glow` alias; also reachable as `x glow`.
+
+set -euo pipefail
+
+style="${XDG_CONFIG_HOME:-$HOME/.config}/glow/terminal.json"
+if [[ -f $style ]]; then
+  exec glow -s "$style" "$@"
+else
+  exec glow "$@"
+fi
