@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-#USAGE cmd "docs" help="Generate documentation" {
-#USAGE   cmd "all" help="Update all keybindings docs"
-#USAGE   cmd "tmux" help="Update tmux keybindings"
-#USAGE   cmd "nvim" help="Update nvim keybindings"
-#USAGE   cmd "wezterm" help="Update wezterm keybindings"
+#USAGE cmd "docs" help="Show generated documentation" {
+#USAGE   cmd "aliases" help="Show shell aliases documentation"
+#USAGE   cmd "nvim" help="Show nvim keybindings documentation"
+#USAGE   cmd "tmux" help="Show tmux keybindings documentation"
+#USAGE   cmd "wezterm" help="Show wezterm keybindings documentation"
 #USAGE }
 #
-# @description Generate keybinding documentation (dfm docs)
-# dfm docs — generate keybinding documentation.
+# @description Show generated documentation (dfm docs)
+# dfm docs — show generated documentation.
 #
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
@@ -23,31 +23,35 @@ if ! source "$_dfm_dir/dfm-lib"; then
 fi
 dfm_bootstrap_for "$@"
 
-# Handle documentation generation commands
+# Show a generated documentation file. Generators live under `dfm helpers`.
 dfm_docs()
 {
   USAGE_PREFIX="$SCRIPT docs <command>"
-
   MENU=(
-    "all:Update all keybindings documentations"
-    "tmux:Update tmux keybindings documentation"
-    "nvim:Update nvim keybindings documentation"
-    "wezterm:Update wezterm keybindings documentation"
+    "aliases:Show shell aliases documentation"
+    "nvim:Show nvim keybindings documentation"
+    "tmux:Show tmux keybindings documentation"
+    "wezterm:Show wezterm keybindings documentation"
   )
 
-  case "$1" in
-    all)
-      local rc=0
-      dfm_docs tmux || rc=1
-      dfm_docs nvim || rc=1
-      dfm_docs wezterm || rc=1
-      return "$rc"
+  local file
+  case "${1:-}" in
+    aliases) file="aliases.md" ;;
+    nvim) file="nvim-keybindings.md" ;;
+    tmux) file="tmux-keybindings.md" ;;
+    wezterm) file="wezterm-keybindings.md" ;;
+    *)
+      menu_builder "$USAGE_PREFIX" "${MENU[@]}"
+      return
       ;;
-    tmux) bash "$DOTFILES/local/bin/x-dfm-docs-tmux-keybindings" ;;
-    nvim) bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
-    wezterm) bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
+
+  local path="$DOTFILES/docs/$file"
+  if [[ ! -f $path ]]; then
+    echo "Documentation not found: $path (generate it with 'dfm helpers docs-$1')" >&2
+    return 1
+  fi
+  cat "$path"
 }
 
 dfm_docs "$@"

@@ -63,21 +63,26 @@ is processed by Dotbot during installation.
 
 Running `dfm` gives you a list of available commands.
 
-#### Documentation generation
+#### Documentation
 
-`dfm docs` regenerates the keybinding documentation under `docs/`. Available
-subcommands:
+`dfm docs` shows the generated documentation under `docs/`; `dfm helpers
+docs-*` regenerates it. Available subcommands:
 
 ```bash
-dfm docs all      # regenerate every keybinding doc
-dfm docs tmux     # tmux keybindings only
-dfm docs nvim     # nvim keybindings only
-dfm docs wezterm  # wezterm keybindings only
+dfm docs aliases        # show the shell aliases doc
+dfm docs tmux           # show tmux keybindings
+dfm docs nvim           # show nvim keybindings
+dfm docs wezterm        # show wezterm keybindings
+
+dfm helpers docs-all      # regenerate every doc
+dfm helpers docs-aliases  # regenerate docs/aliases.md
+dfm helpers docs-tmux     # tmux keybindings only
+dfm helpers docs-nvim     # nvim keybindings only
+dfm helpers docs-wezterm  # wezterm keybindings only
 ```
 
-The `docs/` folder also contains other reference files (alias table,
-folder layout, command catalogue) that are maintained directly rather
-than via `dfm`.
+The `docs/` folder also contains other reference files (folder layout,
+command catalogue) that are maintained directly rather than via `dfm`.
 
 ## Configuration
 

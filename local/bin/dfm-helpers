@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
-#USAGE cmd "helpers" help="Display system information" {
-#USAGE   cmd "aliases" help="Show shell aliases" {
+#USAGE cmd "helpers" help="Display system information and generate documentation" {
+#USAGE   cmd "aliases" help="Show live shell aliases" {
 #USAGE     arg "<shell>" help="Shell to show aliases for (bash, zsh, fish)"
 #USAGE   }
 #USAGE   cmd "colors" help="Show terminal color palette"
 #USAGE   cmd "env" help="Show environment variables"
 #USAGE   cmd "functions" help="Show shell functions"
 #USAGE   cmd "path" help="Show PATH entries"
-#USAGE   cmd "nvim" help="Show nvim keybindings"
-#USAGE   cmd "tmux" help="Show tmux keybindings"
-#USAGE   cmd "wezterm" help="Show wezterm keybindings"
+#USAGE   cmd "docs-aliases" help="Generate docs/aliases.md"
+#USAGE   cmd "docs-nvim" help="Generate nvim keybindings documentation"
+#USAGE   cmd "docs-tmux" help="Generate tmux keybindings documentation"
+#USAGE   cmd "docs-wezterm" help="Generate wezterm keybindings documentation"
+#USAGE   cmd "docs-all" help="Generate all documentation"
 #USAGE }
 #
-# @description Display system information helpers (dfm helpers)
-# dfm helpers — display system information.
+# @description Display system information and generate documentation (dfm helpers)
+# dfm helpers — display system information and generate documentation.
 #
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
@@ -34,14 +36,16 @@ dfm_helpers()
 {
   USAGE_PREFIX="$SCRIPT helpers <command>"
   MENU=(
-    "aliases:<shell> (bash, zsh, fish) Show aliases"
+    "aliases:<shell> (bash, zsh, fish) Show live shell aliases"
     "colors:Show colors"
     "env:Show environment variables"
     "functions:Show functions"
-    "nvim:Show nvim keybindings"
     'path:Show $PATH dir by dir'
-    "tmux:Show tmux keybindings"
-    "wezterm:Show wezterm keybindings"
+    "docs-aliases:Generate docs/aliases.md"
+    "docs-nvim:Generate nvim keybindings documentation"
+    "docs-tmux:Generate tmux keybindings documentation"
+    "docs-wezterm:Generate wezterm keybindings documentation"
+    "docs-all:Generate all documentation"
   )
 
   CMD="${1:-}"
@@ -99,9 +103,20 @@ dfm_helpers()
 
     "env") env | sort ;;
     "functions") declare -F ;;
-    "nvim") cat "$DOTFILES/docs/nvim-keybindings.md" ;;
-    "tmux") cat "$DOTFILES/docs/tmux-keybindings.md" ;;
-    "wezterm") cat "$DOTFILES/docs/wezterm-keybindings.md" ;;
+
+    "docs-aliases") bash "$DOTFILES/scripts/update-readme-aliases.sh" ;;
+    "docs-nvim") bash "$DOTFILES/scripts/create-nvim-keymaps.sh" ;;
+    "docs-tmux") bash "$DOTFILES/local/bin/x-dfm-docs-tmux-keybindings" ;;
+    "docs-wezterm") bash "$DOTFILES/scripts/create-wezterm-keymaps.sh" ;;
+    "docs-all")
+      local rc=0
+      dfm_helpers docs-aliases || rc=1
+      dfm_helpers docs-tmux || rc=1
+      dfm_helpers docs-nvim || rc=1
+      dfm_helpers docs-wezterm || rc=1
+      return "$rc"
+      ;;
+
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac
 }
