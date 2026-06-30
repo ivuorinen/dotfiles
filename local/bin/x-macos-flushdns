@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#USAGE about "Flush macOS DNS cache and restart mDNSResponder"
+#
+# Flush the DNS cache and restart mDNSResponder (the full macOS DNS reset).
+# Also reachable as `x macos-flushdns`.
+
+set -euo pipefail
+
+sudo dscacheutil -flushcache
+sudo killall -HUP mDNSResponder

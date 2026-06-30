@@ -12,7 +12,7 @@ end
 abbr --add gau git add -u
 abbr --add gaa git add -A
 abbr --add gcv git commit -v
-abbr --add gst git status
+abbr --add gst git status -sbv
 abbr --add glg git log
 abbr --add gwa git worktree add
 abbr --add gwr git worktree remove
@@ -131,23 +131,14 @@ function .o --wraps='cd ~/Code/ivuorinen/obsidian/' --description 'cd ~/Code/ivu
     cd ~/Code/ivuorinen/obsidian/ $argv
 end
 
-# cd to git root directory
-function cdgr --description 'cd to git root'
-    if git rev-parse --is-inside-work-tree &>/dev/null
-        cd (git rev-parse --show-toplevel); or return $status
-    else
-        echo >&2 "Not in a git repository"
-        return 1
-    end
-end
+# cd to git root directory (logic lives in local/bin/x-git-root)
+alias cdgr='cd "$(x-git-root)"'
 
 # Colored grep
 abbr --add grep 'grep --color'
 
-# Date helpers
+# Date helpers (datetime/timestamp moved to scripts — run `x datetime` / `x timestamp`)
 alias isodate="date +'%Y-%m-%d'"
-alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
-alias x-timestamp="date +'%s'"
 
 # Random abbreviations
 if type -q onefetch
@@ -161,25 +152,10 @@ end
 abbr --add cd.. 'cd ..'
 alias sl='ls'
 
-# IP addresses
-alias x-ip='dig +short myip.opendns.com @resolver1.opendns.com'
-alias localip='ipconfig getifaddr en1'
-function ips --description 'list IPv4/IPv6 addresses'
-    ifconfig -a |
-        grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' |
-        sed -e 's/inet6* //' |
-        sort
-end
-
-# Show/hide hidden files in Finder
-alias show='defaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder'
-alias hide='defaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder'
-
-# Flush Directory Service cache
-alias flush='dscacheutil -flushcache'
-
-# Update locatedb
-alias updatedb='sudo /usr/libexec/locate.updatedb'
+# macOS-specific commands live in local/bin/x-* (run `x <name>`):
+#   localip -> x-localip                 show/hide -> x-macos-show / x-macos-hide
+#   flush   -> x-macos-flush             flushdns  -> x-macos-flushdns
+#   updatedb -> x-macos-updatedb
 
 # xdg-ninja for a better experience
 alias xdg='xdg-ninja --skip-ok --skip-unsupported'
@@ -191,25 +167,17 @@ alias watchx='watch -dpbc'
 alias dn='du -chd1'
 
 # Mirror stdout to stderr (see data going through a pipe)
-function peek --description 'tee to stderr'
-    tee /dev/stderr $argv
-end
+alias peek='tee /dev/stderr'
 
 # Open dotfiles with $EDITOR
 alias zedit='$EDITOR ~/.dotfiles'
 
 # XDG-aware overrides (use `command` to avoid recursing into the function)
-function wget --description 'wget with XDG hsts file'
+function wget --wraps='wget --hsts-file=$XDG_DATA_HOME/wget-hsts' --description 'wget with XDG hsts file'
     command wget --hsts-file=$XDG_DATA_HOME/wget-hsts $argv
 end
-function svn --description 'svn with XDG config dir'
-    command svn --config-dir $XDG_CONFIG_HOME/subversion $argv
-end
-function irssi --description 'irssi with XDG config/home'
+function irssi --wraps='irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi'
     command irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi $argv
 end
-
-# macOS-only helpers
-if test (uname) = Darwin
-    alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
-end
+# Render markdown with the terminal-palette style (logic in local/bin/x-glow)
+alias glow='x-glow'

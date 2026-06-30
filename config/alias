@@ -3,9 +3,27 @@
 # Color the grep output
 alias grep="grep --color"
 
-x-have eza && {
-  alias ls="eza -h -s=type --git --icons --group-directories-first"
-}
+# ls family: eza with git annotations inside a work tree, system ls otherwise.
+# Mirrors the fish eza_git wrapper so ls/l/ll/lsa match across shells.
+if x-have eza; then
+  eza_git()
+  {
+    if git rev-parse --is-inside-work-tree &> /dev/null; then
+      eza --group-directories-first --icons=always --smart-group --git "$@"
+    else
+      eza --group-directories-first --icons=always --smart-group "$@"
+    fi
+  }
+  alias ls='eza_git'
+  alias l='eza_git'
+  alias ll='eza_git -l'
+  alias lsa='eza_git -al'
+else
+  alias ls='command ls'
+  alias l='command ls'
+  alias ll='command ls -lh'
+  alias lsa='command ls -lah'
+fi
 
 # gopass password manager shortcut (resolves via PATH / mise shim)
 x-have gopass && {
@@ -16,7 +34,7 @@ x-have gopass && {
 alias gau='git add -u'
 alias gaa='git add -A'
 alias gcv='git commit -v'
-alias gst='git status'
+alias gst='git status -sbv'
 alias glg='git log'
 alias gwa='git worktree add'
 alias gwr='git worktree remove'
@@ -28,58 +46,29 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 
-# Get git repository root path
-get_git_root()
-{
-  # check that we are in a git repository
-  if git rev-parse --is-inside-work-tree &> /dev/null; then
-    git rev-parse --show-toplevel
-  else
-    >&2 msgr err "Not in a git repository"
-  fi
-}
+# cd to git root directory (logic lives in local/bin/x-git-root)
+alias cdgr='cd "$(x-git-root)"'
 
-# cd to git root directory
-alias cdgr='cd "$(get_git_root)"'
-
-# interesting folders, and shortcuts
-alias .='cd $HOME'
+# interesting folders, and shortcuts (targets aligned with fish alias.fish)
 alias .b='cd $XDG_BIN_HOME'
-alias .c='cd $HOME/Code'
-alias .d='cd $DOTFILES'
-alias .l='cd $HOME/.local'
-alias .o='cd $HOME/Code/ivuorinen/obsidian/'
-alias .s='cd $HOME/Code/s'
-alias .p='cd $HOME/Code/ivuorinen'
-
-# Shortcuts for listing
-alias ll="ls -la"
-alias l="ls -a"
-alias lsa="ls -lah"
+alias .c='cd ~/Code'
+alias .d='cd ~/.dotfiles'
+alias .l='cd ~/.local'
+alias .o='cd ~/Code/ivuorinen/obsidian/'
+alias .s='cd ~/Code/s'
+alias .p='cd ~/Code/ivuorinen'
 
 # Prevent common typos
 alias cd..="cd .."
 alias sl="ls"
 
-# IP addresses
-alias x-ip="dig +short myip.opendns.com @resolver1.opendns.com"
-alias localip="ipconfig getifaddr en1"
-alias ips="ifconfig -a | grep -o 'inet6\? \(\([0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\)\|[a-fA-F0-9:]\+\)' | sed -e 's/inet6* //' | sort"
+# macOS-specific commands live in local/bin/x-* (run `x <name>`):
+#   localip -> x-localip                 show/hide -> x-macos-show / x-macos-hide
+#   flush   -> x-macos-flush             flushdns  -> x-macos-flushdns
+#   updatedb -> x-macos-updatedb
 
-# Show/hide hidden files in Finder
-alias show="defaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder"
-alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder"
-
-# Flush Directory Service cache
-alias flush="dscacheutil -flushcache"
-
-# Update locatedb
-alias updatedb="sudo /usr/libexec/locate.updatedb"
-
-# Date helpers
+# Date helpers (datetime/timestamp moved to scripts — run `x datetime` / `x timestamp`)
 alias isodate="date +'%Y-%m-%d'"
-alias x-datetime="date +'%Y-%m-%d %H:%M:%S'"
-alias x-timestamp="date +'%s'"
 
 # nvim aliases
 alias v='nvim'
@@ -103,7 +92,7 @@ alias watchx='watch -dpbc'
 # directory usage, return only the total
 alias dn='du -chd1'
 # Mirror stdout to stderr, useful for seeing data going through a pipe
-alias peek='tee >(cat 1>&2)'
+alias peek='tee /dev/stderr'
 
 # Opens dotfiles with $EDITOR
 alias zedit='$EDITOR ~/.dotfiles'
@@ -111,17 +100,8 @@ alias zedit='$EDITOR ~/.dotfiles'
 alias irssi='irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi'
 # Configures wget to use correct wget-hsts file
 alias wget='wget --hsts-file=$XDG_DATA_HOME/wget-hsts'
-# Configures svn to use correct config directory
-alias svn='svn --config-dir $XDG_CONFIG_HOME/subversion'
-
-if [[ $(uname) == 'Darwin' ]]; then
-
-  # Flush Directory Service cache
-  alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-
-  # Using herd for php now, so this is not needed anymore
-  # x-set-php-aliases
-fi
+# Render markdown with the terminal-palette style (logic in local/bin/x-glow)
+alias glow='x-glow'
 
 # Guarded so re-sourcing this file (e.g. zshrc re-applies it after antidote so
 # our git aliases win over the OMZ git plugin) does not re-load secret files.

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#USAGE about "Rebuild the macOS locate database"
+#
+# Rebuild the locate(1) database via the macOS-specific updatedb path.
+# Also reachable as `x macos-updatedb`.
+
+set -euo pipefail
+
+sudo /usr/libexec/locate.updatedb

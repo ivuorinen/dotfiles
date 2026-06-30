@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#USAGE about "Flush the macOS Directory Service cache"
+#
+# Flush the macOS Directory Service cache. Also reachable as `x macos-flush`.
+
+set -euo pipefail
+
+dscacheutil -flushcache
