@@ -91,7 +91,7 @@ just = "1.54.0"
 "github:dimo414/bkt" = "0.8.2"
 
 # Linters & formatters
-editorconfig-checker = "3.7.0"
+editorconfig-checker = "3.8.0"
 biome = "2.4.12"                            # pinned to match biome.json $schema; bump both together
 "npm:prettier" = "3.8.4"
 "npm:markdownlint-cli" = "0.49.0"
