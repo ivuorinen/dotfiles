@@ -567,7 +567,8 @@ export CHEAT_USE_FZF=true
 export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 
 # Additional PATH entries (aligned with fish config)
-[ -d "$XDG_DATA_HOME/mise/shims" ] && export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
+# NOTE: the mise shims dir is prepended *after* `mise activate` below, so it
+# stays ahead of the installs/*/bin dirs that activate adds — see `which -a gh`.
 [ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$PATH:$YARN_GLOBAL_FOLDER/bin"
 [ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
@@ -592,6 +593,10 @@ if command -v mise &> /dev/null; then
   else
     eval "$(env -u MISE_SHELL SHELL=bash mise activate bash)"
   fi
+  # Keep the mise shims dir ahead of the installs/*/bin dirs that
+  # `mise activate` prepends, so tool lookups resolve via the shim rather
+  # than a raw install path — see `which -a gh`.
+  [ -d "$XDG_DATA_HOME/mise/shims" ] && export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
 fi
 
 if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/exports-secret"; fi
