@@ -33,6 +33,7 @@ packages=(
 
   # CLI utilities (not in cargo/go/npm)
   jq                         # JSON processor
+  dnsutils                   # dig and friends (used by x-ip, x-multi-ping)
   tmux                       # Terminal multiplexer
   tree                       # Directory listing
   unzip                      # Archive extraction
