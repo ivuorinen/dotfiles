@@ -46,7 +46,7 @@ uv = "0.11.25"
 cmake = "4.3.4"
 
 # Shell, prompt & terminal sessions
-starship = "1.25.1"
+starship = "1.26.0"
 tmux = "3.6a"
 usage = "3.5.3"
 "github:joshmedeski/sesh" = "2.26.2"
