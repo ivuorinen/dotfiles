@@ -70,12 +70,28 @@ pick_with_select()
 # Cascading tool detection — tv is the primary picker; fzf provides the
 # richer dynamic reload bindings as fallback. Both render correctly
 # inside a tmux popup (display-popup -E in tmux.conf).
+#
+# A tv FAILURE (missing channel, crash, broken config) must fall through
+# to fzf, not abort: under `set -e`, `selection=$(pick_with_tv)` would
+# kill the script the instant tv exits non-zero, and display-popup -E
+# closes on exit — so the error just flashes past unread. tv exits 0 on
+# both a normal pick and a user cancel, so only a genuine failure cascades.
+selection=""
+tv_ok=0
 if command -v tv &> /dev/null; then
-  selection=$(pick_with_tv)
-elif command -v fzf &> /dev/null; then
-  selection=$(pick_with_fzf)
-else
-  selection=$(pick_with_select)
+  if selection=$(pick_with_tv); then
+    tv_ok=1
+  else
+    printf 'sesh.sh: tv picker failed (exit %d); falling back to fzf\n' "$?" >&2
+  fi
+fi
+
+if [[ $tv_ok -eq 0 ]]; then
+  if command -v fzf &> /dev/null; then
+    selection=$(pick_with_fzf)
+  else
+    selection=$(pick_with_select)
+  fi
 fi
 
 if [[ -n "${selection-}" ]]; then
