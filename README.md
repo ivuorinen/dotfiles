@@ -25,6 +25,10 @@ see what interesting stuff you've done with it. Sharing is caring.
 
 `cd $HOME/.dotfiles && git pull && ./install`
 
+To refresh symlinks only (faster, skips package installs and provisioning):
+
+`cd $HOME/.dotfiles && git pull && ./install --links`
+
 ## The looks
 
 ![tmux with nvim, light theme](.github/screenshots/tmux-nvim-kickstart-light.png)

@@ -2,6 +2,7 @@
 set -e
 
 CONFIG="install.conf.yaml"
+LINKS_CONFIG="dotbot-links.yaml"
 DOTBOT_DIR="tools/dotbot"
 
 DOTBOT_BIN="bin/dotbot"
@@ -9,15 +10,33 @@ BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTBOT_BIN_PATH="${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}"
 DOTBOT_HOST="$(hostname -s)"
 
+LINKS_ONLY=false
+DOTBOT_ARGS=()
+for arg in "$@"; do
+  case "$arg" in
+    --links) LINKS_ONLY=true ;;
+    *) DOTBOT_ARGS+=("$arg") ;;
+  esac
+done
+
 cd "${BASEDIR}"
 git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
 git submodule update --init --recursive "${DOTBOT_DIR}"
+
+if [ "$LINKS_ONLY" = true ]; then
+  "${DOTBOT_BIN_PATH}" \
+    -d "${BASEDIR}" \
+    --plugin-dir=tools/dotbot-include \
+    -c "${LINKS_CONFIG}" \
+    "${DOTBOT_ARGS[@]}"
+  exit 0
+fi
 
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
   --plugin-dir=tools/dotbot-include \
   -c "${CONFIG}" \
-  "${@}"
+  "${DOTBOT_ARGS[@]}"
 
 if [ "${DOTBOT_HOST}" != "" ]; then
   DOTBOT_HOST_CONFIG="${BASEDIR}/hosts/${DOTBOT_HOST}/${CONFIG}"
@@ -28,5 +47,5 @@ if [ "${DOTBOT_HOST}" != "" ]; then
       -d "$BASEDIR" \
       --plugin-dir=tools/dotbot-include \
       -c "$DOTBOT_HOST_CONFIG" \
-      "${@}"
+      "${DOTBOT_ARGS[@]}"
 fi
