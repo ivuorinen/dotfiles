@@ -7,4 +7,4 @@
 set -euo pipefail
 
 defaults write com.apple.finder AppleShowAllFiles -bool false
-killall Finder
+killall Finder &> /dev/null || true
