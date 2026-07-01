@@ -86,13 +86,6 @@
   },
   "overrides": [
     {
-      "includes": ["*.md", "*.mdx"],
-      "formatter": {
-        "enabled": true,
-        "lineWidth": 120
-      }
-    },
-    {
       "includes": ["package.json"],
       "json": {
         "formatter": {
