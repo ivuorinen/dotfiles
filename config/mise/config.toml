@@ -136,7 +136,7 @@ act = "0.2.89"
 # System monitoring & misc utilities
 bottom = "0.14.2"
 "github:binwiederhier/ntfy" = "2.25.0"
-"github:wakatime/wakatime-cli" = "2.21.2"
+"github:wakatime/wakatime-cli" = "2.21.4"
 "github:o2sh/onefetch" = "2.27.1"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.14"
