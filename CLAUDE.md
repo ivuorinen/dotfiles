@@ -155,8 +155,9 @@ every section. Key commands:
 - `dfm brew install` / `dfm brew update` — Homebrew management
 - `dfm apt upkeep` — APT package maintenance (Debian/Ubuntu)
 - `dfm dotfiles fmt` / `dfm dotfiles shfmt` — format configs/scripts
-- `dfm helpers <name>` — inspect aliases, colors, env, functions, path
-- `dfm docs all` — regenerate documentation under `docs/`
+- `dfm helpers <name>` — inspect aliases, colors, env, functions, path;
+  `dfm helpers docs-*` (docs-aliases/nvim/tmux/wezterm/all) regenerate docs
+- `dfm docs <name>` — show generated documentation under `docs/`
 - `dfm check arch` / `dfm check host` — system info
 - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers

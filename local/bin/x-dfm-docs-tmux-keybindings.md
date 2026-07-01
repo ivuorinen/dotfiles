@@ -13,7 +13,7 @@ a note.
 x-dfm-docs-tmux-keybindings
 ```
 
-Usually invoked as `dfm docs tmux`. No parameters are needed. The script
+Usually invoked as `dfm helpers docs-tmux`. No parameters are needed. The script
 writes the file under `docs/` and overwrites any existing version.
 
 <!-- vim: set ft=markdown spell spelllang=en_us cc=80 : -->

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#USAGE about "Print the current git repository root"
+#
+# Print the top-level directory of the current git repository, or error if not
+# in one. Backs the shell-agnostic `cdgr` alias: cd "$(x-git-root)".
+
+set -euo pipefail
+
+if git rev-parse --is-inside-work-tree &> /dev/null; then
+  git rev-parse --show-toplevel
+else
+  echo "Not in a git repository" >&2
+  exit 1
+fi

@@ -73,7 +73,7 @@ setup()
 @test "dfm docs menu shows entries" {
   run bash local/bin/dfm docs
   [ "$status" -eq 0 ]
-  [[ "$output" == *"all"* ]]
+  [[ "$output" == *"aliases"* ]]
   [[ "$output" == *"tmux"* ]]
   [[ "$output" == *"nvim"* ]]
   [[ "$output" == *"wezterm"* ]]

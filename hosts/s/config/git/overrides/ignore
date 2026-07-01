@@ -31,3 +31,5 @@ CLAUDE.md
 TODO.md
 specs.md
 .playwright-mcp/*
+_extra/*
+.mcp.json

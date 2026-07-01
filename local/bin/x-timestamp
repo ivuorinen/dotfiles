@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#USAGE about "Show the current Unix timestamp (seconds)"
+#
+# Print the current Unix epoch timestamp in seconds. Also reachable as
+# `x timestamp`.
+
+set -euo pipefail
+
+date +'%s'

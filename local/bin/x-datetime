@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#USAGE about "Show the current date and time (YYYY-MM-DD HH:MM:SS)"
+#
+# Print the current local date and time. Also reachable as `x datetime`.
+
+set -euo pipefail
+
+date +'%Y-%m-%d %H:%M:%S'

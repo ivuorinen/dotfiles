@@ -27,6 +27,11 @@ if status is-interactive
 
     # mise version manager
     type -q mise; and mise activate fish | source
+    # `mise activate` prepends installs/*/bin to PATH (via hook-env), which
+    # would shadow the shims dir added in exports.fish. Move the shims back
+    # in front so lookups hit the shim (re-resolves the version) rather than
+    # a raw install path — see `which -a gh`.
+    type -q mise; and fish_add_path --move --prepend --path "$XDG_DATA_HOME/mise/shims"
 
     # Starship prompt — colours flip via ~/.config/starship.toml symlink
     # swap managed by the theme orchestrator (handlers.d/starship).

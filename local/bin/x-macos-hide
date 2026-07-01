@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#USAGE about "Hide hidden files in macOS Finder"
+#
+# Hide hidden files in Finder, then restart Finder so the change applies.
+# Also reachable as `x macos-hide`.
+
+set -euo pipefail
+
+defaults write com.apple.finder AppleShowAllFiles -bool false
+killall Finder &> /dev/null || true

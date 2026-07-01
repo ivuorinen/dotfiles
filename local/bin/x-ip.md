@@ -1,19 +1,13 @@
 # x-ip
 
-Fetch your public IP address using `curl`.
+Show your external IP address by querying OpenDNS with `dig`.
 
 ## Usage
 
 ```bash
-x-ip [curl-options]
+x-ip
 ```
 
-Any arguments are passed directly to `curl`.
-
-### Example
-
-```bash
-x-ip -4
-```
+Also available as `x ip` via the `x` dispatcher.
 
 <!-- vim: set ft=markdown spell spelllang=en_us cc=80 : -->
