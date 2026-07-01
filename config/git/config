@@ -67,7 +67,7 @@
 	machineId = cli/2d3277ec1da346c4b30b26d0fb373d8c
 [credential "https://github.com"]
 	helper =
-	helper = !gh auth git-credential
+	helper = !~/.local/share/mise/shims/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
-	helper = !gh auth git-credential
+	helper = !~/.local/share/mise/shims/gh auth git-credential
