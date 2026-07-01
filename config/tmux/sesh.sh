@@ -82,7 +82,7 @@ if command -v tv &> /dev/null; then
   if selection=$(pick_with_tv); then
     tv_ok=1
   else
-    printf 'sesh.sh: tv picker failed (exit %d); falling back to fzf\n' "$?" >&2
+    printf 'sesh.sh: tv picker failed (exit %d); falling back\n' "$?" >&2
   fi
 fi
 
