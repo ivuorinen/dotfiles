@@ -75,8 +75,8 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/async-bats.sh",
-            "async": true,
-            "statusMessage": "Running tests..."
+            "statusMessage": "Running tests...",
+            "async": true
           }
         ]
       }
@@ -115,5 +115,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true
   }
 }
