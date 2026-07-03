@@ -33,3 +33,5 @@ specs.md
 .playwright-mcp/*
 _extra/*
 .mcp.json
+
+__pycache__
