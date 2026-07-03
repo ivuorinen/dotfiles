@@ -1,16 +1,22 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-07-01
-Last pass: 40 (2026-07-01)
+Last validated: 2026-07-03
+Last pass: 42 (2026-07-03)
 
 ## Summary
 
-- Total: 187 | Open: 0 | Fixed: 178 | Invalid: 9
+- Total: 188 | Open: 0 | Fixed: 179 | Invalid: 9
 
 ## Open Findings
 
 ## Fixed
+
+### Pass 41 — 2026-07-03
+
+#### [N-196] battery icon_bg set mixed into unset block without separator
+Fixed: 2026-07-03
+Notes: Added blank line and comment before `set -g @catppuccin_status_battery_icon_bg` in `config/theme/palettes.d/tmux.light.conf` to distinguish it from the surrounding `set -Ugq` unset lines.
 
 ### Pass 39 — 2026-06-26
 
