@@ -69,14 +69,15 @@ Running `dfm` gives you a list of available commands.
 
 #### Documentation
 
-`dfm docs` shows the generated documentation under `docs/`; `dfm helpers
-docs-*` regenerates it. Available subcommands:
+`dfm docs` lists every file under `docs/` with its first header as the
+description; `dfm docs <file>` renders one (via `glow`, falling back to
+`bat`, then `cat`). `dfm helpers docs-*` regenerates the generated docs.
 
 ```bash
-dfm docs aliases        # show the shell aliases doc
-dfm docs tmux           # show tmux keybindings
-dfm docs nvim           # show nvim keybindings
-dfm docs wezterm        # show wezterm keybindings
+dfm docs                     # list all docs
+dfm docs aliases             # show the shell aliases doc
+dfm docs tmux-keybindings    # show tmux keybindings
+dfm docs mise                # show the mise tool guide
 
 dfm helpers docs-all      # regenerate every doc
 dfm helpers docs-aliases  # regenerate docs/aliases.md

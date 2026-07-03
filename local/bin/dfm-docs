@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
-#USAGE cmd "docs" help="Show generated documentation" {
-#USAGE   cmd "aliases" help="Show shell aliases documentation"
-#USAGE   cmd "nvim" help="Show nvim keybindings documentation"
-#USAGE   cmd "tmux" help="Show tmux keybindings documentation"
-#USAGE   cmd "wezterm" help="Show wezterm keybindings documentation"
+#USAGE cmd "docs" help="Show documentation from docs/" {
+#USAGE   arg "[file]" help="Doc file name (docs/<file>.md)"
 #USAGE }
 #
-# @description Show generated documentation (dfm docs)
-# dfm docs — show generated documentation.
+# @description Show documentation (dfm docs)
+# dfm docs — show documentation from docs/*.md.
 #
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
@@ -23,35 +20,42 @@ if ! source "$_dfm_dir/dfm-lib"; then
 fi
 dfm_bootstrap_for "$@"
 
-# Show a generated documentation file. Generators live under `dfm helpers`.
+# Show a documentation file from docs/. The menu is built by scanning
+# docs/*.md (top level only — docs/audit/ is never listed) and using
+# each file's first "# " header as its description.
 dfm_docs()
 {
-  USAGE_PREFIX="$SCRIPT docs <command>"
-  MENU=(
-    "aliases:Show shell aliases documentation"
-    "nvim:Show nvim keybindings documentation"
-    "tmux:Show tmux keybindings documentation"
-    "wezterm:Show wezterm keybindings documentation"
-  )
+  USAGE_PREFIX="$SCRIPT docs <file>"
+  local docs_dir="$DOTFILES/docs"
 
-  local file
-  case "${1:-}" in
-    aliases) file="aliases.md" ;;
-    nvim) file="nvim-keybindings.md" ;;
-    tmux) file="tmux-keybindings.md" ;;
-    wezterm) file="wezterm-keybindings.md" ;;
-    *)
-      menu_builder "$USAGE_PREFIX" "${MENU[@]}"
-      return
-      ;;
-  esac
+  if [[ -z ${1:-} ]]; then
+    local MENU=() f name desc
+    for f in "$docs_dir"/*.md; do
+      [[ -f $f ]] || continue
+      name=${f##*/}
+      name=${name%.md}
+      desc=$(awk '/^# /{ sub(/^# /, ""); print; exit }' "$f")
+      MENU+=("$name:${desc:-$name}")
+    done
+    menu_builder "$USAGE_PREFIX" "${MENU[@]}"
+    return
+  fi
 
-  local path="$DOTFILES/docs/$file"
+  local name=${1##*/}
+  local path="$docs_dir/${name%.md}.md"
   if [[ ! -f $path ]]; then
-    echo "Documentation not found: $path (generate it with 'dfm helpers docs-$1')" >&2
+    echo "Documentation not found: $path" >&2
     return 1
   fi
-  cat "$path"
+
+  # x-glow applies the terminal-palette style so glow follows the theme
+  if command -v glow > /dev/null 2>&1; then
+    "$_dfm_dir/x-glow" "$path"
+  elif command -v bat > /dev/null 2>&1; then
+    bat "$path"
+  else
+    cat "$path"
+  fi
 }
 
 dfm_docs "$@"

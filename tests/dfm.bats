@@ -70,13 +70,27 @@ setup()
   [[ "$output" == *"env"* ]]
 }
 
-@test "dfm docs menu shows entries" {
+@test "dfm docs menu lists docs/*.md with first-header descriptions" {
   run bash local/bin/dfm docs
   [ "$status" -eq 0 ]
-  [[ "$output" == *"aliases"* ]]
-  [[ "$output" == *"tmux"* ]]
-  [[ "$output" == *"nvim"* ]]
-  [[ "$output" == *"wezterm"* ]]
+  [[ "$output" == *"Shell Aliases"* ]]
+  [[ "$output" == *"Interesting folders"* ]]
+  [[ "$output" == *"tmux keybindings"* ]]
+  [[ "$output" != *"audit"* ]]
+  [[ "$output" != *"findings"* ]]
+}
+
+@test "dfm docs renders a doc file" {
+  run bash local/bin/dfm docs folders
+  [ "$status" -eq 0 ]
+  # themed glow wraps words in ANSI spans, so match a single word
+  [[ "$output" == *"Interesting"* ]]
+}
+
+@test "dfm docs rejects unknown doc" {
+  run bash local/bin/dfm docs no-such-doc
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Documentation not found"* ]]
 }
 
 @test "dfm dotfiles menu shows entries" {

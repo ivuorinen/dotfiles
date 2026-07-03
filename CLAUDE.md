@@ -160,7 +160,8 @@ every section. Key commands:
 - `dfm dotfiles fmt` / `dfm dotfiles shfmt` — format configs/scripts
 - `dfm helpers <name>` — inspect aliases, colors, env, functions, path;
   `dfm helpers docs-*` (docs-aliases/nvim/tmux/wezterm/all) regenerate docs
-- `dfm docs <name>` — show generated documentation under `docs/`
+- `dfm docs [name]` — list/show `docs/*.md` (glow → bat → cat; never
+  scans `docs/audit/`)
 - `dfm check arch` / `dfm check host` — system info
 - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers
