@@ -3,27 +3,13 @@
 # Color the grep output
 alias grep="grep --color"
 
-# ls family: eza with git annotations inside a work tree, system ls otherwise.
-# Mirrors the fish eza_git wrapper so ls/l/ll/lsa match across shells.
-if x-have eza; then
-  eza_git()
-  {
-    if git rev-parse --is-inside-work-tree &> /dev/null; then
-      eza --group-directories-first --icons=always --smart-group --git "$@"
-    else
-      eza --group-directories-first --icons=always --smart-group "$@"
-    fi
-  }
-  alias ls='eza_git'
-  alias l='eza_git'
-  alias ll='eza_git -l'
-  alias lsa='eza_git -al'
-else
-  alias ls='command ls'
-  alias l='command ls'
-  alias ll='command ls -lh'
-  alias lsa='command ls -lah'
-fi
+# ls family: eza with git annotations inside a work tree, system ls
+# otherwise. Gating and logic live in local/bin/x-eza-git; fish
+# alias.fish points there too.
+alias ls='x-eza-git'
+alias l='x-eza-git'
+alias ll='x-eza-git -l'
+alias lsa='x-eza-git -al'
 
 # gopass password manager shortcut (resolves via PATH / mise shim)
 x-have gopass && {

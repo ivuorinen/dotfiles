@@ -43,10 +43,10 @@ are the same in every shell and are not listed here.
 | `gwr`     | `git worktree remove`                                                                                  |
 | `irssi`   | `irssi --config=$XDG_CONFIG_HOME/irssi/config --home=$XDG_CONFIG_HOME/irssi`                           |
 | `isodate` | `date +'%Y-%m-%d'`                                                                                     |
-| `l`       | `eza_git`                                                                                              |
-| `ll`      | `eza_git -l`                                                                                           |
-| `ls`      | `eza_git`                                                                                              |
-| `lsa`     | `eza_git -al`                                                                                          |
+| `l`       | `x-eza-git`                                                                                            |
+| `ll`      | `x-eza-git -l`                                                                                         |
+| `ls`      | `x-eza-git`                                                                                            |
+| `lsa`     | `x-eza-git -al`                                                                                        |
 | `p`       | `gopass`                                                                                               |
 | `peek`    | `tee /dev/stderr`                                                                                      |
 | `sl`      | `ls`                                                                                                   |

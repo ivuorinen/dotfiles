@@ -28,48 +28,11 @@ if type -q gopass
     alias p='gopass'
 end
 
-# eza aliases if eza is installed
-if type -q eza >/dev/null
-    function eza_git -d "Use eza and its git options if in a git repo"
-        if git rev-parse --is-inside-work-tree &>/dev/null
-            eza --group-directories-first --icons=always \
-                --smart-group --git $argv
-        else
-            eza --group-directories-first \
-                --icons=always \
-                --smart-group $argv
-        end
-    end
-
-    function lsa --wraps='eza_git -al' --description 'eza -al'
-        eza_git -al $argv
-    end
-
-    function ls --wraps='eza_git' --description eza
-        eza_git $argv
-    end
-
-    function ll --wraps='eza_git -l' --description 'eza -l'
-        eza_git -l $argv
-    end
-
-    function l --wraps='eza_git' --description eza
-        eza_git $argv
-    end
-else
-    function ls --description 'ls (system fallback)'
-        command ls $argv
-    end
-    function ll --description 'ls -lh (system fallback)'
-        command ls -lh $argv
-    end
-    function l --description 'ls (system fallback)'
-        command ls $argv
-    end
-    function lsa --description 'ls -lah (system fallback)'
-        command ls -lah $argv
-    end
-end
+# ls family: gating and logic live in local/bin/x-eza-git
+abbr --add ls x-eza-git
+abbr --add l x-eza-git
+abbr --add ll x-eza-git -l
+abbr --add lsa x-eza-git -al
 
 # Edit fish alias file
 function .a \

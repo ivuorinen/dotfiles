@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# @description Run eza with git annotations inside a git work tree
+#USAGE about "Run eza with git annotations inside a git work tree"
+#
+# Shared backend for the ls/l/ll/lsa aliases in bash, zsh, and fish:
+# eza with the standard flags, adding --git inside a git work tree.
+# Falls back to system ls when eza is missing, so the aliases need no
+# gating of their own. The aliases only pass -l/-al, which ls accepts
+# too; -h is a no-op without -l, so ll still matches the old ls -lh.
+# No msgr: hot path (every ls), and the script has no output of its own.
+
+set -euo pipefail
+
+if command -v eza > /dev/null 2>&1; then
+  args=(--group-directories-first --icons=always --smart-group)
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    args+=(--git)
+  fi
+  exec eza "${args[@]}" "$@"
+fi
+exec ls -h "$@"
