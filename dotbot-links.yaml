@@ -38,6 +38,11 @@
       glob: true
       path: base/*
       prefix: "."
+      # base/claude must never match this glob: force: true would replace
+      # the real ~/.claude (plugins, projects, history) with a dir symlink.
+      # Only its single file is linked, explicitly, below.
+      exclude:
+        - base/claude
     # Most of the configs
     ~/.config/:
       glob: true
@@ -51,6 +56,10 @@
       exclude:
         - config/op
         - config/cosmic-desktop
+    # Claude Code statusline (single file — see base/claude exclude above)
+    ~/.claude/statusline-command.sh:
+      relink: true
+      path: base/claude/statusline-command.sh
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
