@@ -34,3 +34,5 @@ FILTER_REGEX_EXCLUDE: >
 # directives, fzf FZF_DEFAULT_OPTS exports), not executed, so the
 # linter's expectation does not apply.
 BASH_EXEC_FILTER_REGEX_EXCLUDE: "config/theme/palettes\\.d/"
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
