@@ -1,0 +1,300 @@
+#!/bin/sh
+# list-open-prs.sh
+# List all currently open PRs across public GitHub repos owned by `ivuorinen`.
+# Uses `gh` when available + authenticated, else falls back to the GitHub
+# GraphQL API (needs GH_TOKEN or GITHUB_TOKEN). Output goes to stdout so it can
+# be redirected or piped. Requires `jq`.
+set -eu
+
+OWNER="ivuorinen"
+UNABLE="Unable to query GitHub."
+NONE="No open PRs."
+
+# jq is mandatory for parsing the JSON the GitHub tooling returns.
+if ! command -v jq > /dev/null 2>&1; then
+  echo "$UNABLE"
+  exit 0
+fi
+
+TMP="$(mktemp)"
+FINAL_JQ="$(mktemp)"
+RESHAPE_JQ="$(mktemp)"
+trap 'rm -f "$TMP" "$FINAL_JQ" "$RESHAPE_JQ"' EXIT INT TERM
+
+# --- final.jq: classify, group, sort and render the merged PR objects --------
+cat > "$FINAL_JQ" << 'JQ'
+# Input (jq -s): array of gh-shaped PR objects, each annotated with .repo.
+
+def lc: ascii_downcase;
+
+def agesecs: now - (.createdAt | fromdateiso8601);
+
+def agestr($s):
+  if   $s < 3600  then "\(($s / 60)    | floor)m"
+  elif $s < 86400 then "\(($s / 3600)  | floor)h"
+  else                 "\(($s / 86400) | floor)d"
+  end;
+
+def review:
+  if   .reviewDecision == "APPROVED"          then "approved"
+  elif .reviewDecision == "CHANGES_REQUESTED" then "changes requested"
+  else                                             "awaiting review"
+  end;
+
+# Per-check verdict: "fail" | "pending" | "pass".
+def check_state($c):
+  if $c.state != null then
+    ( $c.state
+      | if   . == "SUCCESS"                   then "pass"
+        elif (. == "FAILURE" or . == "ERROR") then "fail"
+        else                                       "pending"
+        end )
+  else
+    ( ($c.status // "")     as $st
+    | ($c.conclusion // "") as $cc
+    | if $st != "COMPLETED" then "pending"
+      elif (["FAILURE", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED",
+            "STARTUP_FAILURE", "STALE"] | index($cc)) then "fail"
+      elif (["SUCCESS", "NEUTRAL", "SKIPPED"] | index($cc)) then "pass"
+      else "pending"
+      end )
+  end;
+
+def ci:
+  [ (.statusCheckRollup // [])[] | check_state(.) ] as $st
+  | if   ($st | any(. == "fail"))    then "failing"
+    elif ($st | any(. == "pending")) then "pending"
+    elif ($st | length) == 0         then "passing"
+    elif ($st | all(. == "pass"))    then "passing"
+    else                                  "pending"
+    end;
+
+def branch:
+  ( .mergeable        // "UNKNOWN" ) as $m
+  | ( .mergeStateStatus // "UNKNOWN" ) as $s
+  | if   $m == "CONFLICTING" or $s == "DIRTY" then "conflict"
+    elif $s == "BEHIND"                       then "behind"
+    elif $m == "MERGEABLE"                    then "up to date"
+    else                                           "unknown"
+    end;
+
+def labelnames: [ (.labels // [])[] | .name ];
+
+def haystack:
+  [ .title, (labelnames | join(" ")), (.headRefName // "") ] | join(" ") | lc;
+
+def is_security:
+  ( haystack | test("vulnerabilit|security|cve|ghsa|advisor") )
+  or ( labelnames | map(lc) | any(. == "security") );
+
+def is_robot:
+  ( .author.is_bot == true )
+  or ( (.author.login // "") | lc
+      | ( test("renovate|dependabot|github-actions") or endswith("[bot]") ) );
+
+# Best-effort dependency name from a bot PR's title/branch.
+def dependency:
+  .title as $t
+  | (.headRefName // "") as $br
+  | if ( ($t | test(" and [0-9]+ other| and other| the .+ group| group with"; "i"))
+        or ($br | test("/all\\b|/all-|multiple"; "i")) ) then
+      "Multiple dependencies"
+    elif ($t | test("bump "; "i")) then
+      ( $t | capture("bump (?<d>[^ ]+) from"; "i") | .d ) // "Other robot PRs"
+    elif ($t | test("update dependency "; "i")) then
+      ( $t | capture("update dependency (?<d>[^ ]+) to"; "i") | .d )
+        // "Other robot PRs"
+    elif ($t | test("update .+ (monorepo|action|docker)"; "i")) then
+      ( $t | capture("update (?<d>.+?) (monorepo|action|docker)"; "i") | .d )
+        // "Other robot PRs"
+    elif ($t | test("update .+ to "; "i")) then
+      ( $t | capture("update (?<d>.+?) to "; "i") | .d ) // "Other robot PRs"
+    else
+      "Other robot PRs"
+    end;
+
+def mkrec:
+  agesecs as $secs
+  | {
+      repo:    .repo,
+      number:  .number,
+      title:   .title,
+      author:  (.author.login // "unknown"),
+      created: .createdAt,
+      isDraft: (.isDraft // false),
+      secs:    $secs,
+      stale:   ($secs > (3 * 86400)),
+      review:  review,
+      ci:      ci,
+      branch:  branch,
+      sec:     is_security,
+      robot:   is_robot,
+      dep:     dependency,
+      url:     .url
+    }
+  | . + { age: agestr(.secs) };
+
+def prefixes:
+  [ (if .sec              then "SECURITY" else empty end),
+    (if .ci == "failing"  then "FAILING"  else empty end),
+    (if .stale            then "STALE"    else empty end),
+    (if .isDraft          then "DRAFT"    else empty end) ];
+
+def bullet:
+  ( prefixes | if length > 0 then "[" + join(" ") + "] " else "" end ) as $p
+  | "\(.repo)#\(.number): \(.title)\n"
+    + "   — status: \($p)\n"
+    + "   — url:    \(.url)\n"
+    + "   — author: \(.author)\n"
+    + "   — open    \(.age)\n"
+    + "   — review: \(.review)\n"
+    + "   — ci:     \(.ci)\n"
+    + "   — branch: \(.branch)\n"
+    + "";
+
+def sortkey:
+  [ (if .ci == "failing" then 0 else 1 end),
+    (if .stale           then 0 else 1 end),
+    .created ];
+
+map(mkrec)
+| ( map(select(.sec))                 | sort_by(sortkey) )  as $sec
+| ( map(select(.sec | not)) )                               as $rest
+| ( $rest | map(select(.robot | not)) | sort_by(sortkey) )  as $hum
+| ( $rest | map(select(.robot)) )                           as $rob
+| ( $rob
+    | group_by(.dep)
+    | map({ dep:    .[0].dep,
+            prs:    sort_by(.created),
+            oldest: ( map(.created) | min ) } )
+    | sort_by(.oldest) ) as $groups
+| [ ( if ($sec | length) > 0
+      then ( ["\n## Security updates\n"] + ($sec | map(bullet)) | join("\n") )
+      else empty end ),
+    ( if ($hum | length) > 0
+      then ( ["\n## Human PRs\n"] + ($hum | map(bullet)) | join("\n") )
+      else empty end ),
+    ( if ($groups | length) > 0
+      then (["\n## Robots\n"]
+            + [ $groups[] | ( "### \(.dep)", (.prs[] | bullet) ) ]
+            | join("\n") )
+      else empty end )
+  ]
+| join("\n\n")
+JQ
+
+# --- reshape.jq: GraphQL response -> gh-shaped PR objects (one per line) ------
+cat > "$RESHAPE_JQ" << 'JQ'
+.data.repository.pullRequests.nodes[]
+| {
+    repo:             $repo,
+    number:           .number,
+    title:            .title,
+    createdAt:        .createdAt,
+    isDraft:          .isDraft,
+    url:              .url,
+    headRefName:      .headRefName,
+    reviewDecision:   .reviewDecision,
+    mergeable:        .mergeable,
+    mergeStateStatus: .mergeStateStatus,
+    author: {
+      login:  (.author.login // "unknown"),
+      is_bot: ((.author.__typename // "") == "Bot")
+    },
+    labels: [ (.labels.nodes // [])[] | { name } ],
+    statusCheckRollup:
+      [ ((.commits.nodes[0].commit.statusCheckRollup.contexts.nodes) // [])[] ]
+  }
+JQ
+
+# --- collect PRs -------------------------------------------------------------
+if command -v gh > /dev/null 2>&1 && gh auth status > /dev/null 2>&1; then
+  # gh path
+  if ! repos="$(gh repo list "$OWNER" --public --no-archived --limit 1000 \
+    --json nameWithOwner --jq '.[].nameWithOwner' 2> /dev/null)"; then
+    echo "$UNABLE"
+    exit 0
+  fi
+
+  FIELDS="number,title,author,createdAt,isDraft,reviewDecision,statusCheckRollup"
+  FIELDS="$FIELDS,mergeStateStatus,mergeable,labels,headRefName,url"
+
+  printf '%s\n' "$repos" | while IFS= read -r nwo; do
+    [ -n "$nwo" ] || continue
+    short="${nwo##*/}"
+    gh pr list --repo "$nwo" --state open --limit 100 --json "$FIELDS" \
+      2> /dev/null \
+      | jq -c --arg repo "$short" '.[] | . + {repo: $repo}' \
+        >> "$TMP" 2> /dev/null || true
+  done
+else
+  # GraphQL fallback path
+  TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
+  if [ -z "$TOKEN" ] || ! command -v curl > /dev/null 2>&1; then
+    echo "$UNABLE"
+    exit 0
+  fi
+
+  # Public, non-archived repos owned by OWNER (paginated REST).
+  repos=""
+  page=1
+  while :; do
+    url="https://api.github.com/users/$OWNER/repos?type=owner&per_page=250&page=$page"
+    if ! resp="$(curl -fsSL \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Accept: application/vnd.github+json" "$url")"; then
+      echo "$UNABLE"
+      exit 0
+    fi
+    names="$(printf '%s' "$resp" \
+      | jq -r '.[] | select(.archived == false and .private == false) | .name')"
+    [ -n "$names" ] && repos="$repos$names
+"
+    count="$(printf '%s' "$resp" | jq 'length')"
+    [ "$count" -lt 100 ] && break
+    page=$((page + 1))
+  done
+
+  # GraphQL query (split to keep lines short).
+  q='query($owner:String!,$name:String!){'
+  q="$q"'repository(owner:$owner,name:$name){'
+  q="$q"'pullRequests(states:OPEN,first:100){nodes{'
+  q="$q"'number title createdAt isDraft url headRefName reviewDecision '
+  q="$q"'mergeable mergeStateStatus author{login __typename} '
+  q="$q"'labels(first:50){nodes{name}} '
+  q="$q"'commits(last:1){nodes{commit{statusCheckRollup{'
+  q="$q"'contexts(first:100){nodes{__typename '
+  q="$q"'... on CheckRun{name status conclusion} '
+  q="$q"'... on StatusContext{context state}}}}}}}}}}'
+
+  printf '%s\n' "$repos" | while IFS= read -r name; do
+    [ -n "$name" ] || continue
+    body="$(jq -n --arg q "$q" --arg owner "$OWNER" --arg name "$name" \
+      '{query: $q, variables: {owner: $owner, name: $name}}')"
+    resp="$(curl -fsSL \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -X POST -d "$body" https://api.github.com/graphql 2> /dev/null)" \
+      || continue
+    printf '%s' "$resp" \
+      | jq -c --arg repo "$name" -f "$RESHAPE_JQ" >> "$TMP" 2> /dev/null \
+      || true
+  done
+fi
+
+# --- render ------------------------------------------------------------------
+if [ ! -s "$TMP" ]; then
+  echo "$NONE"
+  exit 0
+fi
+
+if ! out="$(jq -rs -f "$FINAL_JQ" "$TMP" 2> /dev/null)"; then
+  echo "$UNABLE"
+  exit 0
+fi
+
+if [ -z "$out" ]; then
+  echo "$NONE"
+else
+  printf '%s\n' "$out"
+fi
