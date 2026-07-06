@@ -116,3 +116,12 @@ local/man/man1/*.1
 # TELEVISION_CONFIG set (a non-dotfiles shell) would dump its default
 # config.toml here — never track it.
 config/television/config.toml
+
+# The theme handler (config/theme/handlers.d/yazi) writes yazi's active
+# theme.toml symlink and the Catppuccin-<flavor>.tmTheme links into
+# ~/.config/yazi on every dark/light flip. That path is a plain symlink into
+# this repo, so those links land back in config/yazi/ — regenerated on every
+# flip. Source of truth is config/theme/palettes.d/yazi.{dark,light}.toml and
+# config/bat/themes/; never track the generated links.
+config/yazi/theme.toml
+config/yazi/Catppuccin-*.tmTheme
