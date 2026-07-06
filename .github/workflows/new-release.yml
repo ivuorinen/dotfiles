@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Create tag if necessary
-        uses: fregante/daily-version-action@4af8dc643a823f1e44ca39810cd5fe5e4397c26e # v3.0.0
+        uses: fregante/daily-version-action@4bd6944b98e29a3d1b130677012fb1e4ffddc31d # v3.1.0
         id: daily-version
 
       - name: Create changelog text
