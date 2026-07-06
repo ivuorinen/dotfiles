@@ -236,6 +236,23 @@ Preview: PR detail (title, status, author, review decision, age, labels, body)
 | `Ctrl-o` | `gh pr checkout`   |
 | `Ctrl-y` | `gh pr merge`      |
 
+### `gh-repos` — GitHub repositories
+
+`config/television/cable/gh-repos.toml`
+Requirements: `gh`, `git`, `jq`, `tv-gh-repos`
+Sources (cycle with `Ctrl-s`): All, User, Organizations, Public, Private, Internal, Non-forks, Forks
+Preview: repo detail plus local checkout state (branch, worktree, sync, remotes)
+Cache: 15 min under `~/.cache/television/gh-repos`; tune with `GH_REPOS_*` env vars (see `tv-gh-repos help`)
+
+| Key      | Action                                                  |
+|----------|---------------------------------------------------------|
+| `Enter`  | SSH-clone under `~/Code/<owner>/<repo>`                 |
+| `Ctrl-o` | Open in browser                                         |
+| `Ctrl-p` | `git fetch --prune` + `git pull --ff-only` (clean only) |
+| `Ctrl-e` | Open local checkout in `$EDITOR`                        |
+| `Ctrl-y` | Copy repository URL                                     |
+| `Ctrl-r` | Refresh cache and reload                                |
+
 ---
 
 ## Bundled Channels

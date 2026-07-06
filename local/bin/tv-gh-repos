@@ -1,0 +1,763 @@
+#!/usr/bin/env bash
+# @description Backend for the television gh-repos channel
+#USAGE about "Backend for the television gh-repos channel"
+#USAGE cmd "list" help="List cached repositories as TSV (all|user|organizations|public|private|internal|non-forks|forks)"
+#USAGE cmd "preview" help="Render the preview pane for OWNER/REPO"
+#USAGE cmd "clone" help="SSH-clone OWNER/REPO under the local code root"
+#USAGE cmd "open" help="Open OWNER/REPO in the browser"
+#USAGE cmd "pull" help="fetch --prune + pull --ff-only in a clean local checkout"
+#USAGE cmd "edit" help="Open the local checkout in the editor"
+#USAGE cmd "copy-url" help="Copy the repository URL to the clipboard"
+#USAGE cmd "refresh" help="Force-refresh the repository cache"
+#
+# tv-gh-repos — backend for the television gh-repos channel
+# (config/television/cable/gh-repos.toml): repository list source,
+# preview renderer, and keybinding actions in one script.
+#
+# `list` caches gh output under $XDG_CACHE_HOME/television/gh-repos and
+# emits one TSV row per repository. The cable config addresses columns
+# by index ({split:\t:N}), so the column order is load-bearing:
+#   0 nameWithOwner  1 visibility   2 isFork      3 url
+#   4 displayName    5 description  6 ownerType   7 owner
+#   8 ownerOrder     9 gitMarker   10 gitSummary
+#
+# No msgr: stdout is machine-parsed by television (TSV rows, preview
+# text), not human-facing logging.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly CHANNEL_NAME="gh-repos"
+readonly CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/television/${CHANNEL_NAME}"
+readonly LIST_JSON="${CACHE_DIR}/repos.json"
+readonly LIST_TSV="${CACHE_DIR}/repos.tsv"
+readonly CACHE_TTL_SECONDS="${GH_REPOS_CACHE_TTL_SECONDS:-900}"
+readonly CODE_ROOT="${GH_REPOS_CODE_ROOT:-$HOME/Code}"
+readonly LIMIT="${GH_REPOS_LIMIT:-200}"
+readonly INCLUDE_ORGS="${GH_REPOS_INCLUDE_ORGS:-1}"
+
+usage()
+{
+  cat << 'USAGE'
+Usage:
+  tv-gh-repos list [all|user|organizations|public|private|internal|non-forks|forks] [--refresh]
+  tv-gh-repos preview OWNER/REPO
+  tv-gh-repos clone OWNER/REPO
+  tv-gh-repos open OWNER/REPO
+  tv-gh-repos pull OWNER/REPO
+  tv-gh-repos edit OWNER/REPO
+  tv-gh-repos copy-url OWNER/REPO
+  tv-gh-repos refresh
+
+Environment:
+  GH_REPOS_LIMIT              Repository list limit per user/org. Default: 200.
+  GH_REPOS_CACHE_TTL_SECONDS  Cache TTL in seconds. Default: 900.
+  GH_REPOS_CODE_ROOT          Local checkout root. Default: $HOME/Code.
+  GH_REPOS_INCLUDE_ORGS       Include authenticated user's organizations. Default: 1.
+USAGE
+}
+
+die()
+{
+  printf 'tv-gh-repos: %s\n' "$*" >&2
+  exit 1
+}
+
+warn()
+{
+  printf 'tv-gh-repos: warning: %s\n' "$*" >&2
+}
+
+require_command()
+{
+  command -v "$1" > /dev/null 2>&1 || die "required command not found: $1"
+}
+
+require_base_commands()
+{
+  require_command gh
+  require_command jq
+}
+
+cache_file_mtime()
+{
+  local file="$1"
+
+  if stat -c %Y "$file" > /dev/null 2>&1; then
+    stat -c %Y "$file"
+    return
+  fi
+
+  if stat -f %m "$file" > /dev/null 2>&1; then
+    stat -f %m "$file"
+    return
+  fi
+
+  die "cannot read mtime for cache file: $file"
+}
+
+cache_is_fresh()
+{
+  [[ -s "$LIST_JSON" && -s "$LIST_TSV" ]] || return 1
+
+  local now
+  local mtime
+
+  now="$(date +%s)"
+  mtime="$(cache_file_mtime "$LIST_JSON")"
+
+  ((now - mtime < CACHE_TTL_SECONDS))
+}
+
+repo_path()
+{
+  local repo="$1"
+  printf '%s/%s\n' "$CODE_ROOT" "$repo"
+}
+
+safe_repo_name()
+{
+  local repo="$1"
+  [[ "$repo" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || die "invalid repository name: $repo"
+}
+
+authenticated_login()
+{
+  gh api user --jq .login
+}
+
+organization_logins()
+{
+  gh api --paginate user/orgs \
+    | jq -r '.[] | .login' \
+    | sort -f
+}
+
+append_owner_repos()
+{
+  local owner="$1"
+  local owner_type="$2"
+  local owner_order="$3"
+  local output_file="$4"
+
+  local owner_json
+  local owner_err
+
+  owner_json="$(mktemp "${CACHE_DIR}/owner.json.XXXXXX")"
+  owner_err="$(mktemp "${CACHE_DIR}/owner.err.XXXXXX")"
+
+  if ! gh repo list "$owner" \
+    --json nameWithOwner,visibility,isFork,description,url \
+    --no-archived \
+    --limit "$LIMIT" > "$owner_json" 2> "$owner_err"; then
+    warn "could not list repositories for ${owner}; skipping"
+    sed 's/^/  /' "$owner_err" >&2 || true
+    rm -f "$owner_json" "$owner_err"
+    return 0
+  fi
+
+  jq -c \
+    --arg owner "$owner" \
+    --arg ownerType "$owner_type" \
+    --argjson ownerOrder "$owner_order" '
+      sort_by(.isFork, (.nameWithOwner | ascii_downcase))[] |
+      . + {
+        tvOwner: $owner,
+        tvOwnerType: $ownerType,
+        tvOwnerOrder: $ownerOrder
+      }
+    ' "$owner_json" >> "$output_file"
+
+  rm -f "$owner_json" "$owner_err"
+}
+
+refresh_cache()
+{
+  require_base_commands
+  mkdir -p "$CACHE_DIR"
+
+  local tmp_json
+  local tmp_tsv
+  local tmp_ndjson
+
+  # Remove temp files on any exit, including die() mid-refresh. The
+  # globs only match mktemp-suffixed names (repos.json.XXXXXX), never
+  # repos.json/repos.tsv themselves, and also sweep leftovers from
+  # previously interrupted runs.
+  trap 'rm -f "${CACHE_DIR}"/repos.json.* "${CACHE_DIR}"/repos.tsv.* "${CACHE_DIR}"/repos.ndjson.* "${CACHE_DIR}"/owner.*' EXIT
+
+  tmp_json="$(mktemp "${CACHE_DIR}/repos.json.XXXXXX")"
+  tmp_tsv="$(mktemp "${CACHE_DIR}/repos.tsv.XXXXXX")"
+  tmp_ndjson="$(mktemp "${CACHE_DIR}/repos.ndjson.XXXXXX")"
+
+  local login
+  login="$(authenticated_login)"
+  [[ -n "$login" ]] || die "could not resolve authenticated GitHub login"
+
+  # Fetch each owner in parallel; per-owner files concatenated in
+  # owner order keep the output deterministic (no_sort in the cable).
+  # ponytail: no concurrency cap — fine for a dozen owners.
+  local -a owner_files=()
+  local owner_file
+
+  owner_file="$(mktemp "${CACHE_DIR}/owner.ndjson.XXXXXX")"
+  owner_files+=("$owner_file")
+  append_owner_repos "$login" "USER" 0 "$owner_file" &
+
+  if [[ "$INCLUDE_ORGS" != "0" ]]; then
+    local org
+    local owner_order=1
+
+    while IFS= read -r org; do
+      [[ -n "$org" ]] || continue
+      owner_file="$(mktemp "${CACHE_DIR}/owner.ndjson.XXXXXX")"
+      owner_files+=("$owner_file")
+      append_owner_repos "$org" "ORG" "$owner_order" "$owner_file" &
+      owner_order=$((owner_order + 1))
+    done < <(organization_logins)
+  fi
+
+  wait
+
+  cat "${owner_files[@]}" > "$tmp_ndjson"
+  rm -f "${owner_files[@]}"
+
+  if [[ -s "$tmp_ndjson" ]]; then
+    jq -s '.' "$tmp_ndjson" > "$tmp_json"
+  else
+    printf '[]\n' > "$tmp_json"
+  fi
+
+  jq -r '
+    .[] |
+    [
+      .nameWithOwner,
+      .visibility,
+      (.isFork | tostring),
+      .url,
+      (.nameWithOwner + (if .isFork then " ⑂" else "" end)),
+      (.description // "" | gsub("[\t\r\n]+"; " ")),
+      .tvOwnerType,
+      .tvOwner,
+      (.tvOwnerOrder | tostring)
+    ] |
+    @tsv
+  ' "$tmp_json" > "$tmp_tsv"
+
+  mv "$tmp_json" "$LIST_JSON"
+  mv "$tmp_tsv" "$LIST_TSV"
+
+  rm -f "$tmp_ndjson"
+}
+
+ensure_cache()
+{
+  local force_refresh="${1:-false}"
+
+  if [[ "$force_refresh" == "true" ]] || ! cache_is_fresh; then
+    refresh_cache
+  fi
+}
+
+# One `git status --porcelain=v2 --branch` call per cloned repo gives
+# dirty state, upstream, and ahead/behind counts at once. Results land
+# in the GIT_MARKER/GIT_SUMMARY globals so the per-row caller forks
+# nothing — this runs for every row on every source render.
+git_list_status_fields()
+{
+  local repo="$1"
+  local target="${CODE_ROOT}/${repo}"
+
+  GIT_MARKER='○'
+  GIT_SUMMARY='not cloned'
+
+  [[ -d "$target/.git" ]] || return 0
+
+  local out
+  if ! out="$(git -C "$target" status --porcelain=v2 --branch 2> /dev/null)"; then
+    GIT_MARKER='?'
+    GIT_SUMMARY='status failed'
+    return 0
+  fi
+
+  local line
+  local upstream=""
+  local ahead="0"
+  local behind="0"
+  local dirty="false"
+
+  while IFS= read -r line; do
+    case "$line" in
+      '# branch.upstream '*)
+        upstream="${line#'# branch.upstream '}"
+        ;;
+      '# branch.ab '*)
+        # branch.ab is space-separated; the script-global IFS is \n\t.
+        IFS=' ' read -r ahead behind <<< "${line#'# branch.ab '}"
+        ahead="${ahead#+}"
+        behind="${behind#-}"
+        ;;
+      '#'*) ;;
+      ?*)
+        # Header lines always precede entries, so the first entry
+        # line means dirty and nothing further needs parsing.
+        dirty="true"
+        break
+        ;;
+    esac
+  done <<< "$out"
+
+  if [[ "$dirty" == "true" ]]; then
+    GIT_MARKER='●'
+    GIT_SUMMARY='dirty'
+  elif [[ -z "$upstream" ]]; then
+    GIT_MARKER='?'
+    GIT_SUMMARY='no upstream'
+  elif [[ "$ahead" != "0" && "$behind" != "0" ]]; then
+    GIT_MARKER='↕'
+    GIT_SUMMARY="+${ahead}/-${behind}"
+  elif [[ "$ahead" != "0" ]]; then
+    GIT_MARKER='⇡'
+    GIT_SUMMARY="ahead ${ahead}"
+  elif [[ "$behind" != "0" ]]; then
+    GIT_MARKER='⇣'
+    GIT_SUMMARY="behind ${behind}"
+  else
+    GIT_MARKER='✓'
+    GIT_SUMMARY='clean'
+  fi
+}
+
+append_git_status_to_tsv()
+{
+  require_command git
+
+  local name_with_owner
+  local visibility
+  local is_fork
+  local url
+  local display_name
+  local description
+  local owner_type
+  local owner
+  local owner_order
+
+  while IFS=$'\t' read -r \
+    name_with_owner \
+    visibility \
+    is_fork \
+    url \
+    display_name \
+    description \
+    owner_type \
+    owner \
+    owner_order; do
+    [[ -n "${name_with_owner:-}" ]] || continue
+
+    git_list_status_fields "$name_with_owner"
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$name_with_owner" \
+      "$visibility" \
+      "$is_fork" \
+      "$url" \
+      "$display_name" \
+      "$description" \
+      "$owner_type" \
+      "$owner" \
+      "$owner_order" \
+      "$GIT_MARKER" \
+      "$GIT_SUMMARY"
+  done
+}
+
+list_repos()
+{
+  local filter="${1:-all}"
+  local force_refresh="false"
+
+  if [[ "$filter" == "--refresh" ]]; then
+    filter="all"
+    force_refresh="true"
+  elif [[ "${2:-}" == "--refresh" ]]; then
+    force_refresh="true"
+  fi
+
+  case "$filter" in
+    all | user | organizations | public | private | internal | non-forks | forks) ;;
+    *) die "unknown list filter: $filter" ;;
+  esac
+
+  ensure_cache "$force_refresh"
+
+  case "$filter" in
+    all)
+      cat "$LIST_TSV"
+      ;;
+    user)
+      awk -F '\t' '$7 == "USER"' "$LIST_TSV"
+      ;;
+    organizations)
+      awk -F '\t' '$7 == "ORG"' "$LIST_TSV"
+      ;;
+    public)
+      awk -F '\t' '$2 == "PUBLIC"' "$LIST_TSV"
+      ;;
+    private)
+      awk -F '\t' '$2 == "PRIVATE"' "$LIST_TSV"
+      ;;
+    internal)
+      awk -F '\t' '$2 == "INTERNAL"' "$LIST_TSV"
+      ;;
+    non-forks)
+      awk -F '\t' '$3 == "false"' "$LIST_TSV"
+      ;;
+    forks)
+      awk -F '\t' '$3 == "true"' "$LIST_TSV"
+      ;;
+  esac | append_git_status_to_tsv
+}
+
+git_remotes_json()
+{
+  local target="$1"
+  local remotes
+
+  if [[ ! -d "$target/.git" ]]; then
+    printf '[]\n'
+    return
+  fi
+
+  remotes="$(git -C "$target" remote -v 2> /dev/null || true)"
+
+  printf '%s\n' "$remotes" \
+    | awk 'NF > 0 && !seen[$0]++' \
+    | jq -R -s 'split("\n") | map(select(length > 0))'
+}
+
+local_git_status_json()
+{
+  local target="$1"
+  local remotes_json
+
+  remotes_json="$(git_remotes_json "$target")"
+
+  if [[ ! -d "$target/.git" ]]; then
+    jq -n \
+      --arg path "$target" \
+      --argjson remotes "$remotes_json" '
+      {
+        cloned: false,
+        path: $path,
+        branch: null,
+        worktree: "not cloned",
+        upstream: null,
+        ahead: null,
+        behind: null,
+        sync: "not cloned",
+        remotes: $remotes
+      }
+    '
+    return
+  fi
+
+  require_command git
+
+  local branch
+  local worktree
+  local upstream
+  local ahead="0"
+  local behind="0"
+  local sync
+  local porcelain
+  local counts
+
+  branch="$(
+    git -C "$target" symbolic-ref --quiet --short HEAD 2> /dev/null \
+      || git -C "$target" rev-parse --short HEAD 2> /dev/null \
+      || printf '%s' "-"
+  )"
+
+  porcelain="$(git -C "$target" status --porcelain=v1 2> /dev/null || true)"
+  if [[ -n "$porcelain" ]]; then
+    worktree="dirty"
+  else
+    worktree="clean"
+  fi
+
+  upstream="$(
+    git -C "$target" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2> /dev/null \
+      || true
+  )"
+
+  if [[ -n "$upstream" ]]; then
+    counts="$(git -C "$target" rev-list --left-right --count HEAD..."$upstream" 2> /dev/null || true)"
+
+    if [[ -n "$counts" ]]; then
+      read -r ahead behind <<< "$counts"
+    fi
+
+    if [[ "$ahead" == "0" && "$behind" == "0" ]]; then
+      sync="up to date"
+    elif [[ "$ahead" != "0" && "$behind" == "0" ]]; then
+      sync="ahead ${ahead}"
+    elif [[ "$ahead" == "0" && "$behind" != "0" ]]; then
+      sync="behind ${behind}"
+    else
+      sync="diverged +${ahead}/-${behind}"
+    fi
+  else
+    upstream="-"
+    ahead="-"
+    behind="-"
+    sync="no upstream"
+  fi
+
+  jq -n \
+    --arg path "$target" \
+    --arg branch "$branch" \
+    --arg worktree "$worktree" \
+    --arg upstream "$upstream" \
+    --arg ahead "$ahead" \
+    --arg behind "$behind" \
+    --arg sync "$sync" \
+    --argjson remotes "$remotes_json" '
+    {
+      cloned: true,
+      path: $path,
+      branch: $branch,
+      worktree: $worktree,
+      upstream: $upstream,
+      ahead: $ahead,
+      behind: $behind,
+      sync: $sync,
+      remotes: $remotes
+    }
+  '
+}
+
+preview_repo()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+  require_base_commands
+
+  local local_path
+  local git_state
+
+  local_path="$(repo_path "$repo")"
+  git_state="$(local_git_status_json "$local_path")"
+
+  gh repo view "$repo" \
+    --json nameWithOwner,description,url,sshUrl,visibility,isFork,defaultBranchRef,primaryLanguage,pushedAt,updatedAt,stargazerCount,forkCount,pullRequests,issues,parent,repositoryTopics \
+    | jq -r \
+      --arg local_path "$local_path" \
+      --argjson git "$git_state" '
+      def text_or_dash:
+        if . == null or . == "" then "-" else . end;
+
+      [
+        "Repository: " + .nameWithOwner + (if .isFork then " ⑂" else "" end),
+        "Visibility:  " + (.visibility // "-"),
+        "URL:         " + (.url // "-"),
+        "SSH:         " + (.sshUrl // "-"),
+        "Local path:  " + $local_path,
+        "Description: " + ((.description // "") | text_or_dash),
+        "",
+        "Git:",
+        "  Cloned:    " + (if $git.cloned then "yes" else "no" end),
+        "  Worktree:  " + ($git.worktree // "-"),
+        "  Branch:    " + ($git.branch // "-"),
+        "  Upstream:  " + ($git.upstream // "-"),
+        "  Sync:      " + ($git.sync // "-"),
+        "  Ahead:     " + ($git.ahead // "-"),
+        "  Behind:    " + ($git.behind // "-"),
+        "  Remotes:",
+        (if (($git.remotes // []) | length) == 0 then "    -" else ($git.remotes[] | "    " + .) end),
+        "",
+        "GitHub:",
+        "  Default branch: " + (.defaultBranchRef.name // "-"),
+        "  Language:       " + (.primaryLanguage.name // "-"),
+        "  Stars:          " + ((.stargazerCount // 0) | tostring),
+        "  Forks:          " + ((.forkCount // 0) | tostring),
+        "  Open PRs:       " + ((.pullRequests.totalCount? // 0) | tostring),
+        "  Open issues:    " + ((.issues.totalCount? // 0) | tostring),
+        "  Updated:        " + ((.updatedAt // "") | text_or_dash),
+        "  Pushed:         " + ((.pushedAt // "") | text_or_dash),
+        "  Topics:         " + (((.repositoryTopics // []) | map(.name) | join(", ")) | text_or_dash),
+        (if .isFork and .parent != null then "  Parent:         " + .parent.nameWithOwner else empty end),
+        "",
+        "Keybindings:",
+        "  [enter]  clone  -> SSH clone to " + $local_path,
+        "  [ctrl-o] open   -> browser",
+        "  [ctrl-p] pull   -> require clean worktree, fetch --prune, pull --ff-only",
+        "  [ctrl-e] edit   -> open local checkout in $EDITOR",
+        "  [ctrl-y] copy   -> copy repository URL",
+        "  [ctrl-r] refresh cache and reload source"
+      ] |
+      .[]
+    '
+}
+
+clone_repo()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+  require_command gh
+  require_command git
+
+  local target
+  local ssh_url
+
+  target="$(repo_path "$repo")"
+
+  if [[ -d "$target/.git" ]]; then
+    printf 'Already cloned: %s\n' "$target"
+    return 0
+  fi
+
+  if [[ -e "$target" ]]; then
+    die "target exists but is not a Git repository: $target"
+  fi
+
+  ssh_url="$(gh repo view "$repo" --json sshUrl --jq .sshUrl)"
+  [[ -n "$ssh_url" ]] || die "could not resolve SSH clone URL for: $repo"
+
+  mkdir -p "$(dirname "$target")"
+  git clone "$ssh_url" "$target"
+}
+
+open_repo()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+  require_command gh
+
+  gh repo view "$repo" --web > /dev/null
+}
+
+ensure_clean_worktree()
+{
+  local target="$1"
+  local porcelain
+
+  porcelain="$(git -C "$target" status --porcelain=v1)"
+
+  if [[ -n "$porcelain" ]]; then
+    printf 'Refusing to pull because the worktree is dirty: %s\n\n' "$target" >&2
+    git -C "$target" status --short >&2 || true
+    exit 1
+  fi
+}
+
+pull_repo()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+  require_command git
+
+  local target
+  target="$(repo_path "$repo")"
+
+  [[ -d "$target/.git" ]] || die "repository is not cloned: $target"
+
+  ensure_clean_worktree "$target"
+  git -C "$target" fetch --prune
+  git -C "$target" pull --ff-only
+}
+
+edit_repo()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+
+  local target
+  target="$(repo_path "$repo")"
+
+  [[ -d "$target/.git" ]] || die "repository is not cloned: $target"
+
+  cd "$target"
+  exec "${EDITOR:-nvim}" .
+}
+
+copy_to_clipboard()
+{
+  if command -v pbcopy > /dev/null 2>&1; then
+    pbcopy
+    return
+  fi
+
+  if command -v wl-copy > /dev/null 2>&1; then
+    wl-copy
+    return
+  fi
+
+  if command -v xclip > /dev/null 2>&1; then
+    xclip -selection clipboard
+    return
+  fi
+
+  die "no supported clipboard command found: pbcopy, wl-copy, or xclip"
+}
+
+copy_url()
+{
+  local repo="$1"
+  safe_repo_name "$repo"
+  require_command gh
+
+  local url
+  url="$(gh repo view "$repo" --json url --jq .url)"
+
+  printf '%s' "$url" | copy_to_clipboard
+  printf 'Copied: %s\n' "$url"
+}
+
+main()
+{
+  local command="${1:-}"
+  shift || true
+
+  case "$command" in
+    list)
+      list_repos "${1:-all}" "${2:-}"
+      ;;
+    preview)
+      [[ $# -eq 1 ]] || die "preview requires OWNER/REPO"
+      preview_repo "$1"
+      ;;
+    clone)
+      [[ $# -eq 1 ]] || die "clone requires OWNER/REPO"
+      clone_repo "$1"
+      ;;
+    open)
+      [[ $# -eq 1 ]] || die "open requires OWNER/REPO"
+      open_repo "$1"
+      ;;
+    pull)
+      [[ $# -eq 1 ]] || die "pull requires OWNER/REPO"
+      pull_repo "$1"
+      ;;
+    edit)
+      [[ $# -eq 1 ]] || die "edit requires OWNER/REPO"
+      edit_repo "$1"
+      ;;
+    copy-url)
+      [[ $# -eq 1 ]] || die "copy-url requires OWNER/REPO"
+      copy_url "$1"
+      ;;
+    refresh)
+      refresh_cache
+      printf 'Refreshed cache: %s\n' "$CACHE_DIR"
+      ;;
+    help | -h | --help | "")
+      usage
+      ;;
+    *)
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

@@ -1,0 +1,75 @@
+[metadata]
+name = "gh-repos"
+description = "Browse GitHub repositories with gh"
+requirements = ["gh", "git", "jq", "tv-gh-repos"]
+
+[source]
+command = [
+  { name = "All", run = "tv-gh-repos list all" },
+  { name = "User", run = "tv-gh-repos list user" },
+  { name = "Organizations", run = "tv-gh-repos list organizations" },
+  { name = "Public", run = "tv-gh-repos list public" },
+  { name = "Private", run = "tv-gh-repos list private" },
+  { name = "Internal", run = "tv-gh-repos list internal" },
+  { name = "Non-forks", run = "tv-gh-repos list non-forks" },
+  { name = "Forks", run = "tv-gh-repos list forks" },
+]
+display = "{split:\\t:9} {split:\\t:4} [{split:\\t:1}/{split:\\t:6}] {split:\\t:10}"
+output = "{split:\\t:0}"
+no_sort = true
+
+[preview]
+command = "tv-gh-repos preview '{split:\\t:0}'"
+header = "{split:\\t:4}"
+
+[ui]
+layout = "landscape"
+input_header = "GitHub repositories"
+input_prompt = "gh> "
+
+[ui.preview_panel]
+size = 55
+border_type = "rounded"
+padding = { left = 1, right = 1 }
+
+[ui.results_panel]
+border_type = "rounded"
+padding = { left = 1, right = 1 }
+
+[keybindings]
+enter = "actions:clone"
+ctrl-o = "actions:open"
+ctrl-p = "actions:pull"
+ctrl-e = "actions:edit"
+ctrl-y = "actions:copy-url"
+ctrl-r = ["actions:refresh", "reload_source"]
+
+[actions.clone]
+description = "Clone repository under $HOME/Code/<owner>/<repo> using SSH"
+command = "tv-gh-repos clone '{split:\\t:0}'"
+mode = "execute"
+
+[actions.open]
+description = "Open repository in browser"
+command = "tv-gh-repos open '{split:\\t:0}'"
+mode = "fork"
+
+[actions.pull]
+description = "Fetch with prune and run git pull --ff-only in a clean local checkout"
+command = "tv-gh-repos pull '{split:\\t:0}'"
+mode = "execute"
+
+[actions.edit]
+description = "Open local checkout in $EDITOR"
+command = "tv-gh-repos edit '{split:\\t:0}'"
+mode = "execute"
+
+[actions.copy-url]
+description = "Copy repository URL to clipboard"
+command = "tv-gh-repos copy-url '{split:\\t:0}'"
+mode = "fork"
+
+[actions.refresh]
+description = "Refresh repository cache and reload source"
+command = "tv-gh-repos refresh"
+mode = "fork"
