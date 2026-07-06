@@ -81,7 +81,7 @@ difftastic = "0.69.0"
 "npm:github-release-notes" = "0.17.3"
 
 # Editors & language servers
-neovim = "0.12.3"
+neovim = "0.12.4"
 tree-sitter = "0.26.10"
 "npm:neovim" = "5.4.0"                      # Node.js client for Neovim's RPC API (required by plugins)
 "npm:fish-lsp" = "1.1.4"
