@@ -16,8 +16,9 @@ fi
 
 # Library packages — installed into system Python with `uv pip install --system`
 libraries=(
-  libtmux # Python API for tmux
-  pynvim  # Neovim Python client
+  libtmux   # Python API for tmux
+  packaging # Version parsing (used by x-compare-versions.py)
+  pynvim    # Neovim Python client
 )
 
 # Function to install library packages via uv pip install
