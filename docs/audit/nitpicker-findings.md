@@ -1,16 +1,58 @@
 # Nitpicker Findings
 
 Generated: 2026-04-26
-Last validated: 2026-07-03
-Last pass: 42 (2026-07-03)
+Last validated: 2026-07-06
+Last pass: 44 (2026-07-06)
 
 ## Summary
 
-- Total: 188 | Open: 0 | Fixed: 179 | Invalid: 9
+- Total: 196 | Open: 1 | Fixed: 186 | Invalid: 9
 
 ## Open Findings
 
+### Advisory
+
+#### [N-204] x-eza-git upward .git walk never tests the filesystem root
+Category: correctness
+Area: local/bin/x-eza-git
+Problem: The forkless upward walk (`d=${d%/*}`) goes from `/x` to the empty string, so `/.git` is never checked and a repository rooted at `/` never gets `--git`.
+Evidence: Trace of the loop: `d=/x` → test `/x/.git` → `d=""` → loop exits; `/.git` untested.
+Impact: Cosmetic only — eza omits git annotations in the pathological repo-at-root case; the script's own `ponytail:` comment already declares the walk's known ceiling.
+Fix: If it ever matters, treat the empty remainder as `/` for one final check before breaking; not worth the branch today.
+
 ## Fixed
+
+### Pass 44 — 2026-07-06
+
+#### [N-202] mysql stub in x-backup-mysql-with-prefix.bats ignores -N
+Fixed: 2026-07-06
+Notes: Scoped verification pass over the ~43 edited `local/bin/x-*` scripts (user request: "verify the improvements are solid"). The script's rewrite correctly switched from `sed '/Tables_in/d'` to `mysql -N`, but the test stub unconditionally printed the header row, which word-split into two extra mysqldump args (argc 5 ≠ 3) — the suite's only failure. Stub now emits the header only when `-N` is absent, modeling the real client. Suite: 189/189 ok. Review evidence for the rest of the diff set: prek clean on all 43 files, `sh -n` clean on the 5 POSIX scripts, adversarial diff reading of every file, functional smoke tests (x-dc, x-visit-folders, x-until-success validation, x-env-list, x-localip, x-foreach, x-hr), and contract checks (x-gh-get-latest-version two-line return consumed correctly at its only call site, x-pr-comments pr_number threaded through, x-thumbgen env-override guarded in main, x-sonarcloud zero-padded page files merge in order). No behavioral regressions found.
+
+#### [N-203] x-compare-versions.py dead on this machine — packaging module missing
+Fixed: 2026-07-06
+Notes: Pre-existing environment defect surfaced during verification, not caused by the edits: `from packaging import version` (line 12, unchanged by the diff) failed under the active mise python 3.14, so every invocation including `--test` died. Installed via `uv pip install --system packaging` (26.2) and added `packaging` to the `libraries` array in `scripts/install-python-packages.sh` so future machine bootstraps get it. `--test` and a piped `1.0 < 2.0` comparison now pass.
+
+### Pass 43 — 2026-07-06
+
+#### [N-197] tv-gh-repos refresh fetches all owners sequentially
+Fixed: 2026-07-06
+Notes: Scoped performance pass on `local/bin/tv-gh-repos` (user report: "quite slow"). `refresh_cache` ran `gh repo list` for the user plus 11 orgs one at a time (measured 6.9 s for the 200-repo user account alone). Now each owner fetch runs as a background job writing to a per-owner temp file, concatenated in owner order after `wait`. Full cold refresh measured at 4.6 s — roughly the slowest single owner instead of the sum.
+
+#### [N-198] tv-gh-repos fetched the pullRequests GraphQL field nothing consumes
+Fixed: 2026-07-06
+Notes: The field added +64 % to each `gh repo list` call (4.22 s → 6.89 s measured on 200 repos), returned only `{totalCount}` (the `.nodes?` jq fallback was dead code), and fed TSV column 6, which no template in `config/television/cable/gh-repos.toml` references — the preview gets its PR count from `gh repo view` independently. Dropped the field and the column; renumbered the cable `display` splits (10→9, 7→6, 11→10) and the header-comment column map.
+
+#### [N-199] tv-gh-repos warm list spawned 3 git subprocesses + a subshell per row
+Fixed: 2026-07-06
+Notes: Every source render paid `git status` + `rev-parse` + `rev-list` per cloned repo plus a `read < <(...)` fork per row (226 rows). Rewrote `git_list_status_fields` around a single `git status --porcelain=v2 --branch` call parsed in-process, returning via `GIT_MARKER`/`GIT_SUMMARY` globals. Warm `list all` measured 0.98 s → 0.50 s. During verification this surfaced a real parse bug — the script-global `IFS=$'\n\t'` left `# branch.ab +0 -0` unsplit (space-separated) — fixed with a scoped `IFS=' '` on that read. Also verified end-to-end: 28 clones detected, markers ✓/●/⇡/? correct (a first diagnostic falsely showed all-○ because macOS UTF-8 collation makes `sort`/`uniq`/awk `==` treat ○/✓/● as equal; byte-exact `LC_ALL=C` counting confirmed correctness).
+
+#### [N-200] tv-gh-repos leaked mktemp files into the cache dir on refresh failure
+Fixed: 2026-07-06
+Notes: `die()` mid-refresh (e.g. gh auth failure) left `repos.json.XXXXXX` litter in `$XDG_CACHE_HOME/television/gh-repos`. Added an EXIT trap in `refresh_cache` that removes mktemp-suffixed names (also sweeping leftovers from previously interrupted runs); globs cannot match the final `repos.json`/`repos.tsv`.
+
+#### [N-201] tv-gh-repos `list --refresh` without a filter died
+Fixed: 2026-07-06
+Notes: `--refresh` as the first argument was parsed as a filter name and hit `die "unknown list filter"`. Now treated as `list all --refresh`. Not reachable from the cable config (its refresh action calls `tv-gh-repos refresh`); affected manual CLI use only.
 
 ### Pass 41 — 2026-07-03
 
