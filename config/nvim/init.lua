@@ -370,7 +370,7 @@ require('mason-tool-installer').setup {
 
 -- mason-lspconfig (above) auto-enables all mason-installed servers.
 -- Enable mise-managed servers that mason cannot see.
-vim.lsp.enable { 'fish_lsp', 'taplo' }
+vim.lsp.enable { 'fish_lsp', 'taplo', 'zizmor' }
 
 -- ── Navigation ───────────────────────────────────────────────────────
 -- Fuzzy finding is handled by snacks.nvim (below).
