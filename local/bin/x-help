@@ -2,7 +2,7 @@
 # x-help — Browse and display dotfiles documentation
 # @description Browse and display dotfiles documentation
 #USAGE about "Browse and display dotfiles documentation"
-#USAGE flag "--source-only" help="Show raw source instead of rendered output"
+#USAGE flag "--source-only" help="Load functions without running main (for tests)"
 #USAGE arg "[name]" help="Script name to look up (interactive fzf if omitted)"
 
 set -euo pipefail
@@ -56,7 +56,7 @@ direct_lookup()
   local matches
 
   matches=$(discover_files | while IFS= read -r path; do
-    if [[ "$(basename "$path")" == "$target" ]]; then
+    if [[ "${path##*/}" == "$target" ]]; then
       echo "$path"
     fi
   done)
@@ -65,16 +65,12 @@ direct_lookup()
     return 1
   fi
 
-  local count
-  count=$(echo "$matches" | wc -l)
-
-  if [[ "$count" -eq 1 ]]; then
-    echo "$matches"
-    return 0
-  else
-    echo "$matches"
+  echo "$matches"
+  # More than one line means multiple matches (no wc fork needed)
+  if [[ "$matches" == *$'\n'* ]]; then
     return 2
   fi
+  return 0
 }
 
 # Check that fzf is available. Called only in code paths that need it.

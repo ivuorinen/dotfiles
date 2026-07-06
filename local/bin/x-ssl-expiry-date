@@ -52,34 +52,31 @@ if [ "$#" = "0" ]; then
   usage
 fi
 
+# Make a temporary file, reused for every domain
+# Try GNU syntax first, fall back to BSD
+if tmp=$(mktemp 2> /dev/null) && [ -f "$tmp" ]; then
+  # GNU mktemp succeeded
+  :
+else
+  # Try BSD syntax
+  tmp=$(mktemp -t tmp)
+fi
+
+# Always clean up the temp file, even on Ctrl+C between domains.
+trap 'rm -f "$tmp"' EXIT INT TERM HUP
+
 # For each domain-name on the command-line.
 for name in "$@"; do
 
-  # Make a temporary file
-  # Try GNU syntax first, fall back to BSD
-  if tmp=$(mktemp 2> /dev/null) && [ -f "$tmp" ]; then
-    # GNU mktemp succeeded
-    :
-  else
-    # Try BSD syntax
-    tmp=$(mktemp -t tmp)
-  fi
-
-  # Always clean up the temp file, even on Ctrl+C between domains.
-  trap 'rm -f "$tmp"' EXIT INT TERM HUP
-
   # Download the certificate
-  if (! echo "" | openssl s_client -connect "$name:$port" > "$tmp" 2> /dev/null); then
+  if ! echo "" | openssl s_client -connect "$name:$port" > "$tmp" 2> /dev/null; then
     echo "Failed to get cert from https://$name:$port/"
     exit 3
   fi
 
-  # Get the expiry date
-  date=$(openssl x509 -in "$tmp" -noout -enddate | awk -F= '{print $2}')
-
-  # Remove the temporary file
-  rm -f "$tmp"
-  trap - EXIT INT TERM HUP
+  # Get the expiry date ("notAfter=Mar 14 12:00:00 2026 GMT")
+  date=$(openssl x509 -in "$tmp" -noout -enddate)
+  date=${date#*=}
 
   # Convert the expiry date + todays date to seconds-past epoch
   # Try GNU syntax first, fall back to BSD
@@ -87,20 +84,25 @@ for name in "$@"; do
     # GNU date succeeded
     :
   else
-    # BSD date requires manual parsing
-    year=$(echo "$date" | awk '{print $4}')
-    month=$(echo "$date" | awk '{print $1}')
-    day=$(echo "$date" | awk '{print $2}')
-    hour=$(echo "$date" | awk '{print $3}' | awk -F: '{print $1}')
-    minute=$(echo "$date" | awk '{print $3}' | awk -F: '{print $2}')
-    second=$(echo "$date" | awk '{print $3}' | awk -F: '{print $3}')
+    # BSD date requires manual parsing; split "Mar 14 12:00:00 2026 GMT"
+    # on whitespace (the for-loop list is already expanded, so reusing
+    # the positional parameters here is safe)
+    # shellcheck disable=SC2086
+    set -- $date
+    month=$1
+    day=$2
+    year=$4
+    hour=${3%%:*}
+    rest=${3#*:}
+    minute=${rest%%:*}
+    second=${rest#*:}
     then=$(date -v"${year}"y -v"${month}" -v"${day}"d -v"${hour}"H -v"${minute}"M -v"${second}"S -u +%s)
   fi
 
   now=$(date +%s)
 
-  # Day diff
-  diff=$(("$then" - "$now"))
+  # Day diff (no quotes inside $((..)) — dash rejects quoted operands)
+  diff=$((then - now))
   diff=$((diff / 86400))
 
   # All done

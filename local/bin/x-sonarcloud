@@ -48,10 +48,11 @@ readonly NC='\033[0m' # No Color
 readonly MAX_PAGE_SIZE=500
 readonly MAX_TOTAL_ISSUES=10000
 
-# Show usage information
+# Show usage information (anchored to the header block above, so it
+# survives line-number drift)
 show_usage()
 {
-  sed -n '3,27p' "$0" | sed 's/^# //' | sed 's/^#//'
+  awk '/^# x-sonarcloud -/, /^#   - sonar-project.properties/' "$0" | sed 's/^# //; s/^#//'
 }
 
 # Log functions
@@ -291,28 +292,33 @@ fetch_all_issues()
   local resolved="${8:-}"
 
   local page=1
-  local all_issues="[]"
   local total=0
+  local page_file page_count page_total
+
+  # One temp file per page, merged once at the end — re-merging the
+  # accumulator every page is O(n^2) in the issue count.
+  local tmpdir
+  tmpdir=$(mktemp -d) || return 1
 
   while true; do
     log_info "Fetching issues page $page..."
 
     local response
     response=$(fetch_issues_page "$base_url" "$project_key" "$page" \
-      "$pr_number" "$branch" "$severities" "$types" "$statuses" "$resolved") || return 1
+      "$pr_number" "$branch" "$severities" "$types" "$statuses" "$resolved") || {
+      rm -rf "$tmpdir"
+      return 1
+    }
 
-    local page_issues page_total
-    page_issues=$(echo "$response" | jq '.issues // []' 2> /dev/null || echo "[]")
-    page_total=$(echo "$response" | jq '.total // 0' 2> /dev/null || echo "0")
+    # Zero-padded page numbers keep the merge glob in fetch order
+    page_file="$tmpdir/page-$(printf '%03d' "$page").json"
+    jq '.issues // []' <<< "$response" 2> /dev/null > "$page_file" || echo "[]" > "$page_file"
 
-    local page_count
-    page_count=$(echo "$page_issues" | jq 'length' 2> /dev/null || echo "0")
+    page_count=$(jq 'length' "$page_file" 2> /dev/null || echo "0")
+    page_total=$(jq '.total // 0' <<< "$response" 2> /dev/null || echo "0")
 
     log_debug "Page $page: $page_count issues (total available: $page_total)"
-
-    # Merge into accumulated results
-    all_issues=$(echo "$all_issues" "$page_issues" | jq -s '.[0] + .[1]' 2> /dev/null || echo "$all_issues")
-    total=$(echo "$all_issues" | jq 'length' 2> /dev/null || echo "0")
+    total=$((total + page_count))
 
     # Check if we have all issues or hit the cap
     if [[ "$page_count" -lt "$MAX_PAGE_SIZE" ]]; then
@@ -328,7 +334,8 @@ fetch_all_issues()
   done
 
   log_info "Fetched $total issues total"
-  echo "$all_issues"
+  jq -s 'add // []' "$tmpdir"/page-*.json
+  rm -rf "$tmpdir"
 }
 
 # Format issues grouped by severity then by file
@@ -590,7 +597,11 @@ main()
         shift 2
         ;;
       --resolved)
-        resolved="true"
+        # Empty means "no resolution filter": the API then returns
+        # BOTH resolved and unresolved issues, matching the documented
+        # "include resolved" semantics (resolved=true would return
+        # ONLY resolved ones).
+        resolved=""
         statuses=""
         shift
         ;;

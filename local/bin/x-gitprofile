@@ -14,10 +14,7 @@ write_hook()
 {
   local profile="$1" dir="$2"
   mkdir -p "$dir"
-  cat > "$dir/.mise.toml" << EOF
-[hooks]
-enter = "git profile use $profile"
-EOF
+  printf '[hooks]\nenter = "git profile use %s"\n' "$profile" > "$dir/.mise.toml"
   echo "Set git profile '$profile' for $dir"
 }
 
@@ -28,8 +25,10 @@ if [[ $# -eq 0 ]]; then
 elif [[ $# -eq 2 ]]; then
   write_hook "$1" "$2"
 else
-  echo "Usage: x-gitprofile [<profile> <dir>]"
-  echo "  No args: set up defaults (home, masf)"
-  echo "  With args: create .mise.toml in <dir>"
+  {
+    echo "Usage: x-gitprofile [<profile> <dir>]"
+    echo "  No args: set up defaults (home, masf)"
+    echo "  With args: create .mise.toml in <dir>"
+  } >&2
   exit 1
 fi

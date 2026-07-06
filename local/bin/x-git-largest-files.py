@@ -35,7 +35,7 @@ import functools
 import glob
 import signal
 import sys
-from subprocess import PIPE, Popen, check_output  # nosec B404
+from subprocess import DEVNULL, PIPE, Popen, check_output  # nosec B404
 
 sortByOnDiskSize = False
 
@@ -105,12 +105,15 @@ def get_top_blobs(count, size_limit):
 
     git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603 # nosemgrep
     idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
+    if not idx_files:
+        print("No packfiles found — run 'git gc' first.")
+        sys.exit(1)
     verify_pack = Popen(  # nosec B603
         ["git", "verify-pack", "-v", *idx_files],
         stdout=PIPE,
-        stderr=PIPE,
+        stderr=DEVNULL,
     )
-    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
+    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=DEVNULL)  # nosec B603
     if verify_pack.stdout:
         verify_pack.stdout.close()
     sort_cmd = Popen(  # nosec B603
@@ -153,12 +156,12 @@ def populate_blob_paths(blobs):
         print("Finding object paths…")
 
         # Only include revs which have a path. Other revs aren't blobs.
-        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=PIPE)  # nosec B603
+        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=DEVNULL)  # nosec B603
         awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
         if rev_list.stdout:
             rev_list.stdout.close()
         all_object_lines = [line for line in awk_filter.communicate()[0].decode("utf-8").strip().split("\n") if line]
-        outstanding_keys = list(blobs.keys())
+        outstanding_keys = set(blobs.keys())
 
         for line in all_object_lines:
             cols = line.split()
@@ -169,7 +172,7 @@ def populate_blob_paths(blobs):
                 blobs[sha1].path = path
 
                 # short-circuit the search if we're done
-                if not len(outstanding_keys):
+                if not outstanding_keys:
                     break
 
 
@@ -180,16 +183,17 @@ def print_out_blobs(blobs):
         for blob in sorted(blobs.values(), reverse=True):
             csv_lines.append(blob.csv_line())
 
-        command = ["column", "-t", "-s", ","]
-        p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-
-        # Encode the input as bytes
-        input_data = ("\n".join(csv_lines) + "\n").encode()
-
-        stdout, _ = p.communicate(input_data)
-
         print("\nAll sizes in kB. The pack column is the compressed size of the object inside the pack file.\n")
 
+        csv_text = "\n".join(csv_lines) + "\n"
+        try:
+            p = Popen(["column", "-t", "-s", ","], stdin=PIPE, stdout=PIPE, stderr=PIPE)  # nosec B603
+        except FileNotFoundError:
+            # column(1) is missing — fall back to raw CSV
+            print(csv_text.rstrip("\n"))
+            return
+
+        stdout, _ = p.communicate(csv_text.encode())
         print(stdout.decode("utf-8").rstrip("\n"))
     else:
         print("No files found which match those criteria.")

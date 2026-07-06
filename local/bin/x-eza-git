@@ -13,9 +13,16 @@ set -euo pipefail
 
 if command -v eza > /dev/null 2>&1; then
   args=(--group-directories-first --icons=always --smart-group)
-  if git rev-parse --is-inside-work-tree &> /dev/null; then
-    args+=(--git)
-  fi
+  # ponytail: upward .git walk instead of a git fork per ls;
+  # misses exotic GIT_DIR/GIT_WORK_TREE setups, where --git is just omitted
+  d=$PWD
+  while [[ -n $d ]]; do
+    if [[ -e $d/.git ]]; then
+      args+=(--git)
+      break
+    fi
+    d=${d%/*}
+  done
   exec eza "${args[@]}" "$@"
 fi
 exec ls -h "$@"

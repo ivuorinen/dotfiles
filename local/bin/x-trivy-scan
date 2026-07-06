@@ -7,5 +7,5 @@ set -euo pipefail
 
 exec docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$HOME/Library/Caches:/root/.cache/" \
+  -v "${XDG_CACHE_HOME:-$HOME/.cache}/trivy:/root/.cache/trivy" \
   aquasec/trivy "$@"

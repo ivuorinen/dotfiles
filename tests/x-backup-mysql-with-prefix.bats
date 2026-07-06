@@ -5,10 +5,15 @@ setup()
   STUB_DIR="$(mktemp -d)"
   REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
 
-  # mysql stub: returns two table names after the header
+  # mysql stub: returns two table names, honoring -N (skip header row)
+  # like the real client — the script relies on -N instead of sed
   cat > "$STUB_DIR/mysql" << 'STUB'
 #!/usr/bin/env sh
-printf "Tables_in_db (wp_)\n"
+skip_header=0
+for arg in "$@"; do
+  [ "$arg" = "-N" ] && skip_header=1
+done
+[ "$skip_header" -eq 1 ] || printf "Tables_in_db (wp_)\n"
 printf "wp_options\n"
 printf "wp_posts\n"
 STUB

@@ -13,11 +13,13 @@ set -euo pipefail
 
 FORMAT="markdown"
 
-# Function to print help message
+SCRIPT_NAME="${0##*/}"
+
+# Function to print help message ($1: exit code, default 0)
 print_help()
 {
   cat << EOF
-Usage: $(basename "$0") [OPTIONS]
+Usage: $SCRIPT_NAME [OPTIONS]
 
 List open (listened) ports in a formatted table (Markdown) or JSON.
 
@@ -26,11 +28,11 @@ Options:
   --help       Show this help message
 
 Examples:
-  $(basename "$0")         # List open ports as a Markdown table
-  $(basename "$0") --json  # List open ports in JSON format
+  $SCRIPT_NAME         # List open ports as a Markdown table
+  $SCRIPT_NAME --json  # List open ports in JSON format
 
 EOF
-  exit 0
+  exit "${1:-0}"
 }
 
 # Function to print the Markdown table header
@@ -49,7 +51,7 @@ list_open_ports_lsof()
       sub(/.*:/, "", port)  # Extract port number
       printf "| %-16s | %-26s | %-8s | %-7s |\n", substr($3, 1, 16), substr($1, 1, 26), substr($2, 1, 8), port
     }
-  ' | sort -k3,3n | uniq
+  ' | sort -t'|' -k5,5n | uniq
 }
 
 # Function to list open ports using ss (alternative)
@@ -63,25 +65,27 @@ list_open_ports_ss()
       cmd = $7
       sub(/users:\(\(/, "", cmd)  # Cleanup command
       sub(/\)\)/, "", cmd)
+      # POSIX awk: 3-arg match() is a gawk extension
       pid = "-"
-      match(cmd, /pid=([0-9]+)/, m)
-      if (m[1] != "") pid = m[1]
+      if (match(cmd, /pid=[0-9]+/)) pid = substr(cmd, RSTART + 4, RLENGTH - 4)
       printf "| %-16s | %-26s | %-8s | %-7s |\n", substr(user, 1, 16), substr(cmd, 1, 26), substr(pid, 1, 8), port
     }
-  ' | sort -k3,3n | uniq
+  ' | sort -t'|' -k5,5n | uniq
 }
 
 # Function to print JSON output
 list_open_ports_json()
 {
+  # Rows are prefixed with "<port>\t" as a sort key, then the key is cut
+  # away — sorting the JSON text itself has no meaningful numeric field.
   if command -v lsof &> /dev/null; then
     lsof -i -P -n -sTCP:LISTEN +c 0 2> /dev/null | awk '
       NR > 1 {
         port = $9
         sub(/.*:/, "", port)  # Extract port number
-        printf "{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", $3, $1, $2, port
+        printf "%s\t{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", port, $3, $1, $2, port
       }
-    ' | sort -k3,3n | uniq | sed '$ s/,$//'
+    ' | sort -n | cut -f2- | uniq | sed '$ s/,$//'
   elif command -v ss &> /dev/null; then
     ss -ltpn 2> /dev/null | awk '
       NR > 1 {
@@ -91,12 +95,12 @@ list_open_ports_json()
         cmd = $7
         sub(/users:\(\(/, "", cmd)
         sub(/\)\)/, "", cmd)
+        # POSIX awk: 3-arg match() is a gawk extension
         pid = "-"
-        match(cmd, /pid=([0-9]+)/, m)
-        if (m[1] != "") pid = m[1]
-        printf "{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", user, cmd, pid, port
+        if (match(cmd, /pid=[0-9]+/)) pid = substr(cmd, RSTART + 4, RLENGTH - 4)
+        printf "%s\t{\"user\": \"%s\", \"command\": \"%s\", \"pid\": \"%s\", \"port\": \"%s\"},\n", port, user, cmd, pid, port
       }
-    ' | sort -k3,3n | uniq | sed '$ s/,$//'
+    ' | sort -n | cut -f2- | uniq | sed '$ s/,$//'
   else
     echo "[]"
   fi
@@ -134,8 +138,8 @@ main()
       ;;
     "") ;;
     *)
-      echo "Unknown option: $1"
-      print_help
+      echo "Unknown option: $1" >&2
+      print_help 1
       ;;
   esac
 

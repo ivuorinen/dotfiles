@@ -24,7 +24,7 @@ str_to_operator = {
 def vercmp(expr):
     """Version Comparison function."""
     words = expr.split()
-    if len(words) < 3:
+    if len(words) < 3 or len(words) % 2 == 0:
         return False
     comparisons = [words[i : i + 3] for i in range(0, len(words) - 2, 2)]
     for left, op_str, right in comparisons:
@@ -37,6 +37,9 @@ def vercmp(expr):
 def main():
     """Triggers version comparison if line is provided."""
     for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
         if not vercmp(line):
             sys.exit(1)
     sys.exit(0)
@@ -58,6 +61,9 @@ def test():
     # mixed major/minor version comparisons
     assert vercmp("2 >= 1.5")
     assert not vercmp("1 < 1.0")
+
+    # trailing token (even word count) is rejected, not silently dropped
+    assert not vercmp("1.0 < 2.0 junk")
 
     # invalid operator should raise an error
     try:

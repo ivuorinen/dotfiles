@@ -24,36 +24,10 @@ else
   CLEANDIR="."
 fi
 
-# Function to remove node_modules and vendor folders
-remove_node_modules_vendor()
-{
-  local dir=$1
-
-  # If the directory is a symlink, skip it
-  if [ -L "$dir" ]; then
-    echo "Skipping symlink $dir"
-    return
-  fi
-
-  # Check if the directory exists
-  if [ -d "$dir" ]; then
-    # If node_modules or vendor folder exists, remove it and all its contents
-    if [ -d "$dir/node_modules" ]; then
-      echo "Removing $dir/node_modules"
-      rm -rf "$dir/node_modules"
-    fi
-
-    if [ -d "$dir/vendor" ]; then
-      echo "Removing $dir/vendor"
-      rm -rf "$dir/vendor"
-    fi
-
-    # Recursively check subdirectories
-    for item in "$dir"/*; do
-      [ -d "$item" ] && remove_node_modules_vendor "$item"
-    done
-  fi
-}
-
-# Start removing node_modules and vendor folders from the current working directory
-remove_node_modules_vendor "$CLEANDIR"
+# One find pass: -prune stops descent into matched directories and
+# -print logs each one before removal. find does not follow symlinks,
+# so symlinked trees are skipped, and dot-directories are covered
+# (the old shell-glob recursion missed them and tripped set -e when
+# the last glob entry was not a directory).
+find "$CLEANDIR" \( -name node_modules -o -name vendor \) -type d -prune \
+  -print -exec rm -rf {} +

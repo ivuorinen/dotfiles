@@ -68,7 +68,6 @@ DEFINED_GROUPS=(
   "CARGO_BIN_HOME=RUST"
   "CARGO_HOME=RUST"
   "LaunchInstanceID=SHELL"
-  "SECURITYSESSIONID=SHELL"
   "TERM=SHELL"
   "TERM_PROGRAM=SHELL"
   "TERM_PROGRAM_VERSION=SHELL"
@@ -111,7 +110,7 @@ if [[ -f "$CONFIG_FILE" ]]; then
   fi
 
   # Check if required keys exist in the YAML structure
-  if ! yq '.custom_grouping, .protected_keys' "$CONFIG_FILE" &> /dev/null; then
+  if ! yq -e 'has("custom_grouping") and has("protected_keys")' "$CONFIG_FILE" > /dev/null 2>&1; then
     echo "Error: Missing required keys ('custom_grouping' or 'protected_keys') in '$CONFIG_FILE'." >&2
     exit 1
   fi
@@ -120,28 +119,32 @@ if [[ -f "$CONFIG_FILE" ]]; then
   # protected keys will be read from the file. The values in the file will be appended to the
   # processing algorithm.
 
-  CUSTOM_KEYS=$(yq '.protected_keys[]' "$CONFIG_FILE")
-  while IFS= read -r key; do
-    # Add to default_protected_keys
-    PROTECTED_KEYS+=("$key")
-  done <<< "$CUSTOM_KEYS"
+  mapfile -t CUSTOM_KEYS < <(yq '.protected_keys[]' "$CONFIG_FILE")
+  for key in "${CUSTOM_KEYS[@]}"; do
+    # Add to default_protected_keys, guarding against empty patterns
+    [[ -n $key ]] && PROTECTED_KEYS+=("$key")
+  done
 
   mapfile -t SKIPPED < <(yq '.skipped_keys[]' "$CONFIG_FILE")
   for key in "${SKIPPED[@]}"; do
     # Add to default_skipped_keys
-    SKIPPED_KEYS+=("$key")
+    [[ -n $key ]] && SKIPPED_KEYS+=("$key")
   done
 
-  CUSTOM_GROUPS=$(yq '.custom_grouping[]' "$CONFIG_FILE")
-  while IFS= read -r group; do
-    group_name=$(echo "$group" | yq 'keys[0]')
-    GROUP_KEYS=$(yq ".custom_grouping[] | .[\"$group_name\"][]" "$CONFIG_FILE")
-    while IFS= read -r key; do
-      # Add to default_custom_grouping in "GROUP=KEY" format
-      DEFINED_GROUPS+=("$group_name=$key")
-    done <<< "$GROUP_KEYS"
-  done <<< "$CUSTOM_GROUPS"
+  # Emit custom grouping entries in "KEY=GROUP" order (matching DEFINED_GROUPS)
+  mapfile -t CUSTOM_GROUPS < <(
+    yq -r '.custom_grouping[] | to_entries[] | .key as $g | .value[] | . + "=" + $g' "$CONFIG_FILE"
+  )
+  for entry in "${CUSTOM_GROUPS[@]}"; do
+    [[ -n $entry ]] && DEFINED_GROUPS+=("$entry")
+  done
 fi
+
+# Build a hash map from DEFINED_GROUPS for O(1) key -> group lookups
+declare -A GROUP_MAP
+for entry in "${DEFINED_GROUPS[@]}"; do
+  GROUP_MAP["${entry%%=*}"]="${entry#*=}"
+done
 
 # Check if the key is in the protected keywords list
 is_protected()
@@ -158,29 +161,6 @@ is_protected()
       return 0
     fi
   done
-  return 1
-}
-
-# Custom function to determine a custom group.
-#
-# If custom grouping file was found and was read,
-# the default grouping was already overridden.
-get_custom_group()
-{
-  local key=$1
-  for entry in "${DEFINED_GROUPS[@]}"; do
-    local mapping_key=${entry%%=*}
-    local mapping_group=${entry#*=}
-    if [[ $key == "$mapping_key" ]]; then
-      echo "$mapping_group"
-      return 0
-    fi
-  done
-  # Automatically create TOKENS group if the key contains "TOKEN".
-  if [[ $key == *TOKEN* ]]; then
-    echo "TOKENS"
-    return 0
-  fi
   return 1
 }
 
@@ -202,10 +182,11 @@ is_skipped()
   return 1
 }
 
-# Create arrays to store all groups, group data and max lengths for each group
+# Track groups, group data and max key lengths for each group
 all_groups=()
 group_data=()
-group_max_lengths=()
+declare -A group_seen
+declare -A group_max_lengths
 
 # Get environment variables and group them
 while IFS='=' read -r key value; do
@@ -214,12 +195,11 @@ while IFS='=' read -r key value; do
     continue
   fi
 
-  if is_skipped "$value"; then
-    continue
+  # Check for custom group; auto-create TOKENS group for keys containing "TOKEN"
+  group="${GROUP_MAP[$key]:-}"
+  if [[ -z $group && $key == *TOKEN* ]]; then
+    group="TOKENS"
   fi
-
-  # Check for custom group
-  group=$(get_custom_group "$key")
 
   # If there is no custom group, use the default algorithm:
   # 1) First part before underscore is used as the group name.
@@ -242,47 +222,31 @@ while IFS='=' read -r key value; do
   fi
 
   # Update group data - check if group already exists
-  group_exists=false
-  for existing_group in "${all_groups[@]}"; do
-    if [[ "$existing_group" == "$group" ]]; then
-      group_exists=true
-      break
-    fi
-  done
-  if [[ "$group_exists" == false ]]; then
+  if [[ -z ${group_seen[$group]:-} ]]; then
+    group_seen[$group]=1
     all_groups+=("$group")
   fi
 
   group_data+=("$group|$key|$value")
 
   key_length=${#key}
-  for i in "${!all_groups[@]}"; do
-    if [[ ${all_groups[$i]} == "$group" ]]; then
-      if [[ ${group_max_lengths[$i]:-0} -lt $key_length ]]; then
-        group_max_lengths[i]=$key_length
-      fi
-      break
-    fi
-  done
+  if [[ ${group_max_lengths[$group]:-0} -lt $key_length ]]; then
+    group_max_lengths[$group]=$key_length
+  fi
 
-done < <(env | sort | awk -F'=' '{print $1"="$2}')
+done < <(env | sort)
 
-# Print groups in order, "Ungrouped" last
+# Print groups in order, "Ungrouped" last (only if present)
 sorted_groups=()
 while IFS= read -r line; do
   sorted_groups+=("$line")
 done < <(printf "%s\n" "${all_groups[@]}" | grep -v "^Ungrouped$" | sort)
-sorted_groups+=("Ungrouped")
+[[ -n ${group_seen[Ungrouped]:-} ]] && sorted_groups+=("Ungrouped")
 
 for group in "${sorted_groups[@]}"; do
   echo -e "\n# $group"
 
-  for i in "${!all_groups[@]}"; do
-    if [[ ${all_groups[$i]} == "$group" ]]; then
-      max_length=${group_max_lengths[$i]}
-      break
-    fi
-  done
+  max_length=${group_max_lengths[$group]:-0}
 
   for entry in "${group_data[@]}"; do
     IFS='|' read -r g k v <<< "$entry"

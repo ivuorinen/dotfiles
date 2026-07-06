@@ -6,6 +6,8 @@
 # Copyright (c) 2023 Ismo Vuorinen. All Rights Reserved.
 # Licensed under MIT License. http://www.opensource.org/licenses/mit-license.
 
+set -euo pipefail
+
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"
 

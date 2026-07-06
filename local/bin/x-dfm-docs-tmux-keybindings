@@ -7,8 +7,9 @@
 # included), grouped by table. Run via `dfm helpers docs-tmux`.
 #
 # Author: Ismo Vuorinen <https://github.com/ivuorinen> 2024
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 # shellcheck source=./../../config/shared.sh
-source "${DOTFILES}/config/shared.sh"
+source "${DOTFILES}/config/shared.sh" || exit 1
 
 # Enable verbosity with VERBOSE=1
 VERBOSE="${VERBOSE:-0}"

@@ -20,7 +20,7 @@ RESET='\033[0m'
 function welcome_greeting()
 {
   h=$(date +%H)
-  if [ "$h" -lt 04 ] || [ "$h" -gt 22 ]; then
+  if [ "$h" -lt 04 ] || [ "$h" -ge 22 ]; then
     greeting="Good Night"
   elif [ "$h" -lt 12 ]; then
     greeting="Good morning"
@@ -65,10 +65,10 @@ function welcome_today()
   curl -s -m $timeout "https://wttr.in?format=%cWeather:+%C+%t,+%p+%w"
   echo -e "${RESET}"
 
-  # Print IP address
+  # Print IP address (one route lookup for both fields)
   if hash ip 2> /dev/null; then
-    ip_address=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-    ip_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+    read -r ip_address ip_interface < <(ip route get 8.8.8.8 2> /dev/null \
+      | awk 'NR==1 { for (i = 1; i <= NF; i++) { if ($i == "src") a = $(i + 1); if ($i == "dev") d = $(i + 1) } print a, d }')
     echo -e "${COLOR_S}🌐 IP: $(curl -s -m $timeout 'https://ipinfo.io/ip') (${ip_address} on ${ip_interface})"
     echo -e "${RESET}\n"
   fi

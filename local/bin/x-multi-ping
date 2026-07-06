@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #USAGE about "Ping multiple hosts and display results"
 #USAGE flag "--help" help="Show help"
-#USAGE flag "--verbose" help="Verbose output"
 #USAGE flag "--loop" help="Loop indefinitely"
 #USAGE flag "--forever" help="Loop indefinitely (alias)"
 #USAGE flag "--sleep <seconds>" help="Sleep between iterations (default: 1)"
@@ -28,7 +27,6 @@
 #
 # Options:
 #   --help             Display this help message.
-#   --verbose          Enable verbose output.
 #   --loop, --forever  Loop indefinitely.
 #   --sleep=N          Sleep N seconds between iterations (default: 1).
 #
@@ -54,7 +52,6 @@ usage()
   echo "Usage: $0 [--loop|--forever] [--sleep=N] hostname1 hostname2 ..."
   echo "Options:"
   echo "  --help           Display this help message."
-  echo "  --verbose        Enable verbose output."
   echo "  --loop, --forever  Loop indefinitely."
   echo "  --sleep=N        Sleep N seconds between iterations (default: 1)."
 }
@@ -65,9 +62,6 @@ while [[ $# -gt 0 ]]; do
     --help)
       usage
       exit 0
-      ;;
-    --verbose)
-      shift
       ;;
     --loop | --forever)
       LOOP=1
@@ -97,6 +91,12 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Validate --sleep (both --sleep=N and --sleep N land in SLEEP)
+if ! [[ "$SLEEP" =~ ^[0-9]+$ ]]; then
+  echo "Error: --sleep requires a numeric value."
+  exit 1
+fi
+
 # Check for required hostnames
 if [[ $# -lt 1 ]]; then
   usage
@@ -124,6 +124,17 @@ else
   exit 1
 fi
 
+# ping flag dialects, computed once: macOS -t is the overall timeout in
+# seconds; Linux uses -w (deadline) and -W (per-reply wait). macOS ping6
+# has no deadline flag at all, so IPv6 pings there rely on -c1 alone.
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  PING4_OPTS=(-c1 -t "$TIMEOUT")
+  PING6_OPTS=(-c1)
+else
+  PING4_OPTS=(-c1 -w "$TIMEOUT" -W "$TIMEOUT")
+  PING6_OPTS=(-c1 -w "$TIMEOUT" -W "$TIMEOUT")
+fi
+
 # Function to remove any URI scheme and port from the hostname.
 strip_hostname()
 {
@@ -139,50 +150,59 @@ strip_hostname()
   echo "$host"
 }
 
-# Function to ping a given host based on DNS lookups.
+# Function to ping a given (already stripped) host based on DNS lookups.
 pingHost()
 {
-  local original_host="$1"
-  local host
-  host=$(strip_hostname "$original_host")
+  local host="$1"
+  local type ip ips ping_cmd
+  local -a opts
 
   for type in A AAAA; do
+    # Binary and flags depend only on the record type.
+    if [[ "$type" == "A" ]]; then
+      ping_cmd="ping"
+      opts=("${PING4_OPTS[@]}")
+    else
+      ping_cmd="$PING6"
+      opts=("${PING6_OPTS[@]}")
+    fi
+
     # Look up the DNS records for the host.
     ips=$(dig +short "$host" "$type")
     if [[ -z "$ips" ]]; then
       echo "WARNING: Failed to resolve $host [$type]"
-    else
-      # For each IP address found, perform the appropriate ping.
-      while IFS= read -r ip; do
-        if [[ "$type" == "A" ]]; then
-          ping_binary="ping"
-        else
-          ping_binary="$PING6"
-        fi
-
-        # Execute ping with one packet and a timeout.
-        $ping_binary -c1 -w"$TIMEOUT" -W"$TIMEOUT" "$host" > /dev/null 2>&1
-        # shellcheck disable=SC2181
-        if [[ $? -eq 0 ]]; then
-          echo "Host $host - $ip - alive"
-        else
-          echo "Host $host - $ip - FAILED"
-        fi
-      done <<< "$ips"
+      continue
     fi
+
+    # Ping each resolved address (not the hostname, so every line
+    # reports the address it actually probed).
+    while IFS= read -r ip; do
+      # shellcheck disable=SC2086  # PING6 may be "ping -6"
+      if $ping_cmd "${opts[@]}" "$ip" > /dev/null 2>&1; then
+        echo "Host $host - $ip - alive"
+      else
+        echo "Host $host - $ip - FAILED"
+      fi
+    done <<< "$ips"
   done
 }
+
+# Strip URI schemes/ports once up front; --loop reuses the cleaned list.
+HOSTS=()
+for host in "$@"; do
+  HOSTS+=("$(strip_hostname "$host")")
+done
 
 # Main loop: run once or forever based on the options.
 if [[ $LOOP -eq 1 ]]; then
   while true; do
-    for host in "$@"; do
+    for host in "${HOSTS[@]}"; do
       pingHost "$host"
     done
     sleep "$SLEEP"
   done
 else
-  for host in "$@"; do
+  for host in "${HOSTS[@]}"; do
     pingHost "$host"
   done
 fi

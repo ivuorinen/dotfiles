@@ -83,7 +83,8 @@ main()
 
   # Check if the first argument is --get
   if [ "$1" == "--get" ]; then
-    repo="$2"
+    repo="${2:-}"
+    [ -n "$repo" ] || usage
   fi
 
   msg "Fetching the tarball URL for the latest release of repository: $repo"

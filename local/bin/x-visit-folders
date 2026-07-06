@@ -40,6 +40,7 @@ usage()
 msg()
 {
   [[ "$VERBOSE" -eq 1 ]] && echo "$1"
+  return 0
 }
 
 # Function to print error messages and exit
@@ -48,17 +49,6 @@ msg_err()
 {
   echo "(!) ERROR: $1" >&2
   exit 1
-}
-
-# Function to register a directory with zoxide
-# $1 - directory path (string)
-visit_dir()
-{
-  if zoxide add "$1" 2> /dev/null; then
-    msg "Added: $1"
-  else
-    msg "zoxide add failed for: $1"
-  fi
 }
 
 # Main function
@@ -88,6 +78,7 @@ main()
   target="$(cd "$target" && pwd)"
 
   local count=0
+  local dirs=()
   for dir in "$target"/*/; do
     [[ -d "$dir" ]] || continue
     local name
@@ -97,10 +88,15 @@ main()
     if [[ "$DRY_RUN" -eq 1 ]]; then
       echo "(dry-run) $dir"
     else
-      visit_dir "$dir"
+      dirs+=("$dir")
+      msg "Added: $dir"
     fi
     count=$((count + 1))
   done
+
+  if [[ ${#dirs[@]} -gt 0 ]]; then
+    zoxide add "${dirs[@]}" 2> /dev/null || msg "zoxide add failed"
+  fi
 
   echo "Visited $count directories."
 }

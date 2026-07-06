@@ -40,21 +40,21 @@
 VERBOSE="${VERBOSE:-0}"
 
 #######################################
-# Normalize a directory by removing a trailing slash (unless the directory is "/").
+# Normalize a directory by stripping all trailing slashes (unless the
+# directory is "/"). The result is returned in the _xpath_nd global
+# instead of being echoed, so callers avoid a command-substitution
+# fork per PATH component (this file is sourced at shell init).
 # Globals:
-#   None
+#   _xpath_nd
 # Arguments:
 #   $1 - Directory path to normalize
-# Returns:
-#   Echoes the normalized directory.
 #######################################
 normalize_dir()
 {
-  local d="$1"
-  if [ "$d" != "/" ]; then
-    d="${d%/}"
-  fi
-  echo "$d"
+  _xpath_nd="$1"
+  while [ "$_xpath_nd" != "/" ] && [ "${_xpath_nd%/}" != "$_xpath_nd" ]; do
+    _xpath_nd="${_xpath_nd%/}"
+  done
 }
 
 #######################################
@@ -77,7 +77,8 @@ normalize_path_var()
     IFS=':' read -r -a arr <<< "$PATH"
   fi
   for d in "${arr[@]}"; do
-    d=$(normalize_dir "$d")
+    normalize_dir "$d"
+    d="$_xpath_nd"
     if [ -z "$new_path" ]; then
       new_path="$d"
     else
@@ -101,7 +102,11 @@ remove_from_path()
 {
   local d="$1"
   PATH=":${PATH}:"
-  PATH="${PATH//:$d:/:}"
+  # Loop: a single ${//} pass misses adjacent duplicates because
+  # ":/x:/x:" shares the middle colon between the two matches.
+  while [[ "$PATH" == *":$d:"* ]]; do
+    PATH="${PATH//:$d:/:}"
+  done
   PATH="${PATH#:}"
   PATH="${PATH%:}"
 }
@@ -120,11 +125,14 @@ do_append()
   local processed=""
   local d
   for arg in "$@"; do
-    d=$(normalize_dir "$arg")
-    if [[ " $processed " == *" $d "* ]]; then
+    normalize_dir "$arg"
+    d="$_xpath_nd"
+    # Colon-delimited seen-list: space-delimited matching breaks on
+    # directories with spaces in their names.
+    if [[ ":$processed:" == *":$d:"* ]]; then
       continue
     else
-      processed="$processed $d"
+      processed="$processed:$d"
     fi
 
     if [ ! -d "$d" ]; then
@@ -156,11 +164,12 @@ do_prepend()
   local -a arr=("$@")
   local i
   for ((i = ${#arr[@]} - 1; i >= 0; i--)); do
-    d=$(normalize_dir "${arr[i]}")
-    if [[ " $processed " == *" $d "* ]]; then
+    normalize_dir "${arr[i]}"
+    d="$_xpath_nd"
+    if [[ ":$processed:" == *":$d:"* ]]; then
       continue
     else
-      processed="$processed $d"
+      processed="$processed:$d"
     fi
 
     if [ ! -d "$d" ]; then
@@ -189,11 +198,12 @@ do_remove()
   local processed=""
   local d
   for arg in "$@"; do
-    d=$(normalize_dir "$arg")
-    if [[ " $processed " == *" $d "* ]]; then
+    normalize_dir "$arg"
+    d="$_xpath_nd"
+    if [[ ":$processed:" == *":$d:"* ]]; then
       continue
     else
-      processed="$processed $d"
+      processed="$processed:$d"
     fi
 
     case ":$PATH:" in
@@ -226,7 +236,8 @@ do_check()
     echo "Checking all directories in PATH:"
     IFS=':' read -r -a arr <<< "$PATH"
     for d in "${arr[@]}"; do
-      d=$(normalize_dir "$d")
+      normalize_dir "$d"
+      d="$_xpath_nd"
       if [ -d "$d" ]; then
         echo "Valid:   $d"
       else
@@ -235,7 +246,8 @@ do_check()
     done
   else
     for arg in "$@"; do
-      d=$(normalize_dir "$arg")
+      normalize_dir "$arg"
+      d="$_xpath_nd"
       if [ -d "$d" ]; then
         echo "Valid:   $d"
       else

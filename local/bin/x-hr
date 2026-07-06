@@ -10,11 +10,18 @@
 #
 # Modified by Ismo Vuorinen <https://github.com/ivuorinen> 2023
 
-# Determine width of terminal
-hr_col_count="$( (tput cols - 4))"
-if [ -z "${hr_col_count+set}" ] || [ "$hr_col_count" -lt 1 ]; then
-  hr_col_count="${COLUMNS:-80}"
+# Determine width of terminal: ask the tty itself when we have one
+# (exported COLUMNS can be stale after a resize), else COLUMNS, else 80
+hr_col_count=""
+if [ -t 1 ]; then
+  # No stderr redirect: inside $() tput's stdout is a pipe, so ncurses
+  # measures the terminal via stderr — silencing it forces the 80 default
+  hr_col_count="$(tput cols)"
 fi
+hr_col_count="${hr_col_count:-${COLUMNS:-}}"
+case "$hr_col_count" in
+  '' | *[!0-9]*) hr_col_count=80 ;;
+esac
 
 # Colors
 CLR_RED="\033[1;31m"
@@ -24,9 +31,8 @@ hr_reset="\033[0m"
 # Prints the HR line
 hr_draw_char()
 {
-  local CHAR="$1"
-  local LINE=""
-  LINE=$(printf "%*s" "$((hr_col_count - 3))" " ")
+  local CHAR="$1" LINE
+  printf -v LINE "%*s" "$((hr_col_count - 3))" ""
   LINE="${LINE// /${CHAR}}"
   echo -e "${hr_color}${LINE:0:${hr_col_count}}${hr_reset}"
 }

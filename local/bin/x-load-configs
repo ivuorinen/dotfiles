@@ -5,6 +5,13 @@
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
+# Guard BEFORE sourcing: shared.sh (and its msg_err) lives under
+# $DOTFILES, so it cannot report its own missing directory
+[ -d "$DOTFILES" ] || {
+  echo "Error: DOTFILES is not set or $DOTFILES does not exist" >&2
+  exit 1
+}
+
 source "$DOTFILES/config/shared.sh"
 
 # Enable verbosity with VERBOSE=1 x-load-configs
@@ -12,17 +19,14 @@ VERBOSE="${VERBOSE:-0}"
 # Enable debugging with DEBUG=1 x-load-configs
 DEBUG="${DEBUG:-0}"
 
-# Get the hostname
-CONFIG_HOST="$(hostname -s)"
+# Get the short hostname (bash sets HOSTNAME; fork only as fallback)
+CONFIG_HOST="${HOSTNAME%%.*}"
+[ -n "$CONFIG_HOST" ] || CONFIG_HOST="$(hostname -s)"
 
 # Enable debugging if requested
 [ "$DEBUG" = "1" ] && set -x
 
 CONFIG_PATH="${HOME}/.config"
-
-[ -d "$DOTFILES" ] || {
-  msg_err "Error: DOTFILES is not set or $DOTFILES does not exist"
-}
 
 # Function to print messages if VERBOSE is enabled
 # $1 - message type (string)

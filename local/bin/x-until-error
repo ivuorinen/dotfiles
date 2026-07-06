@@ -47,7 +47,7 @@ Options:
 Example:
   $0 --sleep 2 ls -l
 EOF
-  exit 1
+  exit "${1:-1}"
 }
 
 # Parse command-line options.
@@ -55,15 +55,17 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --sleep)
       shift
-      if [ $# -eq 0 ]; then
-        echo "Error: --sleep requires a numeric argument." >&2
-        exit 1
-      fi
+      case "${1:-}" in
+        '' | *[!0-9.]*)
+          echo "Error: --sleep requires a numeric argument." >&2
+          exit 1
+          ;;
+      esac
       SLEEP_INTERVAL="$1"
       shift
       ;;
     -h | --help)
-      usage
+      usage 0
       ;;
     --) # End of options marker.
       shift

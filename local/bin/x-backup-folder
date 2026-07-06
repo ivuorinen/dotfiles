@@ -45,7 +45,9 @@ msg_err()
 sanitize_filename()
 {
   local filename=$1
-  echo "$filename" | tr '/' '_' | iconv -t ascii//TRANSLIT | sed -r 's/[^a-zA-Z0-9]+/_/g' | sed -r 's/^_+|_+$//g'
+  # sed -E is portable (GNU -r is not); the non-alnum collapse also
+  # covers the slashes the old tr stage handled
+  iconv -t ascii//TRANSLIT <<< "$filename" | sed -E 's/[^a-zA-Z0-9]+/_/g; s/^_+|_+$//g'
 }
 
 # Function to backup the directory
@@ -65,7 +67,9 @@ backup_directory()
 
   msg "Backing up directory '$directory' to '${filename_timestamp}.tar.gz'"
 
-  tar cvzf "${filename_timestamp}.tar.gz" "${directory}/"
+  local tarflags="czf"
+  [[ "$VERBOSE" -eq 1 ]] && tarflags="cvzf"
+  tar "$tarflags" "${filename_timestamp}.tar.gz" "${directory}/"
 
   msg "Backup completed and saved to '${filename_timestamp}.tar.gz'"
 }

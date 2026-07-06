@@ -13,7 +13,7 @@ fi
 printf '%s\n' "$quota_output" | awk '
 BEGIN { n = 0; fs_max = 5 }
 NR <= 2 { next }
-NF != 4 { next }
+NF < 4 { next }
 {
   if ($3 + 0 <= 0) next
   if (length($1) > fs_max) fs_max = length($1)

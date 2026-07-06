@@ -100,6 +100,16 @@ get_sha256sum()
   sha256sum "$1" | awk '{print $1}'
 }
 
+# Fast path: a byte-level compare answers match/no-match without
+# hashing both files. Verbose mode keeps hashing to show the digests.
+if [[ "$VERBOSE" -eq 0 ]]; then
+  if cmp -s -- "$file1" "$file2"; then
+    exit 0
+  fi
+  echo "Files do not match." >&2
+  exit 1
+fi
+
 msg "Computing SHA256 for '$file1'..."
 hash1=$(get_sha256sum "$file1")
 msg "SHA256 for '$file1': $hash1"

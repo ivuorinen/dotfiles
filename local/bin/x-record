@@ -15,25 +15,18 @@
 #   ffmpeg
 #   notify-send.sh
 #   pkill (coreutils)
+#   giph
+#   eww
+#   slop
 #
 # 2021-2022 : João F. © BeyondMagic <koetemagie@gmail.com>
 # 2024-     : Ismo Vuorinen <https://github.com/ivuorinen>
-
-# Enable verbosity with VERBOSE=1
-VERBOSE="${VERBOSE:-0}"
 
 # Variables
 frame_rate=30
 name='camera'
 path_recordings="$HOME/.cache/recording"
 replace_id="$HOME/.cache/recording.id"
-
-# Function to print messages if VERBOSE is enabled
-# $1 - message (string)
-msg()
-{
-  [ "$VERBOSE" -eq 1 ] && echo "$1"
-}
 
 # Notify function
 notify()
@@ -89,12 +82,13 @@ check_file_type()
   esac
 }
 
-# Function to determine recording scope
+# Function to determine recording scope (accepts both the documented
+# size/full spellings and the notify-menu set/fullscreen ones)
 determine_scope()
 {
-  if [ "$2" = 'fullscreen' ]; then
+  if [ "$2" = 'fullscreen' ] || [ "$2" = 'full' ]; then
     geometry=$(xrandr | awk '/ primary/{print $4}')
-  elif [ "$2" = 'set' ]; then
+  elif [ "$2" = 'set' ] || [ "$2" = 'size' ]; then
     geometry=$(slop -f "%wx%h+%x+%y")
   else
     next=$(notify -o 'echo fullscreen:The whole_screen!' -o 'echo set:Let me set.' "$name" 'How exactly do you want to record?')

@@ -217,10 +217,10 @@ log_message()
       printf '%s[WARNING] %s%s\n' "$YELLOW" "$message" "$RESET" >&2
       ;;
     INFO)
-      printf '%s[INFO] %s%s\n' "$BLUE" "$message" "$RESET"
+      printf '%s[INFO] %s%s\n' "$BLUE" "$message" "$RESET" >&2
       ;;
     SUCCESS)
-      printf '%s[SUCCESS] %s%s\n' "$GREEN" "$message" "$RESET"
+      printf '%s[SUCCESS] %s%s\n' "$GREEN" "$message" "$RESET" >&2
       ;;
   esac
 }
@@ -334,10 +334,9 @@ ssh_with_retry()
     log_message "INFO" "Will try specific SSH key: $ssh_key"
   fi
 
-  # Priority 2: Detect and add available default keys
-  available_default_keys=$(detect_available_ssh_keys)
-  if [ -n "$available_default_keys" ]; then
-    keys_to_try="${keys_to_try}${keys_to_try:+ }${available_default_keys}"
+  # Priority 2: Add available default keys (detected once in main)
+  if [ -n "${AVAILABLE_DEFAULT_KEYS:-}" ]; then
+    keys_to_try="${keys_to_try}${keys_to_try:+ }${AVAILABLE_DEFAULT_KEYS}"
   fi
 
   # Priority 3: Try without explicit key (agent/default)
@@ -349,7 +348,7 @@ ssh_with_retry()
 
     # Try each key in sequence
     for try_key in $keys_to_try; do
-      ssh_opts="-o ConnectTimeout=$SSH_TIMEOUT -o BatchMode=yes -o StrictHostKeyChecking=yes"
+      ssh_opts="-n -o ConnectTimeout=$SSH_TIMEOUT -o BatchMode=yes -o StrictHostKeyChecking=yes"
 
       if [ "$try_key" != "NO_KEY" ]; then
         ssh_opts="$ssh_opts -i $try_key"
@@ -369,8 +368,7 @@ ssh_with_retry()
       fi
     done
 
-    status=$?
-    log_message "WARNING" "SSH connection failed to $host with all authentication methods (status: $status)"
+    log_message "WARNING" "SSH connection failed to $host with all authentication methods"
 
     if [ "$attempt" -lt "$max_retries" ]; then
       sleep $((attempt * 2))
@@ -582,7 +580,7 @@ check_pending_reboot()
         fi
 
         # Method 4: Check deleted libraries
-        DELETED_LIBS=$(lsof 2>/dev/null | grep -c "DEL.*deleted" || echo 0)
+        DELETED_LIBS=$(lsof 2>/dev/null | grep -c "DEL.*deleted" || true)
         if [ "$DELETED_LIBS" -gt 10 ]; then
             REBOOT_NEEDED=1
             REASONS="${REASONS:+$REASONS,}deleted-libraries"
@@ -762,18 +760,25 @@ display_summary()
 # Run all audit checks on a single host
 audit_host()
 {
-  host_entry="$1"
-  host=$(printf '%s' "$host_entry" | cut -d':' -f1)
-  primary_user=$(printf '%s' "$host_entry" | cut -d':' -f2)
-  ssh_key=$(printf '%s' "$host_entry" | cut -d':' -f3)
+  host="$1"
+  primary_user="$2"
+  ssh_key="${3:-}"
 
   log_message "INFO" "Starting audit of $host"
 
   # Try multiple usernames (primary user first, then fallbacks)
   connected=0
   connected_user=""
+  first_attempt=1
 
   for username in "$primary_user" $FALLBACK_USERS; do
+    # Skip fallback entries that duplicate the primary user
+    if [ "$first_attempt" -eq 1 ]; then
+      first_attempt=0
+    elif [ "$username" = "$primary_user" ]; then
+      continue
+    fi
+
     if test_ssh_connectivity "$host" "$username" "$ssh_key"; then
       connected=1
       connected_user="$username"
@@ -842,12 +847,12 @@ main()
 
   log_message "INFO" "Starting SSH Security Audit"
 
-  # Detect available SSH keys and log
-  available_keys=$(detect_available_ssh_keys)
-  if [ -n "$available_keys" ]; then
-    key_count=$(printf '%s\n' "$available_keys" | wc -w | tr -d ' ')
+  # Detect available SSH keys once (reused by every ssh_with_retry call) and log
+  AVAILABLE_DEFAULT_KEYS=$(detect_available_ssh_keys)
+  if [ -n "$AVAILABLE_DEFAULT_KEYS" ]; then
+    key_count=$(printf '%s\n' "$AVAILABLE_DEFAULT_KEYS" | wc -w | tr -d ' ')
     log_message "INFO" "Detected $key_count default SSH key(s) for authentication"
-    for key in $available_keys; do
+    for key in $AVAILABLE_DEFAULT_KEYS; do
       log_message "INFO" "  - $key"
     done
   else
@@ -857,9 +862,10 @@ main()
   # Parse input file
   parse_host_list "$input_file"
 
-  # Audit each host
+  # Audit each host; a failed host must not abort the loop under set -e
   while IFS=':' read -r host username ssh_key; do
-    audit_host "${host}:${username}:${ssh_key}"
+    audit_host "$host" "$username" "$ssh_key" \
+      || log_message "WARNING" "Audit incomplete for $host"
   done < "$HOSTS_LIST_FILE"
 
   # Generate report

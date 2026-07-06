@@ -140,8 +140,10 @@ check_rate_limits()
   local reset_timestamp
   local reset_time
 
-  remaining=$(echo "$rate_limit_info" | jq -r '.resources.core.remaining')
-  reset_timestamp=$(echo "$rate_limit_info" | jq -r '.resources.core.reset')
+  {
+    read -r remaining
+    read -r reset_timestamp
+  } < <(echo "$rate_limit_info" | jq -r '.resources.core.remaining, .resources.core.reset')
 
   # Handle date command differences between Linux and macOS
   if date --version > /dev/null 2>&1; then
@@ -242,16 +244,17 @@ check_repository()
   response=$(api_request "$api_url") || exit $?
 
   # If we got here, the repository exists (otherwise api_request would have exited)
-  msg "Repository found: $(echo "$response" | jq -r '.full_name')"
+  local full_name default_branch
+  {
+    read -r full_name
+    read -r default_branch
+  } < <(echo "$response" | jq -r '.full_name, .default_branch')
 
-  # Get default branch if no branch is specified
-  if [[ -z ${BRANCH} ]]; then
-    BRANCH=$(echo "$response" | jq -r '.default_branch')
-    msg "Using default branch: $BRANCH"
-  fi
+  msg "Repository found: $full_name (default branch: $default_branch)"
 
-  # Return the repository full name (in case it differs from input due to redirects)
-  echo "$response" | jq -r '.full_name'
+  # Return full name (may differ from input due to redirects) and default branch
+  echo "$full_name"
+  echo "$default_branch"
 }
 
 # Fetches the latest release or the oldest if OLDEST_RELEASE=1
@@ -263,8 +266,7 @@ get_release_version()
   local oldest_release="${OLDEST_RELEASE:-0}"
   local api_url="${GITHUB_API_URL}/${repo}/releases"
 
-  msg "Fetching release data from: $api_url " + \
-    "(Include prereleases: $include_prereleases, Oldest: $oldest_release)"
+  msg "Fetching release data from: $api_url (Include prereleases: $include_prereleases, Oldest: $oldest_release)"
 
   local json_response
   json_response=$(api_request "$api_url") || exit $?
@@ -318,7 +320,7 @@ get_release_version()
 get_latest_branch_tag()
 {
   local repo="$1"
-  local branch="${BRANCH:-main}"
+  local branch="${BRANCH:-${default_branch:-main}}"
   local api_url="${GITHUB_API_URL}/${repo}/git/refs/tags"
 
   msg "Fetching latest tag for branch '$branch' from: $api_url"
@@ -326,9 +328,12 @@ get_latest_branch_tag()
   local json_response
   json_response=$(api_request "$api_url") || exit $?
 
+  # Note: this API cannot map tags to branches; the filter matches tag NAMES
+  # that contain the given string, not tags reachable from the branch.
   local version
   version=$(echo "$json_response" \
-    | jq -r "[.[] | select(.ref | contains(\"refs/tags/$branch\"))] | sort_by(.ref) | reverse | first.ref | sub(\"refs/tags/\"; \"\") // empty")
+    | jq -r --arg branch "$branch" \
+      '[.[] | select(.ref | contains("refs/tags/" + $branch))] | sort_by(.ref | sub("refs/tags/v?"; "") | split(".") | map(tonumber? // 0)) | reverse | (first.ref // "") | sub("refs/tags/"; "")')
 
   if [[ -z $version && $COMBINED -eq 0 ]]; then
     echo "No tags found for branch: $branch in repository: $repo" >&2
@@ -352,7 +357,7 @@ get_latest_git_tag()
 
   local version
   version=$(echo "$json_response" \
-    | jq -r '[.[] | select(.ref | startswith("refs/tags/"))] | sort_by(.ref) | reverse | first.ref | sub("refs/tags/"; "") // empty')
+    | jq -r '[.[] | select(.ref | startswith("refs/tags/"))] | sort_by(.ref | sub("refs/tags/v?"; "") | split(".") | map(tonumber? // 0)) | reverse | (first.ref // "") | sub("refs/tags/"; "")')
 
   if [[ -z $version && $COMBINED -eq 0 ]]; then
     echo "No Git tags found in repository: $repo" >&2
@@ -367,7 +372,7 @@ get_latest_git_tag()
 get_latest_commit()
 {
   local repo="$1"
-  local branch="${BRANCH:-main}"
+  local branch="${BRANCH:-${default_branch:-main}}"
   local api_url="${GITHUB_API_URL}/${repo}/commits/$branch"
 
   msg "Fetching latest commit SHA from: $api_url"
@@ -549,12 +554,17 @@ main()
   check_rate_limits
 
   # Validate repository existence and get normalized repository name
-  local repo_fullname
-  repo_fullname=$(check_repository "$REPOSITORY") || exit $?
+  # check_repository emits two lines: full_name and default_branch
+  local repo_info repo_fullname default_branch
+  repo_info=$(check_repository "$REPOSITORY") || exit $?
+  {
+    read -r repo_fullname
+    read -r default_branch
+  } <<< "$repo_info"
 
   # If --all specified, get all information types
   if [[ $COMBINED -eq 1 ]]; then
-    local branch="${BRANCH:-main}"
+    local branch="${BRANCH:-${default_branch:-main}}"
     local git_tag=""
     local commit_sha=""
     local release_version=""
@@ -566,8 +576,11 @@ main()
     # Get commit SHA
     commit_sha=$(get_latest_commit "$repo_fullname")
 
-    # Get release versions (stable and prerelease)
-    read -r release_version prerelease_version < <(get_release_version "$repo_fullname")
+    # Get release versions (stable and prerelease, one per line)
+    {
+      read -r release_version
+      read -r prerelease_version
+    } < <(get_release_version "$repo_fullname")
 
     # Format output based on selected format
     if [[ $OUTPUT == "json" ]]; then

@@ -6,14 +6,22 @@
 # Run a command in each directory matching a pattern.
 #
 # Usage: x-foreach <listing-command> <command> [args...]
-#   x-foreach "ls -d */" "git status"
+#   x-foreach "ls -d */" "git status"   # quoted command string (evaled)
+#   x-foreach "ls -d */" git status     # command + args
 #
 # Source: https://github.com/mvdan/dotfiles/blob/master/.bin/foreach
 
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-  echo "Usage: $0 <listing-command> <command> [args...]"
+  cat << EOF
+Usage: ${0##*/} <listing-command> <command> [args...]
+
+Examples:
+  ${0##*/} "ls -d */" "git status"     # quoted command string (evaled)
+  ${0##*/} "ls -d */" git status       # command + args
+  ${0##*/} "fd -t d -d 1" "git pull"   # any listing command works
+EOF
   exit 1
 fi
 
@@ -24,7 +32,14 @@ shift
 for dir in $(eval "$listing"); do
   (
     echo "$dir"
+    echo
     cd "$dir" || exit 1
-    "$@"
+    if [ $# -eq 1 ]; then
+      # Single quoted command string: eval so "git status" works
+      eval "$1"
+    else
+      "$@"
+    fi
   )
+  x-hr
 done

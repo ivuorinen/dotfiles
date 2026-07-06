@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-if git rev-parse --is-inside-work-tree &> /dev/null; then
-  git rev-parse --show-toplevel
+if top=$(git rev-parse --show-toplevel 2> /dev/null); then
+  echo "$top"
 else
   echo "Not in a git repository" >&2
   exit 1

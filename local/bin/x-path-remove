@@ -12,8 +12,11 @@
 
 VERBOSE="${VERBOSE:-0}"
 
+_xp_dir="${BASH_SOURCE[0]:-$0}"
+case $_xp_dir in */*) _xp_dir="${_xp_dir%/*}" ;; *) _xp_dir=. ;; esac
 # shellcheck source=./x-path
-. "$(dirname "${BASH_SOURCE[0]:-$0}")/x-path"
+. "$_xp_dir/x-path"
+unset _xp_dir
 
 normalize_path_var
 do_remove "$@"

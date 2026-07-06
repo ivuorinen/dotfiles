@@ -57,14 +57,14 @@ backup_mysql_tables()
 
   msg "Backing up tables with prefix '$prefix' from database '$database' to file '$filename_timestamp'"
 
-  # shellcheck disable=SC2046  # word splitting is intentional: expands table names as separate args
-  mysqldump \
-    "${database}" \
-    $(
-      echo "show tables like '${prefix}%';" \
-        | mysql "${database}" \
-        | sed '/Tables_in/d'
-    ) > "${filename_timestamp}"
+  # -N skips the "Tables_in_..." header row. Guard against an empty
+  # match: mysqldump with no table args would dump the ENTIRE database.
+  local tables
+  tables=$(echo "show tables like '${prefix}%';" | mysql -N "${database}")
+  [ -n "$tables" ] || msg_err "No tables match prefix '${prefix}' in database '${database}'"
+
+  # shellcheck disable=SC2086  # word splitting is intentional: expands table names as separate args
+  mysqldump "${database}" $tables > "${filename_timestamp}"
 
   msg "Backup completed and saved to '$filename_timestamp'"
 }
@@ -92,6 +92,6 @@ main()
 }
 
 # Script name for usage information
-SCRIPT=$(basename "$0")
+SCRIPT=${0##*/}
 
 main "$@"
