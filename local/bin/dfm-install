@@ -176,6 +176,15 @@ dfm_install()
         msgr err "mise reshim failed"
         exit 1
       }
+      # Apply [bootstrap.packages] — Homebrew formulae mise installs into the
+      # canonical prefix (/opt/homebrew) without the brew CLI. macOS-only, since
+      # these mirror the macOS Brewfile; scoped to the brew manager and kept
+      # non-fatal because the feature is experimental.
+      if [[ "$(uname -s)" == "Darwin" ]]; then
+        msgr nested "Applying mise bootstrap brew packages..."
+        mise bootstrap packages apply --manager brew --yes \
+          || msgr warn "mise bootstrap packages apply failed (non-fatal)"
+      fi
       msgr yay "mise tools installed!"
       ;;
 

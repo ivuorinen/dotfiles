@@ -2,11 +2,11 @@
 #USAGE cmd "brew" help="Homebrew package management" {
 #USAGE   cmd "install" help="Install packages from Brewfile"
 #USAGE   cmd "update" help="Update Homebrew and packages"
-#USAGE   cmd "updatebundle" help="Update Brewfile with descriptions"
+#USAGE   cmd "updatebundle" help="Deprecated: formulae now managed by mise"
 #USAGE   cmd "autoupdate" help="Setup Homebrew auto-update"
-#USAGE   cmd "leaves" help="List installed-on-request packages"
-#USAGE   cmd "clean" help="Cleanup old versions"
-#USAGE   cmd "untracked" help="List packages not in Brewfile"
+#USAGE   cmd "leaves" help="Deprecated: use mise bootstrap packages status"
+#USAGE   cmd "clean" help="Deprecated: would remove mise-managed formulae"
+#USAGE   cmd "untracked" help="Deprecated: formulae now tracked by mise"
 #USAGE }
 #
 # @description Homebrew package management (dfm brew)
@@ -26,6 +26,18 @@ if ! source "$_dfm_dir/dfm-lib"; then
 fi
 dfm_bootstrap_for "$@"
 
+# Report a brew subcommand as deprecated by the mise brew-bootstrap migration.
+# Plain homebrew/core CLI formulae now live in mise's [bootstrap.packages]
+# (config/mise/config.toml); commands that dump or prune the Brewfile would
+# fight that split, so they no-op with a pointer to the mise equivalent.
+# $1 = subcommand name, $2 = guidance line. Always returns 0.
+brew_deprecated()
+{
+  msgr warn "dfm brew $1 is deprecated after the mise brew-bootstrap migration."
+  msgr nested "$2"
+  return 0
+}
+
 # Handle Homebrew section commands
 dfm_brew()
 {
@@ -34,11 +46,11 @@ dfm_brew()
   MENU=(
     "install:Installs items defined in Brewfile"
     "update:Updates and upgrades brew packages"
-    "updatebundle:Updates Brewfile with descriptions"
+    "updatebundle:Deprecated (formulae now managed by mise)"
     "autoupdate:Setups brew auto-update and runs it immediately"
-    "leaves:List brew leaves (installed on request)"
-    "clean:Clean up brew packages"
-    "untracked:List untracked brew packages"
+    "leaves:Deprecated (use mise bootstrap packages status)"
+    "clean:Deprecated (would remove mise-managed formulae)"
+    "untracked:Deprecated (formulae now tracked by mise)"
   )
 
   # Homebrew may be absent (a minimal Linux box). Without it there is
@@ -66,60 +78,25 @@ dfm_brew()
       ;;
 
     updatebundle)
-      # Updates .dotfiles/homebrew/Brewfile with descriptions
-      brew bundle dump \
-        --force \
-        --file="$BREWFILE" \
-        --tap \
-        --formula \
-        --cask \
-        --describe && msgr yay "Done!"
+      # `brew bundle dump` would re-add every migrated homebrew/core formula to
+      # the Brewfile, undoing the migration. The Brewfile is curated by hand now.
+      brew_deprecated updatebundle \
+        "The Brewfile is curated; formulae live in mise [bootstrap.packages]. Use 'mise bootstrap packages import --manager brew' to snapshot into mise instead."
       ;;
 
     leaves)
-      brew leaves --installed-on-request
+      # Migrated formulae still appear as brew leaves, so this now mixes
+      # mise-managed and native-brew formulae. mise tracks its own set.
+      brew_deprecated leaves \
+        "Run 'mise bootstrap packages status' for mise-managed formulae, or 'brew leaves --installed-on-request' directly for the native-brew stack (casks/php/media)."
       ;;
 
     untracked)
-      declare -a BREW_LIST_ALL
-      while IFS= read -r line; do
-        BREW_LIST_ALL+=("$line")
-      done < <(brew list --formula --installed-on-request -1 --full-name)
-      while IFS= read -r c; do
-        BREW_LIST_ALL+=("$c")
-      done < <(brew list --cask -1 --full-name)
-
-      # Remove entries that are installed as dependencies
-      declare -a BREW_LIST_DEPENDENCIES
-      while IFS= read -r l; do
-        BREW_LIST_DEPENDENCIES+=("$l")
-      done < <(brew list -1 --installed-as-dependency)
-
-      declare -a BREW_LIST_BUNDLED
-      while IFS= read -r b; do
-        BREW_LIST_BUNDLED+=("$b")
-      done < <(brew bundle list --all --file="$BREWFILE")
-
-      declare -a BREW_LIST_TRACKED_WITHOUT_DEPS
-      for f in "${BREW_LIST_ALL[@]}"; do
-        # shellcheck disable=SC2199
-        if [[ " ${BREW_LIST_DEPENDENCIES[@]} " != *" ${f} "* ]]; then
-          BREW_LIST_TRACKED_WITHOUT_DEPS+=("$f")
-        fi
-      done
-
-      array_diff BREW_LIST_UNTRACKED BREW_LIST_TRACKED_WITHOUT_DEPS BREW_LIST_BUNDLED
-
-      # If there are no untracked packages, return
-      if [ ${#BREW_LIST_UNTRACKED[@]} -eq 0 ]; then
-        msgr yay "No untracked packages found!"
-        return 0
-      fi
-
-      echo "Untracked:"
-      for f in "${BREW_LIST_UNTRACKED[@]}"; do
-        echo "  $f"
-      done
+      # The 49 migrated formulae are installed but intentionally absent from the
+      # Brewfile, so the old diff would report every one of them as "untracked".
+      # They are tracked by mise now, which makes this listing meaningless.
+      brew_deprecated untracked \
+        "Migrated formulae are tracked in mise [bootstrap.packages]; check 'mise bootstrap packages status'. Casks live in the Brewfile."
       ;;
 
     autoupdate)
@@ -127,7 +104,13 @@ dfm_brew()
       brew autoupdate start 43200 --upgrade --cleanup --immediate
       ;;
 
-    clean) brew bundle cleanup --file="$BREWFILE" && msgr yay "Done!" ;;
+    clean)
+      # `brew bundle cleanup` uninstalls anything not in the Brewfile — which
+      # now includes the mise-managed formulae. Neutralised to prevent removing
+      # them. `dfm brew update` still runs `brew cleanup` for real brew cruft.
+      brew_deprecated clean \
+        "It would uninstall mise-managed formulae. mise owns its bootstrap packages; use 'dfm brew update' (runs brew cleanup) for cask/php cruft."
+      ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
   esac

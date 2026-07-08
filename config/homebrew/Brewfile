@@ -1,9 +1,19 @@
+# Native Homebrew bundle. This is now a PARTIAL Brewfile: plain homebrew/core
+# CLI formulae were migrated to mise's experimental brew bootstrap and live in
+# config/mise/config.toml under [bootstrap.packages] (installed by
+# `dfm install mise` via `mise bootstrap packages apply`).
+#
+# What stays here on native brew, on purpose:
+#   - casks (mise brew-cask is experimental, no import/prune)
+#   - imagemagick, ffmpeg, coreutils (GNU) and their linked dependency closure
+#   - yabai/skhd (codesign + sudo installs mise's shim doesn't cover)
+# PHP is no longer managed here — phpenv.fish (homebrew provider) owns it.
+# Applied with `dfm brew install` (brew bundle). Do not re-add the migrated
+# formulae here — mise resolves their dependency closure automatically.
 tap "1password/tap"
 tap "cormacrelf/tap"
 tap "doron-cohen/tap"
 tap "koekeishiya/formulae"
-tap "shivammathur/extensions"
-tap "shivammathur/php"
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
 # Apache Portable Runtime library
@@ -20,28 +30,16 @@ brew "argon2"
 brew "aspell"
 # Automatic configure script builder
 brew "autoconf"
-# Collection of over 500 reusable autoconf macros
-brew "autoconf-archive"
 # GNU multiple precision arithmetic library
 brew "gmp"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
-# Automated text file generator
-brew "autogen"
-# Tool for generating GNU Standards-compliant Makefiles
-brew "automake"
 # GNU internationalization (i18n) and localization (l10n) library
 brew "gettext"
 # Text-based UI library
 brew "ncurses"
-# Bourne-Again SHell, a UNIX command interpreter
-brew "bash"
-# Parser generator
-brew "bison"
 # Generic-purpose lossless compression algorithm by Google
 brew "brotli"
-# Freely available high-quality data compressor
-brew "bzip2"
 # Library for manipulating PNG images
 brew "libpng"
 # Software library to render fonts
@@ -50,8 +48,6 @@ brew "freetype"
 brew "fontconfig"
 # Core application library for C
 brew "glib"
-# Mozilla CA bundle for Python
-brew "certifi"
 # JPEG image codec that aids compression and decompression
 brew "jpeg-turbo"
 # Zstandard is a real-time compression algorithm
@@ -70,46 +66,18 @@ brew "jpeg-xl"
 brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
-# Versatile and fast Unicode/ASCII/ANSI graphics renderer
-brew "chafa"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
-# OWASP dependency-check
-brew "dependency-check"
-# Lightweight DNS forwarder and DHCP server
-brew "dnsmasq"
-# Spellchecker wrapping library
-brew "enchant"
-# Perl lib for reading and writing EXIF metadata
-brew "exiftool"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
-# Banner-like program prints strings as ASCII art
-brew "figlet"
-# User-friendly command-line shell for UNIX-like operating systems
-brew "fish"
-# Lock file during command
-brew "flock"
 # Libraries to talk to Microsoft SQL Server and Sybase databases
 brew "freetds"
-# Monitor a directory for changes and run a shell command
-brew "fswatch"
 # Graphics library to dynamically manipulate images
 brew "gd"
 # Secure hashing function
 brew "libb2"
-# Interpreter for PostScript and PDF
-brew "ghostscript"
-# Distributed revision control system
-brew "git"
-# Small git utilities
-brew "git-extras"
-# GNU implementation of the famous stream editor
-brew "gnu-sed"
 # GNU Transport Layer Security (TLS) Library
 brew "gnutls"
 # Validating, recursive, caching DNS resolver
@@ -118,82 +86,22 @@ brew "unbound"
 brew "gnupg"
 # Library access to GnuPG
 brew "gpgme"
-# Manage your GnuPG keys with ease!
-brew "gpg-tui"
 # Image manipulation
 brew "netpbm"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.13"
-# Graph visualization software from AT&T and Bell Labs
-brew "graphviz"
-# GNU grep, egrep and fgrep
-brew "grep"
-# Popular GNU data compression program
-brew "gzip"
-# Improved top (interactive process viewer)
-brew "htop"
-# Portable abstraction of the hierarchical topology of modern architectures
-brew "hwloc"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
 brew "libheif"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-# Modular IRC client
-brew "irssi"
-# Image manipulation library
-brew "jpeg"
-# JSON parser for C
-brew "json-c"
-# Code coverage tester for compiled programs, Python, and shell scripts
-brew "kcov"
 # Network authentication protocol
 brew "krb5"
-# BSD-style licensed readline alternative
-brew "libedit"
 # Postgres C API library
 brew "libpq"
-# Version of the SSL/TLS protocol forked from OpenSSL
-brew "libressl"
-# Multi-platform support library with a focus on asynchronous I/O
-brew "libuv"
-# Linguistic software and Finnish dictionary
-brew "libvoikko"
-# GNOME XML library
-brew "libxml2"
-# YAML Parser
-brew "libyaml"
 # C library for reading, creating, and modifying zip archives
 brew "libzip"
-# Package manager for the Lua programming language
-brew "luarocks"
-# LZMA-based compression program similar to gzip or bzip2
-brew "lzip"
-# Deep clean and optimize your Mac
-brew "mole"
-# Collection of tools that nobody wrote when UNIX was young
-brew "moreutils"
 # Open source suite of directory software
 brew "openldap"
-# ISO-C API and CLI for generating UUIDs
-brew "ossp-uuid"
-# General-purpose scripting language
-brew "php", link: false
-# General-purpose scripting language
-brew "php@8.3"
-# Generate C-based recognizers from regular expressions
-brew "re2c"
-# Send macOS User Notifications from the command-line
-brew "terminal-notifier"
-# Tool which checks for the support of TLS/SSL ciphers and flaws
-brew "testssl"
-# Display directories as trees (with optional color/HTML output)
-brew "tree"
-# Executes a program periodically, showing output fullscreen
-brew "watch"
-# Internet file retriever
-brew "wget"
-# General-purpose lossless data-compression library
-brew "zlib"
 # Watcher for macOS 10.14+ light/dark mode changes
 brew "cormacrelf/tap/dark-notify"
 # Cleans up your $HOME from those pesky dotfiles
@@ -202,32 +110,6 @@ brew "doron-cohen/tap/antidot"
 brew "koekeishiya/formulae/skhd"
 # A tiling window manager for macOS based on binary space partitioning.
 brew "koekeishiya/formulae/yabai"
-# Igbinary PHP extension
-brew "shivammathur/extensions/igbinary@8.3"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.3"
-# Imagick PHP extension
-brew "shivammathur/extensions/imagick@8.4"
-# Mcrypt PHP extension
-brew "shivammathur/extensions/mcrypt@8.3"
-# Msgpack PHP extension
-brew "shivammathur/extensions/msgpack@8.3"
-# PCOV PHP extension
-brew "shivammathur/extensions/pcov@8.3"
-# Redis PHP extension
-brew "shivammathur/extensions/phpredis@8.3"
-# Uuid PHP extension
-brew "shivammathur/extensions/uuid@8.3"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.4"
-# Xdebug PHP extension
-brew "shivammathur/extensions/xdebug@8.5"
-# Yaml PHP extension
-brew "shivammathur/extensions/yaml@8.3"
-# General-purpose scripting language
-brew "shivammathur/php/php-debug", link: false
-# General-purpose scripting language
-brew "shivammathur/php/php@8.4"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Semantic code analysis engine

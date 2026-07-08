@@ -56,6 +56,29 @@ a system or Homebrew path.
 3. If a shell completion or alias is needed, wire it in `config/alias`
    or `config/fish/`.
 
+## Homebrew formulae via mise (bootstrap packages)
+
+Plain `homebrew/core` CLI formulae are installed by mise's experimental
+brew bootstrap instead of the `brew` CLI. They live under
+`[bootstrap.packages]` in `config/mise/config.toml` as
+`"brew:<formula>" = "latest"`, and mise pours them into the canonical
+Homebrew prefix (`/opt/homebrew`), so paths match a native
+`brew install`.
+
+| Command                                       | Does                                     |
+|-----------------------------------------------|------------------------------------------|
+| `mise bootstrap packages status` (alias `ls`) | Show configured formulae + install state |
+| `mise bootstrap packages apply -m brew -y`    | Install any missing formulae             |
+| `mise bootstrap packages upgrade -m brew`     | Upgrade installed bootstrap formulae     |
+| `mise bootstrap packages import -m brew`      | Snapshot on-request formulae into config |
+
+`dfm install mise` runs `apply` automatically (macOS only). Only
+on-request **leaves** are listed — mise resolves each formula's
+dependency closure, so transitive deps must not be added. Casks, the
+imagemagick/ffmpeg/coreutils stack, and yabai/skhd stay on native brew
+in `config/homebrew/Brewfile` (see its header). PHP is managed by
+`phpenv.fish` (homebrew provider), not brew or mise.
+
 ## Gotchas
 
 - `experimental = true` is set — some commands (`deps`, `oci`, `mcp`) are

@@ -145,3 +145,66 @@ prek = "0.4.8"
 "github:shhac/git-hunk" = "0.16.0"
 1password-cli = "2.34.1"
 "github:modem-dev/hunk" = "0.17.0"
+pi = "latest"
+
+# Homebrew formulae installed by mise's experimental brew bootstrap, without
+# requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
+# (/opt/homebrew), so binary paths are identical to a native `brew install`.
+# Applied by `mise bootstrap packages apply` (wired into `dfm install mise`).
+#
+# Only homebrew/core, on-request LEAVES live here — mise resolves each formula's
+# dependency closure automatically, so transitive deps are intentionally omitted.
+# Kept on native brew (config/homebrew/Brewfile) on purpose: imagemagick,
+# ffmpeg, coreutils (GNU, not uutils), yabai/skhd (codesign+sudo installs), and
+# all casks. PHP is managed by phpenv.fish (homebrew provider), not here.
+# Anything already in [tools] above (e.g. 1password-cli) is not re-introduced.
+[bootstrap.packages]
+"brew:autoconf-archive" = "latest"
+"brew:autogen" = "latest"
+"brew:automake" = "latest"
+"brew:bash" = "latest"
+"brew:bison" = "latest"
+"brew:bzip2" = "latest"
+"brew:certifi" = "latest"
+"brew:chafa" = "latest"
+"brew:cryptography" = "latest"
+"brew:dependency-check" = "latest"
+"brew:dnsmasq" = "latest"
+"brew:enchant" = "latest"
+"brew:exiftool" = "latest"
+"brew:figlet" = "latest"
+"brew:fish" = "latest"
+"brew:flock" = "latest"
+"brew:fswatch" = "latest"
+"brew:ghostscript" = "latest"
+"brew:git" = "latest"
+"brew:git-extras" = "latest"
+"brew:gnu-sed" = "latest"
+"brew:gpg-tui" = "latest"
+"brew:graphviz" = "latest"
+"brew:grep" = "latest"
+"brew:gzip" = "latest"
+"brew:htop" = "latest"
+"brew:hwloc" = "latest"
+"brew:irssi" = "latest"
+"brew:jpeg" = "latest"
+"brew:json-c" = "latest"
+"brew:kcov" = "latest"
+"brew:libedit" = "latest"
+"brew:libressl" = "latest"
+"brew:libuv" = "latest"
+"brew:libvoikko" = "latest"
+"brew:libxml2" = "latest"
+"brew:libyaml" = "latest"
+"brew:luarocks" = "latest"
+"brew:lzip" = "latest"
+"brew:mole" = "latest"
+"brew:moreutils" = "latest"
+"brew:ossp-uuid" = "latest"
+"brew:re2c" = "latest"
+"brew:terminal-notifier" = "latest"
+"brew:testssl" = "latest"
+"brew:tree" = "latest"
+"brew:watch" = "latest"
+"brew:wget" = "latest"
+"brew:zlib" = "latest"
