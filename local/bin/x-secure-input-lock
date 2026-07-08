@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# @description Report which app holds the macOS secure input lock (blocks key remappers)
+#USAGE about "Report which app holds the macOS secure input lock"
+# shellcheck shell=bash
+#
+# macOS "secure input" (EnableSecureEventInput) is claimed by a single process
+# — usually a password field. While held, it can throttle or block third-party
+# keyboard handling (Karabiner remaps, Hammerspoon hotkeys/taps). The claim is
+# sometimes left stuck after unlock. This reports the holding process so you can
+# quit/refocus it instead of rebooting.
+#
+# Exit status: 0 = not held, 1 = held (scriptable), 2 = unsupported platform.
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+# msgr uses unguarded variables ($ZSH_VERSION, $1) — disable nounset
+set +u
+# shellcheck source=msgr
+source "${DOTFILES}/local/bin/msgr"
+set -u
+
+# Extract the first non-zero secure-input PID from `ioreg -l` output on stdin.
+# The key only exists while secure input is engaged; a value of 0 means "not
+# held" and is skipped. Reading stdin keeps the parser unit-testable.
+secure_input_pid()
+{
+  grep -oE 'kCGSSessionSecureInputPID"[^0-9]*[0-9]+' \
+    | grep -oE '[0-9]+' \
+    | grep -vx 0 \
+    | head -n1
+}
+
+# Friendly name for a PID (basename of its executable), or a hint if it's gone.
+holder_name()
+{
+  pid="$1"
+  comm="$(ps -p "$pid" -o comm= 2> /dev/null || true)"
+  if [ -n "$comm" ]; then
+    basename "$comm"
+  else
+    echo "unknown (pid ${pid} may have exited)"
+  fi
+}
+
+main()
+{
+  if ! command -v ioreg > /dev/null 2>&1; then
+    msgr err "ioreg not found — this tool only works on macOS."
+    exit 2
+  fi
+
+  pid="$(ioreg -l -w 0 2> /dev/null | secure_input_pid || true)"
+
+  if [ -z "$pid" ]; then
+    msgr yay "Secure input is NOT held. Keyboard remappers should work."
+    exit 0
+  fi
+
+  name="$(holder_name "$pid")"
+  cmd="$(ps -p "$pid" -o command= 2> /dev/null || true)"
+
+  msgr warn "Secure input IS held — this can block Karabiner/Hammerspoon key handling."
+  msgr msg "Holder : ${name} (PID ${pid})"
+  if [ -n "$cmd" ]; then
+    msgr msg "Command: ${cmd}"
+  fi
+  msgr msg "Release: quit or refocus that app; a full logout clears a stuck claim."
+  exit 1
+}
+
+# Only run when executed, not when sourced (the tests source this file).
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  main "$@"
+fi
