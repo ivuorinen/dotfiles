@@ -52,66 +52,91 @@ end, function()
   f18:exit()
 end)
 
+-- Keycodes resolved from the CURRENT keyboard layout. Binding by keycode (a
+-- number) instead of a character string keeps every key in use visible in one
+-- place, and each entry is the physical key that types that character on this
+-- layout. `hs.keycodes.map` returns nil for a character the layout cannot
+-- produce, so the loop below warns about any bind that would silently never
+-- fire.
+local KEY = {}
+for name, char in pairs {
+  v = 'v',
+  u = 'u',
+  i = 'i',
+  o = 'o',
+  y = 'y',
+  p = 'p',
+  h = 'h',
+  j = 'j',
+  k = 'k',
+  l = 'l',
+  left = 'left',
+  right = 'right',
+  up = 'up',
+  down = 'down',
+  dot = '.',
+  comma = ',',
+} do
+  KEY[name] = hs.keycodes.map[char]
+  if KEY[name] == nil then
+    print(
+      ('hammerspoon: KEY.%s (%q) did not resolve on the current layout'):format(
+        name,
+        char
+      )
+    )
+  end
+end
+
 -- Meh (F18/Caps Lock) key bindings for window management
 -- These provide quick access to common window operations
 
--- Helper function to get focused window
-local function W()
-  return hs.window.focusedWindow()
+-- Bind a Meh key to an action that needs the focused window. The "is anything
+-- focused?" guard lives here once instead of in every handler; fn receives the
+-- window and only runs when one exists.
+local function bind(key, fn)
+  f18:bind({}, key, function()
+    local w = hs.window.focusedWindow()
+    if w then
+      fn(w)
+    end
+  end)
 end
 
--- Paste from clipboard with Meh + v
-f18:bind({}, 'v', function()
+-- Place the focused window into a unit-rect region: x/y/w/h are fractions
+-- (0..1) of the screen, so { 0, 0, 1/3, 1 } is the full-height left third.
+local function place(key, x, y, w, h)
+  bind(key, function(win)
+    win:moveToUnit({ x = x, y = y, w = w, h = h }, 0)
+  end)
+end
+
+-- Center the focused window at wFrac x hFrac of its screen's usable frame.
+local function centerOnScreen(win, wFrac, hFrac)
+  local sf = win:screen():frame()
+  local ww, hh = math.floor(sf.w * wFrac), math.floor(sf.h * hFrac)
+  win:setFrame({
+    x = sf.x + math.floor((sf.w - ww) / 2),
+    y = sf.y + math.floor((sf.h - hh) / 2),
+    w = ww,
+    h = hh,
+  }, 0)
+end
+
+-- Paste clipboard contents as keystrokes (skips paste protection). No window
+-- needed, so this one is bound directly rather than through bind().
+f18:bind({}, KEY.v, function()
   hs.eventtap.keyStrokes(hs.pasteboard.getContents())
 end)
 
--- Window positioning: thirds (U/I/O)
-f18:bind({}, 'u', function()
-  local w = W()
-  if w then
-    w:moveToUnit({ x = 0, y = 0, w = 1 / 3, h = 1 }, 0)
-  end
-end)
-f18:bind({}, 'i', function()
-  local w = W()
-  if w then
-    w:moveToUnit({ x = 1 / 3, y = 0, w = 1 / 3, h = 1 }, 0)
-  end
-end)
-f18:bind({}, 'o', function()
-  local w = W()
-  if w then
-    w:moveToUnit({ x = 2 / 3, y = 0, w = 1 / 3, h = 1 }, 0)
-  end
-end)
-
--- Window positioning: 2/3 width from left, full height (Y)
-f18:bind({}, 'y', function()
-  local w = W()
-  if w then
-    w:moveToUnit({ x = 0, y = 0, w = 2 / 3, h = 1 }, 0)
-  end
-end)
-f18:bind({}, 'p', function()
-  local w = W()
-  if w then
-    w:moveToUnit({ x = 2 / 3, y = 0, w = 2 / 3, h = 1 }, 0)
-  end
-end)
-
--- Window positioning: halves (Left/Right arrows)
-f18:bind({}, 'left', function()
-  local w = W()
-  if w then
-    w:moveToUnit(hs.layout.left50, 0)
-  end
-end)
-f18:bind({}, 'right', function()
-  local w = W()
-  if w then
-    w:moveToUnit(hs.layout.right50, 0)
-  end
-end)
+-- Window positioning (fractions of the screen):
+place(KEY.u, 0, 0, 1 / 3, 1) -- left third
+place(KEY.i, 1 / 3, 0, 1 / 3, 1) -- center third
+place(KEY.o, 2 / 3, 0, 1 / 3, 1) -- right third
+place(KEY.y, 0, 0, 2 / 3, 1) -- left two-thirds
+place(KEY.p, 1 / 3, 0, 2 / 3, 1) -- right two-thirds
+place(KEY.left, 0, 0, 0.5, 1) -- left half
+place(KEY.right, 0.5, 0, 0.5, 1) -- right half
 
 -- Cycle through all windows (H/L)
 -- We need to maintain state to properly cycle through all windows
@@ -130,94 +155,54 @@ local function getWindowCycleList()
   return windowCycleList
 end
 
-f18:bind({}, 'h', function()
-  local windows = getWindowCycleList()
-  if #windows <= 1 then
-    return
-  end
+-- step is +1 (forward, L) or -1 (backward, H); the modulo keeps the index in
+-- 1..#windows and wraps at either end (Lua's % returns a non-negative result).
+local function cycleWindows(key, step)
+  f18:bind({}, key, function()
+    local windows = getWindowCycleList()
+    if #windows <= 1 then
+      return
+    end
+    windowCycleIndex = (windowCycleIndex - 1 + step) % #windows + 1
+    windows[windowCycleIndex]:focus()
+  end)
+end
+cycleWindows(KEY.h, -1)
+cycleWindows(KEY.l, 1)
 
-  -- Cycle backward
-  windowCycleIndex = windowCycleIndex - 1
-  if windowCycleIndex < 1 then
-    windowCycleIndex = #windows
-  end
-
-  windows[windowCycleIndex]:focus()
+-- Maximize (Up / j)
+bind(KEY.up, function(w)
+  w:maximize(0)
+end)
+bind(KEY.j, function(w)
+  w:maximize(0)
 end)
 
-f18:bind({}, 'l', function()
-  local windows = getWindowCycleList()
-  if #windows <= 1 then
-    return
-  end
-
-  -- Cycle forward
-  windowCycleIndex = windowCycleIndex + 1
-  if windowCycleIndex > #windows then
-    windowCycleIndex = 1
-  end
-
-  windows[windowCycleIndex]:focus()
-end)
-
--- Window sizing: maximize (Up/j) and center (Down/k)
-f18:bind({}, 'up', function()
-  local w = W()
-  if w then
-    w:maximize(0)
-  end
-end)
-f18:bind({}, 'j', function()
-  local w = W()
-  if w then
-    w:maximize(0)
-  end
-end)
-f18:bind({}, 'down', function()
-  local w = W()
-  if not w then
-    return
-  end
-  local f = w:frame()
-  local sf = w:screen():frame()
-  if f.w < sf.w * 0.95 then
+-- Toggle maximize <-> centered half (Down): maximize unless already near-full,
+-- otherwise shrink to a centered 50% x 90% window.
+bind(KEY.down, function(w)
+  if w:frame().w < w:screen():frame().w * 0.95 then
     w:maximize(0)
   else
-    local ww, hh = math.floor(sf.w * 0.5), math.floor(sf.h * 0.9)
-    local xx = sf.x + math.floor((sf.w - ww) / 2)
-    local yy = sf.y + math.floor((sf.h - hh) / 2)
-    w:setFrame({ x = xx, y = yy, w = ww, h = hh }, 0)
-  end
-end)
-f18:bind({}, 'k', function()
-  local w = W()
-  if w then
-    local sf = w:screen():frame()
-    local ww, hh = math.floor(sf.w * 0.9), math.floor(sf.h * 0.9)
-    local xx = sf.x + math.floor((sf.w - ww) / 2)
-    local yy = sf.y + math.floor((sf.h - hh) / 2)
-    w:setFrame({ x = xx, y = yy, w = ww, h = hh }, 0)
+    centerOnScreen(w, 0.5, 0.9)
   end
 end)
 
--- Move to next/previous screen (. and ,)
-f18:bind({}, '.', function()
-  local w = W()
-  if w then
-    local s = w:screen()
-    local ns = s:toEast() or s:toWest()
-    if ns then
-      w:moveToScreen(ns, true, true, 0)
-    end
+-- Center at 90% x 90% (k)
+bind(KEY.k, function(w)
+  centerOnScreen(w, 0.9, 0.9)
+end)
+
+-- Move the focused window to the adjacent screen, wrapping when only two exist.
+bind(KEY.dot, function(w) -- next screen (east, else west)
+  local ns = w:screen():toEast() or w:screen():toWest()
+  if ns then
+    w:moveToScreen(ns, true, true, 0)
   end
 end)
-f18:bind({}, ',', function()
-  local w = W()
-  if w then
-    local s = w:screen()
-    local ps = s:toWest() or s:toEast()
-    if ps then
-      w:moveToScreen(ps, true, true, 0)
-    end
+bind(KEY.comma, function(w) -- previous screen (west, else east)
+  local ps = w:screen():toWest() or w:screen():toEast()
+  if ps then
+    w:moveToScreen(ps, true, true, 0)
   end
 end)
