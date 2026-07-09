@@ -23,18 +23,23 @@ if not set -q PHPENV_AUTO_SWITCH
 end
 
 if not set -q PHPENV_DEFAULT_EXTENSIONS
-    set -g PHPENV_DEFAULT_EXTENSIONS opcache
+    set -g PHPENV_DEFAULT_EXTENSIONS "opcache"
 end
 
 # Initialize PATH on shell startup if global version is set (less aggressive)
 if test -n "$PHPENV_GLOBAL_VERSION"; and not set -q PHPENV_INITIALIZED
+    # Internal __phpenv_* functions live inside phpenv.fish and are not
+    # autoloadable by name; printing the definition force-loads the file
+    functions phpenv >/dev/null 2>&1
     if functions -q __phpenv_is_version_installed __phpenv_set_php_path
         if __phpenv_is_version_installed "$PHPENV_GLOBAL_VERSION" 2>/dev/null
             # Only set PATH if no project-specific version is detected
             if not __phpenv_find_version_file .php-version >/dev/null 2>&1
                 if not __phpenv_find_version_file .tool-version >/dev/null 2>&1
-                    if not test -f composer.json
-                        __phpenv_set_php_path "$PHPENV_GLOBAL_VERSION" 2>/dev/null
+                    if not __phpenv_find_version_file .tool-versions >/dev/null 2>&1
+                        if not __phpenv_find_version_file composer.json >/dev/null 2>&1
+                            __phpenv_set_php_path "$PHPENV_GLOBAL_VERSION" 2>/dev/null
+                        end
                     end
                 end
             end

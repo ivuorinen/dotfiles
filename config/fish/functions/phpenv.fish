@@ -63,36 +63,40 @@ function __phpenv_detect_version
     if test -n "$phpenv_version_file"
         set -l phpenv_version (string trim < $phpenv_version_file)
         if test -n "$phpenv_version"
-            echo $phpenv_version
+            __phpenv_normalize_version $phpenv_version
             return
         end
     end
 
-    set -l phpenv_tool_version_file (__phpenv_find_version_file .tool-version)
-    if test -n "$phpenv_tool_version_file"
-        set -l phpenv_version (__phpenv_parse_tool_version $phpenv_tool_version_file)
-        if test -n "$phpenv_version"
-            echo $phpenv_version
-            return
+    # .tool-version is the documented name; .tool-versions is the asdf standard
+    for phpenv_tool_filename in .tool-version .tool-versions
+        set -l phpenv_tool_version_file (__phpenv_find_version_file $phpenv_tool_filename)
+        if test -n "$phpenv_tool_version_file"
+            set -l phpenv_version (__phpenv_parse_tool_version $phpenv_tool_version_file)
+            if test -n "$phpenv_version"
+                __phpenv_normalize_version $phpenv_version
+                return
+            end
         end
     end
 
-    if test -f composer.json
-        set -l phpenv_version (__phpenv_parse_composer_version)
+    set -l phpenv_composer_file (__phpenv_find_version_file composer.json)
+    if test -n "$phpenv_composer_file"
+        set -l phpenv_version (__phpenv_parse_composer_version $phpenv_composer_file)
         if test -n "$phpenv_version"
-            echo $phpenv_version
+            __phpenv_normalize_version $phpenv_version
             return
         end
     end
 
     if test -n "$PHPENV_GLOBAL_VERSION"
-        echo $PHPENV_GLOBAL_VERSION
+        __phpenv_normalize_version $PHPENV_GLOBAL_VERSION
         return
     end
 
     set -l phpenv_global_version (__phpenv_config_get global-version)
     if test -n "$phpenv_global_version"
-        echo $phpenv_global_version
+        __phpenv_normalize_version $phpenv_global_version
         return
     end
 
@@ -103,7 +107,7 @@ end
 
 function __phpenv_find_version_file -a phpenv_filename
     set -l phpenv_dir (pwd)
-    while test "$phpenv_dir" != /
+    while test "$phpenv_dir" != "/"
         if test -f "$phpenv_dir/$phpenv_filename"
             echo "$phpenv_dir/$phpenv_filename"
             return
@@ -114,29 +118,41 @@ end
 
 function __phpenv_parse_tool_version -a phpenv_file
     if test -f $phpenv_file
-        set -l phpenv_line (grep "^php " $phpenv_file)
-        if test -n "$phpenv_line"
-            set -l phpenv_parts (string split ' ' $phpenv_line)
-            if test (count $phpenv_parts) -ge 2
-                echo $phpenv_parts[2] | sed 's/^v//'
-            end
+        set -l phpenv_match (string match -r '^php\s+v?(\S+)' < $phpenv_file)
+        if test (count $phpenv_match) -ge 2
+            echo $phpenv_match[2]
         end
     end
 end
 
-function __phpenv_parse_composer_version
-    if not test -f composer.json
+# Providers only package MAJOR.MINOR (shivammathur php@8.1, apt php8.1-cli);
+# strip PATCH and suffixes: 8.1.12 -> 8.1, v8.2.3 -> 8.2, 8.1.x -> 8.1.
+# Aliases (latest, nightly, 8.x) pass through unchanged.
+function __phpenv_normalize_version -a phpenv_version
+    set -l phpenv_match (string match -r '^v?([0-9]+\.[0-9]+)([^0-9].*)?$' -- "$phpenv_version")
+    if test -n "$phpenv_match"
+        echo $phpenv_match[2]
+    else
+        echo $phpenv_version
+    end
+end
+
+function __phpenv_parse_composer_version -a phpenv_composer_file
+    if test -z "$phpenv_composer_file"
+        set phpenv_composer_file composer.json
+    end
+    if not test -f "$phpenv_composer_file"
         return
     end
 
-    set -l phpenv_platform_php (jq -r '.config.platform.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != null
-        echo $phpenv_platform_php
+    set -l phpenv_platform_php (jq -r '.config.platform.php // empty' "$phpenv_composer_file" 2>/dev/null)
+    if test $status -eq 0 -a -n "$phpenv_platform_php" -a "$phpenv_platform_php" != "null"
+        __phpenv_normalize_version $phpenv_platform_php
         return
     end
 
-    set -l phpenv_require_php (jq -r '.require.php // empty' composer.json 2>/dev/null)
-    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != null
+    set -l phpenv_require_php (jq -r '.require.php // empty' "$phpenv_composer_file" 2>/dev/null)
+    if test $status -eq 0 -a -n "$phpenv_require_php" -a "$phpenv_require_php" != "null"
         __phpenv_parse_semver_constraint $phpenv_require_php
         return
     end
@@ -145,15 +161,18 @@ end
 function __phpenv_parse_semver_constraint -a phpenv_constraint
     set phpenv_constraint (echo $phpenv_constraint | tr -d ' "')
 
-    set -l phpenv_latest_8x (__phpenv_parse_version_field "8.x" "8.4")
-    set -l phpenv_latest_7x (__phpenv_parse_version_field "7.x" "7.4")
-    set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
+    # Exact version constraint (e.g. "8.1.3"): use its MAJOR.MINOR directly.
+    # Must run before the switch: fish globs like '8.*' would swallow it.
+    if string match -rq '^v?[0-9]+(\.[0-9]+)+$' -- $phpenv_constraint
+        __phpenv_normalize_version $phpenv_constraint
+        return
+    end
 
     switch $phpenv_constraint
-        case '^8.*'
-            echo $phpenv_latest_8x
-        case '^7.*'
-            echo $phpenv_latest_7x
+        case '^8.*' '>=8.1' '>=8.0' '>=7.4' '8.*' '8.x.*'
+            __phpenv_parse_version_field "8.x" "8.4"
+        case '^7.*' '7.*' '7.x.*'
+            __phpenv_parse_version_field "7.x" "7.4"
         case '~8.4*'
             echo "8.4"
         case '~8.3*'
@@ -166,16 +185,6 @@ function __phpenv_parse_semver_constraint -a phpenv_constraint
             echo "8.0"
         case '~7.4*'
             echo "7.4"
-        case '>=8.1'
-            echo $phpenv_latest_8x
-        case '>=8.0'
-            echo $phpenv_latest_8x
-        case '>=7.4'
-            echo $phpenv_latest_8x
-        case '8.*' '8.x.*'
-            echo $phpenv_latest_8x
-        case '7.*' '7.x.*'
-            echo $phpenv_latest_7x
         case '5.*' '5.x.*'
             echo "5.6"
         case '*'
@@ -185,7 +194,7 @@ function __phpenv_parse_semver_constraint -a phpenv_constraint
             if test -n "$version_match"
                 echo $version_match[1]
             else
-                echo $phpenv_latest
+                __phpenv_parse_version_field "latest" "8.4"
             end
     end
 end
@@ -196,7 +205,7 @@ set -g __phpenv_version_cache_time 0
 
 function __phpenv_get_version_info
     set -l current_time (date +%s)
-    set -l cache_duration 300 # 5 minutes
+    set -l cache_duration 300  # 5 minutes
 
     # Return cached version if still valid
     if test -n "$__phpenv_version_cache"
@@ -236,12 +245,12 @@ end
 # Check if Ondřej PPA is configured on the system
 function __phpenv_has_ondrej_ppa
     if test -d /etc/apt/sources.list.d
-        if grep -rq ondrej/php /etc/apt/sources.list.d/ 2>/dev/null
+        if grep -rq "ondrej/php" /etc/apt/sources.list.d/ 2>/dev/null
             return 0
         end
     end
     if test -f /etc/apt/sources.list
-        if grep -q ondrej/php /etc/apt/sources.list 2>/dev/null
+        if grep -q "ondrej/php" /etc/apt/sources.list 2>/dev/null
             return 0
         end
     end
@@ -262,34 +271,34 @@ function __phpenv_get_provider
     end
 
     # macOS always uses Homebrew
-    if test (uname -s) = Darwin
-        echo homebrew
+    if test (uname -s) = "Darwin"
+        echo "homebrew"
         return 0
     end
 
     # Linux: check for apt with Ondřej PPA first
-    if test (uname -s) = Linux
+    if test (uname -s) = "Linux"
         if command -q apt-get; and __phpenv_has_ondrej_ppa
-            echo apt
+            echo "apt"
             return 0
         end
 
         # Fall back to Homebrew (Linuxbrew) if available
         if command -q brew
-            echo homebrew
+            echo "homebrew"
             return 0
         end
 
         # If apt is available but no PPA yet, still use apt provider
         # (it will prompt to add the PPA when needed)
         if command -q apt-get
-            echo apt
+            echo "apt"
             return 0
         end
     end
 
     # Default fallback
-    echo homebrew
+    echo "homebrew"
     return 0
 end
 
@@ -319,7 +328,7 @@ function __phpenv_provider_homebrew_ensure_source
     end
 
     # Check and add required taps only if missing
-    set -l required_taps shivammathur/php shivammathur/extensions
+    set -l required_taps "shivammathur/php" "shivammathur/extensions"
     for tap in $required_taps
         if not brew tap | grep -qx $tap 2>/dev/null
             if not brew tap $tap 2>/dev/null
@@ -343,9 +352,8 @@ function __phpenv_provider_homebrew_list_installed
                     continue
                 end
 
-                if test "$phpenv_basename" = php
-                    set -l phpenv_latest (__phpenv_parse_version_field "latest" "8.4")
-                    set -a phpenv_versions $phpenv_latest
+                if test "$phpenv_basename" = "php"
+                    set -a phpenv_versions (__phpenv_brew_unversioned_version)
                 else if echo $phpenv_basename | grep -qE '^php@[0-9]+\.[0-9]+$'
                     set -l phpenv_version (echo $phpenv_basename | sed 's/php@//')
                     set -a phpenv_versions $phpenv_version
@@ -375,7 +383,7 @@ function __phpenv_provider_homebrew_list_available
             continue
         end
 
-        if test "$phpenv_clean_name" = php
+        if test "$phpenv_clean_name" = "php"
             set -a phpenv_versions "$phpenv_latest_version (latest)"
         else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
             set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
@@ -389,21 +397,23 @@ function __phpenv_provider_homebrew_list_available
     end
 end
 
+# MAJOR.MINOR of the unversioned `php` formula, read from its Cellar
+# dirname — the local truth, not the remote version JSON ("" if absent)
+function __phpenv_brew_unversioned_version
+    set -l phpenv_dirs (__phpenv_get_cellar_path)/php/*
+    if test (count $phpenv_dirs) -gt 0
+        __phpenv_normalize_version (basename (printf '%s\n' $phpenv_dirs | sort -V | tail -1))
+    end
+end
+
 function __phpenv_provider_homebrew_get_php_path -a phpenv_version
     set -l phpenv_cellar_path (__phpenv_get_cellar_path)
-    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
 
     set -l phpenv_target_dir
-    if test "$phpenv_version" = "$phpenv_latest_version"
-        if test -d "$phpenv_cellar_path/php"
-            set phpenv_target_dir "$phpenv_cellar_path/php"
-        else if test -d "$phpenv_cellar_path/php@$phpenv_version"
-            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
-        end
-    else
-        if test -d "$phpenv_cellar_path/php@$phpenv_version"
-            set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
-        end
+    if test -d "$phpenv_cellar_path/php@$phpenv_version"
+        set phpenv_target_dir "$phpenv_cellar_path/php@$phpenv_version"
+    else if test "$(__phpenv_brew_unversioned_version)" = "$phpenv_version"
+        set phpenv_target_dir "$phpenv_cellar_path/php"
     end
 
     if test -n "$phpenv_target_dir"
@@ -426,13 +436,8 @@ end
 
 function __phpenv_provider_homebrew_is_installed -a phpenv_version
     set -l phpenv_cellar_path (__phpenv_get_cellar_path)
-    set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
-
-    if test "$phpenv_version" = "$phpenv_latest_version"
-        test -d "$phpenv_cellar_path/php" -o -d "$phpenv_cellar_path/php@$phpenv_version"
-    else
-        test -d "$phpenv_cellar_path/php@$phpenv_version"
-    end
+    test -d "$phpenv_cellar_path/php@$phpenv_version"
+    or test "$(__phpenv_brew_unversioned_version)" = "$phpenv_version"
 end
 
 function __phpenv_provider_homebrew_install -a phpenv_version
@@ -502,7 +507,7 @@ function __phpenv_provider_homebrew_ext_list -a phpenv_version
         for phpenv_ext_dir in $phpenv_cellar_path/*@$phpenv_version
             if test -d $phpenv_ext_dir
                 set -l phpenv_ext_name (basename $phpenv_ext_dir | sed "s/@$phpenv_version//")
-                if test "$phpenv_ext_name" != php
+                if test "$phpenv_ext_name" != "php"
                     echo $phpenv_ext_name
                 end
             end
@@ -535,8 +540,7 @@ function __phpenv_provider_homebrew_doctor
     end
 
     # Check taps
-    set -l tap_status (__phpenv_provider_homebrew_ensure_source 2>/dev/null; echo $status)
-    if test $tap_status -eq 0
+    if __phpenv_provider_homebrew_ensure_source >/dev/null 2>&1
         echo "✓ Required Homebrew taps are available"
     else
         echo "! Some Homebrew taps may need to be added automatically"
@@ -568,13 +572,20 @@ function __phpenv_provider_apt_ensure_source
         return 0
     end
 
+    # Never block on a prompt without a terminal (auto-switch runs installs
+    # with stdin from /dev/null; scripts and CI have no tty either)
+    if not isatty stdin
+        echo "Ondřej PHP PPA not configured; run 'phpenv install <version>' manually to add it" >&2
+        return 1
+    end
+
     # PPA not configured, ask user to add it
     echo "The Ondřej Surý PHP PPA is required but not configured."
     echo "This PPA provides up-to-date PHP versions for Ubuntu/Debian."
     echo ""
     read -P "Add ppa:ondrej/php? [y/N] " -l confirm
 
-    if test "$confirm" = y -o "$confirm" = Y
+    if test "$confirm" = "y" -o "$confirm" = "Y"
         echo "Adding ppa:ondrej/php..."
         if command -q add-apt-repository
             if sudo add-apt-repository -y ppa:ondrej/php
@@ -603,7 +614,8 @@ function __phpenv_provider_apt_list_installed
         return 1
     end
 
-    dpkg -l 'php[0-9]*-cli' 2>/dev/null | grep '^ii' | sed -E 's/^ii\s+php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+    dpkg -l 'php[0-9]*-cli' 2>/dev/null | grep '^ii' | \
+        sed -E 's/^ii\s+php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
 end
 
 function __phpenv_provider_apt_list_available
@@ -612,7 +624,8 @@ function __phpenv_provider_apt_list_available
         return
     end
 
-    apt-cache search '^php[0-9]+\.[0-9]+-cli$' 2>/dev/null | sed -E 's/^php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
+    apt-cache search '^php[0-9]+\.[0-9]+-cli$' 2>/dev/null | \
+        sed -E 's/^php([0-9]+\.[0-9]+)-cli.*/\1/' | sort -V | uniq
 end
 
 function __phpenv_provider_apt_get_php_path -a phpenv_version
@@ -642,7 +655,7 @@ function __phpenv_provider_apt_get_php_path -a phpenv_version
             set -l temp_link "$target.$fish_pid"
             ln -s "$source" "$temp_link" 2>/dev/null
             and mv -f "$temp_link" "$target" 2>/dev/null
-        else if test "$binary" = phar; and test -x "/usr/bin/phar$phpenv_version"
+        else if test "$binary" = "phar"; and test -x "/usr/bin/phar$phpenv_version"
             set -l temp_link "$target.$fish_pid"
             ln -s "/usr/bin/phar$phpenv_version" "$temp_link" 2>/dev/null
             and mv -f "$temp_link" "$target" 2>/dev/null
@@ -752,22 +765,16 @@ function __phpenv_provider_apt_ext_install -a phpenv_extension phpenv_version
         return 1
     end
 
-    # Map common extension names to package names
-    set -l package_name "php$phpenv_version-$phpenv_extension"
-
-    # Some extensions have different package names
-    switch $phpenv_extension
-        case mysql
-            set package_name "php$phpenv_version-mysql"
-        case pdo
-            set package_name "php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3"
-        case gd
-            set package_name "php$phpenv_version-gd"
+    # pdo is a meta-extension: install the common driver packages.
+    # List, not string: a quoted string would reach apt-get as ONE package name.
+    set -l packages php$phpenv_version-$phpenv_extension
+    if test "$phpenv_extension" = pdo
+        set packages php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3
     end
 
     echo "Installing $phpenv_extension for PHP $phpenv_version..."
 
-    if sudo apt-get install -y $package_name
+    if sudo apt-get install -y $packages
         echo "$phpenv_extension installed successfully for PHP $phpenv_version"
         return 0
     else
@@ -788,22 +795,15 @@ function __phpenv_provider_apt_ext_uninstall -a phpenv_extension phpenv_version
         return 1
     end
 
-    # Map extension names to package names (mirror install logic)
-    set -l package_name "php$phpenv_version-$phpenv_extension"
-
-    # Some extensions have different package names
-    switch $phpenv_extension
-        case mysql
-            set package_name "php$phpenv_version-mysql"
-        case pdo
-            set package_name "php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3"
-        case gd
-            set package_name "php$phpenv_version-gd"
+    # Mirror install logic: pdo maps to the driver packages (list, not string)
+    set -l packages php$phpenv_version-$phpenv_extension
+    if test "$phpenv_extension" = pdo
+        set packages php$phpenv_version-mysql php$phpenv_version-pgsql php$phpenv_version-sqlite3
     end
 
     echo "Uninstalling $phpenv_extension for PHP $phpenv_version..."
 
-    if sudo apt-get remove -y $package_name
+    if sudo apt-get remove -y $packages
         echo "$phpenv_extension uninstalled successfully"
         return 0
     else
@@ -817,7 +817,8 @@ function __phpenv_provider_apt_ext_list -a phpenv_version
     # Filter out core packages (cli, common, etc.)
     set -l core_packages cli common opcache fpm cgi phpdbg
 
-    dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}' | sed "s/php$phpenv_version-//" | while read ext
+    dpkg -l "php$phpenv_version-*" 2>/dev/null | grep '^ii' | awk '{print $2}' | \
+        sed "s/php$phpenv_version-//" | while read ext
         # Skip core packages
         set -l is_core 0
         for core in $core_packages
@@ -834,7 +835,9 @@ end
 
 function __phpenv_provider_apt_ext_available -a phpenv_version
     # List available extensions from apt cache
-    apt-cache search "^php$phpenv_version-" 2>/dev/null | sed "s/php$phpenv_version-//" | awk '{print $1}' | grep -v -E '^(cli|common|fpm|cgi|phpdbg|dev)$' | sort | uniq
+    apt-cache search "^php$phpenv_version-" 2>/dev/null | \
+        sed "s/php$phpenv_version-//" | awk '{print $1}' | \
+        grep -v -E '^(cli|common|fpm|cgi|phpdbg|dev)$' | sort | uniq
 end
 
 function __phpenv_provider_apt_get_path_pattern
@@ -957,26 +960,25 @@ function __phpenv_get_cellar_path
     echo $__phpenv_cellar_cache
 end
 
-# Legacy function - redirect to provider
-function __phpenv_ensure_taps
-    __phpenv_ensure_source
-end
-
 function __phpenv_parse_version_field -a field fallback
     set -l version_info (__phpenv_get_version_info)
+    set -l value
     if test -n "$version_info"
-        echo $version_info | jq -r ".$field // \"$fallback\"" 2>/dev/null
-    else
-        echo $fallback
+        # Bracket notation: fields like "8.x" are not valid jq path syntax
+        set value (echo $version_info | jq -r ".[\"$field\"] // \"$fallback\"" 2>/dev/null)
     end
+    if test -z "$value"
+        set value $fallback
+    end
+    __phpenv_normalize_version $value
 end
 
 function __phpenv_resolve_version_alias -a phpenv_version
     switch $phpenv_version
         case latest
-            __phpenv_parse_version_field latest "8.4"
+            __phpenv_parse_version_field "latest" "8.4"
         case nightly
-            __phpenv_parse_version_field nightly "8.5"
+            __phpenv_parse_version_field "nightly" "8.5"
         case '8.x'
             __phpenv_parse_version_field "8.x" "8.4"
         case '7.x'
@@ -984,7 +986,7 @@ function __phpenv_resolve_version_alias -a phpenv_version
         case '5.x'
             __phpenv_parse_version_field "5.x" "5.6"
         case '*'
-            echo $phpenv_version
+            __phpenv_normalize_version $phpenv_version
     end
 end
 
@@ -992,7 +994,7 @@ function __phpenv_get_formula_name -a phpenv_version
     set -l phpenv_latest_version (__phpenv_parse_version_field "latest" "8.4")
 
     if test "$phpenv_version" = "$phpenv_latest_version"
-        echo shivammathur/php/php
+        echo "shivammathur/php/php"
     else
         echo "shivammathur/php/php@$phpenv_version"
     end
@@ -1024,9 +1026,11 @@ function __phpenv_set_php_path -a phpenv_version
     set -l phpenv_path_pattern (__phpenv_get_path_pattern)
     set -l phpenv_shim_dir (__phpenv_get_shim_dir)
 
-    # Build clean PATH without any PHP paths (from any provider)
+    # Build clean PATH without any PHP paths (from any provider).
+    # Filter the CURRENT path, not PHPENV_ORIGINAL_PATH: rebuilding from the
+    # original would drop entries added since (venv, nvm, direnv, ...).
     set -l phpenv_clean_path
-    for phpenv_path_entry in $PHPENV_ORIGINAL_PATH
+    for phpenv_path_entry in $PATH
         # Skip provider-specific paths
         if test -n "$phpenv_path_pattern"; and echo $phpenv_path_entry | grep -qE "$phpenv_path_pattern"
             continue
@@ -1113,6 +1117,8 @@ function __phpenv_uninstall -a phpenv_version
         return 1
     end
 
+    set phpenv_version (__phpenv_resolve_version_alias $phpenv_version)
+
     if not __phpenv_is_version_installed $phpenv_version
         echo "PHP $phpenv_version is not installed"
         return 1
@@ -1122,12 +1128,18 @@ function __phpenv_uninstall -a phpenv_version
 
     switch $provider
         case homebrew
-            __phpenv_provider_homebrew_uninstall $phpenv_version
+            __phpenv_provider_homebrew_uninstall $phpenv_version; or return 1
         case apt
-            __phpenv_provider_apt_uninstall $phpenv_version
+            __phpenv_provider_apt_uninstall $phpenv_version; or return 1
         case '*'
             echo "Unknown provider: $provider"
             return 1
+    end
+
+    # Don't leave PATH pointing at the binaries we just removed
+    if test "$PHPENV_CURRENT_VERSION" = "$phpenv_version"
+        __phpenv_restore_system_path >/dev/null
+        echo "Restored system PHP (uninstalled version was active)"
     end
 end
 
@@ -1135,7 +1147,7 @@ function __phpenv_use
     set -l phpenv_version $argv[1]
 
     # Handle special case: restore system PHP
-    if test "$phpenv_version" = system
+    if test "$phpenv_version" = "system"
         __phpenv_restore_system_path
         echo "Restored system PHP"
         return 0
@@ -1151,8 +1163,10 @@ function __phpenv_use
         echo "Detected PHP $phpenv_version for this project"
     end
 
+    set phpenv_version (__phpenv_resolve_version_alias $phpenv_version)
+
     if not __phpenv_is_version_installed $phpenv_version
-        if test "$(__phpenv_config_get auto-install)" = true
+        if test "$(__phpenv_config_get auto-install)" = "true"
             __phpenv_install $phpenv_version
         else
             echo "PHP $phpenv_version is not installed. Install with: phpenv install $phpenv_version"
@@ -1174,7 +1188,13 @@ function __phpenv_local -a phpenv_version
         return 1
     end
 
-    echo $phpenv_version >.php-version
+    set phpenv_version (__phpenv_normalize_version $phpenv_version)
+    if not __phpenv_validate_version $phpenv_version
+        echo "Invalid PHP version: $phpenv_version"
+        echo "Run 'phpenv versions' to see available versions"
+        return 1
+    end
+    echo $phpenv_version > .php-version
     echo "Set local PHP version to $phpenv_version"
 end
 
@@ -1184,6 +1204,12 @@ function __phpenv_global -a phpenv_version
         return 1
     end
 
+    set phpenv_version (__phpenv_normalize_version $phpenv_version)
+    if not __phpenv_validate_version $phpenv_version
+        echo "Invalid PHP version: $phpenv_version"
+        echo "Run 'phpenv versions' to see available versions"
+        return 1
+    end
     set -U PHPENV_GLOBAL_VERSION $phpenv_version
     echo "Set global PHP version to $phpenv_version"
 end
@@ -1245,47 +1271,21 @@ function __phpenv_versions
     end
 end
 
-function __phpenv_get_tap_versions
-    if not command -q brew
-        return
-    end
-
-    set -l phpenv_formulas (__phpenv_get_tap_formulas "shivammathur/php")
-
-    if test -z "$phpenv_formulas"
-        return
-    end
-
-    set -l phpenv_versions
-    set -l phpenv_version_info (__phpenv_get_version_info)
-    set -l phpenv_latest_version (echo $phpenv_version_info | jq -r '.latest // "8.4"' 2>/dev/null)
-
-    for phpenv_formula in $phpenv_formulas
-        set -l phpenv_clean_name (echo $phpenv_formula | sed 's|shivammathur/php/||')
-
-        if echo $phpenv_clean_name | grep -qE '(debug|zts|autoconf|bison)'
-            continue
-        end
-
-        if test "$phpenv_clean_name" = php
-            set -a phpenv_versions "$phpenv_latest_version (latest)"
-        else if echo $phpenv_clean_name | grep -qE '^php@[0-9]+\.[0-9]+$'
-            set -l phpenv_version (echo $phpenv_clean_name | sed 's/php@//')
-            set -a phpenv_versions $phpenv_version
-        end
-    end
-
-    if test (count $phpenv_versions) -gt 0
-        printf '%s\n' $phpenv_versions | sort -V | tr '\n' ' ' | sed 's/ $//'
-        echo ""
-    end
-end
-
 function __phpenv_which -a phpenv_binary
     set -l phpenv_binary (test -n "$phpenv_binary"; and echo $phpenv_binary; or echo "php")
     set -l phpenv_version (__phpenv_detect_version)
 
     if test -n "$phpenv_version"
+        # apt: answer from /usr/bin directly; __phpenv_get_php_path rewrites
+        # shim symlinks as a side effect and a query must not mutate state
+        if test (__phpenv_get_provider) = apt
+            if test -x "/usr/bin/$phpenv_binary$phpenv_version"
+                echo "/usr/bin/$phpenv_binary$phpenv_version"
+                return 0
+            end
+            echo "$phpenv_binary not found for PHP $phpenv_version"
+            return 1
+        end
         set -l phpenv_php_path (__phpenv_get_php_path $phpenv_version)
         if test -x "$phpenv_php_path/$phpenv_binary"
             echo "$phpenv_php_path/$phpenv_binary"
@@ -1305,7 +1305,7 @@ function __phpenv_doctor
 
     # Show provider information
     set -l provider (__phpenv_get_provider)
-    set -l provider_source auto-detected
+    set -l provider_source "auto-detected"
     if set -q PHPENV_PROVIDER; and test -n "$PHPENV_PROVIDER"
         set provider_source "PHPENV_PROVIDER override"
     end
@@ -1367,22 +1367,6 @@ function __phpenv_config -a phpenv_action phpenv_key phpenv_value
     end
 end
 
-# Helper function to get environment variable value
-function __phpenv_get_env_var -a key
-    switch $key
-        case global-version
-            echo $PHPENV_GLOBAL_VERSION
-        case auto-install
-            echo $PHPENV_AUTO_INSTALL
-        case auto-install-extensions
-            echo $PHPENV_AUTO_INSTALL_EXTENSIONS
-        case auto-switch
-            echo $PHPENV_AUTO_SWITCH
-        case default-extensions
-            echo $PHPENV_DEFAULT_EXTENSIONS
-    end
-end
-
 # Helper function to map config key to env var name
 function __phpenv_env_var_name -a key
     switch $key
@@ -1404,29 +1388,13 @@ end
 function __phpenv_config_get -a phpenv_key
     set -l phpenv_env_var (__phpenv_env_var_name $phpenv_key)
     set -l phpenv_value
-    set -l phpenv_source
-
-    # Check if environment variable is set
     if test -n "$phpenv_env_var"; and set -q $phpenv_env_var
-        set phpenv_value (eval echo \$$phpenv_env_var)
-        set phpenv_source "fish universal variable"
-    else
-        # Check config files if environment variable is unset
-        for phpenv_config_file in ~/.config/fish/conf.d/phpenv.fish ~/.config/phpenv/config ~/.phpenv.fish
-            if test -f $phpenv_config_file
-                set -l phpenv_file_value (grep "^$phpenv_key=" $phpenv_config_file | cut -d= -f2- | head -1)
-                if test -n "$phpenv_file_value"
-                    set phpenv_value $phpenv_file_value
-                    set phpenv_source $phpenv_config_file
-                    break
-                end
-            end
-        end
+        set phpenv_value $$phpenv_env_var
     end
 
-    if test "$argv[2]" = --verbose
+    if test "$argv[2]" = "--verbose"
         if test -n "$phpenv_value"
-            echo "$phpenv_key = $phpenv_value (from $phpenv_source)"
+            echo "$phpenv_key = $phpenv_value"
         else
             echo "$phpenv_key = (not set)"
         end
@@ -1443,6 +1411,7 @@ function __phpenv_config_set -a phpenv_key phpenv_value
 
     switch $phpenv_key
         case global-version
+            set phpenv_value (__phpenv_normalize_version $phpenv_value)
             if __phpenv_validate_version $phpenv_value
                 set -U PHPENV_GLOBAL_VERSION $phpenv_value
             else
@@ -1496,26 +1465,100 @@ function __phpenv_config_list
     __phpenv_config_get default-extensions --verbose
 end
 
-function __phpenv_extensions -a phpenv_action phpenv_extension
+function __phpenv_extensions -a phpenv_action
     switch $phpenv_action
         case install
-            __phpenv_extensions_install $phpenv_extension
+            __phpenv_extensions_install $argv[2..]
         case uninstall remove
-            __phpenv_extensions_uninstall $phpenv_extension
+            __phpenv_extensions_uninstall $argv[2..]
         case list ls
             __phpenv_extensions_list
         case available
             __phpenv_extensions_available
         case '*'
-            echo "Usage: phpenv extensions {install|uninstall|list|available} [extension]"
+            echo "Usage: phpenv extensions {install|uninstall|list|available} [extension ...]"
             return 1
     end
 end
 
-function __phpenv_extensions_install -a phpenv_extension
-    if test -z "$phpenv_extension"
-        echo "Usage: phpenv extensions install <extension>"
+# Extension set from laravel/sail runtimes/<ver>/Dockerfile (identical for 8.0-8.5),
+# minus non-extension packages (cli, dev, readline). Single shared list;
+# split per PHP version if sail's runtimes ever diverge.
+set -g __phpenv_preset_laravel bcmath curl gd igbinary imagick imap intl ldap mbstring \
+    memcached mongodb msgpack mysql pcov pgsql redis soap sqlite3 swoole xdebug xml zip
+
+# Print ext-* requirements from the nearest composer.json (require + require-dev),
+# mapped to provider package names. Stays silent on errors because callers run it
+# in a command substitution (fish routes nested-substitution stderr straight to the
+# session tty, bypassing caller redirections): returns 1 if no composer.json is
+# found, 2 if it cannot be parsed; the caller reports.
+function __phpenv_composer_required_extensions
+    set -l phpenv_composer_file (__phpenv_find_version_file composer.json)
+    if test -z "$phpenv_composer_file"
         return 1
+    end
+
+    set -l phpenv_composer_exts (jq -r '((.require // {}) + (."require-dev" // {}))
+            | keys[] | select(startswith("ext-")) | ltrimstr("ext-")' "$phpenv_composer_file" 2>/dev/null)
+    if test $status -ne 0
+        return 2
+    end
+
+    for phpenv_ext in $phpenv_composer_exts
+        switch $phpenv_ext
+            # Bundled with every PHP the providers ship; nothing to install
+            case json ctype filter hash openssl pcre session spl tokenizer fileinfo iconv phar posix pdo sodium
+                continue
+            # Provider packages bundle these under a different name
+            case dom simplexml xmlreader xmlwriter
+                echo xml
+            case mysqli pdo_mysql
+                echo mysql
+            case pdo_pgsql
+                echo pgsql
+            case pdo_sqlite
+                echo sqlite3
+            case '*'
+                echo $phpenv_ext
+        end
+    end
+end
+
+function __phpenv_extensions_install
+    if test (count $argv) -eq 0
+        echo "Usage: phpenv extensions install <extension|laravel|from-composer> [extension ...]"
+        return 1
+    end
+
+    # Expand shortcuts (framework presets, composer.json scan) and dedupe
+    set -l phpenv_extensions
+    for phpenv_arg in $argv
+        switch $phpenv_arg
+            case laravel
+                set -a phpenv_extensions $__phpenv_preset_laravel
+            case from-composer
+                set -l phpenv_composer_exts (__phpenv_composer_required_extensions)
+                switch $status
+                    case 1
+                        echo "No composer.json found" >&2
+                        return 1
+                    case 2
+                        echo "Failed to parse composer.json" >&2
+                        return 1
+                end
+                if test (count $phpenv_composer_exts) -eq 0
+                    echo "No ext-* requirements found in composer.json"
+                    continue
+                end
+                set -a phpenv_extensions $phpenv_composer_exts
+            case '*'
+                set -a phpenv_extensions $phpenv_arg
+        end
+    end
+    set phpenv_extensions (printf '%s\n' $phpenv_extensions | awk '!seen[$0]++')
+    if test (count $phpenv_extensions) -eq 0
+        echo "Nothing to install"
+        return 0
     end
 
     # Check for version override first (from environment, not global variable)
@@ -1530,24 +1573,37 @@ function __phpenv_extensions_install -a phpenv_extension
         return 1
     end
 
-    echo "Installing $phpenv_extension for PHP $phpenv_version..."
-
     set -l provider (__phpenv_get_provider)
+    if not contains -- $provider homebrew apt
+        echo "Unknown provider: $provider"
+        return 1
+    end
 
-    switch $provider
-        case homebrew
-            __phpenv_provider_homebrew_ext_install $phpenv_extension $phpenv_version
-        case apt
-            __phpenv_provider_apt_ext_install $phpenv_extension $phpenv_version
-        case '*'
-            echo "Unknown provider: $provider"
-            return 1
+    set -l phpenv_failed
+    for phpenv_extension in $phpenv_extensions
+        echo "Installing $phpenv_extension for PHP $phpenv_version..."
+
+        switch $provider
+            case homebrew
+                __phpenv_provider_homebrew_ext_install $phpenv_extension $phpenv_version
+            case apt
+                __phpenv_provider_apt_ext_install $phpenv_extension $phpenv_version
+        end
+
+        if test $status -ne 0
+            set -a phpenv_failed $phpenv_extension
+        end
+    end
+
+    if test (count $phpenv_failed) -gt 0
+        echo "Failed to install: "(string join ", " $phpenv_failed)
+        return 1
     end
 end
 
-function __phpenv_extensions_uninstall -a phpenv_extension
-    if test -z "$phpenv_extension"
-        echo "Usage: phpenv extensions uninstall <extension>"
+function __phpenv_extensions_uninstall
+    if test (count $argv) -eq 0
+        echo "Usage: phpenv extensions uninstall <extension> [extension ...]"
         return 1
     end
 
@@ -1558,15 +1614,28 @@ function __phpenv_extensions_uninstall -a phpenv_extension
     end
 
     set -l provider (__phpenv_get_provider)
+    if not contains -- $provider homebrew apt
+        echo "Unknown provider: $provider"
+        return 1
+    end
 
-    switch $provider
-        case homebrew
-            __phpenv_provider_homebrew_ext_uninstall $phpenv_extension $phpenv_version
-        case apt
-            __phpenv_provider_apt_ext_uninstall $phpenv_extension $phpenv_version
-        case '*'
-            echo "Unknown provider: $provider"
-            return 1
+    set -l phpenv_failed
+    for phpenv_extension in $argv
+        switch $provider
+            case homebrew
+                __phpenv_provider_homebrew_ext_uninstall $phpenv_extension $phpenv_version
+            case apt
+                __phpenv_provider_apt_ext_uninstall $phpenv_extension $phpenv_version
+        end
+
+        if test $status -ne 0
+            set -a phpenv_failed $phpenv_extension
+        end
+    end
+
+    if test (count $phpenv_failed) -gt 0
+        echo "Failed to uninstall: "(string join ", " $phpenv_failed)
+        return 1
     end
 end
 
@@ -1576,27 +1645,12 @@ function __phpenv_get_tap_formulas -a tap_name
         return 1
     end
 
-    brew tap-info $tap_name --json 2>/dev/null | jq -r '.[]|(.formula_names[]?)' 2>/dev/null
+    brew tap-info $tap_name --json 2>/dev/null | \
+        jq -r '.[]|(.formula_names[]?)' 2>/dev/null
 end
 
 function __phpenv_get_available_extensions
-    __phpenv_get_tap_formulas shivammathur/extensions
-end
-
-function __phpenv_extension_available -a phpenv_extension phpenv_version
-    set -l phpenv_available_extensions (__phpenv_get_available_extensions)
-
-    if test -z "$phpenv_available_extensions"
-        return 0 # Assume available if can't check
-    end
-
-    for phpenv_ext_formula in $phpenv_available_extensions
-        if test "$phpenv_ext_formula" = "shivammathur/extensions/$phpenv_extension@$phpenv_version"
-            return 0
-        end
-    end
-
-    return 1
+    __phpenv_get_tap_formulas "shivammathur/extensions"
 end
 
 function __phpenv_extensions_available
@@ -1656,18 +1710,18 @@ function __phpenv_install_default_extensions -a phpenv_version
         echo "Installing default extensions for PHP $phpenv_version..."
         set -l phpenv_failed_extensions
 
+        # Global because fish locals are not visible to called functions
+        set -g PHPENV_VERSION_OVERRIDE $phpenv_version
         for phpenv_ext in (echo $phpenv_extensions | tr ' ' '\n')
             if test -n "$phpenv_ext"
                 echo "Installing $phpenv_ext..."
-                # Temporarily switch context using local variable
-                set -l phpenv_saved_version (__phpenv_detect_version)
-                set -l PHPENV_VERSION_OVERRIDE $phpenv_version
-                if not env PHPENV_VERSION_OVERRIDE=$phpenv_version __phpenv_extensions_install $phpenv_ext
+                if not __phpenv_extensions_install $phpenv_ext
                     set -a phpenv_failed_extensions $phpenv_ext
                     echo "Warning: Failed to install $phpenv_ext for PHP $phpenv_version"
                 end
             end
         end
+        set -e PHPENV_VERSION_OVERRIDE
 
         if test (count $phpenv_failed_extensions) -gt 0
             echo "Some extensions failed to install: "(string join ", " $phpenv_failed_extensions)
@@ -1689,7 +1743,7 @@ function __phpenv_auto_switch --on-variable PWD
     end
 
     set -l phpenv_auto_switch (__phpenv_config_get auto-switch)
-    if test "$phpenv_auto_switch" = false
+    if test "$phpenv_auto_switch" = "false"
         return 0
     end
 
@@ -1702,6 +1756,10 @@ function __phpenv_auto_switch --on-variable PWD
         return 0
     end
 
+    # Resolve aliases (e.g. .php-version containing "latest") so the
+    # installed check compares real versions; no-op for MAJOR.MINOR input
+    set phpenv_new_version (__phpenv_resolve_version_alias $phpenv_new_version)
+
     # Check if we're already using the correct version
     if set -q PHPENV_CURRENT_VERSION; and test "$PHPENV_CURRENT_VERSION" = "$phpenv_new_version"
         return 0
@@ -1712,9 +1770,10 @@ function __phpenv_auto_switch --on-variable PWD
         set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
     else
         set -l phpenv_auto_install (__phpenv_config_get auto-install)
-        if test "$phpenv_auto_install" = true
+        if test "$phpenv_auto_install" = "true"
             echo "Auto-installing PHP $phpenv_new_version..."
-            if phpenv install "$phpenv_new_version"
+            # stdin from /dev/null: a cd hook must never block on a prompt
+            if phpenv install "$phpenv_new_version" </dev/null
                 set -g PHPENV_LAST_SWITCH_TIME $phpenv_current_time
             end
         end
@@ -1740,14 +1799,17 @@ function __phpenv_help
     echo "  doctor                  Check phpenv installation and provider"
     echo "  config <action>         Manage configuration"
     echo "  extensions <action>     Manage PHP extensions"
+    echo "                          install shortcuts: 'laravel' (Laravel Sail set),"
+    echo "                          'from-composer' (ext-* from composer.json)"
     echo "  help                    Show this help"
     echo ""
     echo "Version sources (in order of priority):"
     echo "  1. .php-version file"
-    echo "  2. .tool-version file"
+    echo "  2. .tool-version / .tool-versions file"
     echo "  3. composer.json"
     echo "  4. Global version"
     echo "  5. System PHP"
+    echo "  Versions are normalized to MAJOR.MINOR (8.1.12 -> 8.1)"
     echo ""
     echo "Supported providers:"
     echo "  homebrew    macOS/Linux with Homebrew (shivammathur/php tap)"
@@ -1765,7 +1827,7 @@ function __phpenv_help
 end
 
 function __phpenv_validate_boolean -a phpenv_value
-    test "$phpenv_value" = true -o "$phpenv_value" = false
+    test "$phpenv_value" = "true" -o "$phpenv_value" = "false"
 end
 
 function __phpenv_validate_version -a phpenv_version
