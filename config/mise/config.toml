@@ -42,7 +42,7 @@ bun = "1.3.14"
 python = "3.14"
 go = "1.26.4"
 rust = "1.96.1"
-uv = "0.11.26"
+uv = "0.11.28"
 cmake = "4.3.4"
 
 # Shell, prompt & terminal sessions
