@@ -32,7 +32,7 @@ test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
 # `__theme_switch_last_mtime` is unset and the first fish_prompt
 # event always trips the "mtime changed" branch and re-saves the theme).
 if test -r $mode_file
-    set -g __theme_switch_last_mtime (stat -f %m $mode_file 2>/dev/null; or stat -c %Y $mode_file 2>/dev/null)
+    set -g __theme_switch_last_mtime (stat -c %Y $mode_file 2>/dev/null; or stat -f %m $mode_file 2>/dev/null)
 end
 
 # Per-prompt cheap watcher: stat the mode file's mtime; only do real
@@ -43,7 +43,7 @@ function __theme_switch_check --on-event fish_prompt
     set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
     test -r $mode_file; or return 0
 
-    set -l mtime (stat -f %m $mode_file 2>/dev/null; or stat -c %Y $mode_file 2>/dev/null)
+    set -l mtime (stat -c %Y $mode_file 2>/dev/null; or stat -f %m $mode_file 2>/dev/null)
     if not set -q __theme_switch_last_mtime; or test "$__theme_switch_last_mtime" != "$mtime"
         set -g __theme_switch_last_mtime $mtime
         # Re-save the SAME dual-palette theme; fish re-queries OSC 11
