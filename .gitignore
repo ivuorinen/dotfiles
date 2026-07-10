@@ -26,6 +26,8 @@
 **/exports.secret.fish
 *.tmp.*
 Brewfile.lock.json
+# Homebrew trust.json IS committed (shared trust decisions); its lock is runtime.
+config/homebrew/trust.json.lock
 antidote_plugins.zsh
 config/cheat/cheatsheets/pure-bash-bible/*
 config/cheat/cheatsheets/tldr/*

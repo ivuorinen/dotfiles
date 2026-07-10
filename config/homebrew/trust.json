@@ -1,0 +1,14 @@
+{
+  "trustedformulae": [
+    "shivammathur/extensions/igbinary@8.5",
+    "shivammathur/extensions/imagick@8.5",
+    "shivammathur/extensions/imap@8.5",
+    "shivammathur/extensions/memcached@8.5",
+    "shivammathur/extensions/mongodb@8.5",
+    "shivammathur/extensions/msgpack@8.5",
+    "shivammathur/extensions/pcov@8.5",
+    "shivammathur/extensions/swoole@8.5",
+    "shivammathur/extensions/xdebug@8.5",
+    "shivammathur/php/php"
+  ]
+}

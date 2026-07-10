@@ -12,6 +12,7 @@
       "**",
       "!!**/.mypy_cache",
       "!!**/Brewfile.lock.json",
+      "!!**/config/homebrew/trust.json",
       "!!**/base/plan",
       "!!**/config/cheat/cheatsheets/community",
       "!!**/config/cheat/cheatsheets/tldr",
