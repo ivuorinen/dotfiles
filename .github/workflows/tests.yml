@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Tests
+
+# yamllint disable-line
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  bats:
+    name: Bats (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install bats and fish (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats fish
+
+      - name: Install bats and fish (macOS)
+        if: runner.os == 'macOS'
+        run: brew install bats-core fish
+
+      - name: Run test suite
+        run: bats tests/
+
+  fish-lint:
+    name: Fish syntax and formatting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install fish
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fish
+
+      - name: Check fish syntax and formatting
+        run: |
+          rc=0
+          while IFS= read -r f; do
+            fish -n "$f" || rc=1
+            fish_indent --check "$f" || { echo "needs formatting: $f"; rc=1; }
+          done < <(git ls-files '*.fish')
+          exit "$rc"
