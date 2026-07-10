@@ -27,9 +27,12 @@ jobs:
       version: ${{ steps.daily-version.outputs.version }}
 
     steps:
+      # persist-credentials MUST stay true: fregante/daily-version-action
+      # pushes the new tag using the checkout's git credentials (it has no
+      # token input), so disabling this breaks the daily release entirely.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          persist-credentials: false
+          persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: Create tag if necessary
         uses: fregante/daily-version-action@4bd6944b98e29a3d1b130677012fb1e4ffddc31d # v3.1.0
