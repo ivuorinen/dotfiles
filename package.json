@@ -36,10 +36,6 @@
     "url": "https://github.com/ivuorinen/dotfiles/issues"
   },
   "homepage": "https://github.com/ivuorinen/dotfiles#readme",
-  "devDependencies": {
-    "@types/node": "^25.9.1",
-    "typescript": "^6.0.3"
-  },
   "resolutions": {
     "minimatch": "^10.2.4"
   },
