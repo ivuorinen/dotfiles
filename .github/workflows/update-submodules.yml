@@ -23,13 +23,16 @@ jobs:
       contents: write
 
     steps:
+      # persist-credentials MUST stay true: the "Push changes" step below runs a
+      # raw `git push`, which needs the token persisted in git's config. The
+      # token: input only authenticates the initial clone, not later pushes.
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: true
           fetch-depth: 2
           token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: false
+          persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: Config Git User
         shell: bash
