@@ -44,10 +44,10 @@ teardown()
   source "$THEME_LIB"
   echo data > "$TMPDIR_TEST/src"
   ln -s "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
-  before=$(stat -f %m "$TMPDIR_TEST/dst" 2> /dev/null || stat -c %Y "$TMPDIR_TEST/dst")
+  before=$(stat -c %Y "$TMPDIR_TEST/dst" 2> /dev/null || stat -f %m "$TMPDIR_TEST/dst")
   sleep 1
   _idempotent_ln_sf "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
-  after=$(stat -f %m "$TMPDIR_TEST/dst" 2> /dev/null || stat -c %Y "$TMPDIR_TEST/dst")
+  after=$(stat -c %Y "$TMPDIR_TEST/dst" 2> /dev/null || stat -f %m "$TMPDIR_TEST/dst")
   [ "$before" = "$after" ]
 }
 

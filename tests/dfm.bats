@@ -316,8 +316,8 @@ fake_dotfiles()
   fake_dotfiles "$tmp"
   run bash -c "printf 'tok\n' | DOTFILES='$tmp' bash local/bin/dfm secrets create GITHUB_TOKEN"
   [ "$status" -eq 0 ]
-  perms="$(stat -f '%Lp' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
-    || stat -c '%a' "$tmp/config/secrets.d/github.sh")"
+  perms="$(stat -c '%a' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d/github.sh")"
   [ "$perms" = "600" ]
   rm -rf "$tmp"
 }
@@ -475,8 +475,8 @@ fake_dotfiles()
   tmp="$(mktemp -d)"
   fake_dotfiles "$tmp"
   printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
-  perms="$(stat -f '%Lp' "$tmp/config/secrets.d" 2> /dev/null \
-    || stat -c '%a' "$tmp/config/secrets.d")"
+  perms="$(stat -c '%a' "$tmp/config/secrets.d" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d")"
   [ "$perms" = "700" ]
   rm -rf "$tmp"
 }
@@ -492,10 +492,10 @@ fake_dotfiles()
   chmod 644 "$tmp/config/secrets.d/github.sh" "$tmp/config/fish/secrets.d/github.fish"
   chmod 755 "$tmp/config/secrets.d"
   printf 'newtok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
-  fperms="$(stat -f '%Lp' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
-    || stat -c '%a' "$tmp/config/secrets.d/github.sh")"
-  dperms="$(stat -f '%Lp' "$tmp/config/secrets.d" 2> /dev/null \
-    || stat -c '%a' "$tmp/config/secrets.d")"
+  fperms="$(stat -c '%a' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d/github.sh")"
+  dperms="$(stat -c '%a' "$tmp/config/secrets.d" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d")"
   [ "$fperms" = "600" ]
   [ "$dperms" = "700" ]
   rm -rf "$tmp"
