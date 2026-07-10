@@ -32,6 +32,15 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-bash-route.sh"
           }
         ]
+      },
+      {
+        "matcher": "mcp__plugin_context-mode_context-mode__ctx_execute|mcp__plugin_context-mode_context-mode__ctx_execute_file|mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-ctx-write-guard.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [

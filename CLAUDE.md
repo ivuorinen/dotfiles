@@ -236,7 +236,9 @@ SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
 
 - **Hooks** (`.claude/settings.json`):
   - _PreToolUse_: Blocks edits to `fzf-tmux`, `yarn.lock`,
-    `.yarn/`, submodule paths, and real secrets.d files
+    `.yarn/`, submodule paths, and real secrets.d files —
+    also when attempted through context-mode sandbox code
+    (`pre-ctx-write-guard.sh`)
   - _PostToolUse_: Auto-formats files by extension
     (shfmt, fish_indent, stylua, biome, prettier)
   - _PostToolUse_: Validates Dotbot `install.conf.yaml`
