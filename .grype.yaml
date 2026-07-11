@@ -1,0 +1,10 @@
+# Scope grype to content this repo actually authors. The excluded trees are
+# untracked or vendored caches whose CVEs flow through their own upstream
+# update channels (yarn, vim-plug, submodule sync) — finding SEC-001.
+# Key reference: `grype config` (exclude: a list of globs, same as --exclude).
+exclude:
+  - "./config/vim/extra/**"
+  - "./config/vim/plugged/**"
+  - "./node_modules/**"
+  - "./tools/**"
+  - "./config/cheat/cheatsheets/**"
