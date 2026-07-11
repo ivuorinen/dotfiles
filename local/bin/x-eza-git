@@ -23,6 +23,11 @@ if command -v eza > /dev/null 2>&1; then
     fi
     d=${d%/*}
   done
+  # ${d%/*} drops "/x" to "" without ever testing "/": one final check
+  # so a repository rooted at the filesystem root still gets --git (N-204)
+  if [[ -z $d && -e /.git ]]; then
+    args+=(--git)
+  fi
   exec eza "${args[@]}" "$@"
 fi
 exec ls -h "$@"
