@@ -38,7 +38,9 @@ jobs:
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'
-        run: brew install bats-core fish
+        # bash: the runner's /bin/bash is 3.2 and dfm's full bootstrap
+        # requires 4+; coreutils: gtimeout for the theme actor's 5s kill
+        run: brew install bats-core fish bash coreutils
 
       - name: Run test suite
         run: bats tests/
