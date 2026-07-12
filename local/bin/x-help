@@ -114,8 +114,6 @@ main()
   fi
 
   # Interactive mode: x-help
-  require_fzf
-
   local files
   files=$(discover_files)
 
@@ -123,6 +121,9 @@ main()
     msgr warn "No documentation files found"
     exit 0
   fi
+
+  # fzf is only needed once there is something to pick from
+  require_fzf
 
   local selected
   selected=$(echo "$files" | fzf) || exit 0

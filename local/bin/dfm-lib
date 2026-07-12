@@ -28,6 +28,12 @@ _dfm_libdir=$(
 DFM="$_dfm_libdir/dfm"
 export DFM
 
+# The sections call `msgr <verb>` as an external command. On an installed
+# machine ~/.local/bin/msgr provides it; on a bare checkout (CI, fresh
+# clone) nothing does — resolve it from this directory so dfm works
+# before ./install has linked anything.
+command -v msgr > /dev/null 2>&1 || PATH="$_dfm_libdir:$PATH"
+
 # Shared variable setup used by every bootstrap path. Kept sourcing-free
 # and separate so the full path can control the shared.sh / msgr order
 # (see dfm_bootstrap).

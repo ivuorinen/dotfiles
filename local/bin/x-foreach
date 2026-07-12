@@ -13,6 +13,11 @@
 
 set -euo pipefail
 
+# x-hr lives next to this script; on an uninstalled checkout (CI, fresh
+# clone) it is not on PATH yet — resolve it from this directory.
+command -v x-hr > /dev/null 2>&1 \
+  || PATH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd):$PATH"
+
 if [ $# -lt 2 ]; then
   cat << EOF
 Usage: ${0##*/} <listing-command> <command> [args...]

@@ -13,10 +13,14 @@
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+# msgr sits next to this script; prefer $DOTFILES, fall back to our own
+# directory so a bare checkout (no install) still works
+MSGR="${DOTFILES}/local/bin/msgr"
+[[ -r "$MSGR" ]] || MSGR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/msgr"
 # msgr uses unguarded variables ($ZSH_VERSION, $1) — disable nounset
 set +u
 # shellcheck source=msgr
-source "${DOTFILES}/local/bin/msgr"
+source "$MSGR"
 set -u
 
 # Extract the first non-zero secure-input PID from `ioreg -l` output on stdin.
