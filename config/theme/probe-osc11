@@ -3,12 +3,18 @@
 # print "dark" or "light" based on luminance. Prints nothing (and
 # exits 0) if no answer arrives within the timeout window.
 #
+# Inside tmux the query is wrapped in the passthrough envelope
+# (needs `allow-passthrough on`, set in tmux.conf) so it reaches the
+# outer terminal — a bare OSC 11 is answered by tmux itself, which
+# reports its own background, not the viewing terminal's.
+#
 # Test seams: --input <file> reads OSC 11 reply from a fixture instead
-# of /dev/tty; --timeout <seconds> overrides the default 0.2s.
+# of /dev/tty; --timeout <seconds> overrides the default (0.2s, or 1s
+# over SSH where the reply pays a network round trip).
 set -uo pipefail
 
 INPUT="/dev/tty"
-TIMEOUT="0.2"
+TIMEOUT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -27,6 +33,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -z "$TIMEOUT" ]]; then
+  if [[ -n "${SSH_TTY:-}${SSH_CONNECTION:-}" ]]; then
+    TIMEOUT="1"
+  else
+    TIMEOUT="0.2"
+  fi
+fi
+
 # Ask the terminal. When INPUT is /dev/tty, the printf is what
 # triggers the reply, and we must put the tty into non-canonical /
 # no-echo mode first or `read -d $'\007'` waits for a newline that
@@ -37,11 +51,22 @@ if [[ "$INPUT" = "/dev/tty" ]]; then
   saved="$(stty -g < /dev/tty 2> /dev/null)" || exit 0
   trap 'stty "$saved" < /dev/tty 2>/dev/null || true' EXIT
   stty -icanon -echo min 0 time 0 < /dev/tty 2> /dev/null || exit 0
-  printf '\033]11;?\007' > /dev/tty 2> /dev/null || exit 0
+  if [[ -n "${TMUX:-}" ]]; then
+    # DCS passthrough, inner ESCs doubled: tmux unwraps and forwards to
+    # the outer terminal, whose reply comes back to the active pane.
+    # ST spelled \033\134 (ESC \) — a literal trailing backslash trips
+    # SC1003.
+    printf '\033Ptmux;\033\033]11;?\007\033\134' > /dev/tty 2> /dev/null || exit 0
+  else
+    printf '\033]11;?\007' > /dev/tty 2> /dev/null || exit 0
+  fi
 fi
 
+# `|| true`: a reply terminated with ST (\e\\) instead of BEL never
+# satisfies -d, but the bytes read so far land in $response and the
+# rgb: parse below still succeeds.
 response=""
-read -t "$TIMEOUT" -r -d $'\007' response < "$INPUT" 2> /dev/null || exit 0
+read -t "$TIMEOUT" -r -d $'\007' response < "$INPUT" 2> /dev/null || true
 
 # Format: \033]11;rgb:RRRR/GGGG/BBBB or rgb:RR/GG/BB
 if [[ "$response" =~ rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+) ]]; then

@@ -25,6 +25,13 @@ teardown()
   [ "$output" = "light" ]
 }
 
+@test "probe-osc11: ST-terminated reply => parsed from partial read" {
+  printf '\033]11;rgb:1e1e/1e1e/2e2e\033\134' > "$TMPDIR_TEST/in"
+  run "$PROBE" --input "$TMPDIR_TEST/in" --timeout 1
+  [ "$status" -eq 0 ]
+  [ "$output" = "dark" ]
+}
+
 @test "probe-osc11: no response => empty stdout, exit 0" {
   : > "$TMPDIR_TEST/in"
   run "$PROBE" --input "$TMPDIR_TEST/in" --timeout 0.1

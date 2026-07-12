@@ -75,7 +75,8 @@ test -x /opt/homebrew/bin/brew; and eval "$(/opt/homebrew/bin/brew shellenv fish
 # the watcher self-locks). Skip in SSH sessions — the remote OS is the
 # wrong oracle, and a cached mode goes stale with no watcher to refresh
 # it; there we probe the viewing terminal via OSC 11 each session
-# instead of reading the (unmaintained) state file, falling back to dark.
+# instead of reading the (unmaintained) state file, falling back to the
+# cached state (then dark) when the terminal does not answer.
 if status is-interactive
     set -l m
     if not set -q SSH_TTY; and not set -q SSH_CONNECTION
@@ -86,8 +87,11 @@ if status is-interactive
         end
         set m (theme-mode 2>/dev/null)
     else
-        # SSH/headless: probe the viewing terminal, else default to dark.
+        # SSH/headless: probe the viewing terminal; on no answer keep the
+        # last known mode (theme-mode defaults dark) instead of clobbering
+        # known-good state with a hard dark.
         set m ("$DOTFILES/config/theme/probe-osc11" 2>/dev/null)
+        test "$m" = dark -o "$m" = light; or set m (theme-mode 2>/dev/null)
         test "$m" = dark -o "$m" = light; or set m dark
     end
     # Bootstrap mode so the prompt + LS_COLORS are right on first prompt.
