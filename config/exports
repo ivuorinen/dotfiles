@@ -21,6 +21,21 @@
 [ -z "${EDITOR:-}" ] && export EDITOR="nvim"
 [ -z "${VISUAL:-}" ] && export VISUAL="nvim"
 
+# UTF-8 locale fallback. SSH sessions can arrive with no locale at all
+# (ssh/ sends no LC_*, sshd sets none), tmux's server then starts under
+# C/POSIX and renders multibyte glyphs as escaped octets — e.g.
+# \xee\x82\xb6 around the window pills. Local terminals always set LANG,
+# so the `locale -a` probe only runs on the broken path.
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+  *[Uu][Tt][Ff]-8* | *[Uu][Tt][Ff]8*) ;;
+  *)
+    # ponytail: an explicitly exported non-UTF-8 LC_ALL still wins over LANG;
+    # that is a deliberate user choice we do not fight.
+    LANG="$(locale -a 2> /dev/null | grep -i -m1 -E '^C\.utf-?8$' || echo 'en_US.UTF-8')"
+    export LANG
+    ;;
+esac
+
 # Bootstrap: ensure local/bin is on PATH so x-path is available
 PATH="$DOTFILES/local/bin:$PATH"
 # Use x-path to deduplicate PATH entries (only if x-path is available)

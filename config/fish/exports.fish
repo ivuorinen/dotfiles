@@ -17,6 +17,17 @@ set -q EDITOR; or set -x EDITOR nvim
 set -q VISUAL; or set -x VISUAL nvim
 set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
 
+# UTF-8 locale fallback — mirrors config/exports. SSH sessions can arrive
+# with no locale at all; tmux's server then starts under C/POSIX and renders
+# multibyte glyphs (the window pill caps) as escaped octets.
+set -l _locale $LC_ALL
+test -n "$_locale"; or set _locale $LC_CTYPE
+test -n "$_locale"; or set _locale $LANG
+if not string match -qir 'utf-?8' -- "$_locale"
+    set -x LANG (locale -a 2>/dev/null | string match -ri '^C\.utf-?8$')[1]
+    test -n "$LANG"; or set -x LANG en_US.UTF-8
+end
+
 # Add local bin to path
 fish_add_path "$XDG_BIN_HOME"
 
