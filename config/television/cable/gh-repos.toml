@@ -5,6 +5,8 @@ requirements = ["gh", "git", "jq", "tv-gh-repos"]
 
 [source]
 command = [
+  { name = "Uncloned", run = "tv-gh-repos list uncloned" },
+  { name = "Cloned", run = "tv-gh-repos list cloned" },
   { name = "All", run = "tv-gh-repos list all" },
   { name = "User", run = "tv-gh-repos list user" },
   { name = "Organizations", run = "tv-gh-repos list organizations" },
@@ -14,7 +16,7 @@ command = [
   { name = "Non-forks", run = "tv-gh-repos list non-forks" },
   { name = "Forks", run = "tv-gh-repos list forks" },
 ]
-display = "{split:\\t:9} {split:\\t:4} [{split:\\t:1}/{split:\\t:6}] {split:\\t:10}"
+display = "{split:\\t:10} {split:\\t:9} {split:\\t:4}"
 output = "{split:\\t:0}"
 no_sort = true
 

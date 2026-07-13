@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # @description Backend for the television gh-repos channel
 #USAGE about "Backend for the television gh-repos channel"
-#USAGE cmd "list" help="List cached repositories as TSV (all|user|organizations|public|private|internal|non-forks|forks)"
-#USAGE cmd "preview" help="Render the preview pane for OWNER/REPO"
+#USAGE cmd "list" help="List cached repositories as TSV, or JSON with --json (uncloned|cloned|all|user|organizations|public|private|internal|non-forks|forks)"
+#USAGE cmd "preview" help="Render the preview pane for OWNER/REPO, or JSON with --json"
 #USAGE cmd "clone" help="SSH-clone OWNER/REPO under the local code root"
 #USAGE cmd "open" help="Open OWNER/REPO in the browser"
 #USAGE cmd "pull" help="fetch --prune + pull --ff-only in a clean local checkout"
@@ -19,7 +19,13 @@
 # by index ({split:\t:N}), so the column order is load-bearing:
 #   0 nameWithOwner  1 visibility   2 isFork      3 url
 #   4 displayName    5 description  6 ownerType   7 owner
-#   8 ownerOrder     9 gitMarker   10 gitSummary
+#   8 ownerOrder     9 icons       10 gitMarker  11 gitSummary
+#
+# Column 9 (icons) is a precomputed status badge — visibility glyph,
+# owner-type glyph, and a fork glyph when applicable — rendered ahead of
+# the repo name so every icon leads the row. Columns 10/11 (git marker +
+# summary) are appended per row at `list` time because they reflect live
+# local checkout state, not cached gh output.
 #
 # No msgr: stdout is machine-parsed by television (TSV rows, preview
 # text), not human-facing logging.
@@ -40,8 +46,8 @@ usage()
 {
   cat << 'USAGE'
 Usage:
-  tv-gh-repos list [all|user|organizations|public|private|internal|non-forks|forks] [--refresh]
-  tv-gh-repos preview OWNER/REPO
+  tv-gh-repos list [uncloned|cloned|all|user|organizations|public|private|internal|non-forks|forks] [--refresh] [--json]
+  tv-gh-repos preview OWNER/REPO [--json]
   tv-gh-repos clone OWNER/REPO
   tv-gh-repos open OWNER/REPO
   tv-gh-repos pull OWNER/REPO
@@ -228,18 +234,32 @@ refresh_cache()
     printf '[]\n' > "$tmp_json"
   fi
 
+  # Icons are precomputed here because visibility, owner type, and fork
+  # state are static per repo. The git marker (live checkout state) is
+  # appended later, per row, in append_git_status_to_tsv.
   jq -r '
+    def vis_icon:
+      if . == "PUBLIC" then ""        # nf-fa-unlock  (open padlock)
+      elif . == "PRIVATE" then ""     # nf-fa-lock    (closed padlock)
+      elif . == "INTERNAL" then "◈"
+      else "·" end;
+    def owner_icon:
+      if . == "USER" then ""          # nf-fa-user     (person)
+      elif . == "ORG" then ""         # nf-fa-building (business)
+      else "·" end;
     .[] |
     [
       .nameWithOwner,
       .visibility,
       (.isFork | tostring),
       .url,
-      (.nameWithOwner + (if .isFork then " ⑂" else "" end)),
+      .nameWithOwner,
       (.description // "" | gsub("[\t\r\n]+"; " ")),
       .tvOwnerType,
       .tvOwner,
-      (.tvOwnerOrder | tostring)
+      (.tvOwnerOrder | tostring),
+      ((.visibility | vis_icon) + " " + (.tvOwnerType | owner_icon)
+        + (if .isFork then " ⑂" else "" end))
     ] |
     @tsv
   ' "$tmp_json" > "$tmp_tsv"
@@ -332,63 +352,40 @@ append_git_status_to_tsv()
 {
   require_command git
 
+  # Read each row verbatim (IFS= preserves empty fields; a tab-split
+  # read would collapse the "\t\t" of an empty description and shift
+  # every column). Only the first field — the repo name — is needed to
+  # look up git state; the two git columns are appended to the raw row.
+  local line
   local name_with_owner
-  local visibility
-  local is_fork
-  local url
-  local display_name
-  local description
-  local owner_type
-  local owner
-  local owner_order
 
-  while IFS=$'\t' read -r \
-    name_with_owner \
-    visibility \
-    is_fork \
-    url \
-    display_name \
-    description \
-    owner_type \
-    owner \
-    owner_order; do
-    [[ -n "${name_with_owner:-}" ]] || continue
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
 
+    name_with_owner="${line%%$'\t'*}"
     git_list_status_fields "$name_with_owner"
 
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$name_with_owner" \
-      "$visibility" \
-      "$is_fork" \
-      "$url" \
-      "$display_name" \
-      "$description" \
-      "$owner_type" \
-      "$owner" \
-      "$owner_order" \
-      "$GIT_MARKER" \
-      "$GIT_SUMMARY"
+    printf '%s\t%s\t%s\n' "$line" "$GIT_MARKER" "$GIT_SUMMARY"
   done
 }
 
-list_repos()
+filtered_tsv()
 {
-  local filter="${1:-all}"
-  local force_refresh="false"
+  local filter="$1"
 
-  if [[ "$filter" == "--refresh" ]]; then
-    filter="all"
-    force_refresh="true"
-  elif [[ "${2:-}" == "--refresh" ]]; then
-    force_refresh="true"
-  fi
-
+  # Clone-status filters key off the git summary column, which exists
+  # only after append_git_status_to_tsv runs — so they filter the
+  # annotated stream ($12), not the cached columns.
   case "$filter" in
-    all | user | organizations | public | private | internal | non-forks | forks) ;;
-    *) die "unknown list filter: $filter" ;;
+    uncloned)
+      append_git_status_to_tsv < "$LIST_TSV" | awk -F '\t' '$12 == "not cloned"'
+      return
+      ;;
+    cloned)
+      append_git_status_to_tsv < "$LIST_TSV" | awk -F '\t' '$12 != "not cloned"'
+      return
+      ;;
   esac
-
-  ensure_cache "$force_refresh"
 
   case "$filter" in
     all)
@@ -416,6 +413,60 @@ list_repos()
       awk -F '\t' '$3 == "true"' "$LIST_TSV"
       ;;
   esac | append_git_status_to_tsv
+}
+
+# Convert the git-annotated list TSV on stdin into a JSON array. Column
+# order matches the header-comment map (0 nameWithOwner … 11 gitSummary).
+tsv_to_json()
+{
+  jq -R -n '
+    [
+      inputs
+      | select(. != "")
+      | split("\t")
+      | {
+          nameWithOwner: .[0],
+          visibility: .[1],
+          isFork: (.[2] == "true"),
+          url: .[3],
+          displayName: .[4],
+          description: .[5],
+          ownerType: .[6],
+          owner: .[7],
+          ownerOrder: (.[8] | tonumber),
+          icons: .[9],
+          gitMarker: .[10],
+          gitSummary: .[11]
+        }
+    ]
+  '
+}
+
+list_repos()
+{
+  local filter="all"
+  local force_refresh="false"
+  local as_json="false"
+  local arg
+
+  for arg in "$@"; do
+    case "$arg" in
+      --refresh) force_refresh="true" ;;
+      --json) as_json="true" ;;
+      uncloned | cloned | all | user | organizations | public | private | internal | non-forks | forks)
+        filter="$arg"
+        ;;
+      *) die "unknown list argument: $arg" ;;
+    esac
+  done
+
+  ensure_cache "$force_refresh"
+
+  if [[ "$as_json" == "true" ]]; then
+    filtered_tsv "$filter" | tsv_to_json
+  else
+    filtered_tsv "$filter"
+  fi
 }
 
 git_remotes_json()
@@ -538,18 +589,44 @@ local_git_status_json()
 
 preview_repo()
 {
-  local repo="$1"
+  local repo=""
+  local as_json="false"
+  local arg
+
+  for arg in "$@"; do
+    case "$arg" in
+      --json) as_json="true" ;;
+      *)
+        [[ -z "$repo" ]] || die "preview accepts a single OWNER/REPO"
+        repo="$arg"
+        ;;
+    esac
+  done
+
+  [[ -n "$repo" ]] || die "preview requires OWNER/REPO"
   safe_repo_name "$repo"
   require_base_commands
 
   local local_path
   local git_state
+  local view_json
 
   local_path="$(repo_path "$repo")"
   git_state="$(local_git_status_json "$local_path")"
 
-  gh repo view "$repo" \
-    --json nameWithOwner,description,url,sshUrl,visibility,isFork,defaultBranchRef,primaryLanguage,pushedAt,updatedAt,stargazerCount,forkCount,pullRequests,issues,parent,repositoryTopics \
+  view_json="$(gh repo view "$repo" \
+    --json nameWithOwner,description,url,sshUrl,visibility,isFork,defaultBranchRef,primaryLanguage,pushedAt,updatedAt,stargazerCount,forkCount,pullRequests,issues,parent,repositoryTopics)"
+
+  if [[ "$as_json" == "true" ]]; then
+    printf '%s\n' "$view_json" \
+      | jq \
+        --arg local_path "$local_path" \
+        --argjson git "$git_state" \
+        '. + { localPath: $local_path, local: $git }'
+    return
+  fi
+
+  printf '%s\n' "$view_json" \
     | jq -r \
       --arg local_path "$local_path" \
       --argjson git "$git_state" '
@@ -586,6 +663,8 @@ preview_repo()
         "  Pushed:         " + ((.pushedAt // "") | text_or_dash),
         "  Topics:         " + (((.repositoryTopics // []) | map(.name) | join(", ")) | text_or_dash),
         (if .isFork and .parent != null then "  Parent:         " + .parent.nameWithOwner else empty end),
+        "",
+        "Icons:  public   private  ◈ internal   user   org  ⑂ fork",
         "",
         "Keybindings:",
         "  [enter]  clone  -> SSH clone to " + $local_path,
@@ -720,11 +799,10 @@ main()
 
   case "$command" in
     list)
-      list_repos "${1:-all}" "${2:-}"
+      list_repos "$@"
       ;;
     preview)
-      [[ $# -eq 1 ]] || die "preview requires OWNER/REPO"
-      preview_repo "$1"
+      preview_repo "$@"
       ;;
     clone)
       [[ $# -eq 1 ]] || die "clone requires OWNER/REPO"
