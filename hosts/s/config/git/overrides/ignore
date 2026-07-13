@@ -27,6 +27,7 @@ dfm.sh
 **/docs/plans/*
 **/docs/superpowers/*
 **/docs/audit/*
+**/docs/specs/*
 CLAUDE.md
 TODO.md
 specs.md
