@@ -1,4 +1,8 @@
 ---
+# Vendored graphify skill: third-party content that does not follow this
+# repo's editorconfig/markdown rules. Exclude from every hook, the same
+# way tools/** and other vendored trees are treated.
+exclude: ^\.claude/skills/graphify/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -31,6 +35,19 @@ repos:
         entry: markdown-table-formatter
         language: system
         types: [markdown]
+      - id: markdownlint
+        name: markdownlint
+        # Mirrors `yarn lint:markdownlint` so a commit can't pass the hook
+        # then fail the Stop-gate/CI. Honors .markdownlintignore.
+        entry: markdownlint --ignore-path .markdownlintignore
+        language: system
+        types: [markdown]
+      - id: editorconfig-checker
+        name: EditorConfig Checker
+        # Mirrors `yarn lint:ec`. Exclusions live in .editorconfig-checker.json.
+        entry: ec -f gcc
+        language: system
+        types: [text]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0
@@ -71,6 +88,20 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
+
+  # GitHub Actions security auditing. Already run by MegaLinter
+  # (ACTION_ZIZMOR); this brings it to commit time too.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.27.0
+    hooks:
+      - id: zizmor
+
+  # Secret scanning. Stronger than detect-private-key (PEM headers only);
+  # covers secrets.d/ and ssh/. Scans staged changes only.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
 
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v2.5.2
