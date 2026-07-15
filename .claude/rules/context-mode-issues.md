@@ -1,5 +1,5 @@
 ---
-description: "Halt and notify the user when context-mode reports an upgrade or runtime error — never paper over it."
+description: "Halt and notify the user on context-mode errors or missing MCP tools — never paper over it."
 alwaysApply: true
 ---
 
@@ -40,3 +40,29 @@ automatically: it exits 2 with a blocking message whenever the
 signals above appear in a context-mode tool response. The rule
 exists so the behaviour is also documented in prose, and so an
 agent without the hook active still follows the same path.
+
+## When the ctx tools are missing entirely
+
+A distinct failure mode from the error signals above: the routing
+hooks (`pre-bash-route.sh`, the context-mode PreToolUse guard) are
+active and denying `Bash`, but the `mcp__plugin_context-mode_*` tools
+they redirect you to are **not in your toolset** — a `ToolSearch` for
+`ctx_execute` / `ctx_batch_execute` returns nothing, or the
+deferred-tool list never offered them. This happens when the
+context-mode MCP server failed to connect for the session (the hooks
+are file-based and load regardless; the MCP tools are not).
+
+In this state you MUST stop immediately — **even mid-task, even
+mid-goal** — and tell the user, in one sentence, to run
+`/reload-plugins` (or `/ctx-upgrade` if a reload does not restore
+them), noting that the MCP tool schemas only load after that. Then
+wait for them to do it before continuing.
+
+Do NOT keep working by leaning on the `# ctx-ok` / `BASH_OK` escape
+hatches. Those exist for the occasional one-off named in
+`bash-routing.md`, not as a standing substitute for a missing router.
+Using them turn after turn is a silent bypass of the routing rules
+(`no-hook-bypass.md`) and defeats the context-window protection the
+whole chain exists for. One escape-hatch call to probe the state is
+allowed; you must never reach for a second one to push the task
+forward — stop and notify the user instead.
