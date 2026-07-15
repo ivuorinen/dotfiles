@@ -5,6 +5,7 @@
   "SpacesAfterTabs": false,
   "NoColor": false,
   "Exclude": [
+    ".claude/skills/graphify/.*",
     "base/plan",
     "config/bash/completions.d/.*",
     "config/fish/completions/.*",

@@ -97,6 +97,11 @@ local/man/man1/*.1
 !local/man/man1/fzf.1
 !local/man/man1/fzf-tmux.1
 
+# graphify knowledge graph: generated artifacts, regenerable via
+# `graphify update .` (AST-only, no API cost). graph.json/graph.html
+# exceed biome's 1 MiB limit and are machine-generated — never track.
+graphify-out/
+
 # Allow .claude directory (overrides global **/.claude/* ignore)
 !.claude/
 !.claude/**

@@ -6,6 +6,8 @@ config/cheat/cheatsheets/tldr/*
 config/op/plugins/used_plugins/*
 config/vim/*
 docs/*
+# graphify generated report/wiki — machine-generated, regenerable.
+graphify-out/**
 local/bin/asdf/*
 local/md/*
 node_modules/*
