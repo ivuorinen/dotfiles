@@ -48,9 +48,13 @@ jobs:
 
       - name: Create release
         if: steps.daily-version.outputs.created
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ steps.daily-version.outputs.version }}
-          name: Release ${{ steps.daily-version.outputs.version }}
-          body: ${{ steps.changelog.outputs.changes }}
+        # Values pass through env (not inlined in run) to avoid template
+        # injection; the tag was already pushed by daily-version-action.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.daily-version.outputs.version }}
+          NOTES: ${{ steps.changelog.outputs.changes }}
+        run: |
+          gh release create "$VERSION" \
+            --title "Release $VERSION" \
+            --notes "$NOTES"
