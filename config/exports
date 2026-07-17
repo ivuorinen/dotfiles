@@ -591,6 +591,7 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 [ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
 [ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
+[ -d "$HOME/.aspire/bin" ] && export PATH="$PATH:$HOME/.aspire/bin"
 
 # sonarqube-cli
 [ -d "$HOME/.local/share/sonarqube-cli/bin" ] && export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"

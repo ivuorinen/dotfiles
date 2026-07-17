@@ -68,8 +68,11 @@ remove_dir "$XDG_DATA_HOME/nvm" "nvm data"
 # fnm (Fast Node Manager)
 remove_dir "$XDG_DATA_HOME/fnm" "fnm data"
 
-# pyenv
+# pyenv — XDG data dir plus the classic ~/.pyenv root (git-clone installer),
+# which also holds pyenv-virtualenv under plugins/. Its shims prepend ahead of
+# mise on every prompt via a precmd hook, so leaving it shadows mise entirely.
 remove_dir "$XDG_DATA_HOME/pyenv" "pyenv data"
+remove_dir "$HOME/.pyenv" "pyenv (default root)"
 
 # goenv
 remove_dir "$XDG_DATA_HOME/goenv" "goenv data"
