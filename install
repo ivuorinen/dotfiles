@@ -19,6 +19,33 @@ for arg in "$@"; do
   esac
 done
 
+# Run every executable in hosts/<host>/<phase>.d in alphabetical order, when the
+# directory exists. `before.d` runs ahead of the main install.conf, `after.d`
+# once everything else is done. A failing hook is logged but never aborts the
+# install. Hooks must be executable; non-executable files are skipped with a
+# warning. DOTFILES is exported so hooks can locate the repo.
+run_host_hooks()
+{
+  local phase hook_dir hook
+  phase="$1"
+  hook_dir="${BASEDIR}/hosts/${DOTBOT_HOST}/${phase}.d"
+  if [ -z "${DOTBOT_HOST}" ] || [ ! -d "${hook_dir}" ]; then
+    return 0
+  fi
+  echo "-> Running ${phase}.d hooks for host ${DOTBOT_HOST}"
+  for hook in "${hook_dir}"/*; do
+    [ -e "${hook}" ] || continue # empty dir: skip the literal glob
+    if [ ! -x "${hook}" ]; then
+      echo "(!) Skipping non-executable ${phase}.d hook: ${hook}" >&2
+      continue
+    fi
+    echo "   -> ${hook##*/}"
+    "${hook}" || echo "(!) ${phase}.d hook failed (continuing): ${hook}" >&2
+  done
+}
+
+export DOTFILES="${BASEDIR}"
+
 cd "${BASEDIR}"
 git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
 git submodule update --init --recursive "${DOTBOT_DIR}"
@@ -31,6 +58,8 @@ if [ "$LINKS_ONLY" = true ]; then
     "${DOTBOT_ARGS[@]}"
   exit 0
 fi
+
+run_host_hooks before
 
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
@@ -49,3 +78,5 @@ if [ "${DOTBOT_HOST}" != "" ]; then
       -c "$DOTBOT_HOST_CONFIG" \
       "${DOTBOT_ARGS[@]}"
 fi
+
+run_host_hooks after
