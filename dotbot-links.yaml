@@ -56,10 +56,18 @@
       exclude:
         - config/op
         - config/cosmic-desktop
+        - config/mise
     # Claude Code statusline (single file — see base/claude exclude above)
     ~/.claude/statusline-command.sh:
       relink: true
       path: base/claude/statusline-command.sh
+    # mise: it creates a real ~/.config/mise dir on first run, which blocks a
+    # plain glob relink (relink only replaces symlinks, not real dirs). Force
+    # here so config.toml — and thus the toolset/shims — always links in.
+    ~/.config/mise:
+      relink: true
+      force: true
+      path: config/mise
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
