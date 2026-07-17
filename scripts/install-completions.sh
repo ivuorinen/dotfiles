@@ -169,6 +169,49 @@ for spec in "$DOTFILES"/scripts/*.sh; do
   generate_for_spec "$spec" "$bin_name"
 done
 
+# Third-party tool completions (bash + zsh).
+# The whitelisted fish completions in config/fish/completions/ come from each
+# CLI's own completion output, not a usage spec, so they are committed as-is.
+# Their bash/zsh peers live in the gitignored completions.d dirs and must be
+# regenerated per host. Snapshot them from whatever tools this host actually
+# has (guarded by command -v) so all three shells reach parity without
+# committing host-specific output. The tool list is derived from the tracked
+# fish completions, so whitelisting a new fish file is the only step needed to
+# pick it up here too. Fish itself is left untouched — it is the source of truth.
+while IFS= read -r fish_comp; do
+  tool=$(basename "$fish_comp" .fish)
+  case "$tool" in
+    # fisher is a fish-only plugin manager; x is the repo dispatcher whose
+    # completion is hand-crafted (docs-only above). Neither has bash/zsh output.
+    fisher | x) continue ;;
+    *) ;;
+  esac
+  command -v "$tool" > /dev/null 2>&1 || continue
+  logger::info "Third-party completions: $tool"
+  for shell in bash zsh; do
+    if [[ "$shell" == "bash" ]]; then
+      out="$BASH_DIR/$tool.bash"
+    else
+      out="$ZSH_DIR/_$tool"
+    fi
+    # CLIs disagree on the subcommand name; try the known spellings in order
+    # (cobra `completion`, mise `completions`, bob `complete`, wezterm
+    # `shell-completion`) and keep the first that emits a non-empty result.
+    if "$tool" completion "$shell" > "$out" 2> /dev/null && [[ -s "$out" ]]; then
+      :
+    elif "$tool" completions "$shell" > "$out" 2> /dev/null && [[ -s "$out" ]]; then
+      :
+    elif "$tool" complete "$shell" > "$out" 2> /dev/null && [[ -s "$out" ]]; then
+      :
+    elif "$tool" shell-completion --shell "$shell" > "$out" 2> /dev/null && [[ -s "$out" ]]; then
+      :
+    else
+      rm -f "$out"
+      logger::warn "no $shell completion command worked for $tool"
+    fi
+  done
+done < <(git -C "$DOTFILES" ls-files config/fish/completions/)
+
 logger::info "Done: processed $count specs ($errors warnings)"
 
 if ((errors > 0)); then
