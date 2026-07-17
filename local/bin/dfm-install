@@ -194,15 +194,25 @@ dfm_install()
       ;;
 
     apt-packages)
-      msgr run "Installing apt packages..."
-      bash "$DOTFILES/scripts/install-apt-packages.sh" \
-        && msgr yay "apt packages installed!"
+      # System packages need sudo; auto-skip on hosts where this user has no
+      # sudo rights (e.g. shared servers) rather than failing mid-install.
+      if "$DOTFILES/local/bin/is-sudoer"; then
+        msgr run "Installing apt packages..."
+        bash "$DOTFILES/scripts/install-apt-packages.sh" \
+          && msgr yay "apt packages installed!"
+      else
+        msgr warn "Skipping apt packages: $(id -un) has no sudo privileges"
+      fi
       ;;
 
     dnf-packages)
-      msgr run "Installing dnf packages..."
-      bash "$DOTFILES/scripts/install-dnf-packages.sh" \
-        && msgr yay "dnf packages installed!"
+      if "$DOTFILES/local/bin/is-sudoer"; then
+        msgr run "Installing dnf packages..."
+        bash "$DOTFILES/scripts/install-dnf-packages.sh" \
+          && msgr yay "dnf packages installed!"
+      else
+        msgr warn "Skipping dnf packages: $(id -un) has no sudo privileges"
+      fi
       ;;
 
     ntfy)

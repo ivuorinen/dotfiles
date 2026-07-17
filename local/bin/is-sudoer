@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# @description Test whether a user (default: current) has sudo privileges
+#USAGE about "Test whether a user has sudo privileges (exit 0 if yes, 1 if no)"
+
+# Silent predicate: the exit code is the contract, so it composes cleanly in
+# gates like `is-sudoer && dfm install apt-packages`. Never prompts — every
+# sudo probe uses -n, so an unattended install can branch on it without
+# hanging. Deliberately does not source msgr (kept fast and side-effect-free
+# for use in loops/gates); errors go straight to stderr like x-git-root.
+
+set -euo pipefail
+
+user="${1:-$(id -un)}"
+
+# The user must exist, otherwise "not a sudoer" would be misleading.
+if ! id -u "$user" > /dev/null 2>&1; then
+  echo "is-sudoer: no such user: $user" >&2
+  exit 2
+fi
+
+current="$(id -un)"
+have_sudo=0
+command -v sudo > /dev/null 2>&1 && have_sudo=1
+
+# 1. root (uid 0) is always privileged.
+[ "$(id -u "$user")" -eq 0 ] && exit 0
+
+# 2. Passwordless or already-cached sudo. Only valid for the current user —
+#    another user's credential cannot be validated non-interactively.
+if [ "$have_sudo" -eq 1 ] && [ "$user" = "$current" ] && sudo -n -v > /dev/null 2>&1; then
+  exit 0
+fi
+
+# 3. Authoritative sudoers lookup, but only when it needs no password: root
+#    can list any user's privileges (-n keeps it from ever prompting).
+if [ "$have_sudo" -eq 1 ] && [ "$user" != "$current" ] && [ "$(id -u)" -eq 0 ]; then
+  sudo -n -l -U "$user" > /dev/null 2>&1 && exit 0
+fi
+
+# 4. Group-membership heuristic — password-free and works for any user, so it
+#    catches sudoers who would be prompted for a password (missed by step 2).
+#    sudo: Debian/Ubuntu, wheel: RHEL/Arch/BSD, admin: macOS.
+case " $(id -nG "$user" 2> /dev/null) " in
+  *" sudo "* | *" wheel "* | *" admin "*) exit 0 ;;
+esac
+
+exit 1
