@@ -37,6 +37,38 @@ if ! source "$_dfm_dir/dfm-lib"; then
 fi
 dfm_bootstrap_for "$@"
 
+# Collected outcomes for the `install all` closing summary.
+_install_failures=()
+_install_skips=()
+
+# Run one install step, logging (never aborting) on failure so `install all`
+# always reaches the end. A partial install is surfaced in the summary rather
+# than dying at the first broken step.
+run_step()
+{
+  local label="$1"
+  shift
+  local rc=0
+  "$@" || rc=$?
+  if [[ "$rc" -ne 0 ]]; then
+    msgr err "Step failed (continuing): $label [exit $rc]"
+    _install_failures+=("$label")
+  fi
+  return 0
+}
+
+# Guard a step on a tool it needs. Returns non-zero so the caller skips the
+# step, and records the skip — e.g. once mise itself fails, every step that
+# relies on a mise-installed tool skips cleanly instead of erroring.
+require_bin()
+{
+  local label="$1" bin="$2"
+  command -v "$bin" > /dev/null 2>&1 && return 0
+  msgr warn "Skipping $label: required tool '$bin' not found"
+  _install_skips+=("$label (needs $bin)")
+  return 1
+}
+
 # Handle install section commands
 dfm_install()
 {
@@ -64,30 +96,35 @@ dfm_install()
   case "$1" in
     all)
       msgr msg "Starting to install all and reloading configurations..."
+      _install_failures=()
+      _install_skips=()
 
       # Tier 0: Platform foundations (OS packages, build tools)
-      [[ "$(uname)" == "Darwin" ]] && dfm_install macos
-      [[ "$(uname)" == "Darwin" ]] && dfm_install xcode-cli-tools
-      command -v apt &> /dev/null && dfm_install apt-packages
-      command -v dnf &> /dev/null && dfm_install dnf-packages
+      [[ "$(uname)" == "Darwin" ]] && run_step "macos defaults" dfm_install macos
+      [[ "$(uname)" == "Darwin" ]] && run_step "xcode cli tools" dfm_install xcode-cli-tools
+      command -v apt &> /dev/null && run_step "apt packages" dfm_install apt-packages
+      command -v dnf &> /dev/null && run_step "dnf packages" dfm_install dnf-packages
 
       # Tier 1: Package managers & fonts
-      "$DFM" brew install
-      dfm_install fonts
+      run_step "homebrew" "$DFM" brew install
+      run_step "fonts" dfm_install fonts
 
-      # Tier 2: Runtimes and CLI tools via mise, then remaining installers
-      dfm_install mise || exit 1
-      dfm_install composer || exit 1
-      dfm_install python-libs || exit 1
+      # Tier 2: Runtimes and CLI tools via mise, then remaining installers.
+      # mise is the lynchpin: a failed *tool* (e.g. a host-unsupported dotnet
+      # tool) no longer aborts the run — the mise step stays usable and the
+      # steps below simply skip themselves if mise is genuinely absent.
+      run_step "mise" dfm_install mise
+      run_step "composer" dfm_install composer
+      require_bin "python libraries" mise && run_step "python libraries" dfm_install python-libs
 
       # Tier 3: Tool-dependent installers
-      dfm_install cheat-databases
-      dfm_install gh
-      dfm_install ntfy
+      run_step "cheat databases" dfm_install cheat-databases
+      require_bin "gh extensions" gh && run_step "gh extensions" dfm_install gh
+      require_bin "ntfy" mise && run_step "ntfy" dfm_install ntfy
 
       # Tier 4: Independent utilities
-      dfm_install shellspec
-      dfm_install z
+      run_step "shellspec" dfm_install shellspec
+      run_step "z" dfm_install z
 
       # Tier 5: Generate completions, docs, and manpages from usage specs
       msgr run "Generating completions and docs from usage specs..."
@@ -100,7 +137,19 @@ dfm_install()
       msgr msg "Reloading configurations again..."
       # shellcheck disable=SC1091
       source "$DOTFILES/config/shared.sh"
-      msgr yay "All done!"
+
+      # Closing summary: surface skips and failures so a partial install is
+      # visible instead of silently incomplete.
+      if [[ ${#_install_skips[@]} -gt 0 ]]; then
+        msgr warn "Skipped ${#_install_skips[@]} step(s):"
+        for _s in "${_install_skips[@]}"; do msgr nested "$_s"; done
+      fi
+      if [[ ${#_install_failures[@]} -gt 0 ]]; then
+        msgr err "Completed with ${#_install_failures[@]} failed step(s):"
+        for _f in "${_install_failures[@]}"; do msgr nested "$_f"; done
+      else
+        msgr yay "All done!"
+      fi
       ;;
 
     cheat-databases)
@@ -147,8 +196,11 @@ dfm_install()
       if ! command -v mise &> /dev/null; then
         msgr nested "Installing mise..."
         curl -fsSL https://mise.run | sh || {
+          # No mise binary means nothing downstream can run — the one case
+          # where the mise step is genuinely fatal (caller records it and
+          # skips the mise-dependent steps).
           msgr err "Failed to install mise"
-          exit 1
+          return 1
         }
         export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
       fi
@@ -168,14 +220,14 @@ dfm_install()
           msgr nested "Non-interactive shell; skipping token prompt"
         fi
       fi
-      mise install --yes || {
-        msgr err "mise install failed"
-        exit 1
-      }
-      mise reshim || {
-        msgr err "mise reshim failed"
-        exit 1
-      }
+      # A single host-unsupported tool (e.g. a dotnet tool that will not build
+      # on this box) makes `mise install` exit non-zero even though every other
+      # tool installed. Do not abort on that — warn and still reshim so the
+      # tools that DID install get their shims.
+      mise install --yes \
+        || msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
+      mise reshim \
+        || msgr warn "mise reshim failed (non-fatal)"
       # Apply [bootstrap.packages] — Homebrew formulae mise installs into the
       # canonical prefix (/opt/homebrew) without the brew CLI. macOS-only, since
       # these mirror the macOS Brewfile; scoped to the brew manager and kept
