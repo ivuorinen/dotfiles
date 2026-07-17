@@ -1,5 +1,11 @@
 # lakka exports
 
+## mise
+# These two dotnet tools are not installable on lakka, so `mise install` exits
+# non-zero on every run. disable_tools layers on top of the shared config —
+# no need to fork config/mise/config.toml — so mise skips them here only.
+export MISE_DISABLE_TOOLS="dotnet:csharpier,dotnet:coverlet.console"
+
 ## LUA
 if command -v luarocks &> /dev/null; then
   eval "$(luarocks path --bin)"
