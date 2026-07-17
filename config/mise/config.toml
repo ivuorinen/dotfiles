@@ -82,7 +82,7 @@ difftastic = "0.69.0"
 
 # Editors & language servers
 neovim = "0.12.4"
-tree-sitter = "0.26.10"
+tree-sitter = "0.26.11"
 "npm:neovim" = "5.4.0"                      # Node.js client for Neovim's RPC API (required by plugins)
 "npm:fish-lsp" = "1.1.4"
 
