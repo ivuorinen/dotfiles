@@ -73,7 +73,7 @@ choose = "1.3.7"
 # Git & version control
 github-cli = "2.96.0"
 gitui = "0.28.1"
-lazygit = "0.63.0"
+lazygit = "0.63.1"
 delta = "0.19.2"
 difftastic = "0.69.0"
 "github:dotzero/git-profile" = "1.8.1"             # ships macOS-all universal binary
