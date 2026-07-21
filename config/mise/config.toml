@@ -49,7 +49,7 @@ cmake = "4.4.0"
 starship = "1.26.0"
 tmux = "3.7b"
 usage = "3.5.5"
-"github:joshmedeski/sesh" = "2.26.2"
+"github:joshmedeski/sesh" = "2.27.0"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # File navigation, search & viewing
