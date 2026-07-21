@@ -144,7 +144,7 @@ bottom = "0.14.4"
 prek = "0.4.10"
 "github:shhac/git-hunk" = "0.16.0"
 1password-cli = "2.34.1"
-"github:modem-dev/hunk" = "0.17.0"
+"github:modem-dev/hunk" = "0.17.1"
 pi = "latest"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
