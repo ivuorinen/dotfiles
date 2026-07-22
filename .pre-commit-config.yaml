@@ -92,7 +92,7 @@ repos:
   # GitHub Actions security auditing. Already run by MegaLinter
   # (ACTION_ZIZMOR); this brings it to commit time too.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.27.0
+    rev: v1.28.0
     hooks:
       - id: zizmor
 
