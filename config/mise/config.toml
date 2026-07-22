@@ -128,7 +128,7 @@ zizmor = "1.26.1"
 "github:projectdiscovery/katana" = "1.6.1"
 
 # Build, test & CI
-bats = "1.13.0"
+bats = "1.14.0"
 act = "0.2.89"
 "npm:corepack" = "0.35.0"
 "dotnet:coverlet.console" = "10.0.1"
