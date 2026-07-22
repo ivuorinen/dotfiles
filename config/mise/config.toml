@@ -54,7 +54,7 @@ usage = "3.5.6"
 
 # File navigation, search & viewing
 fd = "10.4.2"
-ripgrep = "15.1.0"
+ripgrep = "15.2.0"
 eza = "0.23.5"
 zoxide = "0.10.0"
 fzf = "0.74.1"
