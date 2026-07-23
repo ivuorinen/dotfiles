@@ -99,7 +99,7 @@ repos:
   # Secret scanning. Stronger than detect-private-key (PEM headers only);
   # covers secrets.d/ and ssh/. Scans staged changes only.
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
+    rev: v8.30.0
     hooks:
       - id: gitleaks
 
