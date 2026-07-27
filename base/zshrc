@@ -5,7 +5,8 @@
 # export VERBOSE=1
 # export DEBUG=1
 
-export DOTFILES="$HOME/.dotfiles"
+# Respect an inherited DOTFILES (./install, bats fixtures) before defaulting.
+export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 # Minimal PATH for x-have and utilities; full PATH set in shared.sh/exports
 export PATH="$HOME/.local/bin:$DOTFILES/local/bin:$PATH"
 export SHARED_SCRIPTS_SOURCED=0
