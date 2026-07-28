@@ -39,6 +39,16 @@ case "$fp" in
     echo "See .claude/rules/vendored-files.md." >&2
     exit 2
     ;;
+  */.claude/skills/graphify/*)
+    echo "BLOCKED: $fp belongs to the vendored graphify skill — refresh it" >&2
+    echo "from the plugin cache instead. See .claude/rules/vendored-files.md." >&2
+    exit 2
+    ;;
+  */iterm2_shell_integration.zsh)
+    echo "BLOCKED: $fp is vendored from iTerm2 — re-download to update." >&2
+    echo "See .claude/rules/vendored-files.md." >&2
+    exit 2
+    ;;
   */tools/dotbot/* | */tools/dotbot-include/* | */tools/antidote/*)
     echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
     exit 2

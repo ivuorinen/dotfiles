@@ -1,5 +1,5 @@
 ---
-description: "Vendored fzf files must never be modified — refresh from upstream as one bundle."
+description: "Vendored third-party files must never be modified — refresh from upstream instead."
 paths:
   - "local/bin/fzf-tmux"
   - "config/fzf/completion.bash"
@@ -7,11 +7,19 @@ paths:
   - "config/fzf/key-bindings.bash"
   - "config/fzf/key-bindings.zsh"
   - "config/fzf/key-bindings.fish"
+  - "local/bin/iterm2_shell_integration.zsh"
+  - ".claude/skills/graphify/**"
 ---
 
 # Vendored files
 
-Never modify these files — they are vendored verbatim from
+Never modify vendored files. Three trees are vendored in-tree rather
+than carried as submodules; each is refreshed from upstream, never
+edited in place.
+
+## fzf
+
+Vendored verbatim from
 [junegunn/fzf](https://github.com/junegunn/fzf). The repo has no
 fzf submodule; refresh happens by fetching the upstream files
 directly and replacing the local copies in a single commit. The
@@ -47,6 +55,24 @@ project code and may be edited.
 `# shellcheck disable=all` directive, so no shellcheck exclude is
 needed.
 
-The `.claude/settings.json` PreToolUse hook blocks edits to all
-six vendored files. Bypassing the hook is forbidden; see
+## graphify skill
+
+`.claude/skills/graphify/` is the graphify skill, copied in from the
+plugin cache rather than authored here. `.pre-commit-config.yaml`
+excludes the whole tree from every hook, so edits to it are never
+linted. Refresh by re-copying the skill from the plugin cache; never
+hand-edit a file under it, because the next refresh discards the
+change with no submodule sync to recover from.
+
+## iTerm2 shell integration
+
+`local/bin/iterm2_shell_integration.zsh` is vendored from iTerm2.
+Refresh by downloading the current version from
+<https://iterm2.com/shell_integration/zsh>.
+
+## Enforcement
+
+The `.claude/settings.json` PreToolUse hook
+(`.claude/hooks/pre-edit-block.sh`) blocks edits to every path listed
+above. Bypassing the hook is forbidden; see
 `.claude/rules/no-hook-bypass.md`.

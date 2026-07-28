@@ -148,10 +148,14 @@ Items already enforced by `.claude/rules/` are flagged.
    `*.example` and `README.md` are tracked.** ✅ Already enforced
    by `.claude/rules/secrets-files.md`.
 5. **Third-party code enters the repo as a submodule under
-   `tools/` (or the specific cheatsheets paths), never as copied
-   files.** The single in-tree exception is `local/bin/fzf-tmux`,
-   which is itself protected by
-   `.claude/rules/vendored-files.md`. ✅ Mostly covered.
+   `tools/` (or the specific cheatsheets paths), or as an explicitly
+   vendored tree — never as ad-hoc copied files.** The in-tree
+   vendored set is authoritative in
+   `.claude/rules/vendored-files.md`: the six fzf files
+   (`local/bin/fzf-tmux` plus five under `config/fzf/`),
+   `.claude/skills/graphify/`, and
+   `local/bin/iterm2_shell_integration.zsh`. Each is excluded from
+   the relevant linters and blocked by the PreToolUse edit guard.
 6. **Helper scripts go in `local/bin/`** — they are symlinked into
    `~/.local/bin/` by dotbot and become part of the user's PATH.
    Tests for them live in `tests/<script-name>.bats`.
