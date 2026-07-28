@@ -217,10 +217,13 @@ SC2174 (mkdir -p -m), SC2016 (single-quote expressions).
 
 ## Gotchas
 
-- **POSIX scripts** (validation rule in `.claude/rules/posix-scripts.md`):
-  `x-ssh-audit`, `x-codeql`, `x-until-error`, `x-until-success`, and
-  `x-ssl-expiry-date` use `/bin/sh`.
-- **Vendor file**: `local/bin/fzf-tmux` is vendored from junegunn/fzf.
+- **POSIX scripts** (validation rule in `.claude/rules/posix-scripts.md`,
+  which holds the authoritative list): ten scripts are `sh`, not bash —
+  eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` and
+  `config/yabai/yabairc` on `#!/usr/bin/env sh`. Validate them with `sh -n`
+  or `dash -n`, never `bash -n`.
+- **Vendored files**: the six fzf files, `.claude/skills/graphify/`, and
+  `local/bin/iterm2_shell_integration.zsh`.
   Edit policy: `.claude/rules/vendored-files.md`.
 - **Fish config**: `config/fish/` has its own config chain
   (`config.fish`, `exports.fish`, `alias.fish`) plus 60+ functions.

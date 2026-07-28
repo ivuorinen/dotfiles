@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Note: Lungo v2.0.4 required
 # Install via Mac App Store: https://apps.apple.com/app/id1263070803
