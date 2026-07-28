@@ -39,7 +39,10 @@ get_latest_tarball_url()
     | sed -Ene '/^[[:blank:]]+"tarball_url":[[:blank:]]"(https:[^"]+)",/s//\1/p')
 
   if [ -z "$tarball_url" ]; then
-    echo "(!) Failed to fetch the tarball URL for repository: $repo"
+    # stderr, not stdout: this function's stdout is captured by a command
+    # substitution in main(), so the message was swallowed into the variable
+    # and the user saw a bare exit 1 with no explanation at all.
+    echo "(!) Failed to fetch the tarball URL for repository: $repo" >&2
     exit 1
   fi
 
