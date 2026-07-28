@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 # ae and ad encrypt and decrypt files with age, using the SSH keys published
 # on a GitHub profile. age and curl are stubbed: nothing is fetched from
 # github.com and no real key is ever used.

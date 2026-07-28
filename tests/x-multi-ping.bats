@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 # x-multi-ping resolves hostnames with dig and pings every address it finds.
 # Both are stubbed: no DNS query and no ICMP packet leaves the machine, so the
 # result does not depend on the network the suite runs on.

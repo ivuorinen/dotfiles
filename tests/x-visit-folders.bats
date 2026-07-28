@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 # x-visit-folders walks one level of a directory and feeds the results to
 # zoxide. zoxide is stubbed so the tests can assert exactly which paths were
 # submitted — the selection rules (one level deep, no dot-directories, no

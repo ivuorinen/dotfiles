@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 # t turns a directory or an existing session name into a tmux session. The
 # tests pass the selection as an argument, which skips the interactive picker,
 # and stub tmux so nothing is created on the real server.

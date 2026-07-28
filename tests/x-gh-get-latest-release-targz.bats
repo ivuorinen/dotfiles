@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 # x-gh-get-latest-release-targz reads the GitHub releases API and optionally
 # downloads the tarball. curl and tar are stubbed, so no request leaves the
 # machine and nothing is extracted into the working directory — the tests
