@@ -1,5 +1,5 @@
 [tool.ruff]
-target-version = "py39"
+target-version = "py314"
 line-length = 120
 # Third-party trees. The cheatsheets submodule holds tldr templates with a
 # .py extension that are not Python, so a bare `ruff check .` reports
