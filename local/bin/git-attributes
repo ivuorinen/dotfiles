@@ -47,15 +47,25 @@ msg_warn()
 }
 
 # Print an info message in blue
+#
+# Info and debug go to stderr, like the error and warning helpers above.
+# suggest_gitattributes is read through a command substitution and the result
+# is what --write appends to .gitattributes, so anything these print on stdout
+# ends up in the file — colour escapes, progress lines and all.
 msg_info()
 {
-  echo -e "\e[36m$*\e[0m"
+  echo -e "\e[36m$*\e[0m" >&2
 }
 
 # Print a debug message when verbose mode is on
 msg_debug()
 {
-  [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$*\e[0m"
+  [[ $VERBOSE -eq 1 ]] && echo -e "\e[35m$*\e[0m" >&2
+  # A quiet run leaves the test above as the function's exit status, so
+  # msg_debug returns 1 and `set -e` kills the caller. That is what stopped
+  # --write: check_gitattributes logs a debug line immediately before calling
+  # the writer, so the file was only ever written under --verbose.
+  return 0
 }
 
 # Display usage information and examples
