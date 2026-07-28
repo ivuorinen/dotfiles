@@ -91,6 +91,8 @@ This registers `Ctrl-r` and `Ctrl-t` in the shell and enables channel triggers.
 `prefix + t` opens a tmux popup running `~/.config/tmux/sesh.sh`, which calls
 `tv sesh` via the `sesh` cable (see below). Tmux prefix is `Ctrl-Space`.
 
+`prefix + T` opens `tv gh-repos`, `prefix + m` opens `tv theme`.
+
 ## Custom Cables
 
 ### `sesh` — Session + directory picker
@@ -252,6 +254,23 @@ Cache: 15 min under `~/.cache/television/gh-repos`; tune with `GH_REPOS_*` env v
 | `Ctrl-e` | Open local checkout in `$EDITOR`                        |
 | `Ctrl-y` | Copy repository URL                                     |
 | `Ctrl-r` | Refresh cache and reload                                |
+
+---
+
+### `theme` — Dark/light theme switcher
+
+`config/television/cable/theme.toml`
+Requirements: `theme-mode`
+Source: static list — `dark`, `light`
+Preview: the currently active mode (`theme-mode`)
+
+| Key     | Action                                           |
+|---------|--------------------------------------------------|
+| `Enter` | Apply the selected mode via `config/theme/apply` |
+
+Selecting the mode that is already active is a no-op — the orchestrator only
+fans out to `handlers.d/` on an actual change. The theme watcher still owns
+automatic flips, so a manual pick lasts until the OS colour scheme changes.
 
 ---
 

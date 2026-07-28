@@ -10,118 +10,120 @@ included; mouse and wheel events are omitted.
 ## prefix
 
 ```txt
-Escape                 Enter copy mode
-Space                  Select next layout
-!                      Break pane to a new window
-"                      Split window vertically
-#                      List all paste buffers
-$                      Rename current session
-%                      Split window horizontally
-&                      Kill current window
-'                      Prompt for window index to select
-(                      Switch to previous client
-)                      Switch to next client
-,                      Rename current window
--                      Delete the most recent paste buffer
-.                      Move the current window
-/                      Describe key binding
-0                      Select window 0
-1                      Select window 1
-2                      Select window 2
-3                      Select window 3
-4                      Select window 4
-5                      Select window 5
-6                      Select window 6
-7                      Select window 7
-8                      Select window 8
-9                      Select window 9
-:                      Prompt for a command
-;                      Move to the previously active pane
-<                      Display window menu
-=                      Choose a paste buffer from a list
->                      Display pane menu
-?                      List key bindings
+Escape                 copy-mode
+Space                  next-layout
+!                      break-pane
+"                      split-window
+#                      list-buffers
+$                      command-prompt -I "#S" { rename-session "%%" }
+%                      split-window -h
+&                      confirm-before -p "kill-window #W? (y/n)" kill-window
+'                      command-prompt -T window-target -p index { select-window -t ":%%" }
+(                      switch-client -p
+)                      switch-client -n
+*                      new-pane
+,                      command-prompt -I "#W" { rename-window "%%" }
+-                      delete-buffer
+.                      command-prompt -T target { move-window -t "%%" }
+/                      command-prompt -k -p key { list-keys -1N "%%" }
+0                      select-window -t :=0
+1                      select-window -t :=1
+2                      select-window -t :=2
+3                      select-window -t :=3
+4                      select-window -t :=4
+5                      select-window -t :=5
+6                      select-window -t :=6
+7                      select-window -t :=7
+8                      select-window -t :=8
+9                      select-window -t :=9
+:                      command-prompt
+;                      last-pane
+<                      display-menu -T "#[align=centre]#{window_index}:#{window_name}" -x W -y W "#{?#{>:#{session_windows},1},,-}Swap Left" l { swap-window -t :-1 } "#{?#{>:#{session_windows},1},,-}Swap Right" r { swap-window -t :+1 } "#{?pane_marked_set,,-}Swap Marked" s { swap-window } '' Kill X { kill-window } Respawn R { respawn-window -k } "#{?pane_marked,Unmark,Mark}" m { select-pane -m } Rename n { command-prompt -F -I "#W" { rename-window -t "#{window_id}" "%%" } } '' "New After" w { new-window -a } "New At End" W { new-window }
+=                      choose-buffer -Z
+>                      display-menu -T "#[align=centre]#{pane_index} (#{pane_id})" -x P -y P "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Top,}" < { send-keys -X history-top } "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Bottom,}" > { send-keys -X history-bottom } '' "#{?#{&&:#{buffer_size},#{!:#{pane_in_mode}}},Paste #[underscore]#{=/9/...:buffer_sample},}" p { paste-buffer } '' "#{?mouse_word,Search For #[underscore]#{=/9/...:mouse_word},}" C-r { if-shell -F "#{?#{m/r:(copy|view)-mode,#{pane_mode}},0,1}" "copy-mode -t=" ; send-keys -X -t = search-backward -- "#{q:mouse_word}" } "#{?mouse_word,Type #[underscore]#{=/9/...:mouse_word},}" C-y { copy-mode -q ; send-keys -l "#{q:mouse_word}" } "#{?mouse_word,Copy #[underscore]#{=/9/...:mouse_word},}" c { copy-mode -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode -q ; set-buffer "#{q:mouse_line}" } '' "#{?mouse_hyperlink,Type #[underscore]#{=/9/...:mouse_hyperlink},}" C-h { copy-mode -q ; send-keys -l "#{q:mouse_hyperlink}" } "#{?mouse_hyperlink,Copy #[underscore]#{=/9/...:mouse_hyperlink},}" h { copy-mode -q ; set-buffer "#{q:mouse_hyperlink}" } '' "#{?#{!:#{pane_floating_flag}},Horizontal Split,}" h { split-window -h } "#{?#{!:#{pane_floating_flag}},Vertical Split,}" v { split-window -v } '' "#{?#{&&:#{!:#{pane_floating_flag}},#{>:#{window_panes},1}},Swap Up,}" u { swap-pane -U } "#{?#{&&:#{!:#{pane_floating_flag}},#{>:#{window_panes},1}},Swap Down,}" d { swap-pane -D } "#{?pane_marked_set,,-}Swap Marked" s { swap-pane } '' Kill X { kill-pane } Respawn R { respawn-pane -k } "#{?pane_marked,Unmark,Mark}" m { select-pane -m } "#{?#{>:#{window_panes},1},,-}#{?window_zoomed_flag,Unzoom,Zoom}" z { resize-pane -Z }
+?                      list-keys -N
 @                      run-shell "tmux-sessionist/scripts/promote_pane.sh '#{session_name}' '#{pane_id}' '#{pane_current_path}'"
 C                      run-shell tmux-sessionist/scripts/new_session_prompt.sh
-D                      Choose and detach a client from a list
-E                      Spread panes out evenly
+D                      choose-client -Z
+E                      select-layout -E
 I                      run-shell tpm/bindings/install_plugins
-L                      last-session (via sesh)
-M                      Clear the marked pane
-N                      sesh ui
+L                      run-shell "sesh last"
+M                      select-pane -M
+N                      display-popup -E "sesh ui"
 S                      switch-client -l
-T                      run-shell "tmux-sessionist/scripts/join_pane.sh 'join-pane' '-b'"
+T                      display-popup -E "tv gh-repos"
 U                      run-shell tpm/bindings/update_plugins
 X                      run-shell "tmux-sessionist/scripts/kill_session_prompt.sh '#{session_name}' '#{session_id}'"
-]                      Paste the most recent paste buffer
-c                      Create a new window
-d                      Detach the current client
-f                      Search for a pane
+]                      paste-buffer -p
+c                      new-window
+d                      detach-client
+f                      command-prompt { find-window -Z "%%" }
 g                      run-shell tmux-sessionist/scripts/goto_session.sh
-i                      Display window information
-l                      Select the previously current window
-m                      Toggle the marked pane
-n                      Select the next window
-o                      Select the next pane
-p                      Paste the most recent buffer
-q                      Display pane numbers
-r                      Reload the tmux config
-s                      Choose a session from a list
-t                      sesh selection
-w                      Choose a window from a list
-x                      Kill the active pane
-z                      Zoom the active pane
-{                      Swap the active pane with the pane above
-}                      Swap the active pane with the pane below
-~                      Show messages
-DC                     Reset so the visible part of the window follows the cursor
-PPage                  Enter copy mode and scroll up
-Up                     Select the pane above the active pane
-Down                   Select the pane below the active pane
-Left                   Select the pane to the left of the active pane
-Right                  Select the pane to the right of the active pane
-M-1                    Set the even-horizontal layout
-M-2                    Set the even-vertical layout
-M-3                    Set the main-horizontal layout
-M-4                    Set the main-vertical layout
-M-5                    Select the tiled layout
-M-6                    Set the main-horizontal-mirrored layout
-M-7                    Set the main-vertical-mirrored layout
-M-n                    Select the next window with an alert
-M-o                    Rotate through the panes in reverse
-M-p                    Select the previous window with an alert
+i                      display-message
+j                      run-shell "tmux-sessionist/scripts/join_pane.sh 'join-pane' '-b'"
+l                      last-window
+m                      display-popup -E "tv theme"
+n                      next-window
+o                      select-pane -t :.+
+p                      paste-buffer
+q                      display-panes
+r                      source-file $HOME/.config/tmux/tmux.conf \; display-message "tmux cfg reloaded!"
+s                      choose-tree -Zs
+t                      display-popup -E $HOME/.config/tmux/sesh.sh
+w                      choose-tree -Zw
+x                      confirm-before -p "kill-pane #P? (y/n)" kill-pane
+z                      resize-pane -Z
+{                      swap-pane -U
+}                      swap-pane -D
+~                      show-messages
+DC                     refresh-client -c
+PPage                  copy-mode -u
+Up                     select-pane -U
+Down                   select-pane -D
+Left                   select-pane -L
+Right                  select-pane -R
+M-1                    select-layout even-horizontal
+M-2                    select-layout even-vertical
+M-3                    select-layout main-horizontal
+M-4                    select-layout main-vertical
+M-5                    select-layout tiled
+M-6                    select-layout main-horizontal-mirrored
+M-7                    select-layout main-vertical-mirrored
+M-n                    next-window -a
+M-o                    rotate-window -D
+M-p                    previous-window -a
 M-u                    run-shell tpm/bindings/clean_plugins
-M-Up                   Resize the pane up by 5
-M-Down                 Resize the pane down by 5
-M-Left                 Resize the pane left by 5
-M-Right                Resize the pane right by 5
-C-Space                Send the prefix key to a nested session
+M-Up                   resize-pane -U 5
+M-Down                 resize-pane -D 5
+M-Left                 resize-pane -L 5
+M-Right                resize-pane -R 5
+C-Space                S-Right Move the visible part of the window right
 C-@                    run-shell "tmux-sessionist/scripts/promote_window.sh '#{session_name}' '#{window_id}' '#{window_name}' '#{pane_current_path}'"
-C-b                    Send the prefix key
-C-n                    Next window
-C-o                    Rotate through the panes
-C-p                    Previous window
+C-b                    send-prefix
+C-n                    next-window
+C-o                    rotate-window
+C-p                    previous-window
 C-r                    run-shell tmux-resurrect/scripts/restore.sh
 C-s                    run-shell tmux-resurrect/scripts/save.sh
-C-z                    Suspend the current client
-C-Up                   Resize the pane up
-C-Down                 Resize the pane down
-C-Left                 Resize the pane left
-C-Right                Resize the pane right
-S-Up                   Move the visible part of the window up
-S-Down                 Move the visible part of the window down
-S-Left                 Move the visible part of the window left
-S-Right                Move the visible part of the window right
+C-z                    suspend-client
+C-Up                   resize-pane -U
+C-Down                 resize-pane -D
+C-Left                 resize-pane -L
+C-Right                resize-pane -R
+S-Up                   refresh-client -U 10
+S-Down                 refresh-client -D 10
+S-Left                 refresh-client -L 10
+S-Right                refresh-client -R 10
 ```
 
 ## root
 
 ```txt
 F8                     run-shell "tmux-suspend/scripts/suspend.sh \"\" \" @mode_indicator_custom_prompt:: ---- , @mode_indicator_custom_mode_style::bg=brightblack\\,fg=black \""
-C-Up                   Select the pane above
-C-Down                 Select the pane below
-C-Left                 Select the pane to the left
-C-Right                Select the pane to the right
+C-Up                   select-pane -U
+C-Down                 select-pane -D
+C-Left                 select-pane -L
+C-Right                select-pane -R
 ```
 
 ## copy-mode
@@ -176,6 +178,7 @@ M-x                    send-keys -X jump-to-mark
 M-Up                   send-keys -X halfpage-up
 M-Down                 send-keys -X halfpage-down
 C-Space                send-keys -X begin-selection
+C-[                    send-keys -X cancel
 C-a                    send-keys -X start-of-line
 C-b                    send-keys -X cursor-left
 C-c                    send-keys -X cancel
@@ -183,7 +186,7 @@ C-e                    send-keys -X end-of-line
 C-f                    send-keys -X cursor-right
 C-g                    send-keys -X clear-selection
 C-k                    send-keys -X copy-pipe-end-of-line-and-cancel
-C-l                    send-keys -X cursor-centre-vertical
+C-l                    send-keys -X recentre-top-bottom
 C-n                    send-keys -X cursor-down
 C-p                    send-keys -X cursor-up
 C-r                    command-prompt -i -I "#{pane_search_string}" -T search -p "(search up)" { send-keys -X search-backward-incremental -- "%%" }
@@ -238,7 +241,7 @@ T                      command-prompt -1 -p "(jump to backward)" { send-keys -X 
 V                      send-keys -X select-line
 W                      send-keys -X next-space
 X                      send-keys -X set-mark
-Y                      Copy selection and paste it
+Y                      send-keys -X copy-selection-and-cancel \; paste-buffer
 ^                      send-keys -X back-to-indentation
 b                      send-keys -X previous-word
 e                      send-keys -X next-word-end
@@ -255,7 +258,7 @@ r                      send-keys -X refresh-from-pane
 t                      command-prompt -1 -p "(jump to forward)" { send-keys -X jump-to-forward -- "%%" }
 v                      send-keys -X rectangle-toggle
 w                      send-keys -X next-word
-y                      Copy selection to the system clipboard
+y                      send-keys -X copy-pipe-and-cancel
 z                      send-keys -X scroll-middle
 {                      send-keys -X previous-paragraph
 }                      send-keys -X next-paragraph
@@ -269,6 +272,7 @@ Down                   send-keys -X cursor-down
 Left                   send-keys -X cursor-left
 Right                  send-keys -X cursor-right
 M-x                    send-keys -X jump-to-mark
+C-[                    send-keys -X clear-selection
 C-b                    send-keys -X page-up
 C-c                    send-keys -X cancel
 C-d                    send-keys -X halfpage-down
@@ -279,8 +283,10 @@ C-j                    send-keys -X copy-pipe-and-cancel
 C-u                    send-keys -X halfpage-up
 C-v                    send-keys -X rectangle-toggle
 C-y                    send-keys -X scroll-up
-C-Up                   send-keys -X scroll-up
-C-Down                 send-keys -X scroll-down
+C-Up                   select-pane -U
+C-Down                 select-pane -D
+C-Left                 select-pane -L
+C-Right                select-pane -R
 ```
 
 ## join-pane
@@ -299,5 +305,4 @@ v                      run-shell "'tmux-sessionist/scripts/join_pane.sh' 'join-p
 ## suspended
 
 ```txt
-F8                     run-shell "tmux-suspend/scripts/resume.sh \"\""
 ```

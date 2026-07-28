@@ -1,0 +1,29 @@
+[metadata]
+name = "theme"
+description = "Switch the shell/tooling theme between dark and light"
+requirements = ["theme-mode"]
+
+[source]
+command = 'printf "%s\n" dark light'
+no_sort = true
+
+# The orchestrator no-ops when the picked mode is already active, so show the
+# current one rather than leaving a silent flip-to-self looking broken.
+[preview]
+command = 'echo "current: $(theme-mode)"'
+shell = "bash"
+
+[ui]
+layout = "portrait"
+input_header = "Theme mode"
+input_prompt = "theme> "
+preview_panel = { size = 20 }
+
+[keybindings]
+enter = "actions:apply"
+
+[actions.apply]
+description = "Apply the selected mode via the theme orchestrator"
+command = '"${XDG_CONFIG_HOME:-$HOME/.config}/theme/apply" {}'
+shell = "bash"
+mode = "execute"
