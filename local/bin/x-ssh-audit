@@ -814,7 +814,11 @@ audit_host()
 main()
 {
   input_file="${1:-}"
-  auto_remediate="${2:-no}"
+  # Empty, not "no": the usage documents this argument as yes|no, so an
+  # explicit "no" has to mean no. Defaulting it to "no" made that
+  # indistinguishable from omitting it, and the prompt below appeared either
+  # way.
+  auto_remediate="${2:-}"
 
   # Validate arguments
   if [ -z "$input_file" ]; then
@@ -874,8 +878,8 @@ main()
   # Display summary
   display_summary
 
-  # Offer remediation
-  if [ "$auto_remediate" != "yes" ]; then
+  # Offer remediation only when the caller did not already answer
+  if [ -z "$auto_remediate" ]; then
     printf '\n%sWould you like to automatically remediate security issues? (y/N)%s ' "$YELLOW" "$RESET"
     read -r response
 
