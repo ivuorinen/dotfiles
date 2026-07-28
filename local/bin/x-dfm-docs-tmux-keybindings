@@ -136,6 +136,7 @@ generate_tmux_keybindings()
   # information (e.g. "$HOME/.local/share/tmux/plugins/tpm/..." -> "tpm/...").
   local tmp
   tmp=$(mktemp)
+  trap 'rm -f -- "$tmp"' EXIT
   if [[ -n "${HOME:-}" ]]; then
     sed -e "s#${HOME}#\$HOME#g" \
       -e 's#\$HOME/\.local/share/tmux/plugins/##g' \

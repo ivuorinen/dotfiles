@@ -299,6 +299,7 @@ fetch_all_issues()
   # accumulator every page is O(n^2) in the issue count.
   local tmpdir
   tmpdir=$(mktemp -d) || return 1
+  trap 'rm -rf -- "$tmpdir"' EXIT
 
   while true; do
     log_info "Fetching issues page $page..."

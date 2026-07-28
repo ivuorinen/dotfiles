@@ -113,6 +113,7 @@ $(get_directories | sort)"
 
   if command -v tv &> /dev/null; then
     T_TMPFILE=$(mktemp)
+    trap 'rm -f -- "$T_TMPFILE"' EXIT
     echo "$T_ITEMS" | grep -v '^#' > "$T_TMPFILE"
     selected=$(tv --no-sort -s "cat $T_TMPFILE") || {
       rm -f "$T_TMPFILE"

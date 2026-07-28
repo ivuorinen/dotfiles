@@ -199,6 +199,7 @@ encrypt_single_file()
 
   local temp_file
   temp_file="$(mktemp -p "$(dirname "$file")")"
+  trap 'rm -f -- "$temp_file"' EXIT
 
   if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
     log_message "File encrypted successfully: $output_file"
@@ -262,6 +263,7 @@ decrypt_single_file()
 
   local temp_file
   temp_file="$(mktemp -p "$(dirname "$file")")"
+  trap 'rm -f -- "$temp_file"' EXIT
 
   if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
     log_message "File decrypted successfully: $output_file"

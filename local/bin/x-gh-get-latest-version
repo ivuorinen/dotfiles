@@ -182,6 +182,7 @@ api_request()
   # Use a temporary file to capture both headers and body
   local tmp_file
   tmp_file=$(mktemp)
+  trap 'rm -f -- "$tmp_file"' EXIT
 
   msg "Making API request to: $url"
 

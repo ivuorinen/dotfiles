@@ -162,6 +162,7 @@ analyze_language()
   # Keep the first attempt's stderr so a real failure is not misdiagnosed
   # as a missing suite.
   analyze_err="$(mktemp)"
+  trap 'rm -f -- "$analyze_err"' EXIT
   if ! codeql database analyze "$db_path" \
     --format=sarif-latest \
     --output="$sarif_file" \
