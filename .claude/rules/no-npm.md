@@ -1,6 +1,5 @@
 ---
 description: "Package manager constraint: yarn v4+ only, never npm."
-alwaysApply: true
 ---
 
 # Package manager

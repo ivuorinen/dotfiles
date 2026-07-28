@@ -1,6 +1,5 @@
 ---
 description: "Conventional Commits format for all commit messages in this repo."
-alwaysApply: true
 ---
 
 # Commit messages

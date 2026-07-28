@@ -1,6 +1,5 @@
 ---
 description: "MCP routing rules for context window protection — curl, WebFetch, Bash, and Read tool routing."
-alwaysApply: true
 ---
 
 # context-mode — mandatory routing rules
@@ -39,41 +38,15 @@ query the indexed content.
 
 ### Bash shell commands
 
-The authoritative Bash routing rule is in `.claude/rules/bash-routing.md`,
-and it is enforced programmatically by the `.claude/hooks/pre-bash-route.sh`
-`PreToolUse` hook. `ctx_batch_execute` is the default for any command that
-produces output you intend to read.
+`ctx_batch_execute` is the default for any command producing output you
+intend to read — searches (`rg`, `grep`, `fd`, `find`) included, and never
+truncated with `| head` to make them fit.
 
-The following invocations are denied by the hook and must be routed through
-`ctx_batch_execute` (or `ctx_execute(language: "shell", …)` for a single
-command):
-
-- Searches — `rg`, `grep`, `fd`, `find`
-- Lint/format checkers — `shellcheck`, `shfmt --diff`, `fish_indent --check`,
-  `biome check`, `yamllint`, `actionlint`, `stylua --check`, `ruff check`,
-  `ruff format --check`, `pre-commit run`, `yarn lint`/`yarn test`/`yarn check`
-- File readers — `cat`, `head`, `tail`, `wc`, `ls`, `tree`, `less`, `more`,
-  `awk`, `sed`, `jq` (when emitting output to read)
-- Git readers — `git log`, `git diff`, `git show`, `git blame`, `git status`
-  (any flag)
-- Dotfiles manager — `dfm <subcommand>` for any subcommand
-- Pipeline/subshell variants of the above (`git status | grep …`,
-  `echo $(rg …)`, `false || cat file`) — the hook splits on `|`, `&&`,
-  `||`, `;`, `$( )`, and backticks before matching.
-
-These pass through the hook unchanged (state mutations, in-place formatters,
-package installs, short interactive ops):
-
-- `git add`/`commit`/`mv`/`rm`/`checkout`/`push`/`fetch`/`reset`/`stash`/
-  `tag`/`merge`/`remote`/`submodule`/etc. (mutation subcommands only)
-- `mkdir`, `chmod`, `chown`, `mv`, `rm`, `cp`, `touch`, `ln`
-- `fish_indent --write`, `shfmt -w`
-- `yarn install`/`add`/`remove`/`dlx`, `brew install`/`upgrade`,
-  `mise install`/`upgrade`
-- `cd`, `pwd`, `whoami`, `date`, `echo`, `printf`, `export`, `source`
-
-`bash-routing.md` carries the full rationale and the one-off `BASH_OK`
-escape hatch for the "user named it in this turn" case.
+`.claude/rules/bash-routing.md` holds the single copy of the deny list, the
+four narrow cases where `Bash` is acceptable, and the `BASH_OK` escape
+hatch. It is kept in sync with `.claude/hooks/pre-bash-route.sh`, the
+`PreToolUse` hook that enforces it. Do not restate that list here — a second
+copy drifts.
 
 ### Read for analysis
 
@@ -82,16 +55,9 @@ in context). Reading to **analyze, explore, or summarize** → use
 `ctx_execute_file(path, language, code)` instead. Only your printed
 summary enters context.
 
-Full Read-vs-sandbox routing rules live in
-`.claude/rules/read-routing.md`, including the three narrow cases
-where Read remains correct, the forbidden patterns, and the cost
-model. That file is to Read what `bash-routing.md` is to Bash.
-
-### Grep with large results
-
-Grep results can flood context. Use
-`ctx_execute(language: "shell", code: "grep ...")` to run searches in
-the sandbox. Only your printed summary enters context.
+`.claude/rules/read-routing.md` carries the three narrow cases where Read
+remains correct, the forbidden patterns, and the cost model. That file is to
+Read what `bash-routing.md` is to Bash.
 
 ## Tool selection hierarchy
 

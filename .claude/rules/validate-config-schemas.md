@@ -41,16 +41,12 @@ committing.
 | `install.conf.yaml` (Dotbot)                   | `dotbot-validate` skill                | YAML + link targets      |
 | Generic YAML without a schema                  | `yamllint` (already in pre-commit)     | Syntax/style only        |
 
-`actionlint` and `yamllint` are not JSON-Schema validators; they
-catch grammar and formatting problems, and a misspelt key passes
-both unflagged. For schema-less files the `no-schema-guessing.md`
-rule is the only safety net.
-
 If `v8r` says "no schema found", the file is not schema-backed — run the
-project's existing syntax linter (yamllint, biome, ruff, …) to catch
-formatting errors. Key-name guessing is still strictly prohibited; see
-`no-schema-guessing.md` for what evidence is required before writing any
-key name into a schema-less file.
+project's existing syntax linter (yamllint, biome, ruff, …) for formatting
+errors, then follow `.claude/rules/no-schema-guessing.md`. That rule is the
+only safety net for schema-less files: it carries the evidence requirement
+for every key name and the reason a syntax linter never substitutes for a
+schema.
 
 ## When extrapolation is fine
 

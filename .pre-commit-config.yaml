@@ -32,9 +32,13 @@ repos:
         files: \.(js|ts|jsx|tsx|json)$
       - id: markdown-table-formatter
         name: Markdown Table Formatter
+        # Mirrors the exclusion in `yarn lint:md-table`. docs/audit/findings/
+        # is a tool-managed store: `findings.py index` rewrites INDEX.md with
+        # unaligned tables on every run, so linting it only creates churn.
         entry: markdown-table-formatter
         language: system
         types: [markdown]
+        exclude: ^docs/audit/findings/
       - id: markdownlint
         name: markdownlint
         # Mirrors `yarn lint:markdownlint` so a commit can't pass the hook

@@ -1,6 +1,5 @@
 ---
 description: "Shell command routing — ctx_batch_execute is the default tool for all commands producing output."
-alwaysApply: true
 ---
 
 # Bash routing — ctx_batch_execute is the default
@@ -18,14 +17,18 @@ If a shell command produces output you intend to read, use
 - `shellcheck`, `shfmt --diff`, `fish_indent --check` — every lint/format check.
 - `biome check`, `yamllint`, `actionlint`, `stylua --check` — every formatter check.
 - `ruff check`, `ruff format --check` — every Python check.
-- `pre-commit run`, `yarn lint`, `yarn lint:ec`, `yarn lint:sh` — every quality gate.
+- `pre-commit run`, `yarn lint`, `yarn test`, `yarn check` — every quality gate
+  (the prefix match covers `yarn lint:ec`, `yarn lint:sh`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
-- `git log`, `git diff`, `git diff --stat`, `git show`, `git status -s`
-  when output is more than 5 lines.
-- `ls`, `tree`, `cat`, `head`, `tail`, `wc -l` — anything reading file content
-  for analysis.
+- `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
+  `git status` is the one git reader the hook lets through, with or without
+  `-s`: it is a common one-line check.
+- `ls`, `tree`, `cat`, `head`, `tail`, `wc`, `less`, `more`, `awk`, `sed`,
+  `jq` — anything reading or transforming file content for analysis.
 - `which <tool>`, `<tool> --version` when probing more than one tool at once
   — batch the probes.
+- `bash -c '<denied command>'` and `sh`/`zsh`/`dash`/`ksh` wrappers, including
+  heredoc forms that hide a denied command inside an allowed one.
 
 Even when output is short, batch related commands together: one
 `ctx_batch_execute` call with five commands costs less than five `Bash`
@@ -38,7 +41,10 @@ Only these narrow cases:
 1. **Side-effect commands that produce no output you need to read:**
     `git add <file>`, `git commit -m '...'`, `git mv`, `git rm`,
     `git checkout <branch>`, `git push`, `mkdir -p <dir>`, `chmod`, `chown`.
-    The exit code is the signal; the stdout is irrelevant.
+    The exit code is the signal; the stdout is irrelevant. The hook's git
+    allowlist also passes plumbing queries (`rev-parse`, `ls-files`,
+    `cat-file`, `check-ignore`, `config`) — they answer one question rather
+    than producing a review.
 2. **In-place formatters with no output to capture:**
     `fish_indent --write <file>`, `shfmt -w <file>`.
 3. **Package installations that must stream output interactively:**

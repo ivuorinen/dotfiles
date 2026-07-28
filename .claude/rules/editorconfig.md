@@ -1,6 +1,5 @@
 ---
 description: "EditorConfig adherence is mandatory for every file edit in this repo."
-alwaysApply: true
 ---
 
 # EditorConfig adherence

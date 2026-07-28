@@ -1,6 +1,5 @@
 ---
 description: "Key-name guessing in schema-less or unvalidated config files is strictly prohibited."
-alwaysApply: true
 ---
 
 # No guessing without a schema

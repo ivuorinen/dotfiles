@@ -1,3 +1,7 @@
+---
+description: "Read routing — ctx_execute_file is the default for any read whose purpose is analysis."
+---
+
 # Read routing — ctx_execute_file is the default for analysis
 
 Every byte `Read` returns enters the conversation and stays there for

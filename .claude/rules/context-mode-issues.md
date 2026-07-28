@@ -1,6 +1,5 @@
 ---
 description: "Halt and notify the user on context-mode errors or missing MCP tools — never paper over it."
-alwaysApply: true
 ---
 
 # context-mode issue handling

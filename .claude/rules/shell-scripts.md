@@ -21,11 +21,10 @@ The shellcheck directive lets `shellcheck` lint sourced libraries
 that have no shebang. Without it the linter falls back to `sh` mode
 and flags valid bash constructs.
 
-Follow the shfmt settings in `.editorconfig`:
-2-space indent, `binary_next_line`, `switch_case_indent`,
-`space_redirects`, `function_next_line`. The `shell-validate` skill
-runs both shellcheck and shfmt after each Edit/Write.
+Follow the shfmt settings in `.editorconfig`; they are enumerated in
+`.claude/rules/editorconfig.md`. The `shell-validate` skill runs both
+shellcheck and shfmt after each Edit/Write.
 
-POSIX (`/bin/sh`) scripts are listed in
-`.claude/rules/posix-scripts.md`. Validate those with `sh -n`,
-not `bash -n`.
+POSIX (`/bin/sh`) scripts have their own validation rule — read
+`.claude/rules/posix-scripts.md` before checking one, and use the method it
+names.
