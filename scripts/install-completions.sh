@@ -139,13 +139,14 @@ if [[ -f "$DOTFILES/local/bin/dfm" ]]; then
   # only extracts #USAGE directives when the file looks like a script;
   # a file starting with #USAGE is parsed as raw KDL and rejected).
   dfm_spec_dir=$(mktemp -d)
+  trap 'rm -rf -- "$dfm_spec_dir"' EXIT
   dfm_spec="$dfm_spec_dir/dfm"
   {
     printf '#!/usr/bin/env bash\n'
     # `|| true`: under `set -e` a grep with no match exits 1 and would abort
     # the whole generator. A dfm-* with no #USAGE simply contributes nothing.
     grep '^#USAGE' "$DOTFILES/local/bin/dfm" || true
-    for section in install brew apt check dotfiles helpers docs scripts tests secrets cleanup; do
+    for section in install brew apt check dotfiles helpers docs scripts tests secrets ssh cleanup; do
       sub="$DOTFILES/local/bin/dfm-$section"
       [[ -f "$sub" ]] || continue
       grep '^#USAGE' "$sub" || true

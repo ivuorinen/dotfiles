@@ -125,7 +125,7 @@ invoked via a `~/.local/bin/dfm` symlink — dropping a new `dfm-<sub>`
 into `local/bin/` works immediately, before `./install` links it. Each
 section lives in its own executable:
 
-- `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,cleanup}`
+- `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,ssh,cleanup}`
   — one file per section, each carrying its own `#USAGE` subtree.
 - `local/bin/dfm-lib` — sourced (non-executable) shared library:
   the bootstrap family, `menu_builder`, `get_script_description`, and the
