@@ -30,13 +30,38 @@ STUB
   chmod +x "$TMP/bin/sudo"
 }
 
-# x-macos-updatedb is deliberately absent from this file: it invokes
-# /usr/libexec/locate.updatedb by absolute path, which PATH stubbing cannot
-# intercept, and running it for real would rebuild the locate database.
-
 teardown()
 {
   rm -rf "$TMP"
+}
+
+# x-macos-updatedb runs /usr/libexec/locate.updatedb, an absolute path no
+# PATH entry can shadow — but it runs it through sudo, and sudo is found on
+# PATH like anything else. Replacing the shared pass-through stub with one
+# that only records is enough to assert the call without the locate database
+# actually being rebuilt.
+record_only_sudo()
+{
+  cat > "$TMP/bin/sudo" << STUB
+#!/usr/bin/env bash
+printf 'sudo %s\n' "\$*" >> "$CALLS"
+STUB
+  chmod +x "$TMP/bin/sudo"
+}
+
+@test "x-macos-updatedb: rebuilds the locate database as root" {
+  record_only_sudo
+  run env PATH="$TMP/bin:$PATH" "$BIN/x-macos-updatedb"
+  [ "$status" -eq 0 ]
+  grep -q 'sudo /usr/libexec/locate.updatedb' "$CALLS"
+}
+
+@test "x-macos-updatedb: uses the macOS updatedb, not the GNU one" {
+  # Plain `updatedb` is the GNU tool and is not what macOS ships; on a Mac it
+  # is either missing or the wrong database.
+  record_only_sudo
+  run env PATH="$TMP/bin:$PATH" "$BIN/x-macos-updatedb"
+  run ! grep -qE 'sudo updatedb' "$CALLS"
 }
 
 @test "x-macos-flush: flushes the directory service cache" {
