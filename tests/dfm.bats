@@ -81,9 +81,13 @@ setup()
 }
 
 @test "dfm docs renders a doc file" {
+  # stdout is a pipe under `run`, so dfm docs emits plain text — the same
+  # path a user gets from `dfm docs folders | grep`. Previously this went
+  # through glow, which returns zero bytes while exiting 0 in some
+  # non-interactive environments, so the test passed from a terminal and
+  # failed from the pre-commit hook.
   run bash local/bin/dfm docs folders
   [ "$status" -eq 0 ]
-  # themed glow wraps words in ANSI spans, so match a single word
   [[ "$output" == *"Interesting"* ]]
 }
 

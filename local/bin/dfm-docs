@@ -48,8 +48,14 @@ dfm_docs()
     return 1
   fi
 
+  # Plain text when stdout is not a terminal: `dfm docs x | grep`, a hook or
+  # a script wants the content, not ANSI. glow additionally emits zero bytes
+  # while still exiting 0 in some non-interactive environments, which made
+  # piped output silently empty.
+  if [[ ! -t 1 ]]; then
+    cat "$path"
   # x-glow applies the terminal-palette style so glow follows the theme
-  if command -v glow > /dev/null 2>&1; then
+  elif command -v glow > /dev/null 2>&1; then
     "$_dfm_dir/x-glow" "$path"
   elif command -v bat > /dev/null 2>&1; then
     bat "$path"

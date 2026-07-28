@@ -136,3 +136,15 @@ repos:
         language: system
         files: ^(scripts/.*\.sh|local/bin/[^/]+)$
         exclude: \.(py|pl|php)$
+      - id: bats
+        name: Bats test suite
+        # ~30s, so it is scoped to paths whose behaviour the suite asserts —
+        # a docs-only or workflow-only commit skips it. The whole suite runs
+        # rather than the test file matching the edited script: removing the
+        # python-libs step from local/bin/dfm-install broke tests/dfm.bats,
+        # a pairing no filename mapping would have found.
+        # See .claude/rules/run-tests-before-commit.md.
+        entry: bats --print-output-on-failure tests/
+        language: system
+        pass_filenames: false
+        files: ^(tests/|local/bin/|scripts/|base/|config/(theme/|shared\.sh|lib\.sh|exports|alias))
