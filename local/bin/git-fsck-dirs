@@ -57,7 +57,20 @@ fsck_repo()
 
   echo "$dir" >> "$collected_repos"
 
-  if ! git -C "$dir" fsck --no-dangling --full --no-progress 2>&1 | grep -vE '^notice:'; then
+  # The verdict is git's exit status, not grep's. Piping fsck into
+  # `grep -v '^notice:'` and testing that pipeline reports the exit code of
+  # grep, which is 1 whenever it prints nothing — exactly what a clean fsck
+  # produces. Every healthy repository was therefore recorded as broken.
+  # grep now only filters what is shown.
+  # `|| fsck_status=$?` rather than a bare assignment: under set -e a failing
+  # command substitution aborts the script, which would skip the summary for
+  # exactly the repositories this tool exists to report.
+  local fsck_output fsck_status=0
+  fsck_output="$(git -C "$dir" fsck --no-dangling --full --no-progress 2>&1)" || fsck_status=$?
+
+  printf '%s\n' "$fsck_output" | grep -vE '^notice:' || true
+
+  if [ "$fsck_status" -ne 0 ]; then
     echo "$dir" >> "$collected_errors"
     msg "  (!) Issues found in: $dir"
   fi
@@ -71,6 +84,13 @@ main()
   starting_path=${1:-$(pwd)}
   errors_file="${2:-/tmp/git-fsck-errors.txt}"
   repo_count_file="${3:-/tmp/git-fsck-repo-count.txt}"
+
+  # Start both files empty. They were only ever created by appending, so a
+  # run that found no repository left repo_count_file absent and the
+  # `wc -l <` below aborted under set -e — no summary, bare exit 1. Starting
+  # fresh also stops a previous run's results leaking into this one's counts.
+  : > "$errors_file"
+  : > "$repo_count_file"
 
   # If starting_point=. or starting_point=.., set it to the current directory
   if [ "$starting_path" = "." ]; then
