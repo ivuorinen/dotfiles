@@ -1,0 +1,26 @@
+# Python libraries installed into every Python that mise installs.
+#
+# mise reads this after each `mise install python@...`, so a version bump no
+# longer orphans these the way `uv pip install --system` did — that was the
+# cause of x-compare-versions.py breaking whenever python moved.
+#
+# One package per line. Comments and blank lines are ignored.
+# Location is set by python.default_packages_file in config.toml.
+#
+# Tools (executables) do NOT belong here — those are mise tools in
+# config.toml. This file is only for libraries something needs to *import*.
+
+# Required by tmux tooling.
+libtmux
+
+# Neovim's python3 provider. base/../config/nvim/init.lua pins
+# g:python3_host_prog at the mise shim so the provider always resolves to the
+# interpreter holding this package.
+pynvim
+
+# Version parsing for local/bin/x-compare-versions.py.
+packaging
+
+# Present on this machine and kept so a rebuild matches, but no consumer was
+# found in the repo — drop it if nothing turns out to need it.
+PyYAML

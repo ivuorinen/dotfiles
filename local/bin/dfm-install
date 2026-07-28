@@ -14,7 +14,6 @@
 #USAGE     flag "--dry-run" help="Show what would be removed without removing"
 #USAGE   }
 #USAGE   cmd "ntfy" help="Install ntfy notification tool"
-#USAGE   cmd "python-libs" help="Install Python libraries (libtmux, pynvim)"
 #USAGE   cmd "shellspec" help="Install shellspec testing framework"
 #USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
 #USAGE   cmd "z" help="Install z directory jumper"
@@ -87,7 +86,6 @@ dfm_install()
     "mise:Install tools via mise (runtimes + CLI tools)"
     "mise-cleanup:Remove old version manager installations (--dry-run supported)"
     "ntfy:Install ntfy notification tool"
-    "python-libs:Install Python libraries (libtmux, pynvim)"
     "shellspec:Install shellspec testing framework"
     "xcode-cli-tools:Install Xcode CLI tools (macOS)"
     "z:Install z"
@@ -113,9 +111,10 @@ dfm_install()
       # mise is the lynchpin: a failed *tool* (e.g. a host-unsupported dotnet
       # tool) no longer aborts the run — the mise step stays usable and the
       # steps below simply skip themselves if mise is genuinely absent.
+      # Python libraries are not a step: mise installs them into every python
+      # it installs, from config/mise/default-python-packages.
       run_step "mise" dfm_install mise
       run_step "composer" dfm_install composer
-      require_bin "python libraries" mise && run_step "python libraries" dfm_install python-libs
 
       # Tier 3: Tool-dependent installers
       run_step "cheat databases" dfm_install cheat-databases
@@ -271,12 +270,6 @@ dfm_install()
       msgr run "Installing ntfy via mise..."
       mise install "github:binwiederhier/ntfy" \
         && msgr yay "ntfy installed!"
-      ;;
-
-    python-libs)
-      msgr run "Installing Python libraries..."
-      bash "$DOTFILES/scripts/install-python-packages.sh" \
-        && msgr yay "Python libraries installed!"
       ;;
 
     xcode-cli-tools)

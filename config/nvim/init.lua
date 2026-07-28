@@ -16,6 +16,13 @@ end
 _path_prepend(vim.env.HOME .. '/.local/bin')
 _path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
 
+-- ── Python 3 provider ───────────────────────────────────────────────
+-- Pin the interpreter instead of letting nvim search the environment on
+-- every start. The shim (not an installs/<version>/ path) keeps this valid
+-- across python upgrades; pynvim is kept in that interpreter by
+-- config/mise/default-python-packages.
+vim.g.python3_host_prog = vim.env.HOME .. '/.local/share/mise/shims/python3'
+
 -- nvim 0.12+ niceness (private API — pcall so a future rename doesn't break startup)
 pcall(function() require('vim._core.ui2').enable {} end)
 
