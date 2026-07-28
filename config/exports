@@ -627,11 +627,20 @@ if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ]; then source "$XDG_CONFIG_HOME/
 # shellcheck source=../hosts/lakka/config/exports-lakka-secret
 if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"; fi
 
-# Source secret environment variables from secrets.d directory
+# Source secret environment variables from secrets.d directory.
+#
+# Deliberately not a glob: zsh treats an unmatched glob as a fatal error
+# ("no matches found") where bash passes the pattern through harmlessly, so
+# a secrets.d that exists but holds no *.sh printed an error on every zsh
+# start. find yields nothing instead. The loop body still runs in the
+# current shell, so `source` lands in the caller's environment.
 if [ -d "$DOTFILES/config/secrets.d" ]; then
-  for _secret_file in "$DOTFILES/config/secrets.d"/*.sh; do
+  while IFS= read -r _secret_file; do
+    [ -n "$_secret_file" ] || continue
     # shellcheck source=/dev/null
     [ -f "$_secret_file" ] && source "$_secret_file"
-  done
+  done << EOF
+$(find "$DOTFILES/config/secrets.d" -maxdepth 1 -type f -name '*.sh' 2> /dev/null)
+EOF
   unset _secret_file
 fi
