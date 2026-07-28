@@ -44,6 +44,9 @@ jobs:
         run: corepack install
 
       - name: Install JavaScript dependencies
+        # Third-party postinstall scripts stay off (sonar githubactions:S6505).
+        env:
+          YARN_ENABLE_SCRIPTS: false
         run: yarn install --immutable
 
       - name: Install shellcheck and shfmt
@@ -55,7 +58,10 @@ jobs:
         run: |
           # renovate: datasource=github-releases depName=JohnnyMorganz/StyLua
           STYLUA_VERSION="2.4.1"
-          curl -sSL "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip" \
+          # -L follows redirects, so pin both the initial protocol and the
+          # redirect target to https (sonar githubactions:S6506).
+          curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip" \
             -o /tmp/stylua.zip
           unzip -q /tmp/stylua.zip -d /tmp/stylua/
           sudo install -m 0755 /tmp/stylua/stylua /usr/local/bin/stylua
@@ -66,7 +72,8 @@ jobs:
           python-version: "3.x"
 
       - name: Install pre-commit
-        run: pip install pre-commit==4.2.0
+        # See the note in pre-commit-autoupdate.yml (sonar githubactions:S8541).
+        run: "pip install --only-binary=:all: pre-commit==4.2.0"
 
       - name: Install pre-commit hooks
         run: |

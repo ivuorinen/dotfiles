@@ -31,7 +31,10 @@ jobs:
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
 
-      - run: pip install pre-commit==4.2.0 && pre-commit autoupdate
+      # --only-binary=:all: refuses sdists, so no package's setup.py runs
+      # during install (sonar githubactions:S8541). Quoted because the
+      # ":all: " colon-space would otherwise read as a YAML mapping.
+      - run: "pip install --only-binary=:all: pre-commit==4.2.0 && pre-commit autoupdate"
 
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:

@@ -73,7 +73,10 @@ fetch_release_json()
   if command -v gh > /dev/null 2>&1; then
     gh api "$endpoint" 2> /dev/null
   else
-    curl -fsSL "https://api.github.com/${endpoint}" 2> /dev/null
+    # -L follows redirects, so pin the protocol on both the initial request
+    # and any redirect target (sonar shell:S6506).
+    curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
+      "https://api.github.com/${endpoint}" 2> /dev/null
   fi
 }
 
