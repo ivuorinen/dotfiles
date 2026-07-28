@@ -108,10 +108,12 @@ function list_php_versions()
       version_label="${formula#php@}"
     fi
 
-    # Find the actual version from the directory structure
+    # Find the actual version from the directory structure. A formula
+    # directory with no version inside it (a failed install) makes grep
+    # exit 1, which under `set -e` would abort the whole listing.
     local version_dir
     version_dir=$(find "$path" -maxdepth 1 -type d \
-      | grep -v "^$path$" | sort -V | tail -1)
+      | grep -v "^$path$" | sort -V | tail -1) || version_dir=""
 
     if [[ -n $version_dir && -d "$version_dir/bin" ]]; then
       local full_version
@@ -230,16 +232,25 @@ function check_formula_installed()
 function unlink_current_php()
 {
   local current_formula=""
+  # The loop variable is deliberately not named `formula`: bash scoping is
+  # dynamic, so an undeclared `formula` here would assign to the caller's
+  # local of that name — switch_php_version's target — and the switch would
+  # relink the version it had just unlinked.
+  local candidate
 
   # Find formulas more safely
-  while IFS= read -r formula; do
-    if [[ -n $formula ]]; then
+  while IFS= read -r candidate; do
+    if [[ -n $candidate ]]; then
+      # An unlinked formula produces no match, so grep exits 1. Without
+      # tolerating that, `set -e` aborts the switch on the first unlinked
+      # formula the scan passes — and brew lists them alphabetically, so
+      # that is nearly always before the linked one.
       local linked
-      linked=$(brew info --json=v1 "$formula" \
+      linked=$(brew info --json=v1 "$candidate" \
         | grep -o '"linked_keg":"[^"]*"' \
-        | grep -v ':"null"')
+        | grep -v ':"null"') || linked=""
       if [[ -n $linked ]]; then
-        current_formula="$formula"
+        current_formula="$candidate"
         break
       fi
     fi
