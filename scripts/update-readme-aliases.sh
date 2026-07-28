@@ -30,9 +30,10 @@ declare -A bz fish
 # without double-escaping a pipe the source already escaped (grep BRE `\|`).
 emit_alias()
 {
+  local name="$1"
   local cmd="${2//|/\\|}"
   cmd="${cmd//\\\\|/\\|}"
-  printf '%s\t%s\n' "$1" "$cmd"
+  printf '%s\t%s\n' "$name" "$cmd"
 }
 
 # Emit "name<TAB>command" for every alias, fish abbreviation and fish function
@@ -56,6 +57,7 @@ collect()
       case $cmd in # strip surrounding quotes from the expansion
         \'*\') cmd="${cmd#\'}" cmd="${cmd%\'}" ;;
         \"*\") cmd="${cmd#\"}" cmd="${cmd%\"}" ;;
+        *) ;; # unquoted expansion — nothing to strip
       esac
       emit_alias "$name" "$cmd"
     elif [[ $line =~ ^function\ ([^ ]+) ]]; then

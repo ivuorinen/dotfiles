@@ -17,15 +17,15 @@ model=${model% (1M context)}
 # → -f fails → badge stays empty.
 badge=""
 for ponytail_script in "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/ponytail/ponytail/*/hooks/ponytail-statusline.sh; do
-  [ -f "$ponytail_script" ] && badge=$(bash "$ponytail_script" 2> /dev/null)
+  [[ -f "$ponytail_script" ]] && badge=$(bash "$ponytail_script" 2> /dev/null)
 done
 
 # Directory — mirrors starship's [directory] truncation_length = 3.
 dir_display=$(cd "$cwd" 2> /dev/null && pwd || printf '%s' "$cwd")
 dir_display="${dir_display/#$HOME/\~}"
 IFS='/' read -ra parts <<< "$dir_display"
-[ -z "${parts[0]:-}" ] && parts=("${parts[@]:1}")
-if [ "${#parts[@]}" -gt 3 ]; then
+[[ -z "${parts[0]:-}" ]] && parts=("${parts[@]:1}")
+if [[ "${#parts[@]}" -gt 3 ]]; then
   last3=("${parts[@]: -3}")
   dir_display=$(
     IFS=/
@@ -53,20 +53,20 @@ read -r cw_size cw_used < <(
 )
 ctx_seg=""
 ctx_col=""
-if [ "${cw_size:-0}" -gt 0 ]; then
+if [[ "${cw_size:-0}" -gt 0 ]]; then
   pct=$((cw_used * 100 / cw_size))
   ncells=8
   filled=$(((pct * ncells + 50) / 100))
-  [ "$filled" -gt "$ncells" ] && filled=$ncells
-  [ "$filled" -lt 0 ] && filled=0
+  [[ "$filled" -gt "$ncells" ]] && filled=$ncells
+  [[ "$filled" -lt 0 ]] && filled=0
   bar=""
   for ((i = 0; i < ncells; i++)); do
-    if [ "$i" -lt "$filled" ]; then bar="${bar}█"; else bar="${bar}░"; fi
+    if [[ "$i" -lt "$filled" ]]; then bar="${bar}█"; else bar="${bar}░"; fi
   done
   # Green until it matters, yellow as it fills, red in the ≥95% danger zone.
-  if [ "$pct" -ge 95 ]; then
+  if [[ "$pct" -ge 95 ]]; then
     ctx_col=$red
-  elif [ "$pct" -ge 75 ]; then
+  elif [[ "$pct" -ge 75 ]]; then
     ctx_col=$yellow
   else
     ctx_col=$green
@@ -75,8 +75,8 @@ if [ "${cw_size:-0}" -gt 0 ]; then
 fi
 
 out="${badge:+$badge }${model}"
-[ -n "$ctx_seg" ] && out="$out ${ctx_seg}"
+[[ -n "$ctx_seg" ]] && out="$out ${ctx_seg}"
 out="$out ${sky}${dir_display}${reset}"
-[ -n "$branch" ] && out="$out ${green} ${branch}${reset}"
+[[ -n "$branch" ]] && out="$out ${green} ${branch}${reset}"
 
 printf '%s\n' "$out"

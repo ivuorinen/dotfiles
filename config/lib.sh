@@ -296,7 +296,7 @@ lib::strict()
 # signal. `rm -rf "$XDG_CACHE_HOME/shell-init"` forces a rebuild.
 lib::init_cached()
 {
-  [ "$#" -ge 2 ] || return "${LIB_E_INVALID_ARGUMENT:-2}"
+  [[ "$#" -ge 2 ]] || return "${LIB_E_INVALID_ARGUMENT:-2}"
   local bin="$1"
   shift
 
@@ -304,32 +304,32 @@ lib::init_cached()
   # scalar assignment to it makes this function fail outright.
   local resolved
   resolved="$(command -v "$bin" 2> /dev/null)" || return 1
-  [ -n "$resolved" ] || return 1
+  [[ -n "$resolved" ]] || return 1
 
   local shell=bash
-  [ -n "${ZSH_VERSION:-}" ] && shell=zsh
+  [[ -n "${ZSH_VERSION:-}" ]] && shell=zsh
 
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}/shell-init"
   local cache="$dir/${bin}${resolved//\//_}.$shell"
 
   local stale=0 stamp
-  [ -s "$cache" ] || stale=1
+  [[ -s "$cache" ]] || stale=1
   for stamp in \
     "$resolved" \
     "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml" \
     "${DOTFILES:-$HOME/.dotfiles}/.mise.toml"; do
-    [ -e "$stamp" ] && [ "$stamp" -nt "$cache" ] && stale=1
+    [[ -e "$stamp" ]] && [[ "$stamp" -nt "$cache" ]] && stale=1
   done
 
-  if [ "$stale" -eq 1 ]; then
+  if [[ "$stale" -eq 1 ]]; then
     local tmp="$dir/.$bin.$$.tmp"
     if mkdir -p "$dir" 2> /dev/null \
-      && "$@" > "$tmp" 2> /dev/null && [ -s "$tmp" ]; then
+      && "$@" > "$tmp" 2> /dev/null && [[ -s "$tmp" ]]; then
       mv -f "$tmp" "$cache"
       # Drop caches left by older builds of the same tool.
       local old
       for old in "$dir/${bin}"*".$shell"; do
-        [ "$old" = "$cache" ] || rm -f "$old"
+        [[ "$old" = "$cache" ]] || rm -f "$old"
       done
     else
       # Never let a cache problem cost the user the integration itself.
