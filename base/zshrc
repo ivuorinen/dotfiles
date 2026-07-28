@@ -34,13 +34,21 @@ source_fzf_config()
 }
 
 source_fzf_config
-x-have antidot && eval "$(antidot init --shell zsh)"
+# Cached via lib::init_cached for the same reason as in base/bashrc: these
+# resolve through mise shims, and a shim call costs ~80ms against ~2ms for
+# the real binary. zprof does not show this — it profiles functions, not
+# top-level evals.
+x-have antidot && lib::init_cached antidot antidot init --shell zsh
 
 # Add usage-generated completions to fpath
 fpath=("${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions.d" $fpath)
 
-autoload -Uz compinit bashcompinit
-compinit -d "$ZSH_COMPDUMP"
+# compinit itself is owned by the ez-compinit plugin (loaded through
+# antidote above), which honours $ZSH_COMPDUMP and so uses the same dumpfile
+# set at the top of this file. Calling compinit again here ran it twice on
+# every start — 37ms of compinit plus 17ms of compaudit, for nothing.
+# bashcompinit still has to be requested explicitly.
+autoload -Uz bashcompinit
 bashcompinit
 
 # Starship prompt — colours flip via ~/.config/starship.toml symlink swap
@@ -48,11 +56,18 @@ bashcompinit
 # `enable_transience` collapses prior prompts to just the character symbol
 # so scrollback stays clean (matches tide --transient=Yes).
 if command -v starship > /dev/null 2>&1; then
-  eval "$(starship init zsh)"
+  lib::init_cached starship starship init zsh
   function starship_transient_prompt_func() {
     starship module character
   }
-  enable_transience
+  # starship's zsh init does not define enable_transience (checked against
+  # 1.26.0: absent from both `starship init zsh` and --print-full-init),
+  # unlike the fish init, which does. Calling it unguarded printed
+  # "command not found: enable_transience" on every zsh start. The guard
+  # keeps the intent for a future starship that ships it.
+  (( $+functions[enable_transience] )) && enable_transience
 fi
 
-if command -v wt > /dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+if command -v wt > /dev/null 2>&1; then
+  lib::init_cached wt command wt config shell init zsh
+fi

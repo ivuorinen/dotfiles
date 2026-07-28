@@ -22,14 +22,18 @@ unset f
 # Import ssh keys in keychain (macOS-specific -A flag, silently fails on Linux)
 ssh-add -A 2>/dev/null
 
-x-have antidot && {
-  eval "$(antidot init --shell bash)"
-}
+# These three go through lib::init_cached (config/lib.sh): by this point
+# PATH leads with the mise shims, and each shim call re-enters mise to
+# resolve a version — `starship init bash` costs ~200ms through the shim
+# against ~8ms to source its cached output.
+x-have antidot && lib::init_cached antidot antidot init --shell bash
 
 PROMPT_DIRTRIM=3
 
 # Starship prompt — colours flip via ~/.config/starship.toml symlink swap
 # managed by the theme orchestrator (config/theme/handlers.d/starship).
-command -v starship > /dev/null 2>&1 && eval "$(starship init bash)"
+command -v starship > /dev/null 2>&1 && lib::init_cached starship starship init bash
 
-if command -v wt > /dev/null 2>&1; then eval "$(command wt config shell init bash)"; fi
+if command -v wt > /dev/null 2>&1; then
+  lib::init_cached wt command wt config shell init bash
+fi

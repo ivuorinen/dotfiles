@@ -22,8 +22,16 @@ DEBUG="${DEBUG:-0}"
 # Enable debugging with DEBUG=1
 [[ "${DEBUG:-0}" -eq 1 ]] && set -x
 
-# Detect the current shell
-CURRENT_SHELL=$(ps -p $$ -ocomm= | awk -F/ '{print $NF}')
+# Detect the current shell. The shell tells us directly; `ps -p $$ -ocomm= |
+# awk` cost 22ms in two subprocesses on every start, and reported "-bash" for
+# a login shell, which matched none of the case arms below.
+if [ -n "${BASH_VERSION:-}" ]; then
+  CURRENT_SHELL=bash
+elif [ -n "${ZSH_VERSION:-}" ]; then
+  CURRENT_SHELL=zsh
+else
+  CURRENT_SHELL=$(ps -p $$ -ocomm= | awk -F/ '{sub(/^-/, "", $NF); print $NF}')
+fi
 
 # Function to prepend a path to PATH based on the shell
 x-path-prepend()

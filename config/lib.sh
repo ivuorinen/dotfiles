@@ -274,3 +274,71 @@ lib::strict()
   trap 'lib::error::handle "${LINENO}" "${BASH_COMMAND-?}"' ERR
   return 0
 }
+
+# ╭──────────────────────────────────────────────────────────╮
+# │ Cached tool init                                         │
+# ╰──────────────────────────────────────────────────────────╯
+# Source a tool's shell-init script from a cache instead of running the
+# tool. `eval "$(starship init bash)"` costs ~200ms at rc time because
+# PATH leads with the mise shims by then, and every shim call re-enters
+# mise to resolve a version: the same binary is 80ms through its shim and
+# 2ms direct. Sourcing the cached output is ~8ms and spawns nothing.
+#
+# Usage: lib::init_cached <binary> <command to generate init script...>
+#   lib::init_cached starship starship init bash
+#   lib::init_cached wt command wt config shell init bash
+#
+# The cache is keyed on the resolved path and stamped against the mise
+# configs, because these tools resolve through shims — symlinks to the
+# mise binary that are created once and never touched on a tool upgrade,
+# so the path's own mtime never moves. Versions are pinned in the mise
+# configs and changed by editing them, so those files are the reliable
+# signal. `rm -rf "$XDG_CACHE_HOME/shell-init"` forces a rebuild.
+lib::init_cached()
+{
+  [ "$#" -ge 2 ] || return "${LIB_E_INVALID_ARGUMENT:-2}"
+  local bin="$1"
+  shift
+
+  # NOT `path`: in zsh that name is a special array tied to $PATH, and a
+  # scalar assignment to it makes this function fail outright.
+  local resolved
+  resolved="$(command -v "$bin" 2> /dev/null)" || return 1
+  [ -n "$resolved" ] || return 1
+
+  local shell=bash
+  [ -n "${ZSH_VERSION:-}" ] && shell=zsh
+
+  local dir="${XDG_CACHE_HOME:-$HOME/.cache}/shell-init"
+  local cache="$dir/${bin}${resolved//\//_}.$shell"
+
+  local stale=0 stamp
+  [ -s "$cache" ] || stale=1
+  for stamp in \
+    "$resolved" \
+    "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml" \
+    "${DOTFILES:-$HOME/.dotfiles}/.mise.toml"; do
+    [ -e "$stamp" ] && [ "$stamp" -nt "$cache" ] && stale=1
+  done
+
+  if [ "$stale" -eq 1 ]; then
+    local tmp="$dir/.$bin.$$.tmp"
+    if mkdir -p "$dir" 2> /dev/null \
+      && "$@" > "$tmp" 2> /dev/null && [ -s "$tmp" ]; then
+      mv -f "$tmp" "$cache"
+      # Drop caches left by older builds of the same tool.
+      local old
+      for old in "$dir/${bin}"*".$shell"; do
+        [ "$old" = "$cache" ] || rm -f "$old"
+      done
+    else
+      # Never let a cache problem cost the user the integration itself.
+      rm -f "$tmp"
+      eval "$("$@")"
+      return 0
+    fi
+  fi
+
+  # shellcheck source=/dev/null
+  . "$cache"
+}

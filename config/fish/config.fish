@@ -19,14 +19,17 @@ test -e "$HOME/.config/fish/exports.fish" &&
 if status is-interactive
     # Commands to run in interactive shell
 
-    type -q tv; and tv init fish | source
+    # Tool init scripts are sourced through __init_cached: `<tool> init fish
+    # | source` costs 58-117ms each in fish, against 2-4ms to source the same
+    # text from a cache keyed on the tool's resolved path.
+    type -q tv; and __init_cached tv tv init fish
 
     # 1Password plugins if op command is available
     type -q op; and test -e "$HOME/.config/op/plugins.sh" &&
         source "$HOME/.config/op/plugins.sh"
 
     # mise version manager
-    type -q mise; and mise activate fish | source
+    type -q mise; and __init_cached mise mise activate fish
     # `mise activate` prepends installs/*/bin to PATH (via hook-env), which
     # would shadow the shims dir added in exports.fish. Move the shims back
     # in front so lookups hit the shim (re-resolves the version) rather than
@@ -38,7 +41,9 @@ if status is-interactive
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship
-        starship init fish | source
+        # `starship init fish` is only a wrapper that sources
+        # --print-full-init, so cache the full init directly.
+        __init_cached starship starship init fish --print-full-init
         function starship_transient_prompt_func
             starship module character
         end
@@ -46,7 +51,7 @@ if status is-interactive
     end
 
     # Initialize other tools if available
-    type -q zoxide; and zoxide init fish | source
+    type -q zoxide; and __init_cached zoxide zoxide init fish
 
     # Seed zoxide with project dirs in the background so sesh/gum finds them
     type -q zoxide; and type -q fd; and functions -q zoxide-seed; and zoxide-seed &
