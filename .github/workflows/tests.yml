@@ -32,18 +32,27 @@ jobs:
 
       - name: Install bats and fish (Linux)
         if: runner.os == 'Linux'
+        # python3-packaging: x-compare-versions.py imports it. Locally mise
+        # installs it from config/mise/default-python-packages; this job has
+        # no mise, so it has to come from the package manager.
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats fish
+          sudo apt-get install -y bats fish python3-packaging
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'
         # bash: the runner's /bin/bash is 3.2 and dfm's full bootstrap
         # requires 4+; coreutils: gtimeout for the theme actor's 5s kill
-        run: brew install bats-core fish bash coreutils
+        run: |
+          brew install bats-core fish bash coreutils
+          python3 -m pip install --break-system-packages packaging \
+            || python3 -m pip install packaging
 
       - name: Run test suite
-        run: bats tests/
+        # --print-output-on-failure matches the pre-commit hook. Without it a
+        # failing assertion is all the log shows, and the script's own output
+        # — the part that says why — is thrown away.
+        run: bats --print-output-on-failure tests/
 
   lint:
     name: Lint (yarn lint)

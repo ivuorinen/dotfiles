@@ -36,8 +36,22 @@ teardown()
   [ "$status" -eq 1 ]
 }
 
+@test "x-apply-uhk-layout: works without msgr installed on PATH" {
+  # The DOTFILES tree is the only place msgr has to be. Calling a bare `msgr`
+  # would need the install symlink on PATH, which defeats the fallback the
+  # script does for exactly that case — and is why this failed on CI, where
+  # nothing is installed, while passing on a machine that has run ./install.
+  for tool in bash env dirname; do
+    ln -sf "$(command -v "$tool")" "$TMP/bin/$tool"
+  done
+  run env PATH="$TMP/bin" DOTFILES="$TMP/dotfiles" "$UHK"
+  [ "$status" -eq 1 ]
+  [[ "$output" != *"command not found"* ]]
+}
+
 @test "x-apply-uhk-layout: names the missing rule file" {
   run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" bash -c "'$UHK' 2>&1"
+  [ "$status" -eq 1 ]
   [[ "$output" == *"hwdb rule not found"* ]]
   [[ "$output" == *"90-uhk-iso-key.hwdb"* ]]
 }

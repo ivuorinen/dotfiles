@@ -12,7 +12,10 @@ bats_require_minimum_version 1.5.0
 setup()
 {
   PS="$BATS_TEST_DIRNAME/../local/bin/php-switcher"
-  TMP="$(mktemp -d)"
+  # -P: on macOS mktemp hands back a path under /tmp, which is a symlink to
+  # /private/tmp. The script compares `readlink -f` of the php on PATH against
+  # the Cellar path it built, and only the resolved form matches.
+  TMP="$(cd "$(mktemp -d)" && pwd -P)"
   CELLAR="$TMP/cellar"
   CALLS="$TMP/calls"
   mkdir -p "$TMP/bin" "$TMP/work"

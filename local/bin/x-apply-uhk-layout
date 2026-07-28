@@ -8,6 +8,9 @@ DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 # directory so a bare checkout (no install) still works
 MSGR="${DOTFILES}/local/bin/msgr"
 [[ -r "$MSGR" ]] || MSGR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/msgr"
+# Every message below goes through "$MSGR", not a bare `msgr`: the fallback
+# above exists so a bare checkout works, and a bare `msgr` would undo it by
+# requiring the install symlink on PATH.
 # msgr uses unguarded variables ($ZSH_VERSION, $1) — disable nounset
 set +u
 # shellcheck source=msgr
@@ -18,23 +21,23 @@ HWDB_SRC="${DOTFILES}/config/udev/90-uhk-iso-key.hwdb"
 HWDB_DST="/etc/udev/hwdb.d/90-uhk-iso-key.hwdb"
 
 if [[ ! -f "$HWDB_SRC" ]]; then
-  msgr err "hwdb rule not found: ${HWDB_SRC}"
+  "$MSGR" err "hwdb rule not found: ${HWDB_SRC}"
   exit 1
 fi
 
-msgr msg "Installing hwdb rule to ${HWDB_DST}"
+"$MSGR" msg "Installing hwdb rule to ${HWDB_DST}"
 sudo cp -- "$HWDB_SRC" "$HWDB_DST"
 
-msgr msg "Rebuilding hwdb database"
+"$MSGR" msg "Rebuilding hwdb database"
 sudo systemd-hwdb update
 
-msgr msg "Triggering udev to apply remap"
+"$MSGR" msg "Triggering udev to apply remap"
 sudo udevadm trigger --subsystem-match=input
 
 # One-time: restore COSMIC xkb_config if it has the crashed layout
 COSMIC_CFG="$HOME/.config/cosmic/com.system76.CosmicComp/v1/xkb_config"
 if [[ -f "$COSMIC_CFG" ]] && grep -q 'layout: "mac-fi-uhk"' "$COSMIC_CFG"; then
-  msgr msg "Restoring COSMIC keyboard config to fi/mac"
+  "$MSGR" msg "Restoring COSMIC keyboard config to fi/mac"
 
   # One awk pass extracts all three fields (| never appears in xkb options)
   IFS='|' read -r options repeat_delay repeat_rate < <(awk -F'"' '
@@ -63,8 +66,8 @@ if [[ -f "$COSMIC_CFG" ]] && grep -q 'layout: "mac-fi-uhk"' "$COSMIC_CFG"; then
 )
 EOF
   mv -- "$tmp" "$COSMIC_CFG"
-  msgr yay "COSMIC config restored to fi/mac"
+  "$MSGR" yay "COSMIC config restored to fi/mac"
 fi
 
-msgr yay "UHK 60 v2 ISO key remap installed"
-msgr msg "The key should work immediately. If not, unplug and replug the UHK."
+"$MSGR" yay "UHK 60 v2 ISO key remap installed"
+"$MSGR" msg "The key should work immediately. If not, unplug and replug the UHK."
