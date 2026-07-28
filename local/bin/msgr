@@ -212,16 +212,19 @@ function msg_ok()
   echo -e "$(__log_marker_ok) $1"
 }
 
-# Print a warning message
+# Print a warning message.
+# Diagnostics go to stderr so a caller whose stdout is data — `x-env-list >
+# vars.txt`, any $(...) capture — keeps them separate. Matches logger::warn
+# in config/lib.sh.
 function msg_warn()
 {
-  echo -e "$(__log_marker_warn) $1"
+  echo -e "$(__log_marker_warn) $1" >&2
 }
 
-# Print an error message
+# Print an error message. On stderr, for the same reason as msg_warn.
 function msg_err()
 {
-  echo -e "$(__log_marker_err) $1"
+  echo -e "$(__log_marker_err) $1" >&2
 }
 
 # Create a prompt which you have to answer y/n to continue
