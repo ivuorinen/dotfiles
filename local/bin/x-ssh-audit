@@ -308,7 +308,9 @@ parse_host_list()
     exit 1
   fi
 
-  host_count=$(wc -l < "$HOSTS_LIST_FILE")
+  # BSD wc right-pads its count, so the message reads "Loaded        2 hosts"
+  # on macOS. Trimmed the same way the key count in main() already is.
+  host_count=$(wc -l < "$HOSTS_LIST_FILE" | tr -d ' ')
   log_message "INFO" "Loaded $host_count hosts for auditing"
 }
 
@@ -715,7 +717,7 @@ display_summary()
   printf '==========================================%s\n' "$RESET"
   printf '\n'
 
-  total_hosts=$(wc -l < "$HOSTS_LIST_FILE")
+  total_hosts=$(wc -l < "$HOSTS_LIST_FILE" | tr -d ' ')
   successful_audits=0
   security_issues_found=0
   reboots_required=0

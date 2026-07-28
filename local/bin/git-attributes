@@ -156,7 +156,10 @@ check_git_root()
   local git_root
   git_root=$(git rev-parse --show-toplevel)
   local current_dir
-  current_dir=$(pwd)
+  # pwd -P: git reports the physical path, so the comparison has to use one
+  # too. On macOS /tmp and /var are symlinks, and a plain pwd there returns
+  # the logical path — the check then rejects the repository root itself.
+  current_dir=$(pwd -P)
 
   if [[ "$git_root" != "$current_dir" ]]; then
     msg_err "Not in git repository root directory"

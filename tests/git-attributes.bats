@@ -79,6 +79,18 @@ ga()
   [[ "$output" == *"$REPO"* ]]
 }
 
+@test "git-attributes: runs in a root reached through a symlink" {
+  # git reports the physical path while pwd reports the logical one, so
+  # comparing them rejected the root itself whenever the path crossed a
+  # symlink. That is every temporary directory on macOS, where /tmp and /var
+  # are symlinks — but it is reachable anywhere.
+  ln -s "$REPO" "$TMP/link"
+  cd "$TMP/link" || return 1
+  ga
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"Not in git repository root"* ]]
+}
+
 @test "git-attributes: refuses to run without a .gitattributes" {
   rm "$REPO/.gitattributes"
   ga
