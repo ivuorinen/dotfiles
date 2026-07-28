@@ -2,3 +2,15 @@
 node = "26.5.0"
 python = "3.14"
 go = "1.26.5"
+
+# The `yarn lint` toolchain. These are also pinned in config/mise/config.toml
+# (the global config, symlinked to ~/.config/mise/), which is what provides
+# them on a workstation. CI checks out the repo and never sees that file, so
+# the gate needs them here too — renovate tracks both copies.
+biome = "2.5.2"
+editorconfig-checker = "3.8.0"
+usage = "3.5.6"
+"npm:prettier" = "3.9.6"
+"npm:markdownlint-cli" = "0.49.1"
+"npm:markdown-table-formatter" = "1.7.0"
+"npm:v8r" = "6.1.0"
