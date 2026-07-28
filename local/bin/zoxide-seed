@@ -21,4 +21,9 @@ mapfile -t paths < <(
   fd --type d --max-depth 1 . "${HOME}" 2> /dev/null
 )
 
-[[ ${#paths[@]} -gt 0 ]] && zoxide add -- "${paths[@]}"
+# An `if` rather than `[[ ... ]] && ...`: as the final command, a false test
+# becomes the script's exit status, so a run with nothing to add reported
+# failure. This is spawned from shell init, where that is pure noise.
+if [[ ${#paths[@]} -gt 0 ]]; then
+  zoxide add -- "${paths[@]}"
+fi
