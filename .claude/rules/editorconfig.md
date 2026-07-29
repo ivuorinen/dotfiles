@@ -39,33 +39,13 @@ canonical 3. A wrapped bullet under a numbered list indents
 
 ## Per-filetype overrides
 
-- `[*.{php,fish}]` — 4-space indent
-- `[*.fish]` — 120-char line length
-- `[.git{ignore,modules}]` — tab indent, `indent_size = 1`
-- `[*.plist]`, `[config/git/**]`, `[**/config/git/**]` — tab
-  indent, `indent_size = 1`
-- `[*.py]` — 4-space indent, 120-char line length
-- `[*.lua]` — 90-char line length (handled by stylua, but the
-  ceiling is the editorconfig)
-- `[*.hwdb]` — `indent_size = 1`
-- `[plan]` — literal filename match for `base/plan`:
-  `trim_trailing_whitespace = false`, `max_line_length = off`
-- `[base/hammerspoon/hammerspoon.types.lua]` — `max_line_length =
-  off` (overrides the `[*.lua]` 90-char ceiling for the generated
-  Hammerspoon type stubs)
+Read `.editorconfig` for the per-filetype sections (fish and PHP at 4
+spaces, tab-indented git config and plists, the shfmt settings for shell,
+the `ignore = true` trees). They are not restated here: a second copy
+drifts, and `editorconfig-checker` enforces the real file either way.
 
-## Shell scripts (`[{local/bin/*,**/*.sh,**/zshrc,config/*,scripts/*}]`)
-
-- 2-space indent
-- shfmt-aware: `binary_next_line`, `switch_case_indent`,
-  `space_redirects`, `function_next_line`, `keep_padding = false`
-
-## Ignored trees
-
-`tools/**`, `local/bin/asdf/**`, `config/cheat/cheatsheets/**`
-have `ignore = true` — editorconfig-checker skips them. Do not
-edit those files anyway (they are submodules or vendored;
-`.claude/rules/vendored-files.md` covers the policy).
+The ignored trees are submodules and vendored code — do not edit them
+regardless of formatting; `.claude/rules/vendored-files.md` is the policy.
 
 ## When uncertain
 

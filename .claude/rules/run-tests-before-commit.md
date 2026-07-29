@@ -1,5 +1,15 @@
 ---
 description: "The bats suite must be run and must pass before any commit that touches covered code."
+paths:
+  - "tests/**"
+  - "local/bin/**"
+  - "scripts/**"
+  - "base/**"
+  - "config/theme/**"
+  - "config/shared.sh"
+  - "config/lib.sh"
+  - "config/exports"
+  - "config/alias"
 ---
 
 # Run the tests before committing
@@ -43,6 +53,13 @@ test-to-code dependency. Use `git grep`.
 The same applies to generated files — completions, man pages, `local/md/`
 and `docs/` are rebuilt by `scripts/install-completions.sh`, and a stale
 reference there survives until that runs.
+
+## Loading
+
+This rule is path-scoped to the same paths the pre-commit hook covers, so
+it loads when you touch code the suite guards rather than in every session.
+The hook below is the mechanical gate: if the rule never loads, a commit
+touching those paths still runs the suite and still fails on red.
 
 ## Enforcement
 
