@@ -135,7 +135,7 @@ repos:
         entry: bash -c 'rc=0; for f in "$@"; do grep -q "#USAGE\|//USAGE" "$f" 2>/dev/null || continue; usage lint "$f" || rc=1; done; exit $rc' --
         language: system
         files: ^(scripts/.*\.sh|local/bin/[^/]+)$
-        exclude: \.(py|pl|php)$
+        exclude: \.(py|pl|php|md)$
       - id: bats
         name: Bats test suite
         # ~30s, so it is scoped to paths whose behaviour the suite asserts —
