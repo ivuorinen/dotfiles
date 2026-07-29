@@ -23,6 +23,8 @@ After modifying code, run `graphify update .` to keep the graph current
 When the user types `/graphify`, invoke the graphify skill
 (`.claude/skills/graphify/SKILL.md`) before anything else.
 
-A `PreToolUse` hook on `Read` restates the first mandate on every file read;
-the rule is the reason the hook exists, not a duplicate of it. Pass the same
+A `PreToolUse` hook on `Read` and `Bash` prints a one-line reminder per call
+(`.claude/hooks/pre-graphify-nudge.sh`). It is a nudge, not a copy of this
+rule — this file is the authority, and it stays deliberately short because
+the hook is paid per tool call rather than per session. Pass the same
 instruction to subagents doing code exploration.
