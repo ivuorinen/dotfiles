@@ -110,7 +110,7 @@ shellcheck = "0.11.0"
 shfmt = "3.13.1"
 actionlint = "1.7.12"
 "aqua:mpalmer/action-validator" = "0.9.0"
-hadolint = "2.14.0"
+hadolint = "2.15.1"
 "dotnet:csharpier" = "1.3.0"
 
 # Security & supply chain
