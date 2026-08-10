@@ -129,7 +129,7 @@ snyk = "1.1306.2"
 pinact = "4.1.1"
 zizmor = "1.28.0"
 "github:Legit-Labs/legitify" = "1.0.11"
-"github:projectdiscovery/katana" = "1.6.1"
+"github:projectdiscovery/katana" = "1.7.0"
 
 # Build, test & CI
 bats = "1.14.0"
