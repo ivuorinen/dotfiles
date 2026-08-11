@@ -9,7 +9,7 @@ go = "1.26.5"
 # the gate needs them here too — renovate tracks both copies.
 biome = "2.5.2"
 editorconfig-checker = "3.8.0"
-usage = "3.5.6"
+usage = "3.6.0"
 "npm:prettier" = "3.9.6"
 "npm:markdownlint-cli" = "0.49.1"
 "npm:markdown-table-formatter" = "1.7.0"
