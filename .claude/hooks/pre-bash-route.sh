@@ -48,7 +48,10 @@ allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish
 
 # Allowlist: specific git subcommands that mutate state. Output-readers like
 # `git log`, `git diff`, `git show`, `git blame` are explicitly _not_ here.
-allow_git_subcmd_re='^(add|commit|mv|rm|checkout|push|fetch|reset|restore|stash|tag|init|clone|branch|merge|remote|cherry-pick|revert|switch|am|apply|format-patch|gc|prune|reflog|worktree|notes|submodule|rerere|update-ref|symbolic-ref|update-index|hash-object|cat-file|rev-parse|rev-list|ls-files|check-ignore|config)$'
+# `status` is here on purpose: bash-routing.md names it as the one git reader
+# that stays on Bash ("a common one-line check"). It was missing until an audit
+# found the hook denying it against both the rule and the comment below.
+allow_git_subcmd_re='^(status|add|commit|mv|rm|checkout|push|fetch|reset|restore|stash|tag|init|clone|branch|merge|remote|cherry-pick|revert|switch|am|apply|format-patch|gc|prune|reflog|worktree|notes|submodule|rerere|update-ref|symbolic-ref|update-index|hash-object|cat-file|rev-parse|rev-list|ls-files|check-ignore|config)$'
 
 # Denylist: first-word commands that almost always produce reviewable output.
 # Includes `bash`/`sh`/`zsh`/`dash`/`ksh` to block `bash -c '<denied>'` and
@@ -107,6 +110,9 @@ first_word()
 
 # Strip a leading wrapper prefix so we match the real command. Handles:
 #   env VAR=val cmd       — env with var-list
+#   env -i cmd            — env with flags (the flag group is why `env -i cat`
+#                           used to slip through: the VAR= group matched zero
+#                           times and `-i` became the first word)
 #   env cmd               — env alone
 #   VAR=val cmd           — inline shell var assignment (no `env`)
 #   VAR=a BAR=b cmd       — chained assignments
@@ -114,9 +120,48 @@ strip_env_prefix()
 {
   local segment=$1
   printf '%s' "$segment" | sed -E '
-    s/^env[[:space:]]+([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)*//
+    s/^env[[:space:]]+(-[^[:space:]]+[[:space:]]+)*([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)*//
     s/^([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)+//
   '
+  return 0
+}
+
+# Reduce a command token to the bare name the deny/allow lists are written
+# against. Both regexes are anchored (`^cat$`), so without this `/bin/cat` and
+# `\cat` match nothing and fall through to the allow-by-default branch — which
+# also defeated the `bash|sh|zsh|dash|ksh` entries whose whole purpose is to
+# block `bash -c '<denied>'`, since `/bin/bash -c` was spelled differently.
+normalise_cmd()
+{
+  local w=${1#\\}
+  printf '%s' "${w##*/}"
+}
+
+# Peel wrappers that execute their argument list, so the denied command is not
+# hidden in second position. Loops because they nest (`nohup timeout 5 rg …`).
+#
+# `command -v X` is deliberately exempt: it is a probe that never runs X, and
+# bash-routing.md treats single tool probes as fine on Bash.
+strip_wrappers()
+{
+  local seg=$1
+  while :; do
+    if [[ "$seg" =~ ^command[[:space:]]+-[vV]([[:space:]]|$) ]]; then
+      break
+    fi
+    case "$(normalise_cmd "$(first_word "$seg")")" in
+      command | builtin | exec | nohup | time | timeout | stdbuf | xargs | nice | ionice)
+        # Drop the wrapper, then its own flags and any numeric argument
+        # (`timeout 5`), leaving the wrapped command in first position.
+        seg=$(printf '%s' "$seg" | sed -E '
+          s/^[^[:space:]]+[[:space:]]+//
+          s/^(-[^[:space:]]+[[:space:]]+|[0-9]+[a-z]?[[:space:]]+)*//
+        ')
+        ;;
+      *) break ;;
+    esac
+  done
+  printf '%s' "$seg"
   return 0
 }
 
@@ -125,7 +170,8 @@ deny_reason=""
 while IFS= read -r segment; do
   [[ -z "$segment" ]] && continue
   segment=$(strip_env_prefix "$segment")
-  fw=$(first_word "$segment")
+  segment=$(strip_wrappers "$segment")
+  fw=$(normalise_cmd "$(first_word "$segment")")
   [[ -z "$fw" ]] && continue
 
   # Compound checks run first — `yarn install` (allow) must beat `yarn` allow-first-word.
