@@ -113,7 +113,12 @@ generate_docs_only()
 # Process local/bin inline specs (#USAGE or //USAGE directives embedded in script)
 for spec in "$DOTFILES"/local/bin/*; do
   [[ -f "$spec" ]] || continue
-  grep -q '#USAGE\|//USAGE' "$spec" 2> /dev/null || continue
+  # Anchored at column 0, matching the dfm assembly step below and `usage`
+  # itself, which only extracts directives that start the line. An unanchored
+  # match also selects prose: local/bin/CLAUDE.md documents the convention and
+  # writes `#USAGE` inline, so it was handed to `usage`, failed to parse as
+  # KDL five times over, and took the generator's exit status to 4.
+  grep -qE '^(#USAGE|//USAGE)' "$spec" 2> /dev/null || continue
   bin_name=$(basename "$spec")
   # The dfm dispatcher and its dfm-* subcommands are handled by the
   # dedicated assembly step below: each dfm-* carries only a nested
