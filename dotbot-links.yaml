@@ -18,14 +18,24 @@
     ~/.config:
     ~/.local:
     ~/.local/bin:
+    # XDG_RUNTIME_DIR (config/exports falls back to this path when the session
+    # sets none — always on macOS). The XDG spec makes 0700 mandatory: the
+    # owner must be the only one with read and write access, because programs
+    # put sockets and lock files here on that assumption.
     ~/.local/run:
+      mode: 0700
     ~/.local/share:
     ~/.local/share/tmux/plugins:
     ~/.local/share/gnupg:
       mode: 0700
+    # XDG_STATE_HOME. Holds zsh history, the 1Password cache dir and the theme
+    # daemon's pidfile — none of which should be readable by other local users.
     ~/.local/state:
+      mode: 0700
     ~/.local/state/tmux:
+      mode: 0700
     ~/.local/state/zsh:
+      mode: 0700
     ~/.ssh:
       mode: 0700
     ~/.ssh/local.d:

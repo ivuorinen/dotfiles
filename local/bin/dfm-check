@@ -13,6 +13,7 @@
 #USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
 #USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
+#USAGE   cmd "perms" help="Verify created directories still have their declared mode"
 #USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
 #USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
 #USAGE }
@@ -48,6 +49,7 @@ dfm_check()
     "brew:Verify all Brewfile packages are installed"
     "disk:Show disk usage for mise installs and brew cache"
     "mise:Run mise doctor to check mise health"
+    "perms:Verify created directories still have their declared mode"
     "tools:Verify essential CLI tools are available in PATH"
     "updates:Show available updates for mise tools and brew packages"
   )
@@ -68,8 +70,77 @@ dfm_check()
       dfm_check brew || rc=1
       dfm_check mise || rc=1
       dfm_check tools || rc=1
+      dfm_check perms || rc=1
       dfm_check updates || rc=1
       dfm_check disk || rc=1
+      return "$rc"
+      ;;
+
+    perms)
+      # dotbot's `create` plugin applies a declared `mode:` only when it
+      # creates the path; on every later run it logs "Path exists" and never
+      # looks at the mode. So a mode added or tightened after a machine was
+      # provisioned is a no-op there, and drift introduced by anything else is
+      # never repaired — `./install` still exits 0. This check is the missing
+      # half: it reads the declared modes out of dotbot-links.yaml rather than
+      # keeping a second hardcoded list that would drift from it.
+      local links="$DOTFILES/dotbot-links.yaml"
+      local defaults="$DOTFILES/tools/dotbot-defaults.yaml"
+      local default_mode rc=0 checked=0
+
+      default_mode=$(awk '
+        /^ *create: *$/ { in_create = 1; next }
+        in_create && /mode:/ { gsub(/[^0-7]/, "", $2); print $2; exit }
+      ' "$defaults")
+      : "${default_mode:=0777}"
+
+      while read -r want path; do
+        path="${path/#\~/$HOME}"
+        if [[ ! -d "$path" ]]; then
+          # Not an error: several entries are only created on the hosts that
+          # need them, and `dfm check` runs on all of them.
+          continue
+        fi
+        local have
+        # GNU coreutils first, BSD/macOS second. %Lp is the permission bits
+        # without the file type, which is what %a gives on GNU.
+        have=$(stat -c '%a' "$path" 2> /dev/null || stat -f '%Lp' "$path" 2> /dev/null)
+        [[ -n "$have" ]] || continue
+        checked=$((checked + 1))
+        if ((8#$have != 8#$want)); then
+          # Normalise both sides: stat prints 777, the YAML carries 0700, and
+          # concatenating a literal 0 onto whichever one lacks it produces
+          # 00700 in the chmod line the user is meant to paste.
+          local have_o want_o
+          printf -v have_o '%04o' "$((8#$have))"
+          printf -v want_o '%04o' "$((8#$want))"
+          msgr err "mode drift: $path is $have_o, declared $want_o"
+          msgr nested "fix: chmod $want_o $path"
+          rc=1
+        fi
+      done < <(awk -v def="$default_mode" '
+        /^- create:/ { in_create = 1; next }
+        /^- / { in_create = 0 }
+        !in_create { next }
+        /^ *#/ { next }
+        /^    [^ ]/ {
+          if (path != "") print mode, path
+          line = $0
+          sub(/^    /, "", line)
+          sub(/:[[:space:]]*$/, "", line)
+          path = line
+          mode = def
+          next
+        }
+        /^      mode:/ { m = $2; gsub(/[^0-7]/, "", m); mode = m }
+        END { if (path != "") print mode, path }
+      ' "$links")
+
+      if ((rc == 0)); then
+        msgr yay "All $checked created directories match their declared mode"
+      else
+        msgr err "Run the chmod lines above; ./install cannot repair an existing path"
+      fi
       return "$rc"
       ;;
 
