@@ -126,7 +126,25 @@ repos:
         args: [--fix]
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
       - id: ruff-format
+        # ruff formats Python code blocks inside Markdown, but the upstream
+        # hook only passes python/pyi/jupyter, so `ruff format --check .`
+        # could fail on a rule file while every gate reported clean. The
+        # repo's rule files are dense with Python snippets, hence markdown.
+        types_or: [python, pyi, jupyter, markdown]
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        # Mirrors `yarn lint:bandit`. -c is mandatory: bandit never
+        # auto-discovers pyproject.toml, and parsing TOML needs the extra.
+        args: [-c, pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+        # exclude_dirs in pyproject.toml only prunes directory recursion.
+        # pre-commit hands bandit explicit filenames, so the vendored fish
+        # helper has to be excluded here as well or it is scanned anyway.
+        exclude: ^config/fish/functions/__bass\.py$
 
   - repo: local
     hooks:
