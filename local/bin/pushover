@@ -39,40 +39,36 @@ __pushover_usage()
   return 1
 }
 
-# Format an optional curl form field
-__pushover_opt_field()
-{
-  field=$1
-  shift
-  value="${*}"
-  if [ -n "${value}" ]; then
-    printf "%s \"%s=%s\"\n" "-F" "$field" "$value"
-  fi
-}
-
-# Send a pushover notification via curl
+# Send a pushover notification via curl.
+#
+# Every value reaches curl as its own argv entry, built up with `set --`.
+# Nothing is ever re-parsed by the shell. The previous implementation
+# assembled the whole command line into a string and ran it through `eval`,
+# so a `$(...)` or a bare `"` anywhere in a value executed as shell code —
+# and message bodies are routinely program output (`pushover "failed: $(tail
+# -1 log)"`, or .claude/hooks/notify-idle.sh forwarding hook text). POSIX sh
+# has no arrays; the positional parameters are the array.
 __pushover_send_message()
 {
   device="${1:-}"
 
-  curl_cmd="\"${CURL}\" -s -S \
-    ${CURL_OPTS} \
-    -F \"token=${TOKEN}\" \
-    -F \"user=${USER}\" \
-    -F \"message=${message}\" \
-    $(__pushover_opt_field device "${device}") \
-    $(__pushover_opt_field callback "${callback}") \
-    $(__pushover_opt_field timestamp "${timestamp}") \
-    $(__pushover_opt_field priority "${priority}") \
-    $(__pushover_opt_field retry "${retry}") \
-    $(__pushover_opt_field expire "${expire}") \
-    $(__pushover_opt_field title "${title}") \
-    $(__pushover_opt_field sound "${sound}") \
-    $(__pushover_opt_field url "${url}") \
-    $(__pushover_opt_field url_title "${url_title}") \
-    \"${PUSHOVER_URL}\""
+  set -- -s -S \
+    -F "token=${TOKEN}" \
+    -F "user=${PUSHOVER_USER_KEY}" \
+    -F "message=${message}"
 
-  response="$(eval "${curl_cmd}")"
+  [ -n "$device" ] && set -- "$@" -F "device=$device"
+  [ -n "$callback" ] && set -- "$@" -F "callback=$callback"
+  [ -n "$timestamp" ] && set -- "$@" -F "timestamp=$timestamp"
+  [ -n "$priority" ] && set -- "$@" -F "priority=$priority"
+  [ -n "$retry" ] && set -- "$@" -F "retry=$retry"
+  [ -n "$expire" ] && set -- "$@" -F "expire=$expire"
+  [ -n "$title" ] && set -- "$@" -F "title=$title"
+  [ -n "$sound" ] && set -- "$@" -F "sound=$sound"
+  [ -n "$url" ] && set -- "$@" -F "url=$url"
+  [ -n "$url_title" ] && set -- "$@" -F "url_title=$url_title"
+
+  response="$("${CURL}" "$@" "${PUSHOVER_URL}")"
   printf "%s\n" "$response"
 
   # Parse response status. Expect JSON like: {"status":1,"request":"..."}
@@ -94,9 +90,10 @@ __pushover_send_message()
 
 CURL="$(command -v curl)"
 PUSHOVER_URL="https://api.pushover.net/1/messages.json"
-TOKEN=$PUSHOVER_TOKEN
-USER=$PUSHOVER_USER
-CURL_OPTS=""
+TOKEN="${PUSHOVER_TOKEN:-}"
+# Not named USER: that is a standard environment variable other code in the
+# same process reads, and the previous version overwrote it for the whole run.
+PUSHOVER_USER_KEY="${PUSHOVER_USER:-}"
 devices=""
 optstring="c:d:D:e:p:r:t:T:s:u:U:a:h"
 
@@ -144,7 +141,7 @@ while getopts ${optstring} c; do
       url="${OPTARG}"
       ;;
     U)
-      USER="${OPTARG}"
+      PUSHOVER_USER_KEY="${OPTARG}"
       ;;
     a)
       url_title="${OPTARG}"
@@ -167,6 +164,18 @@ message="$*"
 if [ ! -x "${CURL}" ]; then
   printf "CURL is unset, empty, or does not point to curl executable.\n \
     This script requires curl!\n" >&2
+  exit 1
+fi
+
+# Fail here rather than sending a request that cannot succeed: the API answers
+# a missing token with a generic 4xx whose body says nothing about which of the
+# two credentials is absent.
+if [ -z "${TOKEN}" ]; then
+  printf "%s: no API token (set PUSHOVER_TOKEN or pass -T)\n" "$0" >&2
+  exit 1
+fi
+if [ -z "${PUSHOVER_USER_KEY}" ]; then
+  printf "%s: no user/group key (set PUSHOVER_USER or pass -U)\n" "$0" >&2
   exit 1
 fi
 
