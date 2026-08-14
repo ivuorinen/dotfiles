@@ -49,6 +49,16 @@ case "$fp" in
     echo "See .claude/rules/vendored-files.md." >&2
     exit 2
     ;;
+  */config/fish/functions/fisher.fish | \
+    */config/fish/functions/bass.fish | \
+    */config/fish/functions/__bass.py | \
+    */config/fish/functions/__z_add.fish | \
+    */config/fish/functions/__z_clean.fish)
+    echo "BLOCKED: $fp is a vendored fish plugin function — refresh it" >&2
+    echo "from upstream (fisher update), do not edit in place." >&2
+    echo "See .claude/rules/vendored-files.md." >&2
+    exit 2
+    ;;
   */tools/dotbot/* | */tools/dotbot-include/* | */tools/antidote/*)
     echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
     exit 2
