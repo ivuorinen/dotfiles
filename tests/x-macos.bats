@@ -7,6 +7,11 @@
 #
 # Every underlying tool is stubbed, so these run on Linux CI too.
 
+# Required before any flagged `run` (this file uses `run -0`). Without it,
+# bats older than 1.5.0 treats the flag as the command to run and the
+# assertion silently stops checking the exit status while still reporting ok.
+bats_require_minimum_version 1.5.0
+
 setup()
 {
   BIN="$BATS_TEST_DIRNAME/../local/bin"
