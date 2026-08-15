@@ -43,28 +43,57 @@ _idempotent_ln_sf()
 }
 
 # Atomic, race-safe lock. ln(1) is the classic atomic create-if-not-exists
-# primitive on POSIX filesystems. A loser in a race silently fails the ln
-# and we return 1.
+# primitive on POSIX filesystems, and it is the ONLY thing that grants the
+# lock here. A loser silently fails the ln and we return 1.
+#
+# Breaking a stale lock is the hard half, because it is inherently two
+# operations (unlink the dead file, link ours) and a pair of syscalls is not
+# atomic. The previous version ran them unguarded, so two processes that both
+# saw the same dead pid could both succeed: the first won its ln, then the
+# second's `rm -f` deleted the *live* pidfile and let it link over the top.
+# Both returned 0 and the watcher's singleton guard admitted two daemons.
+#
+# A read-back after the write does not fix this — each racer reads its own
+# write and every one of them concludes it won. The break must instead be
+# serialised, so the unlink-then-link pair runs under a second lock that is
+# itself taken with ln. A process that cannot take the break lock does not
+# break anything; it just returns 1 and lets the winner proceed.
+#
+# Residual risk, stated rather than hidden: a process SIGKILLed while holding
+# the break lock leaves "${pidfile}.break" behind and no later process can
+# reclaim a stale lock until it is removed by hand. That window spans one
+# cat + kill -0 + rm + ln — orders of magnitude smaller than the whole
+# watcher lifetime this guards, and it fails closed (no daemon) rather than
+# open (two daemons).
 _acquire_lock()
 {
-  local pidfile=$1 tmp
-  if [[ -e "$pidfile" ]]; then
-    local pid
-    pid=$(cat -- "$pidfile" 2> /dev/null || true)
-    if [[ -n "$pid" ]] && kill -0 "$pid" 2> /dev/null; then
-      return 1
-    fi
-    # Stale: remove and continue.
-    rm -f -- "$pidfile"
-  fi
-  tmp="$(mktemp "${pidfile}.tmp.XXXXXX")"
+  local pidfile=$1 tmp breaklock pid rc
+  tmp="$(mktemp "${pidfile}.tmp.XXXXXX")" || return 1
   printf '%s\n' "$$" > "$tmp"
+
+  # Uncontended: nothing holds the lock.
   if ln -- "$tmp" "$pidfile" 2> /dev/null; then
     rm -f -- "$tmp"
     return 0
   fi
-  rm -f -- "$tmp"
-  return 1
+
+  # Contended. Serialise the stale-break so only one process may unlink.
+  breaklock="${pidfile}.break"
+  if ! ln -- "$tmp" "$breaklock" 2> /dev/null; then
+    rm -f -- "$tmp"
+    return 1
+  fi
+
+  rc=1
+  pid=$(cat -- "$pidfile" 2> /dev/null || true)
+  if [[ -z "$pid" ]] || ! kill -0 "$pid" 2> /dev/null; then
+    # Holder is gone. Safe to replace: we are the only breaker.
+    rm -f -- "$pidfile"
+    ln -- "$tmp" "$pidfile" 2> /dev/null && rc=0
+  fi
+
+  rm -f -- "$breaklock" "$tmp"
+  return "$rc"
 }
 
 # Append a timestamped line to the orchestrator log. Single-writer
