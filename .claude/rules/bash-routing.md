@@ -17,8 +17,8 @@ If a shell command produces output you intend to read, use
 - `shellcheck`, `shfmt --diff`, `fish_indent --check` — every lint/format check.
 - `biome check`, `yamllint`, `actionlint`, `stylua --check` — every formatter check.
 - `ruff check`, `ruff format --check` — every Python check.
-- `pre-commit run`, `yarn lint`, `yarn test`, `yarn check` — every quality gate
-  (the prefix match covers `yarn lint:ec`, `yarn lint:sh`, and friends).
+- `pre-commit run`, `yarn lint`, `yarn test` — every quality gate
+  (the prefix match covers `yarn lint:ec`, `yarn lint:bandit`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
 - `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
   `git status` is the one git reader the hook lets through, with or without

@@ -57,6 +57,7 @@ Identify CLI tools (vs libraries) in a Brewfile:
 
 ```python
 import re
+
 with open("config/homebrew/Brewfile") as f:
     for line in f:
         m = re.match(r'brew "([^"]+)"', line)
@@ -68,6 +69,7 @@ Parse mise tool entries:
 
 ```python
 import re
+
 with open("config/mise/config.toml") as f:
     for line in f:
         m = re.match(r'"?([\w:./-]+)"?\s*=\s*"([^"]+)"', line)
