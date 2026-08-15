@@ -3,7 +3,39 @@
 # repo's editorconfig/markdown rules. Exclude from every hook, the same
 # way tools/** and other vendored trees are treated.
 exclude: ^\.claude/skills/graphify/
+
+# commit-msg is not installed by default — without it here, `prek install`
+# wires only pre-commit and the commitlint hook below never runs. A fresh
+# clone needs `prek install` for either stage to exist at all.
+default_install_hook_types: [pre-commit, commit-msg]
+
+# Pin every hook to pre-commit unless it opts out. A hook with no `stages`
+# runs at EVERY installed stage, so installing commit-msg above would
+# otherwise re-run the whole suite a second time per commit — with
+# .git/COMMIT_EDITMSG as the file list, which puts commit message prose in
+# front of editorconfig-checker, gitleaks and friends.
+default_stages: [pre-commit]
+
 repos:
+  # Commit message convention. .commitlintrc.json extends
+  # @ivuorinen/commitlint-config, which is not installed anywhere in this repo
+  # (package.json declares no dependencies at all), so it is supplied here as a
+  # hook dependency: prek builds a node environment holding both commitlint and
+  # the config, and commitlint resolves the extends from inside it. That keeps
+  # the repo's no-npm-dependencies property intact.
+  #
+  # The upstream manifest declares no stages, so commit-msg is set here — and
+  # it is the one hook that must override default_stages above. Every other
+  # hook in this file is language: system on a mise-provided binary; this one
+  # is the exception because the config package has to sit on commitlint's own
+  # resolution path, which a system binary cannot offer.
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.26.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ["@ivuorinen/commitlint-config"]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
