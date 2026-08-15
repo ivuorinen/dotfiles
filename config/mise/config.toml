@@ -127,7 +127,7 @@ opengrep = "1.26.0"
 checkov = "3.3.9"
 snyk = "1.1306.3"
 pinact = "4.1.1"
-zizmor = "1.28.0"
+zizmor = "1.29.0"
 "github:Legit-Labs/legitify" = "1.0.11"
 "github:projectdiscovery/katana" = "1.7.0"
 
