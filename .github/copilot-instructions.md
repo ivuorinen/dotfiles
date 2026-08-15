@@ -189,7 +189,7 @@ yarn test             # run all tests
 |-----------------------------|------------------------------------------------|
 | `linters.yml`               | PR lint (Biome, EditorConfig, md-tables, etc.) |
 | `update-submodules.yml`     | Scheduled submodule auto-update                |
-| `new-release.yml`           | Semantic-release driven publishing             |
+| `new-release.yml`           | Daily date-versioned tag + GitHub release      |
 | `changelog.yml`             | Changelog generation                           |
 | `pre-commit-autoupdate.yml` | Keep pre-commit hooks up to date               |
 | `sync-labels.yml`           | Sync GitHub labels                             |
