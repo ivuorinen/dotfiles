@@ -65,7 +65,7 @@ fzf = "0.74.2"
 "github:alexpasmantier/television" = "0.15.9"
 yazi = "26.5.6"
 bat = "0.26.1"
-glow = "2.1.2"
+glow = "3.0.0"
 cheat = "5.1.0"
 
 # Text & document processing
