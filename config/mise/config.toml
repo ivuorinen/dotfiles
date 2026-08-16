@@ -6,7 +6,13 @@ pipx.uvx = true
 # directory rather than the default ~/.default-python-packages so it lives
 # with the rest of the mise config and is version-controlled.
 python.default_packages_file = "~/.config/mise/default-python-packages"
-trusted_config_paths = ["~/Code/ivuorinen", "~/Code/s", "~/Code/masf"]
+trusted_config_paths = [
+  "~/Code/ivuorinen",
+  "~/Code/s",
+  "~/Code/masf",
+  "~/Code/9b11",
+  "~/Code/eslefi",
+]
 # Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
 # This repo uses .mise.toml at the repo root for pinned versions.
 idiomatic_version_file = true
