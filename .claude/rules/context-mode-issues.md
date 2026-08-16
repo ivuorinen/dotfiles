@@ -27,9 +27,18 @@ yourself.
 ## Required response
 
 1. Stop work on the current task.
-2. Tell the user, in one sentence, that context-mode needs upgrading
-    and that they must run `/ctx-upgrade`.
-3. Wait for the user to run the upgrade and restart the session
+2. Confirm the signal is real by calling `ctx_doctor`. It is the one
+    tool exempt from the check below, precisely so it stays reachable
+    here, and it reports the installed version and every subsystem.
+3. If `ctx_doctor` returns all `[OK]`, this is a **false positive**:
+    the response merely quoted the signal strings rather than
+    reporting a fault. Say so to the user in one sentence and carry
+    on. Never run `/ctx-upgrade` on a healthy install.
+4. If `ctx_doctor` reports any `[FAIL]`, or its version line shows an
+    upgrade is available, tell the user in one sentence that
+    context-mode needs upgrading and that they must run
+    `/ctx-upgrade`.
+5. Wait for the user to run the upgrade and restart the session
     before continuing. The new MCP tool schemas only load after a
     session restart.
 
@@ -39,6 +48,15 @@ automatically: it exits 2 with a blocking message whenever the
 signals above appear in a context-mode tool response. The rule
 exists so the behaviour is also documented in prose, and so an
 agent without the hook active still follows the same path.
+
+The check matches its patterns anywhere in the response, so it fires
+on any text that merely contains them — the hook's own source, this
+rule file, and any finding body discussing the signals all do, and
+reading one through `ctx_execute` trips it. That breadth is
+deliberate: a missed signal degrades the routing rules silently for a
+whole session, while a false positive costs one `ctx_doctor` call.
+Step 2 exists because the hook cannot tell a server reporting a fault
+from a faithful echo of text describing one — only `ctx_doctor` can.
 
 ## When the ctx tools are missing entirely
 

@@ -70,13 +70,18 @@ check()
 # describing one, so it fails closed: reading this hook's own source, the rule
 # file, or a finding body through ctx_execute all trip it.
 #
-# Pinning the CURRENT behaviour, not the desired message. The agreed change
-# (keep detection, reword the block to say "confirm with /ctx-doctor" instead
-# of asserting the install is broken) is still unapplied — the classifier
-# blocks edits under .claude/hooks/. When it lands, add here:
-#   [[ "$output" == *"/ctx-doctor"* ]]
-#   [[ "$output" != *"context-mode reported an issue"* ]]
 @test "post-tool-context-mode-check: fires on merely quoted signal strings" {
   run -2 check "$CTX" "$(printf '# batch_re=%s\n' "'Batch execution error'")"
   [[ "$output" == *"context-mode-issues.md"* ]]
+}
+
+# The block message must send the reader to ctx_doctor rather than asserting a
+# fault. The hook sees only text; "the install is broken" is a claim it cannot
+# make, and acting on it wrongly means running /ctx-upgrade on a healthy
+# install and restarting the session for nothing.
+@test "post-tool-context-mode-check: the message asks for confirmation" {
+  run -2 check "$CTX" 'Batch execution error: worker died'
+  [[ "$output" == *"/ctx-doctor"* ]]
+  [[ "$output" == *"FALSE POSITIVE"* ]]
+  [[ "$output" != *"context-mode reported an issue"* ]]
 }
