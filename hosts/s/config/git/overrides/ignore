@@ -3,6 +3,7 @@
 .run
 *.cache
 *~
+__pycache__
 
 *-secret
 __secret
@@ -22,6 +23,8 @@ dfm.sh
 .phpactor.json
 .zsh_history
 
+.config/tfs-cli.json
+
 **/.claude/*
 **/.serena/*
 **/docs/plans/*
@@ -34,5 +37,4 @@ specs.md
 .playwright-mcp/*
 _extra/*
 .mcp.json
-
-__pycache__
+graphify-out/
