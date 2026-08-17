@@ -2,6 +2,7 @@
 node = "26.7.0"
 python = "3.14"
 go = "1.26.5"
+dotnet = "10"
 
 # The `yarn lint` toolchain. These are also pinned in config/mise/config.toml
 # (the global config, symlinked to ~/.config/mise/), which is what provides
