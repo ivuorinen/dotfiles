@@ -9,7 +9,7 @@
 #USAGE     alias "hostname"
 #USAGE     arg "[hostname]" help="Hostname to check against"
 #USAGE   }
-#USAGE   cmd "all" help="Run all health checks in sequence"
+#USAGE   cmd "all" help="Run brew, mise, tools, perms, updates, and disk checks"
 #USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
 #USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
@@ -45,7 +45,7 @@ dfm_check()
   MENU=(
     "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
     "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
-    "all:Run brew, mise, tools, updates, and disk checks in sequence"
+    "all:Run brew, mise, tools, perms, updates, and disk checks in sequence"
     "brew:Verify all Brewfile packages are installed"
     "disk:Show disk usage for mise installs and brew cache"
     "mise:Run mise doctor to check mise health"
@@ -101,31 +101,12 @@ dfm_check()
         return 1
       fi
 
-      while read -r want path; do
-        path="${path/#\~/$HOME}"
-        if [[ ! -d "$path" ]]; then
-          # Not an error: several entries are only created on the hosts that
-          # need them, and `dfm check` runs on all of them.
-          continue
-        fi
-        local have
-        # GNU coreutils first, BSD/macOS second. %Lp is the permission bits
-        # without the file type, which is what %a gives on GNU.
-        have=$(stat -c '%a' "$path" 2> /dev/null || stat -f '%Lp' "$path" 2> /dev/null)
-        [[ -n "$have" ]] || continue
-        checked=$((checked + 1))
-        if ((8#$have != 8#$want)); then
-          # Normalise both sides: stat prints 777, the YAML carries 0700, and
-          # concatenating a literal 0 onto whichever one lacks it produces
-          # 00700 in the chmod line the user is meant to paste.
-          local have_o want_o
-          printf -v have_o '%04o' "$((8#$have))"
-          printf -v want_o '%04o' "$((8#$want))"
-          msgr err "mode drift: $path is $have_o, declared $want_o"
-          msgr nested "fix: chmod $want_o $path"
-          rc=1
-        fi
-      done < <(awk -v def="$default_mode" '
+      # Parsed up front rather than in a process substitution. A `while ... done
+      # < <(awk ...)` swallows awk's exit status: if the parse failed, the loop
+      # would simply see no rows, checked would stay 0, rc would stay 0, and
+      # the check would report success having inspected nothing.
+      local declared
+      if ! declared=$(awk -v def="$default_mode" '
         /^- create:/ { in_create = 1; next }
         /^- / { in_create = 0 }
         !in_create { next }
@@ -141,7 +122,47 @@ dfm_check()
         }
         /^      mode:/ { m = $2; gsub(/[^0-7]/, "", m); mode = m }
         END { if (path != "") print mode, path }
-      ' "$links")
+      ' "$links"); then
+        msgr err "Cannot parse the create block in $links"
+        return 1
+      fi
+      if [[ -z "$declared" ]]; then
+        msgr err "No create entries found in $links — refusing to report a clean check"
+        return 1
+      fi
+
+      while read -r want path; do
+        path="${path/#\~/$HOME}"
+        if [[ ! -d "$path" ]]; then
+          # Not an error: several entries are only created on the hosts that
+          # need them, and `dfm check` runs on all of them.
+          continue
+        fi
+        local have
+        # GNU coreutils first, BSD/macOS second. %Lp is the permission bits
+        # without the file type, which is what %a gives on GNU.
+        have=$(stat -c '%a' "$path" 2> /dev/null || stat -f '%Lp' "$path" 2> /dev/null)
+        # Fail closed: a directory that exists but whose mode cannot be read is
+        # unverified, not compliant. Skipping it silently would let the check
+        # report success over the one path it could not inspect.
+        if [[ -z "$have" ]]; then
+          msgr err "Cannot read the mode of $path"
+          rc=1
+          continue
+        fi
+        checked=$((checked + 1))
+        if ((8#$have != 8#$want)); then
+          # Normalise both sides: stat prints 777, the YAML carries 0700, and
+          # concatenating a literal 0 onto whichever one lacks it produces
+          # 00700 in the chmod line the user is meant to paste.
+          local have_o want_o
+          printf -v have_o '%04o' "$((8#$have))"
+          printf -v want_o '%04o' "$((8#$want))"
+          msgr err "mode drift: $path is $have_o, declared $want_o"
+          msgr nested "fix: chmod $want_o $path"
+          rc=1
+        fi
+      done <<< "$declared"
 
       if ((rc == 0)); then
         msgr yay "All $checked created directories match their declared mode"
