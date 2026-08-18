@@ -56,7 +56,7 @@ shellcheck local/bin/<script>
 stylua config/nvim/
 
 # Pre-commit (all hooks at once)
-prek run --all-files
+pre-commit run --all-files
 ```
 
 **Package manager: Yarn v4+** — do NOT use `npm install` or `npm run`.

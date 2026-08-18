@@ -122,7 +122,9 @@ teardown()
   grep -Fqx 'message=@/etc/passwd' "$STUB_DIR/curl.args"
   # The literal-value flag must be what carries it.
   grep -Fqx -- '--form-string' "$STUB_DIR/curl.args"
-  run grep -Fqx -- '-F' "$STUB_DIR/curl.args"
+  # `--form` is the long alias of `-F` and enables the same file reference, so
+  # rejecting only `-F` would let a switch to `--form` restore the defect.
+  run grep -Eqx -- '-F|--form(=.*)?' "$STUB_DIR/curl.args"
   [ "$status" -ne 0 ]
 }
 

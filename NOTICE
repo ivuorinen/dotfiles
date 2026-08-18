@@ -66,15 +66,19 @@ graphify skill -- license not recorded
   source before redistributing this tree or reusing anything from it.
 
 
-Submodules are not vendored: each is a git submodule that carries its own
-LICENSE file at its own root, and each is updated from upstream rather than
-edited here.
+Submodules are not vendored into this tree: each is a git submodule pinned at
+a commit, carrying its own license, and updated from upstream rather than
+edited here. The MIT license above does not cover them.
 
-    tools/dotbot                        anishathalye/dotbot
-    tools/dotbot-include                dotbot-include plugin
-    tools/antidote                      mattmc3/antidote
-    config/cheat/cheatsheets/community  cheat/cheatsheets
-    config/cheat/cheatsheets/tldr       ivuorinen/cheatsheet-tldr
+    tools/dotbot                        MIT   LICENSE.md
+    tools/dotbot-include                MIT   LICENSE.txt
+    tools/antidote                      MIT   LICENSE
+    config/cheat/cheatsheets/community  CC0-1.0  .github/LICENSE.txt
+    config/cheat/cheatsheets/tldr       MIT   .github/LICENSE.md
+
+  Each license was read from the pinned checkout at the path shown. Note that
+  `config/cheat/cheatsheets/tldr/tldr/license` is a cheatsheet about the
+  `license` command, not that repository's license.
 
 
 Maintenance
