@@ -50,6 +50,29 @@ batch()
   run -2 code 'chmod 777 config/fzf/completion.zsh'
 }
 
+# pre-edit-block.sh listed these four groups while this guard did not, so the
+# same write went through unchecked when routed via ctx_execute rather than
+# Edit. The two lists cover the same paths by different doors.
+@test "pre-ctx-write-guard: blocks writes to the vendored fish plugin functions" {
+  run -2 code 'rm config/fish/functions/fisher.fish'
+  run -2 code 'echo x > config/fish/functions/bass.fish'
+  run -2 code 'sed -i s/a/b/ config/fish/functions/__bass.py'
+  run -2 code 'mv config/fish/functions/__z_add.fish /tmp/x'
+  run -2 code 'tee config/fish/functions/__z_clean.fish < /tmp/x'
+}
+
+@test "pre-ctx-write-guard: blocks writes to the other vendored trees" {
+  run -2 code 'rm .claude/skills/graphify/SKILL.md'
+  run -2 code 'echo x > local/bin/iterm2_shell_integration.zsh'
+  run -2 code 'rm tools/dotbot-include/plugin.py'
+}
+
+# Hand-written fish functions sit in the same directory with no naming signal,
+# and must stay writable.
+@test "pre-ctx-write-guard: a hand-written fish function is not protected" {
+  run -0 code 'rm config/fish/functions/mkcd.fish'
+}
+
 @test "pre-ctx-write-guard: blocks node-style writes too, not just shell" {
   run -2 code 'fs.writeFileSync("tools/dotbot/x", data)'
   run -2 code 'await fs.appendFile("yarn.lock", line)'

@@ -75,6 +75,10 @@ decision()
   [ "$(decision 'yarn lint')" = "deny" ]
   [ "$(decision 'yarn test')" = "deny" ]
   [ "$(decision 'pre-commit run --all-files')" = "deny" ]
+  # prek is the runner actually installed; denying only the old name left the
+  # real command unrouted.
+  [ "$(decision 'prek run --all-files')" = "deny" ]
+  [ "$(decision 'prek run')" = "deny" ]
   [ "$(decision 'shfmt --diff local/bin/dfm')" = "deny" ]
 }
 
@@ -128,6 +132,42 @@ decision()
   [ "$(decision 'env FOO=bar cat README.md')" = "deny" ]
   [ "$(decision 'FOO=bar cat README.md')" = "deny" ]
   [ "$(decision 'FOO=bar git add .')" = "allow" ]
+}
+
+# An empty assignment is legal shell. Requiring a value left `FOO=` as the
+# first word, matching neither list, so the command fell through to allow.
+@test "pre-bash-route: an empty assignment value is still an assignment" {
+  [ "$(decision 'FOO= cat README.md')" = "deny" ]
+  [ "$(decision 'FOO= BAR= rg foo .')" = "deny" ]
+  [ "$(decision 'FOO= git add .')" = "allow" ]
+}
+
+# -u/-C/-S take a separate operand. Consuming only the flag left the operand
+# as the first word and the real command was never classified.
+@test "pre-bash-route: env options that take an operand consume it" {
+  [ "$(decision 'env -u FOO cat README.md')" = "deny" ]
+  [ "$(decision 'env --unset FOO rg foo .')" = "deny" ]
+  [ "$(decision 'env -C /tmp cat README.md')" = "deny" ]
+  [ "$(decision 'env -u FOO git add .')" = "allow" ]
+}
+
+# Wrappers and env prefixes nest in either order, so one pass of each in a
+# fixed order is not enough: the wrapper hid the env prefix, which hid `cat`.
+@test "pre-bash-route: a wrapper wrapping an env prefix is fully peeled" {
+  [ "$(decision 'timeout 5 env -i cat README.md')" = "deny" ]
+  [ "$(decision 'nohup env FOO=bar rg foo .')" = "deny" ]
+  [ "$(decision 'xargs env -u FOO cat')" = "deny" ]
+  [ "$(decision 'timeout 5 env -i git add .')" = "allow" ]
+}
+
+# Regression: a bare wrapper has no trailing token for the substitutions to
+# consume, so the stripping loop never converged and the hook hung forever —
+# blocking every Bash call in the session, not just this one.
+@test "pre-bash-route: a bare wrapper terminates instead of looping" {
+  for c in xargs timeout command nohup exec time stdbuf nice ionice builtin; do
+    run timeout 5 bash -c 'printf "{\"tool_input\":{\"command\":\"$1\"}}" | bash "$2"' _ "$c" "$HOOK"
+    [ "$status" -ne 124 ]
+  done
 }
 
 @test "pre-bash-route: BASH_OK passes through and strips the marker" {

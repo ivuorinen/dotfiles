@@ -17,7 +17,13 @@ payload=$(printf '%s' "$input" | jq -r '
 ' 2> /dev/null) || exit 0
 [[ -z "$payload" ]] && exit 0
 
-protected='fzf-tmux|yarn\.lock|\.yarn/|tools/dotbot|tools/antidote|config/fzf/(completion|key-bindings)\.|cheat/cheatsheets/(community|tldr)'
+# Must stay in step with the case list in pre-edit-block.sh: that guard covers
+# Edit/Write, this one covers the same paths reached through the sandbox. Four
+# groups were listed there but missing here — the five fish plugin functions,
+# the graphify skill, the iTerm2 integration, and tools/dotbot-include (which
+# the tools/dotbot prefix does happen to cover) — so a `rm` on any of them went
+# through ctx_execute unchecked.
+protected='fzf-tmux|yarn\.lock|\.yarn/|tools/dotbot|tools/antidote|config/fzf/(completion|key-bindings)\.|cheat/cheatsheets/(community|tldr)|config/fish/functions/(fisher|bass|__bass|__z_add|__z_clean)\.|\.claude/skills/graphify/|iterm2_shell_integration\.zsh'
 # ponytail: same-line co-occurrence heuristic — write-shaped tokens next to a
 # protected path. Upgrade to real argv parsing only if false positives hurt.
 writeish='>>|>|sed [^|;&]*-i|tee |rm |mv |cp |chmod |truncate |open\(|writeFile|appendFile'

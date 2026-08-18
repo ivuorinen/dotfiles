@@ -76,6 +76,10 @@ deny_compound_res=(
   '^ruff[[:space:]]+(check|format[[:space:]]+--check)'
   '^stylua[[:space:]]+(--check|-c)'
   '^pre-commit[[:space:]]+run'
+  # prek is the hook runner this repo actually installs (config/mise/config.toml);
+  # `pre-commit` was denied while its replacement was not, so the same
+  # full-suite output escaped routing under the name that is really used.
+  '^prek[[:space:]]+run'
 )
 
 # Split the command on pipeline separators (|, &&, ||, ;) and command
@@ -123,11 +127,32 @@ first_word()
 #   VAR=a BAR=b cmd       — chained assignments
 strip_env_prefix()
 {
-  local segment=$1
-  printf '%s' "$segment" | sed -E '
-    s/^env[[:space:]]+(-[^[:space:]]+[[:space:]]+)*([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)*//
-    s/^([A-Za-z_][A-Za-z_0-9]*=[^[:space:]]+[[:space:]]+)+//
-  '
+  local seg=$1 prev
+  # Inline assignments. The value is optional (`[^[:space:]]*`, not `+`):
+  # `FOO= cat README.md` is a legal empty assignment, and requiring a value
+  # left `FOO=` as the first word, matching nothing on either list.
+  while :; do
+    prev=$seg
+    seg=$(printf '%s' "$seg" | sed -E 's/^[A-Za-z_][A-Za-z_0-9]*=[^[:space:]]*[[:space:]]+//')
+    [[ "$seg" == "$prev" ]] && break
+  done
+
+  if [[ "$seg" =~ ^env([[:space:]]|$) ]]; then
+    seg=$(printf '%s' "$seg" | sed -E 's/^env[[:space:]]+//')
+    while :; do
+      prev=$seg
+      # -u/-C/-S take a SEPARATE operand, so the operand is consumed with the
+      # flag. Dropping only the flag left `env -u FOO cat` as `FOO cat`, and
+      # `cat` was never classified.
+      seg=$(printf '%s' "$seg" | sed -E '
+        s/^(-u|--unset|-C|--chdir|-S|--split-string)[[:space:]]+[^[:space:]]+[[:space:]]+//
+        s/^-[^[:space:]]+[[:space:]]+//
+        s/^[A-Za-z_][A-Za-z_0-9]*=[^[:space:]]*[[:space:]]+//
+      ')
+      [[ "$seg" == "$prev" ]] && break
+    done
+  fi
+  printf '%s' "$seg"
   return 0
 }
 
@@ -149,7 +174,7 @@ normalise_cmd()
 # bash-routing.md treats single tool probes as fine on Bash.
 strip_wrappers()
 {
-  local seg=$1
+  local seg=$1 next
   while :; do
     if [[ "$seg" =~ ^command[[:space:]]+-[vV]([[:space:]]|$) ]]; then
       break
@@ -158,10 +183,16 @@ strip_wrappers()
       command | builtin | exec | nohup | time | timeout | stdbuf | xargs | nice | ionice)
         # Drop the wrapper, then its own flags and any numeric argument
         # (`timeout 5`), leaving the wrapped command in first position.
-        seg=$(printf '%s' "$seg" | sed -E '
+        next=$(printf '%s' "$seg" | sed -E '
           s/^[^[:space:]]+[[:space:]]+//
           s/^(-[^[:space:]]+[[:space:]]+|[0-9]+[a-z]?[[:space:]]+)*//
         ')
+        # A bare wrapper with nothing after it (`xargs`, `timeout`) matches the
+        # case but has no trailing space for the substitutions to bite on, so
+        # the value never changes. Without this guard the loop spins forever
+        # and the PreToolUse hook never returns — every Bash call hangs.
+        [[ "$next" == "$seg" ]] && break
+        seg=$next
         ;;
       *) break ;;
     esac
@@ -174,8 +205,16 @@ deny_reason=""
 
 while IFS= read -r segment; do
   [[ -z "$segment" ]] && continue
-  segment=$(strip_env_prefix "$segment")
-  segment=$(strip_wrappers "$segment")
+  # Wrappers and env prefixes nest in either order — `timeout 5 env -i cat`
+  # needs the wrapper peeled before the env prefix is even visible, and a
+  # single pass of each in fixed order classified `env` and let `cat` through.
+  # Alternate until neither peels anything.
+  prev_segment=""
+  while [[ "$segment" != "$prev_segment" ]]; do
+    prev_segment=$segment
+    segment=$(strip_env_prefix "$segment")
+    segment=$(strip_wrappers "$segment")
+  done
   fw=$(normalise_cmd "$(first_word "$segment")")
   [[ -z "$fw" ]] && continue
 
