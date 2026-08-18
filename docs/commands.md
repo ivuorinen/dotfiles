@@ -51,7 +51,7 @@ stylua config/nvim/     # Format neovim Lua files
 ## Pre-commit
 
 ```bash
-pre-commit run --all-files
+prek run --all-files
 ```
 
 ## Tooling maintenance

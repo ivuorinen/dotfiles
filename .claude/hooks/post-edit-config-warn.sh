@@ -8,7 +8,7 @@ fp=$(jq -r '.tool_input.file_path // empty')
 case "$(basename "$fp")" in
   .editorconfig | biome.json | .prettierrc.json | .shellcheckrc | stylua.toml | .yamllint.yml)
     echo "NOTE: Formatter/linter config changed ($fp)." >&2
-    echo "Run 'pre-commit run --all-files' to verify consistency." >&2
+    echo "Run 'prek run --all-files' to verify consistency." >&2
     ;;
   *) ;;
 esac
