@@ -75,12 +75,12 @@ with_path()
     _ "$WORK/install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
 }
 
-# The repo's real dotbot config must pass its own validator — a check that
-# would have caught the link-config split had it gone wrong.
-@test "post-edit-dotbot-validate: the repo's own configs validate" {
-  for f in install.conf.yaml dotbot-links.yaml; do
-    [ -f "${BATS_TEST_DIRNAME}/../$f" ] || continue
-  done
+# The repo's real install.conf.yaml must pass its own validator. The hook is
+# scoped to `*install.conf.yaml`, so this covers that file alone —
+# dotbot-links.yaml is never handed to it and asserting on it here would be
+# theatre. Its YAML is covered by the yamllint hook instead.
+@test "post-edit-dotbot-validate: the repo's own install.conf.yaml validates" {
+  [ -f "${BATS_TEST_DIRNAME}/../install.conf.yaml" ]
   run -0 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
     _ "${BATS_TEST_DIRNAME}/../install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
 }

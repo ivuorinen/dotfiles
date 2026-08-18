@@ -92,7 +92,14 @@ dfm_check()
         /^ *create: *$/ { in_create = 1; next }
         in_create && /mode:/ { gsub(/[^0-7]/, "", $2); print $2; exit }
       ' "$defaults")
-      : "${default_mode:=0777}"
+      # No silent fallback. 0777 mirrors dotbot's own os.makedirs default, but
+      # for a *checker* it is the worst possible guess: an unreadable or
+      # restructured defaults file would make every unmoded directory "pass"
+      # at world-writable, and print `chmod 0777` as the repair.
+      if [[ -z "$default_mode" ]]; then
+        msgr err "Cannot read the create default mode from $defaults"
+        return 1
+      fi
 
       while read -r want path; do
         path="${path/#\~/$HOME}"
