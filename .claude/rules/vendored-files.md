@@ -7,6 +7,8 @@ paths:
   - "config/fzf/key-bindings.bash"
   - "config/fzf/key-bindings.zsh"
   - "config/fzf/key-bindings.fish"
+  - "local/man/man1/fzf.1"
+  - "local/man/man1/fzf-tmux.1"
   - "local/bin/iterm2_shell_integration.zsh"
   - ".claude/skills/graphify/**"
   - "config/fish/functions/fisher.fish"

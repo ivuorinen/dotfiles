@@ -141,11 +141,17 @@ strip_env_prefix()
     seg=$(printf '%s' "$seg" | sed -E 's/^env[[:space:]]+//')
     while :; do
       prev=$seg
-      # -u/-C/-S take a SEPARATE operand, so the operand is consumed with the
-      # flag. Dropping only the flag left `env -u FOO cat` as `FOO cat`, and
-      # `cat` was never classified.
+      # -u/-C take a SEPARATE operand naming a variable or directory, so the
+      # operand is consumed with the flag. Dropping only the flag left
+      # `env -u FOO cat` as `FOO cat`, and `cat` was never classified.
+      #
+      # -S/--split-string is deliberately NOT here. Its operand is the command
+      # itself, so consuming it threw the command away: `env -S cat README.md`
+      # became `README.md` and the `cat` was never seen. Only the flag is
+      # dropped (by the generic rule below), leaving the split string to be
+      # classified like any other command.
       seg=$(printf '%s' "$seg" | sed -E '
-        s/^(-u|--unset|-C|--chdir|-S|--split-string)[[:space:]]+[^[:space:]]+[[:space:]]+//
+        s/^(-u|--unset|-C|--chdir)[[:space:]]+[^[:space:]]+[[:space:]]+//
         s/^-[^[:space:]]+[[:space:]]+//
         s/^[A-Za-z_][A-Za-z_0-9]*=[^[:space:]]*[[:space:]]+//
       ')
@@ -161,9 +167,14 @@ strip_env_prefix()
 # `\cat` match nothing and fall through to the allow-by-default branch — which
 # also defeated the `bash|sh|zsh|dash|ksh` entries whose whole purpose is to
 # block `bash -c '<denied>'`, since `/bin/bash -c` was spelled differently.
+# Leading quotes are stripped too: `env -S "cat README.md"` leaves the split
+# string quoted, so the first word arrives as `"cat` and matches no anchored
+# entry.
 normalise_cmd()
 {
   local w=${1#\\}
+  w=${w#\"}
+  w=${w#\'}
   printf '%s' "${w##*/}"
 }
 
@@ -210,10 +221,13 @@ while IFS= read -r segment; do
   # single pass of each in fixed order classified `env` and let `cat` through.
   # Alternate until neither peels anything.
   prev_segment=""
+  wrapped=0
   while [[ "$segment" != "$prev_segment" ]]; do
     prev_segment=$segment
     segment=$(strip_env_prefix "$segment")
+    before_wrappers=$segment
     segment=$(strip_wrappers "$segment")
+    [[ "$segment" != "$before_wrappers" ]] && wrapped=1
   done
   fw=$(normalise_cmd "$(first_word "$segment")")
   [[ -z "$fw" ]] && continue
@@ -244,6 +258,19 @@ while IFS= read -r segment; do
   # First-word allowlist — anything else falls through to the catch-all below.
   if printf '%s' "$fw" | grep -qE "$allow_first_word_re"; then
     continue
+  fi
+
+  # Fail closed on a wrapper form this parser could not fully normalise.
+  # Wrapper options with operands are open-ended — `stdbuf -o L`, `xargs -E EOF`,
+  # `timeout --signal KILL` — and enumerating them all is a losing game: each
+  # miss leaves the operand as the first word, so `stdbuf -o L cat README.md`
+  # was classified as `L` and allowed. Anything peeled from a wrapper that
+  # lands on neither list is refused rather than waved through; the unwrapped
+  # command is still checked normally, and BASH_OK remains the documented
+  # override.
+  if [[ "$wrapped" -eq 1 ]]; then
+    deny_reason="wrapper form could not be normalised — '$fw' in segment '$segment' is on neither list"
+    break
   fi
 
   # Unknown command: not on either list. Allow by default — bash-routing.md is

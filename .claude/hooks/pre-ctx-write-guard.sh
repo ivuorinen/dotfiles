@@ -23,7 +23,7 @@ payload=$(printf '%s' "$input" | jq -r '
 # the graphify skill, the iTerm2 integration, and tools/dotbot-include (which
 # the tools/dotbot prefix does happen to cover) — so a `rm` on any of them went
 # through ctx_execute unchecked.
-protected='fzf-tmux|yarn\.lock|\.yarn/|tools/dotbot|tools/antidote|config/fzf/(completion|key-bindings)\.|cheat/cheatsheets/(community|tldr)|config/fish/functions/(fisher|bass|__bass|__z_add|__z_clean)\.|\.claude/skills/graphify/|iterm2_shell_integration\.zsh'
+protected='fzf-tmux|yarn\.lock|\.yarn/|tools/dotbot|tools/antidote|config/fzf/(completion|key-bindings)\.|cheat/cheatsheets/(community|tldr)|config/fish/functions/(fisher|bass|__bass|__z_add|__z_clean)\.|\.claude/skills/graphify/|iterm2_shell_integration\.zsh|local/man/man1/fzf(-tmux)?\.1'
 # ponytail: same-line co-occurrence heuristic — write-shaped tokens next to a
 # protected path. Upgrade to real argv parsing only if false positives hurt.
 writeish='>>|>|sed [^|;&]*-i|tee |rm |mv |cp |chmod |truncate |open\(|writeFile|appendFile'

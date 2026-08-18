@@ -160,6 +160,33 @@ decision()
   [ "$(decision 'timeout 5 env -i git add .')" = "allow" ]
 }
 
+# `env -S` is not like `-u`/`-C`: its operand IS the command. Consuming it as
+# an operand threw the command away — `env -S cat README.md` became
+# `README.md` — so only the flag is dropped now.
+@test "pre-bash-route: env -S keeps the split string as the command" {
+  [ "$(decision 'env -S cat README.md')" = "deny" ]
+  [ "$(decision 'env -S "cat README.md"')" = "deny" ]
+  [ "$(decision "env -S 'rg foo .'")" = "deny" ]
+  [ "$(decision 'env -S git add .')" = "allow" ]
+}
+
+# Wrapper options with operands are open-ended (`stdbuf -o L`, `xargs -E EOF`,
+# `timeout --signal KILL`), and every one missed leaves the operand as the
+# first word. Rather than enumerate them, an unrecognised post-wrapper token
+# fails closed.
+@test "pre-bash-route: an unnormalisable wrapper form fails closed" {
+  [ "$(decision 'stdbuf -o L cat README.md')" = "deny" ]
+  [ "$(decision 'xargs -E EOF cat')" = "deny" ]
+  [ "$(decision 'timeout --signal KILL rg foo .')" = "deny" ]
+}
+
+# Fail-closed must not swallow the ordinary wrapped-allow case.
+@test "pre-bash-route: a wrapped allowed command is still allowed" {
+  [ "$(decision 'timeout 5 git add .')" = "allow" ]
+  [ "$(decision 'nohup git push')" = "allow" ]
+  [ "$(decision 'nice mkdir -p x')" = "allow" ]
+}
+
 # Regression: a bare wrapper has no trailing token for the substitutions to
 # consume, so the stripping loop never converged and the hook hung forever —
 # blocking every Bash call in the session, not just this one.

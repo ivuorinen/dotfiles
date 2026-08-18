@@ -34,7 +34,8 @@ case "$fp" in
     ;;
   */config/fzf/completion.bash | */config/fzf/completion.zsh | \
     */config/fzf/key-bindings.bash | */config/fzf/key-bindings.zsh | \
-    */config/fzf/key-bindings.fish)
+    */config/fzf/key-bindings.fish | \
+    */local/man/man1/fzf.1 | */local/man/man1/fzf-tmux.1)
     echo "BLOCKED: $fp is a vendored fzf file — update via submodule sync" >&2
     echo "See .claude/rules/vendored-files.md." >&2
     exit 2
