@@ -51,7 +51,12 @@ allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish
 # `status` is here on purpose: bash-routing.md names it as the one git reader
 # that stays on Bash ("a common one-line check"). It was missing until an audit
 # found the hook denying it against both the rule and the comment below.
-allow_git_subcmd_re='^(status|add|commit|mv|rm|checkout|push|fetch|reset|restore|stash|tag|init|clone|branch|merge|remote|cherry-pick|revert|switch|am|apply|format-patch|gc|prune|reflog|worktree|notes|submodule|rerere|update-ref|symbolic-ref|update-index|hash-object|cat-file|rev-parse|rev-list|ls-files|check-ignore|config)$'
+# `rebase` sits with merge/cherry-pick/revert: it rewrites history, and its
+# `--continue`/`--skip`/`--abort` steps are the same operation. It was missing
+# while its siblings were listed, so every rebase needed a BASH_OK escape —
+# which trains the habit of reaching for the escape hatch rather than fixing
+# the list.
+allow_git_subcmd_re='^(status|add|commit|mv|rm|checkout|push|fetch|reset|restore|stash|tag|init|clone|branch|merge|rebase|remote|cherry-pick|revert|switch|am|apply|format-patch|gc|prune|reflog|worktree|notes|submodule|rerere|update-ref|symbolic-ref|update-index|hash-object|cat-file|rev-parse|rev-list|ls-files|check-ignore|config)$'
 
 # Denylist: first-word commands that almost always produce reviewable output.
 # Includes `bash`/`sh`/`zsh`/`dash`/`ksh` to block `bash -c '<denied>'` and

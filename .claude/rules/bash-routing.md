@@ -40,7 +40,9 @@ Only these narrow cases:
 
 1. **Side-effect commands that produce no output you need to read:**
     `git add <file>`, `git commit -m '...'`, `git mv`, `git rm`,
-    `git checkout <branch>`, `git push`, `mkdir -p <dir>`, `chmod`, `chown`.
+    `git checkout <branch>`, `git push`, `git rebase` (including its
+    `--continue`/`--skip`/`--abort` steps), `mkdir -p <dir>`, `chmod`,
+    `chown`.
     The exit code is the signal; the stdout is irrelevant. The hook's git
     allowlist also passes plumbing queries (`rev-parse`, `ls-files`,
     `cat-file`, `check-ignore`, `config`) — they answer one question rather

@@ -46,6 +46,17 @@ decision()
   [ "$(decision 'git rev-parse --git-dir')" = "allow" ]
 }
 
+# rebase rewrites history exactly as merge and cherry-pick do, and its
+# continuation steps are the same operation. It was omitted while its siblings
+# were listed, so every rebase needed a BASH_OK escape.
+@test "pre-bash-route: rebase and its continuation steps are allowed" {
+  [ "$(decision 'git rebase origin/main')" = "allow" ]
+  [ "$(decision 'git rebase --continue')" = "allow" ]
+  [ "$(decision 'git rebase --skip')" = "allow" ]
+  [ "$(decision 'git rebase --abort')" = "allow" ]
+  [ "$(decision 'git rebase -i HEAD~3')" = "allow" ]
+}
+
 @test "pre-bash-route: git readers are denied" {
   [ "$(decision 'git log --oneline -5')" = "deny" ]
   [ "$(decision 'git diff')" = "deny" ]
