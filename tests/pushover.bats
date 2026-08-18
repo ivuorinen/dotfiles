@@ -12,6 +12,10 @@ setup()
 # split into several by a shell that re-parsed it.
 : > "${STUB_DIR}/curl.args"
 for a in "$@"; do printf '%s\n' "$a" >> "${STUB_DIR}/curl.args"; done
+# Record USER as the child process sees it. A parent-shell check cannot prove
+# anything: the script runs in its own process and could set USER freely
+# without the caller ever observing it.
+printf '%s\n' "${USER-}" > "${STUB_DIR}/curl.user"
 echo '{"status":1,"request":"stub-id"}'
 STUB
   chmod +x "$STUB_DIR/curl"
@@ -99,9 +103,31 @@ teardown()
 
 # The standard USER variable must survive the run: -U used to assign straight
 # into it, clobbering it for the rest of the process.
+#
+# Asserted inside the curl stub, not in the calling shell. A child process
+# cannot modify its parent's variables, so echoing $USER after the script
+# returns proves nothing — that check passed even against the broken version.
 @test "pushover: -U does not overwrite the standard USER variable" {
-  run sh -c 'USER=realuser; . /dev/null; sh local/bin/pushover -U key-from-flag "body"; echo "USER=$USER"'
+  run env USER=realuser sh local/bin/pushover -U key-from-flag "body"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"USER=realuser"* ]]
+  grep -Fqx 'realuser' "$STUB_DIR/curl.user"
   grep -Fqx 'user=key-from-flag' "$STUB_DIR/curl.args"
+}
+
+# With -F, curl reads a local file when a value starts with `@` (or `<`), so a
+# message could exfiltrate a file to the API. --form-string takes it literally.
+@test "pushover: a message starting with @ is text, not a file reference" {
+  run sh local/bin/pushover '@/etc/passwd'
+  [ "$status" -eq 0 ]
+  grep -Fqx 'message=@/etc/passwd' "$STUB_DIR/curl.args"
+  # The literal-value flag must be what carries it.
+  grep -Fqx -- '--form-string' "$STUB_DIR/curl.args"
+  run grep -Fqx -- '-F' "$STUB_DIR/curl.args"
+  [ "$status" -ne 0 ]
+}
+
+@test "pushover: a title starting with < is text, not a file reference" {
+  run sh local/bin/pushover -t '<config' 'body'
+  [ "$status" -eq 0 ]
+  grep -Fqx 'title=<config' "$STUB_DIR/curl.args"
 }
