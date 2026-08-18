@@ -31,12 +31,14 @@ exclude_dirs = [
   "./config/fish/functions/__bass.py",
   "./config/fish/functions/fisher.fish",
 ]
-# B607 (start_process_with_partial_path): every script here calls git, awk,
-# sort, and column through PATH on purpose. Absolute paths would break on
-# macOS/Homebrew and on mise shims, where the same binary lives elsewhere per
-# host. The companion check B603 stays on, so the argument list is still
-# audited — only the "resolve via PATH" half is accepted.
-skips = ["B607"]
+# No repo-wide skips. B607 (start_process_with_partial_path) is accepted only
+# at the seven call sites in local/bin/x-git-largest-files.py that invoke git,
+# awk, sort, grep and column through PATH on purpose — absolute paths would
+# break on macOS/Homebrew and on mise shims, where the same binary lives
+# elsewhere per host. Those lines carry `# nosec B603,B607` individually, so
+# the check stays armed for every future call site rather than being disabled
+# across the whole scan. B603 is likewise per-line, never global, so the
+# argument list of each call is still audited.
 
 [tool.bandit.assert_used]
 # local/bin/x-compare-versions.py ships an assert-based self-check run as
