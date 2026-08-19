@@ -120,8 +120,20 @@ dfm_check()
           mode = def
           next
         }
-        /^      mode:/ { m = $2; gsub(/[^0-7]/, "", m); mode = m }
-        END { if (path != "") print mode, path }
+        # Validate rather than sanitise. Stripping non-octal characters turned
+        # `mode: invalid` into an empty field (the entry was then silently
+        # skipped) and `mode: 07558` into `0755` — quietly checking against a
+        # mode nobody declared. Both now abort the parse, and the caller
+        # already treats a non-zero awk as fatal.
+        /^      mode:/ {
+          m = $2
+          if (m !~ /^0?[0-7][0-7][0-7]$/) { bad = m; exit 1 }
+          mode = m
+        }
+        END {
+          if (bad != "") exit 1
+          if (path != "") print mode, path
+        }
       ' "$links"); then
         msgr err "Cannot parse the create block in $links"
         return 1
