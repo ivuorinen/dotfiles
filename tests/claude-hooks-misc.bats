@@ -61,7 +61,12 @@ with_path()
 # dotbot config breaks ./install, and the failure would otherwise appear far
 # from the edit that caused it.
 
+# Needs a validator present. This previously "passed" on macOS for the wrong
+# reason: PyYAML was missing, the ImportError exited 2, and the assertion read
+# that as a rejection of the YAML.
 @test "post-edit-dotbot-validate: rejects malformed install.conf.yaml" {
+  command -v yamllint > /dev/null || python3 -c 'import yaml' 2> /dev/null \
+    || skip "no yamllint and no PyYAML — nothing can validate"
   printf -- '- link:\n    ~/.foo: bar\n  bad indent here: [\n' > "$WORK/install.conf.yaml"
   run -2 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
     _ "$WORK/install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
@@ -83,6 +88,27 @@ with_path()
   [ -f "${BATS_TEST_DIRNAME}/../install.conf.yaml" ]
   run -0 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
     _ "${BATS_TEST_DIRNAME}/../install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
+}
+
+# The reason the two accept-tests above failed in CI: with no yamllint and no
+# PyYAML the hook reported "YAML parse error ... ModuleNotFoundError" and
+# exited 2, blocking a perfectly valid config. A missing parser means the file
+# is unvalidated, not invalid.
+@test "post-edit-dotbot-validate: a missing parser does not fail the edit" {
+  mkdir -p "$WORK/bin"
+  # python3 that has no yaml module, and a PATH with no yamllint.
+  cat > "$WORK/bin/python3" << 'EOF'
+#!/usr/bin/env bash
+echo "ModuleNotFoundError: No module named 'yaml'" >&2
+exit 1
+EOF
+  chmod +x "$WORK/bin/python3"
+  printf -- '---\n- link:\n    ~/.bashrc: base/bashrc\n' > "$WORK/install.conf.yaml"
+  run -0 env PATH="$WORK/bin:/usr/bin:/bin" bash -c \
+    'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
+    _ "$WORK/install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
+  # Silence would be worse: a skipped check must not look like a passed one.
+  [[ "$output" == *"not validated"* ]]
 }
 
 @test "post-edit-dotbot-validate: ignores yaml that is not a dotbot config" {
@@ -189,9 +215,16 @@ with_path()
 
 @test "async-bats: runs the test file matching the edited script" {
   mkdir -p "$WORK/tests"
+  # Multi-line body deliberately: the one-line `@test "x" { true; }` form is
+  # not parsed by every bats version, and an unparsed file yields `1..0` — a
+  # run with no tests in it, which reads as a pass. That failed on the Ubuntu
+  # runner while passing locally on bats 1.14.
   cat > "$WORK/tests/demo-script.bats" << 'EOF'
 #!/usr/bin/env bats
-@test "demo: trivially true" { true; }
+
+@test "demo: trivially true" {
+  true
+}
 EOF
   run -0 env CLAUDE_PROJECT_DIR="$WORK" bash -c \
     'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
