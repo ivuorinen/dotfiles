@@ -1,0 +1,44 @@
+---
+# Codacy runs against this repo through the GitHub App
+# (https://app.codacy.com/gh/ivuorinen/dotfiles). Without this file Codacy
+# analyses everything, including third-party code, and reports issues that
+# cannot be acted on: the next upstream sync discards any fix.
+#
+# The exclusion set below mirrors the one every other gate already uses --
+# tool.ruff.extend-exclude and tool.bandit.exclude_dirs (pyproject.toml),
+# FILTER_REGEX_EXCLUDE (.mega-linter.yml), and the vendored trees listed in
+# .claude/rules/vendored-files.md. Keep the four in step when one moves.
+#
+# Patterns use Java glob syntax, not gitignore syntax: `dir/**` matches
+# everything inside dir, and a bare `dir/*` would only match its direct
+# children.
+#
+# Scope limit: this file controls which paths are analysed. It does NOT
+# enable or disable individual patterns -- that lives in the repository's
+# Code patterns page in the Codacy UI. Bandit's B101/B607 decisions for this
+# repo are recorded in [tool.bandit] in pyproject.toml; for Codacy to honour
+# them, "use configuration file" must be enabled for Bandit in that UI.
+exclude_paths:
+  # Git submodules
+  - "tools/**"
+  - "config/cheat/cheatsheets/community/**"
+  - "config/cheat/cheatsheets/tldr/**"
+  # Vendored in-tree (.claude/rules/vendored-files.md)
+  - "config/fzf/**"
+  - "local/bin/fzf-tmux"
+  - "local/bin/iterm2_shell_integration.zsh"
+  - ".claude/skills/graphify/**"
+  # Vendored fish helpers, refreshed from upstream rather than edited
+  - "config/fish/functions/__bass.py"
+  - "config/fish/functions/bass.fish"
+  - "config/fish/functions/fisher.fish"
+  - "config/fish/functions/__z_add.fish"
+  - "config/fish/functions/__z_clean.fish"
+  # Generated shell completions, rewritten by scripts/install-completions.sh
+  - "config/bash/completions.d/**"
+  - "config/zsh/completions.d/**"
+  # Tool-managed trees, never hand-edited
+  - "node_modules/**"
+  - ".yarn/**"
+  - "graphify-out/**"
+  - "config/tmux/plugins/**"

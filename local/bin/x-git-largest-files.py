@@ -103,20 +103,20 @@ def get_top_blobs(count, size_limit):
     if sortByOnDiskSize:
         sort_column = 3
 
-    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603 # nosemgrep
+    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603 B607 # nosemgrep
     idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
     if not idx_files:
         print("No packfiles found — run 'git gc' first.")
         sys.exit(1)
-    verify_pack = Popen(  # nosec B603
+    verify_pack = Popen(  # nosec B603 B607
         ["git", "verify-pack", "-v", *idx_files],
         stdout=PIPE,
         stderr=DEVNULL,
     )
-    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=DEVNULL)  # nosec B603
+    grep_blob = Popen(["grep", "blob"], stdin=verify_pack.stdout, stdout=PIPE, stderr=DEVNULL)  # nosec B603 B607
     if verify_pack.stdout:
         verify_pack.stdout.close()
-    sort_cmd = Popen(  # nosec B603
+    sort_cmd = Popen(  # nosec B603 B607
         ["sort", f"-k{sort_column}nr"],
         stdin=grep_blob.stdout,
         stdout=PIPE,
@@ -156,8 +156,8 @@ def populate_blob_paths(blobs):
         print("Finding object paths…")
 
         # Only include revs which have a path. Other revs aren't blobs.
-        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=DEVNULL)  # nosec B603
-        awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603
+        rev_list = Popen(["git", "rev-list", "--all", "--objects"], stdout=PIPE, stderr=DEVNULL)  # nosec B603 B607
+        awk_filter = Popen(["awk", "$2 {print}"], stdin=rev_list.stdout, stdout=PIPE, stderr=PIPE)  # nosec B603 B607
         if rev_list.stdout:
             rev_list.stdout.close()
         all_object_lines = [line for line in awk_filter.communicate()[0].decode("utf-8").strip().split("\n") if line]
@@ -187,7 +187,7 @@ def print_out_blobs(blobs):
 
         csv_text = "\n".join(csv_lines) + "\n"
         try:
-            p = Popen(["column", "-t", "-s", ","], stdin=PIPE, stdout=PIPE, stderr=PIPE)  # nosec B603
+            p = Popen(["column", "-t", "-s", ","], stdin=PIPE, stdout=PIPE, stderr=PIPE)  # nosec B603 B607
         except FileNotFoundError:
             # column(1) is missing — fall back to raw CSV
             print(csv_text.rstrip("\n"))

@@ -29,6 +29,12 @@ Examples:
 - `feat(starship): add battery module`
 - `chore(deps): bump grype 0.111.1 → 0.112.0`
 
-Enforced by commitlint extending `@ivuorinen/commitlint-config` via a
-pre-commit hook. Getting the format right on the first attempt avoids
-a hook-failure round-trip.
+Enforced by commitlint extending `@ivuorinen/commitlint-config`, wired
+in `.pre-commit-config.yaml` as a **commit-msg** hook — the only stage
+that can see a commit message. Getting the format right on the first
+attempt avoids a hook-failure round-trip.
+
+The gate exists only after `prek install` has run in the clone:
+`default_install_hook_types` names both stages, but nothing installs
+them for you. If a malformed message commits cleanly, check
+`.git/hooks/commit-msg` exists before assuming the message passed.

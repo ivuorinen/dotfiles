@@ -9,10 +9,11 @@
 #USAGE     alias "hostname"
 #USAGE     arg "[hostname]" help="Hostname to check against"
 #USAGE   }
-#USAGE   cmd "all" help="Run all health checks in sequence"
+#USAGE   cmd "all" help="Run brew, mise, tools, perms, updates, and disk checks"
 #USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
 #USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
+#USAGE   cmd "perms" help="Verify created directories still have their declared mode"
 #USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
 #USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
 #USAGE }
@@ -44,10 +45,11 @@ dfm_check()
   MENU=(
     "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
     "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
-    "all:Run brew, mise, tools, updates, and disk checks in sequence"
+    "all:Run brew, mise, tools, perms, updates, and disk checks in sequence"
     "brew:Verify all Brewfile packages are installed"
     "disk:Show disk usage for mise installs and brew cache"
     "mise:Run mise doctor to check mise health"
+    "perms:Verify created directories still have their declared mode"
     "tools:Verify essential CLI tools are available in PATH"
     "updates:Show available updates for mise tools and brew packages"
   )
@@ -68,8 +70,127 @@ dfm_check()
       dfm_check brew || rc=1
       dfm_check mise || rc=1
       dfm_check tools || rc=1
+      dfm_check perms || rc=1
       dfm_check updates || rc=1
       dfm_check disk || rc=1
+      return "$rc"
+      ;;
+
+    perms)
+      # dotbot's `create` plugin applies a declared `mode:` only when it
+      # creates the path; on every later run it logs "Path exists" and never
+      # looks at the mode. So a mode added or tightened after a machine was
+      # provisioned is a no-op there, and drift introduced by anything else is
+      # never repaired — `./install` still exits 0. This check is the missing
+      # half: it reads the declared modes out of dotbot-links.yaml rather than
+      # keeping a second hardcoded list that would drift from it.
+      local links="$DOTFILES/dotbot-links.yaml"
+      local defaults="$DOTFILES/tools/dotbot-defaults.yaml"
+      local default_mode rc=0 checked=0
+
+      # Validated, not sanitised — the same rule the explicit `mode:` parser
+      # below uses. Stripping non-octal characters turned `07558` into `0755`,
+      # so every unmoded directory would have been checked against a default
+      # the defaults file never declared.
+      default_mode=$(awk '
+        /^ *create: *$/ { in_create = 1; next }
+        in_create && /^ *mode:/ {
+          if ($2 !~ /^0?[0-7][0-7][0-7]$/) exit 1
+          print $2
+          found = 1
+          exit
+        }
+        END { if (!found) exit 1 }
+      ' "$defaults")
+      # No silent fallback. 0777 mirrors dotbot's own os.makedirs default, but
+      # for a *checker* it is the worst possible guess: an unreadable or
+      # restructured defaults file would make every unmoded directory "pass"
+      # at world-writable, and print `chmod 0777` as the repair.
+      if [[ -z "$default_mode" ]]; then
+        msgr err "Cannot read the create default mode from $defaults"
+        return 1
+      fi
+
+      # Parsed up front rather than in a process substitution. A `while ... done
+      # < <(awk ...)` swallows awk's exit status: if the parse failed, the loop
+      # would simply see no rows, checked would stay 0, rc would stay 0, and
+      # the check would report success having inspected nothing.
+      local declared
+      if ! declared=$(awk -v def="$default_mode" '
+        /^- create:/ { in_create = 1; next }
+        /^- / { in_create = 0 }
+        !in_create { next }
+        /^ *#/ { next }
+        /^    [^ ]/ {
+          if (path != "") print mode, path
+          line = $0
+          sub(/^    /, "", line)
+          sub(/:[[:space:]]*$/, "", line)
+          path = line
+          mode = def
+          next
+        }
+        # Validate rather than sanitise. Stripping non-octal characters turned
+        # `mode: invalid` into an empty field (the entry was then silently
+        # skipped) and `mode: 07558` into `0755` — quietly checking against a
+        # mode nobody declared. Both now abort the parse, and the caller
+        # already treats a non-zero awk as fatal.
+        /^      mode:/ {
+          m = $2
+          if (m !~ /^0?[0-7][0-7][0-7]$/) { bad = m; exit 1 }
+          mode = m
+        }
+        END {
+          if (bad != "") exit 1
+          if (path != "") print mode, path
+        }
+      ' "$links"); then
+        msgr err "Cannot parse the create block in $links"
+        return 1
+      fi
+      if [[ -z "$declared" ]]; then
+        msgr err "No create entries found in $links — refusing to report a clean check"
+        return 1
+      fi
+
+      while read -r want path; do
+        path="${path/#\~/$HOME}"
+        if [[ ! -d "$path" ]]; then
+          # Not an error: several entries are only created on the hosts that
+          # need them, and `dfm check` runs on all of them.
+          continue
+        fi
+        local have
+        # GNU coreutils first, BSD/macOS second. %Lp is the permission bits
+        # without the file type, which is what %a gives on GNU.
+        have=$(stat -c '%a' "$path" 2> /dev/null || stat -f '%Lp' "$path" 2> /dev/null)
+        # Fail closed: a directory that exists but whose mode cannot be read is
+        # unverified, not compliant. Skipping it silently would let the check
+        # report success over the one path it could not inspect.
+        if [[ -z "$have" ]]; then
+          msgr err "Cannot read the mode of $path"
+          rc=1
+          continue
+        fi
+        checked=$((checked + 1))
+        if ((8#$have != 8#$want)); then
+          # Normalise both sides: stat prints 777, the YAML carries 0700, and
+          # concatenating a literal 0 onto whichever one lacks it produces
+          # 00700 in the chmod line the user is meant to paste.
+          local have_o want_o
+          printf -v have_o '%04o' "$((8#$have))"
+          printf -v want_o '%04o' "$((8#$want))"
+          msgr err "mode drift: $path is $have_o, declared $want_o"
+          msgr nested "fix: chmod $want_o $path"
+          rc=1
+        fi
+      done <<< "$declared"
+
+      if ((rc == 0)); then
+        msgr yay "All $checked created directories match their declared mode"
+      else
+        msgr err "Run the chmod lines above; ./install cannot repair an existing path"
+      fi
       return "$rc"
       ;;
 

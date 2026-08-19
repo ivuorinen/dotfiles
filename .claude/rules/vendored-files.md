@@ -7,13 +7,20 @@ paths:
   - "config/fzf/key-bindings.bash"
   - "config/fzf/key-bindings.zsh"
   - "config/fzf/key-bindings.fish"
+  - "local/man/man1/fzf.1"
+  - "local/man/man1/fzf-tmux.1"
   - "local/bin/iterm2_shell_integration.zsh"
   - ".claude/skills/graphify/**"
+  - "config/fish/functions/fisher.fish"
+  - "config/fish/functions/bass.fish"
+  - "config/fish/functions/__bass.py"
+  - "config/fish/functions/__z_add.fish"
+  - "config/fish/functions/__z_clean.fish"
 ---
 
 # Vendored files
 
-Never modify vendored files. Three trees are vendored in-tree rather
+Never modify vendored files. Four groups are vendored in-tree rather
 than carried as submodules; each is refreshed from upstream, never
 edited in place.
 
@@ -69,6 +76,30 @@ change with no submodule sync to recover from.
 `local/bin/iterm2_shell_integration.zsh` is vendored from iTerm2.
 Refresh by downloading the current version from
 <https://iterm2.com/shell_integration/zsh>.
+
+## fish plugin functions
+
+Five files under `config/fish/functions/` are plugin code, not repo
+code. They sit beside hand-written functions with no naming signal,
+which is exactly why they are listed here:
+
+| File                     | Upstream                                                      |
+|--------------------------|---------------------------------------------------------------|
+| `fisher.fish`            | [jorgebucaran/fisher](https://github.com/jorgebucaran/fisher) |
+| `bass.fish`, `__bass.py` | [edc/bass](https://github.com/edc/bass)                       |
+| `__z_add.fish`           | [jethrokuan/z](https://github.com/jethrokuan/z)               |
+| `__z_clean.fish`         | [jethrokuan/z](https://github.com/jethrokuan/z)               |
+
+`fisher.fish` carries its own version marker — `set --local
+fisher_version 4.4.8` on line 3 — so check that before and after any
+refresh. Refresh each through fisher itself (`fisher update`), never
+by editing the file.
+
+Scanner exclusions for this group already exist: `__bass.py` is in
+`exclude_dirs` under `[tool.bandit]` in `pyproject.toml`, and all five
+are in `exclude_paths` in `.codacy.yml`. Without them Codacy reports
+five unactionable Security issues against `__bass.py` alone (B404,
+two B603, two Opengrep `dangerous-subprocess-use`).
 
 ## Enforcement
 

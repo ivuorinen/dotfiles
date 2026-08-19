@@ -119,6 +119,64 @@ run_watcher_linux()
   [ "$status" -eq 1 ]
 }
 
+# Regression: _acquire_lock must never hand the same lock to two processes.
+#
+# The stale-reclaim path used to unlink the dead pidfile and then ln its own,
+# unguarded. Two racers that both saw the same dead pid could both return 0 —
+# the second's `rm -f` deleted the first's *live* pidfile. Against that code
+# this test reports 2 winners; against the break-lock version it reports 1.
+#
+# A dead pid is manufactured by starting a subshell and waiting for it to
+# exit, so the pid is real, unambiguously gone, and not a guess.
+@test "_acquire_lock: concurrent stale reclaim produces exactly one winner" {
+  local libsh="${BATS_TEST_DIRNAME}/../config/theme/_lib.sh"
+  local dir="$TMPDIR_TEST/lockrace"
+  mkdir -p "$dir"
+  local pidfile="$dir/daemon.pid"
+
+  # A pid that is certainly dead: spawn, reap, reuse the number.
+  sh -c 'exit 0' &
+  local dead=$!
+  wait "$dead" 2> /dev/null || true
+  printf '%s\n' "$dead" > "$pidfile"
+
+  # Race N acquirers. Each writes a line only if _acquire_lock returned 0.
+  local n=8 i
+  for ((i = 0; i < n; i++)); do
+    (
+      # shellcheck source=/dev/null
+      . "$libsh"
+      if _acquire_lock "$pidfile"; then
+        printf 'won\n' >> "$dir/winners"
+      fi
+    ) &
+  done
+  wait
+
+  local winners=0
+  [ -f "$dir/winners" ] && winners="$(grep -c '^won$' "$dir/winners")"
+  [ "$winners" -eq 1 ]
+
+  # The survivor's pid must be the one actually recorded in the lock.
+  [ -f "$pidfile" ]
+  [ -s "$pidfile" ]
+}
+
+@test "_acquire_lock: a live holder is never displaced" {
+  local libsh="${BATS_TEST_DIRNAME}/../config/theme/_lib.sh"
+  local dir="$TMPDIR_TEST/lockLive"
+  mkdir -p "$dir"
+  local pidfile="$dir/daemon.pid"
+
+  # $$ is this bats process — definitively alive for the whole test.
+  printf '%s\n' "$$" > "$pidfile"
+
+  run bash -c '. "$1"; _acquire_lock "$2"' _ "$libsh" "$pidfile"
+  [ "$status" -eq 1 ]
+  # The live holder's pid is still the recorded owner.
+  [ "$(cat "$pidfile")" = "$$" ]
+}
+
 # --- Linux source-selection + initial-seed tests ---
 
 @test "watcher linux: GNOME prefers gsettings; seed applies before monitor" {

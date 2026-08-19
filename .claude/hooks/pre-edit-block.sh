@@ -34,7 +34,8 @@ case "$fp" in
     ;;
   */config/fzf/completion.bash | */config/fzf/completion.zsh | \
     */config/fzf/key-bindings.bash | */config/fzf/key-bindings.zsh | \
-    */config/fzf/key-bindings.fish)
+    */config/fzf/key-bindings.fish | \
+    */local/man/man1/fzf.1 | */local/man/man1/fzf-tmux.1)
     echo "BLOCKED: $fp is a vendored fzf file — update via submodule sync" >&2
     echo "See .claude/rules/vendored-files.md." >&2
     exit 2
@@ -46,6 +47,16 @@ case "$fp" in
     ;;
   */iterm2_shell_integration.zsh)
     echo "BLOCKED: $fp is vendored from iTerm2 — re-download to update." >&2
+    echo "See .claude/rules/vendored-files.md." >&2
+    exit 2
+    ;;
+  */config/fish/functions/fisher.fish | \
+    */config/fish/functions/bass.fish | \
+    */config/fish/functions/__bass.py | \
+    */config/fish/functions/__z_add.fish | \
+    */config/fish/functions/__z_clean.fish)
+    echo "BLOCKED: $fp is a vendored fish plugin function — refresh it" >&2
+    echo "from upstream (fisher update), do not edit in place." >&2
     echo "See .claude/rules/vendored-files.md." >&2
     exit 2
     ;;

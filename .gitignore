@@ -132,3 +132,12 @@ config/television/config.toml
 # config/bat/themes/; never track the generated links.
 config/yazi/theme.toml
 config/yazi/Catppuccin-*.tmTheme
+
+# mise.lock is generated locally (config/mise/config.toml sets lockfile = true)
+# and must stay untracked. jdx/mise-action adds `--locked` to `mise install`
+# whenever a lockfile is present in the repo, and mise cannot resolve the
+# core:python backend from a lockfile — `python@3.14 is not in the lockfile`,
+# with an exact 3.14.7 pin failing the same way. That broke the Tests workflow
+# the moment the file was first committed. Keeping it local preserves
+# reproducible installs on a workstation without arming --locked in CI.
+mise.lock

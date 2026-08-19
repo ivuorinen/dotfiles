@@ -187,13 +187,14 @@ yarn test             # run all tests
 
 | Workflow file               | Purpose                                        |
 |-----------------------------|------------------------------------------------|
+| `tests.yml`                 | Bats suite (Linux + macOS), `yarn lint`, fish  |
 | `linters.yml`               | PR lint (Biome, EditorConfig, md-tables, etc.) |
 | `update-submodules.yml`     | Scheduled submodule auto-update                |
-| `new-release.yml`           | Semantic-release driven publishing             |
-| `changelog.yml`             | Changelog generation                           |
+| `new-release.yml`           | Daily date-versioned tag + GitHub release      |
 | `pre-commit-autoupdate.yml` | Keep pre-commit hooks up to date               |
 | `sync-labels.yml`           | Sync GitHub labels                             |
 | `semantic-pr.yml`           | Enforce semantic PR titles                     |
+| `copilot-setup-steps.yml`   | Provision the Copilot agent's environment      |
 
 ---
 

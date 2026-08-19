@@ -152,28 +152,5 @@ if ! declare -f msg_ok > /dev/null; then
   }
 fi
 
-if ! declare -f array_diff > /dev/null; then
-  # Function to compare two arrays and return the difference
-  # Example: array_diff DIFFERENCE ARRAY1 ARRAY2
-  # $1 - variable to store the difference
-  # $2 - first array
-  # $3 - second array
-  # Output to $1 the difference between $2 and $3
-  # Source: https://stackoverflow.com/a/42399479/594940
-  array_diff()
-  {
-    local result_var="$1"
-    local arr1_name="$2"
-    local arr2_name="$3"
-    # shellcheck disable=SC1083,SC2086
-    eval local ARR1=\(\"\${${arr1_name}[@]}\"\)
-    # shellcheck disable=SC1083,SC2086
-    eval local ARR2=\(\"\${${arr2_name}[@]}\"\)
-    local IFS=$'\n'
-    mapfile -t "$result_var" < <(comm -23 <(echo "${ARR1[*]}" | sort) <(echo "${ARR2[*]}" | sort))
-    return 0
-  }
-fi
-
 source "$DOTFILES/config/exports"
 source "$DOTFILES/config/alias"

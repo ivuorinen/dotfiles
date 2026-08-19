@@ -55,9 +55,22 @@ if printf '%s' "$response" | grep -Eq "$batch_re"; then
   hits="${hits}- batch execution failed inside context-mode runtime\n"
 fi
 
+# Detection is deliberately broad: the patterns match anywhere in the
+# response, so this also fires when a response merely *quotes* them. This
+# hook's own source, .claude/rules/context-mode-issues.md, and any finding
+# body discussing the signals all do — reading one through ctx_execute trips
+# the check. The trade is intentional: a missed signal degrades the routing
+# rules silently for a whole session, while a false positive costs one
+# /ctx-doctor call. So the message asks for confirmation rather than asserting
+# the install is broken, which is a claim this hook cannot actually make.
 if [[ -n "$hits" ]]; then
-  printf 'BLOCKED: context-mode reported an issue.\n%b' "$hits" >&2
-  printf 'Stop and tell the user to run /ctx-upgrade before continuing.\n' >&2
+  printf 'BLOCKED: context-mode signal strings found in the tool response:\n%b' "$hits" >&2
+  printf 'Confirm before acting — run /ctx-doctor:\n' >&2
+  printf '  * All checks [OK] => FALSE POSITIVE. The response only quoted these\n' >&2
+  printf '    strings (reading this hook, the rule file, or a finding does it).\n' >&2
+  printf '    Say so to the user and carry on. Do NOT run /ctx-upgrade.\n' >&2
+  printf '  * Any [FAIL], or a real version banner => the install is stale. Stop\n' >&2
+  printf '    and tell the user to run /ctx-upgrade, then restart the session.\n' >&2
   printf 'See .claude/rules/context-mode-issues.md.\n' >&2
   exit 2
 fi

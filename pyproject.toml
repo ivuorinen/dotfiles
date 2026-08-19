@@ -11,3 +11,40 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4"]
 
 [tool.ruff.format]
 quote-style = "double"
+
+# Bandit reads this file only when invoked as `bandit -c pyproject.toml`
+# (it never auto-discovers pyproject.toml), and parsing TOML needs the
+# `bandit[toml]` extra. `yarn lint:bandit` passes both.
+[tool.bandit]
+# Third-party trees, mirroring tool.ruff's extend-exclude above. The extra
+# entries are the vendored fish helpers: they are refreshed from upstream
+# rather than edited, so a finding against them is not actionable
+# (.claude/rules/vendored-files.md). Paths are prefix-matched against the
+# scanned path, so naming the directory covers everything under it.
+exclude_dirs = [
+  "./config/cheat/cheatsheets",
+  "./tools",
+  "./.claude/skills/graphify",
+  "./node_modules",
+  "./.yarn",
+  "./graphify-out",
+  "./config/fish/functions/__bass.py",
+  "./config/fish/functions/fisher.fish",
+]
+# No repo-wide skips. B607 (start_process_with_partial_path) is accepted only
+# at the seven call sites in local/bin/x-git-largest-files.py that invoke git,
+# awk, sort, grep and column through PATH on purpose — absolute paths would
+# break on macOS/Homebrew and on mise shims, where the same binary lives
+# elsewhere per host. Those lines carry `# nosec B603 B607` individually —
+# space-separated, since bandit parses a comma-separated list as neither ID and
+# silently stops honouring both — so
+# the check stays armed for every future call site rather than being disabled
+# across the whole scan. B603 is likewise per-line, never global, so the
+# argument list of each call is still audited.
+
+[tool.bandit.assert_used]
+# local/bin/x-compare-versions.py ships an assert-based self-check run as
+# `x-compare-versions.py test`. There the asserts ARE the test, not an
+# interface guard, so `python -O` stripping them costs nothing. B101 stays
+# on everywhere else.
+skips = ["*/x-compare-versions.py"]

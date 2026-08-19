@@ -130,6 +130,10 @@ trivy = "0.73.0"
 syft = "1.50.0"
 semgrep = "1.172.0"
 opengrep = "1.26.0"
+# Python SAST. Not in mise's registry, so it comes through the pipx backend.
+# The [toml] extra is required: without it bandit cannot read its config out
+# of pyproject.toml and silently falls back to defaults.
+"pipx:bandit[toml]" = "1.9.4"
 checkov = "3.3.11"
 snyk = "1.1306.3"
 pinact = "4.1.1"

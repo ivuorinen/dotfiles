@@ -17,8 +17,8 @@ If a shell command produces output you intend to read, use
 - `shellcheck`, `shfmt --diff`, `fish_indent --check` — every lint/format check.
 - `biome check`, `yamllint`, `actionlint`, `stylua --check` — every formatter check.
 - `ruff check`, `ruff format --check` — every Python check.
-- `pre-commit run`, `yarn lint`, `yarn test`, `yarn check` — every quality gate
-  (the prefix match covers `yarn lint:ec`, `yarn lint:sh`, and friends).
+- `prek run` (and `pre-commit run`), `yarn lint`, `yarn test` — every quality gate
+  (the prefix match covers `yarn lint:ec`, `yarn lint:bandit`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
 - `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
   `git status` is the one git reader the hook lets through, with or without
@@ -40,7 +40,9 @@ Only these narrow cases:
 
 1. **Side-effect commands that produce no output you need to read:**
     `git add <file>`, `git commit -m '...'`, `git mv`, `git rm`,
-    `git checkout <branch>`, `git push`, `mkdir -p <dir>`, `chmod`, `chown`.
+    `git checkout <branch>`, `git push`, `git rebase` (including its
+    `--continue`/`--skip`/`--abort` steps), `mkdir -p <dir>`, `chmod`,
+    `chown`.
     The exit code is the signal; the stdout is irrelevant. The hook's git
     allowlist also passes plumbing queries (`rev-parse`, `ls-files`,
     `cat-file`, `check-ignore`, `config`) — they answer one question rather

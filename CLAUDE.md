@@ -116,9 +116,12 @@ symlinks them into `~/.config/` automatically.
   eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` and
   `config/yabai/yabairc` on `#!/usr/bin/env sh`. Validate them with `sh -n`
   or `dash -n`, never `bash -n`.
-- **Vendored files**: the six fzf files, `.claude/skills/graphify/`, and
-  `local/bin/iterm2_shell_integration.zsh`.
+- **Vendored files**: the six fzf files, `.claude/skills/graphify/`,
+  `local/bin/iterm2_shell_integration.zsh`, and five fish plugin functions
+  under `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
+  `__z_add.fish`, `__z_clean.fish`).
   Edit policy: `.claude/rules/vendored-files.md`.
+  Third-party licenses: `NOTICE`.
 - **Fish config**: `config/fish/` has its own config chain
   (`config.fish`, `exports.fish`, `alias.fish`) plus 60+ functions.
 - **gh CLI config**: `config/gh/hosts.yml` is managed by `gh` CLI
