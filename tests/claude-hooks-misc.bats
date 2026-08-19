@@ -215,21 +215,25 @@ EOF
 
 @test "async-bats: runs the test file matching the edited script" {
   mkdir -p "$WORK/tests"
-  # Multi-line body deliberately: the one-line `@test "x" { true; }` form is
-  # not parsed by every bats version, and an unparsed file yields `1..0` — a
-  # run with no tests in it, which reads as a pass. That failed on the Ubuntu
-  # runner while passing locally on bats 1.14.
-  cat > "$WORK/tests/demo-script.bats" << 'EOF'
-#!/usr/bin/env bats
-
-@test "demo: trivially true" {
-  true
-}
+  # bats is stubbed rather than really invoked. Running bats inside a bats run
+  # inherits the parent's BATS_* environment, and on the Ubuntu runner the
+  # child parsed no tests at all and printed `1..0` — a green result asserting
+  # nothing. The hook's contract is "invoke bats on the matching test file",
+  # so the stub records argv and the test checks exactly that.
+  mkdir -p "$WORK/bin"
+  : > "$WORK/tests/demo-script.bats"
+  cat > "$WORK/bin/bats" << 'EOF'
+#!/usr/bin/env bash
+for a in "$@"; do printf '%s\n' "$a" >> "$STUB_BATS_ARGS"; done
 EOF
-  run -0 env CLAUDE_PROJECT_DIR="$WORK" bash -c \
+  chmod +x "$WORK/bin/bats"
+
+  run -0 env PATH="$WORK/bin:$PATH" STUB_BATS_ARGS="$WORK/bats.args" \
+    CLAUDE_PROJECT_DIR="$WORK" bash -c \
     'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
     _ "$WORK/local/bin/demo-script" "$HOOKS/async-bats.sh"
-  [[ "$output" == *"demo: trivially true"* ]]
+  grep -Fqx "$WORK/tests/demo-script.bats" "$WORK/bats.args"
+  [[ "$output" == *"Running"* ]]
 }
 
 @test "async-bats: an empty payload is a no-op" {
