@@ -88,9 +88,19 @@ dfm_check()
       local defaults="$DOTFILES/tools/dotbot-defaults.yaml"
       local default_mode rc=0 checked=0
 
+      # Validated, not sanitised — the same rule the explicit `mode:` parser
+      # below uses. Stripping non-octal characters turned `07558` into `0755`,
+      # so every unmoded directory would have been checked against a default
+      # the defaults file never declared.
       default_mode=$(awk '
         /^ *create: *$/ { in_create = 1; next }
-        in_create && /mode:/ { gsub(/[^0-7]/, "", $2); print $2; exit }
+        in_create && /^ *mode:/ {
+          if ($2 !~ /^0?[0-7][0-7][0-7]$/) exit 1
+          print $2
+          found = 1
+          exit
+        }
+        END { if (!found) exit 1 }
       ' "$defaults")
       # No silent fallback. 0777 mirrors dotbot's own os.makedirs default, but
       # for a *checker* it is the worst possible guess: an unreadable or
