@@ -137,8 +137,10 @@ strip_env_prefix()
     [[ "$seg" == "$prev" ]] && break
   done
 
-  if [[ "$seg" =~ ^env([[:space:]]|$) ]]; then
-    seg=$(printf '%s' "$seg" | sed -E 's/^env[[:space:]]+//')
+  # Matched through normalise_cmd, not literally: `/usr/bin/env cat README.md`
+  # is the same invocation and was walking past both env checks.
+  if [[ "$(normalise_cmd "$(first_word "$seg")")" == "env" ]]; then
+    seg=$(printf '%s' "$seg" | sed -E 's/^[^[:space:]]+[[:space:]]+//')
     while :; do
       prev=$seg
       # -u/-C take a SEPARATE operand naming a variable or directory, so the
@@ -241,7 +243,7 @@ while IFS= read -r segment; do
   # `env` counts as a wrapper for the fail-closed rule below. Its option
   # grammar is as open-ended as any other wrapper's, so an unrecognised token
   # after peeling it is refused rather than allowed.
-  [[ "$segment" =~ ^env([[:space:]]|$) ]] && wrapped=1
+  [[ "$(normalise_cmd "$(first_word "$segment")")" == "env" ]] && wrapped=1
   while [[ "$segment" != "$prev_segment" ]]; do
     prev_segment=$segment
     segment=$(strip_env_prefix "$segment")
@@ -259,6 +261,19 @@ while IFS= read -r segment; do
       break 2
     fi
   done
+
+  # Fail closed on a command word this parser cannot resolve. The shell
+  # resolves `c\at` and `$'cat'` to `cat`, but reproducing its quote and
+  # escape removal here means writing a shell tokeniser — and every gap in one
+  # is a silent bypass. Residual escape or quote syntax in the command word is
+  # therefore refused outright; the plain spelling is unaffected, and BASH_OK
+  # remains the documented override.
+  case "$fw" in
+    *\\* | *\'* | *\"* | *\$* | *\`*)
+      deny_reason="command word '$fw' in segment '$segment' carries unresolved quote or escape syntax"
+      break
+      ;;
+  esac
 
   # First-word denylist.
   if printf '%s' "$fw" | grep -qE "$deny_first_word_re"; then

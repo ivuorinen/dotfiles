@@ -179,6 +179,25 @@ decision()
   [ "$(decision "env --split-string='git add .'")" = "allow" ]
 }
 
+# Both env checks matched the literal string, so a path-qualified env walked
+# past them — the same normalisation gap that `/bin/cat` had.
+@test "pre-bash-route: a path-qualified env is still env" {
+  [ "$(decision '/usr/bin/env cat README.md')" = "deny" ]
+  [ "$(decision '/usr/bin/env -S cat README.md')" = "deny" ]
+  [ "$(decision '/usr/bin/env git add .')" = "allow" ]
+}
+
+# The shell resolves `c\at` and `$'cat'` to `cat`; reproducing its quote and
+# escape removal here means writing a tokeniser, and every gap in one is a
+# silent bypass. Unresolved syntax in the command word is refused instead.
+@test "pre-bash-route: an unresolvable command word fails closed" {
+  [ "$(decision 'c\at README.md')" = "deny" ]
+  [ "$(decision "\$'cat' README.md")" = "deny" ]
+  [ "$(decision '"cat" README.md')" = "deny" ]
+  # The plain spelling of an allowed command is untouched by this rule.
+  [ "$(decision 'git add .')" = "allow" ]
+}
+
 # A split string can nest quotes, so one strip left `"cat` and matched no
 # anchored entry. normalise_cmd now strips to a fixed point, both ends.
 @test "pre-bash-route: nested quoting still resolves to the command" {
