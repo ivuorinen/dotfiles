@@ -150,7 +150,13 @@ strip_env_prefix()
       # became `README.md` and the `cat` was never seen. Only the flag is
       # dropped (by the generic rule below), leaving the split string to be
       # classified like any other command.
+      # The -S prefix is removed while its operand is kept, and it is matched
+      # BEFORE the generic flag rule. In the attached forms — `-S'cat x'` and
+      # `--split-string='cat x'` — the flag and the command share one
+      # whitespace-delimited token, so the generic rule would consume the
+      # command along with the flag.
       seg=$(printf '%s' "$seg" | sed -E '
+        s/^(-S|--split-string=?)[[:space:]]*//
         s/^(-u|--unset|-C|--chdir)[[:space:]]+[^[:space:]]+[[:space:]]+//
         s/^-[^[:space:]]+[[:space:]]+//
         s/^[A-Za-z_][A-Za-z_0-9]*=[^[:space:]]*[[:space:]]+//
@@ -172,9 +178,19 @@ strip_env_prefix()
 # entry.
 normalise_cmd()
 {
-  local w=${1#\\}
-  w=${w#\"}
-  w=${w#\'}
+  local w=${1#\\} prev
+  # To a fixed point, not once: a split string can nest quotes, so
+  # `env -S '"cat" README.md'` arrives as `'"cat"` and one pass leaves `"cat`,
+  # which matches no anchored entry. Also drop a trailing quote, since the
+  # nested form closes on the same token.
+  while :; do
+    prev=$w
+    w=${w#\"}
+    w=${w#\'}
+    w=${w%\"}
+    w=${w%\'}
+    [[ "$w" == "$prev" ]] && break
+  done
   printf '%s' "${w##*/}"
 }
 
@@ -222,6 +238,10 @@ while IFS= read -r segment; do
   # Alternate until neither peels anything.
   prev_segment=""
   wrapped=0
+  # `env` counts as a wrapper for the fail-closed rule below. Its option
+  # grammar is as open-ended as any other wrapper's, so an unrecognised token
+  # after peeling it is refused rather than allowed.
+  [[ "$segment" =~ ^env([[:space:]]|$) ]] && wrapped=1
   while [[ "$segment" != "$prev_segment" ]]; do
     prev_segment=$segment
     segment=$(strip_env_prefix "$segment")

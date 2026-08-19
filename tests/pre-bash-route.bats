@@ -170,6 +170,22 @@ decision()
   [ "$(decision 'env -S git add .')" = "allow" ]
 }
 
+# Attached forms put the flag and the command in one whitespace-delimited
+# token, so the generic flag rule ate the command with the flag. The -S rule
+# runs first and keeps the operand.
+@test "pre-bash-route: an attached env -S operand is preserved" {
+  [ "$(decision "env -S'cat README.md'")" = "deny" ]
+  [ "$(decision "env --split-string='cat README.md'")" = "deny" ]
+  [ "$(decision "env --split-string='git add .'")" = "allow" ]
+}
+
+# A split string can nest quotes, so one strip left `"cat` and matched no
+# anchored entry. normalise_cmd now strips to a fixed point, both ends.
+@test "pre-bash-route: nested quoting still resolves to the command" {
+  [ "$(decision 'env -S '"'"'"cat" README.md'"'"'')" = "deny" ]
+  [ "$(decision "env -S '\"rg\" foo .'")" = "deny" ]
+}
+
 # Wrapper options with operands are open-ended (`stdbuf -o L`, `xargs -E EOF`,
 # `timeout --signal KILL`), and every one missed leaves the operand as the
 # first word. Rather than enumerate them, an unrecognised post-wrapper token
