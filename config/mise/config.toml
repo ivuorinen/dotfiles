@@ -128,7 +128,7 @@ trufflehog = "3.96.0"
 grype = "0.117.0"
 trivy = "0.73.0"
 syft = "1.50.0"
-semgrep = "1.172.0"
+semgrep = "1.173.0"
 opengrep = "1.26.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
