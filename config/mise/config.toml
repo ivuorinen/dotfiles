@@ -135,7 +135,7 @@ opengrep = "1.26.0"
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
 checkov = "3.3.11"
-snyk = "1.1306.3"
+snyk = "1.1306.4"
 pinact = "4.1.1"
 zizmor = "1.29.0"
 "github:Legit-Labs/legitify" = "1.0.11"
