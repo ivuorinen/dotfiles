@@ -66,8 +66,6 @@ dependency-check-report.html
 iTermServer-*
 lazy-lock.json
 local/bin/asdf/plugins/*
-local/bin/yabai
-local/man/yabai.1
 local/share/fonts/*
 lock
 node_modules

@@ -74,8 +74,8 @@ Homebrew prefix (`/opt/homebrew`), so paths match a native
 
 `dfm install mise` runs `apply` automatically (macOS only). Only
 on-request **leaves** are listed — mise resolves each formula's
-dependency closure, so transitive deps must not be added. Casks, the
-imagemagick/ffmpeg/coreutils stack, and yabai/skhd stay on native brew
+dependency closure, so transitive deps must not be added. Casks and the
+imagemagick/ffmpeg/coreutils stack stay on native brew
 in `config/homebrew/Brewfile` (see its header). PHP is managed by
 `phpenv.fish` (homebrew provider), not brew or mise.
 
