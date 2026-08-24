@@ -48,17 +48,17 @@ experimental = true
 
 # Language runtimes & build toolchains
 node = "lts"
-bun = "1.3.14"
+bun = "1.4.0"
 python = "3.14"
-go = "1.26.6"
-rust = "1.97.1"
+go = "1.27.0"
+rust = "1.98.0"
 uv = "0.12.5"
 cmake = "4.4.2"
 
 # Shell, prompt & terminal sessions
 starship = "1.26.0"
 tmux = "3.7b"
-usage = "5.1.0"
+usage = "6.1.0"
 "github:joshmedeski/sesh" = "2.28.0"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
@@ -69,19 +69,18 @@ eza = "0.23.5"
 zoxide = "0.10.0"
 fzf = "0.74.3"
 "github:alexpasmantier/television" = "0.15.9"
-yazi = "26.5.6"
+yazi = "26.8.15"
 bat = "0.26.1"
 glow = "3.0.0"
-cheat = "5.1.0"
 
 # Text & document processing
 jq = "1.8.2"
-yq = "4.53.3"
+yq = "4.53.6"
 choose = "1.3.7"
 "github:jgm/pandoc" = "3.10.2"
 
 # Git & version control
-github-cli = "2.97.0"
+github-cli = "2.98.0"
 gitui = "0.28.1"
 lazygit = "0.64.1"
 delta = "0.19.2"
@@ -89,10 +88,13 @@ difftastic = "0.70.0"
 "github:dotzero/git-profile" = "1.9.0"             # ships macOS-all universal binary
 "github:max-sixty/worktrunk" = "0.74.0"
 "npm:github-release-notes" = "0.17.3"
+"github:shhac/git-hunk" = "0.18.1"
+"github:modem-dev/hunk" = "0.19.0"
+"github:ivuorinen/gh-history" = "2026.03.0"
 
 # Editors & language servers
-neovim = "0.12.4"
-tree-sitter = "0.26.12"
+neovim = "0.12.5"
+tree-sitter = "0.26.13"
 "npm:neovim" = "5.4.0"                      # Node.js client for Neovim's RPC API (required by plugins)
 "npm:fish-lsp" = "1.1.4"
 
@@ -102,14 +104,14 @@ just = "1.58.0"
 
 # Linters & formatters
 editorconfig-checker = "3.11.1"
-biome = "2.5.2"
+biome = "2.5.10"
 "npm:prettier" = "3.9.6"
 "npm:markdownlint-cli" = "0.49.1"
 "npm:markdown-table-formatter" = "1.7.0"
 "npm:v8r" = "6.1.0"
 yamllint = "1.38.0"
 yamlfmt = "0.21.0"
-ruff = "0.16.3"
+ruff = "0.16.4"
 stylua = "2.5.2"
 taplo = "0.10.0"
 shellcheck = "0.11.0"
@@ -124,17 +126,19 @@ age = "1.3.1"
 gopass = "1.16.1"                          # pass-compatible password manager (gopasspw/gopass)
 cosign = "3.1.3"
 gitleaks = "8.30.1"
-trufflehog = "3.96.0"
+trufflehog = "3.97.0"
 grype = "0.117.0"
 trivy = "0.74.0"
 syft = "1.51.0"
-semgrep = "1.172.0"
+semgrep = "1.174.0"
 opengrep = "1.27.1"
+osv-scanner = "2.5.1"
+scorecard = "5.5.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
-checkov = "3.3.11"
+checkov = "3.3.13"
 snyk = "1.1306.4"
 pinact = "4.1.1"
 zizmor = "1.29.0"
@@ -144,24 +148,19 @@ zizmor = "1.29.0"
 # Build, test & CI
 bats = "1.14.0"
 act = "0.2.89"
+prek = "0.4.14"
 "npm:corepack" = "0.35.0"
 "dotnet:coverlet.console" = "10.0.1"
 
 # System monitoring & misc utilities
 bottom = "0.14.8"
+cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.27.0"
 "github:wakatime/wakatime-cli" = "2.24.4"
 "github:o2sh/onefetch" = "2.27.1"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.20"
-"github:ZenNotes/zennotes" = "v2.27.0"
-prek = "0.4.14"
-"github:shhac/git-hunk" = "0.17.0"
-1password-cli = "2.34.1"
-"github:modem-dev/hunk" = "0.19.0"
-pi = "latest"
-"github:ivuorinen/gh-history" = "latest"
-osv-scanner = "latest"
+"github:ZenNotes/zennotes" = "2.36.0"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
@@ -171,9 +170,13 @@ osv-scanner = "latest"
 # Only homebrew/core, on-request LEAVES live here — mise resolves each formula's
 # dependency closure automatically, so transitive deps are intentionally omitted.
 # Kept on native brew (config/homebrew/Brewfile) on purpose: imagemagick,
-# ffmpeg, coreutils (GNU, not uutils), yabai/skhd (codesign+sudo installs), and
-# all casks. PHP is managed by phpenv.fish (homebrew provider), not here.
-# Anything already in [tools] above (e.g. 1password-cli) is not re-introduced.
+# ffmpeg, coreutils (GNU, not uutils), and all casks — 1password-cli included,
+# since it is a cask and not a formula.
+# PHP is managed by phpenv.fish (homebrew provider), not here.
+# Anything already in [tools] above (e.g. jq) is not re-introduced.
+#
+# Every entry is "latest" by necessity, not by omission: Homebrew installs only
+# the current revision of a plain formula, so there is no version to pin here.
 [bootstrap.packages]
 "brew:autoconf-archive" = "latest"
 "brew:autogen" = "latest"

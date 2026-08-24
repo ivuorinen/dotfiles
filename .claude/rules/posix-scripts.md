@@ -10,7 +10,6 @@ paths:
   - "local/bin/x-quota-usage"
   - "local/bin/mise-python-arch"
   - "local/bin/pushover"
-  - "config/yabai/yabairc"
 ---
 
 # POSIX shell scripts
@@ -30,11 +29,10 @@ script missing from here gets validated as bash and a bashism slips through:
 - `local/bin/x-quota-usage`
 - `local/bin/mise-python-arch`
 
-Two more declare `#!/usr/bin/env sh` rather than `#!/bin/sh`, and are POSIX
+One more declares `#!/usr/bin/env sh` rather than `#!/bin/sh`, and is POSIX
 all the same:
 
 - `local/bin/pushover`
-- `config/yabai/yabairc`
 
 Running `bash -n` on a POSIX script masks bashism leaks (e.g.
 `[[ ]]`, `<<<`, arrays) that would fail under `dash` or `busybox sh`.

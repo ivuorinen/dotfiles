@@ -112,10 +112,10 @@ symlinks them into `~/.config/` automatically.
 ## Gotchas
 
 - **POSIX scripts** (validation rule in `.claude/rules/posix-scripts.md`,
-  which holds the authoritative list): ten scripts are `sh`, not bash —
-  eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` and
-  `config/yabai/yabairc` on `#!/usr/bin/env sh`. Validate them with `sh -n`
-  or `dash -n`, never `bash -n`.
+  which holds the authoritative list): nine scripts are `sh`, not bash —
+  eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
+  `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
+  `bash -n`.
 - **Vendored files**: the six fzf files, `.claude/skills/graphify/`,
   `local/bin/iterm2_shell_integration.zsh`, and five fish plugin functions
   under `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
