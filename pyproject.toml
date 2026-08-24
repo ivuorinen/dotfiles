@@ -17,10 +17,14 @@ quote-style = "double"
 # `bandit[toml]` extra. `yarn lint:bandit` passes both.
 [tool.bandit]
 # Third-party trees, mirroring tool.ruff's extend-exclude above. The extra
-# entries are the vendored fish helpers: they are refreshed from upstream
-# rather than edited, so a finding against them is not actionable
-# (.claude/rules/vendored-files.md). Paths are prefix-matched against the
-# scanned path, so naming the directory covers everything under it.
+# entries are the vendored fish helpers and vim-plug's plugin checkout: they
+# are refreshed from upstream rather than edited, so a finding against them is
+# not actionable (.claude/rules/vendored-files.md). Paths are prefix-matched
+# against the scanned path, so naming the directory covers everything under it.
+#
+# config/vim/plugged is gitignored, so it exists only on machines where vim-plug
+# has run — CI never sees it, but a local `yarn lint:bandit` otherwise scans
+# ~62k lines of jedi/parso/vint and fails. .prettierignore excludes it already.
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
@@ -28,6 +32,7 @@ exclude_dirs = [
   "./node_modules",
   "./.yarn",
   "./graphify-out",
+  "./config/vim/plugged",
   "./config/fish/functions/__bass.py",
   "./config/fish/functions/fisher.fish",
 ]
