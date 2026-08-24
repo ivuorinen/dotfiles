@@ -72,7 +72,9 @@ jobs:
           python-version: "3.x"
 
       - name: Install pre-commit
-        # See the note in pre-commit-autoupdate.yml (sonar githubactions:S8541).
+        # --only-binary=:all: refuses sdists, so no package's setup.py runs
+        # during install (sonar githubactions:S8541). Quoted because the
+        # ":all: " colon-space would otherwise read as a YAML mapping.
         run: "pip install --only-binary=:all: pre-commit==4.2.0"
 
       - name: Install pre-commit hooks
