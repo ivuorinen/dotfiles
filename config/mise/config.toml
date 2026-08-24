@@ -127,7 +127,7 @@ gitleaks = "8.30.1"
 trufflehog = "3.96.0"
 grype = "0.117.0"
 trivy = "0.74.0"
-syft = "1.50.0"
+syft = "1.51.0"
 semgrep = "1.172.0"
 opengrep = "1.27.1"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
