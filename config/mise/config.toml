@@ -72,7 +72,6 @@ fzf = "0.74.3"
 yazi = "26.5.6"
 bat = "0.26.1"
 glow = "3.0.0"
-cheat = "5.1.0"
 
 # Text & document processing
 jq = "1.8.2"
@@ -89,6 +88,9 @@ difftastic = "0.70.0"
 "github:dotzero/git-profile" = "1.9.0"             # ships macOS-all universal binary
 "github:max-sixty/worktrunk" = "0.74.0"
 "npm:github-release-notes" = "0.17.3"
+"github:shhac/git-hunk" = "0.17.0"
+"github:modem-dev/hunk" = "0.19.0"
+"github:ivuorinen/gh-history" = "2026.03.0"
 
 # Editors & language servers
 neovim = "0.12.4"
@@ -130,11 +132,13 @@ trivy = "0.74.0"
 syft = "1.51.0"
 semgrep = "1.172.0"
 opengrep = "1.27.1"
+osv-scanner = "2.5.1"
+scorecard = "5.5.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
-checkov = "3.3.11"
+checkov = "3.3.12"
 snyk = "1.1306.4"
 pinact = "4.1.1"
 zizmor = "1.29.0"
@@ -144,24 +148,19 @@ zizmor = "1.29.0"
 # Build, test & CI
 bats = "1.14.0"
 act = "0.2.89"
+prek = "0.4.14"
 "npm:corepack" = "0.35.0"
 "dotnet:coverlet.console" = "10.0.1"
 
 # System monitoring & misc utilities
 bottom = "0.14.8"
+cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.27.0"
 "github:wakatime/wakatime-cli" = "2.24.4"
 "github:o2sh/onefetch" = "2.27.1"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.20"
 "github:ZenNotes/zennotes" = "v2.27.0"
-prek = "0.4.14"
-"github:shhac/git-hunk" = "0.17.0"
-1password-cli = "2.34.1"
-"github:modem-dev/hunk" = "0.19.0"
-pi = "latest"
-"github:ivuorinen/gh-history" = "latest"
-osv-scanner = "latest"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
@@ -171,9 +170,13 @@ osv-scanner = "latest"
 # Only homebrew/core, on-request LEAVES live here — mise resolves each formula's
 # dependency closure automatically, so transitive deps are intentionally omitted.
 # Kept on native brew (config/homebrew/Brewfile) on purpose: imagemagick,
-# ffmpeg, coreutils (GNU, not uutils), yabai/skhd (codesign+sudo installs), and
-# all casks. PHP is managed by phpenv.fish (homebrew provider), not here.
-# Anything already in [tools] above (e.g. 1password-cli) is not re-introduced.
+# ffmpeg, coreutils (GNU, not uutils), and all casks — 1password-cli included,
+# since it is a cask and not a formula.
+# PHP is managed by phpenv.fish (homebrew provider), not here.
+# Anything already in [tools] above (e.g. jq) is not re-introduced.
+#
+# Every entry is "latest" by necessity, not by omission: Homebrew installs only
+# the current revision of a plain formula, so there is no version to pin here.
 [bootstrap.packages]
 "brew:autoconf-archive" = "latest"
 "brew:autogen" = "latest"

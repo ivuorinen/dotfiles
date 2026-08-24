@@ -104,6 +104,8 @@ brew "openldap"
 brew "cormacrelf/tap/dark-notify"
 # Cleans up your $HOME from those pesky dotfiles
 brew "doron-cohen/tap/antidot"
+# Command-line interface for 1Password
+cask "1password-cli"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Semantic code analysis engine
