@@ -10,5 +10,10 @@
     "shivammathur/extensions/swoole@8.5",
     "shivammathur/extensions/xdebug@8.5",
     "shivammathur/php/php"
+  ],
+  "trustedtaps": [
+    "1password/tap",
+    "cormacrelf/tap",
+    "doron-cohen/tap"
   ]
 }
