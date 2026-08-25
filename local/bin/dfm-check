@@ -13,7 +13,9 @@
 #USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
 #USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
-#USAGE   cmd "perms" help="Verify created directories still have their declared mode"
+#USAGE   cmd "perms" help="Verify declared directory and secret-file modes" {
+#USAGE     flag "--fix" help="Repair drift instead of only reporting it"
+#USAGE   }
 #USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
 #USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
 #USAGE }
@@ -49,7 +51,7 @@ dfm_check()
     "brew:Verify all Brewfile packages are installed"
     "disk:Show disk usage for mise installs and brew cache"
     "mise:Run mise doctor to check mise health"
-    "perms:Verify created directories still have their declared mode"
+    "perms [--fix]:Verify declared directory and secret-file modes; --fix repairs drift"
     "tools:Verify essential CLI tools are available in PATH"
     "updates:Show available updates for mise tools and brew packages"
   )
@@ -86,7 +88,12 @@ dfm_check()
       # keeping a second hardcoded list that would drift from it.
       local links="$DOTFILES/dotbot-links.yaml"
       local defaults="$DOTFILES/tools/dotbot-defaults.yaml"
-      local default_mode rc=0 checked=0
+      local default_mode rc=0 checked=0 fixed=0 fix=0
+      # `--fix` repairs instead of reporting. dotbot cannot do this itself: its
+      # create plugin applies `mode:` only when it creates the path and logs
+      # "Path exists" forever after, so ./install can establish a mode but never
+      # restore one. This is the enforcement half.
+      [[ "${2:-}" == "--fix" ]] && fix=1
 
       # Validated, not sanitised — the same rule the explicit `mode:` parser
       # below uses. Stripping non-octal characters turned `07558` into `0755`,
@@ -153,9 +160,56 @@ dfm_check()
         return 1
       fi
 
+      # Security-critical paths dotbot cannot express. Its `create:` block only
+      # governs directories dotbot itself makes, and it has no directive for
+      # file modes at all — so none of these can come from dotbot-links.yaml,
+      # and this second list is unavoidable rather than duplication.
+      #
+      # Several ~/.config entries are symlinks into this repo (config/gh,
+      # config/git, config/secrets.d, config/fish/secrets.d), so the repo path
+      # is named directly: chmod follows the symlink to the same inode either
+      # way, and naming the target keeps the intent obvious.
+      #
+      # A path that does not exist is skipped, so entries for tools that are
+      # not installed on a given host cost nothing.
+      local xdg_data="${XDG_DATA_HOME:-$HOME/.local/share}"
+      local security_paths=(
+        # Repo-side credential stores, reached through ~/.config symlinks.
+        "0700 $DOTFILES/config/secrets.d"
+        "0700 $DOTFILES/config/fish/secrets.d"
+        "0700 $DOTFILES/config/gh"
+        "0700 $DOTFILES/config/git"
+        # Real directories the apps create for themselves. op and docker are
+        # NOT here: dotbot-links.yaml declares them, and listing a path in both
+        # places reports it twice.
+        "0700 $xdg_data/gnupg"
+        "0700 $HOME/.gnupg"
+        "0700 $HOME/.aws"
+        "0700 $HOME/.kube"
+        # The secrets themselves. Owner-only: these hold live tokens, and the
+        # *.example templates they are copied from are deliberately excluded by
+        # the glob so the tracked samples keep their normal mode.
+        "0600 $DOTFILES/config/secrets.d/*.sh"
+        "0600 $DOTFILES/config/fish/secrets.d/*.fish"
+        "0600 $HOME/.netrc"
+      )
+      local entry spec_mode spec_path expanded
+      for entry in "${security_paths[@]}"; do
+        spec_mode=${entry%% *}
+        spec_path=${entry#* }
+        # Unquoted on purpose: these entries carry globs, and an unmatched
+        # pattern stays literal, which the existence test below then skips.
+        # shellcheck disable=SC2086
+        for expanded in $spec_path; do
+          declared+=$'\n'"$spec_mode $expanded"
+        done
+      done
+
       while read -r want path; do
         path="${path/#\~/$HOME}"
-        if [[ ! -d "$path" ]]; then
+        # -e, not -d: the list now carries files (secrets, .netrc) as well as
+        # directories.
+        if [[ ! -e "$path" ]]; then
           # Not an error: several entries are only created on the hosts that
           # need them, and `dfm check` runs on all of them.
           continue
@@ -180,14 +234,30 @@ dfm_check()
           local have_o want_o
           printf -v have_o '%04o' "$((8#$have))"
           printf -v want_o '%04o' "$((8#$want))"
-          msgr err "mode drift: $path is $have_o, declared $want_o"
-          msgr nested "fix: chmod $want_o $path"
-          rc=1
+          if ((fix == 1)); then
+            if chmod "$want_o" "$path"; then
+              msgr yay "fixed: $path $have_o -> $want_o"
+              fixed=$((fixed + 1))
+            else
+              # A failed chmod is still drift, so rc stays non-zero rather than
+              # counting the path as repaired.
+              msgr err "could not chmod $want_o $path"
+              rc=1
+            fi
+          else
+            msgr err "mode drift: $path is $have_o, declared $want_o"
+            msgr nested "fix: chmod $want_o $path"
+            rc=1
+          fi
         fi
       done <<< "$declared"
 
-      if ((rc == 0)); then
-        msgr yay "All $checked created directories match their declared mode"
+      if ((fix == 1)); then
+        if ((rc == 0)); then
+          msgr yay "Checked $checked paths, repaired $fixed"
+        fi
+      elif ((rc == 0)); then
+        msgr yay "All $checked paths match their declared mode"
       else
         msgr err "Run the chmod lines above; ./install cannot repair an existing path"
       fi
