@@ -13,3 +13,9 @@
 - shell:
     # Use my dotfiles manager to install everything
     - bash local/bin/dfm install all
+    # Enforce the declared directory and secret-file modes. This cannot live in
+    # the create: block above: dotbot applies `mode:` only when it creates a
+    # path and logs "Path exists" on every run after, so it can establish a
+    # mode but never restore one. Runs last so it also covers anything the
+    # install steps just created under the 0002 umask.
+    - bash local/bin/dfm check perms --fix

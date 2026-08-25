@@ -16,6 +16,19 @@
     ~/.cache:
     ~/.cache/git:
     ~/.config:
+    # Credential stores the apps create for themselves: 1Password CLI config,
+    # and DOCKER_CONFIG (config/exports points it here), which holds registry
+    # auths. Declared so a fresh machine starts at 0700 rather than inheriting
+    # the 0002 umask — `dfm check perms --fix` keeps them there afterwards.
+    #
+    # Note the ~/.config entries that are NOT here: gh, git, secrets.d and
+    # fish/ are symlinks into this repo created by the link step, so dotbot
+    # must not also create them as directories. Their modes are enforced by
+    # `dfm check perms` against the repo paths instead.
+    ~/.config/op:
+      mode: 0700
+    ~/.config/docker:
+      mode: 0700
     ~/.local:
     ~/.local/bin:
     # XDG_RUNTIME_DIR (config/exports falls back to this path when the session
