@@ -190,6 +190,40 @@ cheat = "5.1.0"
 #
 # Every entry is "latest" by necessity, not by omission: Homebrew installs only
 # the current revision of a plain formula, so there is no version to pin here.
+#
+# Why these stay on brew rather than becoming [tools] entries — all 49 were
+# checked and none can move:
+#
+#   * 48 of 49 have no mise registry entry. The one that does,
+#     dependency-check, is a Java application: mise installs it, but it dies
+#     with "JAVA_HOME is not defined correctly" because brew resolves its JRE
+#     dependency and mise does not.
+#   * 26 are GitHub-hosted, but only 5 publish prebuilt binaries rather than
+#     source tarballs — the rest (chafa, htop, irssi, flock, …) ship a .tar.gz
+#     that the github backend cannot use, and git-extras, kcov, testssl.sh,
+#     luarocks and tree publish no release assets at all.
+#   * Of those 5: Mole has no Linux asset and fails outright,
+#     terminal-notifier unpacks a macOS .app that is inert on Linux, and
+#     gpg-tui installs but cannot run — "libgpgme.so.11: cannot open shared
+#     object file", again a dependency brew supplies and mise does not.
+#
+#   * fish installs and runs, and was moved here briefly before being put
+#     back: its release tarball contains the `fish` binary ALONE. No
+#     fish_indent. This repo gates on `fish_indent --check` in both
+#     .pre-commit-config.yaml and the Tests workflow, so pinning fish at 4.8.1
+#     would have left the formatter floating at whatever apt or brew supplies
+#     (3.7.0 here) — a formatter decoupled from its shell, across a major
+#     version, guarding 38 tracked files.
+#
+# The pattern is the point: brew resolves a dependency closure, mise installs a
+# single self-contained artifact. A formula that needs system libraries, a
+# runtime, or sibling binaries belongs here, not in [tools]. There are no
+# platform conditionals in this file either, so a macOS-only tool moved to
+# [tools] would break `mise install` on Linux.
+#
+# fswatch is the one clean technical candidate — prebuilt Linux and macOS
+# binaries, no dependencies — but nothing in this repo references it at all, so
+# deleting it beats moving it.
 [bootstrap.packages]
 "brew:autoconf-archive" = "latest"
 "brew:autogen" = "latest"
