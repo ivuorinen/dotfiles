@@ -52,5 +52,12 @@ every section. Key commands:
 - `dfm docs [name]` — list/show `docs/*.md` (glow → bat → cat; never
   scans `docs/audit/`)
 - `dfm check arch` / `dfm check host` — system info
+- `dfm check perms [--fix]` — verify (or repair) the declared directory
+  modes from `dotbot-links.yaml` plus a table of security-critical paths
+  dotbot cannot express: the two `secrets.d` trees, `config/gh`,
+  `config/git`, gnupg/aws/kube, and the secret files themselves at `0600`.
+  `--fix` exists because dotbot's `create:` applies a mode only when it
+  creates the path — it can establish a mode, never restore one. `./install`
+  runs the `--fix` form last.
 - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers
