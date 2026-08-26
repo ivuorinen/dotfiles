@@ -5,11 +5,11 @@ requirements = ["sesh", "fd"]
 
 [source]
 command = [
-  "sesh list --icons",
-  "sesh list -t --icons",
-  "sesh list -c --icons",
-  "sesh list -z --icons",
-  "fd -H -d 2 -t d -E .Trash . ~",
+  "sesh list --icons | LC_ALL=C sort",
+  "sesh list -t --icons | LC_ALL=C sort",
+  "sesh list -c --icons | LC_ALL=C sort",
+  "sesh list -z --icons | LC_ALL=C sort",
+  "fd -H -d 2 -t d -E .Trash . ~ | LC_ALL=C sort",
 ]
 ansi = true
 output = "{strip_ansi|split: :1..|join: }"

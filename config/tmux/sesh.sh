@@ -27,12 +27,12 @@ FZF_COMMON_OPTS=(
   --prompt '⚡  '
   --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find'
   --bind 'tab:down,btab:up'
-  --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)'
-  --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)'
-  --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)'
-  --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)'
-  --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d -E .Trash . ~)'
-  --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-prompt(⚡  )+reload(sesh list --icons)'
+  --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons | LC_ALL=C sort)'
+  --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons | LC_ALL=C sort)'
+  --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons | LC_ALL=C sort)'
+  --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons | LC_ALL=C sort)'
+  --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d -E .Trash . ~ | LC_ALL=C sort)'
+  --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-prompt(⚡  )+reload(sesh list --icons | LC_ALL=C sort)'
   --preview-window 'right:55%'
   --preview 'sesh preview {}'
 )
@@ -46,7 +46,7 @@ pick_with_tv()
 # Pick a sesh session using fzf inline
 pick_with_fzf()
 {
-  sesh list --icons | fzf "${FZF_COMMON_OPTS[@]}"
+  sesh list --icons | LC_ALL=C sort | fzf "${FZF_COMMON_OPTS[@]}"
   return 0
 }
 
