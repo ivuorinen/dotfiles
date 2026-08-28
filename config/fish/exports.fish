@@ -106,7 +106,11 @@ set -q GNUPGHOME; or set -x GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
 # Go configuration
 set -x GOPATH "$XDG_DATA_HOME/go"
-set -x GOBIN "$XDG_BIN_HOME"
+# Go's own default ($GOPATH/bin), NOT $XDG_BIN_HOME: `go install` binaries
+# landing in ~/.local/bin shadow the mise-managed versions. fish_add_path
+# appends here, so it stays behind the mise shims.
+set -x GOBIN "$GOPATH/bin"
+fish_add_path --append "$GOBIN"
 set -e GOROOT
 
 # 1Password configuration

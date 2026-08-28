@@ -399,7 +399,11 @@ export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 # https://golang.org/doc/code.html
 msg "Setting up Go configuration"
 export GOPATH="$XDG_DATA_HOME/go"
-export GOBIN="$XDG_BIN_HOME"
+# Go's own default ($GOPATH/bin), NOT $XDG_BIN_HOME: `go install` binaries
+# landing in ~/.local/bin shadow the mise-managed versions, because
+# ~/.profile re-prepends ~/.local/bin after ~/.bashrc has already put the
+# mise shims first. Appended to PATH below, behind the shims.
+export GOBIN="$GOPATH/bin"
 
 # Lando
 export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
@@ -587,6 +591,7 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 # Additional PATH entries (aligned with fish config)
 # NOTE: the mise shims dir is prepended *after* `mise activate` below, so it
 # stays ahead of the installs/*/bin dirs that activate adds — see `which -a gh`.
+[ -d "$GOBIN" ] && export PATH="$PATH:$GOBIN"
 [ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$PATH:$YARN_GLOBAL_FOLDER/bin"
 [ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
