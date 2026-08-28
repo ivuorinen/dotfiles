@@ -45,6 +45,14 @@ perms()
   env DOTFILES="$WORK" HOME="$HOMEDIR" bash "$CHECK" perms "$@"
 }
 
+# Octal mode of a path, portable across GNU and BSD stat. The macOS runner has
+# no `stat -c`, which is why this is a helper rather than eight inline
+# fallbacks — same idiom as tests/dfm.bats and tests/age-wrappers.bats.
+mode()
+{
+  stat -c '%a' "$1" 2> /dev/null || stat -f '%Lp' "$1"
+}
+
 # Declare a create: block with one entry at the given mode.
 declare_dir()
 {
@@ -77,7 +85,7 @@ declare_dir()
   declare_dir '~/.local/state' 0700
   run -0 perms --fix
   [[ "$output" == *"fixed:"* ]]
-  [ "$(stat -c '%a' "$HOMEDIR/.local/state")" = "700" ]
+  [ "$(mode "$HOMEDIR/.local/state")" = "700" ]
   # And the repair holds: a second pass has nothing left to do.
   run -0 perms
 }
@@ -102,8 +110,8 @@ declare_dir()
   chmod 0664 "$WORK/config/secrets.d/github.sh"
 
   run -0 perms --fix
-  [ "$(stat -c '%a' "$WORK/config/fish/secrets.d/github.fish")" = "600" ]
-  [ "$(stat -c '%a' "$WORK/config/secrets.d/github.sh")" = "600" ]
+  [ "$(mode "$WORK/config/fish/secrets.d/github.fish")" = "600" ]
+  [ "$(mode "$WORK/config/secrets.d/github.sh")" = "600" ]
 }
 
 # The committed templates are not secrets and must keep their normal mode —
@@ -121,9 +129,9 @@ declare_dir()
     "$WORK/config/secrets.d/github.sh.example"
 
   run -0 perms --fix
-  [ "$(stat -c '%a' "$WORK/config/fish/secrets.d/github.fish.example")" = "664" ]
-  [ "$(stat -c '%a' "$WORK/config/fish/secrets.d/README.md")" = "664" ]
-  [ "$(stat -c '%a' "$WORK/config/secrets.d/github.sh.example")" = "664" ]
+  [ "$(mode "$WORK/config/fish/secrets.d/github.fish.example")" = "664" ]
+  [ "$(mode "$WORK/config/fish/secrets.d/README.md")" = "664" ]
+  [ "$(mode "$WORK/config/secrets.d/github.sh.example")" = "664" ]
 }
 
 @test "dfm check perms --fix: tightens the secrets directories themselves" {
@@ -133,8 +141,8 @@ declare_dir()
   # setup() starts these compliant, so drift them deliberately here.
   chmod 0775 "$WORK/config/secrets.d" "$WORK/config/fish/secrets.d"
   run -0 perms --fix
-  [ "$(stat -c '%a' "$WORK/config/secrets.d")" = "700" ]
-  [ "$(stat -c '%a' "$WORK/config/fish/secrets.d")" = "700" ]
+  [ "$(mode "$WORK/config/secrets.d")" = "700" ]
+  [ "$(mode "$WORK/config/fish/secrets.d")" = "700" ]
 }
 
 # A path in the table that does not exist on this host is skipped, so entries
