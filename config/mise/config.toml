@@ -121,6 +121,25 @@ actionlint = "1.7.12"
 hadolint = "2.15.1"
 "dotnet:csharpier" = "1.3.0"
 
+# Go linters & formatters. Used in other repos, not this one — they live here
+# because dotfiles provisions the machine, not just this checkout.
+#
+# gofumpt/golines/revive are pinned to the github backend for the same reason
+# as grype and syft below. Measured with `mise install --force`:
+#
+#   gofumpt  aqua: checksum   github: checksum + attestations
+#   golines  aqua: checksum   github: checksum + attestations + SLSA provenance
+#   revive   aqua: checksum   github: checksum + attestations + SLSA provenance
+#
+# gocyclo is the odd one: it publishes no release assets at all, so neither the
+# registry nor the github backend can see it — the go backend is the only route,
+# and it builds from source against the go entry pinned above.
+"github:mvdan/gofumpt" = "0.11.0"
+"github:segmentio/golines" = "0.13.0"
+"github:mgechev/revive" = "1.16.0"
+"go:github.com/fzipp/gocyclo/cmd/gocyclo" = "0.6.0"
+golangci-lint = "2.13.1"
+
 # Security & supply chain
 age = "1.3.1"
 gopass = "1.16.1"                          # pass-compatible password manager (gopasspw/gopass)
@@ -164,6 +183,9 @@ act = "0.2.89"
 prek = "0.4.14"
 "npm:corepack" = "0.35.0"
 "dotnet:coverlet.console" = "10.0.1"
+# Go HTML templating codegen. Not in mise's registry, so it comes through the
+# github backend — which also gets attestations + SLSA provenance.
+"github:a-h/templ" = "0.3.1020"
 
 # System monitoring & misc utilities
 bottom = "0.14.8"
