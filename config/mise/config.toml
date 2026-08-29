@@ -176,6 +176,9 @@ pinact = "4.1.1"
 zizmor = "1.29.0"
 "github:Legit-Labs/legitify" = "1.0.11"
 "github:projectdiscovery/katana" = "1.7.0"
+# Go vulnerability scanner. Neither the registry nor the github backend knows
+# golang/vuln, so the go backend is the only route — same case as gocyclo above.
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.7.0"
 
 # Build, test & CI
 bats = "1.14.0"
