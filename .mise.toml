@@ -9,7 +9,7 @@ dotnet = "10"
 # them on a workstation. CI checks out the repo and never sees that file, so
 # the gate needs them here too — renovate tracks both copies.
 biome = "2.5.10"
-editorconfig-checker = "3.11.1"
+editorconfig-checker = "3.11.2"
 usage = "6.1.0"
 "npm:prettier" = "3.9.6"
 "npm:markdownlint-cli" = "0.49.1"

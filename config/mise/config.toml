@@ -103,7 +103,7 @@ just = "1.58.0"
 "github:dimo414/bkt" = "0.8.2"
 
 # Linters & formatters
-editorconfig-checker = "3.11.1"
+editorconfig-checker = "3.11.2"
 biome = "2.5.10"
 "npm:prettier" = "3.9.6"
 "npm:markdownlint-cli" = "0.49.1"
