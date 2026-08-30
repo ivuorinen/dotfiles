@@ -145,7 +145,7 @@ age = "1.3.1"
 gopass = "1.16.1"                          # pass-compatible password manager (gopasspw/gopass)
 cosign = "3.1.3"
 gitleaks = "8.30.1"
-trufflehog = "3.97.0"
+trufflehog = "3.97.1"
 # grype and syft are pinned to the github backend rather than left bare, because
 # it is the only backend that verifies them beyond a checksum. Measured, not
 # assumed — `mise install --force` prints what it actually verified:
