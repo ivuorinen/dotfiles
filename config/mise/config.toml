@@ -161,7 +161,7 @@ trufflehog = "3.97.1"
 # without a config change.
 "github:anchore/grype" = "0.117.0"
 trivy = "0.74.0"
-"github:anchore/syft" = "1.51.0"
+"github:anchore/syft" = "1.51.1"
 semgrep = "1.174.0"
 opengrep = "1.27.1"
 osv-scanner = "2.5.1"
