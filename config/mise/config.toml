@@ -36,6 +36,7 @@ lockfile = true
 always_keep_download = false
 always_keep_install = false
 experimental = true
+auto_update = true
 
 [tools]
 # Tools are grouped by function below, not by backend. Prefixed keys
