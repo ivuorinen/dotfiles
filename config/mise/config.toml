@@ -160,7 +160,7 @@ trufflehog = "3.97.1"
 # signature check. A bare entry also lets the registry absorb an upstream org
 # rename — which is exactly how gitui moved from extrawurst to gitui-org
 # without a config change.
-"github:anchore/grype" = "0.117.0"
+"github:anchore/grype" = "0.118.0"
 trivy = "0.74.0"
 "github:anchore/syft" = "1.51.1"
 semgrep = "1.174.0"
