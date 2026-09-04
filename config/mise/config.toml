@@ -164,7 +164,7 @@ trufflehog = "3.97.1"
 trivy = "0.74.0"
 "github:anchore/syft" = "1.51.1"
 semgrep = "1.174.0"
-opengrep = "1.27.1"
+opengrep = "1.29.0"
 osv-scanner = "2.5.1"
 scorecard = "5.5.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
