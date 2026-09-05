@@ -199,7 +199,7 @@ cheat = "5.1.0"
 "github:o2sh/onefetch" = "2.27.1"
 "github:exercism/cli" = "3.5.8"
 "npm:ccusage" = "20.0.20"
-"github:ZenNotes/zennotes" = "2.36.0"
+"github:ZenNotes/zennotes" = "2.42.0"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
