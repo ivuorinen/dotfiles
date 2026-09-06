@@ -1,5 +1,5 @@
 [tools]
-node = "26.7.0"
+node = "26.8.1"
 python = "3.14"
 go = "1.27.0"
 dotnet = "10"
