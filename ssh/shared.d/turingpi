@@ -2,17 +2,17 @@
 
 Host t1
   User ubuntu
-  HostName t1.home.antiprocess.net
+  HostName 192.168.5.11
   IdentityFile ~/.ssh/id_rsa
 Host t2
   User ubuntu
-  HostName t2.home.antiprocess.net
+  HostName 192.168.5.12
   IdentityFile ~/.ssh/id_rsa
 Host t3
   User ubuntu
-  HostName t3.home.antiprocess.net
+  HostName 192.168.5.13
   IdentityFile ~/.ssh/id_rsa
 Host t4
   User ubuntu
-  HostName t4.home.antiprocess.net
+  HostName 192.168.5.14
   IdentityFile ~/.ssh/id_rsa
