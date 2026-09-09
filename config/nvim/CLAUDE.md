@@ -18,8 +18,9 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
     PackChanged, sessions, linting trigger)
 3. `lua/utils.lua` — registers K, HasConfig, Gated, TOOL_CONFIGS globals
 4. `lua/keymaps.lua` — all non-plugin keybindings
-5. `lua/pack.lua` — PackUpdate / PackRemove / PackList user commands (vim.pack built-in,
-    no plugin dependency)
+5. `lua/pack.lua` — PackUpdate / PackRemove user commands (vim.pack built-in,
+    no plugin dependency) plus the `FileType nvim-pack` hook that makes the
+    update confirm buffer navigable (`:w` applies, `q` / `Esc` discards)
 6. `vim.pack.add {}` — loads all plugins onto the rtp
 7. Plugin configuration — inline sections in `init.lua` in this order:
     Completion → Editor → LSP → Navigation → QA → Snacks → Tools → Treesitter → UI
