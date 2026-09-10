@@ -4,12 +4,16 @@
 -- Commands:
 --   :Pack            open the dashboard
 --   :Pack check      open + immediately check remote for updates
---   :Pack update     close + run vim.pack.update() (all plugins)
+--   :Pack update     close + open the vim.pack review tab (all plugins)
 --   :Pack clean      close + remove all non-active (orphaned) plugins
 --
 -- Keymaps (buffer-local, active while the window is open):
---   U        update all plugins (closes UI, runs vim.pack.update)
---   u        update plugin under cursor
+--   U        review all updates (closes UI, opens vim.pack review tab)
+--   u        review update for plugin under cursor
+--
+-- U and u do not apply anything on their own: vim.pack.update() only stages
+-- changes into a confirm buffer in a new tabpage. :w there applies them,
+-- q / Esc discards. See the winbar set in lua/pack.lua.
 --   C        check remote for new commits
 --   X        clean non-active plugins (orphans)
 --   D        delete plugin under cursor (non-active only)
@@ -484,8 +488,8 @@ render = function()
   if state.show_help then
     add ''
     add(' Keymaps:', 'PackUiHelp')
-    add('   U       Update all plugins', 'PackUiHelp')
-    add('   u       Update plugin under cursor', 'PackUiHelp')
+    add('   U       Review all updates (:w in review tab applies)', 'PackUiHelp')
+    add('   u       Review update under cursor (:w applies)', 'PackUiHelp')
     add('   C       Check remote for new commits', 'PackUiHelp')
     add('   X       Clean non-active plugins', 'PackUiHelp')
     add('   D       Delete plugin under cursor (non-active only)', 'PackUiHelp')

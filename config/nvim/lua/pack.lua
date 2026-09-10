@@ -45,6 +45,16 @@ vim.api.nvim_create_user_command(
 
 -- Close the vim.pack confirm buffer (filetype nvim-pack) with q or Esc.
 -- :w confirms and runs the update; closing cancels via Neovim's own on_cancel.
+--
+-- The winbar is not decoration. Neovim's confirm buffer is `modifiable = false`
+-- with no header naming either verb, so the flow dead-ends: `q` is bound here,
+-- making the discard path reachable by accident while the apply path (`:w`,
+-- routed through the buffer's BufWriteCmd) is reachable only by someone who has
+-- read `:h vim.pack.update()`. Naming both verbs on screen is the whole fix.
+--
+-- vim.pack sets `filetype` last in show_confirm_buf specifically so user
+-- autocmds can override, so FileType is the sanctioned hook and fires for every
+-- caller — the :Pack UI's U/u keys, :PackUpdate, and a bare vim.pack.update().
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('nvim_pack_close', { clear = true }),
   pattern = 'nvim-pack',
@@ -63,5 +73,8 @@ vim.api.nvim_create_autocmd('FileType', {
       close,
       vim.tbl_extend('force', opts, { desc = 'Cancel update' })
     )
+    -- wo[0][0] scopes the winbar to this window *and* buffer, so it does not
+    -- leak onto the next buffer shown in the same window.
+    vim.wo[0][0].winbar = '%#Question# :w %*apply updates   %#Question# q %*discard'
   end,
 })
