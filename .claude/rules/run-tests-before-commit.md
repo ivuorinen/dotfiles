@@ -46,9 +46,26 @@ artifacts:
 git grep -n '<name>'
 ```
 
-`.claude/skills/graphify` does not cover this: the knowledge graph contains
-no nodes from `tests/`, so a graphify query returns nothing for a
-test-to-code dependency. Use `git grep`.
+The knowledge graph now carries the suite: `scripts/graphify-tests.py` adds a
+node per `tests/*.bats` file, a node per `@test` case, and a `tests` edge to
+the code each file exercises. So
+
+```bash
+graphify explain '<script>.bats'     # which cases a test file holds
+graphify path '<script>' '<script>.bats'
+```
+
+answers the test-to-code direction that used to require `git grep`. Two limits
+keep `git grep` the authority for deletions:
+
+1. Edges come from path references and the `tests/<name>.bats` ↔
+    `local/bin/<name>` convention. Five test files resolve to no node at all,
+    and a test that reaches its target some other way has no edge.
+2. The graph is a snapshot. Anything added since the last build is missing.
+
+So query the graph to understand coverage, and still run `git grep -n '<name>'`
+before deleting — it is the only check that sees uncommitted and
+just-renamed code.
 
 The same applies to generated files — completions, man pages, `local/md/`
 and `docs/` are rebuilt by `scripts/install-completions.sh`, and a stale

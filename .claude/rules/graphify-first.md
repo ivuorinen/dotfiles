@@ -17,8 +17,18 @@ raw source browsing.
 Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review, or
 when query/path/explain did not surface enough context.
 
-After modifying code, run `graphify update .` to keep the graph current
-(AST-only, no API cost).
+After modifying code, refresh the graph (AST-only, no API cost):
+
+```bash
+graphify update .            # re-extract changed files
+scripts/graphify-tests.py    # re-add the bats suite
+graphify export html         # regenerate the viewer
+```
+
+The second step is not optional. `graphify update` rebuilds `graph.json` from
+its own extractors, which have no `.bats` support, so it drops the test
+subgraph every time. `scripts/graphify-tests.md` explains why the suite needs
+a repo-owned extractor rather than a graphify extension.
 
 When the user types `/graphify`, invoke the graphify skill
 (`.claude/skills/graphify/SKILL.md`) before anything else.
