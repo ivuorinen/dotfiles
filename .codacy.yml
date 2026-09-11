@@ -9,6 +9,13 @@
 # FILTER_REGEX_EXCLUDE (.mega-linter.yml), and the vendored trees listed in
 # .claude/rules/vendored-files.md. Keep the four in step when one moves.
 #
+# `yarn lint:exclusions` enforces this: scripts/check-exclusion-drift.py
+# compares which gates cover which tree against .exclusion-baseline.json and
+# fails when that changes. Add a tree here and the check names the gates still
+# missing it. A difference that is intentional is recorded with
+# `scripts/check-exclusion-drift.py --update`, committed alongside the config
+# change so the reason shows in that diff.
+#
 # Patterns use Java glob syntax, not gitignore syntax: `dir/**` matches
 # everything inside dir, and a bare `dir/*` would only match its direct
 # children.
