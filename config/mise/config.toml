@@ -135,7 +135,7 @@ hadolint = "2.15.1"
 # gocyclo is the odd one: it publishes no release assets at all, so neither the
 # registry nor the github backend can see it — the go backend is the only route,
 # and it builds from source against the go entry pinned above.
-"github:mvdan/gofumpt" = "0.11.0"
+"github:mvdan/gofumpt" = "0.12.0"
 "github:segmentio/golines" = "0.13.0"
 "github:mgechev/revive" = "1.16.0"
 "go:github.com/fzipp/gocyclo/cmd/gocyclo" = "0.6.0"
