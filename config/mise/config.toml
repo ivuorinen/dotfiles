@@ -185,7 +185,7 @@ zizmor = "1.29.0"
 bats = "1.14.0"
 act = "0.2.89"
 prek = "0.4.14"
-"npm:corepack" = "0.35.0"
+"npm:corepack" = "0.36.0"
 "dotnet:coverlet.console" = "10.0.1"
 # Go HTML templating codegen. Not in mise's registry, so it comes through the
 # github backend — which also gets attestations + SLSA provenance.
