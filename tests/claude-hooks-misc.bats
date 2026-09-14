@@ -14,6 +14,13 @@ bats_require_minimum_version 1.5.0
 
 setup()
 {
+  # Fixture repos must not inherit commit.gpgsign from the developer's global
+  # config: the signing key lives in 1Password, so a locked vault makes every
+  # fixture commit block for 60s and then fail with "failed to write commit
+  # object". That made the suite's result depend on the vault's lock timer.
+  # Overriding only this one key leaves global user.name/email intact.
+  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+
   HOOKS="${BATS_TEST_DIRNAME}/../.claude/hooks"
   WORK="$(mktemp -d)"
   export HOOKS WORK

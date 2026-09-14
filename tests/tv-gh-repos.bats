@@ -10,6 +10,11 @@ bats_require_minimum_version 1.5.0
 
 setup()
 {
+  # See tests/claude-hooks-misc.bats: keeps fixture commits off the
+  # 1Password-backed signing key, which costs 60s and fails when locked.
+  # This file alone spent 253s of the suite's runtime on that timeout.
+  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+
   TVR="$BATS_TEST_DIRNAME/../local/bin/tv-gh-repos"
   TMP="$(mktemp -d)"
   mkdir -p "$TMP/bin" "$TMP/cache" "$TMP/code"

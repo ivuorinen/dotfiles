@@ -12,6 +12,10 @@ bats_require_minimum_version 1.5.0
 
 setup()
 {
+  # See tests/claude-hooks-misc.bats: keeps fixture commits off the
+  # 1Password-backed signing key, which costs 60s and fails when locked.
+  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+
   GA="$BATS_TEST_DIRNAME/../local/bin/git-attributes"
   TMP="$(mktemp -d)"
   REPO="$TMP/repo"
