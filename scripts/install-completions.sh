@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # @description Generate shell completions, markdown docs, and manpages from usage specs
 #USAGE about "Generate shell completions, markdown docs, and manpages from usage specs"
+#USAGE flag "--prune-list" help="List generated artifacts whose source spec is gone, delete nothing"
+#USAGE flag "--prune" help="Delete the artifacts --prune-list reports"
 #
 # Requires: usage (https://usage.jdx.dev/) installed via mise
 # Generates: fish/bash/zsh completions, markdown docs, manpages
@@ -21,6 +23,148 @@ MAN_DIR="$DOTFILES/local/man/man1"
 
 # Ensure output directories exist
 mkdir -p "$FISH_DIR" "$BASH_DIR" "$ZSH_DIR" "$MD_DIR" "$MAN_DIR"
+
+PRUNE_MODE=none # none | list | delete
+
+for arg in "$@"; do
+  case "$arg" in
+    --prune-list) PRUNE_MODE=list ;;
+    --prune) PRUNE_MODE=delete ;;
+    *)
+      logger::error "unknown argument: $arg (expected --prune or --prune-list)"
+      exit "$LIB_E_INVALID_ARGUMENT"
+      ;;
+  esac
+done
+
+# ── Pruning ───────────────────────────────────────────────────────────────
+# This generator only ever creates files, so deleting a script strands its
+# completion, markdown and manpage. That is finding N-147, which removed the
+# zsh copy and left the bash and markdown siblings behind — the rot outlived
+# two cleanups because nothing enumerated it.
+#
+# The catalog is built from the same source lists the generator itself walks,
+# so a file is only ever named when nothing would regenerate it. Deletion is
+# limited to exactly what the catalog printed; there is no separate find.
+#
+# Three deliberate exclusions:
+#   * git-tracked files are never touched. local/man/man1 holds the vendored
+#     fzf manpages and config/fish/completions is a hand-curated whitelist —
+#     neither is generated here, and both would otherwise look orphaned.
+#   * config/fish/completions is skipped outright: it is the input that drives
+#     the third-party tool list below, so pruning it would delete the
+#     generator's own source of truth.
+#   * third-party tools are expected whenever they are whitelisted in fish,
+#     not when `command -v` finds them. A whitelisted tool missing from this
+#     host is absent, not stale, and returns on the next host that has it.
+
+# Names that get completions, markdown and a manpage.
+spec_bin_names()
+{
+  local spec bin_name
+  for spec in "$DOTFILES"/local/bin/*; do
+    [[ -f "$spec" ]] || continue
+    grep -qE '^(#USAGE|//USAGE)' "$spec" 2> /dev/null || continue
+    bin_name=$(basename "$spec")
+    case "$bin_name" in
+      dfm | dfm-* | x) continue ;;
+      *) printf '%s\n' "$bin_name" ;;
+    esac
+  done
+  [[ -f "$DOTFILES/local/bin/dfm" ]] && printf 'dfm\n'
+  for spec in "$DOTFILES"/scripts/*.sh; do
+    [[ -f "$spec" ]] || continue
+    bin_name=$(basename "$spec")
+    [[ "$bin_name" == "shared.sh" ]] && continue
+    printf '%s\n' "$bin_name"
+  done
+  return 0
+}
+
+# Tools whose bash/zsh completions are snapshotted from the tool itself.
+thirdparty_bin_names()
+{
+  local fish_comp tool
+  while IFS= read -r fish_comp; do
+    tool=$(basename "$fish_comp" .fish)
+    case "$tool" in
+      fisher | x) continue ;;
+      *) printf '%s\n' "$tool" ;;
+    esac
+  done < <(git -C "$DOTFILES" ls-files config/fish/completions/)
+  return 0
+}
+
+# Print every generated artifact with no surviving source, one path per line.
+stale_catalog()
+{
+  local specs thirdparty expected_comp expected_doc file base
+  specs=$(spec_bin_names)
+  thirdparty=$(thirdparty_bin_names)
+  expected_comp=$(printf '%s\n%s\n' "$specs" "$thirdparty")
+  # `x` is docs-only: its fish completion is hand-crafted and tracked.
+  expected_doc=$(printf '%s\nx\n' "$specs")
+
+  for file in "$BASH_DIR"/*.bash; do
+    [[ -f "$file" ]] || continue
+    base=$(basename "$file" .bash)
+    printf '%s\n' "$expected_comp" | grep -Fxq "$base" || printf '%s\n' "$file"
+  done
+
+  for file in "$ZSH_DIR"/_*; do
+    [[ -f "$file" ]] || continue
+    base=$(basename "$file")
+    printf '%s\n' "$expected_comp" | grep -Fxq "${base#_}" || printf '%s\n' "$file"
+  done
+
+  for file in "$MD_DIR"/*.md; do
+    [[ -f "$file" ]] || continue
+    base=$(basename "$file" .md)
+    printf '%s\n' "$expected_doc" | grep -Fxq "$base" || printf '%s\n' "$file"
+  done
+
+  for file in "$MAN_DIR"/*.1; do
+    [[ -f "$file" ]] || continue
+    base=$(basename "$file" .1)
+    printf '%s\n' "$expected_doc" | grep -Fxq "$base" || printf '%s\n' "$file"
+  done
+  return 0
+}
+
+if [[ "$PRUNE_MODE" != "none" ]]; then
+  stale_count=0
+  kept_tracked=0
+  declare -a to_remove=()
+
+  while IFS= read -r file; do
+    [[ -n "$file" ]] || continue
+    rel="${file#"$DOTFILES"/}"
+    if git -C "$DOTFILES" ls-files --error-unmatch "$rel" > /dev/null 2>&1; then
+      logger::info "keeping tracked file (not generated here): $rel"
+      ((kept_tracked++)) || true
+      continue
+    fi
+    printf '  %s\n' "$rel"
+    to_remove+=("$file")
+    ((stale_count++)) || true
+  done < <(stale_catalog)
+
+  if ((stale_count == 0)); then
+    logger::info "no stale generated artifacts ($kept_tracked tracked file(s) skipped)"
+    exit "$LIB_E_SUCCESS"
+  fi
+
+  if [[ "$PRUNE_MODE" == "list" ]]; then
+    logger::info "$stale_count stale artifact(s); re-run with --prune to delete them"
+    exit "$LIB_E_SUCCESS"
+  fi
+
+  for file in "${to_remove[@]}"; do
+    rm -f "$file"
+  done
+  logger::info "pruned $stale_count stale artifact(s)"
+  exit "$LIB_E_SUCCESS"
+fi
 
 # Check for usage CLI
 if ! command -v usage &> /dev/null; then
