@@ -188,11 +188,21 @@ repos:
         exclude: \.(py|pl|php|md)$
       - id: bats
         name: Bats test suite
-        # ~30s, so it is scoped to paths whose behaviour the suite asserts —
-        # a docs-only or workflow-only commit skips it. The whole suite runs
-        # rather than the test file matching the edited script: removing the
-        # python-libs step from local/bin/dfm-install broke tests/dfm.bats,
-        # a pairing no filename mapping would have found.
+        # ~5min for 1005 tests (measured 2026-09-13; the "~30s" this comment
+        # used to claim predates most of the suite). It is scoped to paths
+        # whose behaviour the suite asserts — a docs-only or workflow-only
+        # commit skips it. The whole suite runs rather than the test file
+        # matching the edited script: removing the python-libs step from
+        # local/bin/dfm-install broke tests/dfm.bats, a pairing no filename
+        # mapping would have found.
+        #
+        # Most of the cost is spread flat across 91 files (slowest is
+        # git-dirty at 25s), not one hot spot, so there is nothing left to
+        # fix by tuning a single test. `bats --jobs` would cut it to roughly
+        # a minute on this 10-core machine, but it needs GNU parallel and
+        # /opt/homebrew/bin/parallel is moreutils' incompatible namesake,
+        # pinned as brew:moreutils in config/mise/config.toml. Resolving that
+        # collision is a deliberate decision, not a drive-by.
         # See .claude/rules/run-tests-before-commit.md.
         entry: bats --print-output-on-failure tests/
         language: system
