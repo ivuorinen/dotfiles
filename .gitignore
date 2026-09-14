@@ -139,3 +139,6 @@ config/yazi/Catppuccin-*.tmTheme
 # the moment the file was first committed. Keeping it local preserves
 # reproducible installs on a workstation without arming --locked in CI.
 mise.lock
+# Per-tool install locks (aube-lock.yaml, uv.lock) mise writes for npm: and
+# pipx: tools. Generated on install for the same reason as mise.lock above.
+.mise/
