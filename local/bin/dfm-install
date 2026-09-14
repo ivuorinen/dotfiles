@@ -13,8 +13,6 @@
 #USAGE   cmd "mise-cleanup" help="Remove old version manager installations" {
 #USAGE     flag "--dry-run" help="Show what would be removed without removing"
 #USAGE   }
-#USAGE   cmd "ntfy" help="Install ntfy notification tool"
-#USAGE   cmd "shellspec" help="Install shellspec testing framework"
 #USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
 #USAGE   cmd "z" help="Install z directory jumper"
 #USAGE }
@@ -85,8 +83,6 @@ dfm_install()
     "macos:Setup nice macOS defaults"
     "mise:Install tools via mise (runtimes + CLI tools)"
     "mise-cleanup:Remove old version manager installations (--dry-run supported)"
-    "ntfy:Install ntfy notification tool"
-    "shellspec:Install shellspec testing framework"
     "xcode-cli-tools:Install Xcode CLI tools (macOS)"
     "z:Install z"
   )
@@ -117,12 +113,12 @@ dfm_install()
       run_step "composer" dfm_install composer
 
       # Tier 3: Tool-dependent installers
+      # ntfy and shellspec are not steps: they are pinned in
+      # config/mise/config.toml, so the mise step above already installs them.
       run_step "cheat databases" dfm_install cheat-databases
       require_bin "gh extensions" gh && run_step "gh extensions" dfm_install gh
-      require_bin "ntfy" mise && run_step "ntfy" dfm_install ntfy
 
       # Tier 4: Independent utilities
-      run_step "shellspec" dfm_install shellspec
       run_step "z" dfm_install z
 
       # Tier 5: Generate completions, docs, and manpages from usage specs
@@ -266,22 +262,10 @@ dfm_install()
       fi
       ;;
 
-    ntfy)
-      msgr run "Installing ntfy via mise..."
-      mise install "github:binwiederhier/ntfy" \
-        && msgr yay "ntfy installed!"
-      ;;
-
     xcode-cli-tools)
       msgr run "Installing Xcode CLI tools..."
       bash "$DOTFILES/scripts/install-xcode-cli-tools.sh" \
         && msgr yay "Xcode CLI tools installed!"
-      ;;
-
-    shellspec)
-      msgr run "Installing shellspec..."
-      bash "$DOTFILES/scripts/install-shellspec.sh" \
-        && msgr yay "shellspec has been installed!"
       ;;
 
     z)

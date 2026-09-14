@@ -47,8 +47,6 @@ setup()
   [[ "$output" == *"macos"* ]]
   [[ "$output" == *"mise"* ]]
   [[ "$output" == *"mise-cleanup"* ]]
-  [[ "$output" == *"ntfy"* ]]
-  [[ "$output" == *"shellspec"* ]]
   [[ "$output" == *"xcode-cli-tools"* ]]
   [[ "$output" == *"z"* ]]
 }
