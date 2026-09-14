@@ -60,7 +60,7 @@ cmake = "4.4.3"
 starship = "1.26.0"
 tmux = "3.7b"
 usage = "6.5.0"
-"github:joshmedeski/sesh" = "2.29.0"
+"github:joshmedeski/sesh" = "2.30.1"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # File navigation, search & viewing
