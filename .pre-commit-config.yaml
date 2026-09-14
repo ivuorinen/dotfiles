@@ -81,7 +81,7 @@ repos:
       - id: editorconfig-checker
         name: EditorConfig Checker
         # Mirrors `yarn lint:ec`. Exclusions live in .editorconfig-checker.json.
-        entry: ec -f gcc
+        entry: editorconfig-checker -f gcc
         language: system
         types: [text]
 

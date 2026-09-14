@@ -13,7 +13,7 @@
     "fix:prettier": "prettier --write '**/*.{yml,yaml}'",
     "format:yaml": "prettier --write '**/*.{yml,yaml}'",
     "test": "bash test-all.sh",
-    "lint:ec": "ec -f gcc",
+    "lint:ec": "editorconfig-checker -f gcc",
     "lint:markdownlint": "markdownlint --ignore-path .markdownlintignore '**/*.md'",
     "lint:md-table": "git ls-files '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter --check",
     "fix:md-table": "git ls-files '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter",
