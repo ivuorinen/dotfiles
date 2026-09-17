@@ -57,5 +57,5 @@ prek run --all-files
 ## Tooling maintenance
 
 ```bash
-yarn dlx @biomejs/biome migrate --write   # Update biome schema version
+biome migrate --write   # Update biome schema version (mise-pinned biome)
 ```
