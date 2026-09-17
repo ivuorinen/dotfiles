@@ -38,6 +38,11 @@ always_keep_install = false
 experimental = true
 auto_update = true
 auto_install = true
+# The default 24h minimum_release_age is passed to uv as a rolling
+# exclude-newer, which mise hashes into the pypi install path — so every run
+# lands in a new directory and auto_install reinstalls pypi tools forever
+# (still present in mise 2026.9.10). Drop this once mise fixes it.
+minimum_release_age_excludes = ["pypi:*"]
 
 [tools]
 # Tools are grouped by function below, not by backend. Prefixed keys
