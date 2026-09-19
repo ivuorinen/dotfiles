@@ -166,7 +166,7 @@ trivy = "0.74.0"
 "github:anchore/syft" = "1.51.1"
 semgrep = "1.177.0"
 opengrep = "1.30.0"
-osv-scanner = "2.5.1"
+osv-scanner = "2.6.0"
 scorecard = "5.5.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
