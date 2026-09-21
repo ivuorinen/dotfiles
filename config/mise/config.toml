@@ -208,6 +208,7 @@ cheat = "5.1.0"
 "npm:ccusage" = "20.0.20"
 "github:ZenNotes/zennotes" = "2.50.4"
 pnpm = "12.4.2"
+adr-tools = "3.0.0"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
