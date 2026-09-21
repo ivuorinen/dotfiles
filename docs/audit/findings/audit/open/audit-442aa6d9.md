@@ -53,3 +53,7 @@ curl -s https://app.codacy.com/api/v3/analysis/organizations/gh/ivuorinen/reposi
 ```
 
 Expect 0. Anything else is a pattern the repo has not yet ruled on.
+
+## Status (2026-09-21)
+
+Not applied in the fix run: both options are Codacy dashboard settings with no file-level equivalent, so no repo change can close this. It stays open until someone with dashboard access toggles option 1 (or 2) and re-runs the count.
