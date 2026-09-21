@@ -47,7 +47,7 @@ yarn format:yaml       # Prettier for YAML
 
 # Tests (Bats – Bash Automated Testing System)
 yarn test              # Run all tests in tests/
-./node_modules/.bin/bats tests/dfm.bats   # Run a single test file
+bats tests/dfm.bats    # Run a single test file (bats from PATH, via mise)
 
 # Shell linting (individual files)
 shellcheck local/bin/<script>
@@ -142,20 +142,28 @@ with their own `base/`, `config/`, and `install.conf.yaml`.
 
 ## Files You Must NOT Modify
 
-| File / Path                    | Reason                                       |
-|--------------------------------|----------------------------------------------|
-| `local/bin/fzf-tmux`           | Vendored from junegunn/fzf — read-only       |
-| `yarn.lock` / `.yarn/`         | Managed by Yarn — do not hand-edit           |
-| `tools/**` (submodule paths)   | Git submodules — changes belong upstream     |
-| `config/fish/secrets.d/*.fish` | Real secrets — gitignored, never commit      |
-| `config/gh/hosts.yml`          | Managed by `gh` CLI — excluded from Prettier |
+The authoritative lists are `.claude/rules/vendored-files.md` (its `paths:`
+frontmatter) and `.claude/rules/secrets-files.md`. No hook enforces them for
+the cloud agent yet — this list is the only guard.
+
+- **Vendored from junegunn/fzf:** `local/bin/fzf-tmux`,
+  `config/fzf/{completion,key-bindings}.*`, `local/man/man1/fzf{,-tmux}.1`
+- **Vendored from iTerm2:** `local/bin/iterm2_shell_integration.zsh`
+- **Vendored graphify skill:** `.claude/skills/graphify/**`
+- **Vendored fish plugins:** `config/fish/functions/` — `fisher.fish`,
+  `bass.fish`, `__bass.py`, `__z_add.fish`, `__z_clean.fish`
+- **Managed by Yarn:** `yarn.lock`, `.yarn/`
+- **Git submodules:** `tools/**`, `config/cheat/cheatsheets/{community,tldr}/**`
+- **Real secrets — never read, edit, or commit:** `config/fish/secrets.d/*`,
+  `config/secrets.d/*` (only `*.example` and `README.md` are tracked)
+- **Managed by the `gh` CLI:** `config/gh/hosts.yml` (excluded from Prettier)
 
 ---
 
 ## Important Gotchas
 
-1. **POSIX scripts** — `x-ssh-audit`, `x-codeql`, `x-until-error`,
-    `x-until-success`, `x-ssl-expiry-date` use `/bin/sh`. Validate with
+1. **POSIX scripts** — nine scripts in `local/bin/` use `sh`, not bash;
+    `.claude/rules/posix-scripts.md` holds the list. Validate with
     `sh -n`, not `bash -n`.
 2. **Fish config chain** — `config/fish/config.fish` →
     `exports.fish` → `alias.fish`. The `exports.fish` auto-sources
@@ -176,9 +184,8 @@ Tests live in `tests/` and use [Bats](https://github.com/bats-core/bats-core).
 Each script in `local/bin/` that has a `.bats` counterpart is fully covered.
 
 ```bash
-yarn install          # install bats as a dev dependency
 yarn test             # run all tests
-./node_modules/.bin/bats tests/dfm.bats   # run a single file
+bats tests/dfm.bats   # run a single file (bats from PATH, via mise)
 ```
 
 ---
