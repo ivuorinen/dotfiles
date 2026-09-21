@@ -10,6 +10,8 @@ paths:
   - "config/lib.sh"
   - "config/exports"
   - "config/alias"
+  - ".claude/hooks/**"
+  - ".claude/rules/vendored-files.md"
 ---
 
 # Run the tests before committing
@@ -36,41 +38,6 @@ bats tests/ 2>&1 | grep '^not ok'    # empty means green
 The exit code is the authority. `ok 222 ...` as the final line proves
 nothing about tests 1 through 221.
 
-## Deleting something means grepping for it first
-
-Removing a subcommand, script, menu entry, or config key requires a
-repo-wide search **before** the deletion, including `tests/` and generated
-artifacts:
-
-```bash
-git grep -n '<name>'
-```
-
-The knowledge graph now carries the suite: `scripts/graphify-tests.py` adds a
-node per `tests/*.bats` file, a node per `@test` case, and a `tests` edge to
-the code each file exercises. So
-
-```bash
-graphify explain '<script>.bats'     # which cases a test file holds
-graphify path '<script>' '<script>.bats'
-```
-
-answers the test-to-code direction that used to require `git grep`. Two limits
-keep `git grep` the authority for deletions:
-
-1. Edges come from path references and the `tests/<name>.bats` ↔
-    `local/bin/<name>` convention. Five test files resolve to no node at all,
-    and a test that reaches its target some other way has no edge.
-2. The graph is a snapshot. Anything added since the last build is missing.
-
-So query the graph to understand coverage, and still run `git grep -n '<name>'`
-before deleting — it is the only check that sees uncommitted and
-just-renamed code.
-
-The same applies to generated files — completions, man pages, `local/md/`
-and `docs/` are rebuilt by `scripts/install-completions.sh`, and a stale
-reference there survives until that runs.
-
 ## Loading
 
 This rule is path-scoped to the same paths the pre-commit hook covers, so
@@ -85,5 +52,5 @@ under the covered paths. A docs-only commit skips it, because nothing the
 suite asserts can change. Bypassing that hook is forbidden — see
 `.claude/rules/no-hook-bypass.md`.
 
-The suite takes about 30 seconds. That is the price of the gate, and it is
-paid on commit rather than in CI.
+The suite takes about five minutes (1005 tests, measured 2026-09-13). That
+is the price of the gate, and it is paid on commit rather than in CI.

@@ -8,7 +8,10 @@ When editing any structured config file (YAML, JSON, TOML, INI, or any
 key-value format) that has no JSON Schema **and** no linter that validates
 key names:
 
-**You must not guess, assume, infer, or extrapolate any key name or value.**
+**You must not guess, assume, infer, or extrapolate any key name, or any
+value whose accepted set the tool defines (enums, flags, formats).**
+Freeform content the user supplied — a message, a regex, a secret — is
+not a guess; it needs no evidence beyond the user's request.
 
 ## What counts as guessing (all forbidden)
 

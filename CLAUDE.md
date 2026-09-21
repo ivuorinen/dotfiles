@@ -54,11 +54,8 @@ through `dfm_bootstrap`). Adapted from the dfm `common.sh` logging
 functions and made portable across bash 3.2+, bash 5, and zsh (severities
 map via a `case` statement, not a bash-only associative array).
 
-**Load-time invariant:** because it lands in interactive shells,
 `lib.sh` is side-effect-free on source — it only defines functions and
-constants. It never runs `set -e`, installs traps, or calls `exit` at
-the top level; scripts opt into those via `lib::strict` /
-`lib::trap_cleanup`. Covered by `tests/lib.bats`.
+constants; the mandate is `.claude/rules/lib-sh-side-effects.md`.
 
 ### Theme Orchestrator (`config/theme/`)
 
@@ -82,10 +79,9 @@ list live in `local/bin/CLAUDE.md`, which loads when working there.
 
 `config/mise/config.toml` pins the language runtimes and CLI tools.
 Activated via `eval "$(mise activate bash)"` in `config/exports`.
-Run `mise install` after adding new tools.
-
-Python packages come from `config/mise/default-python-packages`, not pip
-by hand — `python.default_packages_file` in the same config points at it.
+Python libraries come from `config/mise/default-python-packages`
+(`python.default_packages_file` points at it). Install mandates:
+`.claude/rules/mise-packages.md`.
 
 ### Host-specific Configs
 
@@ -116,7 +112,8 @@ symlinks them into `~/.config/` automatically.
   eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
   `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
   `bash -n`.
-- **Vendored files**: the six fzf files, `.claude/skills/graphify/`,
+- **Vendored files**: the eight fzf files (six scripts, two man pages),
+  `.claude/skills/graphify/`,
   `local/bin/iterm2_shell_integration.zsh`, and five fish plugin functions
   under `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
   `__z_add.fish`, `__z_clean.fish`).

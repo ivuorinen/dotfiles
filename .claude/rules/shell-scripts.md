@@ -22,8 +22,9 @@ that have no shebang. Without it the linter falls back to `sh` mode
 and flags valid bash constructs.
 
 Follow the shfmt settings in `.editorconfig`; they are enumerated in
-`.claude/rules/editorconfig.md`. The `shell-validate` skill runs both
-shellcheck and shfmt after each Edit/Write.
+`.claude/rules/editorconfig.md`. After each Edit/Write,
+`post-edit-format.sh` runs `shfmt -w` and `post-edit-lint.sh` runs
+shellcheck, feeding any failure back; pre-commit runs both again.
 
 POSIX (`/bin/sh`) scripts have their own validation rule — read
 `.claude/rules/posix-scripts.md` before checking one, and use the method it

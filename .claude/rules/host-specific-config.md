@@ -21,3 +21,9 @@ stays portable across machines and forks.
 
 Use the `host-override` skill to scaffold a new overlay when adding
 machine-specific config.
+
+The `host-leak-check` pre-commit hook (`scripts/check-host-leak.sh`)
+rejects staged lines under `config/`, `base/` or `ssh/` that add a
+`hosts/` directory name (three characters or longer), this machine's
+`hostname -s`, or a `~/Code/…` / `/Users/<user>/Code/…` path. It checks
+added lines only; references already in the shared tree predate it.

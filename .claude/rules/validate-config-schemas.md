@@ -48,15 +48,15 @@ only safety net for schema-less files: it carries the evidence requirement
 for every key name and the reason a syntax linter never substitutes for a
 schema.
 
-## When extrapolation is fine
+Which values need evidence and which are freeform is defined once, in
+`.claude/rules/no-schema-guessing.md`.
 
-Only when the field is freeform (regex, glob list, log message text,
-secrets value). Anything where the parser pattern-matches a known
-key name → schema-validate.
+## What the gates cover
 
-## Why a Stop-hook does not replace this rule
-
-Pre-commit hooks run shellcheck, yamllint, and actionlint, but none
-of them schema-check `.mega-linter.yml` or other tool-specific
-files. The Stop-hook's `yarn lint` aggregator skips them too. There
-is no automatic safety net — the discipline is the safety net.
+`v8r --ignore-errors` runs in pre-commit and in `yarn lint:v8r` (the
+Stop gate) over every tracked YAML, JSON and TOML file, excluding
+submodules, cheat sheets, `config/gh/` (rewritten by `gh config set`),
+`graphify-out/` and `docs/audit/`. A file with a schema-store match that
+fails validation fails both gates. A file with no match, or with several
+candidate schemas (`.github/renovate.json`, `.prettierrc.json`), passes
+unchecked — for those, `no-schema-guessing.md` is the only safety net.

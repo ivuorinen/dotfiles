@@ -14,16 +14,11 @@ Either form is acceptable, but the description must be present:
 mini.clue surfaces it in the popup, and an omitted description leaves
 the binding unlabelled in `<leader>?`.
 
-## Manual verification
+## Enforcement
 
-No automated hook enforces this rule. Run the following grep before
-opening a PR that touches `config/nvim/`:
-
-```bash
-# Two-argument K.* calls (missing the opts/desc argument) are bugs.
-grep -nrE '\bK\.(n|nl|d|ld)\(\s*"[^"]*"\s*,\s*[^,)]+\)\s*$' config/nvim/ \
-  | grep -v utils.lua
-```
-
-A non-empty result is a regression. The `utils.lua` exclusion covers
-the K-table definition itself.
+The `keymap-desc` pre-commit hook runs `scripts/check-keymap-desc.py` on
+every staged `config/nvim/**/*.lua` file. It parses each `K.*` call —
+quotes, comments and inline `function … end` bodies included — and fails
+when the opts argument is neither a string literal nor a table holding
+`desc`. Run it by hand with `python3 scripts/check-keymap-desc.py`; exit 0
+means every call is labelled.

@@ -57,7 +57,8 @@ The shell loaders `config/fzf/fzf.bash` and `config/fzf/fzf.zsh`
 are local shims that `source` the vendored files — those are
 project code and may be edited.
 
-`.pre-commit-config.yaml` excludes the vendored shell files from
+`.pre-commit-config.yaml` excludes the vendored shell files —
+`local/bin/fzf-tmux` and the four `config/fzf/*.{bash,zsh}` files — from
 `shfmt`. The vendored files self-disable shellcheck via an in-file
 `# shellcheck disable=all` directive, so no shellcheck exclude is
 needed.
@@ -103,7 +104,12 @@ two B603, two Opengrep `dangerous-subprocess-use`).
 
 ## Enforcement
 
-The `.claude/settings.json` PreToolUse hook
-(`.claude/hooks/pre-edit-block.sh`) blocks edits to every path listed
-above. Bypassing the hook is forbidden; see
-`.claude/rules/no-hook-bypass.md`.
+One regex, `PROTECTED_RE` in `.claude/hooks/lib/protected-paths.sh`,
+covers every path listed above plus `yarn.lock`, `.yarn/` and the
+submodule trees. Three hooks source it: `pre-edit-block.sh` blocks
+Edit/Write, `pre-ctx-write-guard.sh` blocks sandbox code that writes,
+and `pre-bash-route.sh` blocks Bash commands that write (`>`, `cp`,
+`mv`, `rm`, `tee`, `sed -i`, `git checkout … --`). The `paths:` list in
+this file's frontmatter is the source: `tests/protected-paths-parity.bats`
+fails when any entry is not refused by all three hooks. Bypassing the
+hooks is forbidden; see `.claude/rules/no-hook-bypass.md`.

@@ -19,7 +19,7 @@ in `.claude/rules/`:
 4. **All files**: `.claude/rules/editorconfig.md` (2-space indent
     unless overridden, LF endings, multiples-of-2 indentation);
     `.claude/rules/commit-format.md` for any commit-message review;
-    `.claude/rules/vendored-files.md` for the six fzf vendor files;
+    `.claude/rules/vendored-files.md` for every vendored file (its `paths:` list);
     `.claude/rules/no-schema-guessing.md` for any structured-config
     key-name changes.
 

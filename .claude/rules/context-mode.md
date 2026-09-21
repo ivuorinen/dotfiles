@@ -14,6 +14,8 @@ session. These rules are not optional.
 
 Never run a Bash command containing `curl` or `wget`. The hook
 intercepts them and replaces the output with an error. Do not retry.
+`pre-bash-route.sh` denies them in every spelling — `/usr/bin/curl`,
+`env curl`, `command curl`, `\curl` — and `BASH_OK` does not override it.
 Use instead:
 
 - `ctx_fetch_and_index(url, source)` — fetch and index web pages
@@ -38,26 +40,12 @@ query the indexed content.
 
 ### Bash shell commands
 
-`ctx_batch_execute` is the default for any command producing output you
-intend to read — searches (`rg`, `grep`, `fd`, `find`) included, and never
-truncated with `| head` to make them fit.
-
-`.claude/rules/bash-routing.md` holds the single copy of the deny list, the
-four narrow cases where `Bash` is acceptable, and the `BASH_OK` escape
-hatch. It is kept in sync with `.claude/hooks/pre-bash-route.sh`, the
-`PreToolUse` hook that enforces it. Do not restate that list here — a second
-copy drifts.
+`.claude/rules/bash-routing.md` owns this, enforced by
+`.claude/hooks/pre-bash-route.sh`.
 
 ### Read for analysis
 
-Reading a file to **Edit** it → Read is correct (Edit needs content
-in context). Reading to **analyze, explore, or summarize** → use
-`ctx_execute_file(path, language, code)` instead. Only your printed
-summary enters context.
-
-`.claude/rules/read-routing.md` carries the three narrow cases where Read
-remains correct, the forbidden patterns, and the cost model. That file is to
-Read what `bash-routing.md` is to Bash.
+`.claude/rules/read-routing.md` owns this.
 
 ## Tool selection hierarchy
 
@@ -82,13 +70,10 @@ automatically injected into their prompt. Bash-type subagents are
 upgraded to general-purpose so they have access to MCP tools. Do NOT
 manually instruct subagents about context-mode.
 
-## Output constraints
+## Index labels
 
-- Keep responses under 500 words.
-- Write artifacts (code, configs, PRDs) to FILES — never return them
-  as inline text. Return only: file path + 1-line description.
-- When indexing content, use descriptive source labels so others can
-  `ctx_search(source: "label")` later.
+When indexing content, use descriptive source labels so others can
+`ctx_search(source: "label")` later.
 
 ## ctx commands
 

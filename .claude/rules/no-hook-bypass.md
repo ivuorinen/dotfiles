@@ -9,7 +9,9 @@ with a flag that bypasses the project's hook chain. The forbidden
 flags include — but are not limited to:
 
 - `git commit --no-verify` / `git push --no-verify`
+- `git commit -n` (the short form of `--no-verify`)
 - `git commit --no-gpg-sign` / `-c commit.gpgsign=false`
+- `git config core.hooksPath …` and `prek uninstall` / `pre-commit uninstall`
 - `pre-commit run --no-verify`
 - Any option that disables a configured PreToolUse / PostToolUse /
   Stop hook in `.claude/settings.json` or in any active plugin's
@@ -19,6 +21,9 @@ flags include — but are not limited to:
   to broaden its allow list, removing the hook entry from
   `.claude/settings.json`, or using `Bash -c '…'` / heredoc tricks to
   hide a denied command inside an allowed one all count as bypass
+
+`pre-bash-route.sh` denies the git and hook-runner forms above before
+its `BASH_OK` check, so the escape cannot override them.
 
 If a hook fails, fix the underlying problem. The hook chain
 (commitlint, shellcheck, shfmt, biome, prettier, yamllint,

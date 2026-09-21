@@ -21,10 +21,14 @@ If a shell command produces output you intend to read, use
   (the prefix match covers `yarn lint:ec`, `yarn lint:bandit`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
 - `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
-  `git status` is the one git reader the hook lets through, with or without
-  `-s`: it is a common one-line check.
+  The hook lets `git status` (with or without `-s`) through as a one-line
+  check, along with the state and plumbing subcommands on its allowlist;
+  every other git subcommand is denied as a reader.
+- `git-hunk list`/`show`/`diff`, `graphify query`/`path`/`explain`, and
+  `gh api` / `gh pr view` and friends — readers the project rules mandate.
 - `ls`, `tree`, `cat`, `head`, `tail`, `wc`, `less`, `more`, `awk`, `sed`,
-  `jq` — anything reading or transforming file content for analysis.
+  `jq`, `diff`, `bat`, `sort`, `cut`, `base64`, `stat`, `python3 -c` —
+  anything reading or transforming file content for analysis.
 - `which <tool>`, `<tool> --version` when probing more than one tool at once
   — batch the probes.
 - `bash -c '<denied command>'` and `sh`/`zsh`/`dash`/`ksh` wrappers, including
@@ -39,10 +43,11 @@ calls.
 Only these narrow cases:
 
 1. **Side-effect commands that produce no output you need to read:**
-    `git add <file>`, `git commit -m '...'`, `git mv`, `git rm`,
-    `git checkout <branch>`, `git push`, `git rebase` (including its
+    `git-hunk commit <hash>... -m '...'`, `git-hunk add <hash>`, `git mv`,
+    `git rm`, `git checkout <branch>`, `git push`, `git rebase` (including its
     `--continue`/`--skip`/`--abort` steps), `mkdir -p <dir>`, `chmod`,
-    `chown`.
+    `chown`. `git add` and `git commit -a` are forbidden —
+    `.claude/rules/git-hunk-commits.md`.
     The exit code is the signal; the stdout is irrelevant. The hook's git
     allowlist also passes plumbing queries (`rev-parse`, `ls-files`,
     `cat-file`, `check-ignore`, `config`) — they answer one question rather
@@ -72,21 +77,30 @@ A `PreToolUse` hook (`.claude/hooks/pre-bash-route.sh`, registered in
 `.claude/settings.json` under matcher `Bash`) inspects every `Bash`
 invocation and denies the call with an educational reason when the
 command matches the routing rules above. The hook splits the command
-on pipeline separators (`|`, `&&`, `||`, `;`) and command
-substitutions (`$( … )`, backticks) and checks each segment, so
-`git status | grep modified` and `echo $(rg foo src/)` are both
-caught — first-word matchers alone would miss those.
+on pipeline separators (`|`, `&&`, `||`, `;`, `&`), command
+substitutions (`$( … )`, backticks), subshells and brace groups, and
+drops leading shell keywords (`if`, `do`, `!`), then checks each
+segment, so `git status | grep modified`, `echo $(rg foo src/)` and
+`(cat README.md)` are all caught.
+
+The same hook carries a policy tier that runs before any routing
+decision: secrets paths, hook-bypass flags, network fetchers, npm/npx,
+hand-run pip/uv installs, `git add`, and writes to vendored paths. The
+policy tier is not a routing choice, so `BASH_OK` never overrides it.
 
 The hook denies (not asks) so that `permissionDecisionReason` reaches
 the model in-context, teaching it to route correctly on the next
 turn. `ask` would only prompt the user silently and Claude would
 learn nothing.
 
-To override the hook for a single one-off call (case #4 above),
-prepend `BASH_OK` to the command. The hook recognises this marker and
-passes the call through. Use sparingly — it is the documented escape
-hatch for the "user named it in this turn" case, not a general
-opt-out. Settings.json `permissions.allow` entries do **not** override
+To override a routing deny for a single one-off call (case #4 above),
+prepend `BASH_OK` to the command. The hook honours the marker only when
+the command's name appears in the user's latest prompt, which
+`.claude/hooks/prompt-record.sh` (a `UserPromptSubmit` hook) records in
+the gitignored `.claude/.last-prompt`; otherwise it denies. It is the
+escape hatch for the "user named it in this turn" case, not a general
+opt-out. The hook cannot check the twenty-line output bound — that half
+of case #4 stays on you. Settings.json `permissions.allow` entries do **not** override
 the hook — the hook's `deny` takes precedence so user-allowlisted
 patterns from earlier sessions are still routed through context-mode.
 

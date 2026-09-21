@@ -9,14 +9,15 @@ paths:
 The `-- LSP` section of `init.lua` uses `mason-lspconfig` with
 `automatic_enable = true`, which calls `vim.lsp.enable()` for every server mason
 has installed. The explicit `vim.lsp.enable` block therefore contains **only** the
-mise-managed exceptions — currently `fish_lsp` and `taplo`.
+mise-managed exceptions: every server in it must be a tool in
+`config/mise/config.toml` and absent from `ensure_installed`.
 
 ## Active server set
 
 The active set of LSP servers is determined by two sources:
 1. **`ensure_installed` in mason-tool-installer** — all mason-managed servers
     (using mason package names, e.g. `'bash-language-server'`).
-2. **`vim.lsp.enable { 'fish_lsp', 'taplo' }`** — mise-managed servers only.
+2. **The bare `vim.lsp.enable { … }` call** — mise-managed servers only.
 
 Do NOT add mason-managed servers to the bare `vim.lsp.enable` call. They are
 auto-enabled by mason-lspconfig; adding them explicitly would double-enable them
@@ -43,8 +44,9 @@ The only parity to check is that mise-managed exceptions are absent from
 `ensure_installed` and present in `vim.lsp.enable`:
 
 ```bash
-cd config/nvim && grep -n 'vim\.lsp\.enable' init.lua
-# Expected: one line containing both fish_lsp and taplo
+cd config/nvim && grep -n 'vim\.lsp\.enable {' init.lua
+# Expected: one line; each server named on it has a matching tool in
+# config/mise/config.toml and no entry in ensure_installed.
 ```
 
 The old diff-based check (ensure_installed vs vim.lsp.enable) no longer applies

@@ -16,8 +16,12 @@ git-hunk list --staged --oneline           # verify what is staged
 ```
 
 `git-hunk commit` takes the named hunks straight to a commit, so
-unrelated work in progress stays in the tree untouched. Message format
+unrelated work in progress stays in the tree untouched. It runs the
+pre-commit and commit-msg hooks, so no gate is lost. Message format
 is still `.claude/rules/commit-format.md`.
+
+`pre-bash-route.sh` denies `git add` (any form) and `git commit` with
+`-a`/`--all`, and `BASH_OK` does not override it.
 
 ## Gotchas
 

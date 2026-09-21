@@ -55,8 +55,9 @@ K.ld(key, mode, cmd, opts)   -- Leader + explicit mode(s)
 ```
 
 `opts` can be a string (converted to `{desc = str}`) or a table.
-The description requirement is enforced by
-`.claude/rules/keymap-descriptions.md` (path-scoped to lua files).
+The description requirement is stated in
+`.claude/rules/keymap-descriptions.md` and enforced by the `keymap-desc`
+pre-commit hook (`scripts/check-keymap-desc.py`).
 
 ## Project Config Detection (`lua/utils.lua`)
 
@@ -121,8 +122,8 @@ native `lsp/*.lua` files (customizations only) +
 `lsp/<name>.lua` file that exists is deep-merged on top. Only servers with
 genuine customizations have a `lsp/` file; the rest run on defaults.
 `mason-lspconfig` with `automatic_enable = true` calls `vim.lsp.enable()` for
-every server mason has installed; `fish_lsp` and `taplo` (from mise) are enabled
-explicitly via a bare `vim.lsp.enable {}` call.
+every server mason has installed; the mise-managed servers (`fish_lsp`, `taplo`,
+`zizmor`) are enabled explicitly via a bare `vim.lsp.enable {}` call.
 
 **Server config pattern:** `lsp/<name>.lua` files return only the fields
 that differ from nvim-lspconfig's defaults — typically `settings`,
@@ -141,12 +142,12 @@ variants. `lua/autogroups.lua` wraps `grt` and `gri` with a
 capability check so unsupported servers get a friendly notification
 instead of the default "… is not supported" error.
 
-**Servers from mise (not mason):** `fish_lsp`, `taplo`. These are excluded
-from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`.
+**Servers from mise (not mason):** `fish_lsp`, `taplo`, `zizmor`. These are
+excluded from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`.
 All other active servers are derived from `ensure_installed` (mason-tool-installer
-installs them; mason-lspconfig auto-enables them). The rule in `.claude/rules/lsp-list-parity.md` checks that the mise-managed
-exceptions (`fish_lsp`, `taplo`) are present in `vim.lsp.enable` and absent
-from `ensure_installed`.
+installs them; mason-lspconfig auto-enables them). `.claude/rules/lsp-list-parity.md`
+requires every server in the bare `vim.lsp.enable` call to be a mise tool and
+absent from `ensure_installed`.
 
 ## Formatting
 
