@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 #
 # Coverage for the remaining .claude/hooks/ scripts — the advisory and
-# housekeeping half of the chain, which the four dedicated files
-# (pre-bash-route, pre-edit-block, pre-ctx-write-guard,
-# post-tool-context-mode-check, post-edit-rules-lint) do not reach.
+# housekeeping half of the chain, which the dedicated files
+# (pre-bash-route, pre-edit-block, pre-ctx-write-guard, pre-rules-lint,
+# post-tool-context-mode-check, protected-paths-parity) do not reach.
 #
 # None of these block a tool call, which is exactly why they need tests: a
 # non-blocking hook that stops working fails silently. There is no red gate to
@@ -35,6 +35,33 @@ teardown()
 with_path()
 {
   jq -cn --arg fp "$1" '{tool_input: {file_path: $fp}}'
+}
+
+# --- post-edit-lint.sh ----------------------------------------------------
+
+# The validate skills ran only when invoked (agent-hooks-5c0be1dd); the hook
+# runs them on every edit and feeds failures back with exit 2.
+@test "post-edit-lint: an unquoted expansion in a shell script is reported" {
+  command -v shellcheck > /dev/null || skip "shellcheck not installed"
+  printf '#!/usr/bin/env bash\necho $foo\n' > "$WORK/s.sh"
+  run -2 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/s.sh" "$HOOKS/post-edit-lint.sh"
+  [[ "$output" == *"SC2086"* ]]
+}
+
+@test "post-edit-lint: a clean shell script passes" {
+  command -v shellcheck > /dev/null || skip "shellcheck not installed"
+  printf '#!/usr/bin/env bash\necho "$1"\n' > "$WORK/s.sh"
+  run -0 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/s.sh" "$HOOKS/post-edit-lint.sh"
+}
+
+# CR-003, CR-004, CR-009: the 200-line guideline overran three times.
+@test "post-edit-lint: a CLAUDE.md over 200 lines is reported" {
+  mkdir -p "$WORK/d"
+  seq 201 > "$WORK/d/CLAUDE.md"
+  run -2 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/d/CLAUDE.md" "$HOOKS/post-edit-lint.sh"
+  [[ "$output" == *"201 lines > 200"* ]]
+  seq 200 > "$WORK/d/CLAUDE.md"
+  run -0 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/d/CLAUDE.md" "$HOOKS/post-edit-lint.sh"
 }
 
 # --- prompt-record.sh -----------------------------------------------------

@@ -31,6 +31,10 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-edit-block.sh"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-rules-lint.sh"
           }
         ]
       },
@@ -101,8 +105,8 @@
           },
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-rules-lint.sh",
-            "statusMessage": "Linting .claude/rules/..."
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-lint.sh",
+            "statusMessage": "Validating..."
           },
           {
             "type": "command",
