@@ -40,7 +40,7 @@ decision()
 }
 
 @test "pre-bash-route: state-mutating git subcommands are allowed" {
-  [ "$(decision 'git add .')" = "allow" ]
+  [ "$(decision 'git mv a b')" = "allow" ]
   [ "$(decision "git commit -m 'x'")" = "allow" ]
   [ "$(decision 'git push')" = "allow" ]
   [ "$(decision 'git rev-parse --git-dir')" = "allow" ]
@@ -131,7 +131,7 @@ decision()
 @test "pre-bash-route: env with a var-list is peeled to the real command" {
   [ "$(decision 'env FOO=bar cat README.md')" = "deny" ]
   [ "$(decision 'FOO=bar cat README.md')" = "deny" ]
-  [ "$(decision 'FOO=bar git add .')" = "allow" ]
+  [ "$(decision 'FOO=bar git push')" = "allow" ]
 }
 
 # An empty assignment is legal shell. Requiring a value left `FOO=` as the
@@ -139,7 +139,7 @@ decision()
 @test "pre-bash-route: an empty assignment value is still an assignment" {
   [ "$(decision 'FOO= cat README.md')" = "deny" ]
   [ "$(decision 'FOO= BAR= rg foo .')" = "deny" ]
-  [ "$(decision 'FOO= git add .')" = "allow" ]
+  [ "$(decision 'FOO= git push')" = "allow" ]
 }
 
 # -u/-C/-S take a separate operand. Consuming only the flag left the operand
@@ -148,7 +148,7 @@ decision()
   [ "$(decision 'env -u FOO cat README.md')" = "deny" ]
   [ "$(decision 'env --unset FOO rg foo .')" = "deny" ]
   [ "$(decision 'env -C /tmp cat README.md')" = "deny" ]
-  [ "$(decision 'env -u FOO git add .')" = "allow" ]
+  [ "$(decision 'env -u FOO git push')" = "allow" ]
 }
 
 # Wrappers and env prefixes nest in either order, so one pass of each in a
@@ -157,7 +157,7 @@ decision()
   [ "$(decision 'timeout 5 env -i cat README.md')" = "deny" ]
   [ "$(decision 'nohup env FOO=bar rg foo .')" = "deny" ]
   [ "$(decision 'xargs env -u FOO cat')" = "deny" ]
-  [ "$(decision 'timeout 5 env -i git add .')" = "allow" ]
+  [ "$(decision 'timeout 5 env -i git push')" = "allow" ]
 }
 
 # `env -S` is not like `-u`/`-C`: its operand IS the command. Consuming it as
@@ -167,7 +167,7 @@ decision()
   [ "$(decision 'env -S cat README.md')" = "deny" ]
   [ "$(decision 'env -S "cat README.md"')" = "deny" ]
   [ "$(decision "env -S 'rg foo .'")" = "deny" ]
-  [ "$(decision 'env -S git add .')" = "allow" ]
+  [ "$(decision 'env -S git push')" = "allow" ]
 }
 
 # Attached forms put the flag and the command in one whitespace-delimited
@@ -176,7 +176,7 @@ decision()
 @test "pre-bash-route: an attached env -S operand is preserved" {
   [ "$(decision "env -S'cat README.md'")" = "deny" ]
   [ "$(decision "env --split-string='cat README.md'")" = "deny" ]
-  [ "$(decision "env --split-string='git add .'")" = "allow" ]
+  [ "$(decision "env --split-string='git mv a b'")" = "allow" ]
 }
 
 # Both env checks matched the literal string, so a path-qualified env walked
@@ -184,7 +184,7 @@ decision()
 @test "pre-bash-route: a path-qualified env is still env" {
   [ "$(decision '/usr/bin/env cat README.md')" = "deny" ]
   [ "$(decision '/usr/bin/env -S cat README.md')" = "deny" ]
-  [ "$(decision '/usr/bin/env git add .')" = "allow" ]
+  [ "$(decision '/usr/bin/env git push')" = "allow" ]
 }
 
 # The shell resolves `c\at` and `$'cat'` to `cat`; reproducing its quote and
@@ -195,7 +195,7 @@ decision()
   [ "$(decision "\$'cat' README.md")" = "deny" ]
   [ "$(decision '"cat" README.md')" = "deny" ]
   # The plain spelling of an allowed command is untouched by this rule.
-  [ "$(decision 'git add .')" = "allow" ]
+  [ "$(decision 'git push')" = "allow" ]
 }
 
 # A split string can nest quotes, so one strip left `"cat` and matched no
@@ -217,7 +217,7 @@ decision()
 
 # Fail-closed must not swallow the ordinary wrapped-allow case.
 @test "pre-bash-route: a wrapped allowed command is still allowed" {
-  [ "$(decision 'timeout 5 git add .')" = "allow" ]
+  [ "$(decision 'timeout 5 git push')" = "allow" ]
   [ "$(decision 'nohup git push')" = "allow" ]
   [ "$(decision 'nice mkdir -p x')" = "allow" ]
 }
@@ -232,11 +232,135 @@ decision()
   done
 }
 
-@test "pre-bash-route: BASH_OK passes through and strips the marker" {
+# BASH_OK is honoured only for a command named in the latest prompt, which
+# prompt-record.sh writes to .claude/.last-prompt (agent-loopholes-ab4a6d36).
+# with_prompt TEXT points CLAUDE_PROJECT_DIR at a fixture holding TEXT.
+with_prompt()
+{
+  CLAUDE_PROJECT_DIR="$BATS_TEST_TMPDIR/proj"
+  mkdir -p "$CLAUDE_PROJECT_DIR/.claude"
+  printf '%s\n' "$1" > "$CLAUDE_PROJECT_DIR/.claude/.last-prompt"
+  export CLAUDE_PROJECT_DIR
+}
+
+@test "pre-bash-route: BASH_OK passes through and strips the marker when the user named the command" {
+  with_prompt 'please run cat on the readme'
   run bash -c 'printf "{\"tool_input\":{\"command\":\"BASH_OK cat README.md\"}}" | bash "$1"' _ "$HOOK"
   [ "$status" -eq 0 ]
   [ "$(printf '%s' "$output" | jq -r '.hookSpecificOutput.permissionDecision')" = "allow" ]
   [ "$(printf '%s' "$output" | jq -r '.hookSpecificOutput.updatedInput.command')" = "cat README.md" ]
+}
+
+@test "pre-bash-route: BASH_OK is denied when the latest prompt does not name the command" {
+  with_prompt 'fix the findings'
+  [ "$(decision 'BASH_OK cat README.md')" = "deny" ]
+  # A missing prompt record denies too: no evidence the user named anything.
+  rm "$CLAUDE_PROJECT_DIR/.claude/.last-prompt"
+  [ "$(decision 'BASH_OK cat README.md')" = "deny" ]
+}
+
+@test "pre-bash-route: BASH_OK never overrides a policy deny" {
+  with_prompt 'run cat and base64 and curl'
+  [ "$(decision 'BASH_OK cat config/fish/secrets.d/tfs.fish')" = "deny" ]
+  [ "$(decision 'BASH_OK curl -s https://example.com')" = "deny" ]
+  [ "$(decision 'BASH_OK git commit --no-verify -m x')" = "deny" ]
+}
+
+# Secrets: both trees, any reader, globs and bare directories
+# (agent-loopholes-4cafa9a8, agent-loopholes-da375736).
+@test "pre-bash-route: secrets files are unreadable through any command" {
+  [ "$(decision 'base64 config/fish/secrets.d/tfs.fish')" = "deny" ]
+  [ "$(decision "python3 -c 'print(open(\"config/secrets.d/tfs.sh\").read())'")" = "deny" ]
+  [ "$(decision 'cp config/secrets.d/sonar.sh /tmp/x')" = "deny" ]
+  [ "$(decision 'echo config/fish/secrets.d/*.fish')" = "deny" ]
+  [ "$(decision 'mkdir -p config/secrets.d')" = "deny" ]
+  # The committed templates stay reachable.
+  [ "$(decision 'cp config/secrets.d/github.sh.example /tmp/x')" = "allow" ]
+}
+
+# no-hook-bypass.md (agent-loopholes-31a486f9).
+@test "pre-bash-route: hook-bypass flags are denied" {
+  [ "$(decision "git commit --no-verify -m 'x'")" = "deny" ]
+  [ "$(decision "git commit -n -m 'x'")" = "deny" ]
+  [ "$(decision 'git push --no-verify')" = "deny" ]
+  [ "$(decision 'git config core.hooksPath /dev/null')" = "deny" ]
+  [ "$(decision 'prek uninstall')" = "deny" ]
+  [ "$(decision 'git commit --no-gpg-sign -m x')" = "deny" ]
+  # --amend and --no-edit are not -n clusters.
+  [ "$(decision 'git commit --amend --no-edit')" = "allow" ]
+}
+
+# git-hunk-commits.md (agent-loopholes-a4023b81).
+@test "pre-bash-route: git add and git commit -a are denied" {
+  [ "$(decision 'git add local/bin/dfm')" = "deny" ]
+  [ "$(decision 'git add -A')" = "deny" ]
+  [ "$(decision 'git commit -a -m x')" = "deny" ]
+  [ "$(decision 'git commit -am x')" = "deny" ]
+  [ "$(decision 'git-hunk commit abc123 -m "fix(x): y"')" = "allow" ]
+}
+
+# context-mode.md curl/wget ban, path-qualified or wrapped
+# (agent-loopholes-c37c506d).
+@test "pre-bash-route: network fetchers are denied in every spelling" {
+  [ "$(decision '/usr/bin/curl -s https://example.com')" = "deny" ]
+  [ "$(decision 'env curl https://example.com')" = "deny" ]
+  [ "$(decision 'command curl https://example.com')" = "deny" ]
+  [ "$(decision '\curl https://example.com')" = "deny" ]
+  [ "$(decision 'wget https://example.com')" = "deny" ]
+  [ "$(decision 'command -v curl')" = "allow" ]
+}
+
+# no-npm.md (agent-loopholes-9289ced7).
+@test "pre-bash-route: npm and npx are denied" {
+  [ "$(decision 'npm install')" = "deny" ]
+  [ "$(decision 'npx prettier --write x.yml')" = "deny" ]
+  [ "$(decision 'pnpm add x')" = "deny" ]
+}
+
+# mise-packages.md; the vendored graphify skill runs these (agent-loopholes-c31d880a).
+@test "pre-bash-route: hand-run Python package installs are denied" {
+  [ "$(decision 'pip install graphifyy')" = "deny" ]
+  [ "$(decision 'python3 -m pip install graphifyy -q --break-system-packages')" = "deny" ]
+  [ "$(decision 'uv tool install --upgrade graphifyy -q')" = "deny" ]
+  [ "$(decision 'uv pip install x')" = "deny" ]
+}
+
+@test "pre-bash-route: node_modules/.bin/bats is denied, bare bats is not" {
+  [ "$(decision './node_modules/.bin/bats tests/dfm.bats')" = "deny" ]
+  [ "$(decision 'bats tests/dfm.bats')" = "allow" ]
+}
+
+# vendored-files.md through Bash (agent-loopholes-cef01270).
+@test "pre-bash-route: writes to protected paths are denied" {
+  [ "$(decision 'echo x > config/fzf/completion.bash')" = "deny" ]
+  [ "$(decision 'cp /tmp/x local/bin/fzf-tmux')" = "deny" ]
+  [ "$(decision 'rm config/fish/functions/fisher.fish')" = "deny" ]
+  [ "$(decision 'git checkout HEAD~5 -- local/bin/iterm2_shell_integration.zsh')" = "deny" ]
+  [ "$(decision 'rm -rf tools/dotbot')" = "deny" ]
+}
+
+# Subshells, groups, background, negation and keywords (agent-loopholes-9bfab590).
+@test "pre-bash-route: shell grouping and keywords cannot hide a denied command" {
+  [ "$(decision '(cat README.md)')" = "deny" ]
+  [ "$(decision '{ cat README.md; }')" = "deny" ]
+  [ "$(decision 'true & cat README.md')" = "deny" ]
+  [ "$(decision '! cat README.md')" = "deny" ]
+  [ "$(decision 'if cat README.md; then :; fi')" = "deny" ]
+  [ "$(decision 'for f in a; do cat README.md; done')" = "deny" ]
+  [ "$(decision 'for f in a b; do mkdir -p "$f"; done')" = "allow" ]
+}
+
+# Readers that used to pass as unknown (agent-loopholes-63a35580,
+# agent-hooks-d4a254dc, agent-hooks-73fe8599).
+@test "pre-bash-route: rule-named and content-emitting readers are denied" {
+  [ "$(decision "python3 -c 'print(open(\"README.md\").read())'")" = "deny" ]
+  [ "$(decision 'diff CLAUDE.md local/bin/CLAUDE.md')" = "deny" ]
+  [ "$(decision 'bat README.md')" = "deny" ]
+  [ "$(decision 'git-hunk list -U 0')" = "deny" ]
+  [ "$(decision 'graphify query "how does dfm dispatch"')" = "deny" ]
+  [ "$(decision 'gh api repos/x/y/pulls')" = "deny" ]
+  [ "$(decision 'gh pr view 12')" = "deny" ]
+  [ "$(decision 'git-hunk add abc123')" = "allow" ]
 }
 
 # The marker only works as the leading token; a command that merely mentions it

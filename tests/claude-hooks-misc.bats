@@ -37,6 +37,15 @@ with_path()
   jq -cn --arg fp "$1" '{tool_input: {file_path: $fp}}'
 }
 
+# --- prompt-record.sh -----------------------------------------------------
+
+@test "prompt-record: writes the prompt 0600 for the BASH_OK check" {
+  mkdir -p "$WORK/.claude"
+  run -0 bash -c 'printf "{\"prompt\":\"run cat please\"}" | CLAUDE_PROJECT_DIR="$1" bash "$2"' _ "$WORK" "$HOOKS/prompt-record.sh"
+  [ "$(cat "$WORK/.claude/.last-prompt")" = "run cat please" ]
+  [ "$(stat -f '%Lp' "$WORK/.claude/.last-prompt" 2> /dev/null || stat -c '%a' "$WORK/.claude/.last-prompt")" = "600" ]
+}
+
 # --- post-edit-config-warn.sh -------------------------------------------
 # Advisory only: a formatter config change is repo-wide, so it earns a note
 # on stderr. It must never block, or editing .editorconfig would be

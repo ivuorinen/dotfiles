@@ -8,8 +8,8 @@
 # routed through ctx_execute would otherwise reach the disk unchecked
 # (finding audit-5f0966e7).
 #
-# The detection is a documented same-line co-occurrence heuristic: a protected
-# path next to a write-shaped token. These tests pin both halves — what it
+# The detection is a documented whole-payload co-occurrence heuristic: a
+# protected path anywhere plus a write-shaped token anywhere. These tests pin both halves — what it
 # catches and what it deliberately lets through — so a future tightening has
 # to state which line it is changing.
 
@@ -114,6 +114,30 @@ batch()
 
 @test "pre-ctx-write-guard: allows the secrets.d example templates" {
   run -0 code 'cat config/fish/secrets.d/github.fish.example'
+}
+
+# Globs, bare directories and the bash/zsh tree all expand to real secrets
+# (agent-loopholes-4cafa9a8, agent-loopholes-da375736).
+@test "pre-ctx-write-guard: blocks globs, directories and the bash/zsh secrets tree" {
+  run -2 code 'cat config/fish/secrets.d/*.fish'
+  run -2 code 'ls config/fish/secrets.d/'
+  run -2 code 'cat config/secrets.d/tfs.sh'
+  run -2 code '' 'config/secrets.d/sonar.sh'
+}
+
+# ctx_execute_file only reads its path, so analysing a vendored file with code
+# that happens to call open() is not a write to it.
+@test "pre-ctx-write-guard: reading a protected file via ctx_execute_file is allowed" {
+  run -0 code 'print(open("/tmp/other").read())' '.claude/skills/graphify/SKILL.md'
+}
+
+# The path and the write used to have to share a line, so a variable split
+# them apart (agent-loopholes-408b9560).
+@test "pre-ctx-write-guard: a protected path in a variable is still caught" {
+  run -2 code "p='local/bin/fzf-tmux'
+require('fs').writeFileSync(p,'x')"
+  run -2 code 'f=config/fzf/completion.bash
+printf x > "$f"'
 }
 
 @test "pre-ctx-write-guard: an empty or absent payload is allowed" {

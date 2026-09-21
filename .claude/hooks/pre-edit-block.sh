@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Pre-tool guard: block edits to vendor/lock/submodule files and
-# reads or edits of secrets.d fish files.
+# reads or edits of real secrets.d files (fish and bash/zsh trees).
 # Receives tool input JSON on stdin.
+
+# shellcheck source=lib/protected-paths.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/protected-paths.sh"
 
 input=$(cat)
 if ! fp=$(printf '%s' "$input" | jq -er '.tool_input.file_path' 2> /dev/null); then
@@ -10,74 +13,25 @@ if ! fp=$(printf '%s' "$input" | jq -er '.tool_input.file_path' 2> /dev/null); t
 fi
 tool=$(printf '%s' "$input" | jq -r '.tool_name // empty' 2> /dev/null)
 
-# Read-only block: secrets files must not be read — they contain credentials.
-if [[ "$tool" = "Read" ]]; then
-  case "$fp" in
-    */secrets.d/*.fish)
-      case "$(basename "$fp")" in
-        *.fish.example) exit 0 ;;
-        *) ;;
-      esac
-      echo "BLOCKED: do not read $fp — it contains secrets. Ask the user instead." >&2
-      exit 2
-      ;;
-    *) ;;
-  esac
-  exit 0
+# Secrets: reading is as forbidden as editing — the files hold credentials.
+# Only the committed `*.example` templates and README.md are exempt.
+if secrets_referenced "$fp"; then
+  if [[ "$tool" = "Read" ]]; then
+    echo "BLOCKED: do not read $fp — it contains secrets. Ask the user instead." >&2
+  else
+    echo "BLOCKED: do not edit $fp directly — it is gitignored and holds credentials." >&2
+    echo "Copy the matching .example file and edit that locally." >&2
+  fi
+  exit 2
 fi
 
-# Edit/Write block: vendor, lock, submodule, and secrets files.
-case "$fp" in
-  */fzf-tmux | */yarn.lock | */.yarn/*)
-    echo "BLOCKED: $fp is a vendor/lock file — do not edit directly" >&2
-    exit 2
-    ;;
-  */config/fzf/completion.bash | */config/fzf/completion.zsh | \
-    */config/fzf/key-bindings.bash | */config/fzf/key-bindings.zsh | \
-    */config/fzf/key-bindings.fish | \
-    */local/man/man1/fzf.1 | */local/man/man1/fzf-tmux.1)
-    echo "BLOCKED: $fp is a vendored fzf file — update via submodule sync" >&2
-    echo "See .claude/rules/vendored-files.md." >&2
-    exit 2
-    ;;
-  */.claude/skills/graphify/*)
-    echo "BLOCKED: $fp belongs to the vendored graphify skill — refresh it" >&2
-    echo "from the plugin cache instead. See .claude/rules/vendored-files.md." >&2
-    exit 2
-    ;;
-  */iterm2_shell_integration.zsh)
-    echo "BLOCKED: $fp is vendored from iTerm2 — re-download to update." >&2
-    echo "See .claude/rules/vendored-files.md." >&2
-    exit 2
-    ;;
-  */config/fish/functions/fisher.fish | \
-    */config/fish/functions/bass.fish | \
-    */config/fish/functions/__bass.py | \
-    */config/fish/functions/__z_add.fish | \
-    */config/fish/functions/__z_clean.fish)
-    echo "BLOCKED: $fp is a vendored fish plugin function — refresh it" >&2
-    echo "from upstream (fisher update), do not edit in place." >&2
-    echo "See .claude/rules/vendored-files.md." >&2
-    exit 2
-    ;;
-  */tools/dotbot/* | */tools/dotbot-include/* | */tools/antidote/*)
-    echo "BLOCKED: $fp is inside a git submodule — do not edit" >&2
-    exit 2
-    ;;
-  */config/cheat/cheatsheets/community/* | */config/cheat/cheatsheets/tldr/*)
-    echo "BLOCKED: $fp is a cheat submodule — do not edit" >&2
-    exit 2
-    ;;
-  */secrets.d/*.fish)
-    case "$(basename "$fp")" in
-      *.fish.example) exit 0 ;;
-      *) ;;
-    esac
-    echo "BLOCKED: do not edit $fp directly — it is gitignored." >&2
-    echo "Copy the matching .fish.example file and edit that locally." >&2
-    exit 2
-    ;;
-  *) ;;
-esac
+# Everything else is readable; only edits are restricted below.
+[[ "$tool" = "Read" ]] && exit 0
+
+if [[ "$fp" =~ $PROTECTED_RE ]]; then
+  echo "BLOCKED: $fp is vendored, a lock file, or inside a submodule — do not edit it in place." >&2
+  echo "Each group's refresh procedure is in .claude/rules/vendored-files.md." >&2
+  exit 2
+fi
 
 exit 0

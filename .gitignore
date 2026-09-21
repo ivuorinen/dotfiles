@@ -105,6 +105,9 @@ graphify-out/
 !.claude/**
 .claude/**/*.log
 .claude/settings.local.json
+# Latest user prompt, written by .claude/hooks/prompt-record.sh for the
+# BASH_OK check in pre-bash-route.sh. Prompts can carry anything.
+.claude/.last-prompt
 
 !docs/audit/**
 
