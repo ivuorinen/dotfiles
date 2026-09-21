@@ -99,13 +99,17 @@ repos:
         types_or: [yaml]
       - id: v8r
         name: v8r (JSON Schema validation)
-        entry: v8r
+        # Every YAML/JSON/TOML file, not a hardcoded five: v8r resolves each
+        # schema via schemastore.org by filename and fails the hook on any
+        # unknown property — see .claude/rules/validate-config-schemas.md.
+        # --ignore-errors turns "no schema found" / "multiple schemas" into
+        # a pass, so only a file that validated and failed exits non-zero.
+        # config/gh/ is rewritten by `gh config set`; its shape follows gh,
+        # not schemastore (which rejects gh's `version: "1"`).
+        entry: v8r --ignore-errors
         language: system
-        # Schema-backed config files only. v8r resolves schemas via
-        # schemastore.org and fails the hook on any unknown property,
-        # which is the whole point of adding it — see
-        # .claude/rules/validate-config-schemas.md.
-        files: ^(\.mega-linter\.yml|\.pre-commit-config\.yaml|biome\.json|package\.json|\.markdownlint\.json)$
+        files: \.(ya?ml|json|toml)$
+        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|node_modules/|graphify-out/|docs/audit/)
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
@@ -117,7 +121,7 @@ repos:
     rev: v3.13.1-1
     hooks:
       - id: shfmt
-        exclude: ^config/(bash/completions\.d/|zsh/completions\.d/|fzf/(key-bindings|completion)\.(bash|zsh)$)
+        exclude: ^(config/(bash/completions\.d/|zsh/completions\.d/|fzf/(key-bindings|completion)\.(bash|zsh)$)|local/bin/fzf-tmux$)
         args: [-i, "2", -bn, -ci, -sr, -fn, -w]
 
   - repo: https://github.com/rhysd/actionlint
@@ -207,4 +211,29 @@ repos:
         entry: bats --print-output-on-failure tests/
         language: system
         pass_filenames: false
-        files: ^(tests/|local/bin/|scripts/|base/|config/(theme/|shared\.sh|lib\.sh|exports|alias))
+        # .claude/hooks/ and vendored-files.md are here so an edit to either
+        # protected-path list runs tests/protected-paths-parity.bats.
+        files: ^(tests/|local/bin/|scripts/|base/|config/(theme/|shared\.sh|lib\.sh|exports|alias)|\.claude/hooks/|\.claude/rules/vendored-files\.md$)
+      - id: rules-lint
+        name: .claude/rules lint (hedge words, frontmatter keys)
+        # Commit-time twin of the pre-rules-lint.sh PreToolUse hook: catches
+        # rule files changed through Bash or the ctx sandbox, where no edit
+        # hook fires.
+        entry: .claude/hooks/lib/rules-lint.sh
+        language: system
+        files: ^\.claude/rules/.*\.md$
+      - id: claude-md-length
+        name: CLAUDE.md at most 200 lines
+        entry: bash -c 'rc=0; for f; do n=$(wc -l < "$f"); [ "$n" -le 200 ] || { echo "$f has $n lines, limit 200"; rc=1; }; done; exit $rc' --
+        language: system
+        files: (^|/)CLAUDE\.md$
+      - id: host-leak-check
+        name: No host names or ~/Code paths added to shared config
+        entry: scripts/check-host-leak.sh
+        language: system
+        files: ^(config|base|ssh)/
+      - id: keymap-desc
+        name: Neovim K.* keymaps carry a description
+        entry: scripts/check-keymap-desc.py
+        language: system
+        files: ^config/nvim/.*\.lua$
