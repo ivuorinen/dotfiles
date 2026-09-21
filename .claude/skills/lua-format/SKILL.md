@@ -15,7 +15,7 @@ stylua <file>
 
 Project settings are in `stylua.toml` (90-char line length).
 
-If stylua is not available, skip formatting silently.
+If stylua is not available, say so in the response: `stylua not available — <file> not formatted`.
 
 ## Files to never format
 

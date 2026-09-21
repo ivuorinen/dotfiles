@@ -31,7 +31,7 @@ If the file is under `.github/workflows/`, also run:
 actionlint <file>
 ```
 
-If actionlint is not available, skip silently.
+If actionlint is not available, report `actionlint not available — <file> not validated`.
 
 ## Files to skip
 

@@ -35,7 +35,7 @@ set -euo pipefail
   (see <https://usage.jdx.dev/cli/scripts>)
 - Use `msgr` functions for output: `msgr msg`, `msgr run`,
   `msgr yay`, `msgr err`, `msgr warn`
-- POSIX scripts (`/bin/sh`) should NOT source msgr
+- POSIX scripts (`/bin/sh`) must never source msgr (it is bash; sourcing it breaks a POSIX script)
 
 ## 2. Make executable
 
