@@ -172,7 +172,7 @@ scorecard = "5.5.0"
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
-checkov = "3.3.17"
+checkov = "3.3.19"
 snyk = "1.1307.2"
 pinact = "5.0.0"
 zizmor = "1.30.1"
