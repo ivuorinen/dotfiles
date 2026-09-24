@@ -45,7 +45,6 @@
 *.scm             text
 *.scss            text diff=css
 *.sh              text eol=lf diff=shell
-.husky/*          text eol=lf
 *.sql             text
 *.styl            text
 *.tag             text
