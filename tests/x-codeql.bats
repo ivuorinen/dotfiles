@@ -15,7 +15,7 @@ setup()
   mkdir -p "$TMP/bin" "$TMP/src" "$TMP/out" "$TMP/cache"
   CALLS="$TMP/calls"
   : > "$CALLS"
-  for tool in sh bash env date mkdir find awk grep rm cat mktemp head jq; do
+  for tool in sh bash env date mkdir find awk grep rm cat mktemp head jq git; do
     src="$(command -v "$tool")" && ln -sf "$src" "$TMP/bin/$tool"
   done
 
@@ -29,6 +29,11 @@ if [ "\$1" = "version" ]; then
 fi
 
 if [ "\$1" = "database" ] && [ "\$2" = "create" ]; then
+  # PROBE_BUILD_FAIL stands in for a machine where the probe database cannot be
+  # compiled at all — verify_engine warns and skips rather than aborting.
+  case "\$3" in
+    *.probe-db*) [ -n "\$PROBE_BUILD_FAIL" ] && exit 1 ;;
+  esac
   mkdir -p "\$3"
   exit 0
 fi
@@ -38,6 +43,25 @@ if [ "\$1" = "database" ] && [ "\$2" = "analyze" ]; then
   for a in "\$@"; do
     case "\$a" in --output=*) out="\${a#--output=}" ;; esac
   done
+
+  # verify_engine compiles a throwaway probe database and aborts the whole run
+  # unless a known py/path-injection comes back. A stub that always answers []
+  # fails that check, so every python tree would exit 1 before any analysis.
+  # Emulate a working dataflow engine for the probe database only; the real
+  # tree still goes through the SARIF_RESULTS switch below. PROBE_FAIL makes
+  # the probe come back empty, which is what a missing dataflow library pack
+  # looks like.
+  case "\$3" in
+    *.probe-db*)
+      if [ -n "\$PROBE_FAIL" ]; then
+        printf '{"runs":[{"results":[]}]}\n' > "\$out"
+      else
+        printf '{"runs":[{"results":[{"ruleId":"py/path-injection","message":{"text":"probe"}}]}]}\n' > "\$out"
+      fi
+      exit 0
+      ;;
+  esac
+
   for last; do :; done
   case "\$last" in
     *codeql-suites*)
@@ -151,10 +175,67 @@ cq()
   [ "$langs" = "go" ]
 }
 
+@test "codeql: C sources map to the cpp language" {
+  # CodeQL has no "c" language; asking for one downloads codeql/c-queries,
+  # which does not exist.
+  printf 'x\n' > "$TMP/src/main.c"
+  printf 'x\n' > "$TMP/src/main.h"
+  cq --path "$TMP/src"
+  langs=$(printf '%s\n' "$output" | sed -n 's/.*Found languages: //p')
+  [ "$langs" = "cpp" ]
+}
+
+@test "codeql: in a git repo, submodule and gitignored files do not add languages" {
+  git -C "$TMP/src" init -q
+  printf 'x\n' > "$TMP/src/main.go"
+  printf 'ignored/\n' > "$TMP/src/.gitignore"
+  mkdir -p "$TMP/src/ignored" "$TMP/sub"
+  printf 'x\n' > "$TMP/src/ignored/app.rb"
+  git -C "$TMP/sub" init -q
+  printf 'x\n' > "$TMP/sub/lib.h"
+  git -C "$TMP/sub" add lib.h
+  git -C "$TMP/sub" -c user.name=t -c user.email=t@t -c commit.gpgsign=false \
+    commit -qm init
+  git -C "$TMP/src" -c protocol.file.allow=always \
+    submodule add -q "$TMP/sub" vendor/sub
+  [ -f "$TMP/src/vendor/sub/lib.h" ]
+  cq --path "$TMP/src"
+  langs=$(printf '%s\n' "$output" | sed -n 's/.*Found languages: //p')
+  [ "$langs" = "go" ]
+}
+
 @test "codeql: builds the database under the cache directory" {
   printf 'x\n' > "$TMP/src/main.go"
   cq --path "$TMP/src"
   grep -q "database create $TMP/cache/codeql/db-" "$CALLS"
+}
+
+@test "codeql: passes the tree's code-scanning config to database create" {
+  printf 'x\n' > "$TMP/src/main.go"
+  mkdir -p "$TMP/src/.github/codeql"
+  printf 'paths-ignore:\n  - vendor/**\n' > "$TMP/src/.github/codeql/codeql-config.yml"
+  cq --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  grep -q "database create .*--codescanning-config=$TMP/src/.github/codeql/codeql-config.yml" "$CALLS"
+}
+
+@test "codeql: without a code-scanning config the flag is not passed" {
+  printf 'x\n' > "$TMP/src/main.go"
+  cq --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  run ! grep -q -- "--codescanning-config" "$CALLS"
+}
+
+@test "codeql: the engine probe never gets the tree's config" {
+  # The probe's source lives outside the tree; applying the tree's paths-ignore
+  # to it is meaningless at best and would hide the known-positive at worst.
+  printf 'x\n' > "$TMP/src/app.py"
+  mkdir -p "$TMP/src/.github/codeql"
+  printf 'paths-ignore:\n  - vendor/**\n' > "$TMP/src/.github/codeql/codeql-config.yml"
+  cq --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  grep "database create .*probe-db" "$CALLS" > "$TMP/probe-calls"
+  run ! grep -q -- "--codescanning-config" "$TMP/probe-calls"
 }
 
 @test "codeql: removes the database when it is done" {
@@ -210,6 +291,43 @@ cq()
   [ "$status" -eq 1 ]
   [[ "$output" == *"the real reason the suite run failed"* ]]
   [[ "$output" == *"CodeQL analysis failed for go"* ]]
+}
+
+@test "codeql: the engine self-check actually runs on a python tree" {
+  # A self-check that silently never executes is indistinguishable from one
+  # that passes, so assert the evidence that it ran, not just a zero exit.
+  printf 'x\n' > "$TMP/src/main.py"
+  cq --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Engine self-check passed"* ]]
+  grep -q -- '--threat-model=all' "$CALLS"
+}
+
+@test "codeql: the self-check does not run when no python is present" {
+  printf 'x\n' > "$TMP/src/main.go"
+  cq --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"Engine self-check"* ]]
+}
+
+@test "codeql: a probe that detects nothing aborts the run" {
+  # The whole point of the check: a zero-result run on the real tree must not
+  # be reported as clean when the engine cannot find a known-positive either.
+  printf 'x\n' > "$TMP/src/main.py"
+  cd "$TMP/out" || return 1
+  run env PATH="$TMP/bin" XDG_CACHE_HOME="$TMP/cache" PROBE_FAIL=1 "$CQ" --path "$TMP/src"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"engine self-check FAILED"* ]]
+  [[ "$output" == *"codeql/python-all"* ]]
+}
+
+@test "codeql: a probe that cannot be built warns and continues" {
+  printf 'x\n' > "$TMP/src/main.py"
+  cd "$TMP/out" || return 1
+  run env PATH="$TMP/bin" XDG_CACHE_HOME="$TMP/cache" PROBE_BUILD_FAIL=1 "$CQ" --path "$TMP/src"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"could not build its probe database"* ]]
+  [[ "$output" != *"Engine self-check passed"* ]]
 }
 
 @test "codeql: --parallel analyses every language" {

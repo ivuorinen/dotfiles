@@ -1,6 +1,7 @@
 #!/bin/sh
 #USAGE about "CodeQL security scanning wrapper"
 #USAGE flag "--path <path>" help="Source path to analyze (default: current directory)"
+#USAGE flag "--threat-model <model>" help="CodeQL threat model: default, local, remote or all"
 #USAGE flag "--parallel" help="Run language analyses in parallel"
 #USAGE flag "-h --help" help="Show help"
 #USAGE flag "-v --version" help="Show version"
@@ -9,7 +10,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # Display usage information and options
 usage()
@@ -18,10 +19,17 @@ usage()
 Usage: $0 [OPTIONS]
 
 Options:
-  --path PATH        Source path to analyze (default: current directory)
-  --parallel         Run language analyses in parallel
-  -h, --help         Show this help message
-  -v, --version      Show version
+  --path PATH             Source path to analyze (default: current directory)
+  --threat-model MODEL    Taint sources to trust: default, local, remote, all
+                          (default: CodeQL's own default; "local" adds argv,
+                          environment and stdin as sources)
+  --parallel              Run language analyses in parallel
+  -h, --help              Show this help message
+  -v, --version           Show version
+
+If PATH/.github/codeql/codeql-config.yml exists, its paths-ignore is applied.
+
+Exit codes: 0 success, 1 runtime error.
 EOF
   exit "${1:-0}"
 }
@@ -53,6 +61,23 @@ get_cache_dir()
   printf '%s' "$cache"
 }
 
+# List the files whose extensions decide which languages to analyse.
+# In a git work tree, ask git: that leaves out submodule contents and
+# gitignored files, which would otherwise add a language (and a full database
+# build) for code the project does not own — one header inside the dotbot
+# submodule was enough to trigger a C/C++ build. Elsewhere, walk the tree,
+# pruning .git and node_modules.
+list_source_files()
+{
+  if command -v git > /dev/null 2>&1 \
+    && git -C "$1" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    git -C "$1" ls-files --cached --others --exclude-standard
+  else
+    find "$1" -name .git -prune -o -name node_modules -prune \
+      -o -type f -print 2> /dev/null
+  fi
+}
+
 # Detect supported programming languages in source path
 detect_languages()
 {
@@ -66,12 +91,11 @@ detect_languages()
     detected="actions"
   fi
 
-  # Single find pass (pruning .git and node_modules), extension -> language
-  # mapping and dedupe handled in awk
-  langs=$(find "$src_path" -name .git -prune -o -name node_modules -prune \
-    -o -type f -print 2> /dev/null | awk '
+  # Extension -> language mapping and dedupe handled in awk. CodeQL has no
+  # "c" language: C and C++ are both extracted as cpp.
+  langs=$(list_source_files "$src_path" | awk '
       BEGIN {
-        map["c"] = map["h"] = "c"
+        map["c"] = map["h"] = "cpp"
         map["cpp"] = map["cc"] = map["cxx"] = map["hpp"] = map["hxx"] = "cpp"
         map["cs"] = "csharp"
         map["go"] = "go"
@@ -97,6 +121,92 @@ detect_languages()
   printf '%s' "$detected"
 }
 
+# Install the query pack AND its library pack for a language.
+#
+# `codeql/<lang>-all` is the library pack carrying the dataflow and taint
+# implementation. Without it every taint query still compiles, still reports its
+# full rule count, and returns ZERO results — a well-formed SARIF that is
+# indistinguishable from clean code. This wrapper then deleted the empty file and
+# logged "No results found", turning a broken engine into a clean bill of health.
+#
+# `--download` on `database analyze` does not repair this: it short-circuits on
+# "Already installed" for the query pack and never resolves the missing library
+# dependency. So both packs are installed explicitly, before the analysis.
+#
+# Measured on ivuorinen/skills: 0 results without the library pack, 95 with it,
+# under every suite and every threat model.
+install_packs()
+{
+  lang="$1"
+
+  for pack in "codeql/$lang-queries" "codeql/$lang-all"; do
+    if ! codeql pack download "$pack" > /dev/null 2>&1; then
+      log "WARNING: could not download $pack — results for $lang may be incomplete"
+    fi
+  done
+}
+
+# Fail loudly when the dataflow engine is not actually loaded.
+#
+# A zero-result run is only trustworthy if a known-positive would have been
+# caught. This compiles one throwaway database containing a textbook
+# path-injection and asserts the analysis finds it; if it does not, the zero on
+# the real tree proves nothing and is reported as a failure rather than as clean.
+verify_engine()
+{
+  cache_dir="$1"
+  probe_src="$cache_dir/.probe-src"
+  probe_db="$cache_dir/.probe-db"
+
+  # Self-healing: install first, so the common cause of a failed check is
+  # repaired rather than merely reported.
+  install_packs python
+
+  mkdir -p "$probe_src"
+  cat > "$probe_src/probe.py" << 'PROBE'
+import sys
+import os
+
+
+def run():
+    """Known-positive for py/path-injection: argv straight into a file open."""
+    target = sys.argv[1]
+    return os.path.getsize(os.path.join("/tmp", target))
+PROBE
+
+  if ! codeql database create "$probe_db" --language=python \
+    --source-root="$probe_src" --overwrite > /dev/null 2>&1; then
+    rm -rf "$probe_src" "$probe_db"
+    log "WARNING: engine self-check could not build its probe database; skipping"
+    return 0
+  fi
+
+  # Always --threat-model=all, never the caller's choice. The probe asks one
+  # question — is the dataflow engine loaded — and its taint source is argv,
+  # which is a *local* source: under CodeQL's default model that flow is not
+  # tracked at all, so a correctly-working engine would report nothing and the
+  # check would fail for a reason that has nothing to do with what it tests.
+  probe_sarif="$cache_dir/.probe.sarif"
+  codeql database analyze "$probe_db" --format=sarif-latest \
+    --output="$probe_sarif" --quiet --threat-model=all \
+    "codeql/python-queries:codeql-suites/python-security-and-quality.qls" \
+    > /dev/null 2>&1 || true
+
+  found=0
+  if [ -f "$probe_sarif" ] && command -v jq > /dev/null 2>&1; then
+    found=$(jq -r '[.runs[0].results[]? | select(.ruleId | test("path-injection"))] | length' \
+      "$probe_sarif" 2> /dev/null || echo 0)
+  fi
+  rm -rf "$probe_src" "$probe_db" "$probe_sarif"
+
+  if [ "$found" -eq 0 ]; then
+    err "engine self-check FAILED: a known path-injection was not detected.
+        The dataflow library pack is probably missing, so a zero-result run
+        would be meaningless. Try: codeql pack download codeql/python-all"
+  fi
+  log "Engine self-check passed (known-positive detected)."
+}
+
 # Create a CodeQL database for a language
 create_database()
 {
@@ -104,11 +214,18 @@ create_database()
   src_path="$2"
   db_path="$3"
 
+  # Honour the tree's own code-scanning config, so local runs apply the same
+  # paths-ignore as GitHub code scanning instead of reporting on vendored and
+  # submodule code. Its query list is not used: analyze names its suite.
+  set -- --language="$lang" --source-root="$src_path" --overwrite
+  config="$src_path/.github/codeql/codeql-config.yml"
+  if [ -f "$config" ]; then
+    log "Using code-scanning config $config"
+    set -- "$@" --codescanning-config="$config"
+  fi
+
   log "Creating $lang database..."
-  codeql database create "$db_path" \
-    --language="$lang" \
-    --source-root="$src_path" \
-    --overwrite
+  codeql database create "$db_path" "$@"
 }
 
 # Display analysis result statistics from SARIF file
@@ -154,29 +271,39 @@ analyze_language()
   db_path="$cache_dir/db-$path_suffix-$lang"
   sarif_file="$output_dir/codeql-$lang.sarif"
 
+  install_packs "$lang"
   create_database "$lang" "$src_path" "$db_path"
 
-  log "Analyzing $lang with security-and-quality suite..."
+  if [ -n "$THREAT_MODEL_ARG" ]; then
+    log "Analyzing $lang with security-and-quality suite (threat model: $THREAT_MODEL)..."
+  else
+    log "Analyzing $lang with security-and-quality suite..."
+  fi
 
   # Try security-and-quality suite, fall back to default if not found.
   # Keep the first attempt's stderr so a real failure is not misdiagnosed
   # as a missing suite.
+  #
+  # $THREAT_MODEL_ARG is deliberately unquoted: it is either empty (contributing
+  # no argument) or exactly one `--threat-model=<model>` token validated in main.
   analyze_err="$(mktemp)"
   trap 'rm -f -- "$analyze_err"' EXIT
+  # shellcheck disable=SC2086
   if ! codeql database analyze "$db_path" \
     --format=sarif-latest \
     --output="$sarif_file" \
     --sarif-category="$lang" \
-    --download \
+    --download $THREAT_MODEL_ARG \
     "codeql/$lang-queries:codeql-suites/$lang-security-and-quality.qls" \
     2> "$analyze_err"; then
 
     log "Suite not found, trying default pack for $lang..."
+    # shellcheck disable=SC2086
     if ! codeql database analyze "$db_path" \
       --format=sarif-latest \
       --output="$sarif_file" \
       --sarif-category="$lang" \
-      --download \
+      --download $THREAT_MODEL_ARG \
       "codeql/$lang-queries"; then
       cat "$analyze_err" >&2
       rm -f "$analyze_err"
@@ -202,11 +329,29 @@ main()
 {
   src_path="."
   parallel=0
+  THREAT_MODEL=""
+  THREAT_MODEL_ARG=""
 
   while [ $# -gt 0 ]; do
     case "$1" in
       --path)
         src_path="${2:?--path requires an argument}"
+        shift 2
+        ;;
+      --threat-model)
+        THREAT_MODEL="${2:?--threat-model requires an argument}"
+        case "$THREAT_MODEL" in
+          default)
+            # CodeQL's own default (remote sources only); pass nothing.
+            THREAT_MODEL_ARG=""
+            ;;
+          local | remote | all)
+            THREAT_MODEL_ARG="--threat-model=$THREAT_MODEL"
+            ;;
+          *)
+            err "--threat-model must be one of: default, local, remote, all. Received: '$THREAT_MODEL'"
+            ;;
+        esac
         shift 2
         ;;
       --parallel)
@@ -235,6 +380,11 @@ main()
   log "Detecting languages in $src_path..."
   languages="$(detect_languages "$src_path")"
   log "Found languages: $languages"
+
+  # Only meaningful where the probe's language is actually being analyzed.
+  case " $languages " in
+    *" python "*) verify_engine "$cache" ;;
+  esac
 
   output_dir="$(pwd)"
 

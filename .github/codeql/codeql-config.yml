@@ -1,0 +1,47 @@
+---
+# CodeQL code scanning configuration.
+#
+# Point default setup at this file, or pass it to an advanced-setup workflow
+# via `github/codeql-action/init` `config-file: ./.github/codeql/codeql-config.yml`.
+#
+# Without paths-ignore every finding lands in submodules (tools/dotbot's bundled
+# PyYAML, the tldr cheatsheets) -- code whose fixes the next upstream sync
+# discards. The list mirrors exclude_paths in .codacy.yml; `yarn lint:exclusions`
+# (scripts/check-exclusion-drift.py) fails when the two stop agreeing.
+#
+# Pattern rules differ from gitignore: `?`, `+`, `[`, `]` and `!` match
+# literally, and `**` may only appear at the start or end of a pattern or
+# between slashes.
+name: "dotfiles CodeQL config"
+
+# No `queries:` block on purpose. local/bin/x-codeql passes this file to
+# `codeql database create --codescanning-config`, and the CLI resolves
+# `uses: security-and-quality` as a pack name, which fails
+# ("Query pack python-security-and-quality cannot be found"). Pick the query
+# suite in the workflow or the default-setup settings instead; x-codeql names
+# its own suite at analyze time.
+
+paths-ignore:
+  # Git submodules
+  - "tools/**"
+  - "config/cheat/cheatsheets/community/**"
+  - "config/cheat/cheatsheets/tldr/**"
+  # Vendored in-tree (.claude/rules/vendored-files.md)
+  - "config/fzf/**"
+  - "local/bin/fzf-tmux"
+  - "local/bin/iterm2_shell_integration.zsh"
+  - ".claude/skills/graphify/**"
+  # Vendored fish helpers, refreshed from upstream rather than edited
+  - "config/fish/functions/__bass.py"
+  - "config/fish/functions/bass.fish"
+  - "config/fish/functions/fisher.fish"
+  - "config/fish/functions/__z_add.fish"
+  - "config/fish/functions/__z_clean.fish"
+  # Generated shell completions, rewritten by scripts/install-completions.sh
+  - "config/bash/completions.d/**"
+  - "config/zsh/completions.d/**"
+  # Tool-managed trees, never hand-edited
+  - "node_modules/**"
+  - ".yarn/**"
+  - "graphify-out/**"
+  - "config/tmux/plugins/**"
