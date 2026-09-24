@@ -107,7 +107,9 @@ edges = [e for e in g['links'] if e.get('relation') == 'tests']
 assert edges, 'no tests edges in graph'
 ids = {n['id'] for n in g['nodes']}
 assert 'tests_msgr' in ids, 'tests/msgr.bats missing from graph'
-assert any(e['source'] == 'tests_msgr' and e['target'] == 'local_bin_msgr' for e in edges), \
+# The target is local_bin_msgr or local_bin_msgr__entry depending on which
+# extractor emitted the script's file node; assert the link, not the spelling.
+assert any(e['source'] == 'tests_msgr' and e['target'].startswith('local_bin_msgr') for e in edges), \
     'msgr.bats is not linked to local/bin/msgr'
 print('ok')
 "

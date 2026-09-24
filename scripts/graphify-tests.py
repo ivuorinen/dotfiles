@@ -116,8 +116,14 @@ def collect(existing_ids: set[str]) -> tuple[list[dict], list[dict], list[str]]:
         for target in sorted(targets):
             if target == file_id:
                 continue
-            if target in existing_ids:
-                edges.append(_edge(file_id, target, "tests", rel, "L1"))
+            # graphify names a file's top-level node "<id>__entry" and only emits
+            # the bare "<id>" when another extractor happens to produce it too.
+            # Without this fallback the naming convention above silently resolved
+            # to nothing for 43 of the 71 test files -- including tests/msgr.bats,
+            # whose script is in the graph solely as local_bin_msgr__entry.
+            resolved = target if target in existing_ids else f"{target}__entry"
+            if resolved in existing_ids:
+                edges.append(_edge(file_id, resolved, "tests", rel, "L1"))
                 matched = True
         if not matched:
             unresolved.append(rel)
