@@ -33,6 +33,10 @@ let g:ale_linters = { "python": [ "flake8" ] }
 " .markdownlintignore, so it would flag ignored files like graphify-out/.
 let g:ale_linters_ignore = { "markdown": [ "markdownlint_cli", "markdownlint_cli2" ] }
 
+" gitgutter's default <leader>h{p,s,u} hunk maps made <leader>h (split) a
+" prefix and wait for timeoutlen; hunk keys follow nvim's mini.diff instead
+" (set in the Neovim parity block). Must be set before the plugin loads.
+let g:gitgutter_map_keys = 0
 
 if !filereadable(vimplug_exists)
   if !executable(curl_exists)
@@ -204,7 +208,7 @@ set smartcase                     " Enable smart-case search
 set smartindent                   " Enable smart-indent
 set smarttab                      " Enable smart-tabs
 set softtabstop=4                 " Number of spaces per Tab
-set spelllang=fi,en               " Set the spell language
+set spelllang=en_gb,en_us        " Same as nvim; vim ships no fi word list
 set spellsuggest=double           " Suggest the first word when spell checking
 set t_Co=256                      " 256 colors
 set termguicolors                 " Enable 24-bit RGB color in the terminal
@@ -314,11 +318,6 @@ let g:session_command_aliases = 1
 
 syntax on
 
-" Search mappings: These will make it so that going to the next one in a
-" search will center on the line it's found in.
-nnoremap n nzzzv
-nnoremap N Nzzzv
-
 " if fugitive is installed, add the statusline
 if exists("*fugitive#statusline")
   set statusline+=%{fugitive#statusline()}
@@ -343,23 +342,14 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 50
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*node_modules/,*vendor/
 nnoremap <silent> <F2> :NERDTreeFind<CR>
-" <leader>te = file explorer (nvim parity; frees <leader>t as Toggle group)
-nnoremap <silent> <leader>te :NERDTreeToggle<CR>
 
 " grep.vim configuration
-" <leader>sg = live grep (nvim parity: Search Grep)
-nnoremap <silent> <leader>sg :Rgrep<CR>
 let Grep_Default_Options = '-IR'
 let Grep_Skip_Files = '*.log *.db .DS_Store'
 let Grep_Skip_Dirs = '.git node_modules vendor plugged'
 
-" CoC (code suggestions, diagnostics and refactoring)
-" find or update definitions
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-nmap <silent> gn <Plug>(coc-rename)
+" CoC (code suggestions, diagnostics and refactoring). LSP keymaps follow
+" nvim and live in the Neovim parity block below.
 " autoformat code based on linter
 function! s:auto_format()
     " eslint is no longer exposed as a proper linter to coc
@@ -370,10 +360,9 @@ function! s:auto_format()
     endif
 endfunction
 " <leader>cf = format (nvim parity: Code Format)
-noremap <silent> <leader>cf :call <SID>auto_format()<cr>
-" jump to diagnostics or the documentation
-nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
-nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
+nnoremap <silent> <leader>cf :call <SID>auto_format()<cr>
+xnoremap <silent> <leader>cf :<C-u>call <SID>auto_format()<cr>
+" K = hover documentation (nvim default LSP hover)
 function! s:show_documentation()
     if index(['vim','help'], &filetype) >= 0
         execute 'h '.expand('<cword>')
@@ -414,11 +403,6 @@ let g:copilot_no_tab_map = v:true
 inoremap <silent><expr> <Tab>
       \ coc#pum#has_item_selected() ? coc#_select_confirm() :
       \ exists('b:_copilot.suggestions') ? copilot#Accept("\<CR>") : ""
-" automatically fix diagnostics and/or refactor
-noremap <silent> <leader>d :CocList diagnostics<cr>
-" <leader>ca = code action (nvim parity: Code group, frees <leader>c)
-nmap <leader>ca <Plug>(coc-codeaction)
-xmap <leader>ca <Plug>(coc-codeaction-selected)
 
 let g:wordy#ring = [
     \ 'weak',
@@ -437,55 +421,180 @@ let g:wordy#ring = [
 "*****************************************************************************
 "" Neovim parity (config/nvim/lua/keymaps.lua is the source of truth)
 "*****************************************************************************
-" Plugin-bound nvim maps (snacks picker, mini, trouble, LSP) have no plain-vim
-" equivalent and are already covered above by coc/fzf/NERDTree. This block is
-" guarded to vim only — IdeaVim keeps its own IDE-action scheme (set notimeout
-" plus <leader> prefixes for bookmarks/debug/refactor would clash otherwise).
+" Same keys, same order as keymaps.lua; nvim's plugin-backed actions map to
+" the vim plugin that does the same job: snacks.picker -> fzf.vim, LSP ->
+" coc.nvim, trouble -> quickfix/location lists, mini.files -> NERDTree,
+" mini.bufremove -> s:BufRemove. nvim keys with no vim counterpart are left
+" unmapped: <leader>ct (treesitter), <leader>xc and <leader>xt (trouble
+" cascade/test) and <leader>tn (snacks notifier).
+" Guarded to vim only: IdeaVim sources this file and keeps its own
+" IDE-action scheme in config/ideavim/ideavimrc.
 if !has('ideavim')
-  " Find files (nvim <leader>f) — fzf
-  nnoremap <silent> <leader>f :Files<CR>
-
-  " Save / clear search highlight
-  nnoremap <silent> <C-s> :w!<CR>
-  nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
-
-  " Keep selection when indenting
-  xnoremap < <gv
-  xnoremap > >gv
-
-  " Wrap-aware vertical motion
-  nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
-  nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
-
-  " Window resize
+  " ── Splits ──────────────────────────────────────────────────────────
   nnoremap <silent> <C-w>, :vertical resize -10<CR>
   nnoremap <silent> <C-w>. :vertical resize +10<CR>
   nnoremap <silent> <C-w>- :resize -10<CR>
   nnoremap <silent> <C-w>+ :resize +10<CR>
 
-  " Buffers (<leader>b…)
+  " ── Deal with word wrap ─────────────────────────────────────────────
+  nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+  nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+
+  " ── Text manipulation ───────────────────────────────────────────────
+  " nvim also binds these in normal mode, where '< and '> are the marks
+  " of the previous visual selection; vim keeps them to visual mode.
+  xnoremap < <gv
+  xnoremap > >gv
+  xnoremap <silent> <C-k> :m '<-2<CR>gv=gv
+  xnoremap <silent> <C-j> :m '>+1<CR>gv=gv
+
+  " ── Other operations ────────────────────────────────────────────────
+  nnoremap <silent> <C-s> :w!<CR>
+  nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
+
+  " Disable arrow keys in normal mode; use hjkl or count motions instead.
+  for s:key in ['<Up>', '<Down>', '<Left>', '<Right>',
+        \ '<C-Up>', '<C-Down>', '<C-Left>', '<C-Right>']
+    execute 'nnoremap' s:key '<Nop>'
+  endfor
+
+  " ── Buffer operations ───────────────────────────────────────────────
+  " MiniBufremove keeps the window: show another buffer in it first, then
+  " delete the old one. A modified buffer is refused rather than dropped.
+  function! s:BufRemove(cmd) abort
+    let l:buf = bufnr('%')
+    if getbufvar(l:buf, '&modified')
+      echohl ErrorMsg | echo 'Buffer has unsaved changes' | echohl None
+      return
+    endif
+    if len(getbufinfo({'buflisted': 1})) > 1
+      bprevious
+    else
+      enew
+    endif
+    execute a:cmd l:buf
+  endfunction
+
+  " Close every listed buffer except the current one; skip modified ones.
+  function! s:BufOnly() abort
+    let l:cur = bufnr('%')
+    for l:info in getbufinfo({'buflisted': 1})
+      if l:info.bufnr != l:cur && !l:info.changed
+        execute 'bdelete' l:info.bufnr
+      endif
+    endfor
+  endfunction
+
+  nnoremap <silent> <leader>ba :call <SID>BufOnly()<CR>
+  nnoremap <silent> <leader>bd :call <SID>BufRemove('bdelete')<CR>
   nnoremap <silent> <leader>bh :bprevious<CR>
-  nnoremap <silent> <leader>bl :bnext<CR>
   nnoremap <silent> <leader>bj :bfirst<CR>
   nnoremap <silent> <leader>bk :blast<CR>
+  nnoremap <silent> <leader>bl :bnext<CR>
   nnoremap <silent> <leader>bn :enew<CR>
-  nnoremap <silent> <leader>bd :bdelete<CR>
+  nnoremap <silent> <leader>bw :call <SID>BufRemove('bwipeout')<CR>
 
-  " Quit (<leader>q…)
-  nnoremap <silent> <leader>qf :q<CR>
-  nnoremap <silent> <leader>qw :wq<CR>
-  nnoremap <silent> <leader>qq :wq!<CR>
-  nnoremap <silent> <leader>qQ :confirm q<CR>
+  " ── Code & LSP operations (coc.nvim) ────────────────────────────────
+  " <leader>cf is defined with s:auto_format above.
+  nnoremap <silent> <C-l> :call CocActionAsync('showSignatureHelp')<CR>
+  nnoremap <silent> <leader>cci :call CocAction('showIncomingCalls')<CR>
+  nnoremap <silent> <leader>cco :call CocAction('showOutgoingCalls')<CR>
+  nmap <silent> <leader>cd <Plug>(coc-definition)
+  nmap <silent> <leader>ci <Plug>(coc-implementation)
+  nmap <silent> <leader>cp <Plug>(coc-type-definition)
+  nnoremap <silent> <leader>cr :CocCommand workspace.renameCurrentFile<CR>
+  nnoremap <silent> <leader>cs :CocList outline<CR>
+  nnoremap <silent> <leader>cws :CocList -I symbols<CR>
 
-  " Toggle options (<leader>tm…)
+  " Neovim's built-in LSP defaults (grn, gra, grr, gri, grt, gO, [d, ]d);
+  " K (hover) is defined with s:show_documentation above.
+  nmap <silent> grn <Plug>(coc-rename)
+  nmap <silent> gra <Plug>(coc-codeaction-cursor)
+  xmap <silent> gra <Plug>(coc-codeaction-selected)
+  nmap <silent> grr <Plug>(coc-references)
+  nmap <silent> gri <Plug>(coc-implementation)
+  nmap <silent> grt <Plug>(coc-type-definition)
+  nnoremap <silent> gO :CocList outline<CR>
+  nmap <silent> [d <Plug>(coc-diagnostic-prev)
+  nmap <silent> ]d <Plug>(coc-diagnostic-next)
+
+  " ── Trouble operations (quickfix / location lists) ──────────────────
+  nnoremap <silent> <leader>xl :lopen<CR>
+  nnoremap <silent> <leader>xq :copen<CR>
+  nnoremap <silent> <leader>xx :CocDiagnostics<CR>
+
+  " ── Toggle settings ─────────────────────────────────────────────────
+  " Format on save is ALE's fixer run in vim (g:ale_fix_on_save).
+  nnoremap <silent> <leader>tf :let g:ale_fix_on_save = !get(g:, 'ale_fix_on_save', 0)
+        \ <Bar> echo 'Format on save: ' . (g:ale_fix_on_save ? 'on' : 'off')<CR>
+  nnoremap <silent> <leader>te :NERDTreeToggle<CR>
+  nnoremap <silent> - :NERDTreeFind<CR>
+  nnoremap <silent> <leader>tl :call ToggleBackground()<CR>
+
+  " Snacks terminal toggle: hide the terminal window if shown, else show
+  " the existing terminal buffer, else start one.
+  function! s:ToggleTerminal() abort
+    for l:win in range(1, winnr('$'))
+      if getbufvar(winbufnr(l:win), '&buftype') ==# 'terminal'
+        execute l:win . 'hide'
+        return
+      endif
+    endfor
+    for l:info in getbufinfo()
+      if getbufvar(l:info.bufnr, '&buftype') ==# 'terminal'
+            \ && term_getstatus(l:info.bufnr) =~# 'running'
+        execute 'botright sbuffer' l:info.bufnr
+        resize 15
+        return
+      endif
+    endfor
+    botright terminal ++rows=15
+  endfunction
+  nnoremap <silent> <leader>tt :call <SID>ToggleTerminal()<CR>
+
+  " ── Option toggles ──────────────────────────────────────────────────
   nnoremap <silent> <leader>tmc :set cursorline!<CR>
   nnoremap <silent> <leader>tmC :set cursorcolumn!<CR>
+  nnoremap <silent> <leader>tmd :call CocAction('diagnosticToggle')<CR>
   nnoremap <silent> <leader>tmh :set hlsearch!<CR>
   nnoremap <silent> <leader>tml :set list!<CR>
   nnoremap <silent> <leader>tmn :set number!<CR>
   nnoremap <silent> <leader>tmr :set relativenumber!<CR>
   nnoremap <silent> <leader>tms :set spell!<CR>
   nnoremap <silent> <leader>tmw :set wrap!<CR>
+
+  " ── Plugin manager ──────────────────────────────────────────────────
+  nnoremap <silent> <leader>pp :PlugStatus<CR>
+
+  " ── Quit operations ─────────────────────────────────────────────────
+  nnoremap <silent> <leader>qf :q<CR>
+  nnoremap <silent> <leader>qq
+        \ :if confirm('Force save and quit?', "&Yes\n&No", 2) == 1 <Bar> wq! <Bar> endif<CR>
+  nnoremap <silent> <leader>qw :wq<CR>
+  nnoremap <silent> <leader>qQ
+        \ :if confirm('Force quit without saving?', "&Yes\n&No", 2) == 1 <Bar> q! <Bar> endif<CR>
+
+  " ── Search / picker (fzf.vim) ───────────────────────────────────────
+  nnoremap <silent> <leader>f :Files<CR>
+  nnoremap <silent> <leader>, :Buffers<CR>
+  nnoremap <silent> <leader>sd :CocList diagnostics<CR>
+  nnoremap <silent> <leader>sf :execute 'Rg' expand('<cword>')<CR>
+  nnoremap <silent> <leader>sg :Rg<CR>
+  nnoremap <silent> <leader>sh :Helptags<CR>
+  nnoremap <silent> <leader>sk :Maps<CR>
+  nnoremap <silent> <leader>sn :messages<CR>
+  nnoremap <silent> <leader>so :History<CR>
+  nnoremap <silent> <leader>sq :copen<CR>
+  nnoremap <silent> <leader>ss :BLines<CR>
+
+  " ── Git hunks (vim-gitgutter, as mini.diff's defaults) ──────────────
+  " mini.diff's gh/gH are operators over a range; gitgutter acts on the
+  " hunk under the cursor.
+  nmap ]h <Plug>(GitGutterNextHunk)
+  nmap [h <Plug>(GitGutterPrevHunk)
+  nmap gh <Plug>(GitGutterStageHunk)
+  nmap gH <Plug>(GitGutterUndoHunk)
+
 endif
 
 "*****************************************************************************
@@ -494,19 +603,6 @@ endif
 
 " remove trailing whitespaces
 command! FixWhitespace :%s/\s\+$//e
-
-"*****************************************************************************
-"" Functions
-"*****************************************************************************
-
-" setup wrapping function
-if !exists('*s:setupWrapping')
-  function s:setupWrapping()
-    set wrap
-    set wm=2
-    set textwidth=79
-  endfunction
-endif
 
 "*****************************************************************************
 "" Custom configs

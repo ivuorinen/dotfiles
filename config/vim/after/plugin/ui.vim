@@ -30,5 +30,5 @@ endif
 
 " set the title of the terminal to the file name
 set title
-set titleold="Terminal"
+set titleold=Terminal
 set titlestring=%F

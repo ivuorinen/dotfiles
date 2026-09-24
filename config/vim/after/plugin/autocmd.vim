@@ -1,14 +1,8 @@
 "" The PC is fast enough, do syntax highlight
-"" syncing from start 6nless 200 lines
+"" syncing from start unless 200 lines
 augroup vimrc-sync-fromstart
   autocmd!
   autocmd BufEnter * :syntax sync maxlines=600
-augroup END
-
-"" txt
-augroup vimrc-wrapping
-  autocmd!
-  autocmd BufRead,BufNewFile *.txt call s:setupWrapping()
 augroup END
 
 "" make/cmake
@@ -27,10 +21,11 @@ function! s:CreateAugroup(name) abort
   augroup END
 endfunction
 
-" Highlight on yank
-" See `:help vim.highlight.on_yank()`
-call s:CreateAugroup('YankHighlight')
-autocmd YankHighlight TextYankPost * silent! lua vim.highlight.on_yank()
+" Highlight on yank. vim.highlight.on_yank() is Neovim-only Lua; Vim 9.1
+" ships the same behaviour as the optional hlyank package.
+if !has('nvim')
+  silent! packadd hlyank
+endif
 
 " Set the numberwidth to the maximum line number.
 " Fixes the issue where the line numbers jump
@@ -39,22 +34,22 @@ call s:CreateAugroup('AdjustNumberWidth')
 autocmd AdjustNumberWidth BufEnter,BufWinEnter,TabEnter *
   \ let max_line_count = line('$') |
   \ if max_line_count > 99 |
-  \   let &numberwidth = strlen(string(max_line_count)) + 1
+  \   let &numberwidth = strlen(string(max_line_count)) + 1 |
   \ endif
 
-" Windows to close with "q"
+" Windows to close with "q". The pattern is one comma-separated word: a
+" space inside it (as a `\ name` continuation adds) ends the pattern.
 call s:CreateAugroup('close_with_q')
-autocmd close_with_q FileType checkhealth,dbout,gitsigns.blame,grug-far,help,
-  \ lspinfo,man,neotest-output,neotest-output-panel,neotest-summary,notify,
-  \ qf,spectre_panel,startuptime,tsplayground
-  \ setlocal buflisted=false |
+autocmd close_with_q FileType
+  \ checkhealth,dbout,gitsigns.blame,grug-far,help,lspinfo,man,neotest-output,neotest-output-panel,neotest-summary,notify,qf,spectre_panel,startuptime,tsplayground
+  \ setlocal nobuflisted |
   \ nnoremap <silent> <buffer> q :close<CR>
 
 " Make it easier to close man-files when opened inline
 call s:CreateAugroup('man_unlisted')
-autocmd man_unlisted FileType man setlocal buflisted=false
+autocmd man_unlisted FileType man setlocal nobuflisted
 
-" Wrap and check for spell in text filetypes
+" Wrap and check for spell in text filetypes (covers *.txt via 'text')
 call s:CreateAugroup('wrap_spell')
 autocmd wrap_spell FileType text,plaintex,typst,gitcommit,markdown,asciidoc,rst,tex
   \ setlocal wrap spell
