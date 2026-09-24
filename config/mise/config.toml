@@ -209,6 +209,7 @@ cheat = "5.1.0"
 "github:ZenNotes/zennotes" = "2.50.4"
 pnpm = "12.4.2"
 adr-tools = "3.0.0"
+codeql = { version = "latest", bin_path = "codeql", platforms = { linux-x64 = { asset_pattern = "codeql-linux64.zip" }, macos-arm64 = { asset_pattern = "codeql-osx64.zip" }, macos-x64 = { asset_pattern = "codeql-osx64.zip" }, windows-x64 = { asset_pattern = "codeql-win64.zip" } } }
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
