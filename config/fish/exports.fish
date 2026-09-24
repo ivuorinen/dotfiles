@@ -48,28 +48,11 @@ fish_add_path "$MASON_HOME/bin"
 # Add dotnet tools to path
 fish_add_path "$HOME/.dotnet/tools/"
 
-# Set Neovim environment variables
-test -z "$NVIM_STATE" && set -x NVIM_STATE "$XDG_STATE_HOME/nvim"
-test -z "$NVIM_CONFIG_HOME" && set -x NVIM_CONFIG_HOME "$XDG_CONFIG_HOME/nvim"
-test -z "$NVIM_DATA_HOME" && set -x NVIM_DATA_HOME "$XDG_DATA_HOME/nvim"
-test -z "$NVIM_CACHE_HOME" && set -x NVIM_CACHE_HOME "$XDG_CACHE_HOME/nvim"
-test -z "$NVIM_LOG_PATH" && set -x NVIM_LOG_PATH "$NVIM_STATE/log"
-test -z "$NVIM_SESSION_PATH" && set -x NVIM_SESSION_PATH "$NVIM_STATE/session"
-test -z "$NVIM_SHADA_PATH" && set -x NVIM_SHADA_PATH "$NVIM_STATE/shada"
-test -z "$NVIM_UNDO_PATH" && set -x NVIM_UNDO_PATH "$NVIM_STATE/undo"
-
 # fish-lsp — silence 4006 (duplicate function in same scope).
 # Our if/else blocks define the same function name in mutually exclusive
 # branches; fish-lsp flags them lexically, which is a false positive.
 set -q fish_lsp_diagnostic_disable_error_codes
 or set -gx fish_lsp_diagnostic_disable_error_codes 4006
-
-# Ansible configuration
-set -q ANSIBLE_HOME; or set -x ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
-set -q ANSIBLE_CONFIG; or set -x ANSIBLE_CONFIG "$ANSIBLE_HOME/ansible.cfg"
-set -q ANSIBLE_GALAXY_CACHE_DIR; or set -x ANSIBLE_GALAXY_CACHE_DIR "$XDG_CACHE_HOME/ansible/galaxy_cache"
-x-dc "$ANSIBLE_HOME"
-x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
 
 # Brew configuration
 set -q HOMEBREW_NO_ANALYTICS; or set -x HOMEBREW_NO_ANALYTICS true
@@ -89,7 +72,6 @@ set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
 set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
 # fzf configuration
-set -q FZF_BASE; or set -x FZF_BASE "$XDG_CONFIG_HOME/fzf"
 set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
     '--height 40% --tmux bottom,40% --layout reverse --border top'
 
@@ -116,9 +98,6 @@ set -e GOROOT
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 
-# Python configuration
-set -q WORKON_HOME; or set -x WORKON_HOME "$XDG_DATA_HOME/virtualenvs"
-
 # Set precompiled Python arch+OS so mise downloads the right binary
 # Each output line from mise-python-arch has the format: export KEY="value"
 if command -v mise-python-arch >/dev/null 2>&1
@@ -132,10 +111,6 @@ if command -v mise-python-arch >/dev/null 2>&1
     end
 end
 
-# Poetry configuration
-set -q POETRY_HOME; or set -x POETRY_HOME "$XDG_DATA_HOME/poetry"
-fish_add_path "$POETRY_HOME/bin"
-
 # Rust / cargo configuration
 set -q CARGO_HOME; or set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
@@ -143,23 +118,9 @@ set -q RUSTUP_HOME; or set -x RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 set -x RUST_WITHOUT "clippy,docs,rls"
 fish_add_path "$CARGO_HOME/bin"
 
-# screen configuration
-set -q SCREENRC; or set -x SCREENRC "$XDG_CONFIG_HOME/misc/screenrc"
-
-# Sonarlint configuration
-set -q SONARLINT_HOME; or set -x SONARLINT_HOME "$XDG_DATA_HOME/sonarlint"
-set -q SONARLINT_BIN; or set -x SONARLINT_BIN "$XDG_BIN_HOME"
-set -q SONARLINT_USER_HOME; or set -x SONARLINT_USER_HOME "$XDG_DATA_HOME/sonarlint"
-
-# tmux configuration
+# tmux configuration. TMUX_PLUGIN_MANAGER_PATH is set by tmux.conf itself
+# (set-environment -g), which is the value tpm reads.
 set -q TMUX_TMPDIR; or set -x TMUX_TMPDIR "$XDG_STATE_HOME/tmux"
-set -q TMUX_CONF_DIR; or set -x TMUX_CONF_DIR "$XDG_CONFIG_HOME/tmux"
-set -q TMUX_PLUGINS; or set -x TMUX_PLUGINS "$TMUX_CONF_DIR/plugins"
-set -q TMUX_CONF; or set -x TMUX_CONF "$TMUX_CONF_DIR/tmux.conf"
-set -q TMUX_PLUGIN_MANAGER_PATH; or set -x TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGINS"
-
-# tms configuration
-set -q TMS_CONFIG_FILE; or set -x TMS_CONFIG_FILE "$XDG_CONFIG_HOME/tms/config.toml"
 
 # wakatime configuration
 set -q WAKATIME_HOME; or set -x WAKATIME_HOME "$XDG_STATE_HOME/wakatime"

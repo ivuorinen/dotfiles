@@ -326,29 +326,9 @@ export ANTIDOTE_DIR="$DOTFILES/tools/antidote"
 export ANTIDOTE_HOME="$XDG_CACHE_HOME/antidote"
 export ANTIDOTE_PLUGINS="$XDG_CONFIG_HOME/zsh/antidote_plugins"
 
-# Ansible configuration
-# https://docs.ansible.com/ansible/latest/reference_appendices/config.html
-msg "Setting up Ansible configuration"
-export ANSIBLE_HOME="$XDG_CONFIG_HOME/ansible"
-export ANSIBLE_CONFIG="$ANSIBLE_HOME/ansible.cfg"
-export ANSIBLE_GALAXY_CACHE_DIR="$XDG_CACHE_HOME/ansible/galaxy_cache"
-x-dc "$ANSIBLE_HOME"
-x-dc "$ANSIBLE_GALAXY_CACHE_DIR"
-
-# Mason (nvim package manager)
+# Mason (nvim package manager) — its bin dir is added to PATH below
 msg "Setting up Mason configuration"
 export MASON_HOME="$XDG_DATA_HOME/nvim/mason"
-
-# Neovim environment variables
-msg "Setting up Neovim configuration"
-[ -z "${NVIM_STATE:-}" ] && export NVIM_STATE="$XDG_STATE_HOME/nvim"
-[ -z "${NVIM_CONFIG_HOME:-}" ] && export NVIM_CONFIG_HOME="$XDG_CONFIG_HOME/nvim"
-[ -z "${NVIM_DATA_HOME:-}" ] && export NVIM_DATA_HOME="$XDG_DATA_HOME/nvim"
-[ -z "${NVIM_CACHE_HOME:-}" ] && export NVIM_CACHE_HOME="$XDG_CACHE_HOME/nvim"
-[ -z "${NVIM_LOG_PATH:-}" ] && export NVIM_LOG_PATH="$NVIM_STATE/log"
-[ -z "${NVIM_SESSION_PATH:-}" ] && export NVIM_SESSION_PATH="$NVIM_STATE/session"
-[ -z "${NVIM_SHADA_PATH:-}" ] && export NVIM_SHADA_PATH="$NVIM_STATE/shada"
-[ -z "${NVIM_UNDO_PATH:-}" ] && export NVIM_UNDO_PATH="$NVIM_STATE/undo"
 
 # bkt (shell command caching tool) configuration
 msg "Setting up bkt configuration"
@@ -382,12 +362,7 @@ x-dc "$DOCKER_CONFIG"
 export DOCKER_SCAN_SUGGEST=false
 export DOCKER_HIDE_LEGACY_COMMANDS=true
 
-# direnv
-msg "Setting up direnv configuration"
-export DIRENV_LOG_FORMAT=""
-
 # fzf
-export FZF_BASE="${XDG_CONFIG_HOME}/fzf"
 export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
 
 # GnuPG
@@ -528,12 +503,6 @@ export TELEVISION_CONFIG="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/t
 msg "Setting up 1Password CLI configuration"
 export OP_CACHE="$XDG_STATE_HOME/1password"
 
-# Python
-msg "Setting up Python configuration"
-export WORKON_HOME="$XDG_DATA_HOME/virtualenvs"
-## for MichaelAquilina/zsh-autoswitch-virtualenv
-export AUTOSWITCH_VIRTUAL_ENV_DIR="$WORKON_HOME"
-
 # Rust / cargo
 msg "Setting up Rust/Cargo configuration"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
@@ -541,41 +510,15 @@ export CARGO_BIN_HOME="$XDG_BIN_HOME"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export RUST_WITHOUT="clippy,docs,rls"
 
-# Poetry
-msg "Setting up Poetry configuration"
-export POETRY_HOME="$XDG_DATA_HOME/poetry"
-
-# sonarlint
-# https://www.sonarlint.org/
-msg "Setting up Sonarlint configuration"
-export SONARLINT_USER_HOME="$XDG_DATA_HOME/sonarlint"
-
 # tmux
 # https://tmux.github.io/
 msg "Setting up tmux configuration"
 export TMUX_TMPDIR="$XDG_STATE_HOME/tmux"
-export TMUX_CONF_DIR="$XDG_CONFIG_HOME/tmux"
-export TMUX_PLUGINS="$TMUX_CONF_DIR/plugins"
-export TMUX_CONF="$TMUX_CONF_DIR/tmux.conf"
-## These settings are for zsh-tmux
-export ZSH_TMUX_AUTOSTART=true
-export ZSH_TMUX_CONFIG="$TMUX_CONF"
-export ZSH_TMUX_UNICODE=true
-export ZSH_TMUX_AUTOQUIT=false
-export ZSH_TMUX_DEFAULT_SESSION_NAME=main
-
-# tms (tmux session manager)
-msg "Setting up tms configuration"
-export TMS_CONFIG_FILE="$XDG_CONFIG_HOME/tms/config.toml"
 
 # wakatime, https://github.com/wakatime/wakatime-cli
 msg "Setting up Wakatime configuration"
 export WAKATIME_HOME="$XDG_STATE_HOME/wakatime"
 x-dc "$WAKATIME_HOME"
-
-# Screen
-msg "Setting up screen configuration"
-export SCREENRC="$XDG_CONFIG_HOME/misc/screenrc"
 
 # Zoxide
 msg "Setting up Zoxide configuration"
@@ -595,7 +538,6 @@ export SQLITE_HISTORY="${XDG_CACHE_HOME}/sqlite_history"
 [ -d "$YARN_GLOBAL_FOLDER/bin" ] && export PATH="$PATH:$YARN_GLOBAL_FOLDER/bin"
 [ -d "$MASON_HOME/bin" ] && export PATH="$PATH:$MASON_HOME/bin"
 [ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
-[ -d "$POETRY_HOME/bin" ] && export PATH="$PATH:$POETRY_HOME/bin"
 [ -d "$HOME/.aspire/bin" ] && export PATH="$PATH:$HOME/.aspire/bin"
 
 # sonarqube-cli

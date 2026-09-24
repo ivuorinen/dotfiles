@@ -21,10 +21,3 @@ ACME_PATH="$HOME/.acme.sh"
 if [[ -s "$ACME_PATH/acme.sh.env" ]]; then
   source "$ACME_PATH/acme.sh.env"
 fi
-
-export RVM_PATH="$HOME/.rvm"
-export PATH="$RVM_PATH/bin:$PATH"
-# shellcheck source=$HOME/.rvm/scripts/rvm
-if [[ -s "$RVM_PATH/scripts/rvm" ]]; then
-  source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
-fi
