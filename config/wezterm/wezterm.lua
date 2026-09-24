@@ -59,12 +59,42 @@ config.send_composed_key_when_right_alt_is_pressed = true
 
 config.scrollback_lines = 3000
 
+-- Catppuccin Latte with the ANSI accents darkened to reach WCAG AA
+-- (4.5:1) on base #eff1f5. Hue and saturation are unchanged; the mapping
+-- is in config/theme/palettes.d/starship.light.toml. Black and white use
+-- the Catppuccin style guide's Latte mapping (black = subtext1/subtext0,
+-- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
+-- which leaves text printed in "black" unreadable.
+local latte_aa = wezterm.color.get_builtin_schemes()['Catppuccin Latte']
+latte_aa.ansi = {
+  '#5c5f77',
+  '#d20f39',
+  '#327c21',
+  '#996114',
+  '#1761f5',
+  '#c71f9a',
+  '#13797e',
+  '#acb0be',
+}
+latte_aa.brights = {
+  '#6c6f85',
+  '#d20f39',
+  '#327c21',
+  '#996114',
+  '#1761f5',
+  '#c71f9a',
+  '#13797e',
+  '#bcc0cc',
+}
+latte_aa.indexed = { [16] = '#be4601', [17] = '#bb4930' }
+config.color_schemes = { ['Catppuccin Latte AA'] = latte_aa }
+
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
   if appearance:find 'Dark' then
     return 'Catppuccin Mocha'
   else
-    return 'Catppuccin Latte'
+    return 'Catppuccin Latte AA'
   end
 end
 

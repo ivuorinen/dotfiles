@@ -211,8 +211,63 @@ set wrapscan                      " Searches wrap around the end of the file
 " Ignore these files in wildmenu
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,vendor
 
-colorscheme catppuccin_mocha      " Set the color scheme
-filetype plugin indent on         " enable filetype detection, plugins and indenting
+" Colour scheme follows the dotfiles theme orchestrator: config/theme/apply
+" writes "dark" or "light" to $XDG_STATE_HOME/dotfiles-theme/mode. Polled
+" every 3s so a flip reaches running sessions. A missing or unreadable file
+" means dark. Replaces after/colors.vim, which was never sourced (vim only
+" auto-loads after/plugin/, not files directly in after/) and could not
+" detect light mode: `defaults read -g AppleInterfaceStyle` prints nothing
+" and exits 1 in light mode, so its out_cb never fired.
+" IdeaVim sources this file and has no timers, readfile() or colorschemes.
+if !has('ideavim')
+  function! s:ThemeMode() abort
+    let l:state = empty($XDG_STATE_HOME) ? expand('~/.local/state') : $XDG_STATE_HOME
+    let l:file = l:state . '/dotfiles-theme/mode'
+    if filereadable(l:file)
+      let l:lines = readfile(l:file, '', 1)
+      if !empty(l:lines) && trim(l:lines[0]) ==# 'light'
+        return 'light'
+      endif
+    endif
+    return 'dark'
+  endfunction
+
+  function! s:ApplyScheme(scheme) abort
+    if get(g:, 'colors_name', '') ==# a:scheme
+      return
+    endif
+    execute 'colorscheme' a:scheme
+    let g:airline_theme = a:scheme
+    if exists(':AirlineTheme') == 2
+      execute 'AirlineTheme' a:scheme
+    endif
+  endfunction
+
+  " Act only when the mode file changes, so a manual <leader>tl flip
+  " stays until the next OS flip (same as auto-dark-mode.nvim).
+  function! s:ApplyThemeMode(...) abort
+    let l:mode = s:ThemeMode()
+    if l:mode ==# get(s:, 'last_mode', '')
+      return
+    endif
+    let s:last_mode = l:mode
+    call s:ApplyScheme(l:mode ==# 'light' ? 'catppuccin_latte' : 'catppuccin_mocha')
+  endfunction
+
+  " <leader>tl (nvim ToggleBackground). Catppuccin colour files set
+  " 'background' themselves, so flip the scheme rather than the option.
+  function! ToggleBackground() abort
+    call s:ApplyScheme(get(g:, 'colors_name', '') ==# 'catppuccin_latte'
+          \ ? 'catppuccin_mocha' : 'catppuccin_latte')
+  endfunction
+
+  call s:ApplyThemeMode()
+  if has('timers')
+    call timer_start(3000, function('s:ApplyThemeMode'), {'repeat': -1})
+  endif
+endif
+
+filetype plugin indent on       " enable filetype detection, plugins and indenting
 
 " Set the shell
 if exists('$SHELL')
@@ -267,7 +322,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme = 'catppuccin_mocha'
+let g:airline_theme = get(g:, 'colors_name', 'catppuccin_mocha')
 
 " NERDTree configuration
 let g:NERDTreeChDirMode=2

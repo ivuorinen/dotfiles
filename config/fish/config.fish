@@ -5,10 +5,11 @@
 set -g fish_greeting
 
 # Catppuccin theme controls fish syntax/completion colours; the prompt
-# itself is rendered by starship (see below). The Catppuccin Mocha theme
-# file holds both [light] and [dark] palettes; conf.d/theme-switch.fish
-# re-saves it on dark/light flip so syntax colours follow the OS.
-fish_config theme choose "Catppuccin Mocha"
+# itself is rendered by starship (see below). The repo-owned catppuccin-aa
+# theme holds both [light] (AA-darkened Latte) and [dark] (Mocha) palettes;
+# conf.d/theme-switch.fish re-saves it on dark/light flip so syntax
+# colours follow the OS.
+fish_config theme choose catppuccin-aa
 
 test -e "$HOME/.config/fish/alias.fish" &&
     source "$HOME/.config/fish/alias.fish"

@@ -6,21 +6,23 @@
 "
 " =============================================================================
 
-" Original theme colors
-let s:rosewater = "#dc8a78"
-let s:flamingo = "#DD7878"
-let s:pink = "#ea76cb"
+" Theme colors. Accents darkened from upstream Latte (same HSL hue and
+" saturation) to reach WCAG AA 4.5:1 on base #EFF1F5; mapping in
+" config/theme/palettes.d/starship.light.toml.
+let s:rosewater = "#BB4930"
+let s:flamingo = "#CB3333"
+let s:pink = "#C71F9A"
 let s:mauve = "#8839EF"
 let s:red = "#D20F39"
-let s:maroon = "#E64553"
-let s:peach = "#FE640B"
-let s:yellow = "#df8e1d"
-let s:green = "#40A02B"
-let s:teal = "#179299"
-let s:sky = "#04A5E5"
-let s:sapphire = "#209FB5"
-let s:blue = "#1e66f5"
-let s:lavender = "#7287FD"
+let s:maroon = "#D61D2D"
+let s:peach = "#BE4601"
+let s:yellow = "#996114"
+let s:green = "#327C21"
+let s:teal = "#13797E"
+let s:sky = "#0374A1"
+let s:sapphire = "#187787"
+let s:blue = "#1761F5"
+let s:lavender = "#3D5AFC"
 "
 let s:text = "#4C4F69"
 let s:subtext1 = "#5C5F77"

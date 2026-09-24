@@ -7,9 +7,11 @@
 
 let s:mauve = [ "#8839EF", 183 ]
 let s:red = [ "#D20F39", 211 ]
-let s:yellow = [ "#DF8E1D", 223 ]
-let s:teal = [ "#179299", 152 ]
-let s:blue = [ "#1E66F5", 117 ]
+" Accents AA-darkened (4.5:1 on #EFF1F5); mapping in
+" config/theme/palettes.d/starship.light.toml
+let s:yellow = [ "#996114", 223 ]
+let s:teal = [ "#13797E", 152 ]
+let s:blue = [ "#1761F5", 117 ]
 let s:overlay0 = [ "#9CA0B0", 243 ]
 let s:surface1 = [ "#BCC0CC", 240 ]
 let s:surface0 = [ "#CCD0DA", 236 ]

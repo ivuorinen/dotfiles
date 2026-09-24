@@ -47,13 +47,13 @@ function __theme_switch_check --on-event fish_prompt
     if not set -q __theme_switch_last_mtime; or test "$__theme_switch_last_mtime" != "$mtime"
         set -g __theme_switch_last_mtime $mtime
         # Re-save the SAME dual-palette theme; fish re-queries OSC 11
-        # and picks [light] vs [dark] from Catppuccin Mocha.theme,
-        # which contains both sections. Catppuccin Latte.theme is not
-        # vendored in this repo, so we do not switch theme names by
-        # mode — saving Mocha for both modes is the correct flip
-        # mechanism here. `echo y |` bypasses the interactive overwrite
-        # prompt that would otherwise pollute the next prompt line.
-        echo y | fish_config theme save "Catppuccin Mocha" >/dev/null 2>&1
+        # and picks [light] vs [dark] from catppuccin-aa.theme, which
+        # contains both sections, so the theme name does not change by
+        # mode. catppuccin-aa is repo-owned; the fisher-managed Mocha
+        # file would lose its AA [light] edits on `fisher update`.
+        # `echo y |` bypasses the interactive overwrite prompt that
+        # would otherwise pollute the next prompt line.
+        echo y | fish_config theme save catppuccin-aa >/dev/null 2>&1
         if test -r $ls_cache
             set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
             test -n "$ls_value"; and set -gx LS_COLORS $ls_value

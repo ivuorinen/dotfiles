@@ -22,6 +22,13 @@
 # request); both still hidden outside SSH per starship defaults.
 #
 # Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Latte)
+#
+# Accents deviate from upstream Latte: each keeps its HSL hue and
+# saturation with lightness lowered until it reaches WCAG AA (4.5:1) on
+# base #eff1f5. Upstream sky is 2.47:1, which made the path unreadable.
+# Upstream declines a palette change (catppuccin/catppuccin#2588). The
+# same darkened set is used in the eza, dircolors, fish, gitui and fzf
+# light palettes. Mauve and red already pass and are unchanged.
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
@@ -46,20 +53,20 @@ $character"""
 palette = "catppuccin_latte"
 
 [palettes.catppuccin_latte]
-rosewater = "#dc8a78"
-flamingo = "#dd7878"
-pink = "#ea76cb"
+rosewater = "#bb4930"
+flamingo = "#cb3333"
+pink = "#c71f9a"
 mauve = "#8839ef"
 red = "#d20f39"
-maroon = "#e64553"
-peach = "#fe640b"
-yellow = "#df8e1d"
-green = "#40a02b"
-teal = "#179299"
-sky = "#04a5e5"
-sapphire = "#209fb5"
-blue = "#1e66f5"
-lavender = "#7287fd"
+maroon = "#d61d2d"
+peach = "#be4601"
+yellow = "#996114"
+green = "#327c21"
+teal = "#13797e"
+sky = "#0374a1"
+sapphire = "#187787"
+blue = "#1761f5"
+lavender = "#3d5afc"
 text = "#4c4f69"
 subtext1 = "#5c5f77"
 subtext0 = "#6c6f85"

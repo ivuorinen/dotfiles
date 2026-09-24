@@ -598,6 +598,25 @@ require('catppuccin').setup {
     -- indentscope_color defaults to 'overlay2'; clear it to suppress the tint.
     mini = { indentscope_color = '' },
   },
+  -- Upstream Latte accents fall to 2.3–3.5:1 on base (sky is 2.47:1).
+  -- Same hue and saturation, lightness lowered to reach WCAG AA 4.5:1;
+  -- mapping in config/theme/palettes.d/starship.light.toml.
+  color_overrides = {
+    latte = {
+      rosewater = '#bb4930',
+      flamingo = '#cb3333',
+      pink = '#c71f9a',
+      maroon = '#d61d2d',
+      peach = '#be4601',
+      yellow = '#996114',
+      green = '#327c21',
+      teal = '#13797e',
+      sky = '#0374a1',
+      sapphire = '#187787',
+      blue = '#1761f5',
+      lavender = '#3d5afc',
+    },
+  },
 }
 
 vim.cmd.colorscheme 'catppuccin'

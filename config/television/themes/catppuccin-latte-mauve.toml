@@ -7,16 +7,18 @@ dimmed_text_fg = '#9ca0b0'
 input_text_fg = '#8839ef'
 result_count_fg = '#8839ef'
 # results
-result_name_fg = '#1e66f5'
-result_line_number_fg = '#df8e1d'
-result_value_fg = '#7287fd'
-selection_fg = '#40a02b'
+# accents AA-darkened (4.5:1 on #eff1f5); mapping in
+# config/theme/palettes.d/starship.light.toml
+result_name_fg = '#1761f5'
+result_line_number_fg = '#996114'
+result_value_fg = '#3d5afc'
+selection_fg = '#327c21'
 selection_bg = '#ccd0da'
-match_fg = '#40a02b'
+match_fg = '#327c21'
 # preview
 preview_title_fg = '#8839ef'
 # modes
 channel_mode_fg = '#eff1f5'
 channel_mode_bg = '#8839ef'
 remote_control_mode_fg = '#eff1f5'
-remote_control_mode_bg = '#40a02b'
+remote_control_mode_bg = '#327c21'

@@ -79,11 +79,12 @@ TERM xterm-color
 TERM xterm-debian
 TERM xterm-termite
 
-## Catppuccin Latte (green accent) reference
+## Catppuccin Latte (green accent) reference, accents darkened to reach
+## WCAG AA 4.5:1 on base #eff1f5 (same set as eza.light.yml)
 #  text       76;79;105    subtext1 92;95;119    subtext0 140;143;161
-#  green      64;160;43    blue     30;102;245   teal     23;146;153
-#  maroon     230;69;83    red      210;15;57    yellow   223;142;29
-#  mauve      136;57;239   pink     234;118;203  sapphire 32;159;181
+#  green      50;124;33    blue     23;97;245    teal     19;121;126
+#  maroon     214;29;45    red      210;15;57    yellow   153;97;20
+#  mauve      136;57;239   pink     199;31;154   sapphire 24;119;135
 
 ## Global defaults
 
@@ -91,21 +92,21 @@ NORMAL 00  # no color
 RESET  0   # reset to "normal" color
 
 FILE 00                                  # normal (terminal default fg)
-DIR  38;2;64;160;43;01                   # green (eza directory), bold
-LINK 38;2;30;102;245                     # blue (eza symlink)
-MULTIHARDLINK 04;38;2;30;102;245         # blue, underscore
+DIR  38;2;50;124;33;01                   # green (eza directory), bold
+LINK 38;2;23;97;245                     # blue (eza symlink)
+MULTIHARDLINK 04;38;2;23;97;245         # blue, underscore
 
 FIFO 38;2;92;95;119                      # subtext1 (eza pipe)
 SOCK 38;2;92;95;119                      # subtext1 (eza socket)
 DOOR 38;2;92;95;119                      # subtext1
-BLK  38;2;230;69;83;04                   # maroon (eza block_device), underscore
-CHR  38;2;230;69;83;01                   # maroon (eza char_device), bold
+BLK  38;2;214;29;45;04                   # maroon (eza block_device), underscore
+CHR  38;2;214;29;45;01                   # maroon (eza char_device), bold
 
-EXEC 38;2;64;160;43;01                   # green (eza executable), bold
+EXEC 38;2;50;124;33;01                   # green (eza executable), bold
 
 OTHER_WRITABLE        38;2;140;143;161   # subtext0 (eza file_type.crypto)
-STICKY                38;2;23;146;153    # teal (eza mount_point)
-STICKY_OTHER_WRITABLE 38;2;23;146;153    # teal
+STICKY                38;2;19;121;126    # teal (eza mount_point)
+STICKY_OTHER_WRITABLE 38;2;19;121;126    # teal
 
 ORPHAN 38;2;210;15;57;01                 # red (eza broken_symlink), bold
 SETUID 38;2;136;57;239;04                # mauve (eza perms.special_user_file)
@@ -115,37 +116,37 @@ SETGID 38;2;136;57;239;04                # mauve
 CAPABILITY 00
 
 ## Archive or compressed - pink (eza file_type.compressed), bold
-.tar   38;2;234;118;203;01
-.tgz   38;2;234;118;203;01
-.arj   38;2;234;118;203;01
-.taz   38;2;234;118;203;01
-.lzh   38;2;234;118;203;01
-.lzma  38;2;234;118;203;01
-.tlz   38;2;234;118;203;01
-.txz   38;2;234;118;203;01
-.zip   38;2;234;118;203;01
-.z     38;2;234;118;203;01
-.Z     38;2;234;118;203;01
-.dz    38;2;234;118;203;01
-.gz    38;2;234;118;203;01
-.lz    38;2;234;118;203;01
-.xz    38;2;234;118;203;01
-.bz2   38;2;234;118;203;01
-.bz    38;2;234;118;203;01
-.tbz   38;2;234;118;203;01
-.tbz2  38;2;234;118;203;01
-.tz    38;2;234;118;203;01
-.deb   38;2;234;118;203;01
-.rpm   38;2;234;118;203;01
-.jar   38;2;234;118;203;01
-.rar   38;2;234;118;203;01
-.ace   38;2;234;118;203;01
-.zoo   38;2;234;118;203;01
-.cpio  38;2;234;118;203;01
-.7z    38;2;234;118;203;01
-.rz    38;2;234;118;203;01
-.apk   38;2;234;118;203;01
-.gem   38;2;234;118;203;01
+.tar   38;2;199;31;154;01
+.tgz   38;2;199;31;154;01
+.arj   38;2;199;31;154;01
+.taz   38;2;199;31;154;01
+.lzh   38;2;199;31;154;01
+.lzma  38;2;199;31;154;01
+.tlz   38;2;199;31;154;01
+.txz   38;2;199;31;154;01
+.zip   38;2;199;31;154;01
+.z     38;2;199;31;154;01
+.Z     38;2;199;31;154;01
+.dz    38;2;199;31;154;01
+.gz    38;2;199;31;154;01
+.lz    38;2;199;31;154;01
+.xz    38;2;199;31;154;01
+.bz2   38;2;199;31;154;01
+.bz    38;2;199;31;154;01
+.tbz   38;2;199;31;154;01
+.tbz2  38;2;199;31;154;01
+.tz    38;2;199;31;154;01
+.deb   38;2;199;31;154;01
+.rpm   38;2;199;31;154;01
+.jar   38;2;199;31;154;01
+.rar   38;2;199;31;154;01
+.ace   38;2;199;31;154;01
+.zoo   38;2;199;31;154;01
+.cpio  38;2;199;31;154;01
+.7z    38;2;199;31;154;01
+.rz    38;2;199;31;154;01
+.apk   38;2;199;31;154;01
+.gem   38;2;199;31;154;01
 
 # General file - normal (terminal default; eza file_type.document is text-colored)
 .tex             00
@@ -185,53 +186,53 @@ CAPABILITY 00
 .csv             00
 
 # Image file - yellow (eza file_type.image)
-.jpg   38;2;223;142;29
-.JPG   38;2;223;142;29
-.jpeg  38;2;223;142;29
-.gif   38;2;223;142;29
-.bmp   38;2;223;142;29
-.pbm   38;2;223;142;29
-.pgm   38;2;223;142;29
-.ppm   38;2;223;142;29
-.tga   38;2;223;142;29
-.xbm   38;2;223;142;29
-.xpm   38;2;223;142;29
-.tif   38;2;223;142;29
-.tiff  38;2;223;142;29
-.png   38;2;223;142;29
-.PNG   38;2;223;142;29
-.svg   38;2;223;142;29
-.svgz  38;2;223;142;29
-.mng   38;2;223;142;29
-.pcx   38;2;223;142;29
-.dl    38;2;223;142;29
-.xcf   38;2;223;142;29
-.xwd   38;2;223;142;29
-.yuv   38;2;223;142;29
-.cgm   38;2;223;142;29
-.emf   38;2;223;142;29
-.eps   38;2;223;142;29
-.CR2   38;2;223;142;29
-.ico   38;2;223;142;29
+.jpg   38;2;153;97;20
+.JPG   38;2;153;97;20
+.jpeg  38;2;153;97;20
+.gif   38;2;153;97;20
+.bmp   38;2;153;97;20
+.pbm   38;2;153;97;20
+.pgm   38;2;153;97;20
+.ppm   38;2;153;97;20
+.tga   38;2;153;97;20
+.xbm   38;2;153;97;20
+.xpm   38;2;153;97;20
+.tif   38;2;153;97;20
+.tiff  38;2;153;97;20
+.png   38;2;153;97;20
+.PNG   38;2;153;97;20
+.svg   38;2;153;97;20
+.svgz  38;2;153;97;20
+.mng   38;2;153;97;20
+.pcx   38;2;153;97;20
+.dl    38;2;153;97;20
+.xcf   38;2;153;97;20
+.xwd   38;2;153;97;20
+.yuv   38;2;153;97;20
+.cgm   38;2;153;97;20
+.emf   38;2;153;97;20
+.eps   38;2;153;97;20
+.CR2   38;2;153;97;20
+.ico   38;2;153;97;20
 
 # Audio file - green (eza file_type.music)
-.aac   38;2;64;160;43
-.au    38;2;64;160;43
-.flac  38;2;64;160;43
-.mid   38;2;64;160;43
-.midi  38;2;64;160;43
-.mka   38;2;64;160;43
-.mp3   38;2;64;160;43
-.mpc   38;2;64;160;43
-.ogg   38;2;64;160;43
-.opus  38;2;64;160;43
-.ra    38;2;64;160;43
-.wav   38;2;64;160;43
-.m4a   38;2;64;160;43
-.axa   38;2;64;160;43
-.oga   38;2;64;160;43
-.spx   38;2;64;160;43
-.xspf  38;2;64;160;43
+.aac   38;2;50;124;33
+.au    38;2;50;124;33
+.flac  38;2;50;124;33
+.mid   38;2;50;124;33
+.midi  38;2;50;124;33
+.mka   38;2;50;124;33
+.mp3   38;2;50;124;33
+.mpc   38;2;50;124;33
+.ogg   38;2;50;124;33
+.opus  38;2;50;124;33
+.ra    38;2;50;124;33
+.wav   38;2;50;124;33
+.m4a   38;2;50;124;33
+.axa   38;2;50;124;33
+.oga   38;2;50;124;33
+.spx   38;2;50;124;33
+.xspf  38;2;50;124;33
 
 # Video file - red (eza file_type.video)
 .mov   38;2;210;15;57
