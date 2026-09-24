@@ -103,7 +103,13 @@ def get_top_blobs(count, size_limit):
     if sortByOnDiskSize:
         sort_column = 3
 
-    git_dir = check_output(["git", "rev-parse", "--git-dir"]).decode("utf-8").strip()  # nosec B603 B607 # nosemgrep
+    # The subprocess call sits alone on its line: bandit applies a line's
+    # suppression marker to every call node on it, so a chained
+    # .decode().strip() made it warn "no failed test" for those two calls.
+    # (Do not name the marker in this comment: bandit parses the words after
+    # it as test IDs and warns on each.)
+    git_dir_raw = check_output(["git", "rev-parse", "--git-dir"])  # nosec B603 B607 # nosemgrep
+    git_dir = git_dir_raw.decode("utf-8").strip()
     idx_files = glob.glob(f"{git_dir}/objects/pack/pack-*.idx")
     if not idx_files:
         print("No packfiles found — run 'git gc' first.")
