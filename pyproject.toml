@@ -1,5 +1,10 @@
 [tool.ruff]
-target-version = "py314"
+# The oldest python these scripts must run on, not the one mise pins. The bats
+# CI job installs no mise and runs ubuntu-latest's system python (3.12), so a
+# py314 target let ruff format rewrite `except (A, B):` into the bare PEP 758
+# form — legal only in 3.14 — and CI died with a SyntaxError while every local
+# gate stayed green. Raise this only when CI runs the same interpreter.
+target-version = "py312"
 line-length = 120
 # Third-party trees. The cheatsheets submodule holds tldr templates with a
 # .py extension that are not Python, so a bare `ruff check .` reports

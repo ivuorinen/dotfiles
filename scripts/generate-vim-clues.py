@@ -149,7 +149,10 @@ def mini_version(source_path: str) -> str:
             check=True,
         )
         return out.stdout.strip() or "unknown"
-    except OSError, subprocess.CalledProcessError:
+    # Parenthesised on purpose: PEP 758 made the bare form legal only in 3.14,
+    # and the bats CI job runs the system python (3.12 on ubuntu-latest), where
+    # it is a SyntaxError. ruff cannot catch it — target-version is py314.
+    except (OSError, subprocess.CalledProcessError):
         return "unknown"
 
 
