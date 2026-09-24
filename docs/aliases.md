@@ -53,10 +53,9 @@ are the same in every shell and are not listed here.
 | `stats`   | `onefetch --nerd-fonts --true-color never`                                                             |
 | `v`       | `nvim`                                                                                                 |
 | `vi`      | `nvim`                                                                                                 |
-| `vim`     | `nvim`                                                                                                 |
 | `watchx`  | `watch -dpbc`                                                                                          |
 | `wget`    | `wget --hsts-file=$XDG_DATA_HOME/wget-hsts`                                                            |
 | `xdg`     | `xdg-ninja --skip-ok --skip-unsupported`                                                               |
 | `zedit`   | `$EDITOR ~/.dotfiles`                                                                                  |
 
-Total aliases: 43
+Total aliases: 42

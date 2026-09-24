@@ -59,7 +59,6 @@ alias isodate="date +'%Y-%m-%d'"
 # nvim aliases
 alias v='nvim'
 alias vi='nvim'
-alias vim='nvim'
 
 # .NET shortcuts (aligned with fish alias.fish abbreviations)
 alias dt='dotnet test'

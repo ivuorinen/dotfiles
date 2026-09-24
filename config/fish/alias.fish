@@ -4,7 +4,6 @@
 
 if type -q nvim
     alias v='nvim'
-    alias vim='nvim'
     alias vi='nvim'
 end
 
