@@ -9,7 +9,10 @@ let $PATH = $HOME . '/.local/bin:' . $HOME . '/.local/share/mise/shims:' . $PATH
 "*****************************************************************************
 "" Vim-Plug core
 "*****************************************************************************
-let vimplug_exists=expand('$HOME/.config/autoload/plug.vim')
+" Must be the autoload dir on 'runtimepath' (~/.config/vim, which this repo
+" ships plug.vim into). A path outside it never satisfies :call plug#begin,
+" and when missing it triggers a fresh download on every start.
+let vimplug_exists=expand('$HOME/.config/vim/autoload/plug.vim')
 if has('win32') && !has('win64')
   let curl_exists=expand('C:\Windows\Sysnative\curl.exe')
 else
