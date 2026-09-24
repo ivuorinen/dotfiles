@@ -13,6 +13,9 @@ setup()
   # See tests/claude-hooks-misc.bats: keeps fixture commits off the
   # 1Password-backed signing key, which costs 60s and fails when locked.
   export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+  # See tests/claude-hooks-misc.bats: keeps fixture repos off the git
+  # environment a commit hook inherits (GIT_INDEX_FILE and friends).
+  unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_COMMON_DIR GIT_PREFIX
 
   GD="$BATS_TEST_DIRNAME/../local/bin/git-dirty"
   TMP="$(mktemp -d)"

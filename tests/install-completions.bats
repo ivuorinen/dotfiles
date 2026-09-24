@@ -16,6 +16,10 @@
 
 setup()
 {
+  # See tests/claude-hooks-misc.bats: keeps the fixture repo off the git
+  # environment a commit hook inherits (GIT_INDEX_FILE and friends).
+  unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_COMMON_DIR GIT_PREFIX
+
   SCRIPT="$BATS_TEST_DIRNAME/../scripts/install-completions.sh"
   export DOTFILES="$BATS_TEST_TMPDIR/repo"
 

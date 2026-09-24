@@ -208,7 +208,16 @@ repos:
         # pinned as brew:moreutils in config/mise/config.toml. Resolving that
         # collision is a deliberate decision, not a drive-by.
         # See .claude/rules/run-tests-before-commit.md.
-        entry: bats --print-output-on-failure tests/
+        #
+        # env -u: git exports GIT_INDEX_FILE and friends to its hooks whenever
+        # the commit builds a temporary index — `git commit <path>` and
+        # `git-hunk commit` both do. A fixture repo that inherits them writes
+        # into the pending commit's index instead of its own, which fails the
+        # test ("invalid object … Error building trees") and can corrupt the
+        # commit itself. The suite's setup() functions unset these too; this is
+        # the boundary that holds for a test file that forgets.
+        entry: env -u GIT_INDEX_FILE -u GIT_DIR -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY
+          -u GIT_COMMON_DIR -u GIT_PREFIX bats --print-output-on-failure tests/
         language: system
         pass_filenames: false
         # .claude/hooks/ and vendored-files.md are here so an edit to either

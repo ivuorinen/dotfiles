@@ -21,6 +21,15 @@ setup()
   # Overriding only this one key leaves global user.name/email intact.
   export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
 
+  # Fixture repos must not inherit the caller's git environment either. git
+  # exports GIT_INDEX_FILE (and friends) to its hooks whenever the commit uses
+  # a temporary index — `git commit <path>` and `git-hunk commit` both do — so
+  # the pre-commit suite runs with them set. A fixture repo that inherits them
+  # writes its trees against the outer repo's index and dies with
+  # "invalid object … Error building trees". Without this the suite is green
+  # standalone and red from the very hook that is supposed to gate it.
+  unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_COMMON_DIR GIT_PREFIX
+
   HOOKS="${BATS_TEST_DIRNAME}/../.claude/hooks"
   WORK="$(mktemp -d)"
   export HOOKS WORK
@@ -70,7 +79,12 @@ with_path()
   mkdir -p "$WORK/.claude"
   run -0 bash -c 'printf "{\"prompt\":\"run cat please\"}" | CLAUDE_PROJECT_DIR="$1" bash "$2"' _ "$WORK" "$HOOKS/prompt-record.sh"
   [ "$(cat "$WORK/.claude/.last-prompt")" = "run cat please" ]
-  [ "$(stat -f '%Lp' "$WORK/.claude/.last-prompt" 2> /dev/null || stat -c '%a' "$WORK/.claude/.last-prompt")" = "600" ]
+  # GNU first: on Linux `stat -f` is filesystem status, not a format string, so
+  # it prints a block of filesystem info and the BSD-first order appends the
+  # real mode to that noise. BSD stat rejects -c on stderr with no stdout, so
+  # this order is safe on macOS (audit-96494642 fixed the same idiom in
+  # tests/dfm.bats and tests/theme-lib.bats).
+  [ "$(stat -c '%a' "$WORK/.claude/.last-prompt" 2> /dev/null || stat -f '%Lp' "$WORK/.claude/.last-prompt")" = "600" ]
 }
 
 # --- post-edit-config-warn.sh -------------------------------------------

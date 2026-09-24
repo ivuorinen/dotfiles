@@ -10,6 +10,11 @@ bats_require_minimum_version 1.5.0
 
 setup()
 {
+  # See tests/claude-hooks-misc.bats: the submodule fixture below builds real
+  # repos, so it must not inherit the git environment a commit hook carries
+  # (GIT_INDEX_FILE and friends).
+  unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_COMMON_DIR GIT_PREFIX
+
   CQ="$BATS_TEST_DIRNAME/../local/bin/x-codeql"
   TMP="$(mktemp -d)"
   mkdir -p "$TMP/bin" "$TMP/src" "$TMP/out" "$TMP/cache"
