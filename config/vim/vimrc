@@ -287,6 +287,19 @@ if !has('ideavim')
   endif
 endif
 
+" Cursor shape per mode, matching nvim's default 'guicursor': block in
+" normal/visual/command, bar in insert, underline in replace. Vim sends
+" these DECSCUSR codes only when told to (t_SI/t_SR/t_EI fire on mode
+" change). t_ti sets the block at startup, since no mode change happens
+" there, and t_te resets to the terminal's own cursor on exit, as nvim
+" does. IdeaVim sources this file and has no terminal.
+if !has('ideavim') && !has('gui_running')
+  let &t_SI = "\e[6 q"
+  let &t_SR = "\e[4 q"
+  let &t_EI = "\e[2 q"
+  let &t_ti .= "\e[2 q"
+  let &t_te .= "\e[0 q"
+endif
 filetype plugin indent on       " enable filetype detection, plugins and indenting
 
 " Set the shell
