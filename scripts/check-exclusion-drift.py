@@ -128,6 +128,7 @@ GATES = {
     "ruff": from_ruff,
     "bandit": from_bandit,
     "megalinter": from_megalinter,
+    "codeql": lambda: _yaml_list(REPO / ".github/codeql/codeql-config.yml", "paths-ignore"),
 }
 
 
@@ -169,7 +170,8 @@ def report_drift(current: dict[str, list[str]], baseline: dict[str, list[str]]) 
 
     print(
         "\nAdd the tree to the other gates (.grype.yaml, .codacy.yml, pyproject.toml "
-        "[tool.ruff]/[tool.bandit], .mega-linter.yml) and to .claude/rules/vendored-files.md,\n"
+        "[tool.ruff]/[tool.bandit], .mega-linter.yml, .github/codeql/codeql-config.yml)\n"
+        "and to .claude/rules/vendored-files.md, "
         "or record the difference as intentional with:  scripts/check-exclusion-drift.py --update"
     )
     return 1
@@ -183,7 +185,14 @@ def main() -> int:
     current = coverage()
 
     if args.update:
-        BASELINE.write_text(json.dumps(current, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        # One tree per line with its gate list inline: `json.dumps(indent=2)` would
+        # explode every list across lines, which biome's formatter then collapses —
+        # so a plain --update always left `yarn lint:biome` red.
+        body = ",\n".join(
+            f"  {json.dumps(tree, ensure_ascii=False)}: {json.dumps(gates, ensure_ascii=False)}"
+            for tree, gates in current.items()
+        )
+        BASELINE.write_text("{\n" + body + "\n}\n", encoding="utf-8")
         print(f"baseline written: {BASELINE.relative_to(REPO)} ({len(current)} trees)")
         return 0
 
