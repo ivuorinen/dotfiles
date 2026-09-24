@@ -16,11 +16,15 @@ Initialized in fish via `zoxide init fish | source` (`config/fish/config.fish`).
 
 ### fzf — fuzzy finder
 
-Key bindings sourced from `config/fzf/key-bindings.fish`:
+In bash and zsh, key bindings come from the mise-installed fzf itself
+(`fzf --bash` / `fzf --zsh`, cached by `config/fzf/fzf.{bash,zsh}`):
 
 - `Ctrl-T` — paste a fuzzy-selected file path onto the command line.
 - `Ctrl-R` — fuzzy-search shell history.
 - `Alt-C` — `cd` into a fuzzy-selected directory.
+
+In fish, `Ctrl-R` and `Ctrl-T` belong to television
+(`tv_shell_history`, `tv_smart_autocomplete`) instead.
 
 Also used inside helper functions (e.g. branch pickers in
 `config/fish/functions/`).

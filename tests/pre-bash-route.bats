@@ -332,10 +332,10 @@ with_prompt()
 
 # vendored-files.md through Bash (agent-loopholes-cef01270).
 @test "pre-bash-route: writes to protected paths are denied" {
-  [ "$(decision 'echo x > config/fzf/completion.bash')" = "deny" ]
-  [ "$(decision 'cp /tmp/x local/bin/fzf-tmux')" = "deny" ]
+  [ "$(decision 'echo x > config/fish/functions/__bass.py')" = "deny" ]
+  [ "$(decision 'cp /tmp/x .claude/skills/graphify/SKILL.md')" = "deny" ]
   [ "$(decision 'rm config/fish/functions/fisher.fish')" = "deny" ]
-  [ "$(decision 'git checkout HEAD~5 -- local/bin/iterm2_shell_integration.zsh')" = "deny" ]
+  [ "$(decision 'git checkout HEAD~5 -- config/fish/functions/bass.fish')" = "deny" ]
   [ "$(decision 'rm -rf tools/dotbot')" = "deny" ]
 }
 

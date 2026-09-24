@@ -27,9 +27,6 @@ paths-ignore:
   - "config/cheat/cheatsheets/community/**"
   - "config/cheat/cheatsheets/tldr/**"
   # Vendored in-tree (.claude/rules/vendored-files.md)
-  - "config/fzf/**"
-  - "local/bin/fzf-tmux"
-  - "local/bin/iterm2_shell_integration.zsh"
   - ".claude/skills/graphify/**"
   # Vendored fish helpers, refreshed from upstream rather than edited
   - "config/fish/functions/__bass.py"

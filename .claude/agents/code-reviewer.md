@@ -23,5 +23,5 @@ in `.claude/rules/`:
     `.claude/rules/no-schema-guessing.md` for any structured-config
     key-name changes.
 
-Report only high-confidence issues. Skip vendored files
-(`local/bin/fzf-tmux`, `config/fzf/{completion,key-bindings}.{bash,zsh,fish}`).
+Report only high-confidence issues. Skip vendored files (the `paths:` list
+in `.claude/rules/vendored-files.md`).

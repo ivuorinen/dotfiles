@@ -39,6 +39,5 @@ Only report and fix warnings that are NOT in that exclude list.
 
 ## Key files to never validate (not shell scripts)
 
-- `local/bin/fzf-tmux` (vendor file)
 - `*.md` files
 - `*.bats` test files (Bats, not plain shell)

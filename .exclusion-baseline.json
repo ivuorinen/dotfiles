@@ -10,15 +10,12 @@
   "config/fish/functions/__z_clean.fish": ["codacy", "codeql"],
   "config/fish/functions/bass.fish": ["codacy", "codeql"],
   "config/fish/functions/fisher.fish": ["bandit", "codacy", "codeql"],
-  "config/fzf": ["codacy", "codeql", "megalinter"],
   "config/tmux/plugins": ["codacy", "codeql", "megalinter"],
   "config/vim/extra": ["grype"],
   "config/vim/plugged": ["bandit", "grype"],
   "config/zsh": ["megalinter"],
   "config/zsh/completions.d": ["codacy", "codeql"],
   "graphify-out": ["bandit", "codacy", "codeql"],
-  "local/bin/fzf-tmux": ["codacy", "codeql"],
-  "local/bin/iterm2_shell_integration.zsh": ["codacy", "codeql"],
   "node_modules": ["bandit", "codacy", "codeql", "grype", "megalinter"],
   "tools": ["bandit", "codacy", "codeql", "grype", "megalinter", "ruff"]
 }

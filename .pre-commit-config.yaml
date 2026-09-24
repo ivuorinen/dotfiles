@@ -121,7 +121,7 @@ repos:
     rev: v3.13.1-1
     hooks:
       - id: shfmt
-        exclude: ^(config/(bash/completions\.d/|zsh/completions\.d/|fzf/(key-bindings|completion)\.(bash|zsh)$)|local/bin/fzf-tmux$)
+        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
         args: [-i, "2", -bn, -ci, -sr, -fn, -w]
 
   - repo: https://github.com/rhysd/actionlint

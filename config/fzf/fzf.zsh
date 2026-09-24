@@ -2,16 +2,9 @@
 # shellcheck disable=SC1071
 # Setup fzf
 # ---------
-
-# Auto-completion
-# ---------------
-# shellcheck source=completion.zsh
-[[ $- == *i* ]] && source "$HOME/.dotfiles/config/fzf/completion.zsh" 2> /dev/null
-
-# Key bindings
-# ------------
-# shellcheck source=key-bindings.zsh
-source "$HOME/.dotfiles/config/fzf/key-bindings.zsh"
+# Key bindings and completion come from the mise-installed fzf itself
+# (`fzf --zsh`), cached by lib::init_cached — see notes in fzf.bash.
+command -v fzf > /dev/null 2>&1 && lib::init_cached fzf fzf --zsh
 
 # Catppuccin palette — see notes in fzf.bash. Same state-dir symlink,
 # zsh-compatible source.

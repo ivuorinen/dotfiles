@@ -18,8 +18,9 @@ ohmyzsh/ohmyzsh path:plugins/brew
 ohmyzsh/ohmyzsh path:plugins/extract
 ohmyzsh/ohmyzsh path:plugins/eza
 # OMZ's fzf plugin is deliberately absent: base/zshrc calls
-# source_fzf_config, which sources the vendored config/fzf/fzf.zsh (~1ms).
-# The OMZ plugin does the same job by shelling out — `fzf --version` then
+# source_fzf_config, which loads `fzf --zsh` through lib::init_cached
+# (config/fzf/fzf.zsh), sourcing a cached copy instead of running fzf.
+# The OMZ plugin shells out on every start — `fzf --version` then
 # `eval "$(fzf --zsh)"` — and cost 138ms, 55% of zsh startup, for a
 # duplicate of what is already loaded.
 ohmyzsh/ohmyzsh path:plugins/git

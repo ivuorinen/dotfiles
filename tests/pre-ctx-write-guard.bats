@@ -46,8 +46,8 @@ batch()
 @test "pre-ctx-write-guard: blocks writes aimed at lock and vendored files" {
   run -2 code 'echo broken > yarn.lock'
   run -2 code 'truncate -s0 .yarn/install-state.gz'
-  run -2 code 'tee config/fzf/key-bindings.bash < /tmp/x'
-  run -2 code 'chmod 777 config/fzf/completion.zsh'
+  run -2 code 'tee config/fish/functions/bass.fish < /tmp/x'
+  run -2 code 'chmod 777 config/fish/functions/__z_add.fish'
 }
 
 # pre-edit-block.sh listed these four groups while this guard did not, so the
@@ -63,7 +63,7 @@ batch()
 
 @test "pre-ctx-write-guard: blocks writes to the other vendored trees" {
   run -2 code 'rm .claude/skills/graphify/SKILL.md'
-  run -2 code 'echo x > local/bin/iterm2_shell_integration.zsh'
+  run -2 code 'echo x > config/cheat/cheatsheets/tldr/README.md'
   run -2 code 'rm tools/dotbot-include/plugin.py'
 }
 
@@ -87,7 +87,7 @@ batch()
 # about writes. This is the line most at risk from a careless tightening.
 @test "pre-ctx-write-guard: allows reading a protected path" {
   run -0 code 'cat tools/dotbot/README.md'
-  run -0 code 'grep -n foo config/fzf/key-bindings.bash'
+  run -0 code 'grep -n foo config/fish/functions/fisher.fish'
   run -0 code 'wc -l yarn.lock'
 }
 
@@ -134,9 +134,9 @@ batch()
 # The path and the write used to have to share a line, so a variable split
 # them apart (agent-loopholes-408b9560).
 @test "pre-ctx-write-guard: a protected path in a variable is still caught" {
-  run -2 code "p='local/bin/fzf-tmux'
+  run -2 code "p='config/fish/functions/fisher.fish'
 require('fs').writeFileSync(p,'x')"
-  run -2 code 'f=config/fzf/completion.bash
+  run -2 code 'f=.claude/skills/graphify/SKILL.md
 printf x > "$f"'
 }
 

@@ -12,7 +12,7 @@
 # relative ones (Bash and sandbox code). The right edge is bounded so
 # `tools/dotbot` does not also claim a sibling such as `tools/dotbotx`.
 # shellcheck disable=SC2034 # consumed by the scripts that source this file
-PROTECTED_RE='(local/bin/fzf-tmux([^[:alnum:]._-]|$)|local/man/man1/fzf(-tmux)?\.1|config/fzf/(completion\.(bash|zsh)|key-bindings\.(bash|zsh|fish))|yarn\.lock|\.yarn/|tools/(dotbot|dotbot-include|antidote)([^[:alnum:]._-]|$)|config/cheat/cheatsheets/(community|tldr)([^[:alnum:]._-]|$)|config/fish/functions/(fisher\.fish|bass\.fish|__bass\.py|__z_add\.fish|__z_clean\.fish)|\.claude/skills/graphify/|local/bin/iterm2_shell_integration\.zsh)'
+PROTECTED_RE='(yarn\.lock|\.yarn/|tools/(dotbot|dotbot-include|antidote)([^[:alnum:]._-]|$)|config/cheat/cheatsheets/(community|tldr)([^[:alnum:]._-]|$)|config/fish/functions/(fisher\.fish|bass\.fish|__bass\.py|__z_add\.fish|__z_clean\.fish)|\.claude/skills/graphify/)'
 
 # secrets_referenced TEXT — succeed when TEXT names a secrets.d tree or any
 # file in one other than a `*.example` template or README.md.

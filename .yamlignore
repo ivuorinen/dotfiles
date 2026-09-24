@@ -3,7 +3,6 @@
 Brewfile.lock.json
 config/cheat/cheatsheets/community
 config/cheat/cheatsheets/tldr
-config/fzf/*
 config/nvim/*
 config/op/plugins/used_plugins/*
 config/vim/plugged/*

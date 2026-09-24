@@ -103,8 +103,8 @@ Evidence — five git submodules:
 - `config/cheat/cheatsheets/community`,
   `config/cheat/cheatsheets/tldr`
 
-Plus one in-tree vendored binary (`local/bin/fzf-tmux` from
-junegunn/fzf), tracked under `.claude/rules/vendored-files.md`.
+Plus in-tree vendored files (the graphify skill and five fish plugin
+functions), tracked under `.claude/rules/vendored-files.md`.
 
 The boundary rule is consistent: third-party code lives under
 `tools/` or specifically-named subdirectories; updates flow via
@@ -151,11 +151,10 @@ Items already enforced by `.claude/rules/` are flagged.
    `tools/` (or the specific cheatsheets paths), or as an explicitly
    vendored tree — never as ad-hoc copied files.** The in-tree
    vendored set is authoritative in
-   `.claude/rules/vendored-files.md`: the six fzf files
-   (`local/bin/fzf-tmux` plus five under `config/fzf/`),
-   `.claude/skills/graphify/`, and
-   `local/bin/iterm2_shell_integration.zsh`. Each is excluded from
-   the relevant linters and blocked by the PreToolUse edit guard.
+   `.claude/rules/vendored-files.md`: `.claude/skills/graphify/` and five
+   fish plugin functions under `config/fish/functions/`. Each is
+   excluded from the relevant linters and blocked by the PreToolUse
+   edit guard.
 6. **Helper scripts go in `local/bin/`** — they are symlinked into
    `~/.local/bin/` by dotbot and become part of the user's PATH.
    Tests for them live in `tests/<script-name>.bats`.

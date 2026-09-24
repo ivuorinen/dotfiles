@@ -146,9 +146,6 @@ The authoritative lists are `.claude/rules/vendored-files.md` (its `paths:`
 frontmatter) and `.claude/rules/secrets-files.md`. No hook enforces them for
 the cloud agent yet — this list is the only guard.
 
-- **Vendored from junegunn/fzf:** `local/bin/fzf-tmux`,
-  `config/fzf/{completion,key-bindings}.*`, `local/man/man1/fzf{,-tmux}.1`
-- **Vendored from iTerm2:** `local/bin/iterm2_shell_integration.zsh`
 - **Vendored graphify skill:** `.claude/skills/graphify/**`
 - **Vendored fish plugins:** `config/fish/functions/` — `fisher.fish`,
   `bass.fish`, `__bass.py`, `__z_add.fish`, `__z_clean.fish`

@@ -92,8 +92,6 @@ config/fish/completions/*.fish
 config/zsh/completions.d/
 local/md/
 local/man/man1/*.1
-!local/man/man1/fzf.1
-!local/man/man1/fzf-tmux.1
 
 # graphify knowledge graph: generated artifacts, regenerable via
 # `graphify update .` (AST-only, no API cost). graph.json/graph.html

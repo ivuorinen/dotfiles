@@ -27,7 +27,7 @@ payload=$(printf '%s\n%s' "$code" "$path")
 
 # ponytail: whole-payload co-occurrence heuristic — a protected path anywhere
 # plus a write-shaped token anywhere. It was per-line until a variable split
-# the two across lines (`p=local/bin/fzf-tmux` then `writeFileSync(p, …)`,
+# the two across lines (`p=<protected path>` then `writeFileSync(p, …)`,
 # agent-loopholes-408b9560). Read-only code that mentions a protected path and
 # writes somewhere else is a false positive; Write/Edit is the way round it.
 # Upgrade to real argv/AST parsing only if those false positives hurt.

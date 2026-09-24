@@ -13,7 +13,6 @@
     "config/karabiner/.*",
     "config/fish/conf.d/.*",
     "config/fish/functions/.*",
-    "config/fzf/key-bindings.fish",
     "config/irssi/scripts/autorun/.*",
     "config/vim/autoload/.*",
     "docs/.*",

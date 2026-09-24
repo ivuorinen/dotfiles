@@ -42,8 +42,10 @@ rule_paths()
   ' "$RULE"
 }
 
+# Floor at the rule's current size (the graphify skill plus five fish
+# functions): a parser that silently drops entries reports fewer and fails.
 @test "protected-paths-parity: the rule lists paths to check" {
-  [ "$(rule_paths | wc -l)" -ge 10 ]
+  [ "$(rule_paths | wc -l)" -ge 6 ]
 }
 
 @test "protected-paths-parity: every vendored path is refused by all three hooks" {

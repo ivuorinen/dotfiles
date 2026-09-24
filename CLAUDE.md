@@ -112,9 +112,7 @@ symlinks them into `~/.config/` automatically.
   eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
   `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
   `bash -n`.
-- **Vendored files**: the eight fzf files (six scripts, two man pages),
-  `.claude/skills/graphify/`,
-  `local/bin/iterm2_shell_integration.zsh`, and five fish plugin functions
+- **Vendored files**: `.claude/skills/graphify/` and five fish plugin functions
   under `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
   `__z_add.fish`, `__z_clean.fish`).
   Edit policy: `.claude/rules/vendored-files.md`.
