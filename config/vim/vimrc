@@ -88,6 +88,13 @@ call plug#begin(expand('$HOME/.config/vim/plugged'))
   " vim-airline
   Plug 'vim-airline/vim-airline'
 
+  " vim-which-key — key guide on <leader>, g, z and <C-w> (nvim uses
+  " mini.clue, which is Neovim-only)
+  Plug 'liuchengxu/vim-which-key'
+  " vim-peekaboo — register preview on " and @ and insert <C-r> (mini.clue's
+  " register clues in nvim)
+  Plug 'junegunn/vim-peekaboo'
+
   " fzf.vim - Fuzzy finder
   if isdirectory('~/.config/vim/extra/fzf')
     Plug '~/.config/vim/extra/fzf' | Plug 'junegunn/fzf.vim'
@@ -595,6 +602,102 @@ if !has('ideavim')
   nmap gh <Plug>(GitGutterStageHunk)
   nmap gH <Plug>(GitGutterUndoHunk)
 
+  " ── Key guide (vim-which-key, the mini.clue counterpart) ────────────
+  " Vim mappings carry no description, so the labels live here. Group
+  " names match mini.clue's in config/nvim/init.lua and each label is the
+  " desc of the same key in keymaps.lua. A key must be either a command
+  " or a group prefix, never both, or the guide cannot reach the command.
+  let g:which_key_map = {
+        \ 'f': 'Find Files',
+        \ ',': 'Find existing buffers',
+        \ 'b': {'name': '+Buffers',
+        \   'a': 'Close all except current', 'd': 'Delete buf',
+        \   'h': 'Prev buf', 'j': 'First buf', 'k': 'Last buf',
+        \   'l': 'Next buf', 'n': 'New buf', 'w': 'Wipeout'},
+        \ 'c': {'name': '+Code',
+        \   'c': {'name': '+Calls', 'i': 'Incoming calls', 'o': 'Outgoing calls'},
+        \   'd': 'Definitions', 'f': 'Format', 'i': 'Implementations',
+        \   'p': 'Type Definition', 'r': 'Rename file',
+        \   's': 'LSP Document Symbols',
+        \   'w': {'name': '+Workspace', 's': 'Workspace Symbols'}},
+        \ 'p': {'name': '+Pack', 'p': 'Open plugin manager',
+        \   'c': {'name': '+PHP CS Fixer', 'f': 'Fix file', 'd': 'Fix directory'}},
+        \ 'q': {'name': '+Quit',
+        \   'f': 'Quicker close split', 'q': 'Quit with force saving',
+        \   'w': 'Write and quit', 'Q': 'Force quit without saving'},
+        \ 's': {'name': '+Search',
+        \   'd': 'Search Diagnostics', 'f': 'Grep String', 'g': 'Live Grep',
+        \   'h': 'Help tags', 'k': 'Search Keymaps', 'n': 'Message History',
+        \   'o': 'Old Files', 'q': 'Quickfix', 's': 'Search Buffer Lines'},
+        \ 't': {'name': '+Toggle',
+        \   'e': 'File Explorer (cwd)', 'f': 'Toggle autoformat on save',
+        \   'l': 'Toggle Light/Dark Mode', 't': 'Toggle Terminal',
+        \   'm': {'name': '+Toggle Options',
+        \     'c': 'Toggle cursorline', 'C': 'Toggle cursorcolumn',
+        \     'd': 'Toggle diagnostics', 'h': 'Toggle hlsearch',
+        \     'l': 'Toggle list', 'n': 'Toggle number',
+        \     'r': 'Toggle relativenumber', 's': 'Toggle spell',
+        \     'w': 'Toggle wrap'}},
+        \ 'x': {'name': '+Trouble',
+        \   'l': 'Location List', 'q': 'Quickfix', 'x': 'Diagnostics'},
+        \ 'g': {'name': '+Git',
+        \   'a': 'Stage file', 'b': 'Blame', 'c': 'Commit', 'd': 'Diff split',
+        \   'l': 'Pull', 'p': 'Push', 'r': 'Remove file', 's': 'Status'},
+        \ 'h': 'Horizontal split',
+        \ 'v': 'Vertical split',
+        \ 'o': 'Open line on GitHub',
+        \ 'r': 'Tab edit in file dir',
+        \ 'y': 'Command history',
+        \ '.': 'cd to file dir',
+        \ 'K': 'Man page for word',
+        \ }
+
+  " Register only when the plugin is on disk: which_key#register is an
+  " autoload function, and before :PlugInstall has run it does not exist.
+  if isdirectory(get(get(g:, 'plugs', {}), 'vim-which-key', {'dir': ''}).dir)
+    call which_key#register('<Space>', 'g:which_key_map')
+    nnoremap <silent> <leader> :<C-u>WhichKey '<Space>'<CR>
+
+    " Visual <leader>: the only visual leader key nvim has is <leader>cf.
+    let g:which_key_map_visual = {'c': {'name': '+Code', 'f': 'Format'}}
+    call which_key#register('<Space>', 'g:which_key_map_visual', 'v')
+    xnoremap <silent> <leader> :<C-u>WhichKeyVisual '<Space>'<CR>
+
+    " g / z / <C-w>, as mini.clue's triggers. Built-in labels come from
+    " config/vim/autoload/miniclue.vim, generated from mini.clue itself by
+    " scripts/generate-vim-clues.py; the extends below add this config's own
+    " keys on top. A key the dictionary does not list runs as the native
+    " command (gg, zz, <C-w>w ...), keeping the count and register.
+    let g:which_key_fallback_to_native_key = 1
+
+    let g:which_key_map_g = extend(miniclue#get('g', 'n'), {
+          \ 'h': 'Stage hunk', 'H': 'Undo hunk',
+          \ 'O': 'Document symbols',
+          \ 'r': {'name': '+LSP', 'n': 'Rename', 'a': 'Code action',
+          \   'r': 'References', 'i': 'Implementation', 't': 'Type definition'},
+          \ })
+    let g:which_key_map_g_visual = extend(miniclue#get('g', 'x'), {
+          \ 'r': {'name': '+LSP', 'a': 'Code action'},
+          \ })
+    let g:which_key_map_z = miniclue#get('z', 'n')
+    let g:which_key_map_z_visual = miniclue#get('z', 'x')
+    " The resize keys are this config's own (keymaps.lua "Splits").
+    let g:which_key_map_ctrl_w = extend(miniclue#get('windows', 'n'), {
+          \ ',': 'V Resize -', '.': 'V Resize +',
+          \ '-': 'H Resize -', '+': 'H Resize +',
+          \ })
+
+    call which_key#register('g', 'g:which_key_map_g')
+    call which_key#register('g', 'g:which_key_map_g_visual', 'v')
+    call which_key#register('z', 'g:which_key_map_z')
+    call which_key#register('z', 'g:which_key_map_z_visual', 'v')
+    call which_key#register('<C-W>', 'g:which_key_map_ctrl_w')
+    nnoremap <silent> g :<C-u>WhichKey 'g'<CR>
+    xnoremap <silent> g :<C-u>WhichKeyVisual 'g'<CR>
+    nnoremap <silent> z :<C-u>WhichKey 'z'<CR>
+    xnoremap <silent> z :<C-u>WhichKeyVisual 'z'<CR>
+    nnoremap <silent> <C-w> :<C-u>WhichKey '<C-W>'<CR>
+  endif
 endif
 
 "*****************************************************************************
