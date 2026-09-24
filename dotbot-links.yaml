@@ -76,10 +76,16 @@
       # env var (BAT_THEME, GH_DASH_CONFIG, TELEVISION_CONFIG, …), so their
       # config dirs are plain symlinks. The remaining excludes are 1Password's
       # split sub-paths (below) and cosmic-desktop's runtime-written state.
+      # herdr is excluded because a whole-directory symlink puts its state in
+      # the repo: ~400 MB of managed plugin checkouts under plugins/github/,
+      # two live unix sockets, growing *.log files, plus plugins.json and
+      # session.json, which record absolute paths and never transfer between
+      # machines. Only the portable files are linked individually below.
       exclude:
         - config/op
         - config/cosmic-desktop
         - config/mise
+        - config/herdr
     # Claude Code statusline (single file — see base/claude exclude above)
     ~/.claude/statusline-command.sh:
       relink: true
@@ -91,6 +97,20 @@
       relink: true
       force: true
       path: config/mise
+    # herdr: file-level links so ~/.config/herdr stays a real directory that
+    # herdr owns (see the config/* exclude above). force, because herdr writes
+    # these files itself on first run and relink alone will not replace a real
+    # file. Plugin *config* is portable; plugin checkouts and state are not —
+    # scripts/install-herdr-plugins.sh reinstalls those per machine.
+    ~/.config/herdr/config.toml:
+      force: true
+      path: config/herdr/config.toml
+    ~/.config/herdr/plugins/config/herdr-navigator/config.toml:
+      force: true
+      path: config/herdr/plugins/config/herdr-navigator/config.toml
+    ~/.config/herdr/plugins/config/sessionizer/config.toml:
+      force: true
+      path: config/herdr/plugins/config/sessionizer/config.toml
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true
