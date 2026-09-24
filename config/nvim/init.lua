@@ -56,6 +56,7 @@ vim.pack.add {
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
+  'https://github.com/ray-x/lsp_signature.nvim',
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
@@ -378,6 +379,12 @@ require('mason-tool-installer').setup {
 -- mason-lspconfig (above) auto-enables all mason-installed servers.
 -- Enable mise-managed servers that mason cannot see.
 vim.lsp.enable { 'fish_lsp', 'taplo', 'zizmor' }
+
+-- lsp_signature
+require('lsp_signature').setup {
+  hint_enable = false,
+  padding = ' ',
+}
 
 -- ── Navigation ───────────────────────────────────────────────────────
 -- Fuzzy finding is handled by snacks.nvim (below).

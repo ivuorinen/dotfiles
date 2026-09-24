@@ -16,6 +16,10 @@
       "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"
     },
+    "lsp_signature.nvim": {
+      "rev": "1997451c4c9956a1380d8bea4b0e33ebdf07976e",
+      "src": "https://github.com/ray-x/lsp_signature.nvim"
+    },
     "mason-conform.nvim": {
       "rev": "48da2ebd5efbaf8a99566eadc3ece82d523f03c5",
       "src": "https://github.com/zapling/mason-conform.nvim"
