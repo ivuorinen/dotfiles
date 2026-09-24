@@ -22,12 +22,29 @@ state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 _atomic_write "$state_dir/bat-theme" "$theme"
 
 # Custom themes are only picked up after `bat cache --build`. Build lazily
-# when the cache is missing so we don't re-syntect on every flip. A bat-less
+# when the cache is missing, or when a *.tmTheme is newer than it, so
+# we don't re-syntect on every flip. Without the mtime check, editing a
+# theme (for example the AA-darkened Latte) never reaches bat on a host
+# whose cache already exists. A bat-less
 # host (or a transient build error) must not poison the orchestrator's
 # parallel-handler aggregation, so failures are silenced.
 if command -v bat > /dev/null 2>&1; then
   cache_dir="$(bat --cache-dir 2> /dev/null || true)"
-  if [[ -n "$cache_dir" && ! -f "$cache_dir/themes.bin" ]]; then
-    bat cache --build > /dev/null 2>&1 || true
+  config_dir="$(bat --config-dir 2> /dev/null || true)"
+  if [[ -n "$cache_dir" ]]; then
+    stale=0
+    if [[ ! -f "$cache_dir/themes.bin" ]]; then
+      stale=1
+    elif [[ -n "$config_dir" && -d "$config_dir/themes" ]]; then
+      for tm in "$config_dir/themes"/*.tmTheme; do
+        if [[ "$tm" -nt "$cache_dir/themes.bin" ]]; then
+          stale=1
+          break
+        fi
+      done
+    fi
+    if ((stale)); then
+      bat cache --build > /dev/null 2>&1 || true
+    fi
   fi
 fi
