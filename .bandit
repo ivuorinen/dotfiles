@@ -1,0 +1,10 @@
+# Stub INI so `yarn lint:bandit` can pass `--ini .bandit`. The settings live
+# in pyproject.toml [tool.bandit]; keep this file free of options.
+#
+# Without --ini, `bandit -r .` walks the whole target tree for `.bandit`
+# files before scanning, and that walk ignores exclude_dirs. vim-plug's
+# checkout carries ALE's test fixture
+# config/vim/plugged/ale/test/test-files/python/with_bandit/.bandit, which
+# bandit then loads as this project's config (a warning today; a second
+# `.bandit` anywhere makes bandit exit 2). An explicit --ini skips the walk.
+[bandit]
