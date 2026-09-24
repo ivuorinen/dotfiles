@@ -27,6 +27,12 @@ let g:vim_bootstrap_frams = "vuejs"
 " ale
 let g:ale_fixers = {}
 let g:ale_linters = { "python": [ "flake8" ] }
+" markdownlint_cli is replaced by ale_linters/markdown/markdownlint_root.vim,
+" which runs from the project root so .markdownlintignore applies.
+" markdownlint_cli2 (nvim's mason copy, reachable through $PATH) never reads
+" .markdownlintignore, so it would flag ignored files like graphify-out/.
+let g:ale_linters_ignore = { "markdown": [ "markdownlint_cli", "markdownlint_cli2" ] }
+
 
 if !filereadable(vimplug_exists)
   if !executable(curl_exists)
