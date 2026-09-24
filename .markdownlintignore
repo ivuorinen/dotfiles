@@ -12,5 +12,8 @@ local/bin/asdf/*
 local/md/*
 node_modules/*
 tools/*
+# Symlink to the repo root left by a local CodeQL run; linting through it
+# re-lints the whole tree, submodules included.
+_codeql_detected_source_root/**
 # Code-review export pasted from GitHub PR comments — not authored here.
 cr.md

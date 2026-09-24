@@ -145,3 +145,9 @@ mise.lock
 # Per-tool install locks (aube-lock.yaml, uv.lock) mise writes for npm: and
 # pipx: tools. Generated on install for the same reason as mise.lock above.
 .mise/
+
+# Local CodeQL runs: x-codeql writes codeql-<lang>.sarif to the working
+# directory, and the CLI leaves a symlink to the source root. No trailing
+# slash — git sees the symlink as a file, so `dir/` would not match it.
+codeql-*.sarif
+/_codeql_detected_source_root
