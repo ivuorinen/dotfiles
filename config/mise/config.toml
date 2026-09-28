@@ -143,7 +143,7 @@ hadolint = "2.15.1"
 # and it builds from source against the go entry pinned above.
 "github:mvdan/gofumpt" = "0.12.0"
 "github:segmentio/golines" = "0.13.0"
-"github:mgechev/revive" = "1.16.0"
+"github:mgechev/revive" = "1.17.0"
 "go:github.com/fzipp/gocyclo/cmd/gocyclo" = "0.6.0"
 golangci-lint = "2.13.2"
 
