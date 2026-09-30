@@ -1,0 +1,19 @@
+# Kanagawa Wave — derived from ../../catppuccin/dark/gh-dash.theme.yml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+---
+theme:
+  colors:
+    text:
+      primary: "#dcd7ba"
+      secondary: "#957fb8"
+      inverted: "#16161d"
+      faint: "#c8c093"
+      warning: "#e6c384"
+      success: "#98bb6c"
+      error: "#e46876"
+    background:
+      selected: "#2a2a37"
+    border:
+      primary: "#957fb8"
+      secondary: "#363646"
+      faint: "#2a2a37"

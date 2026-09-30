@@ -1,0 +1,290 @@
+# Kanagawa Wave — derived from ../../catppuccin/dark/dircolors by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# Source: derived from catppuccin/eza green variant (mocha flavor).
+# Extension layout originally from https://github.com/joshjon/bliss-dircolors
+# (MIT). Palette remapped to catppuccin truecolor on 2026-04-27 so `ls`
+# and `eza` agree on file/category colors.
+#
+# Truecolor (38;2;R;G;B) requires GNU coreutils >= 8.30 and a terminal
+# that advertises 24-bit colour. On macOS use `gdircolors` (Homebrew
+# coreutils). Modern terminals (WezTerm, iTerm2, Alacritty, Kitty,
+# Linux GUI emulators) all support it.
+
+# Term Section
+TERM Eterm
+TERM ansi
+TERM color-xterm
+TERM con132x25
+TERM con132x30
+TERM con132x43
+TERM con132x60
+TERM con80x25
+TERM con80x28
+TERM con80x30
+TERM con80x43
+TERM con80x50
+TERM con80x60
+TERM cons25
+TERM console
+TERM cygwin
+TERM dtterm
+TERM dvtm
+TERM dvtm-256color
+TERM eterm-color
+TERM fbterm
+TERM gnome
+TERM gnome-256color
+TERM jfbterm
+TERM konsole
+TERM konsole-256color
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mach-color
+TERM mlterm
+TERM putty
+TERM putty-256color
+TERM rxvt
+TERM rxvt-256color
+TERM rxvt-cygwin
+TERM rxvt-cygwin-native
+TERM rxvt-unicode
+TERM rxvt-unicode256
+TERM rxvt-unicode-256color
+TERM screen
+TERM screen-16color
+TERM screen-16color-bce
+TERM screen-16color-s
+TERM screen-16color-bce-s
+TERM screen-256color
+TERM screen-256color-bce
+TERM screen-256color-s
+TERM screen-256color-bce-s
+TERM screen-256color-italic
+TERM screen-bce
+TERM screen-w
+TERM screen.linux
+TERM screen.xterm-256color
+TERM st
+TERM st-meta
+TERM st-256color
+TERM st-meta-256color
+TERM tmux
+TERM tmux-256color
+TERM vt100
+TERM xterm
+TERM xterm-16color
+TERM xterm-256color
+TERM xterm-256color-italic
+TERM xterm-88color
+TERM xterm-color
+TERM xterm-debian
+TERM xterm-termite
+
+## Kanagawa Wave (green accent) reference
+#  text       205;214;244  subtext1 186;194;222  overlay1 127;132;156
+#  green      166;227;161  blue     137;180;250  teal     148;226;213
+#  maroon     235;160;172  red      243;139;168  yellow   249;226;175
+#  mauve      203;166;247  pink     245;194;231  sapphire 116;199;236
+
+## Global defaults
+
+NORMAL 00  # no color
+RESET  0   # reset to "normal" color
+
+FILE 00                                       # normal (terminal default fg)
+DIR  38;2;152;187;108;01                      # green (eza directory), bold
+LINK 38;2;126;156;216                         # blue (eza symlink)
+MULTIHARDLINK 04;38;2;126;156;216             # blue, underscore
+
+FIFO 38;2;200;192;147                         # subtext1 (eza pipe)
+SOCK 38;2;200;192;147                         # subtext1 (eza socket)
+DOOR 38;2;200;192;147                         # subtext1
+BLK  38;2;255;93;98;04                      # maroon (eza block_device), underscore
+CHR  38;2;255;93;98;01                      # maroon (eza char_device), bold
+
+EXEC 38;2;152;187;108;01                      # green (eza executable), bold
+
+OTHER_WRITABLE        38;2;113;124;124        # overlay1 (eza file_type.crypto)
+STICKY                38;2;122;168;159        # teal (eza mount_point)
+STICKY_OTHER_WRITABLE 38;2;122;168;159        # teal
+
+ORPHAN 38;2;228;104;118;01                    # red (eza broken_symlink), bold
+SETUID 38;2;149;127;184;04                    # mauve (eza perms.special_user_file)
+SETGID 38;2;149;127;184;04                    # mauve
+
+# Unable to test capability on macOS
+CAPABILITY 00
+
+## Archive or compressed - pink (eza file_type.compressed), bold
+.tar   38;2;210;126;153;01
+.tgz   38;2;210;126;153;01
+.arj   38;2;210;126;153;01
+.taz   38;2;210;126;153;01
+.lzh   38;2;210;126;153;01
+.lzma  38;2;210;126;153;01
+.tlz   38;2;210;126;153;01
+.txz   38;2;210;126;153;01
+.zip   38;2;210;126;153;01
+.z     38;2;210;126;153;01
+.Z     38;2;210;126;153;01
+.dz    38;2;210;126;153;01
+.gz    38;2;210;126;153;01
+.lz    38;2;210;126;153;01
+.xz    38;2;210;126;153;01
+.bz2   38;2;210;126;153;01
+.bz    38;2;210;126;153;01
+.tbz   38;2;210;126;153;01
+.tbz2  38;2;210;126;153;01
+.tz    38;2;210;126;153;01
+.deb   38;2;210;126;153;01
+.rpm   38;2;210;126;153;01
+.jar   38;2;210;126;153;01
+.rar   38;2;210;126;153;01
+.ace   38;2;210;126;153;01
+.zoo   38;2;210;126;153;01
+.cpio  38;2;210;126;153;01
+.7z    38;2;210;126;153;01
+.rz    38;2;210;126;153;01
+.apk   38;2;210;126;153;01
+.gem   38;2;210;126;153;01
+
+# General file - normal (terminal default; eza file_type.document is text-colored)
+.tex             00
+.rdf             00
+.owl             00
+.n3              00
+.ttl             00
+.nt              00
+.torrent         00
+.xml             00
+*Makefile        00
+*Rakefile        00
+*Dockerfile      00
+*build.xml       00
+*rc              00
+*1               00
+.nfo             00
+*README          00
+*README.txt      00
+*readme.txt      00
+.md              00
+*README.markdown 00
+.ini             00
+.yml             00
+.cfg             00
+.conf            00
+.h               00
+.hpp             00
+.c               00
+.cpp             00
+.cxx             00
+.cc              00
+.objc            00
+.sqlite          00
+.go              00
+.sql             00
+.csv             00
+
+# Image file - yellow (eza file_type.image)
+.jpg   38;2;230;195;132
+.JPG   38;2;230;195;132
+.jpeg  38;2;230;195;132
+.gif   38;2;230;195;132
+.bmp   38;2;230;195;132
+.pbm   38;2;230;195;132
+.pgm   38;2;230;195;132
+.ppm   38;2;230;195;132
+.tga   38;2;230;195;132
+.xbm   38;2;230;195;132
+.xpm   38;2;230;195;132
+.tif   38;2;230;195;132
+.tiff  38;2;230;195;132
+.png   38;2;230;195;132
+.PNG   38;2;230;195;132
+.svg   38;2;230;195;132
+.svgz  38;2;230;195;132
+.mng   38;2;230;195;132
+.pcx   38;2;230;195;132
+.dl    38;2;230;195;132
+.xcf   38;2;230;195;132
+.xwd   38;2;230;195;132
+.yuv   38;2;230;195;132
+.cgm   38;2;230;195;132
+.emf   38;2;230;195;132
+.eps   38;2;230;195;132
+.CR2   38;2;230;195;132
+.ico   38;2;230;195;132
+
+# Audio file - green (eza file_type.music)
+.aac   38;2;152;187;108
+.au    38;2;152;187;108
+.flac  38;2;152;187;108
+.mid   38;2;152;187;108
+.midi  38;2;152;187;108
+.mka   38;2;152;187;108
+.mp3   38;2;152;187;108
+.mpc   38;2;152;187;108
+.ogg   38;2;152;187;108
+.opus  38;2;152;187;108
+.ra    38;2;152;187;108
+.wav   38;2;152;187;108
+.m4a   38;2;152;187;108
+.axa   38;2;152;187;108
+.oga   38;2;152;187;108
+.spx   38;2;152;187;108
+.xspf  38;2;152;187;108
+
+# Video file - red (eza file_type.video)
+.mov   38;2;228;104;118
+.MOV   38;2;228;104;118
+.mpg   38;2;228;104;118
+.mpeg  38;2;228;104;118
+.m2v   38;2;228;104;118
+.mkv   38;2;228;104;118
+.ogm   38;2;228;104;118
+.mp4   38;2;228;104;118
+.m4v   38;2;228;104;118
+.mp4v  38;2;228;104;118
+.vob   38;2;228;104;118
+.qt    38;2;228;104;118
+.nuv   38;2;228;104;118
+.wmv   38;2;228;104;118
+.asf   38;2;228;104;118
+.rm    38;2;228;104;118
+.rmvb  38;2;228;104;118
+.flc   38;2;228;104;118
+.avi   38;2;228;104;118
+.fli   38;2;228;104;118
+.flv   38;2;228;104;118
+.gl    38;2;228;104;118
+.m2ts  38;2;228;104;118
+.divx  38;2;228;104;118
+.webm  38;2;228;104;118
+.axv   38;2;228;104;118
+.anx   38;2;228;104;118
+.ogv   38;2;228;104;118
+.ogx   38;2;228;104;118
+
+# 'unimportant' file e.g. logs and backups - overlay1 (muted, matches eza git.ignored)
+.log         38;2;113;124;124
+.bak         38;2;113;124;124
+.aux         38;2;113;124;124
+.lof         38;2;113;124;124
+.lol         38;2;113;124;124
+.lot         38;2;113;124;124
+.out         38;2;113;124;124
+.toc         38;2;113;124;124
+.bbl         38;2;113;124;124
+.blg         38;2;113;124;124
+*~           38;2;113;124;124
+*#           38;2;113;124;124
+.part        38;2;113;124;124
+.incomplete  38;2;113;124;124
+.swp         38;2;113;124;124
+.tmp         38;2;113;124;124
+.temp        38;2;113;124;124
+.o           38;2;113;124;124
+.pyc         38;2;113;124;124
+.class       38;2;113;124;124
+.cache       38;2;113;124;124

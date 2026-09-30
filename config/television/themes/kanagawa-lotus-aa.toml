@@ -1,0 +1,26 @@
+# Kanagawa Lotus AA — derived from catppuccin-latte-mauve.toml by the colour-role map
+# in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# general
+background = '#f2ecbc'
+border_fg = '#d5cea3'
+text_fg = '#545464'
+dimmed_text_fg = '#88877e'
+# input
+input_text_fg = '#624c83'
+result_count_fg = '#624c83'
+# results
+# accents AA-darkened (4.5:1 on #f2ecbc); mapping in
+# config/theme/palettes.d/kanagawa/light/starship.toml
+result_name_fg = '#4d699b'
+result_line_number_fg = '#716b3c'
+result_value_fg = '#5d57a3'
+selection_fg = '#5b7040'
+selection_bg = '#e7dba0'
+match_fg = '#5b7040'
+# preview
+preview_title_fg = '#624c83'
+# modes
+channel_mode_fg = '#f2ecbc'
+channel_mode_bg = '#624c83'
+remote_control_mode_fg = '#f2ecbc'
+remote_control_mode_bg = '#5b7040'

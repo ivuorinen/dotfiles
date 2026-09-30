@@ -1,0 +1,6 @@
+# Kanagawa Lotus AA — derived from ../../catppuccin/light/television.toml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# television light palette — Kanagawa Lotus (mauve accent), the Lotus
+# counterpart to dark/television.toml. Appended to base.toml by the handler.
+[ui]
+theme = "kanagawa-lotus-aa.toml"

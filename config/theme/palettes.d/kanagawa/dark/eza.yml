@@ -1,0 +1,107 @@
+# Kanagawa Wave — derived from ../../catppuccin/dark/eza.yml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# Source: catppuccin/eza, mocha flavor, green accent
+# https://github.com/catppuccin/eza (MIT)
+# Vendored on: 2026-04-27
+---
+colourful: true
+
+filekinds:
+  normal: {foreground: "#dcd7ba"}
+  directory: {foreground: "#98bb6c"}
+  symlink: {foreground: "#7e9cd8"}
+  pipe: {foreground: "#c8c093"}
+  block_device: {foreground: "#ff5d62"}
+  char_device: {foreground: "#ff5d62"}
+  socket: {foreground: "#c8c093"}
+  special: {foreground: "#957fb8"}
+  executable: {foreground: "#98bb6c"}
+  mount_point: {foreground: "#7aa89f"}
+
+perms:
+  user_read: {foreground: "#e46876", is_bold: true}
+  user_write: {foreground: "#e6c384", is_bold: true}
+  user_execute_file: {foreground: "#98bb6c", is_bold: true}
+  user_execute_other: {foreground: "#98bb6c", is_bold: true}
+  group_read: {foreground: "#e46876"}
+  group_write: {foreground: "#e6c384"}
+  group_execute: {foreground: "#98bb6c"}
+  other_read: {foreground: "#e46876"}
+  other_write: {foreground: "#e6c384"}
+  other_execute: {foreground: "#98bb6c"}
+  special_user_file: {foreground: "#957fb8"}
+  special_other: {foreground: "#717c7c"}
+  attribute: {foreground: "#938aa9"}
+
+size:
+  major: {foreground: "#a6a69c"}
+  minor: {foreground: "#7fb4ca"}
+  number_byte: {foreground: "#c8c093"}
+  number_kilo: {foreground: "#a6a69c"}
+  number_mega: {foreground: "#7e9cd8"}
+  number_giga: {foreground: "#957fb8"}
+  number_huge: {foreground: "#957fb8"}
+  unit_byte: {foreground: "#a6a69c"}
+  unit_kilo: {foreground: "#7fb4ca"}
+  unit_mega: {foreground: "#957fb8"}
+  unit_giga: {foreground: "#957fb8"}
+  unit_huge: {foreground: "#7aa89f"}
+
+users:
+  user_you: {foreground: "#dcd7ba"}
+  user_root: {foreground: "#e46876"}
+  user_other: {foreground: "#ff5d62"}
+  group_yours: {foreground: "#a6a69c"}
+  group_other: {foreground: "#938aa9"}
+  group_root: {foreground: "#e46876"}
+
+links:
+  normal: {foreground: "#7e9cd8"}
+  multi_link_file: {foreground: "#7e9cd8"}
+
+git:
+  new: {foreground: "#98bb6c"}
+  modified: {foreground: "#e6c384"}
+  deleted: {foreground: "#ff5d62"}
+  renamed: {foreground: "#7aa89f"}
+  typechange: {foreground: "#d27e99"}
+  ignored: {foreground: "#717c7c"}
+  conflicted: {foreground: "#ffa066"}
+
+git_repo:
+  branch_main: {foreground: "#a6a69c"}
+  branch_other: {foreground: "#957fb8"}
+  git_clean: {foreground: "#98bb6c"}
+  git_dirty: {foreground: "#ff5d62"}
+
+security_context:
+  colon: {foreground: "#727169"}
+  user: {foreground: "#717c7c"}
+  role: {foreground: "#957fb8"}
+  typ: {foreground: "#54546d"}
+  range: {foreground: "#957fb8"}
+
+file_type:
+  image: {foreground: "#e6c384"}
+  video: {foreground: "#e46876"}
+  music: {foreground: "#98bb6c"}
+  lossless: {foreground: "#7aa89f"}
+  crypto: {foreground: "#717c7c"}
+  document: {foreground: "#dcd7ba"}
+  compressed: {foreground: "#d27e99"}
+  temp: {foreground: "#ff5d62"}
+  compiled: {foreground: "#a3d4d5"}
+  source: {foreground: "#7e9cd8"}
+
+punctuation: {foreground: "#727169"}
+date: {foreground: "#e6c384"}
+inode: {foreground: "#a6a69c"}
+blocks: {foreground: "#727169"}
+header: {foreground: "#dcd7ba"}
+octal: {foreground: "#7aa89f"}
+flags: {foreground: "#957fb8"}
+
+symlink_path: {foreground: "#7fb4ca"}
+control_char: {foreground: "#a3d4d5"}
+broken_symlink: {foreground: "#e46876"}
+broken_path_overlay: {foreground: "#54546d"}

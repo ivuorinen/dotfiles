@@ -1,0 +1,24 @@
+# Kanagawa Wave — derived from catppuccin-mocha-mauve.toml by the colour-role map
+# in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# general
+background = '#1f1f28'
+border_fg = '#363646'
+text_fg = '#dcd7ba'
+dimmed_text_fg = '#727169'
+# input
+input_text_fg = '#957fb8'
+result_count_fg = '#957fb8'
+# results
+result_name_fg = '#7e9cd8'
+result_line_number_fg = '#e6c384'
+result_value_fg = '#9cabca'
+selection_fg = '#98bb6c'
+selection_bg = '#2a2a37'
+match_fg = '#98bb6c'
+# preview
+preview_title_fg = '#957fb8'
+# modes
+channel_mode_fg = '#1f1f28'
+channel_mode_bg = '#957fb8'
+remote_control_mode_fg = '#1f1f28'
+remote_control_mode_bg = '#98bb6c'

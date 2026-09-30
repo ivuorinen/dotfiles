@@ -1,0 +1,25 @@
+// Kanagawa Lotus AA — derived from ../../catppuccin/light/gitui.ron by the
+// colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+(
+    selected_tab: Some("Reset"),
+    command_fg: Some("#545464"),
+    selection_bg: Some("#a09cac"),
+    selection_fg: Some("#545464"),
+    cmdbar_bg: Some("#e5ddb0"),
+    cmdbar_extra_lines_bg: Some("#e5ddb0"),
+    disabled_fg: Some("#716e61"),
+    diff_line_add: Some("#5b7040"),
+    diff_line_delete: Some("#c0374a"),
+    diff_file_added: Some("#5b7040"),
+    diff_file_removed: Some("#c92c30"),
+    diff_file_moved: Some("#624c83"),
+    diff_file_modified: Some("#a15600"),
+    commit_hash: Some("#5d57a3"),
+    commit_time: Some("#43436c"),
+    commit_author: Some("#536e7b"),
+    danger_fg: Some("#c0374a"),
+    push_gauge_bg: Some("#4d699b"),
+    push_gauge_fg: Some("#f2ecbc"),
+    tag_fg: Some("#9a5b00"),
+    branch_fg: Some("#51706b")
+)

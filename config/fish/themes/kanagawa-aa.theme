@@ -1,0 +1,96 @@
+# name: 'kanagawa-aa'
+# Repo-owned. [dark] and [unknown] are Kanagawa Wave: upstream
+# rebelot/kanagawa.nvim extras/fish/kanagawa.fish for the keys it sets
+# (error lifted from autumnRed c34043, 3.22:1, to cf6769, 4.51:1 on 1f1f28),
+# the rest mapped from catppuccin-aa.theme by the colour-role map in
+# docs/plans/2026-09-30-kanagawa-theme-families.md. [light] is
+# Kanagawa Lotus mapped slot-by-slot from Wave (upstream themes.lua) with
+# every foreground darkened to WCAG AA 4.5:1 on f2ecbc; comments and
+# autosuggestions use the muted overlay0 (3:1).
+
+[light]
+# preferred_background: f2ecbc
+fish_color_normal 545464
+fish_color_command 4f7067
+fish_color_param 624c83
+fish_color_keyword a54c6b
+fish_color_quote 7a6745
+fish_color_redirection 545464
+fish_color_end a15600
+fish_color_comment 88877e
+fish_color_error c0374a
+fish_color_gray 88877e
+fish_color_selection --background=b5cbd2
+fish_color_search_match --background=b5cbd2
+fish_color_option 5b7040
+fish_color_operator 5b7040
+fish_color_escape a54c6b
+fish_color_autosuggestion 88877e
+fish_color_cancel c0374a
+fish_color_cwd 716b3c
+fish_color_user 4f7067
+fish_color_host 4d699b
+fish_color_host_remote 5b7040
+fish_color_status c0374a
+fish_pager_color_progress 88877e
+fish_pager_color_prefix 4f7067
+fish_pager_color_completion 545464
+fish_pager_color_description 88877e
+
+[dark]
+# preferred_background: 1f1f28
+fish_color_normal dcd7ba
+fish_color_command 7aa89f
+fish_color_param 957fb8
+fish_color_keyword d27e99
+fish_color_quote c0a36e
+fish_color_redirection dcd7ba
+fish_color_end ffa066
+fish_color_comment 727169
+fish_color_error cf6769
+fish_color_gray 727169
+fish_color_selection --background=2d4f67
+fish_color_search_match --background=2d4f67
+fish_color_option 98bb6c
+fish_color_operator 76946a
+fish_color_escape d27e99
+fish_color_autosuggestion 727169
+fish_color_cancel e46876
+fish_color_cwd e6c384
+fish_color_user 7aa89f
+fish_color_host 7e9cd8
+fish_color_host_remote 98bb6c
+fish_color_status e46876
+fish_pager_color_progress 727169
+fish_pager_color_prefix 7aa89f
+fish_pager_color_completion dcd7ba
+fish_pager_color_description 727169
+
+[unknown]
+# preferred_background: 1f1f28
+fish_color_normal dcd7ba
+fish_color_command 7aa89f
+fish_color_param 957fb8
+fish_color_keyword d27e99
+fish_color_quote c0a36e
+fish_color_redirection dcd7ba
+fish_color_end ffa066
+fish_color_comment 727169
+fish_color_error cf6769
+fish_color_gray 727169
+fish_color_selection --background=2d4f67
+fish_color_search_match --background=2d4f67
+fish_color_option 98bb6c
+fish_color_operator 76946a
+fish_color_escape d27e99
+fish_color_autosuggestion 727169
+fish_color_cancel e46876
+fish_color_cwd e6c384
+fish_color_user 7aa89f
+fish_color_host 7e9cd8
+fish_color_host_remote 98bb6c
+fish_color_status e46876
+fish_pager_color_progress 727169
+fish_pager_color_prefix 7aa89f
+fish_pager_color_completion dcd7ba
+fish_pager_color_description 727169
