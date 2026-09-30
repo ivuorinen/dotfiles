@@ -53,13 +53,43 @@ fish_theme_name()
 
 # --- vim --------------------------------------------------------------
 
+# vim_colors <family> [ex-command...] — run the real vimrc headless and print
+# g:colors_name. Two things keep the result deterministic:
+#  - HOME is a temp dir holding a no-op vim-plug stub. Without plug.vim the
+#    vimrc bootstraps it with curl (whose progress meter lands on stdout) and
+#    runs PlugInstall on VimEnter, so the first vim test on a fresh machine
+#    both hit the network and failed on the garbled output — only in CI.
+#  - The name is written to a file with writefile(), never scraped from
+#    stdout, so any message the vimrc prints cannot leak into the value.
+vim_colors()
+{
+  local family=$1
+  shift
+  local home="$TMPDIR_TEST/home" out="$TMPDIR_TEST/colors_name"
+  mkdir -p "$home/.config/vim/autoload"
+  cat > "$home/.config/vim/autoload/plug.vim" << 'VIM'
+function! plug#begin(...) abort
+endfunction
+function! plug#end() abort
+endfunction
+command! -nargs=+ -bar Plug :
+VIM
+  rm -f "$out"
+  local cmds=()
+  local c
+  for c in "$@"; do cmds+=("+$c"); done
+  HOME="$home" XDG_STATE_HOME="$TMPDIR_TEST" DOTFILES_THEME_FAMILY="$family" timeout 30 \
+    vim -Nu "$ROOT/config/vim/vimrc" -i NONE -es --cmd "set rtp^=$ROOT/config/vim" \
+    "${cmds[@]}" "+call writefile([get(g:, 'colors_name', 'UNSET')], '$out')" '+qa!' \
+    > /dev/null 2>&1
+  cat "$out" 2> /dev/null || echo "vim exited without writing a colors_name"
+}
+
 # vim_scheme <mode> [family] — g:colors_name after vimrc applies the mode.
 vim_scheme()
 {
   echo "$1" > "$TMPDIR_TEST/dotfiles-theme/mode"
-  XDG_STATE_HOME="$TMPDIR_TEST" DOTFILES_THEME_FAMILY="${2:-}" timeout 30 \
-    vim -Nu "$ROOT/config/vim/vimrc" -i NONE -es --cmd "set rtp^=$ROOT/config/vim" \
-    '+redir! > /dev/stdout' '+echo g:colors_name' '+redir END' '+qa!' 2>&1 | tr -d '\r\n '
+  vim_colors "${2:-}"
 }
 
 @test "vim: kanagawa maps dark/light to wave/lotus" {
@@ -85,10 +115,7 @@ vim_scheme()
   # Start on kanagawa, switch the family, and let the 3 s timer fire
   # (:sleep processes timers). Before the fix the mode-only change check
   # left the session on the old family forever.
-  run bash -c "XDG_STATE_HOME='$TMPDIR_TEST' DOTFILES_THEME_FAMILY=kanagawa timeout 30 \
-    vim -Nu '$ROOT/config/vim/vimrc' -i NONE -es --cmd 'set rtp^=$ROOT/config/vim' \
-    '+let \$DOTFILES_THEME_FAMILY = \"catppuccin\"' '+sleep 4' \
-    '+redir! > /dev/stdout' '+echo g:colors_name' '+redir END' '+qa!' 2>&1 | tr -d '\r\n '"
+  run vim_colors kanagawa 'let $DOTFILES_THEME_FAMILY = "catppuccin"' 'sleep 4'
   [ "$output" = "catppuccin_mocha" ]
 }
 
