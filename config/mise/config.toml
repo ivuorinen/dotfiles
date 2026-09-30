@@ -95,7 +95,7 @@ difftastic = "0.71.0"
 "github:dotzero/git-profile" = "1.9.1"      # ships macOS-all universal binary
 "github:max-sixty/worktrunk" = "0.79.0"
 "npm:github-release-notes" = "0.17.3"
-"github:shhac/git-hunk" = "0.18.1"
+"github:shhac/git-hunk" = "0.20.0"
 "github:modem-dev/hunk" = "0.22.0"
 "github:ivuorinen/gh-history" = "2026.03.0"
 
