@@ -54,6 +54,7 @@ vim.pack.add {
   'https://github.com/ivuorinen/nvim-shellspec',
   'https://github.com/arborist-ts/arborist.nvim',
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
+  { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
   'https://github.com/ray-x/lsp_signature.nvim',
@@ -587,6 +588,56 @@ require('arborist').setup {
 -- Loads after editor setup above (mini.icons must be set up first so
 -- catppuccin can resolve auto_integrations).
 
+-- ── Colorscheme ──────────────────────────────────────────────────────
+-- The theme family comes from config/theme/family (DOTFILES_THEME_FAMILY
+-- overrides it, as in config/theme/_lib.sh). Both families follow
+-- 'background', which auto-dark-mode below flips with the OS.
+local function theme_family()
+  local env = vim.env.DOTFILES_THEME_FAMILY
+  if env and env ~= '' then return env end
+  local dotfiles = vim.env.DOTFILES or (vim.env.HOME .. '/.dotfiles')
+  local ok, lines = pcall(vim.fn.readfile, dotfiles .. '/config/theme/family', '', 1)
+  return ok and lines[1] and vim.trim(lines[1]) or 'catppuccin'
+end
+
+-- ── Kanagawa ─────────────────────────────────────────────────────────
+-- https://github.com/rebelot/kanagawa.nvim
+-- Wave for dark, Lotus for light. Upstream Lotus accents fall to 2.0–4.3:1
+-- on lotusWhite3 #f2ecbc; same hue and saturation, lightness lowered to
+-- reach WCAG AA 4.5:1 (lotusGray3 to 3:1 as the muted comment colour);
+-- mapping in config/theme/palettes.d/kanagawa/light/starship.toml.
+require('kanagawa').setup {
+  dimInactive = true,
+  background = { dark = 'wave', light = 'lotus' },
+  colors = {
+    palette = {
+      lotusGray3 = '#88877e',
+      lotusGreen = '#5b7040',
+      lotusGreen2 = '#56714a',
+      lotusPink = '#a54c6b',
+      lotusOrange = '#a15600',
+      lotusOrange2 = '#9a5b00',
+      lotusYellow = '#716b3c',
+      lotusYellow2 = '#7a6745',
+      lotusYellow3 = '#8d6100',
+      lotusRed = '#c0374a',
+      lotusRed2 = '#c92c30',
+      lotusRed3 = '#d21616',
+      lotusAqua = '#51706b',
+      lotusAqua2 = '#4f7067',
+      lotusTeal1 = '#3e7082',
+      lotusTeal2 = '#406d99',
+      lotusTeal3 = '#536e7b',
+      -- Wave foregrounds below WCAG AA on sumiInk3 #1f1f28, lifted with hue
+      -- and saturation kept: autumnRed (terminal red, diff delete) 3.22:1,
+      -- samuraiRed (errors, diagnostics) 3.66:1, dragonBlue 4.15:1.
+      autumnRed = '#cf6769',
+      samuraiRed = '#ed4f4f',
+      dragonBlue = '#6b8b9a',
+    },
+  },
+}
+
 -- ── Catppuccin ───────────────────────────────────────────────────────
 -- https://github.com/catppuccin/nvim
 require('catppuccin').setup {
@@ -619,7 +670,7 @@ require('catppuccin').setup {
   },
 }
 
-vim.cmd.colorscheme 'catppuccin'
+vim.cmd.colorscheme(theme_family() == 'kanagawa' and 'kanagawa' or 'catppuccin')
 
 -- ── Auto dark mode ───────────────────────────────────────────────────
 -- https://github.com/f-person/auto-dark-mode.nvim
