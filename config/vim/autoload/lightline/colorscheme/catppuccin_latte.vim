@@ -8,7 +8,7 @@
 let s:mauve = [ "#8839EF", 183 ]
 let s:red = [ "#D20F39", 211 ]
 " Accents AA-darkened (4.5:1 on #EFF1F5); mapping in
-" config/theme/palettes.d/starship.light.toml
+" config/theme/palettes.d/catppuccin/light/starship.toml
 let s:yellow = [ "#996114", 223 ]
 let s:teal = [ "#13797E", 152 ]
 let s:blue = [ "#1761F5", 117 ]

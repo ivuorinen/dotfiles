@@ -1,0 +1,111 @@
+# Kanagawa Lotus AA — derived from ../../catppuccin/light/eza.yml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# Source: catppuccin/eza, latte flavor, green accent
+# https://github.com/catppuccin/eza (MIT)
+# Vendored on: 2026-04-27
+# Local change: accents darkened (same HSL hue and saturation) to reach
+# WCAG AA 4.5:1 on base #f2ecbc. Upstream green is 2.96:1 and sky is
+# 2.47:1. Muted greys are left as upstream on purpose, because they mark
+# low-priority fields. The mapping is in light/starship.toml.
+---
+colourful: true
+
+filekinds:
+  normal: {foreground: "#545464"}
+  directory: {foreground: "#5b7040"}
+  symlink: {foreground: "#4d699b"}
+  pipe: {foreground: "#43436c"}
+  block_device: {foreground: "#c92c30"}
+  char_device: {foreground: "#c92c30"}
+  socket: {foreground: "#43436c"}
+  special: {foreground: "#624c83"}
+  executable: {foreground: "#5b7040"}
+  mount_point: {foreground: "#51706b"}
+
+perms:
+  user_read: {foreground: "#c0374a", is_bold: true}
+  user_write: {foreground: "#716b3c", is_bold: true}
+  user_execute_file: {foreground: "#5b7040", is_bold: true}
+  user_execute_other: {foreground: "#5b7040", is_bold: true}
+  group_read: {foreground: "#c0374a"}
+  group_write: {foreground: "#716b3c"}
+  group_execute: {foreground: "#5b7040"}
+  other_read: {foreground: "#c0374a"}
+  other_write: {foreground: "#716b3c"}
+  other_execute: {foreground: "#5b7040"}
+  special_user_file: {foreground: "#624c83"}
+  special_other: {foreground: "#716e61"}
+  attribute: {foreground: "#766b90"}
+
+size:
+  major: {foreground: "#6d6a5e"}
+  minor: {foreground: "#3e7082"}
+  number_byte: {foreground: "#43436c"}
+  number_kilo: {foreground: "#6d6a5e"}
+  number_mega: {foreground: "#4d699b"}
+  number_giga: {foreground: "#624c83"}
+  number_huge: {foreground: "#624c83"}
+  unit_byte: {foreground: "#6d6a5e"}
+  unit_kilo: {foreground: "#3e7082"}
+  unit_mega: {foreground: "#624c83"}
+  unit_giga: {foreground: "#624c83"}
+  unit_huge: {foreground: "#51706b"}
+
+users:
+  user_you: {foreground: "#545464"}
+  user_root: {foreground: "#c0374a"}
+  user_other: {foreground: "#c92c30"}
+  group_yours: {foreground: "#6d6a5e"}
+  group_other: {foreground: "#766b90"}
+  group_root: {foreground: "#c0374a"}
+
+links:
+  normal: {foreground: "#4d699b"}
+  multi_link_file: {foreground: "#4d699b"}
+
+git:
+  new: {foreground: "#5b7040"}
+  modified: {foreground: "#716b3c"}
+  deleted: {foreground: "#c92c30"}
+  renamed: {foreground: "#51706b"}
+  typechange: {foreground: "#a54c6b"}
+  ignored: {foreground: "#716e61"}
+  conflicted: {foreground: "#a15600"}
+
+git_repo:
+  branch_main: {foreground: "#6d6a5e"}
+  branch_other: {foreground: "#624c83"}
+  git_clean: {foreground: "#5b7040"}
+  git_dirty: {foreground: "#c92c30"}
+
+security_context:
+  colon: {foreground: "#88877e"}
+  user: {foreground: "#716e61"}
+  role: {foreground: "#624c83"}
+  typ: {foreground: "#a09cac"}
+  range: {foreground: "#624c83"}
+
+file_type:
+  image: {foreground: "#716b3c"}
+  video: {foreground: "#c0374a"}
+  music: {foreground: "#5b7040"}
+  lossless: {foreground: "#51706b"}
+  crypto: {foreground: "#716e61"}
+  document: {foreground: "#545464"}
+  compressed: {foreground: "#a54c6b"}
+  temp: {foreground: "#c92c30"}
+  compiled: {foreground: "#536e7b"}
+  source: {foreground: "#4d699b"}
+
+punctuation: {foreground: "#88877e"}
+date: {foreground: "#716b3c"}
+inode: {foreground: "#6d6a5e"}
+blocks: {foreground: "#88877e"}
+header: {foreground: "#545464"}
+octal: {foreground: "#51706b"}
+flags: {foreground: "#624c83"}
+
+symlink_path: {foreground: "#3e7082"}
+control_char: {foreground: "#536e7b"}
+broken_symlink: {foreground: "#c0374a"}
+broken_path_overlay: {foreground: "#a09cac"}

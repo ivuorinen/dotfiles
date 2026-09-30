@@ -1,7 +1,9 @@
+# Kanagawa Lotus AA — derived from ../../catppuccin/light/starship.toml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
 # Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
-# theme), Catppuccin Mocha (dark).
+# theme), Kanagawa Lotus (light).
 #
-# Mirror of starship-light.toml with the palette swapped. The dark/light
+# Mirror of dark/starship.toml with the palette swapped. The dark/light
 # variants are kept as separate complete files so the theme orchestrator
 # (config/theme/handlers.d/starship)
 # can switch them via a symlink at ~/.config/starship.toml. Starship reads
@@ -9,7 +11,7 @@
 # effect on the next prompt with no shell-side reload.
 #
 # MAINTAINER NOTE: any non-palette change made here MUST also be applied
-# to starship-light.toml. The two files are intentionally identical except
+# to dark/starship.toml. The two files are intentionally identical except
 # for `palette = "..."` and the [palettes.*] block.
 #
 # Layout: line 1 = OS icon · user@host (SSH only) · path
@@ -21,7 +23,26 @@
 # Username is peach, hostname is lavender (your "differentiated colours"
 # request); both still hidden outside SSH per starship defaults.
 #
-# Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Mocha)
+# Palette source: https://github.com/rebelot/kanagawa.nvim (Kanagawa Lotus)
+#
+# Accents deviate from upstream Lotus: each keeps its HSL hue and
+# saturation with lightness lowered until it reaches WCAG AA (4.5:1) on
+# base #f2ecbc (overlay0: 3:1). Upstream rosewater-slot #e98a00 was 2.16:1.
+# The same darkened set is used in every Kanagawa light palette and in
+# nvim, vim, wezterm, fish, bat and COSMIC; tests/theme-contrast.bats
+# recomputes the ratios. Upstream -> AA:
+#   red       #c84053 -> #c0374a
+#   maroon    #d7474b -> #c92c30
+#   peach     #cc6d00 -> #a15600
+#   yellow    #77713f -> #716b3c
+#   green     #6f894e -> #5b7040
+#   teal      #597b75 -> #51706b
+#   sky       #4e8ca2 -> #3e7082
+#   sapphire  #5a7785 -> #536e7b
+#   pink      #b35b79 -> #a54c6b
+#   rosewater #e98a00 -> #9a5b00
+#   subtext0  #716e61 -> #6d6a5e
+#   overlay0  #8a8980 -> #88877e
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
@@ -43,35 +64,35 @@ $python\
 $line_break\
 $character"""
 
-palette = "catppuccin_mocha"
+palette = "kanagawa_lotus"
 
-[palettes.catppuccin_mocha]
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
-pink = "#f5c2e7"
-mauve = "#cba6f7"
-red = "#f38ba8"
-maroon = "#eba0ac"
-peach = "#fab387"
-yellow = "#f9e2af"
-green = "#a6e3a1"
-teal = "#94e2d5"
-sky = "#89dceb"
-sapphire = "#74c7ec"
-blue = "#89b4fa"
-lavender = "#b4befe"
-text = "#cdd6f4"
-subtext1 = "#bac2de"
-subtext0 = "#a6adc8"
-overlay2 = "#9399b2"
-overlay1 = "#7f849c"
-overlay0 = "#6c7086"
-surface2 = "#585b70"
-surface1 = "#45475a"
-surface0 = "#313244"
-base = "#1e1e2e"
-mantle = "#181825"
-crust = "#11111b"
+[palettes.kanagawa_lotus]
+rosewater = "#9a5b00"
+flamingo = "#c92c30"
+pink = "#a54c6b"
+mauve = "#624c83"
+red = "#c0374a"
+maroon = "#c92c30"
+peach = "#a15600"
+yellow = "#716b3c"
+green = "#5b7040"
+teal = "#51706b"
+sky = "#3e7082"
+sapphire = "#536e7b"
+blue = "#4d699b"
+lavender = "#5d57a3"
+text = "#545464"
+subtext1 = "#43436c"
+subtext0 = "#6d6a5e"
+overlay2 = "#766b90"
+overlay1 = "#716e61"
+overlay0 = "#88877e"
+surface2 = "#a09cac"
+surface1 = "#d5cea3"
+surface0 = "#e7dba0"
+base = "#f2ecbc"
+mantle = "#e5ddb0"
+crust = "#dcd5ac"
 
 [os]
 disabled = false

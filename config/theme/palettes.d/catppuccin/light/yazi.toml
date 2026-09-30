@@ -1,5 +1,5 @@
 # Catppuccin Latte with accents darkened (same HSL hue and saturation) to
-# reach WCAG AA 4.5:1 on base #eff1f5; mapping in starship.light.toml.
+# reach WCAG AA 4.5:1 on base #eff1f5; mapping in light/starship.toml.
 [app]
 overall = { bg = "#eff1f5" }
 
@@ -21,7 +21,7 @@ count_selected = { fg = "#eff1f5", bg = "#8839ef" }
 border_symbol = "│"
 border_style  = { fg = "#8c8fa1" }
 
-syntect_theme = "~/.config/yazi/Catppuccin-latte.tmTheme"
+syntect_theme = "~/.config/yazi/Catppuccin-Latte.tmTheme"
 
 [tabs]
 active   = { fg = "#eff1f5", bg = "#4c4f69", bold = true }

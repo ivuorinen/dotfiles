@@ -1,0 +1,8 @@
+# Kanagawa Wave — derived from ../../catppuccin/dark/television.toml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+# television dark palette — Kanagawa Wave (mauve accent). The theme
+# file is vendored under config/television/themes/ and linked into
+# ~/.config/television/themes/; television resolves `[ui] theme` by
+# filename from that directory. Appended to base.toml by the handler.
+[ui]
+theme = "kanagawa-wave.toml"

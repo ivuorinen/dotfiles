@@ -31,12 +31,16 @@ the last two tests and hides every failure above them, which is how a
 Use one of these instead:
 
 ```bash
+scripts/bats-run.sh; echo "exit=$?"  # 0 means green; ends with a failure list
 bats tests/; echo "exit=$?"          # 0 means green
 bats tests/ 2>&1 | grep '^not ok'    # empty means green
 ```
 
 The exit code is the authority. `ok 222 ...` as the final line proves
-nothing about tests 1 through 221.
+nothing about tests 1 through 221. `scripts/bats-run.sh` (what the hook
+and CI run) closes with a block naming every failing test as `file:line`
+with its failed assertion; its absence on a non-zero exit means bats
+aborted before running tests.
 
 ## Loading
 

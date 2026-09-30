@@ -6,7 +6,7 @@ theme:
       secondary: "#8839ef"
       inverted: "#dce0e8"
       faint: "#5c5f77"
-      # AA-darkened Latte yellow/green (4.5:1 on #eff1f5); see starship.light.toml
+      # AA-darkened Latte yellow/green (4.5:1 on #eff1f5); see light/starship.toml
       warning: "#996114"
       success: "#327c21"
       error: "#d20f39"

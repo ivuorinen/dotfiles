@@ -1,0 +1,20 @@
+# Kanagawa Lotus AA — derived from ../../catppuccin/light/gh-dash.theme.yml by the
+# colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+---
+theme:
+  colors:
+    text:
+      primary: "#545464"
+      secondary: "#624c83"
+      inverted: "#dcd5ac"
+      faint: "#43436c"
+      # AA-darkened Lotus yellow/green (4.5:1 on #f2ecbc); see light/starship.toml
+      warning: "#716b3c"
+      success: "#5b7040"
+      error: "#c0374a"
+    background:
+      selected: "#e7dba0"
+    border:
+      primary: "#624c83"
+      secondary: "#d5cea3"
+      faint: "#e7dba0"

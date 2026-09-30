@@ -1,0 +1,37 @@
+(
+  name: "Kanagawa Lotus AA",
+  foreground: "#545464",
+  cursor: "#9a5b00",
+  bright_foreground: "#545464",
+  dim_foreground: "#88877e",
+  normal: (
+    black: "#43436c",
+    red: "#c0374a",
+    green: "#5b7040",
+    yellow: "#716b3c",
+    blue: "#4d699b",
+    magenta: "#a54c6b",
+    cyan: "#51706b",
+    white: "#a09cac"
+  ),
+  bright: (
+    black: "#6d6a5e",
+    red: "#c0374a",
+    green: "#5b7040",
+    yellow: "#716b3c",
+    blue: "#4d699b",
+    magenta: "#a54c6b",
+    cyan: "#51706b",
+    white: "#d5cea3"
+  ),
+  dim: (
+    black: "#43436c",
+    red: "#c0374a",
+    green: "#5b7040",
+    yellow: "#716b3c",
+    blue: "#4d699b",
+    magenta: "#a54c6b",
+    cyan: "#51706b",
+    white: "#a09cac"
+  ),
+)

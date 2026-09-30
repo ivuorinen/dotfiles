@@ -7,6 +7,59 @@ setup()
   export THEME_HANDLERS_DIR="$TMPDIR_TEST/handlers.d"
   mkdir -p "$THEME_HANDLERS_DIR"
   APPLY="$BATS_TEST_DIRNAME/../config/theme/apply"
+  export DOTFILES="$BATS_TEST_DIRNAME/.."
+  export DOTFILES_THEME_FAMILY=catppuccin
+}
+
+counting_handler()
+{
+  cat > "$THEME_HANDLERS_DIR/count" << 'STUB'
+#!/usr/bin/env bash
+echo run >> "$TMPDIR_TEST/handler-runs"
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/count"
+}
+
+@test "apply: records the family next to the mode" {
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "catppuccin" ]
+}
+
+@test "apply: same mode and family skips the handlers" {
+  counting_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+}
+
+@test "apply: a family switch at the same mode re-runs the handlers" {
+  counting_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  DOTFILES_THEME_FAMILY=kanagawa TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 2 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "kanagawa" ]
+}
+
+@test "apply: logs stderr from a handler that exits 0 at INFO" {
+  cat > "$THEME_HANDLERS_DIR/notes" << 'STUB'
+#!/usr/bin/env bash
+echo "theme: active family ships no palette for x; removed stale link" >&2
+exit 0
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/notes"
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  grep -q "INFO handler 'notes': theme: active family ships no palette" "$TMPDIR_TEST/dotfiles-theme/log"
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/.handler-notes.err" ]
+}
+
+@test "apply: an unresolvable family still runs handlers and logs a WARN" {
+  counting_handler
+  DOTFILES_THEME_FAMILY=../nope TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+  grep -q 'family unresolvable' "$TMPDIR_TEST/dotfiles-theme/log"
 }
 
 teardown()

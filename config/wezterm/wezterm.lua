@@ -61,7 +61,7 @@ config.scrollback_lines = 3000
 
 -- Catppuccin Latte with the ANSI accents darkened to reach WCAG AA
 -- (4.5:1) on base #eff1f5. Hue and saturation are unchanged; the mapping
--- is in config/theme/palettes.d/starship.light.toml. Black and white use
+-- is in config/theme/palettes.d/catppuccin/light/starship.toml. Black and white use
 -- the Catppuccin style guide's Latte mapping (black = subtext1/subtext0,
 -- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
 -- which leaves text printed in "black" unreadable.
@@ -87,14 +87,114 @@ latte_aa.brights = {
   '#bcc0cc',
 }
 latte_aa.indexed = { [16] = '#be4601', [17] = '#bb4930' }
-config.color_schemes = { ['Catppuccin Latte AA'] = latte_aa }
+
+-- Kanagawa Wave: upstream rebelot/kanagawa.nvim extras/wezterm/kanagawa.lua
+-- (@ bb85e4bf), except the two reds below WCAG AA on #1f1f28, lifted with
+-- hue and saturation unchanged: ANSI red autumnRed #c34043 (3.22:1) to
+-- #cf6769, bright red samuraiRed #e82424 (3.66:1) to #ed4f4f.
+local kanagawa_wave = {
+  foreground = '#dcd7ba',
+  background = '#1f1f28',
+  cursor_bg = '#c8c093',
+  cursor_fg = '#c8c093',
+  cursor_border = '#c8c093',
+  selection_fg = '#c8c093',
+  selection_bg = '#2d4f67',
+  scrollbar_thumb = '#16161d',
+  split = '#16161d',
+  ansi = {
+    '#090618',
+    '#cf6769',
+    '#76946a',
+    '#c0a36e',
+    '#7e9cd8',
+    '#957fb8',
+    '#6a9589',
+    '#c8c093',
+  },
+  brights = {
+    '#727169',
+    '#ed4f4f',
+    '#98bb6c',
+    '#e6c384',
+    '#7fb4ca',
+    '#938aa9',
+    '#7aa89f',
+    '#dcd7ba',
+  },
+  indexed = { [16] = '#ffa066', [17] = '#ff5d62' },
+}
+
+-- Kanagawa Lotus AA: upstream extras/foot/kanagawa-lotus.ini with every
+-- accent darkened (hue and saturation unchanged) to WCAG AA 4.5:1 on
+-- #f2ecbc; bright black is the muted overlay0 (3:1). Mapping in
+-- config/theme/palettes.d/kanagawa/light/starship.toml.
+local kanagawa_lotus_aa = {
+  foreground = '#545464',
+  background = '#f2ecbc',
+  cursor_bg = '#545464',
+  cursor_fg = '#f2ecbc',
+  cursor_border = '#545464',
+  selection_fg = '#43436c',
+  selection_bg = '#c9cbd1',
+  ansi = {
+    '#1f1f28',
+    '#c0374a',
+    '#5b7040',
+    '#716b3c',
+    '#4d699b',
+    '#a54c6b',
+    '#51706b',
+    '#545464',
+  },
+  brights = {
+    '#88877e',
+    '#c92c30',
+    '#56714a',
+    '#7a6745',
+    '#406d99',
+    '#624c83',
+    '#4f7067',
+    '#43436c',
+  },
+  indexed = { [16] = '#9a5b00', [17] = '#d21616' },
+}
+
+config.color_schemes = {
+  ['Catppuccin Latte AA'] = latte_aa,
+  ['Kanagawa Wave'] = kanagawa_wave,
+  ['Kanagawa Lotus AA'] = kanagawa_lotus_aa,
+}
+
+-- Theme family from config/theme/family (DOTFILES_THEME_FAMILY overrides
+-- it, as in config/theme/_lib.sh). Unreadable means catppuccin.
+local function theme_family()
+  local env = os.getenv 'DOTFILES_THEME_FAMILY'
+  if env and env ~= '' then
+    return env
+  end
+  local dotfiles = os.getenv 'DOTFILES' or ((os.getenv 'HOME' or '') .. '/.dotfiles')
+  local f = io.open(dotfiles .. '/config/theme/family', 'r')
+  if not f then
+    return 'catppuccin'
+  end
+  local family = (f:read '*l' or ''):gsub('%s+', '')
+  f:close()
+  return family
+end
+
+local schemes = {
+  kanagawa = { dark = 'Kanagawa Wave', light = 'Kanagawa Lotus AA' },
+  catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
+}
 
 -- Function to detect the theme based on appearance
 function Scheme_for_appearance(appearance)
+  local s = schemes[theme_family()] or schemes.catppuccin
   if appearance:find 'Dark' then
-    return 'Catppuccin Mocha'
+    return s.dark
   else
-    return 'Catppuccin Latte AA'
+    return s.light
   end
 end
 

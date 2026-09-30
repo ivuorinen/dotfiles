@@ -1,22 +1,31 @@
 #!/usr/bin/env bash
-# handlers.d/fish — persist the Catppuccin palette for future fish
+# handlers.d/fish — persist the active family's palette for future fish
 # sessions. Running fish sessions update themselves via the in-process
 # event handler in config/fish/conf.d/theme-switch.fish.
 #
-# config/fish/themes/catppuccin-aa.theme is a repo-owned dual-palette
-# file: [light] is Latte with AA-darkened accents, [dark] is Mocha. fish
-# picks the right section by querying terminal background via OSC 11. We
-# therefore save the SAME theme name regardless of mode — re-saving
+# config/fish/themes/<family>-aa.theme is a repo-owned dual-palette file:
+# [light] carries AA-darkened accents, [dark] the family's dark variant.
+# fish picks the right section by querying terminal background via OSC 11.
+# We therefore save the SAME theme name regardless of mode — re-saving
 # triggers fish's re-query, which is what flips the colours in-process.
-# The fisher-managed Catppuccin Mocha.theme is not used: `fisher update`
-# rewrites it from upstream and would drop the AA [light] section.
+# A family without such a file leaves fish's current theme untouched.
 set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
 case "$mode" in
   dark | light) ;;
   *) exit 2 ;;
 esac
+family="$(_theme_family)" || exit 1
+
+theme="${family}-aa"
+if [[ ! -r "${DOTFILES:-$HOME/.dotfiles}/config/fish/themes/${theme}.theme" ]]; then
+  echo "fish handler: no config/fish/themes/${theme}.theme; leaving the fish theme unchanged" >&2
+  exit 0
+fi
 
 if ! command -v fish > /dev/null 2>&1; then
   echo "fish handler: fish not in PATH" >&2
@@ -27,4 +36,4 @@ fi
 # "Overwrite your current theme? [y/N]" prompt; >/dev/null silences the
 # confirmation echo. `|| true` prevents a transient fish failure from
 # poisoning the actor's parallel-handler exit-code aggregation.
-echo y | fish -c 'fish_config theme save catppuccin-aa' > /dev/null 2>&1 || true
+echo y | fish -c "fish_config theme save $theme" > /dev/null 2>&1 || true

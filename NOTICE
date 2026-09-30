@@ -80,6 +80,28 @@ irssi autorun scripts -- licenses as declared in each script's %IRSSI header
   The GPL scripts carry copyleft obligations: code copied out of them is
   GPL, not MIT.
 
+Kanagawa theme assets -- MIT
+  kanagawa.nvim: Copyright (c) 2021 Tommaso Laurenzi
+    https://github.com/rebelot/kanagawa.nvim
+    @ bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3
+  kanagawa.vim: Copyright (c) 2025 menisadi
+    https://github.com/menisadi/kanagawa.vim
+    @ 23b9b2c24ebaad185d0f1c4a27c67499f29108b1
+
+    config/bat/themes/Kanagawa Wave.tmTheme       (extras/tmTheme, renamed)
+    config/vim/colors/kanagawa_wave.vim           (colors/kanagawa.vim, fixed)
+    config/fish/themes/kanagawa-aa.theme          ([dark] from extras/fish)
+    config/wezterm/wezterm.lua                    (kanagawa_wave table)
+
+  Local changes to the vendored Wave files: foregrounds below WCAG AA on
+  #1f1f28 are lifted (autumnRed, samuraiRed, dragonBlue), and
+  kanagawa_wave.vim sets g:colors_name after `hi clear`. Each file's
+  header lists its changes; diff against the commits above to refresh.
+
+  The Lotus AA variants, and the Kanagawa palettes under
+  config/theme/palettes.d/kanagawa/, are derived from these colours and
+  from upstream's lua/kanagawa/colors.lua and themes.lua.
+
 
 Submodules are not vendored into this tree: each is a git submodule pinned at
 a commit, carrying its own license, and updated from upstream rather than

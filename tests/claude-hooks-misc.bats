@@ -160,8 +160,15 @@ echo "ModuleNotFoundError: No module named 'yaml'" >&2
 exit 1
 EOF
   chmod +x "$WORK/bin/python3"
+  # PATH holds only what the hook and this harness run — never /usr/bin,
+  # where a distro yamllint lives (CI installs one), which would make the
+  # "missing parser" path unreachable.
+  local tool
+  for tool in bash env jq; do
+    ln -s "$(command -v "$tool")" "$WORK/bin/$tool"
+  done
   printf -- '---\n- link:\n    ~/.bashrc: base/bashrc\n' > "$WORK/install.conf.yaml"
-  run -0 env PATH="$WORK/bin:/usr/bin:/bin" bash -c \
+  run -0 "$WORK/bin/env" PATH="$WORK/bin" bash -c \
     'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' \
     _ "$WORK/install.conf.yaml" "$HOOKS/post-edit-dotbot-validate.sh"
   # Silence would be worse: a skipped check must not look like a passed one.

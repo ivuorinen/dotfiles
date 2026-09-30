@@ -197,14 +197,19 @@ Core parsers always installed: `html`, `lua`, `luadoc`, `markdown`,
 
 ## UI
 
-| Plugin              | Role                                                                 |
-|---------------------|----------------------------------------------------------------------|
-| catppuccin/nvim     | Colorscheme; `auto_integrations` picks up mini.nvim; dim_inactive on |
-| auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state  |
-| nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled          |
+| Plugin              | Role                                                                     |
+|---------------------|--------------------------------------------------------------------------|
+| kanagawa.nvim       | Default colorscheme (Wave dark / Lotus light, AA-darkened Lotus accents) |
+| catppuccin/nvim     | Alternate colorscheme; `auto_integrations` picks up mini.nvim            |
+| auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state      |
+| nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled              |
 
-URLs: `github.com/catppuccin/nvim` · `github.com/f-person/auto-dark-mode.nvim` ·
-`github.com/catgoose/nvim-colorizer.lua`
+The colorscheme follows the theme family in `config/theme/family`
+(`kanagawa` or `catppuccin`); both switch variant with `background`.
+The family is read once at startup, so restart nvim after switching it.
+
+URLs: `github.com/rebelot/kanagawa.nvim` · `github.com/catppuccin/nvim` ·
+`github.com/f-person/auto-dark-mode.nvim` · `github.com/catgoose/nvim-colorizer.lua`
 
 ## Installed Tools (mason-tool-installer)
 

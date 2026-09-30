@@ -108,3 +108,81 @@ teardown()
   # Last line preserved
   grep -q 'line 220' "$TMPDIR_TEST/dotfiles-theme/log"
 }
+
+# Fake DOTFILES tree: palettes.d/fam/dark/app.conf only.
+make_family_tree()
+{
+  export DOTFILES="$TMPDIR_TEST/dot"
+  mkdir -p "$DOTFILES/config/theme/palettes.d/fam/dark"
+  echo x > "$DOTFILES/config/theme/palettes.d/fam/dark/app.conf"
+  echo fam > "$DOTFILES/config/theme/family"
+}
+
+@test "_theme_family: reads the tracked family file" {
+  source "$THEME_LIB"
+  make_family_tree
+  unset DOTFILES_THEME_FAMILY
+  run _theme_family
+  [ "$status" -eq 0 ]
+  [ "$output" = "fam" ]
+}
+
+@test "_theme_family: env override wins over the file" {
+  source "$THEME_LIB"
+  make_family_tree
+  mkdir -p "$DOTFILES/config/theme/palettes.d/other"
+  DOTFILES_THEME_FAMILY=other run _theme_family
+  [ "$status" -eq 0 ]
+  [ "$output" = "other" ]
+}
+
+@test "_theme_family: rejects traversal, empty and unknown families" {
+  source "$THEME_LIB"
+  make_family_tree
+  # An empty override means "unset" and falls back to the file, so the
+  # empty case is exercised through the file below instead.
+  for bad in '../fam' 'nope' 'Fam' 'fam/dark' '-x'; do
+    DOTFILES_THEME_FAMILY="$bad" run _theme_family
+    [ "$status" -eq 1 ]
+  done
+  echo '' > "$DOTFILES/config/theme/family"
+  unset DOTFILES_THEME_FAMILY
+  run _theme_family
+  [ "$status" -eq 1 ]
+}
+
+@test "_palette: prints an existing palette, fails for a missing one" {
+  source "$THEME_LIB"
+  make_family_tree
+  run _palette dark app.conf
+  [ "$status" -eq 0 ]
+  [ "$output" = "$DOTFILES/config/theme/palettes.d/fam/dark/app.conf" ]
+  run _palette light app.conf
+  [ "$status" -eq 1 ]
+  [ -z "$output" ]
+}
+
+@test "_link_palette: links a palette idempotently" {
+  source "$THEME_LIB"
+  echo x > "$TMPDIR_TEST/src"
+  _link_palette "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
+  _link_palette "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
+  [ "$(readlink "$TMPDIR_TEST/dst")" = "$TMPDIR_TEST/src" ]
+}
+
+@test "_link_palette: empty src removes a stale (even dangling) link" {
+  source "$THEME_LIB"
+  ln -s "$TMPDIR_TEST/gone" "$TMPDIR_TEST/dst"
+  run _link_palette "" "$TMPDIR_TEST/dst"
+  [ "$status" -eq 0 ]
+  [ ! -L "$TMPDIR_TEST/dst" ]
+  [[ "$output" == *"removed stale link"* ]]
+}
+
+@test "_link_palette: empty src never removes a regular file" {
+  source "$THEME_LIB"
+  echo "user content" > "$TMPDIR_TEST/dst"
+  run _link_palette "" "$TMPDIR_TEST/dst"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dst")" = "user content" ]
+}

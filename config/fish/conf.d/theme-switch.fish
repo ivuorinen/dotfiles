@@ -22,7 +22,7 @@ if test -r $ls_cache
     test -n "$ls_value"; and set -gx LS_COLORS $ls_value
 end
 
-# bat — export the active Catppuccin theme name published by the bat
+# bat — export the active family's theme name published by the bat
 # handler so bat (and bat-driven previews) honour the current mode. The
 # state file holds the bare theme name, so a plain `cat` is enough.
 set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
@@ -46,19 +46,31 @@ function __theme_switch_check --on-event fish_prompt
     set -l mtime (stat -c %Y $mode_file 2>/dev/null; or stat -f %m $mode_file 2>/dev/null)
     if not set -q __theme_switch_last_mtime; or test "$__theme_switch_last_mtime" != "$mtime"
         set -g __theme_switch_last_mtime $mtime
-        # Re-save the SAME dual-palette theme; fish re-queries OSC 11
-        # and picks [light] vs [dark] from catppuccin-aa.theme, which
-        # contains both sections, so the theme name does not change by
-        # mode. catppuccin-aa is repo-owned; the fisher-managed Mocha
-        # file would lose its AA [light] edits on `fisher update`.
-        # `echo y |` bypasses the interactive overwrite prompt that
-        # would otherwise pollute the next prompt line.
-        echo y | fish_config theme save catppuccin-aa >/dev/null 2>&1
+        # Re-save the active family's dual-palette theme (<family>-aa,
+        # e.g. kanagawa-aa); fish re-queries OSC 11 and picks [light] vs
+        # [dark] from it, so the name does not change by mode — only by
+        # family, which also rewrites the mode file and lands here. The
+        # themes are repo-owned; fisher-managed upstream files would lose
+        # their AA [light] edits on `fisher update`. `echo y |` bypasses
+        # the interactive overwrite prompt that would otherwise pollute
+        # the next prompt line.
+        set -l theme (__dotfiles_theme_name)
+        and echo y | fish_config theme save $theme >/dev/null 2>&1
+        # A family without a dircolors palette removes the cache; drop the
+        # export too so a previous family's ls colours do not linger.
         if test -r $ls_cache
             set -l ls_value (string match -rg "LS_COLORS='([^']*)'" < $ls_cache | head -1)
             test -n "$ls_value"; and set -gx LS_COLORS $ls_value
+        else
+            set -e LS_COLORS
         end
+        # A family without a bat theme removes the state file; drop the
+        # export too so a previous family's theme does not linger.
         set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
-        test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
+        if test -r $bat_theme_file
+            set -gx BAT_THEME (cat $bat_theme_file)
+        else
+            set -e BAT_THEME
+        end
     end
 end

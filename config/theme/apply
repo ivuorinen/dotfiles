@@ -4,8 +4,9 @@
 # exit, and returns 0 unless the input was malformed.
 #
 # Env overrides (test seams):
-#   THEME_HANDLERS_DIR  defaults to $DOTFILES/config/theme/handlers.d
-#   XDG_STATE_HOME      defaults to $HOME/.local/state
+#   THEME_HANDLERS_DIR     defaults to $DOTFILES/config/theme/handlers.d
+#   XDG_STATE_HOME         defaults to $HOME/.local/state
+#   DOTFILES_THEME_FAMILY  defaults to the contents of config/theme/family
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -27,18 +28,34 @@ esac
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
+family_file="$state_dir/family"
 handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
 
-if [[ -r "$state_file" ]]; then
-  current=""
+# The theme family (config/theme/family) is part of the applied state: a
+# family switch at an unchanged mode must still re-run the handlers. An
+# unresolvable family is logged and the handlers still run — each one
+# fails closed on its own and leaves its destination untouched.
+family="$(_theme_family 2> /dev/null)" || {
+  family=""
+  _log "WARN actor: theme family unresolvable; handlers will fail closed"
+}
+
+if [[ -r "$state_file" && -n "$family" ]]; then
+  current="" current_family=""
   read -r current < "$state_file" || true
-  if [[ "$current" = "$mode" ]]; then
+  [[ -r "$family_file" ]] && {
+    read -r current_family < "$family_file" || true
+  }
+  if [[ "$current" = "$mode" && "$current_family" = "$family" ]]; then
     exit 0
   fi
 fi
 
+# Both are written before any handler forks: handlers.d/tmux re-sources
+# tmux.conf, whose bootstrap reads the mode back through theme-mode.
 _atomic_write "$state_file" "$mode"
-_log "INFO actor flipped to $mode"
+[[ -n "$family" ]] && _atomic_write "$family_file" "$family"
+_log "INFO actor flipped to $mode${family:+ ($family)}"
 
 # Resolve timeout(1) once. Bare-macOS hosts without coreutils have
 # neither `timeout` nor `gtimeout`; we fall back to running handlers
@@ -81,6 +98,13 @@ for pid in "${pids[@]}"; do
         _log "WARN handler '$name': $line"
       done < "$errlog"
     fi
+  elif [[ -s "$errlog" ]]; then
+    # A handler that succeeds can still report something worth keeping —
+    # e.g. "active family ships no palette; removed stale link". Dropping
+    # it would leave an app silently on defaults with no trace here.
+    while IFS= read -r line; do
+      _log "INFO handler '$name': $line"
+    done < "$errlog"
   fi
   rm -f "$errlog"
   i=$((i + 1))

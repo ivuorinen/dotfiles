@@ -4,7 +4,7 @@
 # Local change: accents darkened (same HSL hue and saturation) to reach
 # WCAG AA 4.5:1 on base #eff1f5. Upstream green is 2.96:1 and sky is
 # 2.47:1. Muted greys are left as upstream on purpose, because they mark
-# low-priority fields. The mapping is in starship.light.toml.
+# low-priority fields. The mapping is in light/starship.toml.
 ---
 colourful: true
 

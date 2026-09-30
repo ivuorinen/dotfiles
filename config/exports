@@ -485,7 +485,7 @@ ls_cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
 [ -r "$ls_cache" ] && eval "$(cat "$ls_cache")"
 unset ls_cache
 
-# bat — export the active Catppuccin theme published by the bat theme
+# bat — export the active theme family's bat theme published by the bat theme
 # handler so bat (and bat-driven previews) honour the current mode without
 # any file under ~/.config/bat. Mirrors the LS_COLORS cache above.
 bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"

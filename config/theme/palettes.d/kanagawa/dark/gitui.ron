@@ -1,0 +1,25 @@
+// Kanagawa Wave — derived from ../../catppuccin/dark/gitui.ron by the
+// colour-role map in docs/plans/2026-09-30-kanagawa-theme-families.md.
+(
+    selected_tab: Some("Reset"),
+    command_fg: Some("#dcd7ba"),
+    selection_bg: Some("#54546d"),
+    selection_fg: Some("#dcd7ba"),
+    cmdbar_bg: Some("#181820"),
+    cmdbar_extra_lines_bg: Some("#181820"),
+    disabled_fg: Some("#717c7c"),
+    diff_line_add: Some("#98bb6c"),
+    diff_line_delete: Some("#e46876"),
+    diff_file_added: Some("#98bb6c"),
+    diff_file_removed: Some("#ff5d62"),
+    diff_file_moved: Some("#957fb8"),
+    diff_file_modified: Some("#ffa066"),
+    commit_hash: Some("#9cabca"),
+    commit_time: Some("#c8c093"),
+    commit_author: Some("#a3d4d5"),
+    danger_fg: Some("#e46876"),
+    push_gauge_bg: Some("#7e9cd8"),
+    push_gauge_fg: Some("#1f1f28"),
+    tag_fg: Some("#c8c093"),
+    branch_fg: Some("#7aa89f")
+)

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# handlers.d/dircolors — regenerate the LS_COLORS cache from the
-# palette matching the requested mode. Cache is sourced by shells via
-# `eval "$(< $cache/ls-colors)"`.
+# handlers.d/dircolors — regenerate the LS_COLORS cache from the active
+# family's palette for the mode. Cache is sourced by shells via
+# `eval "$(< $cache/ls-colors)"`. A family without a dircolors palette
+# gets the cache removed (shells then keep the system default) so a
+# previous family's colours never linger.
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -9,11 +11,15 @@ source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+_theme_family > /dev/null || exit 1
 
-src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/dircolors.${mode}"
-[[ -r "$src" ]] || {
-  echo "dircolors handler: missing palette $src" >&2
-  exit 1
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+mkdir -p -- "$state_dir"
+
+src="$(_palette "$mode" dircolors)" || {
+  rm -f -- "$state_dir/ls-colors"
+  echo "dircolors handler: active family ships no dircolors palette; removed cache" >&2
+  exit 0
 }
 
 # On macOS, GNU dircolors ships as gdircolors (coreutils via Homebrew).
@@ -30,8 +36,6 @@ if [[ -z "$_dircolors_cmd" ]]; then
   exit 1
 fi
 
-state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
-mkdir -p -- "$state_dir"
 # Capture rc separately because $? clobbers after the test for empty content.
 content="$("$_dircolors_cmd" -b "$src")"
 rc=$?
