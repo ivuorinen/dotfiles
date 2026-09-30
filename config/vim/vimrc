@@ -21,7 +21,7 @@ endif
 
 let g:vim_bootstrap_langs = "go,html,javascript,lua,php,python,typescript"
 let g:vim_bootstrap_editor = "vim" " nvim or vim
-let g:vim_bootstrap_theme = "catppuccin_mocha"
+let g:vim_bootstrap_theme = "kanagawa_wave"
 let g:vim_bootstrap_frams = "vuejs"
 
 " ale
@@ -252,6 +252,26 @@ if !has('ideavim')
     return 'dark'
   endfunction
 
+  " Theme family → {dark, light} colour schemes. The family comes from
+  " config/theme/family ($DOTFILES_THEME_FAMILY overrides it, as in
+  " config/theme/_lib.sh). vim cannot run without a scheme, so an unknown
+  " family falls back to catppuccin rather than leaving anything unset.
+  let s:schemes = {
+        \ 'kanagawa': {'dark': 'kanagawa_wave', 'light': 'kanagawa_lotus'},
+        \ 'catppuccin': {'dark': 'catppuccin_mocha', 'light': 'catppuccin_latte'},
+        \ }
+
+  function! s:Schemes() abort
+    let l:family = $DOTFILES_THEME_FAMILY
+    if empty(l:family)
+      let l:dotfiles = empty($DOTFILES) ? expand('~/.dotfiles') : $DOTFILES
+      let l:file = l:dotfiles . '/config/theme/family'
+      let l:lines = filereadable(l:file) ? readfile(l:file, '', 1) : []
+      let l:family = empty(l:lines) ? '' : trim(l:lines[0])
+    endif
+    return get(s:schemes, l:family, s:schemes.catppuccin)
+  endfunction
+
   function! s:ApplyScheme(scheme) abort
     if get(g:, 'colors_name', '') ==# a:scheme
       return
@@ -263,22 +283,24 @@ if !has('ideavim')
     endif
   endfunction
 
-  " Act only when the mode file changes, so a manual <leader>tl flip
-  " stays until the next OS flip (same as auto-dark-mode.nvim).
+  " Act only when the mode or the theme family changes, so a manual
+  " <leader>tl flip stays until the next OS flip (same as
+  " auto-dark-mode.nvim), while a family switch still reaches running
+  " sessions instead of leaving them on the old family's colours.
   function! s:ApplyThemeMode(...) abort
-    let l:mode = s:ThemeMode()
-    if l:mode ==# get(s:, 'last_mode', '')
+    let l:scheme = s:Schemes()[s:ThemeMode()]
+    if l:scheme ==# get(s:, 'last_scheme', '')
       return
     endif
-    let s:last_mode = l:mode
-    call s:ApplyScheme(l:mode ==# 'light' ? 'catppuccin_latte' : 'catppuccin_mocha')
+    let s:last_scheme = l:scheme
+    call s:ApplyScheme(l:scheme)
   endfunction
 
-  " <leader>tl (nvim ToggleBackground). Catppuccin colour files set
-  " 'background' themselves, so flip the scheme rather than the option.
+  " <leader>tl (nvim ToggleBackground). The colour files set 'background'
+  " themselves, so flip the scheme rather than the option.
   function! ToggleBackground() abort
-    call s:ApplyScheme(get(g:, 'colors_name', '') ==# 'catppuccin_latte'
-          \ ? 'catppuccin_mocha' : 'catppuccin_latte')
+    let l:s = s:Schemes()
+    call s:ApplyScheme(get(g:, 'colors_name', '') ==# l:s.light ? l:s.dark : l:s.light)
   endfunction
 
   call s:ApplyThemeMode()
@@ -350,7 +372,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_theme = get(g:, 'colors_name', 'catppuccin_mocha')
+let g:airline_theme = get(g:, 'colors_name', 'kanagawa_wave')
 
 " NERDTree configuration
 let g:NERDTreeChDirMode=2
