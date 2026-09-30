@@ -35,16 +35,19 @@ jobs:
         # python3-packaging: x-compare-versions.py imports it. Locally mise
         # installs it from config/mise/default-python-packages; this job has
         # no mise, so it has to come from the package manager.
+        # tmux, yamllint: the theme tests skip without them — the tmux
+        # reload-recursion and 5 s budget guards, and the palette parse checks.
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats fish python3-packaging
+          sudo apt-get install -y bats fish python3-packaging tmux yamllint
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'
         # bash: the runner's /bin/bash is 3.2 and dfm's full bootstrap
-        # requires 4+; coreutils: gtimeout for the theme actor's 5s kill
+        # requires 4+; coreutils: gtimeout for the theme actor's 5s kill;
+        # tmux, yamllint: see the Linux step
         run: |
-          brew install bats-core fish bash coreutils
+          brew install bats-core fish bash coreutils tmux yamllint
           python3 -m pip install --break-system-packages packaging \
             || python3 -m pip install packaging
 
