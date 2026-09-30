@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # handlers.d/fzf — publish FZF_DEFAULT_OPTS exports for shells to pick
 # up via state-dir symlinks. Bash/zsh source fzf-active.sh, fish sources
-# fzf-active.fish; both files are symlinks rewritten on every flip.
+# fzf-active.fish; both files are symlinks rewritten on every flip, and
+# removed when the active family ships no fzf palette for the mode.
 # Live shells keep their old palette until restart; new shells inherit
 # the latest. Same trade-off as fish in-process refresh — acceptable.
 set -uo pipefail
@@ -11,17 +12,12 @@ source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+_theme_family > /dev/null || exit 1
 
-dotfiles="${DOTFILES:-$HOME/.dotfiles}"
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 mkdir -p -- "$state_dir"
 
 for ext in sh fish; do
-  src="$dotfiles/config/theme/palettes.d/fzf.${mode}.${ext}"
-  dst="$state_dir/fzf-active.${ext}"
-  [[ -r "$src" ]] || {
-    echo "fzf handler: missing palette $src" >&2
-    continue
-  }
-  _idempotent_ln_sf "$src" "$dst"
+  src="$(_palette "$mode" "fzf.${ext}")" || src=""
+  _link_palette "$src" "$state_dir/fzf-active.${ext}"
 done

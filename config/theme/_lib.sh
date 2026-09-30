@@ -42,6 +42,56 @@ _idempotent_ln_sf()
   return 0
 }
 
+# Active theme family: $DOTFILES_THEME_FAMILY (test seam) or the tracked
+# config/theme/family file. The name feeds a filesystem path, so accept
+# only a plain slug that names an existing palettes.d/<family>/ dir.
+# Prints the family; returns 1 (with a stderr note) otherwise.
+_theme_family()
+{
+  local root="${DOTFILES:-$HOME/.dotfiles}/config/theme" family=""
+  if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
+    family="$DOTFILES_THEME_FAMILY"
+  elif [[ -r "$root/family" ]]; then
+    read -r family < "$root/family" || true
+  fi
+  if [[ ! "$family" =~ ^[a-z0-9][a-z0-9-]*$ || ! -d "$root/palettes.d/$family" ]]; then
+    printf 'theme: invalid or unknown theme family %q\n' "$family" >&2
+    return 1
+  fi
+  printf '%s\n' "$family"
+}
+
+# Resolve palettes.d/<family>/<mode>/<file> for the active family.
+# Prints the path and returns 0 when it exists; returns 1 when the family
+# is invalid or does not ship the file.
+_palette()
+{
+  local mode=$1 file=$2 family path
+  family="$(_theme_family)" || return 1
+  path="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/$family/$mode/$file"
+  [[ -e "$path" ]] || return 1
+  printf '%s\n' "$path"
+}
+
+# Link a palette into place, or — when the active family ships none
+# (empty src) — remove a stale link left by another family so palettes
+# never mix. Only a symlink is ever removed; a regular file is user data
+# and stays (same guard as _idempotent_ln_sf). -L, not -e: a link left
+# dangling by a moved palette must still be cleaned up.
+_link_palette()
+{
+  local src=$1 dst=$2
+  if [[ -n "$src" ]]; then
+    _idempotent_ln_sf "$src" "$dst"
+    return 0
+  fi
+  if [[ -L "$dst" ]]; then
+    rm -f -- "$dst"
+    printf 'theme: active family ships no palette for %s; removed stale link\n' "$dst" >&2
+  fi
+  return 0
+}
+
 # Atomic, race-safe lock. ln(1) is the classic atomic create-if-not-exists
 # primitive on POSIX filesystems, and it is the ONLY thing that grants the
 # lock here. A loser silently fails the ln and we return 1.

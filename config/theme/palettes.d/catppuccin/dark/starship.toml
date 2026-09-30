@@ -1,7 +1,7 @@
 # Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
-# theme), Catppuccin Latte (light).
+# theme), Catppuccin Mocha (dark).
 #
-# Mirror of starship-dark.toml with the palette swapped. The dark/light
+# Mirror of light/starship.toml with the palette swapped. The dark/light
 # variants are kept as separate complete files so the theme orchestrator
 # (config/theme/handlers.d/starship)
 # can switch them via a symlink at ~/.config/starship.toml. Starship reads
@@ -9,7 +9,7 @@
 # effect on the next prompt with no shell-side reload.
 #
 # MAINTAINER NOTE: any non-palette change made here MUST also be applied
-# to starship-dark.toml. The two files are intentionally identical except
+# to light/starship.toml. The two files are intentionally identical except
 # for `palette = "..."` and the [palettes.*] block.
 #
 # Layout: line 1 = OS icon · user@host (SSH only) · path
@@ -21,14 +21,7 @@
 # Username is peach, hostname is lavender (your "differentiated colours"
 # request); both still hidden outside SSH per starship defaults.
 #
-# Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Latte)
-#
-# Accents deviate from upstream Latte: each keeps its HSL hue and
-# saturation with lightness lowered until it reaches WCAG AA (4.5:1) on
-# base #eff1f5. Upstream sky is 2.47:1, which made the path unreadable.
-# Upstream declines a palette change (catppuccin/catppuccin#2588). The
-# same darkened set is used in the eza, dircolors, fish, gitui and fzf
-# light palettes. Mauve and red already pass and are unchanged.
+# Palette source: https://github.com/catppuccin/catppuccin (Catppuccin Mocha)
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
@@ -50,35 +43,35 @@ $python\
 $line_break\
 $character"""
 
-palette = "catppuccin_latte"
+palette = "catppuccin_mocha"
 
-[palettes.catppuccin_latte]
-rosewater = "#bb4930"
-flamingo = "#cb3333"
-pink = "#c71f9a"
-mauve = "#8839ef"
-red = "#d20f39"
-maroon = "#d61d2d"
-peach = "#be4601"
-yellow = "#996114"
-green = "#327c21"
-teal = "#13797e"
-sky = "#0374a1"
-sapphire = "#187787"
-blue = "#1761f5"
-lavender = "#3d5afc"
-text = "#4c4f69"
-subtext1 = "#5c5f77"
-subtext0 = "#6c6f85"
-overlay2 = "#7c7f93"
-overlay1 = "#8c8fa1"
-overlay0 = "#9ca0b0"
-surface2 = "#acb0be"
-surface1 = "#bcc0cc"
-surface0 = "#ccd0da"
-base = "#eff1f5"
-mantle = "#e6e9ef"
-crust = "#dce0e8"
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
 
 [os]
 disabled = false

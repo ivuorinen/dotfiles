@@ -61,7 +61,7 @@ config.scrollback_lines = 3000
 
 -- Catppuccin Latte with the ANSI accents darkened to reach WCAG AA
 -- (4.5:1) on base #eff1f5. Hue and saturation are unchanged; the mapping
--- is in config/theme/palettes.d/starship.light.toml. Black and white use
+-- is in config/theme/palettes.d/catppuccin/light/starship.toml. Black and white use
 -- the Catppuccin style guide's Latte mapping (black = subtext1/subtext0,
 -- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
 -- which leaves text printed in "black" unreadable.

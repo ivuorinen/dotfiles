@@ -8,7 +8,7 @@ input_text_fg = '#8839ef'
 result_count_fg = '#8839ef'
 # results
 # accents AA-darkened (4.5:1 on #eff1f5); mapping in
-# config/theme/palettes.d/starship.light.toml
+# config/theme/palettes.d/catppuccin/light/starship.toml
 result_name_fg = '#1761f5'
 result_line_number_fg = '#996114'
 result_value_fg = '#3d5afc'

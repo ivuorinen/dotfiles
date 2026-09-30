@@ -1,16 +1,46 @@
 #!/usr/bin/env bash
-# handlers.d/tmux — source the matching tmux palette.
-# Errexit-masked: a transient tmux server failure must not poison the
-# rest of the chain.
+# handlers.d/tmux — reload the full tmux config on a flip so every live
+# session picks up the new mode (and family) without `prefix r`. The
+# config's bootstrap line runs config/theme/tmux-palette with the mode
+# `apply` already wrote, so the reload is what applies the palette. The
+# bootstrap calls tmux-palette, never this handler, so there is no
+# recursion. THEME_TMUX_CONF is a test seam; the default is the linked
+# config.
+#
+# A full reload re-runs TPM and every plugin, which takes ~10 s — past
+# apply's 5 s handler budget. So the handler only asks the tmux server to
+# run the reload in the background (`run-shell -b`, re-invoking this
+# script with --now) and returns at once. A failed background reload
+# cannot reach apply's log any more, so it is shown as a tmux message.
 set -uo pipefail
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
 
-palette="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/tmux.${mode}.conf"
-[[ -r "$palette" ]] || {
-  echo "tmux handler: missing palette $palette" >&2
+# No server running: nothing to reload; the next tmux start bootstraps.
+tmux list-sessions > /dev/null 2>&1 || exit 0
+
+conf="${THEME_TMUX_CONF:-$HOME/.config/tmux/tmux.conf}"
+[[ -r "$conf" ]] || {
+  echo "tmux handler: missing config $conf" >&2
   exit 1
 }
 
-tmux source-file "$palette" 2> /dev/null || true
+if [[ "${2:-}" != "--now" ]]; then
+  tmux run-shell -b "$(printf '%q ' env "THEME_TMUX_CONF=$conf" "$0" "$mode" --now)"
+  exit $?
+fi
+
+if ! err="$(tmux source-file "$conf" 2>&1)"; then
+  # display-message expands formats: `#(...)` in the quoted config line
+  # would run, `#{...}` would substitute. Doubling every # shows it
+  # literally on any tmux version (`-l` is newer than some distros' tmux).
+  msg="theme: tmux reload failed: ${err//$'\n'/ }"
+  tmux display-message "${msg//#/##}"
+  exit 1
+fi
+# Repaint every attached client now instead of on the next status-interval.
+while IFS= read -r client; do
+  [[ -n "$client" ]] && tmux refresh-client -S -t "$client"
+done < <(tmux list-clients -F '#{client_name}' 2> /dev/null)
+exit 0

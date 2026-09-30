@@ -600,7 +600,7 @@ require('catppuccin').setup {
   },
   -- Upstream Latte accents fall to 2.3–3.5:1 on base (sky is 2.47:1).
   -- Same hue and saturation, lightness lowered to reach WCAG AA 4.5:1;
-  -- mapping in config/theme/palettes.d/starship.light.toml.
+  -- mapping in config/theme/palettes.d/catppuccin/light/starship.toml.
   color_overrides = {
     latte = {
       rosewater = '#bb4930',

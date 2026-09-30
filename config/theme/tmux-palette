@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# config/theme/tmux-palette <mode> — source the active family's tmux
+# palette into the running tmux server. Called by the bootstrap line at
+# the end of config/tmux/tmux.conf. Deliberately NOT in handlers.d/:
+# handlers.d/tmux re-sources the whole tmux.conf on a flip, and if
+# tmux.conf called that handler back it would recurse. A family without a
+# tmux palette sources nothing (tmux keeps the plugin's defaults).
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+palette="$(_palette "$mode" tmux.conf)" || {
+  echo "tmux-palette: active family ships no tmux palette for $mode" >&2
+  exit 0
+}
+
+tmux source-file "$palette"

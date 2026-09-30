@@ -124,13 +124,14 @@ graphify-out/
 config/television/config.toml
 
 # The theme handler (config/theme/handlers.d/yazi) writes yazi's active
-# theme.toml symlink and the Catppuccin-<flavor>.tmTheme links into
-# ~/.config/yazi on every dark/light flip. That path is a plain symlink into
-# this repo, so those links land back in config/yazi/ — regenerated on every
-# flip. Source of truth is config/theme/palettes.d/yazi.{dark,light}.toml and
-# config/bat/themes/; never track the generated links.
+# theme.toml symlink and the <bat-theme-name>.tmTheme links (spaces as
+# dashes, e.g. Kanagawa-Wave.tmTheme) into ~/.config/yazi on every flip.
+# That path is a plain symlink into this repo, so those links land back in
+# config/yazi/ — regenerated on every flip. Source of truth is
+# config/theme/palettes.d/<family>/<mode>/yazi.toml and config/bat/themes/;
+# never track the generated links.
 config/yazi/theme.toml
-config/yazi/Catppuccin-*.tmTheme
+config/yazi/*.tmTheme
 
 # mise.lock is generated locally (config/mise/config.toml sets lockfile = true)
 # and must stay untracked. jdx/mise-action adds `--locked` to `mise install`

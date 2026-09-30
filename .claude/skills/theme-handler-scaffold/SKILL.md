@@ -13,10 +13,12 @@ Scaffolds a new entry in the theme orchestrator's handler chain. Per
 
 - An executable handler at `config/theme/handlers.d/<app>` that
   receives `dark` or `light` as `$1` and applies the theme.
-- One palette per variant under `config/theme/palettes.d/<app>.dark.<ext>`
-  and `config/theme/palettes.d/<app>.light.<ext>` (extension matches
-  the consuming format; omit when the format has no canonical
-  extension).
+- One palette per mode, per theme family, under
+  `config/theme/palettes.d/<family>/dark/<app>.<ext>` and
+  `config/theme/palettes.d/<family>/light/<app>.<ext>` (extension
+  matches the consuming format; omit when the format has no canonical
+  extension). Every family under `palettes.d/` needs both, or
+  `tests/theme-palettes.bats` fails.
 
 ## Inputs
 
@@ -41,40 +43,40 @@ source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+_theme_family > /dev/null || exit 1
 
-src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/<app>.${mode}.<ext>"
-[[ -r "$src" ]] || {
-  echo "<app> handler: missing palette $src" >&2
-  exit 1
-}
+# Empty when the active family ships no palette for this app/mode.
+src="$(_palette "$mode" <app>.<ext>)" || src=""
+dst="$HOME/.config/<app>/theme.<ext>"
 
-# Apply theme: replace this with the app-specific flip command.
-# Examples:
-#   - cp "$src" "$XDG_CONFIG_HOME/<app>/active.<ext>"
-#   - tmux source-file "$src"
-#   - reload via app's IPC / signal
-
-_atomic_write "$XDG_CONFIG_HOME/<app>/active.<ext>" "$(cat "$src")"
+# Apply theme: replace this with the app-specific flip. The default
+# links the palette, or removes a stale link from another family when
+# the active one ships none. For a composed or state-dir artifact,
+# rebuild it without the palette (or delete it) in the empty-src case.
+mkdir -p -- "$(dirname -- "$dst")"
+_link_palette "$src" "$dst"
 ```
 
 3. `chmod +x config/theme/handlers.d/<app>`.
 
-4. Create stub palette files with a comment header:
+4. Create a stub palette for every family and mode, e.g.:
 
 ```
-# config/theme/palettes.d/<app>.dark.<ext>
-# Catppuccin Mocha — fill in app-specific theme syntax here.
+# config/theme/palettes.d/<family>/dark/<app>.<ext>
+# <Family> dark variant — fill in app-specific theme syntax here.
 ```
 
 ```
-# config/theme/palettes.d/<app>.light.<ext>
-# Catppuccin Latte — fill in app-specific theme syntax here.
+# config/theme/palettes.d/<family>/light/<app>.<ext>
+# <Family> light variant — fill in app-specific theme syntax here.
 ```
+
+Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
 
 5. Print:
 
     - Paths created
-    - The reminder: "Update the handler body — the `_atomic_write`
+    - The reminder: "Update the handler body — the `_link_palette`
       line is a placeholder. Most apps need their own reload
       command (e.g. `tmux source-file`, `kitty @ load-config`).
       The orchestrator forks every handler in parallel under a 5 s
@@ -85,10 +87,12 @@ _atomic_write "$XDG_CONFIG_HOME/<app>/active.<ext>" "$(cat "$src")"
 
 ## Conventions enforced
 
-- Source `_lib.sh` for shared helpers (`_atomic_write`, etc.).
+- Source `_lib.sh` for shared helpers (`_palette`, `_link_palette`,
+  `_atomic_write`, etc.).
 - Validate `$mode` is `dark` or `light`; exit 2 on garbage input.
-- Read the palette file via `${DOTFILES:-$HOME/.dotfiles}` so the
-  handler works regardless of how `apply` was invoked.
+- Exit 1 without touching anything when `_theme_family` fails.
+- Resolve the palette with `_palette`, never a hand-built path, and
+  handle the "family ships none" case so palettes never mix.
 - Use `_atomic_write` for any destination file the user might
   re-read mid-flip (avoids partial-write corruption).
 - Bash, not POSIX — handlers can use `[[`, arrays, etc.

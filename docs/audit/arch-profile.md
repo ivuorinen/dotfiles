@@ -14,12 +14,13 @@ the configuration code is *organised and extended*.
 Evidence — multiple `*.d/` drop-in extension points, each loaded at
 runtime by a co-located orchestrator:
 
-- `config/theme/handlers.d/` (5 entries) — per-app theme flip
+- `config/theme/handlers.d/` (10 handlers) — per-app theme flip
   executables; the orchestrator forks each one in parallel under a
   5 s timeout. Add a new app by dropping a file here. Documented in
   root CLAUDE.md ("Add new apps by dropping a file here.")
-- `config/theme/palettes.d/[app].[variant].[ext]` — per-app palette
-  assets keyed by app + variant.
+- `config/theme/palettes.d/<family>/<variant>/<app>[.<ext>]` — per-app
+  palette assets keyed by theme family + variant + app; the active
+  family is named in `config/theme/family`.
 - `config/fish/conf.d/` (3 entries) — fish auto-loaded config
   fragments.
 - `config/fish/secrets.d/` (3 entries; only `*.example` and
@@ -133,14 +134,14 @@ Items already enforced by `.claude/rules/` are flagged.
    not by editing `apply` or `watcher`.** The orchestrator forks
    every executable under that directory; modifying the orchestrator
    to special-case an app violates the extension contract.
-2. **Per-app palette files follow `config/theme/palettes.d/<app>.<variant>[.<ext>]`.**
+2. **Per-app palette files follow `config/theme/palettes.d/<family>/<variant>/<app>[.<ext>]`.**
    Variant is `dark` or `light`. Extension is required when the
    consuming format expects one (`.toml` for starship, `.conf` for
    tmux, `.yml` for eza). Formats with no canonical extension —
-   e.g. dircolors — may omit it; the corresponding handler must
-   then read the no-ext form directly. The handler at
-   `config/theme/handlers.d/dircolors:14` is the one current
-   exception.
+   e.g. dircolors — may omit it (`<family>/<variant>/dircolors` is the
+   one current case). Handlers resolve the path with `_palette` from
+   `config/theme/_lib.sh`, and a family that ships no file gets the
+   stale link removed rather than another family's palette kept.
 3. **Host-specific values must live under `hosts/<hostname>/`,
    never in shared `config/` or `base/`.** ✅ Already enforced by
    `.claude/rules/host-specific-config.md`.

@@ -6,16 +6,212 @@ setup()
   export XDG_STATE_HOME="$TMPDIR_TEST"
   HD="$BATS_TEST_DIRNAME/../config/theme/handlers.d"
   export DOTFILES="$BATS_TEST_DIRNAME/.."
+  # Pin the family so assertions don't follow the tracked default.
+  export DOTFILES_THEME_FAMILY=catppuccin
+  # Never touch the developer's real tmux server: a private socket dir,
+  # and no inherited $TMUX pointing at the outer session.
+  export TMUX_TMPDIR="$TMPDIR_TEST/tmux"
+  mkdir -p "$TMUX_TMPDIR"
+  unset TMUX
 }
 
 teardown()
 {
+  tmux kill-server 2> /dev/null || true
   rm -rf "$TMPDIR_TEST"
+}
+
+# A DOTFILES tree whose only family ("bare") ships no palettes at all,
+# for the "missing palette ⇒ unlinked" paths.
+bare_family()
+{
+  local real="$BATS_TEST_DIRNAME/.."
+  export DOTFILES="$TMPDIR_TEST/dot"
+  mkdir -p "$DOTFILES/config/theme/palettes.d/bare/dark" "$DOTFILES/config/theme/palettes.d/bare/light" \
+    "$DOTFILES/config/gh-dash" "$DOTFILES/config/television"
+  cp "$real/config/gh-dash/base.yml" "$DOTFILES/config/gh-dash/base.yml"
+  cp "$real/config/television/base.toml" "$DOTFILES/config/television/base.toml"
+  mkdir -p "$DOTFILES/config/television/cable" "$DOTFILES/config/television/themes"
+  export DOTFILES_THEME_FAMILY=bare
 }
 
 @test "tmux handler: succeeds even when no tmux server is running" {
   run "$HD/tmux" dark
   [ "$status" -eq 0 ]
+}
+
+# Throwaway server whose pane runs `sleep`, not a shell: a shell pane
+# would run the user's shell init, which spawns the theme watcher with
+# this test's environment.
+test_server()
+{
+  tmux -f /dev/null new-session -d -s theme-test 'sleep 300'
+}
+
+# Poll (up to ~5 s) until the tmux option $1 is set; prints its value.
+wait_for_option()
+{
+  local _ v
+  for _ in $(seq 1 50); do
+    v="$(tmux show -gv "$1" 2> /dev/null)"
+    [[ -n "$v" ]] && break
+    sleep 0.1
+  done
+  printf '%s' "$v"
+}
+
+@test "tmux handler: reloads the config once (no recursion)" {
+  command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
+  test_server
+  # Stub config: records each load, and runs the same bootstrap the real
+  # tmux.conf does. If the bootstrap re-entered the handler, the marker
+  # would keep growing past one entry.
+  cat > "$TMPDIR_TEST/tmux.conf" << STUB
+set -ga @theme_test_loads x
+run-shell '"$DOTFILES/config/theme/tmux-palette" dark'
+STUB
+  THEME_TMUX_CONF="$TMPDIR_TEST/tmux.conf" run timeout 5s "$HD/tmux" dark
+  [ "$status" -eq 0 ]
+  [ "$(wait_for_option @theme_test_loads)" = "x" ]
+  sleep 1
+  [ "$(tmux show -gv @theme_test_loads)" = "x" ]
+}
+
+@test "tmux handler: a slow config reload does not block apply's budget" {
+  command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
+  test_server
+  # The real tmux.conf takes ~10 s (TPM); the handler must hand it to the
+  # server and return well inside apply's 5 s timeout.
+  printf '%s\n' "run-shell 'sleep 8'" 'set -g @theme_test_done yes' > "$TMPDIR_TEST/tmux.conf"
+  local start=$SECONDS
+  THEME_TMUX_CONF="$TMPDIR_TEST/tmux.conf" run timeout 5s "$HD/tmux" dark
+  [ "$status" -eq 0 ]
+  ((SECONDS - start < 3))
+}
+
+@test "tmux handler: a missing config fails loudly" {
+  command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
+  test_server
+  THEME_TMUX_CONF="$TMPDIR_TEST/nope.conf" run "$HD/tmux" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"missing config"* ]]
+}
+
+@test "handlers: resolve palettes through _palette, never a hand-built path" {
+  # .claude/rules/theme-handler-contract.md: a literal palettes.d path in a
+  # handler bypasses the family lookup and its missing-palette cleanup.
+  # Comment lines may describe the layout; only code lines count.
+  run grep -lE '^[^#]*palettes\.d' "$HD"/* "$BATS_TEST_DIRNAME/../config/theme/tmux-palette"
+  echo "$output"
+  [ "$status" -eq 1 ]
+}
+
+@test "tmux-palette: a family without a tmux palette sources nothing" {
+  bare_family
+  run "$BATS_TEST_DIRNAME/../config/theme/tmux-palette" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ships no tmux palette"* ]]
+}
+
+@test "handlers: an invalid family exits 1 and leaves the link untouched" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config"
+  ln -s /somewhere "$HOME/.config/starship.toml"
+  for h in starship eza gitui yazi fzf dircolors gh-dash television bat fish; do
+    DOTFILES_THEME_FAMILY=../catppuccin run "$HD/$h" dark
+    [ "$status" -eq 1 ] || {
+      echo "$h exited $status"
+      return 1
+    }
+  done
+  [ "$(readlink "$HOME/.config/starship.toml")" = "/somewhere" ]
+}
+
+@test "symlink handlers: a family without the palette removes the stale link" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  "$HD/starship" dark
+  "$HD/eza" dark
+  "$HD/gitui" dark
+  "$HD/yazi" dark
+  [ -L "$HOME/.config/starship.toml" ]
+  bare_family
+  for h in starship eza gitui yazi; do
+    run "$HD/$h" dark
+    [ "$status" -eq 0 ]
+  done
+  [ ! -e "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]
+  [ ! -L "$HOME/.config/eza/theme.yml" ]
+  [ ! -L "$HOME/.config/gitui/theme.ron" ]
+  [ ! -L "$HOME/.config/yazi/theme.toml" ]
+}
+
+@test "symlink handlers: a family without the palette keeps a regular file" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config"
+  echo "user content" > "$HOME/.config/starship.toml"
+  bare_family
+  run "$HD/starship" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$HOME/.config/starship.toml")" = "user content" ]
+}
+
+@test "state handlers: a family without palettes clears the stale state" {
+  "$HD/fzf" dark
+  "$HD/bat" dark
+  [ -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
+  [ -f "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+  bare_family
+  run "$HD/fzf" dark
+  [ "$status" -eq 0 ]
+  run "$HD/bat" dark
+  [ "$status" -eq 0 ]
+  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
+  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.fish" ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+}
+
+@test "dircolors handler: a family without a palette removes the cache" {
+  mkdir -p "$TMPDIR_TEST/dotfiles-theme"
+  echo "LS_COLORS=stale" > "$TMPDIR_TEST/dotfiles-theme/ls-colors"
+  bare_family
+  run "$HD/dircolors" dark
+  [ "$status" -eq 0 ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
+}
+
+@test "composed handlers: a family without palettes writes the base config only" {
+  bare_family
+  run "$HD/gh-dash" dark
+  [ "$status" -eq 0 ]
+  grep -q "prSections" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  run grep -q "^theme:" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  [ "$status" -ne 0 ]
+  run "$HD/television" dark
+  [ "$status" -eq 0 ]
+  [ -f "$TMPDIR_TEST/dotfiles-theme/television/config.toml" ]
+  run grep -q "^theme = " "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
+  [ "$status" -ne 0 ]
+}
+
+@test "handlers: kanagawa resolves every palette" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  export DOTFILES_THEME_FAMILY=kanagawa
+  for h in starship eza gitui yazi fzf gh-dash television bat; do
+    run "$HD/$h" light
+    [ "$status" -eq 0 ]
+  done
+  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/kanagawa/light/starship.toml" ]]
+  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/kanagawa/light/yazi.toml" ]]
+  [ -L "$HOME/.config/yazi/Kanagawa-Lotus-AA.tmTheme" ]
+  [ -L "$HOME/.config/yazi/Kanagawa-Wave.tmTheme" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
+  grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
 @test "starship handler: swaps ~/.config/starship.toml symlink" {
@@ -26,7 +222,7 @@ teardown()
   [ "$status" -eq 0 ]
   [ -L "$HOME/.config/starship.toml" ]
   target="$(readlink "$HOME/.config/starship.toml")"
-  [[ "$target" == *"starship.light.toml" ]]
+  [[ "$target" == *"/catppuccin/light/starship.toml" ]]
 }
 
 @test "starship handler: refuses to clobber a regular file" {
@@ -48,7 +244,7 @@ teardown()
   [ "$status" -eq 0 ]
   [ -L "$HOME/.config/eza/theme.yml" ]
   target="$(readlink "$HOME/.config/eza/theme.yml")"
-  [[ "$target" == *"eza.light.yml" ]]
+  [[ "$target" == *"/catppuccin/light/eza.yml" ]]
 }
 
 @test "eza handler: refuses to clobber a regular file" {

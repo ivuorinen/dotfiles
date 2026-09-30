@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# handlers.d/eza — swap ~/.config/eza/theme.yml symlink to the matching
-# variant. Refuses to clobber a regular file (N-021 guard). eza reads
+# handlers.d/eza — swap ~/.config/eza/theme.yml symlink to the active
+# family's palette for the mode, or remove a stale link when the family
+# ships none. Refuses to clobber a regular file (N-021 guard). eza reads
 # theme.yml on each invocation, so no shell refresh is required.
 set -uo pipefail
 
@@ -9,13 +10,10 @@ source "$(dirname -- "$0")/../_lib.sh"
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+_theme_family > /dev/null || exit 1
 
-src="${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/eza.${mode}.yml"
+src="$(_palette "$mode" eza.yml)" || src=""
 dst="${EZA_CONFIG_DIR:-$HOME/.config/eza}/theme.yml"
-[[ -r "$src" ]] || {
-  echo "eza handler: missing palette $src" >&2
-  exit 1
-}
 
 mkdir -p -- "$(dirname -- "$dst")"
-_idempotent_ln_sf "$src" "$dst"
+_link_palette "$src" "$dst"

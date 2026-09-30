@@ -80,7 +80,7 @@ TERM xterm-debian
 TERM xterm-termite
 
 ## Catppuccin Latte (green accent) reference, accents darkened to reach
-## WCAG AA 4.5:1 on base #eff1f5 (same set as eza.light.yml)
+## WCAG AA 4.5:1 on base #eff1f5 (same set as light/eza.yml)
 #  text       76;79;105    subtext1 92;95;119    subtext0 140;143;161
 #  green      50;124;33    blue     23;97;245    teal     19;121;126
 #  maroon     214;29;45    red      210;15;57    yellow   153;97;20

@@ -12,7 +12,7 @@ set t_Co=256
 
 " Accents darkened from upstream Latte (same HSL hue and saturation) to
 " reach WCAG AA 4.5:1 on base #EFF1F5; mapping in
-" config/theme/palettes.d/starship.light.toml.
+" config/theme/palettes.d/catppuccin/light/starship.toml.
 let s:rosewater = "#BB4930"
 let s:flamingo = "#CB3333"
 let s:pink = "#C71F9A"
