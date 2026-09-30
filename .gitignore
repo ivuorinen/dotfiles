@@ -106,6 +106,9 @@ graphify-out/
 # Latest user prompt, written by .claude/hooks/prompt-record.sh for the
 # BASH_OK check in pre-bash-route.sh. Prompts can carry anything.
 .claude/.last-prompt
+# Claude Code's per-session scheduler lock (ScheduleWakeup / loops):
+# harness runtime state holding a live pid, never repo content.
+.claude/scheduled_tasks.lock
 
 !docs/audit/**
 
