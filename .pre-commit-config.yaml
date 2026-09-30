@@ -216,8 +216,12 @@ repos:
         # test ("invalid object … Error building trees") and can corrupt the
         # commit itself. The suite's setup() functions unset these too; this is
         # the boundary that holds for a test file that forgets.
+        #
+        # scripts/bats-run.sh runs `bats --print-output-on-failure` and ends
+        # with one block listing every failing test as file:line, so a
+        # `not ok` is not lost among ~1000 lines of hook output.
         entry: env -u GIT_INDEX_FILE -u GIT_DIR -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY
-          -u GIT_COMMON_DIR -u GIT_PREFIX bats --print-output-on-failure tests/
+          -u GIT_COMMON_DIR -u GIT_PREFIX scripts/bats-run.sh tests/
         language: system
         pass_filenames: false
         # .claude/hooks/ and vendored-files.md are here so an edit to either

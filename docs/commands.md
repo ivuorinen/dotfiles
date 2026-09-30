@@ -38,6 +38,8 @@ yarn format:yaml   # Format YAML files with prettier
 
 ```bash
 yarn test                  # Run all tests (bash test-all.sh)
+scripts/bats-run.sh        # Run the suite as the hook and CI do; ends with a
+                           # file:line list of every failing test
 bats tests/dfm.bats        # Run a single test file (bats from PATH, via mise)
 ```
 
