@@ -9,7 +9,7 @@ agent_panel_sort = "priority"
 status_indicators = "symbols"
 [theme]
 name = "terminal"
-auto_switch = true
+auto_switch = false
 
 [[keys.command]]
 key = "prefix+t"
