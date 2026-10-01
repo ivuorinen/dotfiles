@@ -635,6 +635,9 @@ require('kanagawa').setup {
       samuraiRed = '#ed4f4f',
       dragonBlue = '#6b8b9a',
     },
+    -- The gutter (LineNr, SignColumn, FoldColumn, diagnostic signs) uses
+    -- the editor background instead of Kanagawa's lighter bg_gutter.
+    theme = { all = { ui = { bg_gutter = 'none' } } },
   },
 }
 

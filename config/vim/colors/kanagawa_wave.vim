@@ -1,11 +1,13 @@
 " Vendored from https://github.com/menisadi/kanagawa.vim (MIT,
 " Copyright (c) 2025 menisadi) @ 23b9b2c24ebaad185d0f1c4a27c67499f29108b1,
-" colors/kanagawa.vim. Three changes: g:colors_name is renamed so it can
+" colors/kanagawa.vim. Four changes: g:colors_name is renamed so it can
 " sit beside kanagawa_lotus; it is set after `hi clear` (upstream sets it
 " before, and `hi clear` unsets it, so the scheme loaded without a name);
-" and the Wave foregrounds below WCAG AA 4.5:1 on #1f1f28 are lifted
-" (hue and saturation kept): #c34043 -> #cf6769, #e82424 -> #ed4f4f,
-" #658594 -> #6b8b9a. cterm numbers are upstream's.
+" the Wave foregrounds below WCAG AA 4.5:1 on #1f1f28 are lifted (hue and
+" saturation kept): #c34043 -> #cf6769, #e82424 -> #ed4f4f, #658594 ->
+" #6b8b9a; and the gutter (LineNr, CursorLineNr, SignColumn, FoldColumn)
+" has no background of its own, so it matches the editor, as in nvim's
+" bg_gutter = 'none'. cterm numbers are upstream's.
 " ============================================================================
 " Kanagawa (Wave) Colorscheme for Vim
 " Inspired by https://github.com/rebelot/kanagawa.nvim (Wave variant)
@@ -41,7 +43,7 @@ hi link CursorColumn CursorLine
 hi link CursorIM Cursor
 hi CursorLine gui=NONE term=NONE cterm=NONE guifg=NONE guibg=#363646 ctermfg=NONE ctermbg=237
 hi link CursorLineFold FoldColumn
-hi CursorLineNr gui=bold term=bold cterm=bold guifg=#ff9e3b guibg=#2a2a37 ctermfg=215 ctermbg=235
+hi CursorLineNr gui=bold term=bold cterm=bold guifg=#ff9e3b guibg=NONE ctermfg=215 ctermbg=NONE
 hi link CursorLineSign SignColumn
 hi link Debug Special
 hi link Define PreProc
@@ -56,7 +58,7 @@ hi Error gui=NONE term=NONE cterm=NONE guifg=#ed4f4f guibg=NONE ctermfg=160 cter
 hi ErrorMsg gui=NONE term=NONE cterm=NONE guifg=#ed4f4f guibg=NONE ctermfg=160 ctermbg=NONE
 hi Exception gui=NONE term=NONE cterm=NONE guifg=#e46876 guibg=NONE ctermfg=168 ctermbg=NONE
 hi link Float Number
-hi FoldColumn gui=NONE term=NONE cterm=NONE guifg=#54546d guibg=#2a2a37 ctermfg=240 ctermbg=235
+hi FoldColumn gui=NONE term=NONE cterm=NONE guifg=#54546d guibg=NONE ctermfg=240 ctermbg=NONE
 hi Folded gui=NONE term=NONE cterm=NONE guifg=#938aa9 guibg=#2a2a37 ctermfg=103 ctermbg=235
 hi Function gui=NONE term=NONE cterm=NONE guifg=#7e9cd8 guibg=NONE ctermfg=246 ctermbg=NONE
 hi Identifier gui=NONE term=NONE cterm=NONE guifg=#e6c384 guibg=NONE ctermfg=251 ctermbg=NONE
@@ -65,7 +67,7 @@ hi IncSearch gui=NONE term=NONE cterm=NONE guifg=#223249 guibg=#ff9e3b ctermfg=2
 hi link Include PreProc
 hi Keyword gui=italic term=italic cterm=italic guifg=#957fb8 guibg=NONE ctermfg=103 ctermbg=NONE
 hi link Label Statement
-hi LineNr gui=NONE term=NONE cterm=NONE guifg=#54546d guibg=#2a2a37 ctermfg=240 ctermbg=235
+hi LineNr gui=NONE term=NONE cterm=NONE guifg=#54546d guibg=NONE ctermfg=240 ctermbg=NONE
 hi link LineNrAbove LineNr
 hi link LineNrBelow LineNr
 hi link Macro PreProc
@@ -92,7 +94,7 @@ hi link Question MoreMsg
 hi QuickFixLine gui=NONE term=NONE cterm=NONE guifg=NONE guibg=#2a2a37 ctermfg=NONE ctermbg=235
 hi link Repeat Statement
 hi Search gui=NONE term=NONE cterm=NONE guifg=#dcd7ba guibg=#2d4f67 ctermfg=187 ctermbg=238
-hi SignColumn gui=NONE term=NONE cterm=NONE guifg=#938aa9 guibg=#2a2a37 ctermfg=103 ctermbg=235
+hi SignColumn gui=NONE term=NONE cterm=NONE guifg=#938aa9 guibg=NONE ctermfg=103 ctermbg=NONE
 hi Special gui=NONE term=NONE cterm=NONE guifg=#7fb4ca guibg=NONE ctermfg=110 ctermbg=NONE
 hi link SpecialChar Special
 hi link SpecialComment Special

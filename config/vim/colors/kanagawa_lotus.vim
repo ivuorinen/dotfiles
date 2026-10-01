@@ -2,6 +2,8 @@
 " replaced by its Lotus counterpart, paired slot-by-slot from upstream
 " rebelot/kanagawa.nvim lua/kanagawa/themes.lua, foregrounds darkened to
 " WCAG AA 4.5:1 on #f2ecbc, cterm numbers recomputed. Map: docs/plans/2026-09-30-kanagawa-theme-families.md.
+" Like kanagawa_wave.vim, the gutter (LineNr, CursorLineNr, SignColumn,
+" FoldColumn) has no background of its own, so it matches the editor.
 " ============================================================================
 " Kanagawa (Lotus AA) Colorscheme for Vim
 " Inspired by https://github.com/rebelot/kanagawa.nvim (Wave variant)
@@ -37,7 +39,7 @@ hi link CursorColumn CursorLine
 hi link CursorIM Cursor
 hi CursorLine gui=NONE term=NONE cterm=NONE guifg=NONE guibg=#e4d794 ctermfg=NONE ctermbg=186
 hi link CursorLineFold FoldColumn
-hi CursorLineNr gui=bold term=bold cterm=bold guifg=#9a5b00 guibg=#e7dba0 ctermfg=94 ctermbg=187
+hi CursorLineNr gui=bold term=bold cterm=bold guifg=#9a5b00 guibg=NONE ctermfg=94 ctermbg=NONE
 hi link CursorLineSign SignColumn
 hi link Debug Special
 hi link Define PreProc
@@ -52,7 +54,7 @@ hi Error gui=NONE term=NONE cterm=NONE guifg=#d21616 guibg=NONE ctermfg=160 cter
 hi ErrorMsg gui=NONE term=NONE cterm=NONE guifg=#d21616 guibg=NONE ctermfg=160 ctermbg=NONE
 hi Exception gui=NONE term=NONE cterm=NONE guifg=#c0374a guibg=NONE ctermfg=131 ctermbg=NONE
 hi link Float Number
-hi FoldColumn gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=#e7dba0 ctermfg=96 ctermbg=187
+hi FoldColumn gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=NONE ctermfg=96 ctermbg=NONE
 hi Folded gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=#e7dba0 ctermfg=96 ctermbg=187
 hi Function gui=NONE term=NONE cterm=NONE guifg=#4d699b guibg=NONE ctermfg=60 ctermbg=NONE
 hi Identifier gui=NONE term=NONE cterm=NONE guifg=#716b3c guibg=NONE ctermfg=59 ctermbg=NONE
@@ -61,7 +63,7 @@ hi IncSearch gui=NONE term=NONE cterm=NONE guifg=#f2ecbc guibg=#9a5b00 ctermfg=2
 hi link Include PreProc
 hi Keyword gui=italic term=italic cterm=italic guifg=#624c83 guibg=NONE ctermfg=60 ctermbg=NONE
 hi link Label Statement
-hi LineNr gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=#e7dba0 ctermfg=96 ctermbg=187
+hi LineNr gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=NONE ctermfg=96 ctermbg=NONE
 hi link LineNrAbove LineNr
 hi link LineNrBelow LineNr
 hi link Macro PreProc
@@ -88,7 +90,7 @@ hi link Question MoreMsg
 hi QuickFixLine gui=NONE term=NONE cterm=NONE guifg=NONE guibg=#e7dba0 ctermfg=NONE ctermbg=187
 hi link Repeat Statement
 hi Search gui=NONE term=NONE cterm=NONE guifg=#545464 guibg=#b5cbd2 ctermfg=240 ctermbg=152
-hi SignColumn gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=#e7dba0 ctermfg=96 ctermbg=187
+hi SignColumn gui=NONE term=NONE cterm=NONE guifg=#766b90 guibg=NONE ctermfg=96 ctermbg=NONE
 hi Special gui=NONE term=NONE cterm=NONE guifg=#406d99 guibg=NONE ctermfg=60 ctermbg=NONE
 hi link SpecialChar Special
 hi link SpecialComment Special
