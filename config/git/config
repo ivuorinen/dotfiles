@@ -73,3 +73,5 @@
 	helper = !~/.local/share/mise/shims/gh auth git-credential
 [alias]
 	cleanup = !git-cleanup-squashed
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
