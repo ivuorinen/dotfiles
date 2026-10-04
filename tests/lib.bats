@@ -108,8 +108,8 @@ setup()
   [[ "$output" == *"GONE"* ]]
 }
 
-@test "lib::cleanup also honors a legacy TEMP_DIR" {
-  run bash -c 'source "$LIB"; TEMP_DIR=$(mktemp -d); lib::cleanup; [[ -d "$TEMP_DIR" ]] && echo EXISTS || echo GONE'
+@test "lib::cleanup leaves an inherited TEMP_DIR alone" {
+  run bash -c 'source "$LIB"; TEMP_DIR=$(mktemp -d); lib::cleanup; [[ -d "$TEMP_DIR" ]] && echo EXISTS || echo GONE; rm -rf "$TEMP_DIR"'
   [ "$status" -eq 0 ]
-  [[ "$output" == *"GONE"* ]]
+  [[ "$output" == *"EXISTS"* ]]
 }

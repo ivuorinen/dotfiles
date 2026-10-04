@@ -40,22 +40,53 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
+      # The foreach body is single-quoted so each submodule's shell evaluates
+      # it. A double-quoted body is expanded once here in the superproject,
+      # where there are no tags: every describe failed, $tag was empty, and
+      # the job reported "No updates" from 2025-02 on while updating nothing.
+      # Tagless submodules (dotbot-include, the cheatsheets) are skipped.
+      #
+      # checkout clones submodules with --depth=2 (its fetch-depth), and a
+      # plain `fetch --tags` adds the tag refs without deepening the graft, so
+      # describe stopped at the shallow boundary before the latest tag and the
+      # job logged every tagged submodule as "no tags". Each submodule is
+      # unshallowed first, and a describe failure on a tagged submodule now
+      # fails the step instead of being reported as tagless.
+      #
+      # Changes are pushed straight to main rather than opened as a PR: no
+      # workflow here uses a PR-creating action, and a PR opened with
+      # GITHUB_TOKEN would not trigger the checks that make review useful.
+      # Every tagged submodule follows its default branch's newest tag, major
+      # bumps included and with no per-submodule exceptions: a tag is the
+      # upstream's own release point, so the pin is always a release. A pin
+      # sitting on untagged commits is moved to that tag too.
       - name: Update submodules
         shell: bash
         run: |
           git submodule sync
-          git submodule foreach --quiet "
-            tag=\"$(git describe --tags --abbrev=0 origin/HEAD)\"
-            if [ \"$(git describe --tags)\" != \"$tag\" ]; then
-              git checkout --quiet \"$tag\"
-              echo \"$name updated to $tag\"
+          # shellcheck disable=SC2016 # expansion must happen per submodule
+          git submodule foreach --quiet '
+            if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+              git fetch --quiet --tags --unshallow origin
+            else
+              git fetch --quiet --tags origin
             fi
-          "
+            if [ -z "$(git tag --list)" ]; then
+              echo "$name: no tags, skipped"
+              exit 0
+            fi
+            tag="$(git describe --tags --abbrev=0 origin/HEAD)" || exit 1
+            [ "$(git describe --tags)" != "$tag" ] || exit 0
+            git checkout --quiet "$tag"
+            echo "$name updated to $tag"
+          '
 
           if git diff --quiet; then
             echo "No updates for submodules."
           else
-            git add .
+            # --update stages only tracked paths (the submodule pointers),
+            # never stray untracked files in the runner's checkout.
+            git add --update
             git commit -m "chore(git): Update submodules (automated)"
             git show --raw
             git push
