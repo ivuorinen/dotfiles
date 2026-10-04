@@ -14,7 +14,7 @@ the configuration code is *organised and extended*.
 Evidence — multiple `*.d/` drop-in extension points, each loaded at
 runtime by a co-located orchestrator:
 
-- `config/theme/handlers.d/` (10 handlers) — per-app theme flip
+- `config/theme/handlers.d/` — one executable per app, per-app theme flip
   executables; the orchestrator forks each one in parallel under a
   5 s timeout. Add a new app by dropping a file here. Documented in
   root CLAUDE.md ("Add new apps by dropping a file here.")
