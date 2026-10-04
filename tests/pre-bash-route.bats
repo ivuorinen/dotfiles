@@ -761,3 +761,20 @@ EOF"
   [ "$(printf '%s' "$output" | jq -r '.hookSpecificOutput.permissionDecision')" = "deny" ]
   [[ "$output" == *"shfmt is not on PATH"* ]]
 }
+
+# shfmt before 3.14.0 encodes operators as enum numbers, not strings, so no
+# redirect matched the write operators and every protected redirect passed.
+# The stub rewrites the real parser's operators to numbers the way an old
+# shfmt emits them.
+@test "pre-bash-route: numeric redirect operators from an older shfmt still deny protected writes" {
+  local bin="$BATS_TEST_TMPDIR/oldshfmt" real
+  real="$(command -v shfmt)"
+  mkdir -p "$bin"
+  printf '#!/usr/bin/env bash\n"%s" "$@" | jq -c '\''walk(if type == "object" and (.Op | type) == "string" then .Op = 54 else . end)'\''\n' "$real" > "$bin/shfmt"
+  chmod +x "$bin/shfmt"
+  PATH="$bin:$PATH"
+  [ "$(decision 'echo x > config/fish/functions/__bass.py')" = "deny" ]
+  [ "$(decision 'echo x >> yarn.lock')" = "deny" ]
+  [ "$(decision 'echo x > /tmp/out.txt')" = "allow" ]
+  [ "$(decision 'git status 2>&1')" = "allow" ]
+}

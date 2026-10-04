@@ -333,12 +333,15 @@ _bp_value()
 }
 
 # _bp_redir OP TARGET — a redirect that writes to a protected path. The
-# routine `2>&1` and `> /dev/null` never reach the predicate.
+# routine `2>&1` and `> /dev/null` never reach the predicate. shfmt before
+# 3.14.0 encodes OP as an enum number whose values shift between releases,
+# so a numeric OP counts as a write: an old shfmt then over-denies redirects
+# to protected paths instead of letting every one of them through.
 _bp_redir()
 {
   local op=$1 target=$2
   BP_SCAN+=$'\n'$target
-  [[ $op =~ $BP_WRITE_OPS_RE ]] || return 0
+  [[ $op =~ $BP_WRITE_OPS_RE || $op =~ ^[0-9]+$ ]] || return 0
   case $target in
     /dev/null | /dev/std* | [0-9] | -) return 0 ;;
     *) ;;
