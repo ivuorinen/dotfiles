@@ -5,10 +5,12 @@
 #
 # config/fish/themes/<family>-aa.theme is a repo-owned dual-palette file:
 # [light] carries AA-darkened accents, [dark] the family's dark variant.
-# fish picks the right section by querying terminal background via OSC 11.
-# We therefore save the SAME theme name regardless of mode — re-saving
-# triggers fish's re-query, which is what flips the colours in-process.
-# A family without such a file leaves fish's current theme untouched.
+# Interactive fish picks the section by querying the terminal (OSC 11),
+# but this handler runs headless, where fish 4 refuses `theme save` with
+# "$fish_terminal_color_theme not yet initialized". --color-theme=$mode
+# names the section explicitly, so the same theme name works for both
+# modes (fish 4 only; see the probe below for fish 3.x). A family
+# without such a file leaves fish's theme untouched.
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -27,13 +29,35 @@ if [[ ! -r "${DOTFILES:-$HOME/.dotfiles}/config/fish/themes/${theme}.theme" ]]; 
   exit 0
 fi
 
+# A host without fish has nothing to persist: skip (exit 0), the same
+# way handlers.d/bat treats a missing bat. A failure here would make
+# apply retry this handler on every shell for a tool that never appears.
 if ! command -v fish > /dev/null 2>&1; then
-  echo "fish handler: fish not in PATH" >&2
-  exit 1
+  echo "fish handler: fish not in PATH; skipping" >&2
+  exit 0
+fi
+
+# --color-theme exists only in fish 4's fish_config (`argparse h/help
+# color-theme= no-override`). fish 3.x declares `argparse h/help` alone
+# and rejects the option, so probe the installed function's source
+# rather than parsing `fish --version`. fish 3.x reads every line of the
+# theme file regardless of its [light]/[dark] sections (the last one
+# wins), so there the saved palette does not follow the mode; the save
+# still succeeds, which is all 3.x can offer. The probe output is
+# captured, not piped into `grep -q`: under pipefail an early grep exit
+# would SIGPIPE fish and fail the pipeline.
+save="fish_config theme save $theme"
+fish_config_src="$(fish -c 'functions fish_config' 2> /dev/null || true)"
+if [[ "$fish_config_src" == *color-theme=* ]]; then
+  save="fish_config theme save --color-theme=$mode $theme"
 fi
 
 # `echo y |` bypasses fish_config's interactive
 # "Overwrite your current theme? [y/N]" prompt; >/dev/null silences the
-# confirmation echo. `|| true` prevents a transient fish failure from
-# poisoning the actor's parallel-handler exit-code aggregation.
-echo y | fish -c "fish_config theme save $theme" > /dev/null 2>&1 || true
+# confirmation echo. A failed save is reported on stderr and through the
+# exit status: apply logs it under this handler's name and retries it on
+# the next apply instead of recording a flip that never landed.
+echo y | fish -c "$save" > /dev/null || {
+  echo "fish handler: fish_config theme save $theme failed" >&2
+  exit 1
+}

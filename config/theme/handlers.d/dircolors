@@ -31,9 +31,12 @@ for _cmd in dircolors gdircolors; do
   fi
 done
 
+# Bare macOS (no coreutils) has neither: skip with exit 0, as handlers.d/bat
+# does for a missing bat. A failure would make apply retry this handler on
+# every shell for a tool that is never going to appear.
 if [[ -z "$_dircolors_cmd" ]]; then
-  echo "dircolors handler: neither dircolors nor gdircolors found in PATH" >&2
-  exit 1
+  echo "dircolors handler: neither dircolors nor gdircolors found in PATH; skipping" >&2
+  exit 0
 fi
 
 # Capture rc separately because $? clobbers after the test for empty content.

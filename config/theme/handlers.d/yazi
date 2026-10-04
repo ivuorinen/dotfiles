@@ -21,7 +21,8 @@ src="$(_palette "$mode" yazi.toml)" || src=""
 dst="$HOME/.config/yazi/theme.toml"
 
 mkdir -p -- "$(dirname -- "$dst")"
-_link_palette "$src" "$dst"
+rc=0
+_link_palette "$src" "$dst" || rc=1
 
 # Provide both modes' tmThemes up front so a flip never leaves
 # `syntect_theme` pointing at a missing file (yazi falls back to a
@@ -32,5 +33,10 @@ for m in dark light; do
   read -r name < "$name_file" || true
   [[ -n "$name" ]] || continue
   tm_src="$dotfiles/config/bat/themes/${name}.tmTheme"
-  [[ -r "$tm_src" ]] && _idempotent_ln_sf "$tm_src" "$HOME/.config/yazi/${name// /-}.tmTheme"
+  # if, not &&: a missing tmTheme is a skip, and a false test as the
+  # loop's last command would otherwise become the handler's exit status.
+  if [[ -r "$tm_src" ]]; then
+    _idempotent_ln_sf "$tm_src" "$HOME/.config/yazi/${name// /-}.tmTheme" || rc=1
+  fi
 done
+exit "$rc"

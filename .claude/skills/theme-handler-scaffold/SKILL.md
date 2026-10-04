@@ -45,6 +45,14 @@ mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
 _theme_family > /dev/null || exit 1
 
+# A missing tool is a skip, not a failure: apply retries failures, and a
+# host without <app> would be retried forever. Drop this block when the
+# handler only writes files and never runs <app>.
+command -v <app> > /dev/null 2>&1 || {
+  echo "<app> handler: <app> not in PATH; skipping" >&2
+  exit 0
+}
+
 # Empty when the active family ships no palette for this app/mode.
 src="$(_palette "$mode" <app>.<ext>)" || src=""
 dst="$HOME/.config/<app>/theme.<ext>"
@@ -54,7 +62,10 @@ dst="$HOME/.config/<app>/theme.<ext>"
 # the active one ships none. For a composed or state-dir artifact,
 # rebuild it without the palette (or delete it) in the empty-src case.
 mkdir -p -- "$(dirname -- "$dst")"
-_link_palette "$src" "$dst"
+_link_palette "$src" "$dst" || {
+  echo "<app> handler: cannot link $dst" >&2
+  exit 1
+}
 ```
 
 3. `chmod +x config/theme/handlers.d/<app>`.
@@ -80,8 +91,11 @@ Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
       line is a placeholder. Most apps need their own reload
       command (e.g. `tmux source-file`, `kitty @ load-config`).
       The orchestrator forks every handler in parallel under a 5 s
-      timeout; if your reload blocks, wrap it with `&` or
-      short-circuit on failure."
+      timeout and retries the ones that exit non-zero, so keep the
+      reload under 5 s and end it with
+      `|| { echo '<app> handler: <what failed>' >&2; exit 1; }`.
+      Never background it with `&` or append `|| true`: apply would
+      never see the failure, so it is neither logged nor retried."
     - Test command: `config/theme/apply dark` then
       `config/theme/apply light` to verify the handler fires.
 
@@ -91,6 +105,11 @@ Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
   `_atomic_write`, etc.).
 - Validate `$mode` is `dark` or `light`; exit 2 on garbage input.
 - Exit 1 without touching anything when `_theme_family` fails.
+- Any other failure exits non-zero with a stderr line: apply logs the
+  line and lists the handler in its `retry` file. Every write and
+  reload carries its own `|| { echo … >&2; exit 1; }`; none is
+  backgrounded or silenced with `|| true`.
+- A missing tool is a skip, not a failure: a stderr note and exit 0.
 - Resolve the palette with `_palette`, never a hand-built path, and
   handle the "family ships none" case so palettes never mix.
 - Use `_atomic_write` for any destination file the user might

@@ -36,8 +36,14 @@ _idempotent_ln_sf()
       "$dst" "$src" >&2
     return 0
   fi
+  # -n: replace an existing link to a directory instead of following it
+  # and creating the new link inside the old target (BSD and GNU ln both
+  # accept it). A failed ln is returned so the handler exits non-zero.
   if [[ "$(readlink "$dst" 2> /dev/null)" != "$src" ]]; then
-    ln -sf "$src" "$dst"
+    ln -sfn -- "$src" "$dst" || {
+      printf 'theme: failed to link %s -> %s\n' "$dst" "$src" >&2
+      return 1
+    }
   fi
   return 0
 }
@@ -83,7 +89,7 @@ _link_palette()
   local src=$1 dst=$2
   if [[ -n "$src" ]]; then
     _idempotent_ln_sf "$src" "$dst"
-    return 0
+    return
   fi
   if [[ -L "$dst" ]]; then
     rm -f -- "$dst"

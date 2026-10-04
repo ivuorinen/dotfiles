@@ -9,7 +9,7 @@
 #            `busctl monitor` against the freedesktop portal, since
 #            those DEs leave `org.gnome.desktop.interface color-scheme`
 #            untouched. Falls back to whichever is available; exits 0
-#            if neither is.
+#            if neither is, and exits 1 (logged) if the monitor ends.
 #   macos  : 2s `defaults read` polling.
 #   stub   : reads modes (one per line) from --stub-input. Test seam.
 set -uo pipefail
@@ -57,7 +57,16 @@ if ! _acquire_lock "$pidfile"; then
   exit 1
 fi
 
-trap 'rm -f "$pidfile"' EXIT INT TERM HUP
+# Cleanup lives on EXIT only; each signal trap exits with 128+signo,
+# which fires the EXIT trap. A signal trap that merely removed the
+# pidfile let the loop run on unlocked, so a second watcher could join.
+# The Linux monitor pipeline runs in the background (see below); `pkill
+# -P $$` takes it down with the watcher so no orphaned reader keeps
+# calling apply.
+trap 'pkill -P $$ 2> /dev/null; rm -f "$pidfile"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 apply_cmd="$(dirname -- "$0")/apply"
 
@@ -115,6 +124,16 @@ seed_initial_state()
   esac
 }
 
+# The Linux monitor streams should never end. When one does (D-Bus or
+# session restart), record it and exit non-zero instead of exiting 0
+# silently: the next interactive shell respawns the watcher (shell init
+# launches it), which is simpler than a resubscribe loop in here.
+monitor_ended()
+{
+  _log "ERROR watcher linux: $1 monitor stream ended; exiting so the next shell respawns the watcher"
+  exit 1
+}
+
 case "$SOURCE" in
   stub)
     [[ -r "$STUB_INPUT" ]] || {
@@ -170,6 +189,11 @@ case "$SOURCE" in
       use="busctl"
     fi
 
+    # Each monitor pipeline runs in the background and the watcher blocks
+    # in `wait`. Bash defers a trap until a foreground command finishes,
+    # and these pipelines never finish, so a foreground pipeline left
+    # TERM/INT/HUP pending forever; `wait` returns as soon as a trapped
+    # signal arrives, so the trap fires and the EXIT trap kills the pipe.
     case "$use" in
       gsettings)
         _log "INFO watcher: subscribing via gsettings monitor"
@@ -178,7 +202,9 @@ case "$SOURCE" in
           | while IFS= read -r _; do
             apply_gsettings_scheme \
               "$(gsettings get org.gnome.desktop.interface color-scheme 2> /dev/null)"
-          done
+          done &
+        wait "$!"
+        monitor_ended gsettings
         ;;
       busctl)
         _log "INFO watcher: subscribing via busctl monitor (portal) — DE='${XDG_CURRENT_DESKTOP:-}'"
@@ -195,7 +221,9 @@ case "$SOURCE" in
               *'"color-scheme"'*'"v":2'*) apply_mode light ;;
               *'"color-scheme"'*'"v":0'*) apply_mode dark ;;
             esac
-          done
+          done &
+        wait "$!"
+        monitor_ended busctl
         ;;
       *)
         _log "WARN watcher linux: neither gsettings nor busctl available; exiting"

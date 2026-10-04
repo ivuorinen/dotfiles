@@ -82,11 +82,27 @@ PY
   [ "$status" -eq 0 ]
 }
 
+# Private tmux socket dir under /tmp, not BATS_TEST_TMPDIR: the socket
+# path must fit macOS's 104-byte sun_path, and a deep TMPDIR overflows it.
+private_tmux()
+{
+  # shellcheck disable=SC2030,SC2031
+  TMUX_TMPDIR="$(mktemp -d /tmp/tmx.XXXXXX)"
+  export TMUX_TMPDIR
+  unset TMUX
+}
+
+teardown()
+{
+  if [[ -n "${TMUX_TMPDIR:-}" && "$TMUX_TMPDIR" == /tmp/tmx.* ]]; then
+    tmux kill-server 2> /dev/null || true
+    rm -rf -- "$TMUX_TMPDIR"
+  fi
+}
+
 @test "palettes: every tmux palette parses" {
   command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
-  # shellcheck disable=SC2030,SC2031
-  export TMUX_TMPDIR="$BATS_TEST_TMPDIR"
-  unset TMUX
+  private_tmux
   # `sleep`, not a shell: a shell pane would run shell init, which spawns
   # the theme watcher with this test's environment.
   tmux -f /dev/null new-session -d -s parse 'sleep 300'
@@ -103,9 +119,7 @@ PY
 
 @test "tmux.conf: server options stay idempotent across the flip-time reload" {
   command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
-  # shellcheck disable=SC2030,SC2031
-  export TMUX_TMPDIR="$BATS_TEST_TMPDIR"
-  unset TMUX
+  private_tmux
   tmux -f /dev/null new-session -d -s idem 'sleep 300'
   # handlers.d/tmux re-sources tmux.conf on every flip, so any appending
   # `set -as`/`-ag` on an array option would grow it without bound.

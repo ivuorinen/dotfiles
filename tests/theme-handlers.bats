@@ -275,12 +275,82 @@ STUB
   grep -q "export LS_COLORS" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
 }
 
-@test "fish handler: returns 0 with valid mode (smoke test only)" {
+@test "fish handler: saves the mode's section of the theme headlessly" {
   if ! command -v fish > /dev/null 2>&1; then
     skip "fish not installed"
   fi
+  # Private fish config dir: the save writes universal variables, which
+  # must never land in the developer's real fish_variables.
+  export XDG_CONFIG_HOME="$TMPDIR_TEST/cfg"
+  mkdir -p "$XDG_CONFIG_HOME/fish/themes"
+  cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$XDG_CONFIG_HOME/fish/themes/"
   run "$HD/fish" dark
   [ "$status" -eq 0 ]
+  local dark light
+  dark="$(fish -c 'echo $fish_color_command')"
+  run "$HD/fish" light
+  [ "$status" -eq 0 ]
+  light="$(fish -c 'echo $fish_color_command')"
+  [ -n "$dark" ]
+  # fish 3.x has no --color-theme and ignores the theme's sections, so
+  # only fish 4 can save a different palette per mode.
+  # shellcheck disable=SC2016
+  if ! fish -c 'functions fish_config' 2> /dev/null | grep -q -- 'color-theme='; then
+    skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
+  fi
+  [ "$dark" != "$light" ]
+}
+
+# Fake fish: answers the fish_config source probe as fish 4 (with
+# --color-theme) or fish 3 (without), and records every other -c command.
+stub_fish()
+{
+  mkdir -p "$TMPDIR_TEST/bin"
+  cat > "$TMPDIR_TEST/bin/fish" << EOF
+#!/usr/bin/env bash
+if [[ "\$2" == "functions fish_config" ]]; then
+  if [[ "$1" == 4 ]]; then
+    echo '    argparse h/help color-theme= no-override -- \$argv'
+  else
+    echo '    argparse h/help -- \$argv'
+  fi
+  exit 0
+fi
+printf '%s\n' "\$2" >> "$TMPDIR_TEST/fish.log"
+EOF
+  chmod +x "$TMPDIR_TEST/bin/fish"
+}
+
+@test "fish handler: fish 4 saves with --color-theme=<mode>" {
+  stub_fish 4
+  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" light
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/fish.log")" = "fish_config theme save --color-theme=light catppuccin-aa" ]
+}
+
+@test "fish handler: fish 3 saves without --color-theme" {
+  stub_fish 3
+  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/fish.log")" = "fish_config theme save catppuccin-aa" ]
+}
+
+@test "fish handler: fish not in PATH is a skip, not a failure" {
+  mkdir -p "$TMPDIR_TEST/bin"
+  ln -s "$(command -v bash)" "$TMPDIR_TEST/bin/bash"
+  ln -s "$(command -v dirname)" "$TMPDIR_TEST/bin/dirname"
+  PATH="$TMPDIR_TEST/bin" run "$HD/fish" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"fish not in PATH; skipping"* ]]
+}
+
+@test "fish handler: a failed theme save exits 1 with a message" {
+  mkdir -p "$TMPDIR_TEST/bin"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$TMPDIR_TEST/bin/fish"
+  chmod +x "$TMPDIR_TEST/bin/fish"
+  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"fish handler: fish_config theme save catppuccin-aa failed"* ]]
 }
 
 @test "fish handler: rejects invalid mode" {
@@ -300,6 +370,35 @@ STUB
   # The reorg invariant: nothing is written under ~/.config.
   [ ! -e "$HOME/.config/bat/config" ]
   [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
+}
+
+@test "bat handler: a failed cache build exits 1 with a message" {
+  # Fake bat: an empty cache dir (so the build is due) and a failing build.
+  mkdir -p "$TMPDIR_TEST/bin" "$TMPDIR_TEST/batcache"
+  cat > "$TMPDIR_TEST/bin/bat" << STUB
+#!/usr/bin/env bash
+case "\$1" in
+  --cache-dir) echo "$TMPDIR_TEST/batcache" ;;
+  --config-dir) echo "$TMPDIR_TEST/batconfig" ;;
+  cache) exit 1 ;;
+esac
+STUB
+  chmod +x "$TMPDIR_TEST/bin/bat"
+  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/bat" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"bat handler: bat cache --build failed"* ]]
+}
+
+@test "bat handler: an unwritable state dir exits 1 with a message" {
+  # Fake bat with no cache dir, so the build block is skipped and the
+  # exit status can only come from the state write.
+  mkdir -p "$TMPDIR_TEST/bin"
+  printf '#!/usr/bin/env bash\n' > "$TMPDIR_TEST/bin/bat"
+  chmod +x "$TMPDIR_TEST/bin/bat"
+  : > "$TMPDIR_TEST/file"
+  XDG_STATE_HOME="$TMPDIR_TEST/file" PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/bat" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"bat handler: cannot write"* ]]
 }
 
 @test "bat handler: rejects invalid mode" {
@@ -338,6 +437,18 @@ STUB
   [ -L "$TMPDIR_TEST/dotfiles-theme/television/themes" ]
   [ ! -e "$HOME/.config/television/config.toml" ]
   [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
+}
+
+@test "television handler: a failed config write exits 1 with a message" {
+  run "$HD/television" light
+  [ "$status" -eq 0 ]
+  # The links are already in place, so only the config write can fail.
+  tvdir="$TMPDIR_TEST/dotfiles-theme/television"
+  chmod 555 "$tvdir"
+  run "$HD/television" dark
+  chmod 755 "$tvdir"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"television handler: cannot write"* ]]
 }
 
 @test "television handler: rejects invalid mode" {
