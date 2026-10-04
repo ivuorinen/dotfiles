@@ -45,25 +45,36 @@ def main():
     sys.exit(0)
 
 
+def check(expr, expected):
+    """Raise AssertionError unless vercmp(expr) is expected.
+
+    A bare `assert` is stripped under `python -O`, which would turn the
+    self-test into a silent pass, and Codacy's Bandit flags every one as
+    B101 because it ignores the per-plugin skip in pyproject.toml.
+    """
+    if vercmp(expr) is not expected:
+        raise AssertionError(f"vercmp({expr!r}) is not {expected}")
+
+
 def test():
     """Basic functionality tests."""
-    assert not vercmp("1.9 >= 2.4")
-    assert vercmp("2.4 >= 2.4")
-    assert vercmp("2.5 >= 2.4")
-    assert vercmp("3 >= 2.999")
-    assert vercmp("2.9a < 2.9")
-    assert vercmp("2.9a >= 2.8")
+    check("1.9 >= 2.4", False)
+    check("2.4 >= 2.4", True)
+    check("2.5 >= 2.4", True)
+    check("3 >= 2.999", True)
+    check("2.9a < 2.9", True)
+    check("2.9a >= 2.8", True)
 
     # multiple comparisons in a single expression
-    assert vercmp("1.0 < 2.0 <= 2.0")
-    assert not vercmp("1.0 > 2.0 < 3.0")
+    check("1.0 < 2.0 <= 2.0", True)
+    check("1.0 > 2.0 < 3.0", False)
 
     # mixed major/minor version comparisons
-    assert vercmp("2 >= 1.5")
-    assert not vercmp("1 < 1.0")
+    check("2 >= 1.5", True)
+    check("1 < 1.0", False)
 
     # trailing token (even word count) is rejected, not silently dropped
-    assert not vercmp("1.0 < 2.0 junk")
+    check("1.0 < 2.0 junk", False)
 
     # invalid operator should raise an error
     try:

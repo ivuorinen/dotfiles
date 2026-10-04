@@ -243,6 +243,36 @@ gud()
   run ! git -C "$WORK/repo-a" rev-parse --verify --quiet already-merged
 }
 
+@test "git-update-dirs: --cleanup counts the branches it removed" {
+  # The count used to travel as an exit status into $(...), so it was
+  # always empty and the summary never appeared.
+  git -C "$WORK/repo-a" branch already-merged
+  gud --cleanup
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Cleaned up 1 merged branches."* ]]
+}
+
+@test "git-update-dirs: --cleanup matches protected names exactly" {
+  # An unanchored "main" also matched "maintenance"; a branch checked out in
+  # another worktree showed up as a bogus "+" entry.
+  git -C "$WORK/repo-a" branch maintenance
+  git -C "$WORK/repo-a" branch fix-domain-check
+  git -C "$WORK/repo-a" worktree add --quiet -b in-worktree "$TMP/wt"
+  gud --cleanup --log "$TMP/gud.log"
+  [ "$status" -eq 0 ]
+  run ! git -C "$WORK/repo-a" rev-parse --verify --quiet maintenance
+  run ! git -C "$WORK/repo-a" rev-parse --verify --quiet fix-domain-check
+  git -C "$WORK/repo-a" rev-parse --verify --quiet in-worktree
+  git -C "$WORK/repo-a" rev-parse --verify --quiet main
+  run ! grep -q 'WARNING' "$TMP/gud.log"
+}
+
+@test "git-update-dirs: -v is --version, matching the usage spec" {
+  gud -v
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"git-update-dirs version"* ]]
+}
+
 @test "git-update-dirs: without --cleanup the branch stays" {
   git -C "$WORK/repo-a" branch already-merged
   gud

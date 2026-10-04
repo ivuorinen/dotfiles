@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 #USAGE about "Get latest GitHub release version for a repository"
-#USAGE flag "--branch" help="Get latest branch name"
-#USAGE flag "--tag" help="Get latest tag (default)"
-#USAGE flag "--commit" help="Get latest commit SHA"
-#USAGE flag "--json" help="Output as JSON"
+#USAGE flag "-b --branch <branch>" help="Branch to read tags and commits from (default: main)"
+#USAGE flag "-t --tag" help="Fetch the latest Git tag (any branch)"
+#USAGE flag "-c --commit" help="Fetch the latest commit SHA from the branch"
+#USAGE flag "-j --json" help="Output as JSON"
 #USAGE flag "-v --verbose" help="Verbose output"
-#USAGE flag "--oldest" help="Get oldest instead of latest"
-#USAGE flag "--prereleases" help="Include pre-releases"
+#USAGE flag "-o --oldest" help="Fetch the oldest release instead of the latest"
+#USAGE flag "-p --prereleases" help="Include pre-releases"
+#USAGE flag "-a --all" help="Fetch all information types in a combined output"
 #USAGE arg "<repo>" help="GitHub repository (owner/repo)"
 #
 # Get latest release version, branch tag, or latest commit from GitHub
@@ -120,21 +121,43 @@ check_dependencies()
   done
 }
 
+# curl with the GITHUB_TOKEN header, when set, fed on stdin (-H @-):
+# argv is readable by every local user for the life of the request.
+gh_curl()
+{
+  if [[ -n ${GITHUB_TOKEN:-} ]]; then
+    curl -H @- "$@" <<< "Authorization: token $GITHUB_TOKEN"
+  else
+    curl "$@"
+  fi
+}
+
 # Check GitHub API rate limits and warn if they're getting low
 check_rate_limits()
 {
   local auth_status="unauthenticated"
-  local auth_header=()
 
   if [[ -n ${GITHUB_TOKEN:-} ]]; then
     auth_status="authenticated"
-    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
   fi
 
   msg "Making $auth_status GitHub API requests"
 
   local rate_limit_info
-  rate_limit_info=$(curl -sSL "${auth_header[@]}" "https://api.github.com/rate_limit")
+  rate_limit_info=$(gh_curl -sSL "https://api.github.com/rate_limit") || rate_limit_info=""
+
+  # The check is advisory. On a 401 (expired GITHUB_TOKEN) or a non-JSON 5xx
+  # the fields below are missing, and under set -e the date call would end the
+  # script silently before api_request could report the real error.
+  if ! jq -e '.resources.core.reset | numbers' <<< "$rate_limit_info" > /dev/null 2>&1; then
+    local api_message
+    api_message=$(jq -r '.message // empty' <<< "$rate_limit_info" 2> /dev/null) || api_message=""
+    echo "Warning: could not read GitHub rate limit: ${api_message:-unparseable response}" >&2
+    if [[ $api_message == "Bad credentials" ]]; then
+      echo "GITHUB_TOKEN was rejected (401); renew it or unset it." >&2
+    fi
+    return 0
+  fi
 
   local remaining
   local reset_timestamp
@@ -170,23 +193,22 @@ check_rate_limits()
 api_request()
 {
   local url="$1"
-  local auth_header=()
-
-  if [[ -n ${GITHUB_TOKEN:-} ]]; then
-    auth_header=(-H "Authorization: token $GITHUB_TOKEN")
-  fi
-
   local response
   local status_code
 
   # Use a temporary file to capture both headers and body
   local tmp_file
   tmp_file=$(mktemp)
-  trap 'rm -f -- "$tmp_file"' EXIT
+  # Expanded now, not when the trap fires: callers run this in $(...),
+  # whose EXIT trap fires after the local is gone, and under set -u that
+  # printed "tmp_file: unbound variable". The trap still covers a curl
+  # failure that aborts the function under set -e.
+  # shellcheck disable=SC2064
+  trap "rm -f -- $(printf '%q' "$tmp_file")" EXIT
 
   msg "Making API request to: $url"
 
-  status_code=$(curl -sSL -w "%{http_code}" -o "$tmp_file" "${auth_header[@]}" "$url")
+  status_code=$(gh_curl -sSL -w "%{http_code}" -o "$tmp_file" "$url")
   response=$(< "$tmp_file")
   rm -f "$tmp_file"
 

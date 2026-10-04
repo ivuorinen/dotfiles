@@ -149,8 +149,10 @@ append_owner_repos()
   local owner_json
   local owner_err
 
-  owner_json="$(mktemp "${CACHE_DIR}/owner.json.XXXXXX")"
-  owner_err="$(mktemp "${CACHE_DIR}/owner.err.XXXXXX")"
+  # Beside output_file, inside the caller's per-run dir, so its cleanup
+  # trap covers these too.
+  owner_json="$(mktemp "${output_file%/*}/owner.json.XXXXXX")"
+  owner_err="$(mktemp "${output_file%/*}/owner.err.XXXXXX")"
 
   if ! gh repo list "$owner" \
     --json nameWithOwner,visibility,isFork,description,url \
@@ -182,19 +184,23 @@ refresh_cache()
   require_base_commands
   mkdir -p "$CACHE_DIR"
 
+  local run_dir
   local tmp_json
   local tmp_tsv
   local tmp_ndjson
 
-  # Remove temp files on any exit, including die() mid-refresh. The
-  # globs only match mktemp-suffixed names (repos.json.XXXXXX), never
-  # repos.json/repos.tsv themselves, and also sweep leftovers from
-  # previously interrupted runs.
-  trap 'rm -f "${CACHE_DIR}"/repos.json.* "${CACHE_DIR}"/repos.tsv.* "${CACHE_DIR}"/repos.ndjson.* "${CACHE_DIR}"/owner.*' EXIT
+  # Every temp file of this run lives in its own dir, removed on any exit
+  # including die() mid-refresh. A glob over CACHE_DIR would also delete
+  # the in-flight files of a concurrent refresh (two tv channels opening
+  # after the TTL expires). The dir sits in CACHE_DIR so the final mv
+  # stays on one filesystem.
+  run_dir="$(mktemp -d "${CACHE_DIR}/refresh.XXXXXX")"
+  # shellcheck disable=SC2064 # expand now: run_dir is local, the trap fires at exit
+  trap "rm -rf -- $(printf '%q' "$run_dir")" EXIT
 
-  tmp_json="$(mktemp "${CACHE_DIR}/repos.json.XXXXXX")"
-  tmp_tsv="$(mktemp "${CACHE_DIR}/repos.tsv.XXXXXX")"
-  tmp_ndjson="$(mktemp "${CACHE_DIR}/repos.ndjson.XXXXXX")"
+  tmp_json="$(mktemp "${run_dir}/repos.json.XXXXXX")"
+  tmp_tsv="$(mktemp "${run_dir}/repos.tsv.XXXXXX")"
+  tmp_ndjson="$(mktemp "${run_dir}/repos.ndjson.XXXXXX")"
 
   local login
   login="$(authenticated_login)"
@@ -206,7 +212,7 @@ refresh_cache()
   local -a owner_files=()
   local owner_file
 
-  owner_file="$(mktemp "${CACHE_DIR}/owner.ndjson.XXXXXX")"
+  owner_file="$(mktemp "${run_dir}/owner.ndjson.XXXXXX")"
   owner_files+=("$owner_file")
   append_owner_repos "$login" "USER" 0 "$owner_file" &
 
@@ -216,7 +222,7 @@ refresh_cache()
 
     while IFS= read -r org; do
       [[ -n "$org" ]] || continue
-      owner_file="$(mktemp "${CACHE_DIR}/owner.ndjson.XXXXXX")"
+      owner_file="$(mktemp "${run_dir}/owner.ndjson.XXXXXX")"
       owner_files+=("$owner_file")
       append_owner_repos "$org" "ORG" "$owner_order" "$owner_file" &
       owner_order=$((owner_order + 1))

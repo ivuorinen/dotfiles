@@ -220,6 +220,27 @@ gd()
   [[ "$output" == *"nested-repo"* ]]
 }
 
+@test "git-dirty: -p without GNU parallel counts every finished job" {
+  # A non-GNU `parallel` forces the manual job pool. Its progress counter
+  # was a racy read-modify-write; a lost update left the count below the
+  # total, so "Processing complete!" never printed.
+  mkdir -p "$TMP/bin"
+  printf '#!/bin/sh\necho "parallel from moreutils"\n' > "$TMP/bin/parallel"
+  chmod +x "$TMP/bin/parallel"
+  # A lost update makes the monitor loop wait forever, so bound the run: a
+  # regression then fails here with status 124 instead of hanging the suite.
+  # GNU timeout signals its whole process group, so the job pool dies too.
+  tmo="$(command -v timeout 2> /dev/null || command -v gtimeout 2> /dev/null || true)"
+  [ -n "$tmo" ] || skip "no timeout(1) on PATH"
+  PATH="$TMP/bin:$PATH" run "$tmo" 60 "$GD" -p "$TREE"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Using manual parallelization"* ]]
+  [[ "$output" == *"Processing complete!"* ]]
+  for repo in clean-repo modified-repo staged-repo untracked-repo branch-repo; do
+    [[ "$output" == *"$repo"* ]]
+  done
+}
+
 @test "git-dirty: -m limits how deep it goes" {
   mkdir -p "$TREE/a/b/c"
   git init --quiet -b main "$TREE/a/b/c/deep-repo"

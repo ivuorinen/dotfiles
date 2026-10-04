@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck shell=sh
 # list-open-prs.sh
 # List all currently open PRs across public GitHub repos owned by `ivuorinen`.
 # Uses `gh` when available + authenticated, else falls back to the GitHub

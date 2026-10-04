@@ -38,7 +38,8 @@ if [ "\$1" = "api" ]; then
 fi
 
 if [ "\$1" = "repo" ] && [ "\$2" = "list" ]; then
-  [ -n "\$GH_LIST_FAIL" ] && { printf 'boom\n' >&2; exit 1; }
+  # GH_LIST_FAIL names the one owner whose listing fails
+  [ "\$3" = "\${GH_LIST_FAIL:-}" ] && { printf 'boom\n' >&2; exit 1; }
   case "\$3" in
     tester)
       cat << 'JSON'
@@ -176,8 +177,30 @@ clone_locally()
 @test "tv-gh-repos: one owner failing does not lose the others" {
   # A single inaccessible organisation must not empty the whole list.
   run env PATH="$TMP/bin" HOME="$TMP/home" XDG_CACHE_HOME="$TMP/cache" \
-    GH_REPOS_CODE_ROOT="$TMP/code" GH_LIST_FAIL=1 "$TVR" list
+    GH_REPOS_CODE_ROOT="$TMP/code" GH_LIST_FAIL=acme "$TVR" list
   [ "$status" -eq 0 ]
+  [[ "$output" == *"tester/alpha"* ]]
+  [[ "$output" == *"tester/beta"* ]]
+  [[ "$output" != *"acme/gamma"* ]]
+}
+
+@test "tv-gh-repos: a refresh leaves a concurrent refresh's files alone" {
+  # The exit trap used to glob owner.* and repos.*.* across the cache
+  # dir, deleting whatever another refresh had in flight.
+  tvr refresh
+  [ "$status" -eq 0 ]
+  local cache_dir
+  cache_dir="$(dirname "$(find "$TMP/cache" -name repos.json | head -n 1)")"
+  : > "$cache_dir/owner.ndjson.OTHER1"
+  : > "$cache_dir/repos.json.OTHER2"
+  mkdir "$cache_dir/refresh.OTHER3"
+  tvr refresh
+  [ "$status" -eq 0 ]
+  [ -e "$cache_dir/owner.ndjson.OTHER1" ]
+  [ -e "$cache_dir/repos.json.OTHER2" ]
+  [ -d "$cache_dir/refresh.OTHER3" ]
+  # and its own per-run dir is gone
+  [ "$(find "$cache_dir" -maxdepth 1 -name 'refresh.*' | wc -l | tr -d ' ')" -eq 1 ]
 }
 
 @test "tv-gh-repos: an unknown list argument is rejected" {
