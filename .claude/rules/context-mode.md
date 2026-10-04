@@ -14,8 +14,14 @@ session. These rules are not optional.
 
 Never run a Bash command containing `curl` or `wget`. The hook
 intercepts them and replaces the output with an error. Do not retry.
-`pre-bash-route.sh` denies them in every spelling — `/usr/bin/curl`,
-`env curl`, `command curl`, `\curl` — and `BASH_OK` does not override it.
+`pre-bash-route.sh` (Bash) and `pre-ctx-write-guard.sh` (context-mode
+sandbox code) deny them in every spelling — `/usr/bin/curl`, `env curl`,
+`command curl`, `\curl`, `mise exec -- curl`, `some-runner curl` — via
+`.claude/hooks/lib/bash-policy.sh`, and `BASH_OK` does not override it.
+The name as a word of its own anywhere in a command counts as running it,
+except in a lookup that never executes it (`which curl`, `rg -n curl docs/`,
+`git log -S curl`). A config or environment value counts too
+(`GIT_PAGER=curl`, `git -c core.editor='curl x'`).
 Use instead:
 
 - `ctx_fetch_and_index(url, source)` — fetch and index web pages

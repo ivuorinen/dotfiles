@@ -5,7 +5,8 @@ description: "Stage and commit exclusively with git-hunk; never git add or git c
 # Commit with git-hunk
 
 Stage and commit only through `git-hunk` (installed via mise). Never
-use `git add`, `git add -p`, or `git commit -a`.
+use `git add`, `git add -p`, `git commit -a`, or `git commit` with a
+pathspec or `-i`/`-o` — each stages whole files.
 
 ```bash
 git-hunk list                              # hunks with content hashes
@@ -20,8 +21,15 @@ unrelated work in progress stays in the tree untouched. It runs the
 pre-commit and commit-msg hooks, so no gate is lost. Message format
 is still `.claude/rules/commit-format.md`.
 
-`pre-bash-route.sh` denies `git add` (any form) and `git commit` with
-`-a`/`--all`, and `BASH_OK` does not override it.
+`pre-bash-route.sh` (Bash) and `pre-ctx-write-guard.sh` (context-mode
+sandbox code) deny `git add` (any form) and `git commit` with
+`-a`/`--all`, `-i`/`--include`, `-o`/`--only`, `--pathspec-from-file`
+or a pathspec, via `.claude/hooks/lib/bash-policy.sh`; `BASH_OK` does
+not override it. They also deny `git update-index` with path operands
+or `--add`/`--again`/`--cacheinfo`/`--index-info`/`--stdin`/
+`--replace`/`--remove`/`--chmod` (the refresh forms and the
+assume-unchanged/skip-worktree marks pass), and any alias that would
+rename these subcommands (`.claude/rules/no-hook-bypass.md`).
 
 ## Gotchas
 

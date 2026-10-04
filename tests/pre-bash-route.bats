@@ -370,9 +370,394 @@ with_prompt()
   [ "$(decision 'echo BASH_OK | cat')" = "deny" ]
 }
 
-@test "pre-bash-route: empty and malformed input yield no decision" {
+# A policy deny names no BASH_OK escape; a routing deny does. The policy cases
+# below assert the stronger of the two, so a regression to a mere routing deny
+# (which BASH_OK overrides) fails.
+policy_denied()
+{
+  printf '{"tool_input":{"command":%s}}' "$(jq -Rn --arg c "$1" '$c')" \
+    | bash "$HOOK" \
+    | jq -e '.hookSpecificOutput.permissionDecisionReason | contains("BASH_OK does not override")' > /dev/null
+}
+
+# eval, sudo, watch and a shell's -c string run their operand as a command, so
+# a one-word prefix hid `git add` from the policy tier (agent-loopholes-6bc32964).
+@test "pre-bash-route: eval, sudo, watch and shell -c wrappers are unwrapped" {
+  policy_denied 'eval git add -A'
+  policy_denied 'eval git commit --no-verify -m x'
+  policy_denied 'fish -c "git add ."'
+  policy_denied "bash -c 'git add .'"
+  policy_denied 'sudo git add x'
+  policy_denied 'sudo -u root git add x'
+  [ "$(decision 'sudo cat README.md')" = "deny" ]
+  [ "$(decision 'watch cat README.md')" = "deny" ]
+  [ "$(decision 'fish -c "cat README.md"')" = "deny" ]
+  [ "$(decision 'fish script.fish')" = "deny" ]
+}
+
+# git accepts any unambiguous long-option prefix, global options shift the
+# subcommand, and update-index --add stages like add (agent-loopholes-e0092417).
+@test "pre-bash-route: abbreviated --no-verify, git globals and update-index --add are denied" {
+  policy_denied 'git commit --no-verif -m x'
+  policy_denied 'git commit --no-veri -m x'
+  policy_denied 'git push --no-verif'
+  policy_denied 'git commit --no-gpg -m x'
+  policy_denied 'git -c core.HooksPath=/dev/null commit -m x'
+  policy_denied 'git -C . add -A'
+  policy_denied 'git -C . commit -n -m x'
+  policy_denied 'git --git-dir .git -c a=b commit -a -m x'
+  policy_denied 'git update-index --add foo'
+  policy_denied 'git stage foo'
+  policy_denied 'find . -exec git add {} +'
+}
+
+@test "pre-bash-route: git global options leave legitimate commands allowed" {
+  [ "$(decision 'git -C dir status')" = "allow" ]
+  [ "$(decision 'git --no-pager status')" = "allow" ]
+  [ "$(decision 'git commit -m x')" = "allow" ]
+  [ "$(decision 'git commit --no-verbose -m x')" = "allow" ]
+  [ "$(decision 'git update-index --refresh')" = "allow" ]
+  [ "$(decision 'git -C dir log')" = "deny" ]
+}
+
+# The shell expands globs and folds case (APFS) after the hook has read the
+# text, so literal matching alone missed these (agent-loopholes-6cb6e566,
+# agent-loopholes-88c3bb49).
+@test "pre-bash-route: globbed, case-folded and dotted protected paths are denied" {
+  policy_denied 'cp config/fish/secret?.d/github.fish /tmp/x'
+  policy_denied 'cp config/secre*.d/* /tmp/'
+  policy_denied 'cp config/fish/*/github.fish /tmp/x'
+  policy_denied 'cp README.md yarn.l?ck'
+  policy_denied 'cp README.md YARN.LOCK'
+  policy_denied 'rm tools//dotbot/x'
+  policy_denied 'rm tools/./dotbot/x'
+  [ "$(decision 'rm build/*')" = "allow" ]
+  [ "$(decision 'cp a.txt b.txt')" = "allow" ]
+}
+
+@test "pre-bash-route: an empty command yields no decision" {
   [ "$(decision '')" = "allow" ]
+}
+
+# Malformed input and a missing jq used to exit 0 with no decision, skipping
+# the policy tier and the secrets guard entirely (agent-loopholes-468c93a6).
+# They block now, as pre-edit-block.sh always did.
+@test "pre-bash-route: malformed input and a missing jq fail closed" {
   run bash -c 'printf "not json" | bash "$1"' _ "$HOOK"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"fails closed"* ]]
+  run /bin/bash -c 'printf "{\"tool_input\":{\"command\":\"git add -A\"}}" | PATH=/nonexistent /bin/bash "$1"' _ "$HOOK"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"jq is not on PATH"* ]]
+}
+
+# The splitter cut on ( ; | with no quote awareness, so every conventional
+# commit header moved the flags after it out of the git checks
+# (agent-loopholes-8dfa8203).
+@test "pre-bash-route: a quoted commit message cannot hide a bypass flag" {
+  policy_denied "git commit -m 'fix(x): y' --no-verify"
+  policy_denied "git commit -m 'fix(x): y' -n"
+  policy_denied "git commit -m 'fix(x): y' -a"
+  policy_denied "git commit -m 'a; b' --no-verify"
+  policy_denied 'git commit -m "feat(hooks): x | y && z" --no-verif'
+  policy_denied "git commit -nm 'fix(x): y'"
+}
+
+# Messages are prose: a header with a scope, separators, or a sentence about
+# the bypass ban or the secrets tree is not a flag or a path
+# (agent-hooks-84fa86e9).
+@test "pre-bash-route: conventional commit messages pass" {
+  [ "$(decision "git commit -m 'fix(x): y'")" = "allow" ]
+  [ "$(decision "git commit -m 'fix(hooks): a; b (c) | d & e'")" = "allow" ]
+  [ "$(decision "git commit -m 'docs: explain the --no-verify ban'")" = "allow" ]
+  [ "$(decision "git commit --message='docs: -n is --no-verify'")" = "allow" ]
+  [ "$(decision "git-hunk commit abc123 def456 -m 'docs(secrets): document secrets.d modes'")" = "allow" ]
+  [ "$(decision "git-hunk commit abc -m 'docs(rules): SKIP= and core.hooksPath are banned'")" = "allow" ]
+}
+
+# The splitter did not model these shell forms, so the command word was
+# something it never checked (agent-loopholes-52d63719).
+@test "pre-bash-route: time -p, coproc, trap, process and command substitution are parsed" {
+  policy_denied 'time -p git add -A'
+  policy_denied 'coproc git add -A'
+  policy_denied "trap 'git add -A' EXIT"
+  policy_denied 'source <(echo git add -A)'
+  policy_denied "\$(printf 'gi%s' t) add -A"
+  policy_denied "git commit '--no-verify' -m x"
+  policy_denied 'git commit "-n" -m x'
+  policy_denied "bash -o pipefail -c 'git add -A'"
+  policy_denied "bash <<'EOF'
+git add -A
+EOF"
+}
+
+# Bypasses that carry no flag on the git command line
+# (agent-loopholes-63eb3265).
+@test "pre-bash-route: environment and hook-file bypasses are denied" {
+  policy_denied 'SKIP=commitlint,shellcheck git commit -m x'
+  policy_denied 'GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x'
+  policy_denied 'export SKIP=commitlint; git-hunk commit abc -m x'
+  policy_denied 'env PRE_COMMIT_ALLOW_NO_CONFIG=1 git commit -m x'
+  policy_denied 'rm .git/hooks/commit-msg'
+  policy_denied 'cp /dev/null .git/hooks/pre-commit'
+  policy_denied 'echo "[core] hooksPath = /dev/null" >> .git/config'
+  # SKIP is an ordinary name away from git and the hook runners.
+  [ "$(decision 'SKIP=1 make test')" = "allow" ]
+}
+
+# `git commit <path>`, -i and -o stage whole files exactly like -a.
+@test "pre-bash-route: git commit with a pathspec or -i/-o is denied" {
+  policy_denied 'git commit -m msg local/bin/dfm'
+  policy_denied 'git commit -i -m msg local/bin/dfm'
+  policy_denied 'git commit -o -m msg local/bin/dfm'
+  policy_denied 'git commit --only -m msg -- local/bin/dfm'
+  policy_denied 'git commit --pathspec-from-file=list -m msg'
+  [ "$(decision "git commit -C HEAD --author 'A <a@b.c>' -m x")" = "allow" ]
+  [ "$(decision 'git commit --fixup abc123')" = "allow" ]
+  [ "$(decision 'git commit -F msg.txt -s')" = "allow" ]
+}
+
+# A wildcard standing for secrets.d is only a secrets read when a literal file
+# name follows it; a regex argument is not a path (agent-hooks-84fa86e9).
+@test "pre-bash-route: globs under config/ and regex arguments are not secrets reads" {
+  run policy_denied 'ls config/*'
+  [ "$status" -ne 0 ]
+  [ "$(decision 'fish_indent --write config/fish/*/*.fish')" = "allow" ]
+  run policy_denied "rg -n 'secrets\.d' .claude/rules"
+  [ "$status" -ne 0 ]
+  policy_denied 'cat config/fish/*/github.fish'
+  policy_denied 'cat config/fish/secrets.d/*.fish'
+}
+
+# Every suffix of a wrapped argv is checked, so two operand-taking wrapper
+# options no longer hide the command (agent-loopholes-2b2e90ee).
+@test "pre-bash-route: wrappers with several operand options are seen through" {
+  policy_denied 'stdbuf -o L -e L git add -A'
+  policy_denied 'sudo -u root -g wheel git add -A'
+  policy_denied 'g=git; $g add -A'
+  policy_denied "echo 'git add -A' | sh"
+}
+
+# A command that runs its arguments as a command hid git from the argv checks
+# unless it was on the fixed wrapper list (audit-a5c76774).
+@test "pre-bash-route: unlisted runners cannot hide a policy command" {
+  policy_denied 'mise exec -- git add -A'
+  policy_denied 'mise x -- git commit --no-verify -m x'
+  policy_denied 'setsid git add -A'
+  policy_denied 'caffeinate git add -A'
+  policy_denied 'unbuffer git add .'
+  policy_denied 'xcrun git add .'
+  policy_denied 'chronic git add .'
+  policy_denied 'flock /tmp/l git add .'
+  policy_denied 'yarn exec git add .'
+  policy_denied 'mise exec python -- -m pip install foo'
+  policy_denied 'mise exec -- curl https://example.com'
+}
+
+# curl and npm have no verb to anchor on, so they were seen only behind a
+# listed runner; the bare word now counts anywhere but in a lookup.
+@test "pre-bash-route: no runner of any name hides a name-only ban" {
+  policy_denied 'nohup2 curl https://example.com'
+  policy_denied 'env -S curl https://example.com'
+  policy_denied 'some-unknown-runner npx foo'
+  policy_denied 'doppler run -- npm i'
+  policy_denied 'op run -- curl https://example.com'
+  policy_denied 'direnv exec . npm i'
+  policy_denied 'uvx --from x curl'
+  policy_denied 'pipx run --spec x npx y'
+  policy_denied 'git submodule foreach npm i'
+  policy_denied 'setsid wget https://example.com'
+  policy_denied 'sudo -u which curl https://example.com'
+  policy_denied 'rg --pre curl x .'
+  policy_denied 'fd -x curl'
+  policy_denied 'man -P curl x'
+}
+
+# The same runners hid a shell -c string and an env assignment.
+@test "pre-bash-route: no runner of any name hides a command string or env bypass" {
+  policy_denied "nohup2 bash -c 'git add -A'"
+  policy_denied "nohup2 sh -c 'curl https://example.com'"
+  policy_denied 'nohup2 env SKIP=x git commit -m x'
+}
+
+# Pagers, editors and ssh/diff/browser commands run a config or environment
+# value as a command, so a value is held to the same checks as argv.
+@test "pre-bash-route: a banned tool in a config or environment value is denied" {
+  policy_denied 'git -c core.pager=npx log'
+  policy_denied "git -c core.editor='curl x' commit"
+  policy_denied "git -c sequence.editor='npm exec x' rebase -i HEAD~2"
+  policy_denied 'VAR=npx git --config-env=core.pager=VAR log'
+  policy_denied 'MANPAGER=curl man x'
+  policy_denied 'PAGER=npx less x'
+  policy_denied 'GIT_PAGER=npx git log'
+  policy_denied 'GIT_EDITOR="curl x" git commit'
+  policy_denied 'EDITOR=npx foo'
+  policy_denied 'VISUAL=wget x'
+  policy_denied "GIT_SSH_COMMAND='curl x' git fetch"
+  policy_denied 'GIT_EXTERNAL_DIFF=npx git diff'
+  policy_denied 'BROWSER=curl gh pr view --web'
+  policy_denied 'env GIT_PAGER=npx git log'
+  policy_denied "git -c core.editor='git add -A' commit"
+  policy_denied 'git config core.pager npx'
+}
+
+@test "pre-bash-route: ordinary config and environment values pass the policy tier" {
+  local c
+  for c in 'LC_ALL=C rg curl' 'git -c color.ui=always log -S curl' \
+    'GIT_PAGER=cat git log' 'PATH=$HOME/bin:$PATH git status' \
+    'git -c core.pager=less log' 'git config --get core.pager' \
+    "rg 'x=curl' docs/" 'echo FOO=npm'; do
+    run policy_denied "$c"
+    [ "$status" -ne 0 ] || {
+      echo "denied: $c"
+      return 1
+    }
+  done
+  [ "$(decision 'EDITOR=vim git commit -m x')" = "allow" ]
+}
+
+# Lookups and searches never execute the name they are given.
+@test "pre-bash-route: lookups and searches naming curl or npm pass the policy tier" {
+  local c
+  for c in 'which curl' 'command -v npm' 'type curl' 'man curl' \
+    'rg -n curl local/bin/' 'rg npm docs/' "grep -rn 'npx' .claude/" \
+    'fd curl' 'git log -S curl' 'git log -S curl -- docs/' 'git grep npm docs/' \
+    "git commit -m 'fix: drop curl'" 'echo "use curl"' 'mise which npm' \
+    'rg -P curl x' 'which bash git'; do
+    run policy_denied "$c"
+    [ "$status" -ne 0 ] || {
+      echo "denied: $c"
+      return 1
+    }
+  done
+  [ "$(decision 'which curl')" = "allow" ]
+  [ "$(decision 'command -v npm')" = "allow" ]
+}
+
+@test "pre-bash-route: a mere mention of a policy tool is not a command" {
+  [ "$(decision 'which curl npm git')" = "allow" ]
+  [ "$(decision 'mise exec -- shfmt -w local/bin/a')" = "allow" ]
+  [ "$(decision "git commit -m 'git add is banned'")" = "allow" ]
+  run policy_denied 'rg -n git local/bin'
+  [ "$status" -ne 0 ]
+}
+
+# A config file named by environment or include can carry core.hooksPath with
+# no key in argv for the bypass scan to see (audit-c36f6a78).
+@test "pre-bash-route: config files that can set core.hooksPath are denied" {
+  policy_denied 'GIT_CONFIG_GLOBAL=/tmp/c git commit -m x'
+  policy_denied 'GIT_CONFIG_SYSTEM=/tmp/c git commit -m x'
+  policy_denied 'export GIT_CONFIG=/tmp/c; git commit -m x'
+  policy_denied 'git -c include.path=/tmp/c commit -m x'
+  policy_denied 'git -c includeIf.gitdir:~/.path=/tmp/c commit -m x'
+  policy_denied 'git config include.path /tmp/c'
+  policy_denied 'git config --global includeIf.gitdir:/x/.path /tmp/c'
+}
+
+# Reading the hook state is what commit-format.md asks for; only a write is a
+# bypass (audit-b668407e).
+@test "pre-bash-route: reading core.hooksPath or an alias is allowed" {
+  [ "$(decision 'git config --get core.hooksPath')" = "allow" ]
+  [ "$(decision 'git config --local --get core.hooksPath')" = "allow" ]
+  [ "$(decision 'git config --get-regexp alias')" = "allow" ]
+  policy_denied 'git config core.hooksPath /dev/null'
+  policy_denied 'git config --unset core.hooksPath'
+}
+
+# An alias renames the subcommand past every check keyed on add/commit
+# (audit-8559f9b1).
+@test "pre-bash-route: git aliases cannot rename a denied subcommand" {
+  policy_denied 'git -c alias.st=add st -A'
+  policy_denied "git -c alias.c='commit --no-verify' c -m x"
+  policy_denied 'git --config-env=alias.st=X st -A'
+  policy_denied 'git config alias.st add'
+  policy_denied 'git config --global alias.c "!git add -A"'
+}
+
+@test "pre-bash-route: persistent aliases are resolved before the checks" {
+  local repo="$BATS_TEST_TMPDIR/repo"
+  git init -q "$repo"
+  git -C "$repo" config alias.st add
+  git -C "$repo" config alias.sneak '!git commit --no-verify -m x'
+  git -C "$repo" config alias.undo 'reset --soft'
+  policy_denied "git -C $repo st -A"
+  cd "$repo"
+  policy_denied 'git st -A'
+  policy_denied 'git sneak'
+  run policy_denied 'git undo HEAD~1'
+  [ "$status" -ne 0 ]
+}
+
+# update-index records worktree content for each path operand, which is `git
+# add` by another name (audit-4bd3f195).
+@test "pre-bash-route: update-index with path operands is staging" {
+  policy_denied 'git update-index config/alias'
+  policy_denied 'git update-index --again'
+  policy_denied 'git update-index --cacheinfo 100644,abc,f'
+  policy_denied 'git update-index --chmod=+x local/bin/a'
+  policy_denied 'git update-index --ad config/alias'
+  [ "$(decision 'git update-index --refresh')" = "allow" ]
+  [ "$(decision 'git update-index -q --really-refresh')" = "allow" ]
+  [ "$(decision 'git update-index --assume-unchanged config/alias')" = "allow" ]
+  [ "$(decision 'git update-index --no-skip-worktree config/alias')" = "allow" ]
+}
+
+# In-place editors outside the copy/move/sed list rewrote vendored files and
+# yarn.lock unvetted (audit-5a6f71da).
+@test "pre-bash-route: in-place editors writing protected paths are denied" {
+  policy_denied 'perl -pi -e s/a/b/ config/fish/functions/fisher.fish'
+  policy_denied 'perl -i.bak -pe s/a/b/ yarn.lock'
+  policy_denied 'ruby -pi -e x yarn.lock'
+  policy_denied 'vim -c wq yarn.lock'
+  policy_denied 'ed yarn.lock'
+  policy_denied 'patch yarn.lock fix.diff'
+  policy_denied "awk '{print > \"yarn.lock\"}' /dev/null"
+  policy_denied 'gawk -i inplace 1 yarn.lock'
+  run policy_denied 'rg -n patch yarn.lock'
+  [ "$status" -ne 0 ]
+  run policy_denied "perl -ne 'print if /x/' yarn.lock"
+  [ "$status" -ne 0 ]
+}
+
+# BASH_OK covered the whole line once its first command was named, so an
+# unbounded reader rode along (audit-7b087cc6).
+@test "pre-bash-route: BASH_OK requires every command in the line to be named" {
+  with_prompt 'please run yarn build for me'
+  [ "$(decision 'BASH_OK yarn build; cat README.md')" = "deny" ]
+  [ "$(decision 'BASH_OK yarn build && git log -p')" = "deny" ]
+  with_prompt 'run cat and wc on the readme'
+  [ "$(decision 'BASH_OK cat README.md | wc -l')" = "allow" ]
+}
+
+# mise installs versioned binaries, and python takes `-mpip` as one word
+# (audit-8f8345da).
+@test "pre-bash-route: versioned pip and python spellings are denied" {
+  policy_denied 'python3.12 -m pip install foo'
+  policy_denied 'pip3.12 install foo'
+  policy_denied 'python3 -mpip install foo'
+  run policy_denied 'python3.12 -m pip list'
+  [ "$status" -ne 0 ]
+}
+
+# The bats rule matched any text naming the path, so a search for it was
+# refused (audit-b668407e).
+@test "pre-bash-route: node_modules/.bin/bats is denied as a command only" {
+  policy_denied 'node_modules/.bin/bats tests'
+  run policy_denied "rg -c -e 'node_modules/.bin/bats' tests"
+  [ "$status" -ne 0 ]
+}
+
+# PATH=/nonexistent stops at the jq check, so the parser-missing branch was
+# never reached (audit-0576cb89). This PATH keeps jq and the system tools.
+@test "pre-bash-route: a missing shfmt fails closed" {
+  local bin="$BATS_TEST_TMPDIR/bin"
+  mkdir -p "$bin"
+  ln -s "$(command -v jq)" "$bin/jq"
+  if PATH="$bin:/usr/bin:/bin" command -v shfmt > /dev/null; then
+    skip "shfmt is installed in a system directory"
+  fi
+  run /bin/bash -c 'printf "{\"tool_input\":{\"command\":\"git add -A\"}}" | PATH="$2:/usr/bin:/bin" /bin/bash "$1"' _ "$HOOK" "$bin"
   [ "$status" -eq 0 ]
-  [ -z "$output" ]
+  [ "$(printf '%s' "$output" | jq -r '.hookSpecificOutput.permissionDecision')" = "deny" ]
+  [[ "$output" == *"shfmt is not on PATH"* ]]
 }
