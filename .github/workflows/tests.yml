@@ -51,6 +51,19 @@ jobs:
           python3 -m pip install --break-system-packages packaging \
             || python3 -m pip install packaging
 
+      # The agent policy hooks parse every command with `shfmt --to-json`
+      # and fail closed without shfmt. Only 3.14.0+ writes operators as
+      # strings (earlier releases emit enum numbers), and apt ships 3.8, so
+      # mise installs the version config/mise/config.toml pins. install_args
+      # limits it to shfmt instead of the whole .mise.toml toolchain.
+      - name: Install shfmt
+        uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          mise_toml: |
+            [tools]
+            shfmt = "3.14.1"
+          install_args: shfmt
+
       - name: Run test suite
         # scripts/bats-run.sh is the same runner as the pre-commit hook:
         # bats --print-output-on-failure (without it a failing assertion is
