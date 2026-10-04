@@ -44,11 +44,45 @@ run_host_hooks()
   done
 }
 
+# Apply hosts/<host>/install.conf.yaml when it exists. Runs in both modes,
+# because host overlays are mostly link steps and `--links` must refresh
+# them too. Extra arguments are passed to dotbot ahead of DOTBOT_ARGS; the
+# links-only path uses dotbot's own `--except shell` so host
+# provisioning steps stay out of a symlink refresh.
+run_host_config()
+{
+  local host_config
+  if [ -z "${DOTBOT_HOST}" ]; then
+    return 0
+  fi
+  host_config="${BASEDIR}/hosts/${DOTBOT_HOST}/${CONFIG}"
+  echo "-> Trying if host config can be found: ${host_config}"
+  if [ ! -r "${host_config}" ] || [ ! -f "${host_config}" ]; then
+    return 0
+  fi
+  echo "(!) Found ${host_config}"
+  "${DOTBOT_BIN_PATH}" \
+    -d "${BASEDIR}" \
+    --plugin-dir=tools/dotbot-include \
+    -c "${host_config}" \
+    "$@" \
+    "${DOTBOT_ARGS[@]}"
+}
+
 export DOTFILES="${BASEDIR}"
 
 cd "${BASEDIR}"
 git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
 git submodule update --init --recursive "${DOTBOT_DIR}"
+
+# config/git/shared no longer sets the `store` helper, so git stops reading
+# the plaintext file it wrote and nothing else would surface the tokens still
+# in it. Deleting it here would leave those tokens live; revoke them first.
+STALE_GIT_CREDENTIALS="${HOME}/.cache/git/git-credentials"
+if [ -e "${STALE_GIT_CREDENTIALS}" ]; then
+  echo "(!) ${STALE_GIT_CREDENTIALS} holds plaintext tokens from the removed git store helper." >&2
+  echo "    Revoke each token it lists at its host, then: rm '${STALE_GIT_CREDENTIALS}'" >&2
+fi
 
 if [ "$LINKS_ONLY" = true ]; then
   "${DOTBOT_BIN_PATH}" \
@@ -56,6 +90,7 @@ if [ "$LINKS_ONLY" = true ]; then
     --plugin-dir=tools/dotbot-include \
     -c "${LINKS_CONFIG}" \
     "${DOTBOT_ARGS[@]}"
+  run_host_config --except shell
   exit 0
 fi
 
@@ -67,16 +102,6 @@ run_host_hooks before
   -c "${CONFIG}" \
   "${DOTBOT_ARGS[@]}"
 
-if [ "${DOTBOT_HOST}" != "" ]; then
-  DOTBOT_HOST_CONFIG="${BASEDIR}/hosts/${DOTBOT_HOST}/${CONFIG}"
-  echo "-> Trying if host config can be found: ${DOTBOT_HOST_CONFIG}"
-  [ -r "$DOTBOT_HOST_CONFIG" ] && [ -f "$DOTBOT_HOST_CONFIG" ] \
-    && echo "(!) Found $DOTBOT_HOST_CONFIG" \
-    && "$DOTBOT_BIN_PATH" \
-      -d "$BASEDIR" \
-      --plugin-dir=tools/dotbot-include \
-      -c "$DOTBOT_HOST_CONFIG" \
-      "${DOTBOT_ARGS[@]}"
-fi
+run_host_config
 
 run_host_hooks after

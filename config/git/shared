@@ -1,6 +1,9 @@
 # vim: ft=gitconfig ai noexpandtab
+# No `store` helper: it writes tokens in plaintext. The empty value drops any
+# system-level helper; `cache` keeps credentials in memory only, ~8h.
+# GitHub hosts use gh instead (config/git/config).
 [credential]
-	helper = store --file ~/.cache/git/git-credentials
+	helper =
 	helper = cache --timeout 30000
 
 [core]

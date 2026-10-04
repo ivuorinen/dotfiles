@@ -71,6 +71,29 @@ end
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :
 
+# pinentry prompts on this tty. gpg sends GPG_TTY with every request; ssh
+# requests through gpg-agent do not, so they prompt on the tty of the last
+# `gpg-connect-agent updatestartuptty`. gpg-agent serves ssh keys only when
+# nothing else claimed SSH_AUTH_SOCK (1Password, launchd's agent, a forwarded
+# agent all win); while ssh goes through it, each command re-points pinentry
+# here. The handler is defined in config.fish because fish autoloads a
+# function only when it is called, so an --on-event function under
+# functions/ would never fire.
+if status is-interactive
+    set -gx GPG_TTY (tty)
+    if command -q gpgconf
+        set -l gpg_ssh_sock (gpgconf --list-dirs agent-ssh-socket 2>/dev/null)
+        if test -z "$SSH_AUTH_SOCK"; and test -n "$gpg_ssh_sock"
+            set -gx SSH_AUTH_SOCK $gpg_ssh_sock
+        end
+        if test -n "$gpg_ssh_sock"; and test "$SSH_AUTH_SOCK" = "$gpg_ssh_sock"
+            function __gpg_ssh_updatetty --on-event fish_preexec
+                gpg-connect-agent --quiet updatestartuptty /bye >/dev/null 2>&1
+            end
+        end
+    end
+end
+
 # Warn if GITHUB_TOKEN is not set
 if status is-interactive; and not set -q GITHUB_TOKEN
     echo "Warning: GITHUB_TOKEN is not set" >&2

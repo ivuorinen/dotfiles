@@ -14,9 +14,34 @@ export SHARED_SCRIPTS_SOURCED=0
 source "$DOTFILES/config/shared.sh"
 
 # zsh completions directory (ZSH_CUSTOM_COMPLETION_PATH set in shared.sh)
+# shellcheck disable=SC2034 # read by the ez-compinit plugin
 ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
 source "$DOTFILES/config/zsh/antidote.zsh"
+
+# pinentry prompts on this tty. gpg sends GPG_TTY with every request. ssh
+# requests through gpg-agent do not carry it: those prompt on the tty of the
+# last `gpg-connect-agent updatestartuptty`.
+# shellcheck disable=SC2154 # zsh sets $TTY itself
+export GPG_TTY="$TTY"
+
+# gpg-agent serves ssh keys only when nothing else claimed SSH_AUTH_SOCK
+# (1Password, launchd's agent, a forwarded agent all win). While ssh goes
+# through gpg-agent, each command re-points pinentry at this tty — the job
+# OMZ's gpg-agent plugin did, without its ~0.8 s gpgconf call per start.
+if command -v gpgconf > /dev/null 2>&1; then
+  _gpg_ssh_sock="$(gpgconf --list-dirs agent-ssh-socket 2> /dev/null)"
+  [[ -z "${SSH_AUTH_SOCK:-}" && -n "$_gpg_ssh_sock" ]] && export SSH_AUTH_SOCK="$_gpg_ssh_sock"
+  if [[ -n "$_gpg_ssh_sock" && "$SSH_AUTH_SOCK" == "$_gpg_ssh_sock" ]]; then
+    _gpg_ssh_updatetty()
+    {
+      gpg-connect-agent --quiet updatestartuptty /bye > /dev/null 2>&1
+    }
+    autoload -Uz add-zsh-hook
+    add-zsh-hook preexec _gpg_ssh_updatetty
+  fi
+  unset _gpg_ssh_sock
+fi
 
 # config/alias is sourced via shared.sh (above) before antidote, so the OMZ
 # git plugin's aliases would otherwise shadow ours. Re-apply the alias file so
@@ -41,6 +66,7 @@ source_fzf_config
 x-have antidot && lib::init_cached antidot antidot init --shell zsh
 
 # Add usage-generated completions to fpath
+# shellcheck disable=SC2206 # zsh: unquoted $fpath expands the array unsplit
 fpath=("${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions.d" $fpath)
 
 # compinit itself is owned by the ez-compinit plugin (loaded through
@@ -65,6 +91,7 @@ if command -v starship > /dev/null 2>&1; then
   # unlike the fish init, which does. Calling it unguarded printed
   # "command not found: enable_transience" on every zsh start. The guard
   # keeps the intent for a future starship that ships it.
+  # shellcheck disable=SC2154 # zsh's $functions special parameter
   (( $+functions[enable_transience] )) && enable_transience
 fi
 
