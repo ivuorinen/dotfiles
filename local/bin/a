@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # A script for encrypting and decrypting files or directories with age and SSH keys
 #USAGE about "Encrypt and decrypt files or directories with age and SSH keys"
-#USAGE version "1.1.0"
-#USAGE flag "-v --verbose" help="Print log messages to console"
-#USAGE flag "--delete" help="Delete original files after encryption"
+#USAGE version "1.2.0"
+#USAGE flag "-v --verbose" help="Print progress messages to stdout"
+#USAGE flag "--delete" help="Delete the source file after a successful encrypt or decrypt"
 #USAGE flag "-f --force" help="Overwrite existing output files"
 #USAGE cmd "encrypt" help="Encrypt a file or directory" {
 #USAGE   alias "e"
@@ -20,56 +20,62 @@
 
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 
 # Default ENV values
 KEYS_FILE="${AGE_KEYSFILE:-$HOME/.ssh/keys.txt}"
 KEYS_SOURCE="${AGE_KEYSSOURCE:-https://github.com/ivuorinen.keys}"
 LOG_FILE="${AGE_LOGFILE:-$HOME/.cache/a.log}"
+# Days a cached keys file is trusted before it is refetched, so a key
+# revoked on GitHub stops receiving newly encrypted files.
+KEYS_MAX_AGE_DAYS="${AGE_KEYS_MAX_AGE_DAYS:-7}"
+
+# Decryption needs a private key: the keys file above holds the public keys
+# encryption uses as recipients, which age rejects as an identity.
+if [[ -n "${AGE_IDENTITY:-}" ]]; then
+  IDENTITY_FILE="$AGE_IDENTITY"
+elif [[ -f "$HOME/.ssh/id_ed25519" ]]; then
+  IDENTITY_FILE="$HOME/.ssh/id_ed25519"
+else
+  IDENTITY_FILE="$HOME/.ssh/id_rsa"
+fi
+
+# Global, not local: the EXIT trap runs after the function that set it has
+# returned, and under set -u a vanished local aborts the script with status 1.
+TEMP_FILE=""
+trap 'rm -f -- "$TEMP_FILE"' EXIT
+# INT/TERM exit through the EXIT trap, so an interrupted keys download or
+# encryption removes its temp file too.
+trap 'exit 130' INT
+trap 'exit 143' TERM
+# Set once the keys were checked this run: a directory encrypts file by
+# file, and a failing refresh must not retry (and time out) for each one.
+KEYS_CHECKED=false
+# Files that failed in this run. A directory keeps going past a failure so
+# one bad file does not leave the rest unprocessed; the count sets the exit.
+FAILED=0
 
 VERBOSE=false
 DELETE_ORIGINAL=false
 FORCE=false
 
-# Check for required dependencies
+# Check for required dependencies; only encryption fetches keys with curl.
 check_dependencies()
 {
+  local command="$1"
+
   if ! command -v age &> /dev/null; then
-    echo "Error: 'age' is not installed. Please install it first." >&2
+    echo "Error: age is not installed. Please install it first." >&2
     echo "  brew install age    # macOS" >&2
     echo "  apt install age     # Debian/Ubuntu" >&2
     echo "  dnf install age     # Fedora" >&2
     exit 1
   fi
 
-  if ! command -v curl &> /dev/null; then
-    echo "Error: 'curl' is not installed." >&2
+  if [[ "$command" =~ ^(e|enc|encrypt)$ ]] && ! command -v curl &> /dev/null; then
+    echo "Error: curl is not installed." >&2
     exit 1
   fi
-}
-
-# Parse flags
-parse_flags()
-{
-  local args=()
-  for arg in "$@"; do
-    case "$arg" in
-      -v | --verbose)
-        VERBOSE=true
-        ;;
-      --delete)
-        DELETE_ORIGINAL=true
-        ;;
-      -f | --force)
-        FORCE=true
-        ;;
-      *)
-        args+=("$arg")
-        ;;
-    esac
-  done
-  # Return remaining arguments
-  printf '%s\n' "${args[@]}"
 }
 
 # Ensure log directory and file exist with correct permissions
@@ -92,16 +98,18 @@ prepare_log_file()
   chmod 0600 "$LOG_FILE"
 }
 
-# Logging function
+# Log every message; errors and warnings also reach stderr unconditionally,
+# since a failed encrypt that only the log file records looks like an
+# unexplained exit 1. Progress goes to stdout with -v.
 log_message()
 {
   local message="$1"
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $message" >> "$LOG_FILE"
 
-  # Print to user if verbose flag is set
-  if [[ "$VERBOSE" == true ]]; then
-    echo "$message"
-  fi
+  case "$message" in
+    Error:* | Warning:*) echo "$message" >&2 ;;
+    *) if [[ "$VERBOSE" == true ]]; then echo "$message"; fi ;;
+  esac
 }
 
 # Function to print usage
@@ -116,14 +124,23 @@ Commands:
   help, --help         Show this help message
   version, --version   Show version information
 
-Options:
-  -v, --verbose        Print log messages to console
-  --delete             Delete original files after successful encryption
+Options (anywhere on the command line):
+  -v, --verbose        Print progress messages to stdout
+  --delete             Delete the source file after a successful encrypt or decrypt
   -f, --force          Overwrite existing output files without prompting
+
+Errors and warnings always go to stderr. A directory is processed
+recursively; a failed file does not stop the rest, and the exit status
+is 1 when any file failed.
 
 Environment Variables:
   AGE_KEYSFILE         Path to the SSH keys file (default: \$HOME/.ssh/keys.txt)
-  AGE_KEYSSOURCE       URL to fetch SSH keys if keys file does not exist
+  AGE_KEYSSOURCE       URL to fetch SSH keys from when the keys file is missing or stale
+  AGE_KEYS_MAX_AGE_DAYS
+                        Days before the keys file is refetched (default: 7);
+                        a failed refetch keeps using the cached file
+  AGE_IDENTITY         Private key used to decrypt
+                        (default: \$HOME/.ssh/id_ed25519, else \$HOME/.ssh/id_rsa)
   AGE_LOGFILE          Path to the log file (default: \$HOME/.cache/a.log)
 
 Examples:
@@ -158,21 +175,66 @@ print_version()
   echo "Created by Ismo Vuorinen <https://github.com/ivuorinen>"
 }
 
-# Function to fetch keys if missing
+# Fetch the recipient keys when missing or older than KEYS_MAX_AGE_DAYS.
+# Caching forever meant a key revoked on GitHub kept receiving every new
+# file. A failed refresh falls back to the cached copy with a warning, so
+# encryption still works offline; with no cached copy it is an error.
 fetch_keys_if_missing()
 {
-  if [[ ! -f "$KEYS_FILE" ]]; then
-    log_message "Keys file '$KEYS_FILE' not found. Attempting to fetch from $KEYS_SOURCE..."
-    mkdir -p "$(dirname "$KEYS_FILE")"
+  [[ "$KEYS_CHECKED" == true ]] && return 0
+  KEYS_CHECKED=true
 
-    if ! curl -s "$KEYS_SOURCE" -o "$KEYS_FILE" || [[ ! -s "$KEYS_FILE" ]]; then
-      rm -f "$KEYS_FILE" 2> /dev/null || true
-      log_message "Error: Failed to fetch keys from $KEYS_SOURCE"
-      exit 1
+  if [[ ! "$KEYS_MAX_AGE_DAYS" =~ ^[0-9]+$ ]]; then
+    log_message "Error: AGE_KEYS_MAX_AGE_DAYS must be a whole number of days."
+    exit 1
+  fi
+
+  if [[ -f "$KEYS_FILE" ]] \
+    && [[ -z "$(find "$KEYS_FILE" -mmin +$((KEYS_MAX_AGE_DAYS * 1440)) 2> /dev/null)" ]]; then
+    return 0
+  fi
+
+  log_message "Fetching keys from $KEYS_SOURCE into '$KEYS_FILE'..."
+  mkdir -p "$(dirname "$KEYS_FILE")"
+
+  # Fetch to a temp file and move it into place only when it holds SSH
+  # keys: without -f curl saves a 404/5xx body, which must never become the
+  # cache. The temp lives in the global TEMP_FILE so the EXIT trap removes
+  # it when the download is interrupted.
+  TEMP_FILE="$(mktemp "$KEYS_FILE.XXXXXX")"
+  if ! curl -fsSL --connect-timeout 10 --max-time 30 "$KEYS_SOURCE" -o "$TEMP_FILE" \
+    || ! grep -qE '^(ssh-|sk-|ecdsa-)' "$TEMP_FILE"; then
+    rm -f "$TEMP_FILE"
+    TEMP_FILE=""
+    if [[ -f "$KEYS_FILE" ]]; then
+      log_message "Warning: Failed to refresh keys from $KEYS_SOURCE; using cached '$KEYS_FILE'."
+      return 0
     fi
+    log_message "Error: Failed to fetch keys from $KEYS_SOURCE"
+    exit 1
+  fi
 
-    chmod 0400 "$KEYS_FILE"
-    log_message "Keys file fetched and permissions set to 0400."
+  # -f replaces the read-only (0400) old copy without a prompt
+  chmod 0400 "$TEMP_FILE"
+  mv -f "$TEMP_FILE" "$KEYS_FILE"
+  TEMP_FILE=""
+  log_message "Keys file fetched and permissions set to 0400."
+}
+
+# Refuse an existing output unless --force, and a directory even then: mv
+# would drop the temp file inside it under a random name, and --delete
+# would then remove the source.
+check_output()
+{
+  local output_file="$1"
+
+  if [[ -d "$output_file" ]]; then
+    log_message "Error: Output '$output_file' is a directory."
+    return 1
+  fi
+  if [[ (-e "$output_file" || -L "$output_file") && "$FORCE" != true ]]; then
+    log_message "Error: Output file '$output_file' already exists. Use --force to overwrite."
+    return 1
   fi
 }
 
@@ -188,20 +250,13 @@ encrypt_single_file()
   fi
 
   local output_file="${file}.age"
-
-  # Check if output file exists
-  if [[ -f "$output_file" && "$FORCE" != true ]]; then
-    log_message "Error: Output file '$output_file' already exists. Use --force to overwrite."
-    return 1
-  fi
+  check_output "$output_file" || return 1
 
   fetch_keys_if_missing
 
-  local temp_file
-  temp_file="$(mktemp -p "$(dirname "$file")")"
-  trap 'rm -f -- "$temp_file"' EXIT
+  TEMP_FILE="$(mktemp -p "$(dirname "$file")")"
 
-  if age -R "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
+  if age -R "$KEYS_FILE" "$file" > "$TEMP_FILE" && mv "$TEMP_FILE" "$output_file"; then
     log_message "File encrypted successfully: $output_file"
 
     if [[ "$DELETE_ORIGINAL" == true ]]; then
@@ -209,35 +264,9 @@ encrypt_single_file()
       log_message "Original file deleted: $file"
     fi
   else
-    rm -f "$temp_file"
+    rm -f "$TEMP_FILE"
     log_message "Error: Failed to encrypt file '$file'."
     return 1
-  fi
-}
-
-# Function to encrypt files or directories
-encrypt_file_or_directory()
-{
-  local file="$1"
-
-  if [[ -d "$file" ]]; then
-    # Enable dotglob to include hidden files
-    shopt -s dotglob nullglob
-    local files=("$file"/*)
-    shopt -u dotglob nullglob
-
-    if [[ ${#files[@]} -eq 0 ]]; then
-      log_message "Warning: Directory '$file' is empty."
-      return 0
-    fi
-
-    for f in "${files[@]}"; do
-      encrypt_file_or_directory "$f"
-    done
-  elif [[ -f "$file" ]]; then
-    encrypt_single_file "$file"
-  else
-    log_message "Warning: '$file' is not a file or directory, skipping."
   fi
 }
 
@@ -252,20 +281,16 @@ decrypt_single_file()
   fi
 
   local output_file="${file%.age}"
+  check_output "$output_file" || return 1
 
-  # Check if output file exists
-  if [[ -f "$output_file" && "$FORCE" != true ]]; then
-    log_message "Error: Output file '$output_file' already exists. Use --force to overwrite."
+  if [[ ! -r "$IDENTITY_FILE" ]]; then
+    log_message "Error: Identity '$IDENTITY_FILE' is not readable. Set AGE_IDENTITY to your private key."
     return 1
   fi
 
-  fetch_keys_if_missing
+  TEMP_FILE="$(mktemp -p "$(dirname "$file")")"
 
-  local temp_file
-  temp_file="$(mktemp -p "$(dirname "$file")")"
-  trap 'rm -f -- "$temp_file"' EXIT
-
-  if age -d -i "$KEYS_FILE" "$file" > "$temp_file" && mv "$temp_file" "$output_file"; then
+  if age -d -i "$IDENTITY_FILE" "$file" > "$TEMP_FILE" && mv "$TEMP_FILE" "$output_file"; then
     log_message "File decrypted successfully: $output_file"
 
     if [[ "$DELETE_ORIGINAL" == true ]]; then
@@ -273,84 +298,108 @@ decrypt_single_file()
       log_message "Encrypted file deleted: $file"
     fi
   else
-    rm -f "$temp_file"
+    rm -f "$TEMP_FILE"
     log_message "Error: Failed to decrypt file '$file'."
     return 1
   fi
 }
 
-# Function to decrypt files or directories
-decrypt_file_or_directory()
+# Apply encrypt_single_file or decrypt_single_file to a file, or to every
+# file under a directory, hidden files included, so a directory decrypt
+# restores everything the directory encrypt produced.
+process_path()
 {
-  local file="$1"
+  local action="$1" path="$2"
 
-  if [[ -d "$file" ]]; then
-    # Enable nullglob to handle no matches gracefully
-    shopt -s nullglob
-    local files=("$file"/*.age)
-    shopt -u nullglob
+  if [[ -d "$path" ]]; then
+    shopt -s dotglob nullglob
+    local entries=("$path"/*)
+    shopt -u dotglob nullglob
 
-    if [[ ${#files[@]} -eq 0 ]]; then
-      log_message "Warning: No .age files found in directory '$file'."
+    if [[ ${#entries[@]} -eq 0 ]]; then
+      log_message "Warning: Directory '$path' is empty."
       return 0
     fi
 
-    for f in "${files[@]}"; do
-      decrypt_single_file "$f"
+    local entry
+    for entry in "${entries[@]}"; do
+      process_path "$action" "$entry"
     done
-  elif [[ -f "$file" ]]; then
-    decrypt_single_file "$file"
+  elif [[ -f "$path" ]]; then
+    "$action" "$path" || FAILED=$((FAILED + 1))
   else
-    log_message "Warning: '$file' is not a file or directory, skipping."
+    log_message "Warning: '$path' is not a file or directory, skipping."
   fi
 }
 
 # Main entry point
 main()
 {
-  check_dependencies
+  # Flags are parsed here, not in a $(...) or <(...) subshell, whose
+  # assignments would never reach this shell.
+  local args=() arg
+  for arg in "$@"; do
+    case "$arg" in
+      -v | --verbose) VERBOSE=true ;;
+      --delete) DELETE_ORIGINAL=true ;;
+      -f | --force) FORCE=true ;;
+      *) args+=("$arg") ;;
+    esac
+  done
 
-  # Parse flags and get remaining arguments
-  mapfile -t ARGS < <(parse_flags "$@")
-
-  prepare_log_file
-
-  local command="${ARGS[0]:-}"
-  local target="${ARGS[1]:-}"
+  local command="${args[0]:-}"
+  local target="${args[1]:-}"
+  local action
 
   case "$command" in
-    e | enc | encrypt)
-      if [[ -z "$target" ]]; then
-        log_message "Error: No file or directory specified for encryption."
-        print_help
-        exit 1
-      fi
-      encrypt_file_or_directory "$target"
-      ;;
-    d | dec | decrypt)
-      if [[ -z "$target" ]]; then
-        log_message "Error: No file or directory specified for decryption."
-        print_help
-        exit 1
-      fi
-      decrypt_file_or_directory "$target"
-      ;;
+    e | enc | encrypt) action=encrypt_single_file ;;
+    d | dec | decrypt) action=decrypt_single_file ;;
     help | --help | -h)
       print_help
+      return 0
       ;;
     version | --version)
       print_version
+      return 0
       ;;
     "")
       print_help
       exit 1
       ;;
     *)
-      log_message "Error: Unknown command '$command'"
+      echo "Error: Unknown command '$command'" >&2
       print_help
       exit 1
       ;;
   esac
+
+  check_dependencies "$command"
+  prepare_log_file
+
+  if [[ -z "$target" ]]; then
+    log_message "Error: No file or directory specified."
+    print_help
+    exit 1
+  fi
+  if [[ ! -e "$target" ]]; then
+    log_message "Error: '$target' does not exist."
+    exit 1
+  fi
+  # A named file without the suffix would decrypt onto itself; inside a
+  # directory such files are simply not ciphertext and are skipped.
+  if [[ "$action" == decrypt_single_file && -f "$target" && "$target" != *.age ]]; then
+    log_message "Error: '$target' has no .age suffix."
+    exit 1
+  fi
+
+  process_path "$action" "$target"
+
+  if ((FAILED > 0)); then
+    if [[ -d "$target" ]]; then
+      log_message "Error: $FAILED file(s) failed under '$target'."
+    fi
+    exit 1
+  fi
 }
 
 main "$@"
