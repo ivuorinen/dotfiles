@@ -116,8 +116,9 @@ the `~/.config/starship.toml` symlink is managed by the theme orchestrator
   - `dfm brew install` / `dfm brew update` — Homebrew management
   - `dfm apt upkeep` — APT maintenance (Debian/Ubuntu)
   - `dfm dotfiles fmt` / `dfm dotfiles shfmt` — format configs/scripts
-  - `dfm docs all` — regenerate documentation under `docs/`
-  - `dfm scripts` — run scripts from `scripts/` (discovered via `@description` tags)
+  - `dfm helpers docs-all` — regenerate generated docs under `docs/`
+  - `dfm docs [name]` — list/show `docs/*.md`
+  - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
   - `dfm helpers <name>` — inspect aliases, colors, env, functions, path
   - `dfm check arch` / `dfm check host` — system info
 
@@ -160,16 +161,16 @@ the cloud agent yet — this list is the only guard.
 ## Important Gotchas
 
 1. **POSIX scripts** — nine scripts in `local/bin/` use `sh`, not bash;
-    `.claude/rules/posix-scripts.md` holds the list. Validate with
-    `sh -n`, not `bash -n`.
+    `.claude/rules/posix-scripts.md` holds the list and the validation
+    method. Never use `bash -n` on them.
 2. **Fish config chain** — `config/fish/config.fish` →
     `exports.fish` → `alias.fish`. The `exports.fish` auto-sources
     `secrets.d/*.fish`. Only `*.example` files and `README.md` in
     `secrets.d/` are tracked.
-3. **Scripts in `scripts/`** are discovered by `dfm scripts` via a
-    `@description` tag comment near the top of each file.
+3. **Scripts in `scripts/`** named `install-*.sh` are listed by
+    `dfm scripts`; their `@description` tag is the menu label.
 4. **Documentation** under `docs/` is generated — do not edit generated
-    files manually; use `dfm docs all` to regenerate.
+    files manually; use `dfm helpers docs-all` to regenerate.
 5. **`.github/copilot-instructions.md`** (this file) — do not delete or
     overwrite; update it incrementally when the repo changes significantly.
 
@@ -206,9 +207,10 @@ bats tests/dfm.bats   # run a single file (bats from PATH, via mise)
 ### Adding a new helper script to `local/bin/`
 
 1. Create the script with a `#!/usr/bin/env bash` shebang.
-2. Add a `@description <one-liner>` comment near the top.
+2. Add a `#USAGE about "<one-liner>"` line (`.claude/rules/local-bin-scripts.md`).
 3. Source `msgr` for output: `. "$DOTFILES/local/bin/msgr"`.
-4. Add a corresponding `.md` and `.usage.kdl` sidecar (follow existing patterns).
+4. Add a corresponding `.md` sidecar (follow existing patterns). The usage spec stays inline as `#USAGE`
+    lines, never a `.usage.kdl` file (`.claude/rules/local-bin-scripts.md`).
 5. Add a Bats test file in `tests/`.
 6. Run `shellcheck local/bin/<script>` and `yarn lint`.
 

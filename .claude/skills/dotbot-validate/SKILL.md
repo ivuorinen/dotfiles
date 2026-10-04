@@ -4,10 +4,12 @@ description: >-
   Validate Dotbot install.conf.yaml files after editing.
   Apply when writing or modifying any install.conf.yaml.
 user-invocable: false
-allowed-tools: Bash, Read
+allowed-tools: Read, mcp__plugin_context-mode_context-mode__ctx_batch_execute
 ---
 
-After editing any `install.conf.yaml` file, validate it:
+After editing any `install.conf.yaml` file, validate it. Run every command
+below through `ctx_batch_execute` (`.claude/rules/bash-routing.md`); `Bash`
+denies them.
 
 ## 1. YAML syntax
 

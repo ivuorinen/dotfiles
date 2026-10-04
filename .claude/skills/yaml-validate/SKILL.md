@@ -4,10 +4,11 @@ description: >-
   Validate YAML files after editing.
   Apply when writing or modifying any .yml or .yaml file.
 user-invocable: false
-allowed-tools: Bash, Read
+allowed-tools: Read, mcp__plugin_context-mode_context-mode__ctx_batch_execute
 ---
 
-After editing any YAML file, validate it:
+After editing any YAML file, validate it. Run every command below through
+`ctx_batch_execute` (`.claude/rules/bash-routing.md`); `Bash` denies them.
 
 ## 1. Syntax check
 

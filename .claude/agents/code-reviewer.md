@@ -9,8 +9,7 @@ in `.claude/rules/`:
 
 1. **Shell scripts**: `.claude/rules/shell-scripts.md` for shebang and
     shellcheck-directive policy; `.claude/rules/posix-scripts.md` for
-    the five `/bin/sh` scripts that must be validated with `sh -n`
-    (and the macOS bashism-leak caveat in that rule).
+    the POSIX scripts it lists, validated by the method it names.
 2. **Fish files**: fish syntax (validated by `fish-validate` skill),
     consistent function patterns.
 3. **Lua files**: stylua compliance (`stylua.toml`);

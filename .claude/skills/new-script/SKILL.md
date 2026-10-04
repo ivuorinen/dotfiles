@@ -15,7 +15,6 @@ Create `local/bin/<name>` with:
 
 ```bash
 #!/usr/bin/env bash
-# @description <one-line description>
 #USAGE about "<one-line description>"
 
 set -euo pipefail
@@ -26,8 +25,6 @@ set -euo pipefail
 # Script logic here
 ```
 
-- The `@description` tag is required — `dfm scripts` discovers
-  scripts by it
 - The `#USAGE about` directive is required — `install-completions.sh`
   discovers scripts by `grep -q '#USAGE\|//USAGE'`; scripts without it
   get no completions, markdown docs, or manpages

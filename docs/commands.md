@@ -12,7 +12,7 @@ yarn install   # Install dependencies (required before lint/test)
 ## Linting
 
 ```bash
-yarn lint              # Runs all eight lint:* steps below, in order
+yarn lint              # Runs all nine lint:* steps below, in order
 yarn lint:biome        # Biome only
 yarn lint:prettier     # Prettier (YAML) check only
 yarn lint:ec           # EditorConfig checker only
@@ -21,6 +21,7 @@ yarn lint:markdownlint # markdownlint (honors .markdownlintignore)
 yarn lint:v8r          # JSON Schema validation of schema-backed configs
 yarn lint:usage        # usage lint for scripts/ and local/bin/
 yarn lint:bandit       # Python SAST (config in [tool.bandit], pyproject.toml)
+yarn lint:exclusions   # Third-party exclusion lists agree across gates (scripts/check-exclusion-drift.py)
 yarn fix               # Autofix everything (biome + prettier + md-table)
 yarn fix:md-table      # Auto-fix markdown tables
 ```

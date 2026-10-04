@@ -47,7 +47,7 @@ with **starship**.
 
 ### Centralized Logging (`config/lib.sh`)
 
-`config/shared.sh` sources `config/lib.sh` first, so the helpers below
+`config/shared.sh` sources `config/lib.sh` first, so its helpers
 are available in every interactive shell and in every script that
 sources `shared.sh` (including all `dfm-*` subcommands, which reach it
 through `dfm_bootstrap`). Adapted from the dfm `common.sh` logging

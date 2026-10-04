@@ -20,3 +20,9 @@ usage = "6.9.1"
 # it bandit cannot read [tool.bandit] out of pyproject.toml and silently falls
 # back to defaults, which would fail the gate on the accepted B607 findings.
 "pipx:bandit[toml]" = "1.9.4"
+
+# The hook runner and the test runner that .github/CONTRIBUTING.md tells a
+# contributor to use. Same pins as config/mise/config.toml, so `mise install`
+# in a fresh clone provides them without linking the global config into ~.
+bats = "1.14.0"
+prek = "0.5.4"
