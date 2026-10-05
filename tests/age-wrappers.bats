@@ -565,6 +565,43 @@ a_args()
   [ -f "$TMP/work/g2.txt.age" ]
 }
 
+# The actions run under `action || FAILED=…`, where errexit is off: a failed
+# rm logged "deleted" and exited 0 with the plaintext still on disk. The rm
+# stub fails only for the source, so the encrypt itself succeeds.
+@test "a: a --delete that cannot remove the source fails the file" {
+  local real_rm
+  real_rm="$(command -v rm)"
+  "$real_rm" -f "$TMP/bin/rm" "$TMP/work/secret.txt.age"
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do [ "$a" = "%s" ] && exit 1; done\nexec "%s" "$@"\n' \
+    "$TMP/work/secret.txt" "$real_rm" > "$TMP/bin/rm"
+  chmod +x "$TMP/bin/rm"
+  a_args --delete e "$TMP/work/secret.txt"
+  [ "$status" -eq 1 ]
+  [ -f "$TMP/work/secret.txt.age" ]
+  [ -f "$TMP/work/secret.txt" ]
+  [[ "$stderr" == *"could not delete"* ]]
+}
+
+# A failed install of refreshed keys logged "Keys file fetched" and went on;
+# it is now a failed refresh: warn, keep the cached copy, leave no temp file.
+@test "a: a refreshed keys file that cannot be installed falls back to the cache" {
+  local real_mv
+  real_mv="$(command -v mv)"
+  stale_keys
+  rm -f "$TMP/bin/mv"
+  printf '#!/usr/bin/env bash\nfor last; do :; done\n[ "$last" = "%s" ] && exit 1\nexec "%s" "$@"\n' \
+    "$KEYS" "$real_mv" > "$TMP/bin/mv"
+  chmod +x "$TMP/bin/mv"
+  rm -f "$TMP/work/secret.txt.age"
+  age_run "$AE" "$TMP/work/secret.txt"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Could not install refreshed keys"* ]]
+  [[ "$output" != *"Keys file fetched"* ]]
+  [ "$(cat "$KEYS")" = "ssh-ed25519 AAAA cached" ]
+  run ls "$TMP"
+  [[ "$output" != *"keys.txt."* ]]
+}
+
 @test "a: -f never moves the output into a directory of that name" {
   rm "$TMP/work/secret.txt.age"
   mkdir "$TMP/work/secret.txt.age"

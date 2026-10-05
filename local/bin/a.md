@@ -35,7 +35,8 @@ Commands:
 Options (accepted anywhere on the command line):
 
 - `-v`, `--verbose` - print progress messages to stdout
-- `--delete` - delete the source file after a successful encrypt or decrypt
+- `--delete` - delete the source file after a successful encrypt or decrypt;
+  a source that cannot be deleted fails that file (exit 1)
 - `-f`, `--force` - overwrite existing output files
 
 Environment variables:
@@ -45,7 +46,8 @@ Environment variables:
   stale (default: GitHub keys)
 - `AGE_KEYS_MAX_AGE_DAYS` - days before the keys file is refetched (default:
   `7`), so a key removed from GitHub stops receiving new files; a failed
-  refetch warns and keeps using the cached file
+  refetch, or a refreshed file that cannot be installed, warns and keeps
+  using the cached file
 - `AGE_IDENTITY` - private key used to decrypt (default: `~/.ssh/id_ed25519`,
   else `~/.ssh/id_rsa`); the keys file holds public keys and cannot decrypt
 - `AGE_LOGFILE` - log file path (default: `~/.cache/a.log`)
