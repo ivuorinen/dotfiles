@@ -238,13 +238,9 @@ lib::register_cleanup()
   return 0
 }
 
-# Remove queued temporary paths. Also honors a legacy $TEMP_DIR variable
-# for parity with the upstream common.sh. Safe to call more than once.
+# Remove queued temporary paths. Safe to call more than once.
 lib::cleanup()
 {
-  if [[ -n "${TEMP_DIR:-}" && -d "$TEMP_DIR" ]]; then
-    rm -rf "$TEMP_DIR"
-  fi
   local path
   for path in "${LIB_CLEANUP_PATHS[@]:-}"; do
     [[ -n "$path" && -e "$path" ]] && rm -rf "$path"

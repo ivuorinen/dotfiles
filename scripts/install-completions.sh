@@ -48,9 +48,9 @@ done
 # limited to exactly what the catalog printed; there is no separate find.
 #
 # Three deliberate exclusions:
-#   * git-tracked files are never touched. local/man/man1 holds the vendored
-#     fzf manpages and config/fish/completions is a hand-curated whitelist —
-#     neither is generated here, and both would otherwise look orphaned.
+#   * git-tracked files are never touched. config/fish/completions is a
+#     hand-curated whitelist — not generated here, and it would otherwise
+#     look orphaned.
 #   * config/fish/completions is skipped outright: it is the input that drives
 #     the third-party tool list below, so pruning it would delete the
 #     generator's own source of truth.

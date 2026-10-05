@@ -51,6 +51,25 @@ mini.nvim (mini.clue key labels) -- MIT
   strings are mini.nvim's; regenerate the file rather than editing it.
 
 
+Other third-party files
+-----------------------
+
+Copied in unmodified and kept under their upstream license. They are not on
+the .claude/rules/vendored-files.md list.
+
+vim-plug -- MIT
+  https://github.com/junegunn/vim-plug
+  Copyright (c) 2024 Junegunn Choi
+
+    config/vim/autoload/plug.vim
+
+JetBrains Mono -- OFL-1.1
+  https://github.com/JetBrains/JetBrainsMono
+  Copyright 2020 The JetBrains Mono Project Authors
+
+    local/share/fonts/JetBrainsMono*   (license text: JetBrainsMono-OFL.txt)
+
+
 Adapted third-party scripts
 ---------------------------
 
@@ -66,6 +85,25 @@ Steve Kemp's sysadmin utilities -- Artistic-1.0-Perl OR GPL-2.0-or-later
     local/bin/x-until-success
     local/bin/x-when-down
     local/bin/x-when-up
+
+Steve Kemp's ssl-expiry-date -- Artistic-1.0-Perl OR GPL-1.0-or-later
+  Copyright (c) 2013-2015 Steve Kemp; the header grants "the same terms as
+  Perl itself"
+
+    local/bin/x-ssl-expiry-date
+
+git-largest-files -- MIT
+  Copyright (c) 2015 Nick Kocharhook; modifications Copyright (c) 2023 Ismo
+  Vuorinen
+
+    local/bin/x-git-largest-files.py
+
+Alicia Sykes's dotfiles scripts -- MIT
+  Copyright (c) 2022 Alicia Sykes; modifications by Ismo Vuorinen
+  https://github.com/Lissy93/dotfiles
+
+    local/bin/x-hr
+    local/bin/x-welcome-banner
 
 irssi autorun scripts -- licenses as declared in each script's %IRSSI header
 

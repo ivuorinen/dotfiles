@@ -10,9 +10,6 @@ installed and pinned via mise (the `gopass` entry in
 - **`p` alias**: `config/alias` defines `alias p="gopass"`, gated behind
   `x-have gopass` so it only exists when gopass is on PATH. So `p show …`
   ≡ `gopass show …`.
-- **Fish completions**: `config/fish/completions/gopass.fish` provides
-  entry-name and subcommand completion (it shells out to
-  `gopass ls --flat`).
 - **age backend**: the `age` tool is also mise-managed, so gopass can
   use age recipients in addition to GPG.
 

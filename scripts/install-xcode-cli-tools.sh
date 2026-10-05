@@ -19,9 +19,6 @@ if ! command -v xcode-select &> /dev/null; then
   exit 0
 fi
 
-# Ask for the administrator password upfront
-sudo -v
-
 # Keep-alive: update existing `sudo` time stamp until the script has finished
 keep_alive_sudo()
 {
@@ -33,18 +30,33 @@ keep_alive_sudo()
   return 0
 }
 
-XCODE_TOOLS_PATH="$(xcode-select -p)"
-XCODE_SWIFT_PATH="$XCODE_TOOLS_PATH/usr/bin/swift"
+# How long to wait for the installer to finish, in seconds. Overridable so
+# the test suite can exercise the timeout without waiting half an hour.
+XCODE_INSTALL_TIMEOUT="${XCODE_INSTALL_TIMEOUT:-1800}"
+
+# Path to swift under the active developer directory, or empty when no
+# Command Line Tools are installed. xcode-select -p exits 2 in that case, and
+# a bare call would end the script under set -e before it could prompt.
+xcode_swift_path()
+{
+  local tools_path
+  if tools_path="$(xcode-select -p 2> /dev/null)"; then
+    echo "$tools_path/usr/bin/swift"
+  fi
+  return 0
+}
 
 # Function to prompt for XCode CLI Tools installation
 prompt_xcode_install()
 {
-  XCODE_MESSAGE="$(
+  # Cancel makes `display dialog` raise error -128 and osascript exit 1, so
+  # the substitution sits in the condition: a bare assignment would end the
+  # script under set -e before the warning below.
+  if XCODE_MESSAGE="$(
     osascript -e \
-      'tell app "System Events" to display dialog "Please click install when Command Line Developer Tools appears"'
-  )"
-
-  if [[ "$XCODE_MESSAGE" = "button returned:OK" ]]; then
+      'tell app "System Events" to display dialog "Please click install when Command Line Developer Tools appears"' \
+      2> /dev/null
+  )" && [[ "$XCODE_MESSAGE" = "button returned:OK" ]]; then
     xcode-select --install
   else
     msgr warn "You have cancelled the installation, please rerun the installer."
@@ -56,18 +68,32 @@ prompt_xcode_install()
 # Main function
 main()
 {
-  keep_alive_sudo
-
-  if [[ -x "$XCODE_SWIFT_PATH" ]]; then
+  local swift_path
+  swift_path="$(xcode_swift_path)"
+  if [[ -n "$swift_path" && -x "$swift_path" ]]; then
     msgr run "You have swift from xcode-select. Continuing..."
-  else
-    prompt_xcode_install
+    return 0
   fi
 
-  until [[ -f "$XCODE_SWIFT_PATH" ]]; do
+  # Ask for the administrator password only when there is something to install
+  sudo -v
+  keep_alive_sudo
+  prompt_xcode_install
+
+  # Bounded: cancelling the system installer dialog leaves nothing to wait
+  # for, and an unbounded loop would hang the bootstrap with sudo kept alive.
+  local waited=0
+  until swift_path="$(xcode_swift_path)" && [[ -n "$swift_path" && -x "$swift_path" ]]; do
+    if ((waited >= XCODE_INSTALL_TIMEOUT)); then
+      echo
+      msgr err "Timed out after ${XCODE_INSTALL_TIMEOUT}s waiting for Command Line Tools"
+      exit 1
+    fi
     echo -n "."
     sleep 1
+    waited=$((waited + 1))
   done
+  echo
   return 0
 }
 
