@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 #USAGE about "Recursively check for dirty git repositories"
-#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-h" help="Show help"
+#USAGE flag "-v" help="Verbose output"
+#USAGE flag "-p" help="Process directories in parallel (requires parallel)"
+#USAGE flag "-a" help="Show all status details (stash, untracked)"
+#USAGE flag "-c" help="Toggle colorized output"
+#USAGE flag "-t" help="Toggle path truncation"
+#USAGE flag "-b" help="Toggle branch name display"
+#USAGE flag "-d <num>" help="Maximum depth for showing non-git directories"
+#USAGE flag "-e <patterns>" help="Additional patterns to exclude (comma separated)"
+#USAGE flag "-m <num>" help="Maximum recursion depth"
+#USAGE arg "[directory]" help="Directory to check"
 # Get git repository status for all subdirectories
 # recursively in specified dir.
 #
@@ -663,7 +673,7 @@ process_in_parallel()
     # Use temp files to collect results and track progress
     temp_output=$(mktemp)
     progress_file=$(mktemp)
-    echo "0" > "$progress_file" # Initialize progress counter
+    : > "$progress_file" # Progress log: one line per finished repository
 
     # To track if we're running or should stop
     running_file=$(mktemp)
@@ -733,7 +743,7 @@ process_in_parallel()
         if [[ -f $running_file && "$(cat "$running_file")" == "1" ]]; then
           if [[ -f $progress_file ]]; then
             local progress
-            progress=$(cat "$progress_file")
+            progress=$(($(wc -l < "$progress_file")))
             update_progress "$progress" "$total"
 
             # Exit when we reach the total
@@ -753,7 +763,7 @@ process_in_parallel()
       # Show completion message only if we finished normally
       if [[ -f $progress_file ]]; then
         local final_progress
-        final_progress=$(cat "$progress_file")
+        final_progress=$(($(wc -l < "$progress_file")))
         if [[ $final_progress -ge $total ]]; then
           echo "Processing complete!"
         fi
@@ -855,10 +865,10 @@ process_in_parallel()
           fi
         fi
 
-        # Update progress atomically
-        local current_progress
-        current_progress=$(cat "$progress_file")
-        echo $((current_progress + 1)) > "$progress_file"
+        # One line per finished repo. A short O_APPEND write is atomic, so
+        # concurrent jobs cannot lose an update the way a cat-then-overwrite
+        # read-modify-write did; the reader counts lines.
+        echo >> "$progress_file"
       ) &
 
       # Control the number of parallel jobs

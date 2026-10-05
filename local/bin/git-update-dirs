@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 #USAGE about "Pull and rebase all git repos in subdirectories"
-#USAGE flag "--help" help="Display help"
-#USAGE flag "--version" help="Display version"
-#USAGE flag "-v --verbose" help="Verbose output"
+#USAGE flag "-h --help" help="Display help"
+#USAGE flag "-v --version" help="Display version"
+#USAGE flag "--verbose" help="Verbose output"
 #USAGE flag "-q --quiet" help="Quiet output"
-#USAGE flag "--force" help="Force operations"
+#USAGE flag "--exclude <dir>" help="Exclude directory (repeatable)"
+#USAGE flag "--cleanup" help="Remove local branches merged into the current branch"
+#USAGE flag "--config <file>" help="Read options from configuration file"
+#USAGE flag "--log <file>" help="Log details and errors to file"
 #
 # Updates subfolders git projects.
 #
@@ -382,7 +385,8 @@ is_repo_clean()
 }
 
 # Function to clean up local branches that have been merged
-# Returns the number of branches cleaned
+# Prints the number of branches cleaned on stdout (the caller captures it;
+# an exit status would wrap at 256 and is not what $(...) returns)
 cleanup_branches()
 {
   local cleaned=0
@@ -393,11 +397,17 @@ cleanup_branches()
   # Skip branch cleanup if we're not on a main branch
   if [[ ! "$current_branch" =~ ^(master|main|develop)$ ]]; then
     msg "Skipping branch cleanup: not on a main branch ($current_branch)"
+    echo 0
     return 0
   fi
 
-  # Get list of merged branches, excluding current branch, master, main, and develop
-  output=$(git branch --merged | grep -v -E "^\*|master|main|develop" | sed 's/^[[:space:]]*//')
+  # Merged branch names, one per line. A branch checked out in any worktree
+  # (the current one included) prints as an empty line, since it cannot be
+  # deleted; the protected names are matched whole, so "maintenance" is not
+  # mistaken for "main".
+  output=$(git for-each-ref --merged HEAD \
+    --format='%(if)%(worktreepath)%(then)%(else)%(refname:short)%(end)' refs/heads/ \
+    | grep -vxE '(master|main|develop)?' || true)
 
   if [[ -n "$output" ]]; then
     if [[ "$VERBOSE" -eq 1 ]]; then
@@ -408,19 +418,19 @@ cleanup_branches()
     fi
 
     # Delete branches
-    for branch in $output; do
-      if [[ -n "$branch" ]]; then
-        if git branch -d "$branch" &> /dev/null; then
-          ((cleaned++))
-          log "INFO" "Deleted merged branch $branch in $(pwd)"
-        else
-          log "WARNING" "Failed to delete branch $branch in $(pwd)"
-        fi
+    local branch
+    while IFS= read -r branch; do
+      if git branch -d "$branch" &> /dev/null; then
+        ((cleaned++))
+        log "INFO" "Deleted merged branch $branch in $(pwd)"
+      else
+        log "WARNING" "Failed to delete branch $branch in $(pwd)"
       fi
-    done
+    done <<< "$output"
   fi
 
-  return $cleaned
+  echo "$cleaned"
+  return 0
 }
 
 # Function to update a git repository

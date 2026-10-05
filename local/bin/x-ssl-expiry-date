@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck shell=sh
 #USAGE about "Check SSL certificate expiry date"
 #USAGE flag "-p <port>" help="Port number (default: 443)"
 #USAGE flag "-d <days>" help="Days threshold for expiry warning"
@@ -15,7 +16,7 @@
 # This script is free software; you can redistribute it and/or modify it under
 # the same terms as Perl itself.
 #
-# The LICENSE file contains the full text of the license.
+# See NOTICE; this file is not covered by the repository's MIT LICENSE.
 
 # Simple function to show usage information, and exit.
 usage()

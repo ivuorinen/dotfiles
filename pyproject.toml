@@ -51,10 +51,3 @@ exclude_dirs = [
 # the check stays armed for every future call site rather than being disabled
 # across the whole scan. B603 is likewise per-line, never global, so the
 # argument list of each call is still audited.
-
-[tool.bandit.assert_used]
-# local/bin/x-compare-versions.py ships an assert-based self-check run as
-# `x-compare-versions.py test`. There the asserts ARE the test, not an
-# interface guard, so `python -O` stripping them costs nothing. B101 stays
-# on everywhere else.
-skips = ["*/x-compare-versions.py"]

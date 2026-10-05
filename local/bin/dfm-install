@@ -175,9 +175,27 @@ dfm_install()
 
     imagick)
       msgr run "Downloading and installing ImageMagick CLI..."
-      curl -L https://imagemagick.org/archive/binaries/magick > "$XDG_BIN_HOME/magick" \
-        && chmod +x "$XDG_BIN_HOME/magick" \
-        && msgr yay "imagick downloaded and installed!"
+      # Download beside the target and move into place only on success:
+      # redirecting straight to magick truncated a working binary, and without
+      # -f an HTTP error page was saved, made executable and reported done.
+      # The subshell owns its traps, so Ctrl-C or TERM mid-download removes
+      # the partial file without replacing any trap the caller has set.
+      if (
+        magick_tmp="$(mktemp "$XDG_BIN_HOME/.magick.XXXXXX")" || exit 1
+        # shellcheck disable=SC2064 # expand now: the path is fixed
+        trap "rm -f -- $(printf '%q' "$magick_tmp")" EXIT
+        trap 'exit 130' INT
+        trap 'exit 143' TERM
+        curl -fsSL --connect-timeout 15 -o "$magick_tmp" \
+          https://imagemagick.org/archive/binaries/magick \
+          && chmod +x "$magick_tmp" \
+          && mv "$magick_tmp" "$XDG_BIN_HOME/magick"
+      ); then
+        msgr yay "imagick downloaded and installed!"
+      else
+        msgr err "imagick download failed"
+        return 1
+      fi
       ;;
 
     macos)

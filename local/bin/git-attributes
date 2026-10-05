@@ -3,7 +3,10 @@
 #USAGE flag "-h --help" help="Show help"
 #USAGE flag "-v --verbose" help="Verbose output"
 #USAGE flag "-e --exit" help="Exit with error if uncovered files found"
-#USAGE flag "-p --pattern" help="Show pattern matches for each file"
+#USAGE flag "-p --pattern <pattern>" help="Pattern to check (default: text: auto)"
+#USAGE flag "-n --no-suggest" help="Do not suggest .gitattributes rules"
+#USAGE flag "-w --write" help="Write suggested rules to .gitattributes"
+#USAGE flag "-f --format-width <n>" help="Width for formatting rule patterns"
 #USAGE arg "[directory]" help="Directory to check (default: current)"
 #
 # Check git repo's files .gitattributes and ensure all of them are mapped.

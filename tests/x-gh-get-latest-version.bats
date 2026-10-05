@@ -4,6 +4,8 @@
 # API-behaviour tests use a sequenced curl stub: each call reads its body from
 # $STUB_DIR/res_N.json and its HTTP code from $STUB_DIR/code_N (0-indexed counter).
 
+bats_require_minimum_version 1.5.0
+
 setup()
 {
   STUB_DIR="$(mktemp -d)"
@@ -26,6 +28,10 @@ _install_curl_stub()
 #!/usr/bin/env bash
 n=$(cat "$STUB_DIR/call_count" 2>/dev/null || echo 0)
 echo $((n + 1)) > "$STUB_DIR/call_count"
+printf '%s\n' "$*" >> "$STUB_DIR/argv"
+for a in "$@"; do
+  [[ "$a" == "@-" ]] && cat >> "$STUB_DIR/stdin"
+done
 body=$(cat "$STUB_DIR/res_${n}.json" 2>/dev/null || echo '{}')
 code=$(cat "$STUB_DIR/code_${n}" 2>/dev/null || echo 200)
 output_file=""
@@ -112,6 +118,18 @@ _set_curl_response()
   [[ "$output" == *"rate limit"* ]]
 }
 
+@test "401 bad token: rate-limit check warns instead of exiting silently" {
+  # The advisory rate-limit check used to die under set -e on the error body,
+  # so an expired GITHUB_TOKEN produced a bare exit 1 with no message.
+  _install_curl_stub
+  _set_curl_response 0 '{"message":"Bad credentials"}' 401
+  _set_curl_response 1 '{"message":"Bad credentials"}' 401
+  GITHUB_TOKEN=expired run bash local/bin/x-gh-get-latest-version owner/repo
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"GITHUB_TOKEN was rejected"* ]]
+  [[ "$output" == *"GitHub API error (401): Bad credentials"* ]]
+}
+
 @test "successful release fetch: exits 0, prints release tag" {
   _install_curl_stub
   # Call 0: check_rate_limits (no -o)
@@ -125,4 +143,21 @@ _set_curl_response()
   run bash local/bin/x-gh-get-latest-version owner/repo
   [ "$status" -eq 0 ]
   [[ "$output" == *"v1.2.3"* ]]
+  # $output carries stderr too. api_request's temp-file trap fires in a
+  # $(...) subshell after its local is gone; it must not trip set -u.
+  [[ "$output" != *"unbound variable"* ]]
+}
+
+@test "GITHUB_TOKEN goes to curl on stdin, never on the command line" {
+  # Any local user can read a process's argv.
+  _install_curl_stub
+  _set_curl_response 0 "$_RATE_OK" 200
+  _set_curl_response 1 \
+    '{"full_name":"owner/repo","default_branch":"main"}' 200
+  _set_curl_response 2 \
+    '[{"tag_name":"v1.2.3","prerelease":false,"created_at":"2024-01-01T00:00:00Z"}]' 200
+  GITHUB_TOKEN=secret-token run bash local/bin/x-gh-get-latest-version owner/repo
+  [ "$status" -eq 0 ]
+  run ! grep -q 'secret-token' "$STUB_DIR/argv"
+  [ "$(grep -cx 'Authorization: token secret-token' "$STUB_DIR/stdin")" -eq 3 ]
 }

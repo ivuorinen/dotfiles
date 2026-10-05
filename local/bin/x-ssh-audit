@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck shell=sh
 #USAGE about "Run SSH security audit and generate reports"
 #
 # POSIX-Compliant SSH Security Auditing and Management Script

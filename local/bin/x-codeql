@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck shell=sh
 #USAGE about "CodeQL security scanning wrapper"
 #USAGE flag "--path <path>" help="Source path to analyze (default: current directory)"
 #USAGE flag "--threat-model <model>" help="CodeQL threat model: default, local, remote or all"

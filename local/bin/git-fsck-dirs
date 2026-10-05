@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #USAGE about "Run git fsck on all git repos in subdirectories"
-#USAGE flag "--help" help="Display help"
-#USAGE flag "--version" help="Display version"
-#USAGE flag "-v --verbose" help="Verbose output"
-#USAGE flag "-q --quiet" help="Quiet output"
+#USAGE arg "[directory]" help="Directory to scan (default: current directory)"
 # FSCK subfolders git projects.
 #
 # Actions taken: git fsck --no-dangling --full
+#
+# Takes no flags: the first argument is the directory to scan. Set
+# VERBOSE=1 for per-repository progress, DEBUG=1 for shell tracing.
 #
 # Copyright 2023 Ismo Vuorinen. All Rights Reserved.
 # License: MIT <https://opensource.org/license/mit/>
