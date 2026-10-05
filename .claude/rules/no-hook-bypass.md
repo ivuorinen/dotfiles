@@ -49,10 +49,11 @@ runner are checked as they are at the front, except in a lookup that never
 executes an operand (`which`, `rg`, `git log`). The value half of every
 `KEY=VALUE` word — an assignment, an `env` operand, `git -c key=value`, a
 `git config` value — is parsed as a command and held to the same checks,
-since pagers, editors and `GIT_SSH_COMMAND` run it. So is an option value a
-tool runs: a `--option=value` whose value starts with a tool, shell, `env`
-or `eval`, and `git grep -O…`, `man -P`, `rg --pre` and `fd -x`; any of these
-also ends a lookup's exemption.
+since pagers, editors and `GIT_SSH_COMMAND` run it. So is the value of an
+option the tool runs as a command — `git grep -O`/`--open-files-in-pager`,
+`man -P`/`--pager`, `rg --pre`, `fd -x`/`-X`/`--exec` — and any of these ends
+a lookup's exemption. A git `-m`/`--message` value is message text and is
+never read as a command.
 
 If a hook fails, fix the underlying problem. The hook chain
 (commitlint, shellcheck, shfmt, biome, prettier, yamllint,

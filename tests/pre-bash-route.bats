@@ -812,3 +812,15 @@ EOF"
   [ "$(decision 'git config list')" = "allow" ]
   [ "$(decision 'git config --get core.hooksPath')" = "allow" ]
 }
+
+# A message is text, never code: a generic --opt=value scan read
+# `--message='git add -A'` as a staging command, and the KEY=VALUE scan read
+# `-m 'EDITOR=npm x'` as an assignment.
+@test "pre-bash-route: commit and tag messages are never read as commands" {
+  [ "$(decision "git commit --message='git add -A'")" = "allow" ]
+  [ "$(decision "git commit -m 'git add -A'")" = "allow" ]
+  [ "$(decision "git commit -m 'EDITOR=npm x'")" = "allow" ]
+  [ "$(decision "git commit -m 'fix' -m 'GIT_EDITOR=npm i'")" = "allow" ]
+  [ "$(decision "git tag -a v1 -m 'PAGER=curl x'")" = "allow" ]
+  [ "$(decision "git commit --no-verify -m 'x'")" = "deny" ]
+}

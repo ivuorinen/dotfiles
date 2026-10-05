@@ -345,25 +345,6 @@ _bp_has_after()
   return 1
 }
 
-# _bp_optval VALUE — an option's attached value (`--open-files-in-pager=…`,
-# git grep's `-O…`) that some tools run as a command. It goes through
-# _bp_value only when its first word runs code: a banned or verb tool, a
-# shell, env or eval. Prose such as `--message='drop npm usage'` starts with
-# an ordinary word and stays untouched, where checking every value would
-# refuse commit messages that mention a banned tool.
-_bp_optval()
-{
-  local v=$1 first
-  first=${v#"${v%%[![:space:]]*}"}
-  first=${first%%[[:space:]]*}
-  first=${first##*/}
-  if [[ $first =~ $BP_NET_RE || $first =~ $BP_NPM_RE || $first =~ $BP_VERB_TOOL_RE ||
-    $first =~ ^(env|eval|bash|sh|zsh|dash|ksh|fish)$ ]]; then
-    _bp_value "$v"
-  fi
-  return 0
-}
-
 # _bp_redir OP TARGET — a redirect that writes to a protected path. The
 # routine `2>&1` and `> /dev/null` never reach the predicate. shfmt before
 # 3.14.0 encodes OP as an enum number whose values shift between releases,
@@ -669,19 +650,30 @@ _bp_final()
   if [[ -z $BP_REASON ]]; then
     for ((k = 1; k < ${#w[@]}; k++)); do
       a=${w[k]##*/}
+      # A git -m/--message value is message text (commit, tag, merge, stash,
+      # notes), never code: `git commit -m 'EDITOR=npm x'` matched the
+      # KEY=VALUE scan below and was refused.
+      if [[ $fw == git && (${w[k - 1]} == -m || ${w[k - 1]} == --message) ]]; then
+        continue
+      fi
       if ((lookup == 0)); then
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9]*= ]] && BP_ASSIGNS+=" ${w[k]%%=*}"
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9.-]*= ]] && _bp_value "${w[k]#*=}"
-        [[ ${w[k]} =~ ^--[A-Za-z0-9-]+= ]] && _bp_optval "${w[k]#*=}"
-        # Options whose value the tool runs: attached short forms (git grep
-        # -O<pager>, man -P<pager>, fd -x<cmd>) and the separate-word value
-        # of man -P/--pager and rg --pre, which take a required argument.
+        # Only the options a tool runs as a command are read as one: git grep
+        # -O/--open-files-in-pager, man -P/--pager, rg --pre, fd -x/-X/--exec.
+        # A generic --opt=value scan also read prose such as `git commit
+        # --message='git add -A'` and refused the commit. Attached and `=`
+        # forms here; the separate-word value of the options taking a
+        # required argument below.
         case $fw:${w[k]} in
-          git:-O?* | man:-P?* | fd:-x?* | fd:-X?*) _bp_optval "${w[k]:2}" ;;
+          git:-O?* | man:-P?* | fd:-x?* | fd:-X?*) _bp_value "${w[k]:2}" ;;
+          git:--open-files-in-pager=* | man:--pager=* | rg:--pre=* | fd:--exec=* | fd:--exec-batch=*)
+            _bp_value "${w[k]#*=}"
+            ;;
           *) ;;
         esac
         case $fw:${w[k - 1]} in
-          man:-P | man:--pager | rg:--pre) _bp_optval "${w[k]}" ;;
+          man:-P | man:--pager | rg:--pre) _bp_value "${w[k]}" ;;
           *) ;;
         esac
         case $a in
