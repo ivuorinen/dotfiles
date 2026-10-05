@@ -156,11 +156,11 @@ STUB
   assert_term_exits_143 "$!"
 }
 
-@test "watcher linux: TERM exits 143 while the monitor pipeline runs" {
-  # A foreground `monitor | while read` pipeline deferred the TERM trap
-  # until the never-ending monitor exited. `exec sleep` makes the fake
-  # monitor itself the long-running process, so its pid is the one the
-  # watcher's exit cleanup has to kill.
+# Run a linux watcher on a fake gsettings monitor, TERM it, and assert
+# the monitor dies with it. `exec sleep` makes the fake monitor itself the
+# long-running process, so its pid is the one the exit cleanup has to kill.
+assert_term_stops_monitor()
+{
   cat > "$BIN/gsettings" << 'STUB'
 #!/usr/bin/env bash
 case "$1" in
@@ -192,6 +192,19 @@ STUB
     kill "$monitor"
     false
   fi
+}
+
+@test "watcher linux: TERM exits 143 while the monitor pipeline runs" {
+  # A foreground `monitor | while read` pipeline deferred the TERM trap
+  # until the never-ending monitor exited.
+  assert_term_stops_monitor
+}
+
+@test "watcher linux: TERM stops the monitor when pkill is not installed" {
+  # The exit cleanup relied on pkill alone; without it the error was
+  # silenced and the monitor kept feeding apply after the pidfile went.
+  rm -f "$UTIL/pkill"
+  assert_term_stops_monitor
 }
 
 @test "watcher: second invocation exits 1 when first holds the lock" {

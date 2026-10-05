@@ -60,10 +60,11 @@ fi
 # Cleanup lives on EXIT only; each signal trap exits with 128+signo,
 # which fires the EXIT trap. A signal trap that merely removed the
 # pidfile let the loop run on unlocked, so a second watcher could join.
-# The Linux monitor pipeline runs in the background (see below); `pkill
-# -P $$` takes it down with the watcher so no orphaned reader keeps
-# calling apply.
-trap 'pkill -P $$ 2> /dev/null; rm -f "$pidfile"' EXIT
+# The Linux monitor pipeline runs in the background (see below); killing
+# it takes it down with the watcher so no orphaned reader keeps calling
+# apply. `jobs -p` and `kill` are builtins, so this holds where pkill is
+# not installed; `pkill -P $$` also catches any other child.
+trap 'kill $(jobs -p) 2> /dev/null; pkill -P $$ 2> /dev/null; rm -f "$pidfile"' EXIT
 trap 'exit 129' HUP
 trap 'exit 130' INT
 trap 'exit 143' TERM
