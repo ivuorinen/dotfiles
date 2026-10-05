@@ -80,7 +80,13 @@ source ~/.orbstack/shell/init2.fish 2>/dev/null || :
 # function only when it is called, so an --on-event function under
 # functions/ would never fire.
 if status is-interactive
-    set -gx GPG_TTY (tty)
+    # `fish -i` without a terminal still counts as interactive, and there
+    # `tty` prints "not a tty", which must not reach pinentry as a tty name.
+    if set -l gpg_tty (tty 2>/dev/null)
+        set -gx GPG_TTY $gpg_tty
+    else
+        set -e GPG_TTY
+    end
     if command -q gpgconf
         set -l gpg_ssh_sock (gpgconf --list-dirs agent-ssh-socket 2>/dev/null)
         if test -z "$SSH_AUTH_SOCK"; and test -n "$gpg_ssh_sock"
