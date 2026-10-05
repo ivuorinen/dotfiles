@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # apply — the actor. Validates mode, atomic-writes state, forks each
 # handlers.d/<name> in parallel under a 5s timeout, logs any non-zero
-# exit, and returns 0 unless the input was malformed.
+# exit, and returns 0 unless the input was malformed (2) or another apply
+# held the lock too long to wait for (1). Failed handlers are listed in
+# $state_dir/retry; a later apply at the same mode and family re-runs only
+# those, at most once per RETRY_MINUTES.
 #
 # Env overrides (test seams):
 #   THEME_HANDLERS_DIR     defaults to $DOTFILES/config/theme/handlers.d
@@ -29,33 +32,104 @@ esac
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
 family_file="$state_dir/family"
+retry_file="$state_dir/retry"
+RETRY_MINUTES=10
+
+lock_file="$state_dir/apply.lock"
+# Ten seconds covers one handler round under its 5 s timeout plus the
+# fork and log overhead.
+LOCK_WAIT_TRIES=100
 handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
 
 # The theme family (config/theme/family) is part of the applied state: a
 # family switch at an unchanged mode must still re-run the handlers. An
-# unresolvable family is logged and the handlers still run — each one
-# fails closed on its own and leaves its destination untouched.
-family="$(_theme_family 2> /dev/null)" || {
-  family=""
-  _log "WARN actor: theme family unresolvable; handlers will fail closed"
-}
+# unresolvable family is recorded as "-", so it is a state of its own:
+# the first apply runs the handlers (each fails closed and leaves its
+# destination untouched), and later ones take the retry backoff below
+# instead of fanning out from every shell.
+family="$(_theme_family 2> /dev/null)" || family=""
+family_key="${family:--}"
 
-if [[ -r "$state_file" && -n "$family" ]]; then
-  current="" current_family=""
+state_unchanged()
+{
+  local current="" current_family=""
+  [[ -r "$state_file" ]] || return 1
   read -r current < "$state_file" || true
   [[ -r "$family_file" ]] && {
     read -r current_family < "$family_file" || true
   }
-  if [[ "$current" = "$mode" && "$current_family" = "$family" ]]; then
-    exit 0
-  fi
+  [[ "$current" = "$mode" && "$current_family" = "$family_key" ]]
+}
+
+retry_due()
+{
+  [[ -s "$retry_file" ]] \
+    && [[ -z "$(find "$retry_file" -mmin -"$RETRY_MINUTES" 2> /dev/null)" ]]
+}
+
+# Shell init calls apply in every interactive shell, so the common
+# nothing-to-do case returns before touching the lock.
+if state_unchanged && ! retry_due; then
+  exit 0
 fi
 
-# Both are written before any handler forks: handlers.d/tmux re-sources
-# tmux.conf, whose bootstrap reads the mode back through theme-mode.
-_atomic_write "$state_file" "$mode"
-[[ -n "$family" ]] && _atomic_write "$family_file" "$family"
-_log "INFO actor flipped to $mode${family:+ ($family)}"
+# Every write to mode, family and retry happens under this lock, decided
+# again once it is held. Without it, shells opened together all pass the
+# retry check before any of them rewrites the file, and a slow retry can
+# finish after a newer flip — leaving the app on the old mode and
+# deleting the flip's retry list.
+mkdir -p -- "$state_dir" || {
+  echo "apply: cannot create $state_dir" >&2
+  exit 1
+}
+if state_unchanged; then
+  # The holder is either running this same retry or a flip that rebuilds
+  # the list, so a retry has nothing to add.
+  _acquire_lock "$lock_file" || exit 0
+else
+  # A flip must not be dropped: wait out the holder.
+  tries=0
+  until _acquire_lock "$lock_file"; do
+    tries=$((tries + 1))
+    if ((tries >= LOCK_WAIT_TRIES)); then
+      _log "WARN actor: $lock_file still held; $mode not applied"
+      echo "apply: $lock_file still held; $mode not applied" >&2
+      exit 1
+    fi
+    sleep 0.1
+  done
+fi
+trap 'rm -f -- "$lock_file"' EXIT
+
+# Assigned, not just declared: bash 3.2 under `set -u` treats a
+# declared-but-empty array as unbound in ${#arr[@]}.
+handlers=()
+if state_unchanged; then
+  # Re-run only the handlers recorded as failed, and only once the retry
+  # file is RETRY_MINUTES old: each retry rewrites the file, so a
+  # permanent failure (a broken config, an unsupported flag) costs one
+  # handler run per window instead of a full fan-out per shell. A mode or
+  # family change runs every handler and rebuilds the list from scratch.
+  retry_due || exit 0
+  while IFS= read -r name; do
+    [[ -n "$name" && -x "$handlers_dir/$name" ]] && handlers+=("$handlers_dir/$name")
+  done < "$retry_file"
+  if ((${#handlers[@]} == 0)); then
+    rm -f -- "$retry_file"
+    exit 0
+  fi
+  _log "INFO actor: retrying failed handlers at $mode${family:+ ($family)}"
+else
+  # Both are written before any handler forks: handlers.d/tmux re-sources
+  # tmux.conf, whose bootstrap reads the mode back through theme-mode.
+  _atomic_write "$state_file" "$mode"
+  _atomic_write "$family_file" "$family_key"
+  [[ -n "$family" ]] || _log "WARN actor: theme family unresolvable; handlers will fail closed"
+  _log "INFO actor flipped to $mode${family:+ ($family)}"
+  for h in "$handlers_dir"/*; do
+    [[ -x "$h" ]] && handlers+=("$h")
+  done
+fi
 
 # Resolve timeout(1) once. Bare-macOS hosts without coreutils have
 # neither `timeout` nor `gtimeout`; we fall back to running handlers
@@ -68,8 +142,8 @@ fi
 # Fork each handler under the resolved timeout. Capture stderr per handler
 # so the actor can label the lines on the way to the log.
 declare -a pids names
-for h in "$handlers_dir"/*; do
-  [[ -x "$h" ]] || continue
+failed_names=()
+for h in ${handlers[@]+"${handlers[@]}"}; do
   name="$(basename -- "$h")"
   errlog="$state_dir/.handler-$name.err"
   : > "$errlog"
@@ -86,12 +160,13 @@ done
 # does not abort the loop — `rc=$?` captures it cleanly. No errexit
 # toggle required.
 i=0
-for pid in "${pids[@]}"; do
+for pid in ${pids[@]+"${pids[@]}"}; do
   wait "$pid"
   rc=$?
   name="${names[$i]}"
   errlog="$state_dir/.handler-$name.err"
   if ((rc != 0)); then
+    failed_names+=("$name")
     _log "WARN handler '$name' exit=$rc"
     if [[ -s "$errlog" ]]; then
       while IFS= read -r line; do
@@ -109,5 +184,16 @@ for pid in "${pids[@]}"; do
   rm -f "$errlog"
   i=$((i + 1))
 done
+
+# State is written before the handlers (see above), so a failed or
+# timed-out handler would otherwise be skipped by every later apply at
+# the same mode. Recording just the failed names keeps the skip key for
+# the handlers that succeeded; rewriting the file restarts the backoff.
+if ((${#failed_names[@]} > 0)); then
+  _atomic_write "$retry_file" "$(printf '%s\n' "${failed_names[@]}")"
+  _log "WARN actor: handler failure; retrying ${failed_names[*]} after ${RETRY_MINUTES}m"
+else
+  rm -f -- "$retry_file"
+fi
 
 exit 0

@@ -38,7 +38,13 @@ else
   echo "television handler: active family ships no television palette; writing base config only" >&2
   content="$(cat -- "$base")"
 fi
-_atomic_write "$tvdir/config.toml" "$content"
+# Attempt the config and both links, then exit non-zero if any failed so
+# apply logs it and retries.
+rc=0
+_atomic_write "$tvdir/config.toml" "$content" || {
+  echo "television handler: cannot write $tvdir/config.toml" >&2
+  rc=1
+}
 
 # television resolves cable channels and user themes relative to its config
 # dir; point both at the repo's single source of truth. $tvdir is state we
@@ -50,5 +56,6 @@ _atomic_write "$tvdir/config.toml" "$content"
 for link in cable themes; do
   [[ -e "$tvdir/$link" && ! -L "$tvdir/$link" ]] && rm -rf -- "${tvdir:?}/$link"
 done
-_idempotent_ln_sf "$dotfiles/config/television/cable" "$tvdir/cable"
-_idempotent_ln_sf "$dotfiles/config/television/themes" "$tvdir/themes"
+_idempotent_ln_sf "$dotfiles/config/television/cable" "$tvdir/cable" || rc=1
+_idempotent_ln_sf "$dotfiles/config/television/themes" "$tvdir/themes" || rc=1
+exit "$rc"

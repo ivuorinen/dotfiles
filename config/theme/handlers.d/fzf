@@ -17,7 +17,11 @@ _theme_family > /dev/null || exit 1
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 mkdir -p -- "$state_dir"
 
+# rc collects a failure from either link; the loop status alone would
+# report only the last one.
+rc=0
 for ext in sh fish; do
   src="$(_palette "$mode" "fzf.${ext}")" || src=""
-  _link_palette "$src" "$state_dir/fzf-active.${ext}"
+  _link_palette "$src" "$state_dir/fzf-active.${ext}" || rc=1
 done
+exit "$rc"

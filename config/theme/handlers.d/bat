@@ -27,15 +27,17 @@ if [[ -z "$theme" ]]; then
   echo "bat handler: active family ships no bat theme; removed $state_dir/bat-theme" >&2
   exit 0
 fi
-_atomic_write "$state_dir/bat-theme" "$theme"
+_atomic_write "$state_dir/bat-theme" "$theme" || {
+  echo "bat handler: cannot write $state_dir/bat-theme" >&2
+  exit 1
+}
 
 # Custom themes are only picked up after `bat cache --build`. Build lazily
 # when the cache is missing, or when a *.tmTheme is newer than it, so
 # we don't re-syntect on every flip. Without the mtime check, editing a
 # theme (for example the AA-darkened Latte) never reaches bat on a host
-# whose cache already exists. A bat-less
-# host (or a transient build error) must not poison the orchestrator's
-# parallel-handler aggregation, so failures are silenced.
+# whose cache already exists. A bat-less host skips this block; a failed
+# build is reported and exits 1, so apply logs it and retries next time.
 if command -v bat > /dev/null 2>&1; then
   cache_dir="$(bat --cache-dir 2> /dev/null || true)"
   config_dir="$(bat --config-dir 2> /dev/null || true)"
@@ -52,7 +54,10 @@ if command -v bat > /dev/null 2>&1; then
       done
     fi
     if ((stale)); then
-      bat cache --build > /dev/null 2>&1 || true
+      bat cache --build > /dev/null || {
+        echo "bat handler: bat cache --build failed; custom themes will not resolve" >&2
+        exit 1
+      }
     fi
   fi
 fi

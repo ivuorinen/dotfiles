@@ -19,7 +19,7 @@ setup()
   BIN="$TMPDIR_TEST/bin"
   UTIL="$TMPDIR_TEST/util"
   mkdir -p "$BIN" "$UTIL"
-  for cmd in bash env mkdir dirname mktemp mv ln rm cat date tail wc kill sleep printf timeout gtimeout awk grep; do
+  for cmd in bash env mkdir dirname basename mktemp mv ln rm cat date tail wc kill sleep printf timeout gtimeout awk grep find pkill; do
     real="$(command -v "$cmd" 2> /dev/null || true)"
     [[ -n "$real" && -e "$real" ]] && ln -sf "$real" "$UTIL/$cmd" || true
   done
@@ -92,11 +92,15 @@ STUB
   chmod +x "$BIN/busctl"
 }
 
+# The timeout is a hang guard only: every caller's fake monitor ends at
+# once, so the watcher exits by itself and the test asserts that status.
+# 3 s killed the seed apply (it now takes the apply lock) under the full
+# suite's parallel load, turning the expected exit 1 into 143.
 run_watcher_linux()
 {
   local de="$1"
   PATH="$ISO_PATH" XDG_CURRENT_DESKTOP="$de" \
-    "$TIMEOUT_BIN" 3 "$WATCHER" --source linux
+    "$TIMEOUT_BIN" 20 "$WATCHER" --source linux
 }
 
 # --- Existing tests ---
@@ -108,6 +112,99 @@ run_watcher_linux()
   run "$tmo" 3 "$WATCHER" --source stub --stub-input "$TMPDIR_TEST/source-stub"
   [ "$status" -eq 0 ]
   [ "$(wc -l < "$TMPDIR_TEST/recorded")" -ge 3 ]
+}
+
+# Send TERM to a background watcher (pid $1) once its pidfile exists and
+# assert it exits 143 and removes the pidfile. The watcher and the
+# watchdog run with fd 3 closed and their output on /dev/null: bats waits
+# for every holder of its descriptors, so an orphaned `sleep` holding
+# one would stall the test for the full watchdog window.
+assert_term_exits_143()
+{
+  local pid="$1" pidfile="$TMPDIR_TEST/dotfiles-theme/daemon.pid" _
+  for _ in $(seq 1 50); do
+    [[ -s "$pidfile" ]] && break
+    sleep 0.1
+  done
+  [ -s "$pidfile" ]
+  # Watchdog: a watcher that ignores TERM would hang `wait`; KILL it
+  # after 8 s so the test fails with 137 instead.
+  (
+    exec 3>&- > /dev/null 2>&1
+    sleep 8
+    kill -KILL "$pid" 2> /dev/null
+  ) &
+  local dog=$!
+  kill -TERM "$pid"
+  local rc=0
+  wait "$pid" || rc=$?
+  pkill -P "$dog" 2> /dev/null || true
+  kill "$dog" 2> /dev/null || true
+  [ "$rc" -eq 143 ]
+  [ ! -e "$pidfile" ]
+}
+
+@test "watcher: TERM exits 143 and removes the pidfile" {
+  # Before the fix the signal trap only removed the pidfile and the loop
+  # kept running, leaving an unlocked daemon a second watcher could join.
+  cat > "$BIN/defaults" << 'STUB'
+#!/usr/bin/env bash
+echo Dark
+STUB
+  chmod +x "$BIN/defaults"
+  PATH="$ISO_PATH" "$WATCHER" --source macos 3>&- > /dev/null 2>&1 &
+  assert_term_exits_143 "$!"
+}
+
+# Run a linux watcher on a fake gsettings monitor, TERM it, and assert
+# the monitor dies with it. `exec sleep` makes the fake monitor itself the
+# long-running process, so its pid is the one the exit cleanup has to kill.
+assert_term_stops_monitor()
+{
+  cat > "$BIN/gsettings" << 'STUB'
+#!/usr/bin/env bash
+case "$1" in
+  get) echo "'prefer-dark'" ;;
+  monitor)
+    echo $$ > "$TMPDIR_TEST/monitor.pid"
+    exec sleep 30
+    ;;
+esac
+STUB
+  chmod +x "$BIN/gsettings"
+  PATH="$ISO_PATH" XDG_CURRENT_DESKTOP=GNOME \
+    "$WATCHER" --source linux 3>&- > /dev/null 2>&1 &
+  local watcher=$! _
+  for _ in $(seq 1 50); do
+    [[ -s "$TMPDIR_TEST/monitor.pid" ]] && break
+    sleep 0.1
+  done
+  [ -s "$TMPDIR_TEST/monitor.pid" ]
+  monitor="$(cat "$TMPDIR_TEST/monitor.pid")"
+  assert_term_exits_143 "$watcher"
+  # An orphaned monitor would keep feeding apply beside the respawned
+  # watcher.
+  for _ in $(seq 1 20); do
+    kill -0 "$monitor" 2> /dev/null || break
+    sleep 0.1
+  done
+  if kill -0 "$monitor" 2> /dev/null; then
+    kill "$monitor"
+    false
+  fi
+}
+
+@test "watcher linux: TERM exits 143 while the monitor pipeline runs" {
+  # A foreground `monitor | while read` pipeline deferred the TERM trap
+  # until the never-ending monitor exited.
+  assert_term_stops_monitor
+}
+
+@test "watcher linux: TERM stops the monitor when pkill is not installed" {
+  # The exit cleanup relied on pkill alone; without it the error was
+  # silenced and the monitor kept feeding apply after the pidfile went.
+  rm -f "$UTIL/pkill"
+  assert_term_stops_monitor
 }
 
 @test "watcher: second invocation exits 1 when first holds the lock" {
@@ -185,7 +282,10 @@ run_watcher_linux()
   fake_busctl 1 # would also map to dark, but must NOT be invoked
 
   run run_watcher_linux GNOME
-  [ "$status" -eq 0 ]
+  # The fake monitor ends at once: the watcher logs it and exits 1.
+  [ "$status" -eq 1 ]
+  grep -q 'ERROR watcher linux: gsettings monitor stream ended' \
+    "$TMPDIR_TEST/dotfiles-theme/log"
 
   # gsettings was used for both seed get and monitor; busctl untouched.
   grep -q '^gsettings get org.gnome.desktop.interface color-scheme$' "$BIN/calls"
@@ -212,7 +312,9 @@ run_watcher_linux()
   fake_busctl 2                  # data:2 = light
 
   run run_watcher_linux COSMIC
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
+  grep -q 'ERROR watcher linux: busctl monitor stream ended' \
+    "$TMPDIR_TEST/dotfiles-theme/log"
 
   # busctl was used (call for seed, monitor for events); gsettings untouched.
   grep -q '^busctl --user --json=short call ' "$BIN/calls"
@@ -236,7 +338,7 @@ run_watcher_linux()
   # ubuntu:GNOME also matches `*GNOME*` — exercises the wildcard and the
   # have_gsettings=false branch of the selector.
   run run_watcher_linux ubuntu:GNOME
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
 
   run grep -q '^gsettings' "$BIN/calls"
   [ "$status" -ne 0 ]
@@ -250,7 +352,7 @@ run_watcher_linux()
   fake_gsettings "'prefer-light'"
 
   run run_watcher_linux COSMIC
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
 
   run grep -q '^busctl' "$BIN/calls"
   [ "$status" -ne 0 ]
@@ -264,7 +366,7 @@ run_watcher_linux()
   fake_gsettings "'default'"
 
   run run_watcher_linux GNOME
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
 
   grep -q '^gsettings ' "$BIN/calls"
   [ "$(cat "$TMPDIR_TEST/recorded")" = "dark" ]
@@ -276,7 +378,7 @@ run_watcher_linux()
   fake_busctl 0 # data:0 = no preference -> dark
 
   run run_watcher_linux COSMIC
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
 
   grep -q '^busctl --user --json=short call ' "$BIN/calls"
   [ "$(cat "$TMPDIR_TEST/recorded")" = "dark" ]

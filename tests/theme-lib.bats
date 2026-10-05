@@ -60,6 +60,23 @@ teardown()
   [ "$(cat "$TMPDIR_TEST/dst")" = "user-content" ]
 }
 
+@test "_idempotent_ln_sf: retargets a link to a directory instead of writing inside it" {
+  source "$THEME_LIB"
+  mkdir -p "$TMPDIR_TEST/a" "$TMPDIR_TEST/b"
+  ln -s "$TMPDIR_TEST/a" "$TMPDIR_TEST/dst"
+  _idempotent_ln_sf "$TMPDIR_TEST/b" "$TMPDIR_TEST/dst"
+  [ "$(readlink "$TMPDIR_TEST/dst")" = "$TMPDIR_TEST/b" ]
+  [ -z "$(ls -A "$TMPDIR_TEST/a")" ]
+}
+
+@test "_idempotent_ln_sf: returns 1 with a message when ln fails" {
+  source "$THEME_LIB"
+  echo data > "$TMPDIR_TEST/src"
+  run _idempotent_ln_sf "$TMPDIR_TEST/src" "$TMPDIR_TEST/missing-dir/dst"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"theme: failed to link"* ]]
+}
+
 @test "_idempotent_ln_sf: repairs broken symlink" {
   source "$THEME_LIB"
   ln -s "$TMPDIR_TEST/missing" "$TMPDIR_TEST/dst"

@@ -241,6 +241,38 @@ gd()
   done
 }
 
+@test "git-dirty: TERM during -p stops the running workers" {
+  # The cleanup ran `pkill -P $$ TERM`, which reads TERM as a process name
+  # to match, so it killed nothing and the job pool outlived the script.
+  # The git stub records its parent — the worker subshell — and stalls.
+  mkdir -p "$TMP/bin"
+  printf '#!/bin/sh\necho "parallel from moreutils"\n' > "$TMP/bin/parallel"
+  real_git="$(command -v git)"
+  cat > "$TMP/bin/git" << STUB
+#!/usr/bin/env bash
+if [[ "\$*" == "diff --quiet" ]]; then
+  echo "\$PPID" >> "$TMP/workers"
+  exec sleep 5
+fi
+exec "$real_git" "\$@"
+STUB
+  chmod +x "$TMP/bin/parallel" "$TMP/bin/git"
+  PATH="$TMP/bin:$PATH" "$GD" -p "$TREE" 3>&- > /dev/null 2>&1 &
+  local gd_pid=$! _ worker alive=0
+  for _ in $(seq 1 50); do
+    [[ -s "$TMP/workers" ]] && break
+    sleep 0.1
+  done
+  [ -s "$TMP/workers" ]
+  kill -TERM "$gd_pid"
+  wait "$gd_pid" || true
+  sleep 0.5
+  while read -r worker; do
+    kill -0 "$worker" 2> /dev/null && alive=$((alive + 1))
+  done < "$TMP/workers"
+  [ "$alive" -eq 0 ]
+}
+
 @test "git-dirty: -m limits how deep it goes" {
   mkdir -p "$TREE/a/b/c"
   git init --quiet -b main "$TREE/a/b/c/deep-repo"

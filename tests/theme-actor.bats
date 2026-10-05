@@ -123,6 +123,148 @@ STUB
   grep -q "WARN handler 'bad' exit=7" "$TMPDIR_TEST/dotfiles-theme/log"
 }
 
+failing_handler()
+{
+  cat > "$THEME_HANDLERS_DIR/flaky" << 'STUB'
+#!/usr/bin/env bash
+echo run >> "$TMPDIR_TEST/flaky-runs"
+exit 1
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/flaky"
+}
+
+# Age the retry file past apply's backoff window.
+age_retry_file()
+{
+  touch -t 202001010000 "$TMPDIR_TEST/dotfiles-theme/retry"
+}
+
+@test "apply: a failed handler is re-run alone once the backoff passes" {
+  failing_handler
+  counting_handler
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/mode")" = "dark" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/retry")" = "flaky" ]
+  grep -q 'handler failure; retrying flaky' "$TMPDIR_TEST/dotfiles-theme/log"
+  age_retry_file
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 2 ]
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+}
+
+@test "apply: a failing handler is not retried inside the backoff window" {
+  failing_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 1 ]
+}
+
+@test "apply: a retried handler that succeeds clears the retry file" {
+  failing_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$THEME_HANDLERS_DIR/flaky"
+  age_retry_file
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/retry" ]
+}
+
+@test "apply: a mode change runs every handler despite a pending retry" {
+  failing_handler
+  counting_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" light
+  [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 2 ]
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 2 ]
+}
+
+@test "apply: concurrent applies past the backoff retry once" {
+  export TMPDIR_TEST
+  cat > "$THEME_HANDLERS_DIR/flaky" << 'STUB'
+#!/usr/bin/env bash
+echo run >> "$TMPDIR_TEST/flaky-runs"
+sleep 1
+exit 1
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/flaky"
+  "$APPLY" dark
+  age_retry_file
+  for _ in 1 2 3 4 5 6; do
+    "$APPLY" dark &
+  done
+  wait
+  # One run from the flip, one retry for the whole window.
+  [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 2 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/retry")" = "flaky" ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
+}
+
+@test "apply: a flip during a retry runs after it and keeps its retry list" {
+  export TMPDIR_TEST
+  # dark fails until dark-ok exists, then succeeds slowly; light fails.
+  cat > "$THEME_HANDLERS_DIR/flaky" << 'STUB'
+#!/usr/bin/env bash
+if [ "$1" = dark ] && [ -e "$TMPDIR_TEST/dark-ok" ]; then
+  sleep 2
+  echo dark >> "$TMPDIR_TEST/order"
+  exit 0
+fi
+echo "$1" >> "$TMPDIR_TEST/order"
+exit 1
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/flaky"
+  "$APPLY" dark
+  touch "$TMPDIR_TEST/dark-ok"
+  : > "$TMPDIR_TEST/order"
+  age_retry_file
+  "$APPLY" dark &
+  sleep 0.5
+  "$APPLY" light
+  wait
+  [ "$(cat "$TMPDIR_TEST/order")" = "$(printf 'dark\nlight')" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/mode")" = "light" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/retry")" = "flaky" ]
+}
+
+@test "apply: an unresolvable family is not re-applied by every shell" {
+  counting_handler
+  DOTFILES_THEME_FAMILY=../nope TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  DOTFILES_THEME_FAMILY=../nope TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+  [ "$(grep -c 'family unresolvable' "$TMPDIR_TEST/dotfiles-theme/log")" -eq 1 ]
+  # Fixing the family is a state change, so the handlers run again.
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 2 ]
+}
+
+@test "apply: a retry gives way to an apply holding the lock" {
+  failing_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  age_retry_file
+  # A live pid (this shell) holds the lock.
+  echo $$ > "$TMPDIR_TEST/dotfiles-theme/apply.lock"
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 1 ]
+  [ -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
+}
+
+@test "apply: a stale lock from a dead apply does not block a flip" {
+  counting_handler
+  mkdir -p "$TMPDIR_TEST/dotfiles-theme"
+  bash -c 'exit 0' &
+  dead=$!
+  wait "$dead"
+  echo "$dead" > "$TMPDIR_TEST/dotfiles-theme/apply.lock"
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
+}
+
 @test "apply: kills handlers that exceed 5s timeout" {
   cat > "$THEME_HANDLERS_DIR/slow" << 'STUB'
 #!/usr/bin/env bash
