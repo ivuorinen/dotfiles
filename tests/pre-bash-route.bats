@@ -823,4 +823,14 @@ EOF"
   [ "$(decision "git commit -m 'fix' -m 'GIT_EDITOR=npm i'")" = "allow" ]
   [ "$(decision "git tag -a v1 -m 'PAGER=curl x'")" = "allow" ]
   [ "$(decision "git commit --no-verify -m 'x'")" = "deny" ]
+  # Every check sees the message removed, not only the per-word scan.
+  [ "$(decision "git tag -a v1 -m '--no-verify'")" = "allow" ]
+  [ "$(decision "git commit -m 'git checkout yarn.lock'")" = "allow" ]
+  [ "$(decision "git stash push -m '--no-verify'")" = "allow" ]
+  [ "$(decision "git tag -m x --no-verify v1")" = "deny" ]
+  # Elsewhere -m is a flag and the next word a path that stays checked.
+  [ "$(decision 'git checkout -m yarn.lock')" = "deny" ]
+  # git-hunk commit is how this repo commits; its message is text too.
+  [ "$(decision "git-hunk commit abc1234 -m 'fix: git checkout yarn.lock was allowed'")" = "allow" ]
+  [ "$(decision "git-hunk commit abc1234 --no-verify -m 'x'")" = "deny" ]
 }

@@ -345,6 +345,43 @@ _bp_has_after()
   return 1
 }
 
+# _bp_git_msgfree ARGV... — set BP_MF to a git or git-hunk argv without its
+# message values. Only the subcommands whose -m/--message is message text are
+# filtered (git commit, tag, merge, notes, stash; git-hunk commit); elsewhere
+# -m is a flag (`git checkout -m yarn.lock`) and the next word a path that
+# must stay checked. _bp_commit_opts already knows every message spelling:
+# -m V, -mV, -amV, --message[=V] and its abbreviations.
+_bp_git_msgfree()
+{
+  local i verb="" vi=0
+  local -a w=("$@")
+  BP_MF=("$@")
+  if [[ ${w[0]##*/} == git-hunk ]]; then
+    [[ ${w[1]-} == commit ]] || return 0
+    _bp_commit_opts "${w[@]:2}"
+    BP_MF=("${w[@]:0:2}" ${BP_C_KEEP[@]+"${BP_C_KEEP[@]}"})
+    return 0
+  fi
+  for ((i = 1; i < ${#w[@]}; i++)); do
+    case ${w[i]} in
+      -C | -c | --git-dir | --work-tree | --namespace) i=$((i + 1)) ;;
+      -*) ;;
+      *)
+        verb=${w[i]}
+        vi=$i
+        break
+        ;;
+    esac
+  done
+  case $verb in
+    commit | tag | merge | notes | stash) ;;
+    *) return 0 ;;
+  esac
+  _bp_commit_opts "${w[@]:vi+1}"
+  BP_MF=("${w[@]:0:vi+1}" ${BP_C_KEEP[@]+"${BP_C_KEEP[@]}"})
+  return 0
+}
+
 # _bp_redir OP TARGET — a redirect that writes to a protected path. The
 # routine `2>&1` and `> /dev/null` never reach the predicate. shfmt before
 # 3.14.0 encodes OP as an enum number whose values shift between releases,
@@ -588,6 +625,14 @@ _bp_final()
   shift 3
   local -a w=("$@")
   fw=${w[0]##*/}
+  # Message text is never code: every check below sees git's argv with the
+  # -m/--message values removed (_bp_git_msgfree), so `git commit -m 'git
+  # checkout yarn.lock'` and `git tag -m '--no-verify'` are text, not a write
+  # or a bypass flag.
+  if [[ $fw == git || $fw == git-hunk ]]; then
+    _bp_git_msgfree "${w[@]}"
+    w=(${BP_MF[@]+"${BP_MF[@]}"})
+  fi
 
   _bp_check_argv "${w[@]}"
   BP_SCAN+=$'\n'"${BP_KEEP[*]}"
@@ -650,12 +695,6 @@ _bp_final()
   if [[ -z $BP_REASON ]]; then
     for ((k = 1; k < ${#w[@]}; k++)); do
       a=${w[k]##*/}
-      # A git -m/--message value is message text (commit, tag, merge, stash,
-      # notes), never code: `git commit -m 'EDITOR=npm x'` matched the
-      # KEY=VALUE scan below and was refused.
-      if [[ $fw == git && (${w[k - 1]} == -m || ${w[k - 1]} == --message) ]]; then
-        continue
-      fi
       if ((lookup == 0)); then
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9]*= ]] && BP_ASSIGNS+=" ${w[k]%%=*}"
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9.-]*= ]] && _bp_value "${w[k]#*=}"
@@ -665,15 +704,27 @@ _bp_final()
         # --message='git add -A'` and refused the commit. Attached and `=`
         # forms here; the separate-word value of the options taking a
         # required argument below.
+        # GNU tar runs --to-command per extracted file, -I/--use-compress-
+        # program as the filter, --checkpoint-action=exec=, and -F/--info-
+        # script/--new-volume-script per volume; its long options take any
+        # unambiguous prefix, hence the shortest unique stems.
         case $fw:${w[k]} in
-          git:-O?* | man:-P?* | fd:-x?* | fd:-X?*) _bp_value "${w[k]:2}" ;;
+          git:-O?* | man:-P?* | fd:-x?* | fd:-X?* | tar:-I?* | tar:-F?*) _bp_value "${w[k]:2}" ;;
           git:--open-files-in-pager=* | man:--pager=* | rg:--pre=* | fd:--exec=* | fd:--exec-batch=*)
             _bp_value "${w[k]#*=}"
             ;;
+          tar:--to-c*=* | tar:--use*=* | tar:--info*=* | tar:--new-v*=*) _bp_value "${w[k]#*=}" ;;
+          tar:--checkpoint-a*=exec=*) _bp_value "${w[k]#*=exec=}" ;;
           *) ;;
         esac
         case $fw:${w[k - 1]} in
-          man:-P | man:--pager | rg:--pre) _bp_value "${w[k]}" ;;
+          man:-P | man:--pager | rg:--pre | tar:-I | tar:-F) _bp_value "${w[k]}" ;;
+          tar:--to-c* | tar:--use* | tar:--info* | tar:--new-v*)
+            [[ ${w[k - 1]} == *=* ]] || _bp_value "${w[k]}"
+            ;;
+          tar:--checkpoint-a*)
+            [[ ${w[k - 1]} != *=* && ${w[k]} == exec=* ]] && _bp_value "${w[k]#exec=}"
+            ;;
           *) ;;
         esac
         case $a in

@@ -51,9 +51,12 @@ executes an operand (`which`, `rg`, `git log`). The value half of every
 `git config` value — is parsed as a command and held to the same checks,
 since pagers, editors and `GIT_SSH_COMMAND` run it. So is the value of an
 option the tool runs as a command — `git grep -O`/`--open-files-in-pager`,
-`man -P`/`--pager`, `rg --pre`, `fd -x`/`-X`/`--exec` — and any of these ends
-a lookup's exemption. A git `-m`/`--message` value is message text and is
-never read as a command.
+`man -P`/`--pager`, `rg --pre`, `fd -x`/`-X`/`--exec`, and GNU tar's
+`--to-command`, `-I`/`--use-compress-program`, `--checkpoint-action=exec=`
+and `-F`/`--info-script`/`--new-volume-script` — and any of these ends a
+lookup's exemption. The `-m`/`--message` value of `git commit`, `tag`,
+`merge`, `notes` and `stash` is message text: every check sees the argv
+without it.
 
 If a hook fails, fix the underlying problem. The hook chain
 (commitlint, shellcheck, shfmt, biome, prettier, yamllint,

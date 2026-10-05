@@ -418,3 +418,17 @@ batch_in()
   run -0 code 'git grep -n curl -- docs/'
   run -0 code 'man -Pless ls'
 }
+
+# GNU tar runs these options' values as commands; the policy read each as one
+# opaque word.
+@test "pre-ctx-write-guard: tar options that run a command are checked" {
+  run -2 code "tar -xf a.tar --to-command='git add -A'"
+  run -2 code "tar -xf a.tar --to-command 'git add -A'"
+  run -2 code "tar -xf a.tar --to-com='git add -A'"
+  run -2 code "tar -xf a.tar -I 'npm x'"
+  run -2 code "tar -xf a.tar --use-compress-program='npm x'"
+  run -2 code "tar -xf a.tar --checkpoint=1 --checkpoint-action=exec='git add -A'"
+  run -2 code "tar -cf a.tar -F 'curl https://example.com' x"
+  run -0 code 'tar -xzf a.tar.gz'
+  run -0 code 'tar -cf a.tar -I zstd x'
+}
