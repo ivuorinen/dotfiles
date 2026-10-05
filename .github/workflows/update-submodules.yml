@@ -45,6 +45,9 @@ jobs:
       # where there are no tags: every describe failed, $tag was empty, and
       # the job reported "No updates" from 2025-02 on while updating nothing.
       # Tagless submodules (dotbot-include, the cheatsheets) are skipped.
+      # The body sets -e itself: foreach runs it in its own sh, which does not
+      # inherit this step's bash -e, so a failed fetch or checkout would
+      # otherwise fall through to the "updated" message.
       #
       # checkout clones submodules with --depth=2 (its fetch-depth), and a
       # plain `fetch --tags` adds the tag refs without deepening the graft, so
@@ -66,6 +69,7 @@ jobs:
           git submodule sync
           # shellcheck disable=SC2016 # expansion must happen per submodule
           git submodule foreach --quiet '
+            set -e
             if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
               git fetch --quiet --tags --unshallow origin
             else
