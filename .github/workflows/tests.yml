@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Tests
 
@@ -37,17 +38,19 @@ jobs:
         # no mise, so it has to come from the package manager.
         # tmux, yamllint: the theme tests skip without them — the tmux
         # reload-recursion and 5 s budget guards, and the palette parse checks.
+        # age: the a/ad/ae real-age round-trip tests skip without it, and they
+        # are the only tests that prove an encrypted file decrypts.
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats fish python3-packaging tmux yamllint
+          sudo apt-get install -y age bats fish python3-packaging tmux yamllint
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'
         # bash: the runner's /bin/bash is 3.2 and dfm's full bootstrap
         # requires 4+; coreutils: gtimeout for the theme actor's 5s kill;
-        # tmux, yamllint: see the Linux step
+        # age, tmux, yamllint: see the Linux step
         run: |
-          brew install bats-core fish bash coreutils tmux yamllint
+          brew install age bats-core fish bash coreutils tmux yamllint
           python3 -m pip install --break-system-packages packaging \
             || python3 -m pip install packaging
 
