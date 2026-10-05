@@ -78,7 +78,9 @@ check_dependencies()
   fi
 }
 
-# Ensure log directory and file exist with correct permissions
+# Create the log file before the first message, mode 0600: the log records
+# the paths of every file encrypted or decrypted, which is nobody else's
+# business on a shared machine.
 prepare_log_file()
 {
   local log_dir
@@ -112,7 +114,8 @@ log_message()
   esac
 }
 
-# Function to print usage
+# Usage text for `help`, a missing command, and an unknown one. Kept in step
+# with the #USAGE spec above by hand; usage lint checks the spec, not this.
 print_help()
 {
   cat << EOF
@@ -168,7 +171,7 @@ Requirements:
 EOF
 }
 
-# Function to print version
+# Print VERSION, which must match the #USAGE version line.
 print_version()
 {
   echo "a version $VERSION"
@@ -263,7 +266,11 @@ check_output()
   fi
 }
 
-# Function to encrypt a single file
+# Encrypt FILE to FILE.age. The output is written to a temp file beside it
+# and moved into place only after age succeeds, so a failed encrypt never
+# truncates an existing .age; .age inputs are skipped so a directory run
+# does not encrypt its own output twice. Returns 1 on any failure for
+# process_path to count.
 encrypt_single_file()
 {
   local file="$1"
@@ -294,7 +301,10 @@ encrypt_single_file()
   fi
 }
 
-# Function to decrypt a single file
+# Decrypt FILE.age to FILE with the private identity (never the public keys
+# file, which cannot decrypt). Same temp-then-move as encrypt; non-.age files
+# are skipped because inside a directory they are not ciphertext. Returns 1
+# on any failure for process_path to count.
 decrypt_single_file()
 {
   local file="$1"
@@ -355,7 +365,9 @@ process_path()
   fi
 }
 
-# Main entry point
+# Parse flags in this shell, pick the action from the command word, then run
+# it on every target, counting failures instead of stopping at the first;
+# the exit status is 1 when anything failed.
 main()
 {
   # Flags are parsed here, not in a $(...) or <(...) subshell, whose
