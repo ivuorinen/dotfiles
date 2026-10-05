@@ -3,7 +3,7 @@
 #USAGE about "Encrypt a file using age with GitHub SSH keys"
 #USAGE flag "-f --force" help="Overwrite an existing <file>.age"
 #USAGE flag "--delete" help="Delete <file> after a successful encrypt"
-#USAGE arg "<file>" help="File or directory to encrypt"
+#USAGE arg "<file>" help="Files or directories to encrypt" var=#true
 
 # A shorthand for `a -v encrypt`: one copy of the key fetching and the
 # overwrite guards, so a fix cannot land in one wrapper and miss another.

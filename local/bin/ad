@@ -3,7 +3,7 @@
 #USAGE about "Decrypt a file using age with your SSH private key"
 #USAGE flag "-f --force" help="Overwrite an existing decrypted file"
 #USAGE flag "--delete" help="Delete <file> after a successful decrypt"
-#USAGE arg "<file>" help="File to decrypt (must end in .age), or a directory"
+#USAGE arg "<file>" help="Files to decrypt (each must end in .age), or directories" var=#true
 
 # A shorthand for `a -v decrypt`: one copy of the identity lookup and the
 # overwrite guards, so a fix cannot land in one wrapper and miss another.

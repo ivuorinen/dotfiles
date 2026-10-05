@@ -6,7 +6,7 @@ SSH private key.
 ## Usage
 
 ```bash
-ad [-f|--force] [--delete] <file.age|directory>
+ad [-f|--force] [--delete] <file.age|directory>...
 ```
 
 `ad` is shorthand for `a -v decrypt`; see `a.md` for the full behaviour.

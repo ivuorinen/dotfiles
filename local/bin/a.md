@@ -18,8 +18,12 @@ dnf install age      # Fedora
 ## Usage
 
 ```bash
-a [options] <command> <file|directory>
+a [options] <command> <file|directory>...
 ```
+
+Every target is processed. A target that is missing, or a named file
+without `.age` when decrypting, counts as a failure and the rest still run;
+any failure makes the exit status 1.
 
 Commands:
 

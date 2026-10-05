@@ -535,6 +535,36 @@ a_args()
   [[ "$stderr" == *"1 file(s) failed"* ]]
 }
 
+# Only the first target was read, so a glob such as `ae *.txt` encrypted one
+# file, exited 0 and left the others in plaintext.
+@test "a: every target given is processed" {
+  printf 'one\n' > "$TMP/work/m1.txt"
+  printf 'two\n' > "$TMP/work/m2.txt"
+  a_args e "$TMP/work/m1.txt" "$TMP/work/m2.txt"
+  [ "$status" -eq 0 ]
+  [ -f "$TMP/work/m1.txt.age" ]
+  [ -f "$TMP/work/m2.txt.age" ]
+}
+
+@test "a: a bad target among several fails the run but the rest still run" {
+  printf 'one\n' > "$TMP/work/m1.txt"
+  a_args e "$TMP/work/no-such-file" "$TMP/work/m1.txt"
+  [ "$status" -eq 1 ]
+  [ -f "$TMP/work/m1.txt.age" ]
+  [[ "$stderr" == *"does not exist"* ]]
+  [[ "$stderr" == *"1 of the given targets failed"* ]]
+}
+
+@test "ae: a glob of several files encrypts each one" {
+  printf 'ssh-ed25519 AAAA existing\n' > "$KEYS"
+  printf 'one\n' > "$TMP/work/g1.txt"
+  printf 'two\n' > "$TMP/work/g2.txt"
+  age_run "$AE" "$TMP/work/g1.txt" "$TMP/work/g2.txt"
+  [ "$status" -eq 0 ]
+  [ -f "$TMP/work/g1.txt.age" ]
+  [ -f "$TMP/work/g2.txt.age" ]
+}
+
 @test "a: -f never moves the output into a directory of that name" {
   rm "$TMP/work/secret.txt.age"
   mkdir "$TMP/work/secret.txt.age"

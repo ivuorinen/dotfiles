@@ -5,7 +5,7 @@ Encrypt a file with `age` using your GitHub SSH keys.
 ## Usage
 
 ```bash
-ae [-f|--force] [--delete] <file|directory>
+ae [-f|--force] [--delete] <file|directory>...
 ```
 
 `ae` is shorthand for `a -v encrypt`; see `a.md` for the full behaviour.
@@ -23,6 +23,7 @@ using the cached file.
 
 ```bash
 ae secret.txt
+ae *.txt           # every matching file
 ```
 
 <!-- vim: set ft=markdown spell spelllang=en_us cc=80 : -->

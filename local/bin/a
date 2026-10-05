@@ -8,12 +8,12 @@
 #USAGE cmd "encrypt" help="Encrypt a file or directory" {
 #USAGE   alias "e"
 #USAGE   alias "enc"
-#USAGE   arg "<target>" help="File or directory to encrypt"
+#USAGE   arg "<target>" help="Files or directories to encrypt" var=#true
 #USAGE }
 #USAGE cmd "decrypt" help="Decrypt a file or directory" {
 #USAGE   alias "d"
 #USAGE   alias "dec"
-#USAGE   arg "<target>" help="File or directory to decrypt"
+#USAGE   arg "<target>" help="Files or directories to decrypt" var=#true
 #USAGE }
 #USAGE cmd "help" help="Show help"
 #USAGE cmd "version" help="Show version"
@@ -348,8 +348,10 @@ main()
   done
 
   local command="${args[0]:-}"
-  local target="${args[1]:-}"
-  local action
+  # Every remaining word is a target: `ae *.txt` expands to several, and
+  # reading only the first encrypted one file, exited 0 and left the rest.
+  local targets=("${args[@]:1}")
+  local action target
 
   case "$command" in
     e | enc | encrypt) action=encrypt_single_file ;;
@@ -376,27 +378,35 @@ main()
   check_dependencies "$command"
   prepare_log_file
 
-  if [[ -z "$target" ]]; then
+  if ((${#targets[@]} == 0)); then
     log_message "Error: No file or directory specified."
     print_help
     exit 1
   fi
-  if [[ ! -e "$target" ]]; then
-    log_message "Error: '$target' does not exist."
-    exit 1
-  fi
-  # A named file without the suffix would decrypt onto itself; inside a
-  # directory such files are simply not ciphertext and are skipped.
-  if [[ "$action" == decrypt_single_file && -f "$target" && "$target" != *.age ]]; then
-    log_message "Error: '$target' has no .age suffix."
-    exit 1
-  fi
 
-  process_path "$action" "$target"
+  # A bad target counts as a failure and the rest still run, as a failed
+  # file does inside a directory; any failure makes the exit status 1.
+  for target in "${targets[@]}"; do
+    if [[ ! -e "$target" ]]; then
+      log_message "Error: '$target' does not exist."
+      FAILED=$((FAILED + 1))
+      continue
+    fi
+    # A named file without the suffix would decrypt onto itself; inside a
+    # directory such files are simply not ciphertext and are skipped.
+    if [[ "$action" == decrypt_single_file && -f "$target" && "$target" != *.age ]]; then
+      log_message "Error: '$target' has no .age suffix."
+      FAILED=$((FAILED + 1))
+      continue
+    fi
+    process_path "$action" "$target"
+  done
 
   if ((FAILED > 0)); then
-    if [[ -d "$target" ]]; then
-      log_message "Error: $FAILED file(s) failed under '$target'."
+    if ((${#targets[@]} > 1)); then
+      log_message "Error: $FAILED of the given targets failed."
+    elif [[ -d "${targets[0]}" ]]; then
+      log_message "Error: $FAILED file(s) failed under '${targets[0]}'."
     fi
     exit 1
   fi
