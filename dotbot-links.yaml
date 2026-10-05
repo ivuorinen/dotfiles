@@ -86,6 +86,7 @@
         - config/cosmic-desktop
         - config/mise
         - config/herdr
+        - config/gnupg
     # Claude Code statusline (single file — see base/claude exclude above)
     ~/.claude/statusline-command.sh:
       relink: true
@@ -111,6 +112,16 @@
     ~/.config/herdr/plugins/config/sessionizer/config.toml:
       force: true
       path: config/herdr/plugins/config/sessionizer/config.toml
+    # GnuPG reads its config only from GNUPGHOME ($XDG_DATA_HOME/gnupg, set in
+    # config/exports and config/fish/exports.fish), never from ~/.config/gnupg,
+    # so the two files link into the keyring dir; config/gnupg is excluded
+    # from the config/* glob above.
+    ~/.local/share/gnupg/gpg-agent.conf:
+      relink: true
+      path: config/gnupg/gpg-agent.conf
+    ~/.local/share/gnupg/dirmngr.conf:
+      relink: true
+      path: config/gnupg/dirmngr.conf
     # 1Password CLI plugins
     ~/.config/op/plugins.sh:
       relink: true

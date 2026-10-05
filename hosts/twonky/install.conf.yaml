@@ -1,0 +1,9 @@
+---
+- include: "tools/dotbot-defaults.yaml"
+- shell:
+    - echo "Configuring twonky"
+- link:
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/twonky/config/**

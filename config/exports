@@ -295,8 +295,10 @@ export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
 # And include the parameter for ZSH
 export HISTORY_IGNORE="(ls|cd|cd -|pwd|exit|date|* --help)"
 
-# Less history location
-export LESSHISTFILE="$XDG_STATE_HOME"/less/history
+# Less history location. A file directly in XDG_STATE_HOME (created by
+# dotbot): less skips saving history silently when the parent dir is missing.
+# Keep in sync with config/fish/exports.fish.
+export LESSHISTFILE="$XDG_STATE_HOME"/lesshst
 
 # Highlight section titles in manual pages
 # export LESS_TERMCAP_md="$ORANGE"
@@ -569,10 +571,12 @@ if [ -f "$XDG_CONFIG_HOME/exports-secret" ]; then source "$XDG_CONFIG_HOME/expor
 if [ -f "$XDG_CONFIG_HOME/exports-local" ]; then source "$XDG_CONFIG_HOME/exports-local"; fi
 # Per-host exports — shipped from hosts/<hostname>/config/exports-<hostname>
 # via the dotbot host overlay, then sourced here when running on that host.
+# Keyed on SHORT_HOST (`hostname -s`), the name ./install picks the overlay
+# by: plain `hostname` can be an FQDN or `<name>.local` and miss the file.
 # shellcheck source=../hosts/lakka/config/exports-lakka
-if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)"; fi
+if [ -f "$XDG_CONFIG_HOME/exports-$SHORT_HOST" ]; then source "$XDG_CONFIG_HOME/exports-$SHORT_HOST"; fi
 # shellcheck source=../hosts/lakka/config/exports-lakka-secret
-if [ -f "$XDG_CONFIG_HOME/exports-$(hostname)-secret" ]; then source "$XDG_CONFIG_HOME/exports-$(hostname)-secret"; fi
+if [ -f "$XDG_CONFIG_HOME/exports-$SHORT_HOST-secret" ]; then source "$XDG_CONFIG_HOME/exports-$SHORT_HOST-secret"; fi
 
 # Source secret environment variables from secrets.d directory.
 #

@@ -10,5 +10,7 @@ Include local.d/*
 Host *
   ServerAliveInterval 300 # send null packets every 5min to keep connection alive
   ServerAliveCountMax 2 # if the server doesn't respond 2 times, it's gone so give up
-  ForwardAgent yes
+  # No ForwardAgent here: on Host * every server, root on it included, could
+  # use the agent. Add `ForwardAgent yes` to a specific Host block in
+  # shared.d/ or local.d/ when needed, or hop with ProxyJump instead.
   #  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"

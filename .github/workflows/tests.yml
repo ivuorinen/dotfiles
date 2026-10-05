@@ -40,9 +40,11 @@ jobs:
         # reload-recursion and 5 s budget guards, and the palette parse checks.
         # age: the a/ad/ae real-age round-trip tests skip without it, and they
         # are the only tests that prove an encrypted file decrypts.
+        # zsh: zsh-antidote.bats runs zshrc and antidote.zsh under zsh itself.
+        # macOS ships it; the Ubuntu image does not.
         run: |
           sudo apt-get update
-          sudo apt-get install -y age bats fish python3-packaging tmux yamllint
+          sudo apt-get install -y age bats fish python3-packaging tmux yamllint zsh
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'

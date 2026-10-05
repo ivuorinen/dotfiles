@@ -9,18 +9,50 @@ export SHARED_SCRIPTS_SOURCED=0
 
 source "$DOTFILES/config/shared.sh"
 
-# shellcheck source=../config/fzf/fzf.bash
+# shellcheck source=config/fzf/fzf.bash
 [ -f "${DOTFILES}/config/fzf/fzf.bash" ] &&
   source "${DOTFILES}/config/fzf/fzf.bash"
 
 # Source usage-generated bash completions
 for f in "$HOME/.config/bash/completions.d/"*.bash; do
+  # shellcheck source=/dev/null # generated per machine, not in the repo
   [[ -f "$f" ]] && source "$f"
 done
 unset f
 
 # Import ssh keys in keychain (macOS-specific -A flag, silently fails on Linux)
 ssh-add -A 2>/dev/null
+
+# pinentry prompts on this tty. gpg sends GPG_TTY with every request; ssh
+# requests through gpg-agent do not, so they prompt on the tty of the last
+# `gpg-connect-agent updatestartuptty`. Without a terminal `tty` prints
+# "not a tty", which must not reach pinentry as a tty name.
+if GPG_TTY="$(tty 2> /dev/null)"; then
+  export GPG_TTY
+else
+  unset GPG_TTY
+fi
+
+# gpg-agent serves ssh keys only when nothing else claimed SSH_AUTH_SOCK
+# (1Password, launchd's agent, a forwarded agent all win). While ssh goes
+# through gpg-agent, each prompt re-points pinentry at this tty.
+if command -v gpgconf > /dev/null 2>&1; then
+  _gpg_ssh_sock="$(gpgconf --list-dirs agent-ssh-socket 2> /dev/null)"
+  [[ -z "${SSH_AUTH_SOCK:-}" && -n "$_gpg_ssh_sock" ]] && export SSH_AUTH_SOCK="$_gpg_ssh_sock"
+  if [[ -n "$_gpg_ssh_sock" && "$SSH_AUTH_SOCK" == "$_gpg_ssh_sock" ]]; then
+    _gpg_ssh_updatetty()
+    {
+      gpg-connect-agent --quiet updatestartuptty /bye > /dev/null 2>&1
+    }
+    # Re-sourcing bashrc must not stack the hook. An array PROMPT_COMMAND
+    # (bash 5.1+) is safe: this rewrites element 0 and leaves the rest.
+    case ";${PROMPT_COMMAND:-};" in
+      *";_gpg_ssh_updatetty;"*) ;;
+      *) PROMPT_COMMAND="_gpg_ssh_updatetty${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+    esac
+  fi
+  unset _gpg_ssh_sock
+fi
 
 # These three go through lib::init_cached (config/lib.sh): by this point
 # PATH leads with the mise shims, and each shim call re-enters mise to

@@ -25,7 +25,8 @@ see what interesting stuff you've done with it. Sharing is caring.
 
 `cd $HOME/.dotfiles && git pull && ./install`
 
-To refresh symlinks only (faster, skips package installs and provisioning):
+To refresh symlinks only, including the `hosts/<host>/` overlay links (faster, skips package installs and
+provisioning):
 
 `cd $HOME/.dotfiles && git pull && ./install --links`
 

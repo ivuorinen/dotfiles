@@ -25,7 +25,9 @@ ohmyzsh/ohmyzsh path:plugins/eza
 # duplicate of what is already loaded.
 ohmyzsh/ohmyzsh path:plugins/git
 ohmyzsh/ohmyzsh path:plugins/golang
-ohmyzsh/ohmyzsh path:plugins/gpg-agent
+# OMZ's gpg-agent plugin is deliberately absent: it runs
+# `gpgconf --list-options gpg-agent` on every start (~0.8s) and repoints
+# SSH_AUTH_SOCK at gpg-agent. base/zshrc sets GPG_TTY instead.
 ohmyzsh/ohmyzsh path:plugins/python
 # ohmyzsh/ohmyzsh path:plugins/tmux
 ohmyzsh/ohmyzsh path:plugins/z

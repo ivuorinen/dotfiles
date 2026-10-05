@@ -16,6 +16,9 @@ set -q DOTFILES; or set -x DOTFILES "$HOME/.dotfiles"
 set -q EDITOR; or set -x EDITOR nvim
 set -q VISUAL; or set -x VISUAL nvim
 set -q HOSTNAME; or set -x HOSTNAME (hostname -s)
+# Host-file key, same value as SHORT_HOST in config/exports. Always computed:
+# an inherited HOSTNAME can be an FQDN and miss hosts/<short>/.
+set -gx SHORT_HOST (hostname -s)
 
 # UTF-8 locale fallback — mirrors config/exports. SSH sessions can arrive
 # with no locale at all; tmux's server then starts under C/POSIX and renders
@@ -141,19 +144,26 @@ fish_add_path "$XDG_DATA_HOME/sonarqube-cli/bin"
 
 # Miscellaneous configuration
 set -q CHEAT_USE_FZF; or set -x CHEAT_USE_FZF true
-set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite/sqlite_history"
+# Same paths as config/exports, in directories that already exist: sqlite3
+# and less skip saving history silently when the parent dir is missing.
+set -q SQLITE_HISTORY; or set -x SQLITE_HISTORY "$XDG_CACHE_HOME/sqlite_history"
+set -q LESSHISTFILE; or set -x LESSHISTFILE "$XDG_STATE_HOME/lesshst"
 
 # Source additional configuration files if they exist
 if test -f "$DOTFILES/config/fish/exports-secret.fish"
     source "$DOTFILES/config/fish/exports-secret.fish"
 end
 
-if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
-    source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports.fish"
+# Host fish exports live in hosts/<host>/fish/, outside hosts/<host>/config/:
+# the host overlay force-links config/** into ~/.config, and ~/.config/fish is
+# a symlink into this repo, so a host config/fish/exports.fish would replace
+# this file.
+if test -f "$DOTFILES/hosts/$SHORT_HOST/fish/exports.fish"
+    source "$DOTFILES/hosts/$SHORT_HOST/fish/exports.fish"
 end
 
-if test -f "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
-    source "$DOTFILES/hosts/$HOSTNAME/config/fish/exports-secret.fish"
+if test -f "$DOTFILES/hosts/$SHORT_HOST/fish/exports-secret.fish"
+    source "$DOTFILES/hosts/$SHORT_HOST/fish/exports-secret.fish"
 end
 
 # Source secret environment variables from secrets.d directory

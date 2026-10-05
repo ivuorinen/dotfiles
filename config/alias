@@ -93,8 +93,8 @@ alias glow='x-glow'
 if [ -z "${X_ALIAS_FILES_SOURCED:-}" ]; then
   X_ALIAS_FILES=(
     "$HOME/.config/alias-secret"
-    "$HOME/.config/alias-$(hostname)"
-    "$HOME/.config/alias-$(hostname)-secret"
+    "$HOME/.config/alias-$SHORT_HOST"
+    "$HOME/.config/alias-$SHORT_HOST-secret"
   )
   for aliasFile in "${X_ALIAS_FILES[@]}"; do
     # shellcheck source=$HOME/.config/alias-secret

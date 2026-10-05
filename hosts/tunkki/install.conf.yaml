@@ -12,6 +12,3 @@
       glob: true
       force: true
       path: hosts/tunkki/config/**
-- snap:
-    - nvim:
-      classic: true
