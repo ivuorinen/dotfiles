@@ -204,9 +204,14 @@ fetch_keys_if_missing()
   # keys: without -f curl saves a 404/5xx body, which must never become the
   # cache. The temp lives in the global TEMP_FILE so the EXIT trap removes
   # it when the download is interrupted.
+  # The prefix grep rejects an HTML error page; age itself then parses the
+  # whole file, because a line such as `ssh-ed25519 invalid` passes the grep,
+  # and age (1.3.2+) rejects a malformed key on every later encrypt while the
+  # bad cache is fresh. Encrypting empty input exercises that same parser.
   TEMP_FILE="$(mktemp "$KEYS_FILE.XXXXXX")"
   if ! curl -fsSL --connect-timeout 10 --max-time 30 "$KEYS_SOURCE" -o "$TEMP_FILE" \
-    || ! grep -qE '^(ssh-|sk-|ecdsa-)' "$TEMP_FILE"; then
+    || ! grep -qE '^(ssh-|sk-|ecdsa-)' "$TEMP_FILE" \
+    || ! age -R "$TEMP_FILE" < /dev/null > /dev/null 2>&1; then
     rm -f "$TEMP_FILE"
     TEMP_FILE=""
     if [[ -f "$KEYS_FILE" ]]; then
@@ -345,6 +350,13 @@ process_path()
   local action="$1" path="$2"
 
   if [[ -d "$path" ]]; then
+    # nullglob makes an unreadable directory look empty, which skipped its
+    # files with a warning and could still exit 0; it is a failure.
+    if [[ ! -r "$path" || ! -x "$path" ]]; then
+      log_message "Error: Cannot read directory '$path'."
+      FAILED=$((FAILED + 1))
+      return 0
+    fi
     shopt -s dotglob nullglob
     local entries=("$path"/*)
     shopt -u dotglob nullglob

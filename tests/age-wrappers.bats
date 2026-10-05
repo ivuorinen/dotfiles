@@ -25,10 +25,17 @@ setup()
     ln -sf "$(command -v "$tool")" "$TMP/bin/$tool"
   done
 
+  # Rejects a recipients file holding a malformed key (a line ending in
+  # " invalid"), as real age 1.3.2+ does when it parses -R.
   cat > "$TMP/bin/age" << STUB
 #!/usr/bin/env bash
 printf 'age %s\n' "\$*" >> "$CALLS"
 [ -n "\$AGE_FAIL" ] && exit 1
+prev=""
+for arg in "\$@"; do
+  [ "\$prev" = "-R" ] && grep -q ' invalid\$' "\$arg" 2> /dev/null && exit 1
+  prev="\$arg"
+done
 printf 'CIPHERTEXT\n'
 STUB
 
@@ -78,7 +85,9 @@ stale_keys()
 
 teardown()
 {
-  chmod -R u+w "$TMP" 2> /dev/null
+  # u+rwx, not u+w: a test that locks a directory (chmod 000) must leave it
+  # listable again, or rm -rf cannot descend into it.
+  chmod -R u+rwx "$TMP" 2> /dev/null
   rm -rf "$TMP"
 }
 
@@ -600,6 +609,33 @@ a_args()
   [ "$(cat "$KEYS")" = "ssh-ed25519 AAAA cached" ]
   run ls "$TMP"
   [[ "$output" != *"keys.txt."* ]]
+}
+
+# The prefix check let `ssh-ed25519 invalid` replace a good cache; age 1.3.2+
+# then rejected that malformed key on every encrypt while the cache was fresh.
+@test "a: a refreshed keys file age cannot parse is not installed" {
+  stale_keys
+  rm -f "$TMP/work/secret.txt.age"
+  CURL_BODY='ssh-ed25519 invalid' age_run "$AE" "$TMP/work/secret.txt"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Failed to refresh keys"* ]]
+  [ "$(cat "$KEYS")" = "ssh-ed25519 AAAA cached" ]
+  [ -f "$TMP/work/secret.txt.age" ]
+}
+
+# nullglob turned an unreadable directory into an empty one, so a recursive
+# run skipped it with a warning and could exit 0 with files left unprocessed.
+@test "a: an unreadable nested directory counts as a failure" {
+  [ "$(id -u)" -ne 0 ] || skip "root reads any directory"
+  mkdir -p "$TMP/work/tree/locked"
+  printf 'one\n' > "$TMP/work/tree/a1"
+  printf 'two\n' > "$TMP/work/tree/locked/b2"
+  chmod 000 "$TMP/work/tree/locked"
+  a_args e "$TMP/work/tree"
+  chmod 700 "$TMP/work/tree/locked"
+  [ "$status" -eq 1 ]
+  [ -f "$TMP/work/tree/a1.age" ]
+  [[ "$stderr" == *"Cannot read directory"* ]]
 }
 
 @test "a: -f never moves the output into a directory of that name" {
