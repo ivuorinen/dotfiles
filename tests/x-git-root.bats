@@ -18,14 +18,15 @@ teardown()
 @test "x-git-root: prints the repository top level from inside a repo" {
   run bash -c "cd '$BATS_TEST_DIRNAME/..' && '$X_GIT_ROOT'"
   [ "$status" -eq 0 ]
-  [ -d "$output/.git" ]
+  # -e, not -d: in a linked worktree .git is a file pointing at the gitdir.
+  [ -e "$output/.git" ]
 }
 
 @test "x-git-root: prints the top level from a subdirectory, not the cwd" {
   run bash -c "cd '$BATS_TEST_DIRNAME' && '$X_GIT_ROOT'"
   [ "$status" -eq 0 ]
   [ "$output" != "$BATS_TEST_DIRNAME" ]
-  [ -d "$output/.git" ]
+  [ -e "$output/.git" ]
 }
 
 @test "x-git-root: exits 1 outside a repository" {
