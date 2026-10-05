@@ -368,6 +368,12 @@ process_path()
 
     local entry
     for entry in "${entries[@]}"; do
+      # A symlinked directory leads outside the tree, where --delete would
+      # remove files, or back up to an ancestor and recurse forever.
+      if [[ -L "$entry" && -d "$entry" ]]; then
+        log_message "Warning: '$entry' is a symlinked directory, skipping."
+        continue
+      fi
       process_path "$action" "$entry"
     done
   elif [[ -f "$path" ]]; then

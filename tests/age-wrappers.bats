@@ -638,6 +638,31 @@ a_args()
   [[ "$stderr" == *"Cannot read directory"* ]]
 }
 
+# [[ -d ]] follows symlinks, so recursion left the tree: --delete removed
+# files elsewhere, and a link to an ancestor recursed until it failed.
+@test "a: a symlinked directory inside a tree is not followed" {
+  mkdir -p "$TMP/work/tree" "$TMP/outside"
+  printf 'in\n' > "$TMP/work/tree/a1"
+  printf 'out\n' > "$TMP/outside/o1"
+  ln -s "$TMP/outside" "$TMP/work/tree/link"
+  ln -s "$TMP/work/tree" "$TMP/work/tree/loop"
+  a_args --delete e "$TMP/work/tree"
+  [ "$status" -eq 0 ]
+  [ -f "$TMP/work/tree/a1.age" ]
+  [ -f "$TMP/outside/o1" ]
+  [ ! -e "$TMP/outside/o1.age" ]
+  [[ "$stderr" == *"symlinked directory"* ]]
+}
+
+@test "a: a symlinked directory named as the target is still processed" {
+  mkdir -p "$TMP/outside"
+  printf 'out\n' > "$TMP/outside/o1"
+  ln -s "$TMP/outside" "$TMP/work/link"
+  a_args e "$TMP/work/link"
+  [ "$status" -eq 0 ]
+  [ -f "$TMP/outside/o1.age" ]
+}
+
 @test "a: -f never moves the output into a directory of that name" {
   rm "$TMP/work/secret.txt.age"
   mkdir "$TMP/work/secret.txt.age"

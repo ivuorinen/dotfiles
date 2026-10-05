@@ -81,7 +81,8 @@ a -v e secret.txt
 ## Behavior
 
 - Encrypting or decrypting a directory processes all files recursively,
-  including hidden files
+  including hidden files; a symlinked directory inside the tree is skipped
+  with a warning, while one named as the target is processed
 - Already encrypted files (`.age`) are skipped during encryption
 - Only `.age` files are processed during directory decryption; a named file
   without the `.age` suffix is refused
