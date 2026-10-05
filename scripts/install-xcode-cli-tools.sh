@@ -83,7 +83,7 @@ main()
   # Bounded: cancelling the system installer dialog leaves nothing to wait
   # for, and an unbounded loop would hang the bootstrap with sudo kept alive.
   local waited=0
-  until swift_path="$(xcode_swift_path)" && [[ -n "$swift_path" && -f "$swift_path" ]]; do
+  until swift_path="$(xcode_swift_path)" && [[ -n "$swift_path" && -x "$swift_path" ]]; do
     if ((waited >= XCODE_INSTALL_TIMEOUT)); then
       echo
       msgr err "Timed out after ${XCODE_INSTALL_TIMEOUT}s waiting for Command Line Tools"
