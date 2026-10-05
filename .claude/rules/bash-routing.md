@@ -31,8 +31,9 @@ If a shell command produces output you intend to read, use
   anything reading or transforming file content for analysis.
 - `which <tool>`, `<tool> --version` when probing more than one tool at once
   — batch the probes.
-- `bash -c '<denied command>'` and `sh`/`zsh`/`dash`/`ksh` wrappers, including
-  heredoc forms that hide a denied command inside an allowed one.
+- `bash -c '<denied command>'` and `sh`/`zsh`/`dash`/`ksh`/`fish` wrappers,
+  `eval`, `sudo` and `watch`, including heredoc forms that hide a denied
+  command inside an allowed one.
 
 Even when output is short, batch related commands together: one
 `ctx_batch_execute` call with five commands costs less than five `Bash`
@@ -76,17 +77,22 @@ tell that the raw output is bigger than you want in chat context.
 A `PreToolUse` hook (`.claude/hooks/pre-bash-route.sh`, registered in
 `.claude/settings.json` under matcher `Bash`) inspects every `Bash`
 invocation and denies the call with an educational reason when the
-command matches the routing rules above. The hook splits the command
-on pipeline separators (`|`, `&&`, `||`, `;`, `&`), command
-substitutions (`$( … )`, backticks), subshells and brace groups, and
-drops leading shell keywords (`if`, `do`, `!`), then checks each
-segment, so `git status | grep modified`, `echo $(rg foo src/)` and
-`(cat README.md)` are all caught.
+command matches the routing rules above. The hook parses the command
+with `shfmt --to-json` and checks every simple command in the tree —
+pipelines, lists, command and process substitutions, subshells, brace
+groups, keywords, and the strings given to `bash -c`, `eval` and
+`trap` — so `git status | grep modified`, `echo $(rg foo src/)` and
+`(cat README.md)` are all caught, while separators inside a quoted
+argument (`-m 'fix(x): y'`) split nothing.
 
 The same hook carries a policy tier that runs before any routing
 decision: secrets paths, hook-bypass flags, network fetchers, npm/npx,
 hand-run pip/uv installs, `git add`, and writes to vendored paths. The
 policy tier is not a routing choice, so `BASH_OK` never overrides it.
+It lives in `.claude/hooks/lib/bash-policy.sh`, and
+`pre-ctx-write-guard.sh` applies it to the code and commands of the
+context-mode execute tools as well, so routing a command to the sandbox
+does not escape it.
 
 The hook denies (not asks) so that `permissionDecisionReason` reaches
 the model in-context, teaching it to route correctly on the next
@@ -95,7 +101,8 @@ learn nothing.
 
 To override a routing deny for a single one-off call (case #4 above),
 prepend `BASH_OK` to the command. The hook honours the marker only when
-the command's name appears in the user's latest prompt, which
+the name of every command in the line (each segment of a `;`, `&&` or `|`
+list) appears in the user's latest prompt, which
 `.claude/hooks/prompt-record.sh` (a `UserPromptSubmit` hook) records in
 the gitignored `.claude/.last-prompt`; otherwise it denies. It is the
 escape hatch for the "user named it in this turn" case, not a general

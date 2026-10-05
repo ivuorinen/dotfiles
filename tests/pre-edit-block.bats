@@ -113,6 +113,55 @@ decide()
   run -0 decide "$REPO/config/fish/functions/fisher.fish" Read
 }
 
+# The raw path was matched unnormalised, so case (APFS is case-insensitive),
+# `./`, `//` and `..` spellings reached protected files (agent-loopholes-88c3bb49).
+@test "pre-edit-block: normalises case, dot and doubled-slash spellings" {
+  run -2 decide "./YARN.LOCK" Write
+  run -2 decide "$REPO/tools/./dotbot/x" Write
+  run -2 decide "$REPO/tools//dotbot/x" Write
+  run -2 decide "$REPO/tools/x/../dotbot/x" Write
+  run -2 decide "$REPO/CONFIG/FISH/SECRETS.D/github.fish" Read
+  run -0 decide "$REPO/./local/bin/dfm" Write
+}
+
+# Grep and Glob read file content and names, NotebookEdit writes; all three
+# were outside the matcher (agent-loopholes-9168e487).
+search()
+{
+  jq -cn --arg tool "$1" --arg path "$2" --arg extra "${3:-}" '
+    {tool_name: $tool, tool_input: ({path: $path} | if $extra == "" then . elif $tool == "Grep" then .glob = $extra else .pattern = $extra end)}
+  ' | bash "$HOOK"
+}
+
+# A Grep glob overrides ripgrep's ignore rules, so `**/github.fish` under
+# config/fish read the gitignored credentials (agent-loopholes-85be385e).
+@test "pre-edit-block: a Grep glob over a directory holding a secrets tree is refused" {
+  export CLAUDE_PROJECT_DIR="$REPO"
+  run -2 search Grep "config/fish" "**/github.fish"
+  [[ "$output" == *"overrides ripgrep's ignore rules"* ]]
+  run -2 search Grep "$REPO/config" "*.sh"
+  run -2 search Grep "$REPO" "*.fish"
+  run -2 search Grep "" "*.fish"
+  run -2 search Grep "$REPO/config/fish/../fish" "*.fish"
+  run -0 search Grep "$REPO/local/bin" "*.sh"
+  run -0 search Grep "config/nvim" "*.lua"
+  run -0 search Grep "config/fish" "*.example"
+  run -0 search Grep "$REPO/config"
+}
+
+@test "pre-edit-block: guards Grep, Glob and NotebookEdit paths" {
+  run -2 search Grep "$REPO/config/fish/secrets.d"
+  run -2 search Grep "$REPO/config" "secrets.d/*.fish"
+  run -2 search Glob "$REPO/config/secrets.d"
+  run -2 search Glob "$REPO" "config/fish/secret?.d/*"
+  run -0 search Grep "$REPO/local/bin"
+  run -0 search Glob "$REPO" "**/*.md"
+  run -0 search Grep "$REPO/yarn.lock"
+  run -0 bash -c 'jq -cn "{tool_name: \"Grep\", tool_input: {pattern: \"secrets.d\"}}" | bash "$1"' _ "$HOOK"
+  run -2 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/.claude/skills/graphify/x.ipynb"
+  run -0 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/notes/x.ipynb"
+}
+
 # Fails closed: a payload the guard cannot understand is refused rather than
 # waved through, so a schema change surfaces as a block instead of silence.
 @test "pre-edit-block: refuses a payload with no file_path" {

@@ -57,9 +57,13 @@ two B603, two Opengrep `dangerous-subprocess-use`).
 One regex, `PROTECTED_RE` in `.claude/hooks/lib/protected-paths.sh`,
 covers every path listed above plus `yarn.lock`, `.yarn/` and the
 submodule trees. Three hooks source it: `pre-edit-block.sh` blocks
-Edit/Write, `pre-ctx-write-guard.sh` blocks sandbox code that writes,
-and `pre-bash-route.sh` blocks Bash commands that write (`>`, `cp`,
-`mv`, `rm`, `tee`, `sed -i`, `git checkout … --`). The `paths:` list in
+Edit/Write, `pre-ctx-write-guard.sh` blocks sandbox code that writes
+(each `ctx_batch_execute` command judged on its own, as each runs in its
+own shell), and `pre-bash-route.sh` blocks Bash commands that write (`>`, `cp`,
+`mv`, `rm`, `tee`, `sed -i`, `perl`/`ruby -i`, `ed`/`ex`/`vi`/`vim`/`nvim`,
+`patch`, `rsync`, awk `print >` or `-i inplace`, `git checkout … --`).
+Sandbox code that launches an editor through a subprocess without naming
+a policy tool is not seen. The `paths:` list in
 this file's frontmatter is the source: `tests/protected-paths-parity.bats`
 fails when any entry is not refused by all three hooks. Bypassing the
 hooks is forbidden; see `.claude/rules/no-hook-bypass.md`.

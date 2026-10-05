@@ -25,10 +25,19 @@ forbids.
 
 `.claude/hooks/lib/protected-paths.sh` (`secrets_referenced`) is the
 one predicate: any reference to a `secrets.d` tree — a file, a glob, a
-bare directory, a variable — other than a `*.example` template or
-`README.md`. `pre-edit-block.sh` applies it to Read/Edit/Write,
-`pre-ctx-write-guard.sh` to the sandbox tools and `ctx_index`, and
-`pre-bash-route.sh` to every Bash command before its `BASH_OK` check.
+bare directory, a variable, a glob in the tree's own name, any letter
+case — other than a `*.example` template or `README.md`.
+`pre-edit-block.sh` applies it to Read/Edit/Write/MultiEdit/NotebookEdit
+and to the `path`/`glob`/`pattern` of Grep and Glob — and refuses any
+Grep `glob` over a directory that contains a secrets tree, since a glob
+overrides ripgrep's ignore rules — `pre-ctx-write-guard.sh` to the
+sandbox tools and `ctx_index`, including their `cwd` (a sandbox run from
+inside a secrets tree is refused outright, since a bare relative name there
+names no tree), and `pre-bash-route.sh` to every Bash
+command before its `BASH_OK` check. In shell code the predicate sees the
+parsed words, so a commit message or a quoted regex such as
+`'secrets\.d'` is not a reference; a wildcard standing for the tree's
+name counts only when a literal file name follows it.
 Bypassing them is forbidden (`.claude/rules/no-hook-bypass.md`).
 
 Creating a secret and the reasoning behind the modes: `docs/secrets.md`.
