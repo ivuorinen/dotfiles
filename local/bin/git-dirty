@@ -688,9 +688,11 @@ process_in_parallel()
       echo -e "\nCleaning up..."
       echo "0" > "$running_file" # Signal progress bar to stop
 
-      # Kill all background processes in our process group
-      # We use SIGTERM to allow processes to clean up
-      pkill -P $$ TERM 2> /dev/null || true
+      # Stop the job pool and the progress bar with SIGTERM. `jobs -p` and
+      # `kill` are builtins; the old `pkill -P $$ TERM` read TERM as a
+      # process name to match and killed nothing.
+      # shellcheck disable=SC2046 # one pid per word
+      kill $(jobs -p) 2> /dev/null || true
 
       # Clean up temp files
       for file in "${temp_files[@]}"; do
