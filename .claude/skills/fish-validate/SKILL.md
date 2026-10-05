@@ -5,12 +5,14 @@ description: >-
   Apply when writing or modifying any .fish file
   in config/fish/.
 user-invocable: false
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, mcp__plugin_context-mode_context-mode__ctx_batch_execute
 ---
 
 # Validate fish scripts
 
-After editing any `.fish` file in `config/fish/`, validate it:
+After editing any `.fish` file in `config/fish/`, validate it. Run the
+checks below through `ctx_batch_execute` (`.claude/rules/bash-routing.md`);
+`Bash` denies them. Only the in-place `fish_indent --write` runs on `Bash`.
 
 ## 1. Syntax check
 
@@ -31,5 +33,5 @@ fish_indent --check <file>
 If formatting differs, apply it:
 
 ```bash
-fish_indent -w <file>
+fish_indent --write <file>
 ```

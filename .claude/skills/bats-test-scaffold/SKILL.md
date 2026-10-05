@@ -10,7 +10,7 @@ allowed-tools: Bash, Read, Write, Edit
 
 Scaffolds `tests/<script>.bats` for a script under `local/bin/<script>`.
 The convention in this repo (per `docs/audit/arch-profile.md` rule 6
-and `docs/audit/arch-findings.md`) is one bats file per script,
+and `.claude/rules/local-bin-scripts.md`) is one bats file per script,
 named after the script.
 
 ## Inputs

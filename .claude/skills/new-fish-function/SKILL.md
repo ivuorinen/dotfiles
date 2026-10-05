@@ -4,7 +4,7 @@ description: >-
   Scaffold a new fish function in config/fish/functions/
   with proper conventions and event handling.
 user-invocable: true
-allowed-tools: Bash, Read, Write, Edit
+allowed-tools: Read, Write, Edit, Skill
 ---
 
 # New fish function
@@ -33,9 +33,6 @@ end
 
 ## 3. Validate
 
-Run the fish-validate skill checks:
-
-```bash
-fish --no-execute config/fish/functions/<name>.fish
-fish_indent --check config/fish/functions/<name>.fish
-```
+Run the `fish-validate` skill on the new file. It owns the check
+commands and routes them through `ctx_batch_execute`, which
+`.claude/rules/bash-routing.md` requires.

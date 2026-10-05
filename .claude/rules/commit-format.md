@@ -12,6 +12,10 @@ Scope is the affected area in lowercase (e.g. `tmux`, `nvim`,
 `starship`, `dotfiles`). Summary is imperative mood, no trailing
 period.
 
+Removing or renaming a command, alias or config a user invokes is a
+breaking change whatever the type: add `!` after the scope and a
+`BREAKING CHANGE: <what was removed>` footer.
+
 Header length: target 72 characters (matches `git log --oneline`
 width). The actual hard limit from `@ivuorinen/commitlint-config`
 (which extends `@commitlint/config-conventional`) is 100 characters
