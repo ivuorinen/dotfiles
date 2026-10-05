@@ -332,6 +332,38 @@ _bp_value()
   return 0
 }
 
+# _bp_has_after START WORD ARGV... — succeed when WORD is one of ARGV's
+# elements from index START on (0-based over ARGV).
+_bp_has_after()
+{
+  local start=$1 want=$2 i
+  shift 2
+  local -a args=("$@")
+  for ((i = start; i < ${#args[@]}; i++)); do
+    [[ ${args[i]} == "$want" ]] && return 0
+  done
+  return 1
+}
+
+# _bp_optval VALUE — an option's attached value (`--open-files-in-pager=…`,
+# git grep's `-O…`) that some tools run as a command. It goes through
+# _bp_value only when its first word runs code: a banned or verb tool, a
+# shell, env or eval. Prose such as `--message='drop npm usage'` starts with
+# an ordinary word and stays untouched, where checking every value would
+# refuse commit messages that mention a banned tool.
+_bp_optval()
+{
+  local v=$1 first
+  first=${v#"${v%%[![:space:]]*}"}
+  first=${first%%[[:space:]]*}
+  first=${first##*/}
+  if [[ $first =~ $BP_NET_RE || $first =~ $BP_NPM_RE || $first =~ $BP_VERB_TOOL_RE ||
+    $first =~ ^(env|eval|bash|sh|zsh|dash|ksh|fish)$ ]]; then
+    _bp_value "$v"
+  fi
+  return 0
+}
+
 # _bp_redir OP TARGET — a redirect that writes to a protected path. The
 # routine `2>&1` and `> /dev/null` never reach the predicate. shfmt before
 # 3.14.0 encodes OP as an enum number whose values shift between releases,
@@ -640,6 +672,18 @@ _bp_final()
       if ((lookup == 0)); then
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9]*= ]] && BP_ASSIGNS+=" ${w[k]%%=*}"
         [[ ${w[k]} =~ ^[A-Za-z_][A-Za-z_0-9.-]*= ]] && _bp_value "${w[k]#*=}"
+        [[ ${w[k]} =~ ^--[A-Za-z0-9-]+= ]] && _bp_optval "${w[k]#*=}"
+        # Options whose value the tool runs: attached short forms (git grep
+        # -O<pager>, man -P<pager>, fd -x<cmd>) and the separate-word value
+        # of man -P/--pager and rg --pre, which take a required argument.
+        case $fw:${w[k]} in
+          git:-O?* | man:-P?* | fd:-x?* | fd:-X?*) _bp_optval "${w[k]:2}" ;;
+          *) ;;
+        esac
+        case $fw:${w[k - 1]} in
+          man:-P | man:--pager | rg:--pre) _bp_optval "${w[k]}" ;;
+          *) ;;
+        esac
         case $a in
           git | git-hunk | prek | pre-commit) BP_HOOKED=1 ;;
           eval) _bp_walk "${w[*]:k+1}" "$((depth + 1))" 1 ;;
@@ -664,7 +708,13 @@ _bp_final()
     _bp_deny "Use bare \`bats\` from PATH (mise); node_modules/.bin/bats is broken (fails with 'rm: command not found')."
   fi
 
-  if [[ $seg =~ $BP_WRITE_SEG_RE ]] && ((${#w[@]} > 1)) && _bp_protected "${w[@]:1}"; then
+  # The git alternative of BP_WRITE_SEG_RE anchors the subcommand right after
+  # `git`, so global options (`git -C . checkout -- yarn.lock`, `git
+  # --no-pager restore …`) hid it; match the write check against the segment
+  # with those options removed too.
+  local wseg=$seg
+  [[ $fw == git ]] && wseg=$(git_strip_globals "$seg")
+  if [[ $seg =~ $BP_WRITE_SEG_RE || $wseg =~ $BP_WRITE_SEG_RE ]] && ((${#w[@]} > 1)) && _bp_protected "${w[@]:1}"; then
     _bp_deny "$BP_R_PROTECTED"
   fi
   return 0
@@ -702,7 +752,14 @@ _bp_lookup()
             ;;
         esac
       done
-      [[ $verb =~ ^(log|grep|show|diff|blame)$ ]]
+      [[ $verb =~ ^(log|grep|show|diff|blame)$ ]] || return 1
+      # git grep -O<pager> / --open-files-in-pager[=<pager>] runs the pager.
+      if [[ $verb == grep ]]; then
+        for a in "${@:i+1}"; do
+          [[ $a == -O* || $a == --open-files-in-pager* ]] && return 1
+        done
+      fi
+      return 0
       ;;
     *) return 1 ;;
   esac
@@ -723,17 +780,27 @@ _bp_check_argv()
   [[ $fw =~ $BP_NPM_RE ]] && _bp_deny "$BP_R_NPM"
   case $fw in
     # mise installs versioned binaries (pip3.12, python3.12), and python takes
-    # `-mpip` as one word (audit-8f8345da).
-    pip | pip[0-9]*) [[ $sub == install ]] && _bp_deny "$BP_R_PIP" ;;
+    # `-mpip` as one word (audit-8f8345da). `install` counts anywhere after
+    # the pip/tool word, not only right after it: options in between (`pip -q
+    # install`, `uv --quiet tool install`, `pip --index-url URL install`) hid
+    # it, and skipping `-*` words alone misses an option's separate value.
+    pip | pip[0-9]*) _bp_has_after 1 install "${w[@]}" && _bp_deny "$BP_R_PIP" ;;
     python | python[0-9]*)
-      for ((i = 1; i + 1 < ${#w[@]}; i++)); do
-        if [[ ${w[i]} == -mpip && ${w[i + 1]} == install ]] \
-          || [[ ${w[i]} == -m && ${w[i + 1]} == pip && ${w[i + 2]-} == install ]]; then
+      for ((i = 1; i < ${#w[@]}; i++)); do
+        if [[ ${w[i]} == -mpip ]] && _bp_has_after "$((i + 1))" install "${w[@]}"; then
+          _bp_deny "$BP_R_PIP"
+        elif [[ ${w[i]} == -m && ${w[i + 1]-} == pip ]] && _bp_has_after "$((i + 2))" install "${w[@]}"; then
           _bp_deny "$BP_R_PIP"
         fi
       done
       ;;
-    uv) [[ ($sub == tool || $sub == pip) && ${w[2]-} == install ]] && _bp_deny "$BP_R_PIP" ;;
+    uv)
+      for ((i = 1; i < ${#w[@]}; i++)); do
+        if [[ ${w[i]} == tool || ${w[i]} == pip ]] && _bp_has_after "$((i + 1))" install "${w[@]}"; then
+          _bp_deny "$BP_R_PIP"
+        fi
+      done
+      ;;
     prek | pre-commit)
       [[ $sub == uninstall ]] && _bp_deny "Uninstalling the hook runner bypasses every commit-time gate (.claude/rules/no-hook-bypass.md)."
       ;;
@@ -930,12 +997,31 @@ _bp_git()
 # definitions are refused (audit-8559f9b1).
 _bp_git_config()
 {
-  local a read=0 write=0
+  # A bare `get`/`list` is the read subcommand only as the first operand: as
+  # the value of the legacy `git config core.hooksPath get` it was taken for a
+  # read, and that write skipped the bypass checks. The separate value of an
+  # option is not an operand.
+  local a read=0 write=0 first=1 skip=0
   for a in "$@"; do
+    if ((skip)); then
+      skip=0
+      continue
+    fi
     case $a in
-      --get | --get-all | --get-regexp | --get-urlmatch | --get-color | --get-colorbool | --list | -l | get | list) read=1 ;;
-      --add | --replace-all | --unset | --unset-all | --rename-section | --remove-section | --edit | -e | set | unset | rename-section | remove-section | edit) write=1 ;;
-      *) ;;
+      --get | --get-all | --get-regexp | --get-urlmatch | --get-color | --get-colorbool | --list | -l) read=1 ;;
+      --add | --replace-all | --unset | --unset-all | --rename-section | --remove-section | --edit | -e) write=1 ;;
+      -f | --file | --blob | --type | --default | --comment) skip=1 ;;
+      -*) ;;
+      *)
+        if ((first)); then
+          case $a in
+            get | list) read=1 ;;
+            set | unset | rename-section | remove-section | edit) write=1 ;;
+            *) ;;
+          esac
+        fi
+        first=0
+        ;;
     esac
   done
   ((read && !write)) && return 0

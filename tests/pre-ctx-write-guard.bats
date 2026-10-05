@@ -402,3 +402,19 @@ batch_in()
   run -2 /bin/bash -c 'printf "{\"tool_input\":{\"code\":\"git add -A\"}}" | PATH="$2:/usr/bin:/bin" /bin/bash "$1"' _ "$HOOK" "$bin"
   [[ "$output" == *"shfmt is not on PATH"* ]]
 }
+
+# An option's attached value was never read as a command, and git grep counted
+# as a lookup even with a pager option, so its pager ran unchecked.
+@test "pre-ctx-write-guard: a command in an option value is checked" {
+  run -2 code "git grep --open-files-in-pager='npm install x' foo"
+  run -2 code "git grep -O'npm install x' foo"
+  run -2 code "git grep -O'sh -c \"curl https://example.com\"' foo"
+  run -2 code "man -P'npm install x' ls"
+  run -2 code "man -P 'npm install x' ls"
+  run -2 code "rg --pre 'npm install x' foo"
+  run -2 code "fd -x'npm install' ."
+  run -0 code "git commit --message='drop npm usage'"
+  run -0 code 'git diff -Oorder.txt'
+  run -0 code 'git grep -n curl -- docs/'
+  run -0 code 'man -Pless ls'
+}

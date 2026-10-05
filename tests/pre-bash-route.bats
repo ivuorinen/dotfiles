@@ -778,3 +778,37 @@ EOF"
   [ "$(decision 'echo x > /tmp/out.txt')" = "allow" ]
   [ "$(decision 'git status 2>&1')" = "allow" ]
 }
+
+# The git write alternative anchored the subcommand right after `git`, so a
+# global option in between let it rewrite a protected path.
+@test "pre-bash-route: git global options do not hide a protected-path write" {
+  [ "$(decision 'git -C . checkout -- yarn.lock')" = "deny" ]
+  [ "$(decision 'git --no-pager restore yarn.lock')" = "deny" ]
+  [ "$(decision 'git -c core.quotepath=off rm tools/dotbot/setup.py')" = "deny" ]
+  [ "$(decision 'git -C . status')" = "allow" ]
+}
+
+# The install checks compared only the word right after pip / -m pip / uv's
+# subcommand, so an option in between hid `install`.
+@test "pre-bash-route: options before install do not hide a hand-run install" {
+  [ "$(decision 'pip -q install requests')" = "deny" ]
+  [ "$(decision 'pip3 --disable-pip-version-check install x')" = "deny" ]
+  [ "$(decision 'pip --index-url https://example.com/simple install y')" = "deny" ]
+  [ "$(decision 'python3 -m pip -q install x')" = "deny" ]
+  [ "$(decision 'python3 -mpip -q install x')" = "deny" ]
+  [ "$(decision 'uv --quiet pip install x')" = "deny" ]
+  [ "$(decision 'uv --quiet tool install ruff')" = "deny" ]
+  [ "$(decision 'pip --version')" = "allow" ]
+  [ "$(decision 'uv tool list')" = "allow" ]
+}
+
+# A bare get/list anywhere marked git config as a read, so the legacy set form
+# with that word as the value skipped the hooksPath and alias checks.
+@test "pre-bash-route: a get or list value does not make a git config write a read" {
+  [ "$(decision 'git config core.hooksPath get')" = "deny" ]
+  [ "$(decision 'git config alias.st list')" = "deny" ]
+  [ "$(decision 'git config get core.hooksPath')" = "allow" ]
+  [ "$(decision 'git config --file .git/config get core.hooksPath')" = "allow" ]
+  [ "$(decision 'git config list')" = "allow" ]
+  [ "$(decision 'git config --get core.hooksPath')" = "allow" ]
+}
