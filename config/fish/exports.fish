@@ -78,9 +78,10 @@ set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
     '--height 40% --tmux bottom,40% --layout reverse --border top'
 
-# gh-dash / television — read their theme-composed config from the theme
-# state dir so config/gh-dash and config/television stay plain symlinks with
-# no install.conf exclude. Paths are stable; the theme handlers rewrite the
+# gh-dash / television — read their themed config from the theme state dir
+# so config/gh-dash and config/television stay plain symlinks with no
+# install.conf exclude; for gh-dash it is an overlay merged on top of
+# config/gh-dash/config.yml. Paths are stable; the theme handlers rewrite the
 # files behind them on every flip. (BAT_THEME is mode-driven and lives in
 # conf.d/theme-switch.fish alongside LS_COLORS.)
 set -gx GH_DASH_CONFIG "$XDG_STATE_HOME/dotfiles-theme/gh-dash-config.yml"

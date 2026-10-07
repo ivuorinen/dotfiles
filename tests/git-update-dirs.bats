@@ -10,8 +10,10 @@ bats_require_minimum_version 1.5.0
 setup()
 {
   # See tests/claude-hooks-misc.bats: keeps fixture commits off the
-  # 1Password-backed signing key, which costs 60s and fails when locked.
-  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+  # 1Password-backed signing key, which costs 60s and fails when locked,
+  # and keeps detached auto-maintenance from racing teardown's rm -rf.
+  export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+    GIT_CONFIG_KEY_1=maintenance.auto GIT_CONFIG_VALUE_1=false
 
   GUD="$BATS_TEST_DIRNAME/../local/bin/git-update-dirs"
   TMP="$(mktemp -d)"

@@ -200,7 +200,7 @@ cq()
   printf 'x\n' > "$TMP/sub/lib.h"
   git -C "$TMP/sub" add lib.h
   git -C "$TMP/sub" -c user.name=t -c user.email=t@t -c commit.gpgsign=false \
-    commit -qm init
+    -c maintenance.auto=false commit -qm init
   git -C "$TMP/src" -c protocol.file.allow=always \
     submodule add -q "$TMP/sub" vendor/sub
   [ -f "$TMP/src/vendor/sub/lib.h" ]

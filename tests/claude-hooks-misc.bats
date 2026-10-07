@@ -19,7 +19,14 @@ setup()
   # fixture commit block for 60s and then fail with "failed to write commit
   # object". That made the suite's result depend on the vault's lock timer.
   # Overriding only this one key leaves global user.name/email intact.
-  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+  #
+  # maintenance.auto=false: every commit runs `git maintenance run --auto`,
+  # which takes .git/objects/maintenance.lock and then daemonizes (the
+  # maintenance.autoDetach default), so a child is still working in .git
+  # after setup returns. A test that exits at once reaches teardown's rm -rf
+  # while it runs, and rm fails with "Directory not empty".
+  export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+    GIT_CONFIG_KEY_1=maintenance.auto GIT_CONFIG_VALUE_1=false
 
   # Fixture repos must not inherit the caller's git environment either. git
   # exports GIT_INDEX_FILE (and friends) to its hooks whenever the commit uses

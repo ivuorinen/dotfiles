@@ -13,7 +13,9 @@ setup()
   # See tests/claude-hooks-misc.bats: keeps fixture commits off the
   # 1Password-backed signing key, which costs 60s and fails when locked.
   # This file alone spent 253s of the suite's runtime on that timeout.
-  export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false
+  # Also keeps detached auto-maintenance from racing teardown's rm -rf.
+  export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+    GIT_CONFIG_KEY_1=maintenance.auto GIT_CONFIG_VALUE_1=false
 
   TVR="$BATS_TEST_DIRNAME/../local/bin/tv-gh-repos"
   TMP="$(mktemp -d)"
