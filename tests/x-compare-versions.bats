@@ -4,9 +4,10 @@
 # break in the comparison logic surfaced only when a caller misbehaved. The
 # first test wires that suite into bats.
 #
-# These tests also guard the `packaging` import. That dependency went missing
-# when mise moved to python 3.14 and the script was dead on this machine until
-# it was noticed by hand — every test here fails loudly in that state.
+# These tests also guard the `packaging` import. It once lived in the
+# interpreter, so the script broke whenever python moved or a commit hook ran
+# with a PATH whose python3 lacked it. The script now declares it inline and
+# runs under `uv run --script`; every test here fails loudly if that breaks.
 #
 # Note the subcommand is `test`, not `--test`: an unrecognised argument falls
 # through to main(), which reads stdin, finds nothing and exits 0. That looks

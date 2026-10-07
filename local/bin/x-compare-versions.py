@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --quiet --script
+#
+# /// script
+# dependencies = ["packaging"]
+# ///
 """
 Version Comparison tool for the CLI.
 

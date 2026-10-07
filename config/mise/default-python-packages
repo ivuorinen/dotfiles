@@ -1,8 +1,11 @@
 # Python libraries installed into every Python that mise installs.
 #
 # mise reads this after each `mise install python@...`, so a version bump no
-# longer orphans these the way `uv pip install --system` did — that was the
-# cause of x-compare-versions.py breaking whenever python moved.
+# longer orphans these the way `uv pip install --system` did.
+#
+# A standalone script declares its own dependencies inline instead (PEP 723,
+# run by `uv run --script`), so it works under any python3 on PATH —
+# local/bin/x-compare-versions.py does this for `packaging`.
 #
 # One package per line. Comments and blank lines are ignored.
 # Location is set by python.default_packages_file in config.toml.
@@ -17,9 +20,6 @@ libtmux
 # g:python3_host_prog at the mise shim so the provider always resolves to the
 # interpreter holding this package.
 pynvim
-
-# Version parsing for local/bin/x-compare-versions.py.
-packaging
 
 # Imported by the vendored graphify skill (.claude/skills/graphify/, Step 1
 # probes `python3 -c "import graphify"`). With it here the probe succeeds and

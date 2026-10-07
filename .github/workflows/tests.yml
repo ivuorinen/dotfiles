@@ -33,9 +33,6 @@ jobs:
 
       - name: Install bats and fish (Linux)
         if: runner.os == 'Linux'
-        # python3-packaging: x-compare-versions.py imports it. Locally mise
-        # installs it from config/mise/default-python-packages; this job has
-        # no mise, so it has to come from the package manager.
         # tmux, yamllint: the theme tests skip without them — the tmux
         # reload-recursion and 5 s budget guards, and the palette parse checks.
         # age: the a/ad/ae real-age round-trip tests skip without it, and they
@@ -44,7 +41,7 @@ jobs:
         # macOS ships it; the Ubuntu image does not.
         run: |
           sudo apt-get update
-          sudo apt-get install -y age bats fish python3-packaging tmux yamllint zsh
+          sudo apt-get install -y age bats fish tmux yamllint zsh
 
       - name: Install bats and fish (macOS)
         if: runner.os == 'macOS'
@@ -53,21 +50,22 @@ jobs:
         # age, tmux, yamllint: see the Linux step
         run: |
           brew install age bats-core fish bash coreutils tmux yamllint
-          python3 -m pip install --break-system-packages packaging \
-            || python3 -m pip install packaging
 
       # The agent policy hooks parse every command with `shfmt --to-json`
       # and fail closed without shfmt. Only 3.14.0+ writes operators as
       # strings (earlier releases emit enum numbers), and apt ships 3.8, so
       # mise installs the version config/mise/config.toml pins. install_args
-      # limits it to shfmt instead of the whole .mise.toml toolchain.
-      - name: Install shfmt
+      # limits it to shfmt and uv instead of the whole .mise.toml toolchain.
+      # uv: x-compare-versions.py runs under `uv run --script`, which
+      # installs the script's inline dependencies itself.
+      - name: Install shfmt and uv
         uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
           mise_toml: |
             [tools]
             shfmt = "3.14.1"
-          install_args: shfmt
+            uv = "0.12.19"
+          install_args: shfmt uv
 
       - name: Run test suite
         # scripts/bats-run.sh is the same runner as the pre-commit hook:
