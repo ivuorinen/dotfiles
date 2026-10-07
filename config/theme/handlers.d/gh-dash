@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-# handlers.d/gh-dash — gh-dash reads a single config.yml that mixes user
-# sections (PR/issue queries) with the inline `theme:` block, so we can't
-# symlink-swap. Concat base.yml + the active family's theme palette into
-# the theme state dir and let shells point gh-dash at it via
-# GH_DASH_CONFIG (config/exports, config/fish/exports.fish). Writing
-# outside ~/.config keeps config/gh-dash a plain dotbot symlink with no
-# install.conf exclude. GH_DASH_CONFIG is exported unconditionally, so a
-# family without a gh-dash palette gets base.yml alone (gh-dash's default
-# colours) rather than no file at all.
+# handlers.d/gh-dash — gh-dash layers its config: it always loads
+# ~/.config/gh-dash/config.yml (writing a default one when it is missing)
+# and merges the file named by GH_DASH_CONFIG on top. config/gh-dash/
+# config.yml is that base layer, reached through the plain dotbot symlink;
+# this handler writes only the overlay — the active family's theme palette
+# — into the theme state dir (GH_DASH_CONFIG is set in config/exports and
+# config/fish/exports.fish). A family without a gh-dash palette gets an
+# empty mapping, so gh-dash falls back to its default colours.
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -17,23 +16,12 @@ mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
 _theme_family > /dev/null || exit 1
 
-dotfiles="${DOTFILES:-$HOME/.dotfiles}"
-base="$dotfiles/config/gh-dash/base.yml"
 dst="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/gh-dash-config.yml"
 
-[[ -r "$base" ]] || {
-  echo "gh-dash handler: missing $base" >&2
-  exit 1
-}
-
 if theme="$(_palette "$mode" gh-dash.theme.yml)"; then
-  content="$(
-    cat -- "$base"
-    printf '\n'
-    cat -- "$theme"
-  )"
+  content="$(cat -- "$theme")"
 else
-  echo "gh-dash handler: active family ships no gh-dash palette; writing base config only" >&2
-  content="$(cat -- "$base")"
+  echo "gh-dash handler: active family ships no gh-dash palette; writing an empty overlay" >&2
+  content='{}'
 fi
 _atomic_write "$dst" "$content"

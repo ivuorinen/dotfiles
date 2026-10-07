@@ -28,8 +28,7 @@ bare_family()
   local real="$BATS_TEST_DIRNAME/.."
   export DOTFILES="$TMPDIR_TEST/dot"
   mkdir -p "$DOTFILES/config/theme/palettes.d/bare/dark" "$DOTFILES/config/theme/palettes.d/bare/light" \
-    "$DOTFILES/config/gh-dash" "$DOTFILES/config/television"
-  cp "$real/config/gh-dash/base.yml" "$DOTFILES/config/gh-dash/base.yml"
+    "$DOTFILES/config/television"
   cp "$real/config/television/base.toml" "$DOTFILES/config/television/base.toml"
   mkdir -p "$DOTFILES/config/television/cable" "$DOTFILES/config/television/themes"
   export DOTFILES_THEME_FAMILY=bare
@@ -183,13 +182,11 @@ STUB
   [ ! -e "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
 }
 
-@test "composed handlers: a family without palettes writes the base config only" {
+@test "composed handlers: a family without palettes writes no theme" {
   bare_family
   run "$HD/gh-dash" dark
   [ "$status" -eq 0 ]
-  grep -q "prSections" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
-  run grep -q "^theme:" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
-  [ "$status" -ne 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml")" = "{}" ]
   run "$HD/television" dark
   [ "$status" -eq 0 ]
   [ -f "$TMPDIR_TEST/dotfiles-theme/television/config.toml" ]
@@ -406,16 +403,18 @@ STUB
   [ "$status" -eq 2 ]
 }
 
-@test "gh-dash handler: composes config into the state dir, not ~/.config" {
+@test "gh-dash handler: writes the theme overlay into the state dir, not ~/.config" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
   run "$HD/gh-dash" dark
   [ "$status" -eq 0 ]
   [ -f "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml" ]
-  # base.yml content + the theme palette are both present.
-  grep -q "prSections" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
-  grep -q "theme" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  # Only the palette: the sections live in the config/gh-dash/config.yml
+  # base layer, which gh-dash loads underneath this overlay.
+  grep -q "^theme:" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  run grep -q "prSections" "$TMPDIR_TEST/dotfiles-theme/gh-dash-config.yml"
+  [ "$status" -ne 0 ]
   [ ! -e "$HOME/.config/gh-dash/config.yml" ]
   [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
 }

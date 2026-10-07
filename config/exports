@@ -494,10 +494,11 @@ bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"
 [ -r "$bat_theme_file" ] && BAT_THEME="$(cat "$bat_theme_file")" && export BAT_THEME
 unset bat_theme_file
 
-# gh-dash and television read their theme-composed config from the theme
-# state dir, so config/gh-dash and config/television stay plain dotbot
-# symlinks with no install.conf exclude. The paths are stable; the theme
-# handlers rewrite the files they point at on every flip.
+# gh-dash and television read their themed config from the theme state
+# dir, so config/gh-dash and config/television stay plain dotbot symlinks
+# with no install.conf exclude. For gh-dash it is an overlay merged on top
+# of config/gh-dash/config.yml. The paths are stable; the theme handlers
+# rewrite the files they point at on every flip.
 export GH_DASH_CONFIG="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/gh-dash-config.yml"
 export TELEVISION_CONFIG="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/television"
 
