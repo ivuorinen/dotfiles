@@ -13,6 +13,7 @@ abbr --add gaa git add -A
 abbr --add gcv git commit -v
 abbr --add gst git status -sbv
 abbr --add glg git log
+abbr --add gsd git diff
 abbr --add gwa git worktree add
 abbr --add gwr git worktree remove
 abbr --add gwl git worktree list

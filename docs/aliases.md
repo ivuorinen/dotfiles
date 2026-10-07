@@ -37,6 +37,7 @@ are the same in every shell and are not listed here.
 | `glg`     | `git log`                                                                                              |
 | `glow`    | `x-glow`                                                                                               |
 | `grep`    | `grep --color`                                                                                         |
+| `gsd`     | `git diff`                                                                                             |
 | `gst`     | `git status -sbv`                                                                                      |
 | `gwa`     | `git worktree add`                                                                                     |
 | `gwl`     | `git worktree list`                                                                                    |
@@ -58,4 +59,4 @@ are the same in every shell and are not listed here.
 | `xdg`     | `xdg-ninja --skip-ok --skip-unsupported`                                                               |
 | `zedit`   | `$EDITOR ~/.dotfiles`                                                                                  |
 
-Total aliases: 42
+Total aliases: 43
