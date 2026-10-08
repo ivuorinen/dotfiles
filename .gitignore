@@ -153,3 +153,4 @@ mise.lock
 # slash — git sees the symlink as a file, so `dir/` would not match it.
 codeql-*.sarif
 /_codeql_detected_source_root
+config/mise/locks

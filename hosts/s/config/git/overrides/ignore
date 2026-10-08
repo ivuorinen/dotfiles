@@ -39,3 +39,4 @@ specs.md
 _extra/*
 .mcp.json
 graphify-out/
+.playwright-mcp/*
