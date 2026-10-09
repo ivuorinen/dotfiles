@@ -44,7 +44,7 @@ jobs:
       # it. A double-quoted body is expanded once here in the superproject,
       # where there are no tags: every describe failed, $tag was empty, and
       # the job reported "No updates" from 2025-02 on while updating nothing.
-      # Tagless submodules (dotbot-include, the cheatsheets) are skipped.
+      # Tagless submodules (the cheatsheets) are skipped.
       # The body sets -e itself: foreach runs it in its own sh, which does not
       # inherit this step's bash -e, so a failed fetch or checkout would
       # otherwise fall through to the "updated" message.

@@ -174,7 +174,6 @@ a commit, carrying its own license, and updated from upstream rather than
 edited here. The MIT license above does not cover them.
 
     tools/dotbot                        MIT   LICENSE.md
-    tools/dotbot-include                MIT   LICENSE.txt
     tools/antidote                      MIT   LICENSE
     config/cheat/cheatsheets/community  CC0-1.0  .github/LICENSE.txt
     config/cheat/cheatsheets/tldr       MIT   .github/LICENSE.md

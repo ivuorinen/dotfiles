@@ -14,7 +14,6 @@ PROTECTED_PATHS=(
   yarn.lock
   .yarn
   tools/dotbot
-  tools/dotbot-include
   tools/antidote
   config/cheat/cheatsheets/community
   config/cheat/cheatsheets/tldr

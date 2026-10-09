@@ -1,6 +1,6 @@
 ---
-- include: "tools/dotbot-defaults.yaml"
-
+# ./install runs tools/dotbot-defaults.yaml ahead of this file (dotbot -c
+# with several files), so its defaults apply here.
 - clean:
     ~/:
     ~/.config:

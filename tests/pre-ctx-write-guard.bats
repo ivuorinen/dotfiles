@@ -65,7 +65,7 @@ batch()
 @test "pre-ctx-write-guard: blocks writes to the other vendored trees" {
   run -2 code 'rm .claude/skills/graphify/SKILL.md'
   run -2 code 'echo x > config/cheat/cheatsheets/tldr/README.md'
-  run -2 code 'rm tools/dotbot-include/plugin.py'
+  run -2 code 'rm tools/antidote/functions/antidote'
 }
 
 # Hand-written fish functions sit in the same directory with no naming signal,
