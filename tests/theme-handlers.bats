@@ -4,6 +4,8 @@ setup()
 {
   TMPDIR_TEST="$(mktemp -d)"
   export XDG_STATE_HOME="$TMPDIR_TEST"
+  # handlers.d/claude must never rewrite the developer's real settings.
+  export CLAUDE_CONFIG_DIR="$TMPDIR_TEST/claude"
   HD="$BATS_TEST_DIRNAME/../config/theme/handlers.d"
   export DOTFILES="$BATS_TEST_DIRNAME/.."
   # Pin the family so assertions don't follow the tracked default.
@@ -471,5 +473,105 @@ STUB
 
 @test "television handler: rejects invalid mode" {
   run "$HD/television" purple
+  [ "$status" -eq 2 ]
+}
+
+# settings.json with content $1 in the sandboxed CLAUDE_CONFIG_DIR (set in
+# setup), and the orchestrator's mode file set to $2.
+claude_fixture()
+{
+  mkdir -p "$CLAUDE_CONFIG_DIR" "$TMPDIR_TEST/dotfiles-theme"
+  printf '%s\n' "$1" > "$CLAUDE_CONFIG_DIR/settings.json"
+  echo "$2" > "$TMPDIR_TEST/dotfiles-theme/mode"
+}
+
+@test "claude handler: writes the theme file and selects it, keeping other keys" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto", "hooks": {"Stop": []}, "model": "x"}' light
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "light" ]
+  [ "$(jq -r .theme "$CLAUDE_CONFIG_DIR/settings.json")" = "custom:dotfiles" ]
+  [ "$(jq -c '.hooks' "$CLAUDE_CONFIG_DIR/settings.json")" = '{"Stop":[]}' ]
+  [ "$(jq -r .model "$CLAUDE_CONFIG_DIR/settings.json")" = "x" ]
+}
+
+@test "claude handler: takes the base from theme-mode, not its argument" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "custom:dotfiles"}' dark
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "dark" ]
+}
+
+@test "claude handler: a flip rewrites only the theme file" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  "$HD/claude" dark
+  local before
+  before="$(ls -i "$CLAUDE_CONFIG_DIR/settings.json")"
+  echo light > "$TMPDIR_TEST/dotfiles-theme/mode"
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "light" ]
+  [ "$(ls -i "$CLAUDE_CONFIG_DIR/settings.json")" = "$before" ]
+}
+
+@test "claude handler: an unchanged mode rewrites nothing" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  "$HD/claude" dark
+  local before
+  before="$(ls -i "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")"
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [ "$(ls -i "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "$before" ]
+}
+
+@test "claude handler: no settings file is a skip and creates nothing" {
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"skipping"* ]]
+  [ ! -e "$CLAUDE_CONFIG_DIR" ]
+}
+
+@test "claude handler: without jq the theme file is still written" {
+  claude_fixture '{"theme": "auto"}' dark
+  mkdir -p "$TMPDIR_TEST/bin"
+  local t
+  for t in bash dirname cat mkdir mktemp mv rm; do
+    ln -s "$(command -v "$t")" "$TMPDIR_TEST/bin/$t"
+  done
+  PATH="$TMPDIR_TEST/bin" run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"jq not in PATH"* ]]
+  [[ "$(cat "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" == *'"base": "dark"'* ]]
+  [ "$(cat "$CLAUDE_CONFIG_DIR/settings.json")" = '{"theme": "auto"}' ]
+}
+
+@test "claude handler: a symlinked settings file stays a link" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  mv "$CLAUDE_CONFIG_DIR/settings.json" "$TMPDIR_TEST/real.json"
+  ln -s "$TMPDIR_TEST/real.json" "$CLAUDE_CONFIG_DIR/settings.json"
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"is a symlink"* ]]
+  [ -L "$CLAUDE_CONFIG_DIR/settings.json" ]
+  [ "$(cat "$TMPDIR_TEST/real.json")" = '{"theme": "auto"}' ]
+}
+
+@test "claude handler: unparsable settings exit 1 and stay untouched" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": ' dark
+  run "$HD/claude" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"claude handler: cannot parse"* ]]
+  [ "$(cat "$CLAUDE_CONFIG_DIR/settings.json")" = '{"theme": ' ]
+  [ -z "$(find "$CLAUDE_CONFIG_DIR" -name 'settings.json.*')" ]
+}
+
+@test "claude handler: rejects invalid mode" {
+  run "$HD/claude" purple
   [ "$status" -eq 2 ]
 }

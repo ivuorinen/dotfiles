@@ -40,7 +40,14 @@ Dark/light theming is owned by a stand-alone orchestrator:
 
 Fish reacts to flips via `config/fish/conf.d/theme-switch.fish`,
 which watches the mode state file. nvim, vim and wezterm read
-`config/theme/family` directly and follow the OS appearance. After a
-family switch, running vim sessions update within 3 s and wezterm on its
-next config reload; nvim reads the family only at startup and needs a
-restart.
+`config/theme/family` directly. nvim and vim follow the OS appearance;
+wezterm follows the mode file (on its reload watch list), falling back to
+the OS appearance when there is none. After a family switch, running vim
+sessions update within 3 s and wezterm on its next config reload; nvim
+reads the family only at startup and needs a restart.
+
+Claude Code follows the mode, not the family. `handlers.d/claude` sets
+`theme` to `custom:dotfiles` once and, on each flip, rewrites
+`${CLAUDE_CONFIG_DIR:-~/.claude}/themes/dotfiles.json` with `base` set to
+the mode. Running sessions reload that file live. They do not re-apply
+`theme` from `settings.json`, and `"auto"` misses flips.

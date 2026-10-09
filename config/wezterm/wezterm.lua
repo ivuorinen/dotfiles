@@ -264,17 +264,38 @@ local schemes = {
   catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
 }
 
--- Function to detect the theme based on appearance
-function Scheme_for_appearance(appearance)
-  local s = schemes[theme_family()] or schemes.catppuccin
-  if appearance:find 'Dark' then
-    return s.dark
-  else
-    return s.light
+-- The orchestrator's mode, from the file local/bin/theme-mode reads
+-- ($XDG_STATE_HOME/dotfiles-theme/mode). The file is on the reload watch
+-- list, so `config/theme/apply` re-runs this config and every window picks
+-- the new scheme. nil when the file is missing or holds anything else.
+local mode_file = (
+  os.getenv 'XDG_STATE_HOME' or ((os.getenv 'HOME' or '') .. '/.local/state')
+) .. '/dotfiles-theme/mode'
+wezterm.add_to_config_reload_watch_list(mode_file)
+
+local function theme_mode()
+  local f = io.open(mode_file, 'r')
+  if not f then
+    return nil
   end
+  local mode = (f:read '*l' or ''):gsub('%s+', '')
+  f:close()
+  if mode == 'dark' or mode == 'light' then
+    return mode
+  end
+  return nil
 end
 
--- Set the color scheme based on appearance
+-- Scheme for the orchestrator's mode; without one (no orchestrator on this
+-- host yet), fall back to the window's OS appearance.
+function Scheme_for_appearance(appearance)
+  local s = schemes[theme_family()] or schemes.catppuccin
+  local mode = theme_mode() or (appearance:find 'Dark' and 'dark' or 'light')
+  return s[mode]
+end
+
+-- Set the color scheme on every config reload (including the ones the
+-- mode file triggers)
 ---@diagnostic disable-next-line: unused-local
 wezterm.on('window-config-reloaded', function(window, pane)
   local overrides = window:get_config_overrides() or {}

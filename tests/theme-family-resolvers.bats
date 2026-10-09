@@ -190,11 +190,40 @@ for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'nosuchfamily' } do
   print(fam .. '=' .. d .. '|' .. l)
 end
 LUA
-  run nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  # An empty state dir: no mode file, so the appearance decides.
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
   echo "$output"
   [ "$status" -eq 0 ]
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
+  [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
   [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
   [[ "$output" == *"nosuchfamily=Catppuccin Mocha|Catppuccin Latte AA"* ]]
-  [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
+}
+
+@test "wezterm: the orchestrator's mode file wins over the appearance" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
+  cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
+local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
+local stub = setmetatable({}, { __index = function() return any end })
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.config_builder = function() return {} end
+stub.on = function() end
+local watched = {}
+stub.add_to_config_reload_watch_list = function(p) watched[#watched + 1] = p end
+stub.action = setmetatable({}, { __index = function() return function() return {} end end })
+package.loaded.wezterm = stub
+dofile(arg[1])
+vim.env.DOTFILES_THEME_FAMILY = 'oasis'
+print('light-os=' .. Scheme_for_appearance 'Light')
+print('watched=' .. table.concat(watched, ','))
+LUA
+  mkdir -p "$TMPDIR_TEST/state/dotfiles-theme"
+  echo dark > "$TMPDIR_TEST/state/dotfiles-theme/mode"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"light-os=Oasis Abyss Dark"* ]]
+  [[ "$output" == *"watched=$TMPDIR_TEST/state/dotfiles-theme/mode"* ]]
 }
