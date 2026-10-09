@@ -26,3 +26,4 @@ usage = "6.12.0"
 # in a fresh clone provides them without linking the global config into ~.
 bats = "1.14.0"
 prek = "0.5.4"
+stylua = "latest"
