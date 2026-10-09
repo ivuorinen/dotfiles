@@ -319,6 +319,35 @@ STUB
   [ "$dark" != "$light" ]
 }
 
+@test "fish theme-switch: an in-session flip saves the mode file's section" {
+  if ! command -v fish > /dev/null 2>&1; then
+    skip "fish not installed"
+  fi
+  # shellcheck disable=SC2016
+  if ! fish -c 'functions fish_config' 2> /dev/null | grep -q -- 'color-theme='; then
+    skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
+  fi
+  # The terminal's OSC 11 answer can lag a flip (WezTerm keeps the old
+  # background in panes open across it), and here there is no terminal at
+  # all: only the mode file can pick the section.
+  local cfg="$TMPDIR_TEST/cfg" expected
+  mkdir -p "$cfg/fish/themes" "$TMPDIR_TEST/dotfiles-theme"
+  cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$cfg/fish/themes/"
+  echo dark > "$TMPDIR_TEST/dotfiles-theme/mode"
+  expected="$(awk '/^\[/ { s = $0 } s == "[dark]" && $1 == "fish_color_command" { print $2 }' \
+    "$DOTFILES/config/fish/themes/catppuccin-aa.theme")"
+  XDG_CONFIG_HOME="$cfg" run fish --no-config -i -c "
+    source '$DOTFILES/config/fish/functions/__dotfiles_theme_name.fish'
+    source '$DOTFILES/config/fish/conf.d/theme-switch.fish'
+    set -e __theme_switch_last_mtime
+    emit fish_prompt
+    echo \$fish_color_command"
+  [ "$status" -eq 0 ]
+  [ -n "$expected" ]
+  # Read in-session: --no-config keeps universal variables off disk.
+  [ "$output" = "$expected" ]
+}
+
 # Fake fish: answers the fish_config source probe as fish 4 (with
 # --color-theme) or fish 3 (without), and records every other -c command.
 stub_fish()
