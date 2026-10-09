@@ -99,8 +99,8 @@ dfm_install()
       command -v apt &> /dev/null && run_step "apt packages" dfm_install apt-packages
       command -v dnf &> /dev/null && run_step "dnf packages" dfm_install dnf-packages
 
-      # Tier 1: Package managers & fonts
-      run_step "homebrew" "$DFM" brew install
+      # Tier 1: Fonts. Homebrew is not a step: `dfm brew install` would put
+      # back every Brewfile formula removed since, so it runs only by hand.
       run_step "fonts" dfm_install fonts
 
       # Tier 2: Runtimes and CLI tools via mise, then remaining installers.
