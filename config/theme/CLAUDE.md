@@ -24,7 +24,7 @@ Dark/light theming is owned by a stand-alone orchestrator:
   is a skip: stderr note, exit 0. Add new apps by dropping a file here
   (`theme-handler-scaffold` skill).
 - `config/theme/family` — the active theme family, one word
-  (`kanagawa`). Switch with an edit plus `config/theme/apply
+  (`oasis`). Switch with an edit plus `config/theme/apply
   "$(theme-mode)"`. `DOTFILES_THEME_FAMILY` overrides it (test seam).
 - `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — theme
   assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`). A handler
