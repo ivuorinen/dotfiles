@@ -6,8 +6,8 @@ when working with code in this repository.
 ## Overview
 
 Neovim configuration using **vim.pack** (Neovim 0.12+ built-in) for plugin
-management, **kanagawa** as the default colorscheme (catppuccin as the
-alternate, chosen by `config/theme/family`), and **mini.nvim** as
+management, **oasis** (Abyss) as the default colorscheme (kanagawa and
+catppuccin as alternates, chosen by `config/theme/family`), and **mini.nvim** as
 the foundation for many core features.
 
 ## Load Order
@@ -38,7 +38,7 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 | `-- Snacks`     | snacks.nvim: picker, notifier, terminal, input, rename, bigfile |
 | `-- Tools`      | wakatime, shellspec, mini.comment                               |
 | `-- Treesitter` | arborist.nvim (parser manager, Neovim 0.12+)                    |
-| `-- UI`         | kanagawa, catppuccin, auto-dark-mode, colorizer                 |
+| `-- UI`         | kanagawa, oasis, catppuccin, auto-dark-mode, colorizer          |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is

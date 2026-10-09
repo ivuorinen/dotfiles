@@ -1,0 +1,24 @@
+# Oasis Abyss Dark — derived from catppuccin-mocha-mauve.toml by the colour-role map
+# in config/theme/palettes.d/oasis/light/starship.toml.
+# general
+background = '#000000'
+border_fg = '#1c1c1c'
+text_fg = '#f5f5dc'
+dimmed_text_fg = '#605c4d'
+# input
+input_text_fg = '#c695ff'
+result_count_fg = '#c695ff'
+# results
+result_name_fg = '#81c0ff'
+result_line_number_fg = '#f0e68c'
+result_value_fg = '#8d8de7'
+selection_fg = '#7fcf78'
+selection_bg = '#141414'
+match_fg = '#7fcf78'
+# preview
+preview_title_fg = '#c695ff'
+# modes
+channel_mode_fg = '#000000'
+channel_mode_bg = '#c695ff'
+remote_control_mode_fg = '#000000'
+remote_control_mode_bg = '#7fcf78'

@@ -1,0 +1,20 @@
+# Oasis Abyss Light 3 — derived from ../../catppuccin/light/gh-dash.theme.yml by the
+# colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+---
+theme:
+  colors:
+    text:
+      primary: "#181811"
+      secondary: "#691fbe"
+      inverted: "#d0d0d0"
+      faint: "#3d4047"
+      # Oasis yellow/green (4.5:1 on #d8d8d8); see light/starship.toml
+      warning: "#554f1c"
+      success: "#31572e"
+      error: "#9e1010"
+    background:
+      selected: "#cdcdcd"
+    border:
+      primary: "#691fbe"
+      secondary: "#b9b9b9"
+      faint: "#cdcdcd"

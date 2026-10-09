@@ -1,0 +1,8 @@
+# Oasis Abyss Dark — derived from ../../catppuccin/dark/television.toml by the
+# colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+# television dark palette — Oasis Abyss Dark (mauve accent). The theme
+# file is vendored under config/television/themes/ and linked into
+# ~/.config/television/themes/; television resolves `[ui] theme` by
+# filename from that directory. Appended to base.toml by the handler.
+[ui]
+theme = "oasis-abyss-dark.toml"

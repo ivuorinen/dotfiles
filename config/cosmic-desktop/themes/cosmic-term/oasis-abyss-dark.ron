@@ -1,0 +1,37 @@
+(
+  name: "Oasis Abyss Dark",
+  foreground: "#f5f5dc",
+  cursor: "#e9c0a5",
+  bright_foreground: "#f5f5dc",
+  dim_foreground: "#605c4d",
+  normal: (
+    black: "#1c1c1c",
+    red: "#ff7979",
+    green: "#7fcf78",
+    yellow: "#f0e68c",
+    blue: "#81c0ff",
+    magenta: "#7fcf78",
+    cyan: "#8ad3be",
+    white: "#a3abb8"
+  ),
+  bright: (
+    black: "#2b4a46",
+    red: "#ff7979",
+    green: "#7fcf78",
+    yellow: "#f0e68c",
+    blue: "#81c0ff",
+    magenta: "#7fcf78",
+    cyan: "#8ad3be",
+    white: "#7a7662"
+  ),
+  dim: (
+    black: "#1c1c1c",
+    red: "#ff7979",
+    green: "#7fcf78",
+    yellow: "#f0e68c",
+    blue: "#81c0ff",
+    magenta: "#7fcf78",
+    cyan: "#8ad3be",
+    white: "#a3abb8"
+  ),
+)

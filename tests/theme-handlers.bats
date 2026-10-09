@@ -198,6 +198,7 @@ STUB
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=kanagawa
   for h in starship eza gitui yazi fzf gh-dash television bat; do
     run "$HD/$h" light
@@ -209,6 +210,24 @@ STUB
   [ -L "$HOME/.config/yazi/Kanagawa-Wave.tmTheme" ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
+}
+
+@test "handlers: oasis resolves every palette" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  # shellcheck disable=SC2030,SC2031
+  export DOTFILES_THEME_FAMILY=oasis
+  for h in starship eza gitui yazi fzf gh-dash television bat; do
+    run "$HD/$h" dark
+    [ "$status" -eq 0 ]
+  done
+  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/oasis/dark/starship.toml" ]]
+  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/oasis/dark/yazi.toml" ]]
+  [ -L "$HOME/.config/yazi/Oasis-Abyss-Dark.tmTheme" ]
+  [ -L "$HOME/.config/yazi/Oasis-Abyss-Light-3.tmTheme" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
+  grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
 @test "starship handler: swaps ~/.config/starship.toml symlink" {

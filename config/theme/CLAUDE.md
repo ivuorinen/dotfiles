@@ -27,7 +27,7 @@ Dark/light theming is owned by a stand-alone orchestrator:
   (`kanagawa`). Switch with an edit plus `config/theme/apply
   "$(theme-mode)"`. `DOTFILES_THEME_FAMILY` overrides it (test seam).
 - `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — theme
-  assets, one tree per family (`catppuccin`, `kanagawa`). A handler
+  assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`). A handler
   whose active family ships no file removes its stale link instead of
   keeping another family's palette.
 - `config/theme/tmux-palette <mode>` — sources the active family's tmux

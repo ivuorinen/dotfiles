@@ -1,0 +1,37 @@
+(
+  name: "Oasis Abyss Light 3",
+  foreground: "#181811",
+  cursor: "#5b3b28",
+  bright_foreground: "#181811",
+  dim_foreground: "#615f57",
+  normal: (
+    black: "#3d4047",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    white: "#97cebe"
+  ),
+  bright: (
+    black: "#615e54",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    white: "#b9b9b9"
+  ),
+  dim: (
+    black: "#3d4047",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    white: "#97cebe"
+  ),
+)

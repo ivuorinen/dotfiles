@@ -98,6 +98,12 @@ vim_scheme()
   [ "$(vim_scheme light kanagawa)" = "kanagawa_lotus" ]
 }
 
+@test "vim: oasis maps dark/light to abyss dark/light" {
+  command -v vim > /dev/null 2>&1 || skip "vim not installed"
+  [ "$(vim_scheme dark oasis)" = "oasis_abyss_dark" ]
+  [ "$(vim_scheme light oasis)" = "oasis_abyss_light" ]
+}
+
 @test "vim: catppuccin maps dark/light to mocha/latte" {
   command -v vim > /dev/null 2>&1 || skip "vim not installed"
   [ "$(vim_scheme dark catppuccin)" = "catppuccin_mocha" ]
@@ -140,6 +146,25 @@ nvim_scheme()
   [ "$(nvim_scheme nosuchfamily)" = "catppuccin-mocha" ]
 }
 
+@test "nvim: oasis selects abyss in both modes" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
+  local data
+  data="$(nvim --clean --headless '+lua io.stdout:write(vim.fn.stdpath("data"))' +qa 2> /dev/null)"
+  compgen -G "$data/site/pack/*/opt/oasis" > /dev/null || skip "oasis.nvim not installed"
+  [ "$(nvim_scheme oasis dark)" = "oasis-abyss" ]
+  [ "$(nvim_scheme oasis light)" = "oasis-abyss" ]
+  # One colors_name serves both modes, so check the mode reached the
+  # palette: Abyss Dark and Abyss Light 3 (intensity 3) backgrounds.
+  local bg
+  for bg in dark:000000 light:d8d8d8; do
+    run env DOTFILES_THEME_FAMILY=oasis timeout 60 nvim --headless \
+      "+set background=${bg%%:*}" \
+      '+lua io.stdout:write(string.format("%06x\n", vim.api.nvim_get_hl(0, { name = "Normal" }).bg))' \
+      +qa
+    [ "${lines[${#lines[@]} - 1]}" = "${bg#*:}" ]
+  done
+}
+
 # --- wezterm ------------------------------------------------------------
 
 @test "wezterm: family selects the scheme pair; unknown falls back" {
@@ -156,7 +181,7 @@ stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
 package.loaded.wezterm = stub
 local cfg = dofile(arg[1])
-for _, fam in ipairs { 'kanagawa', 'catppuccin', 'nosuchfamily' } do
+for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'nosuchfamily' } do
   vim.env.DOTFILES_THEME_FAMILY = fam
   local d, l = Scheme_for_appearance 'Dark', Scheme_for_appearance 'Light'
   for _, s in ipairs { d, l } do
@@ -171,4 +196,5 @@ LUA
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
   [[ "$output" == *"nosuchfamily=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
