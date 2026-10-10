@@ -25,4 +25,4 @@ usage = "6.12.0"
 # contributor to use. Same pins as config/mise/config.toml, so `mise install`
 # in a fresh clone provides them without linking the global config into ~.
 bats = "1.14.0"
-prek = "0.5.4"
+prek = "0.5.5"
