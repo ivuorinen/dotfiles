@@ -1,6 +1,7 @@
 ---
-- include: "dotbot-links.yaml"
-
+# ./install runs tools/dotbot-defaults.yaml and dotbot-links.yaml ahead of
+# this file (dotbot -c with several files), so their defaults and links
+# apply here too.
 - shell:
     # Add Git submodules and remove old ones. A non-zero exit here
     # leaves the tree in a half-installed state — fail loudly so the

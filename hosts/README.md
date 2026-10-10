@@ -26,8 +26,9 @@ Current hosts:
   away, starting fish with no exports. Restore the tracked file before pulling:
   `git -C ~/.dotfiles checkout -- config/fish/exports.fish && git -C ~/.dotfiles pull`.
 - The host `install.conf.yaml` runs on both a full `./install` and `./install --links`. With `--links` its
-  `shell` directives are skipped (dotbot `--except shell`), so only links are refreshed. Host configs load
-  only the `dotbot-include` plugin, so a directive from any other plugin aborts the install.
+  `shell` directives are skipped (dotbot `--except shell`), so only links are refreshed. `./install` runs
+  `tools/dotbot-defaults.yaml` ahead of it, so the shared defaults apply. Host configs load no plugins
+  beyond dotbot's built-ins, so a directive from any other plugin aborts the install.
 
 ## Lifecycle hooks (`before.d` / `after.d`)
 

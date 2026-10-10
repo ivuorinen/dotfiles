@@ -1,0 +1,26 @@
+# Oasis Abyss Light 3 — derived from catppuccin-latte-mauve.toml by the colour-role map
+# in config/theme/palettes.d/oasis/light/starship.toml.
+# general
+background = '#d8d8d8'
+border_fg = '#b9b9b9'
+text_fg = '#181811'
+dimmed_text_fg = '#615f57'
+# input
+input_text_fg = '#691fbe'
+result_count_fg = '#691fbe'
+# results
+# accents reach WCAG AA 4.5:1 on #d8d8d8; mapping in
+# config/theme/palettes.d/oasis/light/starship.toml
+result_name_fg = '#11508d'
+result_line_number_fg = '#554f1c'
+result_value_fg = '#5049c1'
+selection_fg = '#31572e'
+selection_bg = '#cdcdcd'
+match_fg = '#31572e'
+# preview
+preview_title_fg = '#691fbe'
+# modes
+channel_mode_fg = '#d8d8d8'
+channel_mode_bg = '#691fbe'
+remote_control_mode_fg = '#d8d8d8'
+remote_control_mode_bg = '#31572e'

@@ -4,10 +4,11 @@
 # way tools/** and other vendored trees are treated.
 exclude: ^\.claude/skills/graphify/
 
-# commit-msg is not installed by default — without it here, `prek install`
-# wires only pre-commit and the commitlint hook below never runs. A fresh
-# clone needs `prek install` for either stage to exist at all.
-default_install_hook_types: [pre-commit, commit-msg]
+# commit-msg and pre-push are not installed by default — without them here,
+# `prek install` wires only pre-commit, and the commitlint and bats hooks
+# below never run. A fresh clone needs `prek install` for any stage to exist
+# at all, and an existing clone needs it re-run to pick up pre-push.
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
 
 # Pin every hook to pre-commit unless it opts out. A hook with no `stages`
 # runs at EVERY installed stage, so installing commit-msg above would
@@ -192,10 +193,12 @@ repos:
         exclude: \.(py|pl|php|md)$
       - id: bats
         name: Bats test suite
-        # ~5min for 1005 tests (measured 2026-09-13; the "~30s" this comment
-        # used to claim predates most of the suite). It is scoped to paths
-        # whose behaviour the suite asserts — a docs-only or workflow-only
-        # commit skips it. The whole suite runs rather than the test file
+        # ~5min for 1280 tests. It runs on push, not per commit: paying that
+        # on every commit made splitting work into small commits cost five
+        # minutes each, and CI (.github/workflows/tests.yml) runs it again on
+        # every PR. At pre-push the files filter below sees every file the
+        # pushed commits change, so a push of docs-only or workflow-only
+        # commits skips it. The whole suite runs rather than the test file
         # matching the edited script: removing the python-libs step from
         # local/bin/dfm-install broke tests/dfm.bats, a pairing no filename
         # mapping would have found.
@@ -207,7 +210,7 @@ repos:
         # /opt/homebrew/bin/parallel is moreutils' incompatible namesake,
         # pinned as brew:moreutils in config/mise/config.toml. Resolving that
         # collision is a deliberate decision, not a drive-by.
-        # See .claude/rules/run-tests-before-commit.md.
+        # See .claude/rules/run-tests-before-push.md.
         #
         # env -u: git exports GIT_INDEX_FILE and friends to its hooks whenever
         # the commit builds a temporary index — `git commit <path>` and
@@ -224,6 +227,7 @@ repos:
           -u GIT_COMMON_DIR -u GIT_PREFIX scripts/bats-run.sh tests/
         language: system
         pass_filenames: false
+        stages: [pre-push]
         # .claude/hooks/ and vendored-files.md are here so an edit to either
         # protected-path list runs tests/protected-paths-parity.bats.
         files: ^(tests/|local/bin/|scripts/|base/|config/(theme/|shared\.sh|lib\.sh|exports|alias)|\.claude/hooks/|\.claude/rules/vendored-files\.md$)

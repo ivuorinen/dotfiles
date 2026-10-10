@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#USAGE about "Print the terminal palette and the colours the terminal reports"
+#
+# Probe what the terminal draws and what it answers when asked, so a
+# dark/light flip can be checked: run once per mode, redirect each run to
+# a file, and diff them.
+#
+#   x-palette-probe > /tmp/probe-light.txt   # flip the OS appearance
+#   x-palette-probe > /tmp/probe-dark.txt
+#   diff /tmp/probe-light.txt /tmp/probe-dark.txt
+#
+# Indexed colours (palette 0-15) follow the terminal theme; the truecolor
+# row is fixed RGB and must never change, which makes it the control. The
+# OSC 10/11/4 queries read the default fg/bg and palette back from the
+# terminal. Inside tmux, tmux answers them itself, which is what programs
+# running there see. Without a terminal on stdin (a pipe, `!` in Claude
+# Code) the queries print "n/a (no tty)".
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+# msgr sits next to this script; prefer $DOTFILES, fall back to our own
+# directory so a bare checkout (no install) still works
+MSGR="${DOTFILES}/local/bin/msgr"
+[[ -r "$MSGR" ]] || MSGR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/msgr"
+# msgr uses unguarded variables ($ZSH_VERSION, $1) — disable nounset
+set +u
+# shellcheck source=msgr
+source "$MSGR"
+set -u
+
+esc=$'\033'
+reset="${esc}[0m"
+
+# Ask the terminal for a colour via OSC; prints rgb:rrrr/gggg/bbbb or n/a.
+# Raw mode with a 0.5 s read timeout: a terminal that does not answer
+# leaves the reply empty instead of hanging.
+query()
+{
+  if [[ ! -t 0 ]]; then
+    echo "n/a (no tty)"
+    return
+  fi
+  local old reply val
+  old="$(stty -g < /dev/tty)"
+  stty raw -echo min 0 time 5 < /dev/tty
+  printf '%s]%s;?\a' "$esc" "$1" > /dev/tty
+  reply="$(dd bs=128 count=1 2> /dev/null < /dev/tty)"
+  stty "$old" < /dev/tty
+  val="$(printf '%s' "$reply" | sed -n 's/.*\(rgb:[0-9a-fA-F/]*\).*/\1/p')"
+  echo "${val:-n/a}"
+}
+
+[[ -t 0 ]] || msgr warn "stdin is not a terminal; colour queries are skipped"
+
+echo "TERM=${TERM:-} TERM_PROGRAM=${TERM_PROGRAM:-} TMUX=${TMUX:+yes}"
+echo "theme-mode: $(theme-mode 2> /dev/null || echo n/a)"
+echo
+echo "Default fg (OSC 10): $(query 10)"
+echo "Default bg (OSC 11): $(query 11)"
+echo
+
+echo "Indexed palette 0-15 (should change with the theme):"
+for i in {0..15}; do
+  if ((i < 8)); then bg=$((40 + i)); else bg=$((100 + i - 8)); fi
+  printf '%s[%sm  %2d  %s ' "$esc" "$bg" "$i" "$reset"
+  ((i == 7)) && echo
+done
+echo
+echo
+
+echo "Indexed palette values (OSC 4):"
+for i in {0..15}; do
+  printf '  %2d %s\n' "$i" "$(query "4;$i")"
+done
+echo
+
+echo "Foreground text on default bg:"
+for c in 31 32 33 34 35 36 37 90; do
+  printf '%s[%smSample %s%s  ' "$esc" "$c" "$c" "$reset"
+done
+echo
+echo
+
+echo "Truecolor control row (must NOT change):"
+for rgb in "255;0;0" "0;255;0" "0;0;255" "128;128;128"; do
+  printf '%s[48;2;%sm  %-11s  %s ' "$esc" "$rgb" "$rgb" "$reset"
+done
+echo

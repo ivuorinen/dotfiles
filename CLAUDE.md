@@ -14,8 +14,9 @@ The directory layout follows the XDG Base Directory Specification.
 Installation: `./install` runs Dotbot with `install.conf.yaml`,
 then applies `hosts/<hostname>/install.conf.yaml` if it exists.
 Use `./install --links` to refresh symlinks only (skips shell provisioning steps).
-Link steps live in `dotbot-links.yaml`; `install.conf.yaml` includes it and adds
-the shell steps on top.
+Link steps live in `dotbot-links.yaml`; a full install passes dotbot
+`tools/dotbot-defaults.yaml`, `dotbot-links.yaml` and `install.conf.yaml`
+(several `-c` files run in order), so the shell steps come on top.
 
 ## Commands
 

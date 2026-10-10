@@ -47,15 +47,23 @@ function __theme_switch_check --on-event fish_prompt
     if not set -q __theme_switch_last_mtime; or test "$__theme_switch_last_mtime" != "$mtime"
         set -g __theme_switch_last_mtime $mtime
         # Re-save the active family's dual-palette theme (<family>-aa,
-        # e.g. kanagawa-aa); fish re-queries OSC 11 and picks [light] vs
-        # [dark] from it, so the name does not change by mode — only by
-        # family, which also rewrites the mode file and lands here. The
-        # themes are repo-owned; fisher-managed upstream files would lose
-        # their AA [light] edits on `fisher update`. `echo y |` bypasses
-        # the interactive overwrite prompt that would otherwise pollute
-        # the next prompt line.
+        # e.g. kanagawa-aa); the name changes only by family, which also
+        # rewrites the mode file and lands here. The themes are repo-owned;
+        # fisher-managed upstream files would lose their AA [light] edits
+        # on `fisher update`. --color-theme names the section from the
+        # mode file, as handlers.d/fish does: left to itself fish picks it
+        # from the terminal's OSC 11 answer, which WezTerm does not update
+        # in panes open across a flip. fish 3.x lacks the option (see the
+        # probe in handlers.d/fish). `echo y |` bypasses the interactive
+        # overwrite prompt that would otherwise pollute the next prompt line.
+        set -l mode (string trim < $mode_file)
+        set -l save_opts
+        if contains -- "$mode" dark light
+            and string match -q '*color-theme=*' -- (functions fish_config)
+            set save_opts --color-theme=$mode
+        end
         set -l theme (__dotfiles_theme_name)
-        and echo y | fish_config theme save $theme >/dev/null 2>&1
+        and echo y | fish_config theme save $save_opts $theme >/dev/null 2>&1
         # A family without a dircolors palette removes the cache; drop the
         # export too so a previous family's ls colours do not linger.
         if test -r $ls_cache

@@ -4,6 +4,8 @@ setup()
 {
   TMPDIR_TEST="$(mktemp -d)"
   export XDG_STATE_HOME="$TMPDIR_TEST"
+  # handlers.d/claude must never rewrite the developer's real settings.
+  export CLAUDE_CONFIG_DIR="$TMPDIR_TEST/claude"
   HD="$BATS_TEST_DIRNAME/../config/theme/handlers.d"
   export DOTFILES="$BATS_TEST_DIRNAME/.."
   # Pin the family so assertions don't follow the tracked default.
@@ -198,6 +200,7 @@ STUB
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=kanagawa
   for h in starship eza gitui yazi fzf gh-dash television bat; do
     run "$HD/$h" light
@@ -209,6 +212,24 @@ STUB
   [ -L "$HOME/.config/yazi/Kanagawa-Wave.tmTheme" ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
+}
+
+@test "handlers: oasis resolves every palette" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  # shellcheck disable=SC2030,SC2031
+  export DOTFILES_THEME_FAMILY=oasis
+  for h in starship eza gitui yazi fzf gh-dash television bat; do
+    run "$HD/$h" dark
+    [ "$status" -eq 0 ]
+  done
+  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/oasis/dark/starship.toml" ]]
+  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/oasis/dark/yazi.toml" ]]
+  [ -L "$HOME/.config/yazi/Oasis-Abyss-Dark.tmTheme" ]
+  [ -L "$HOME/.config/yazi/Oasis-Abyss-Light-3.tmTheme" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
+  grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
 @test "starship handler: swaps ~/.config/starship.toml symlink" {
@@ -296,6 +317,35 @@ STUB
     skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
   fi
   [ "$dark" != "$light" ]
+}
+
+@test "fish theme-switch: an in-session flip saves the mode file's section" {
+  if ! command -v fish > /dev/null 2>&1; then
+    skip "fish not installed"
+  fi
+  # shellcheck disable=SC2016
+  if ! fish -c 'functions fish_config' 2> /dev/null | grep -q -- 'color-theme='; then
+    skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
+  fi
+  # The terminal's OSC 11 answer can lag a flip (WezTerm keeps the old
+  # background in panes open across it), and here there is no terminal at
+  # all: only the mode file can pick the section.
+  local cfg="$TMPDIR_TEST/cfg" expected
+  mkdir -p "$cfg/fish/themes" "$TMPDIR_TEST/dotfiles-theme"
+  cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$cfg/fish/themes/"
+  echo dark > "$TMPDIR_TEST/dotfiles-theme/mode"
+  expected="$(awk '/^\[/ { s = $0 } s == "[dark]" && $1 == "fish_color_command" { print $2 }' \
+    "$DOTFILES/config/fish/themes/catppuccin-aa.theme")"
+  XDG_CONFIG_HOME="$cfg" run fish --no-config -i -c "
+    source '$DOTFILES/config/fish/functions/__dotfiles_theme_name.fish'
+    source '$DOTFILES/config/fish/conf.d/theme-switch.fish'
+    set -e __theme_switch_last_mtime
+    emit fish_prompt
+    echo \$fish_color_command"
+  [ "$status" -eq 0 ]
+  [ -n "$expected" ]
+  # Read in-session: --no-config keeps universal variables off disk.
+  [ "$output" = "$expected" ]
 }
 
 # Fake fish: answers the fish_config source probe as fish 4 (with
@@ -452,5 +502,105 @@ STUB
 
 @test "television handler: rejects invalid mode" {
   run "$HD/television" purple
+  [ "$status" -eq 2 ]
+}
+
+# settings.json with content $1 in the sandboxed CLAUDE_CONFIG_DIR (set in
+# setup), and the orchestrator's mode file set to $2.
+claude_fixture()
+{
+  mkdir -p "$CLAUDE_CONFIG_DIR" "$TMPDIR_TEST/dotfiles-theme"
+  printf '%s\n' "$1" > "$CLAUDE_CONFIG_DIR/settings.json"
+  echo "$2" > "$TMPDIR_TEST/dotfiles-theme/mode"
+}
+
+@test "claude handler: writes the theme file and selects it, keeping other keys" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto", "hooks": {"Stop": []}, "model": "x"}' light
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "light" ]
+  [ "$(jq -r .theme "$CLAUDE_CONFIG_DIR/settings.json")" = "custom:dotfiles" ]
+  [ "$(jq -c '.hooks' "$CLAUDE_CONFIG_DIR/settings.json")" = '{"Stop":[]}' ]
+  [ "$(jq -r .model "$CLAUDE_CONFIG_DIR/settings.json")" = "x" ]
+}
+
+@test "claude handler: takes the base from theme-mode, not its argument" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "custom:dotfiles"}' dark
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "dark" ]
+}
+
+@test "claude handler: a flip rewrites only the theme file" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  "$HD/claude" dark
+  local before
+  before="$(ls -i "$CLAUDE_CONFIG_DIR/settings.json")"
+  echo light > "$TMPDIR_TEST/dotfiles-theme/mode"
+  run "$HD/claude" light
+  [ "$status" -eq 0 ]
+  [ "$(jq -r .base "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "light" ]
+  [ "$(ls -i "$CLAUDE_CONFIG_DIR/settings.json")" = "$before" ]
+}
+
+@test "claude handler: an unchanged mode rewrites nothing" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  "$HD/claude" dark
+  local before
+  before="$(ls -i "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")"
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [ "$(ls -i "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" = "$before" ]
+}
+
+@test "claude handler: no settings file is a skip and creates nothing" {
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"skipping"* ]]
+  [ ! -e "$CLAUDE_CONFIG_DIR" ]
+}
+
+@test "claude handler: without jq the theme file is still written" {
+  claude_fixture '{"theme": "auto"}' dark
+  mkdir -p "$TMPDIR_TEST/bin"
+  local t
+  for t in bash dirname cat mkdir mktemp mv rm; do
+    ln -s "$(command -v "$t")" "$TMPDIR_TEST/bin/$t"
+  done
+  PATH="$TMPDIR_TEST/bin" run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"jq not in PATH"* ]]
+  [[ "$(cat "$CLAUDE_CONFIG_DIR/themes/dotfiles.json")" == *'"base": "dark"'* ]]
+  [ "$(cat "$CLAUDE_CONFIG_DIR/settings.json")" = '{"theme": "auto"}' ]
+}
+
+@test "claude handler: a symlinked settings file stays a link" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": "auto"}' dark
+  mv "$CLAUDE_CONFIG_DIR/settings.json" "$TMPDIR_TEST/real.json"
+  ln -s "$TMPDIR_TEST/real.json" "$CLAUDE_CONFIG_DIR/settings.json"
+  run "$HD/claude" dark
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"is a symlink"* ]]
+  [ -L "$CLAUDE_CONFIG_DIR/settings.json" ]
+  [ "$(cat "$TMPDIR_TEST/real.json")" = '{"theme": "auto"}' ]
+}
+
+@test "claude handler: unparsable settings exit 1 and stay untouched" {
+  command -v jq > /dev/null 2>&1 || skip "jq not installed"
+  claude_fixture '{"theme": ' dark
+  run "$HD/claude" dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"claude handler: cannot parse"* ]]
+  [ "$(cat "$CLAUDE_CONFIG_DIR/settings.json")" = '{"theme": ' ]
+  [ -z "$(find "$CLAUDE_CONFIG_DIR" -name 'settings.json.*')" ]
+}
+
+@test "claude handler: rejects invalid mode" {
+  run "$HD/claude" purple
   [ "$status" -eq 2 ]
 }
