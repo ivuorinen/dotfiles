@@ -37,7 +37,6 @@ Use one of these instead:
 ```bash
 scripts/bats-run.sh; echo "exit=$?"  # 0 means green; ends with a failure list
 bats tests/; echo "exit=$?"          # 0 means green
-bats tests/ 2>&1 | grep '^not ok'    # empty means green
 ```
 
 The exit code is the authority. `ok 222 ...` as the final line proves
