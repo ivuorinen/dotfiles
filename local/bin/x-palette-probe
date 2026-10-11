@@ -50,7 +50,7 @@ query()
   echo "${val:-n/a}"
 }
 
-[[ -t 0 ]] || msgr warn "stdin is not a terminal; colour queries are skipped"
+[[ -t 0 ]] || msg_warn "stdin is not a terminal; colour queries are skipped"
 
 echo "TERM=${TERM:-} TERM_PROGRAM=${TERM_PROGRAM:-} TMUX=${TMUX:+yes}"
 echo "theme-mode: $(theme-mode 2> /dev/null || echo n/a)"
