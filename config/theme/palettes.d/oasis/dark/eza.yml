@@ -78,7 +78,7 @@ security_context:
   colon: {foreground: "#605c4d"}
   user: {foreground: "#7b786d"}
   role: {foreground: "#c695ff"}
-  typ: {foreground: "#2b4a46"}
+  typ: {foreground: "#605c4d"}
   range: {foreground: "#c695ff"}
 
 file_type:

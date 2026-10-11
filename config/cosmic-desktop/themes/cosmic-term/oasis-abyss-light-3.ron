@@ -12,7 +12,9 @@
     blue: "#11508d",
     magenta: "#2e6b28",
     cyan: "#2f564a",
-    white: "#97cebe"
+    // ANSI white takes upstream's terminal ink, as wezterm does: the
+    // role-mapped surface shades were unreadable on #d8d8d8.
+    white: "#3a3a1b"
   ),
   bright: (
     black: "#615e54",
@@ -22,7 +24,7 @@
     blue: "#11508d",
     magenta: "#2e6b28",
     cyan: "#2f564a",
-    white: "#b9b9b9"
+    white: "#3a3a0c"
   ),
   dim: (
     black: "#3d4047",
@@ -32,6 +34,6 @@
     blue: "#11508d",
     magenta: "#2e6b28",
     cyan: "#2f564a",
-    white: "#97cebe"
+    white: "#3a3a1b"
   ),
 )
