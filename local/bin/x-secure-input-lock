@@ -46,6 +46,15 @@ holder_name()
   fi
 }
 
+# Process-supplied text (the holder's name or command line) made safe to
+# show: control characters become '?', so a crafted argv cannot drive the
+# terminal. Print the result with printf '%s', never msg, whose echo -e
+# would turn a literal \e in it into an escape sequence.
+printable()
+{
+  printf '%s' "${1//[[:cntrl:]]/?}"
+}
+
 main()
 {
   if ! command -v ioreg > /dev/null 2>&1; then
@@ -64,9 +73,9 @@ main()
   cmd="$(ps -p "$pid" -o command= 2> /dev/null || true)"
 
   msg_warn "Secure input IS held — this can block Karabiner/Hammerspoon key handling."
-  msg "Holder : ${name} (PID ${pid})"
+  printf '%s Holder : %s (PID %s)\n' "$(__log_marker)" "$(printable "$name")" "$pid"
   if [ -n "$cmd" ]; then
-    msg "Command: ${cmd}"
+    printf '%s Command: %s\n' "$(__log_marker)" "$(printable "$cmd")"
   fi
   msg "Release: quit or refocus that app; a full logout clears a stuck claim."
   exit 1

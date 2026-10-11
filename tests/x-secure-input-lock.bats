@@ -43,3 +43,26 @@ parse()
   parse '"kCGSSessionSecureInputPID"=0 ... "kCGSSessionSecureInputPID"=777'
   [ "$output" = "777" ]
 }
+
+# printable() renders process-supplied text; a crafted argv must not reach
+# the terminal as a control sequence.
+show()
+{
+  run bash -c "source '$SCRIPT' >/dev/null 2>&1 || true; printable \"\$1\"" _ "$1"
+}
+
+@test "printable replaces control characters" {
+  show $'evil\033]0;pwned\007 --flag'
+  [ "$status" -eq 0 ]
+  [ "$output" = 'evil?]0;pwned? --flag' ]
+}
+
+@test "printable keeps a literal backslash escape as text" {
+  show 'app \e[31mred'
+  [ "$output" = 'app \e[31mred' ]
+}
+
+@test "printable leaves an ordinary command line unchanged" {
+  show '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --type=renderer'
+  [ "$output" = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --type=renderer' ]
+}
