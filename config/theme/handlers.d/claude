@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# handlers.d/claude — make Claude Code follow the orchestrator's mode.
+# A running session does not re-apply `theme` from settings.json, but it
+# does watch its themes dir and reloads a custom theme when the file
+# changes. So `theme` is pinned once to custom:dotfiles, and each flip
+# rewrites themes/dotfiles.json with `base` set to the mode (the value
+# comes from theme-mode, which reads the mode file apply writes before it
+# forks any handler). A themes dir created after a session started needs
+# that session restarted once. No palette: the theme is one word per mode.
+set -uo pipefail
+
+# shellcheck disable=SC1091
+source "$(dirname -- "$0")/../_lib.sh"
+
+mode="${1:-}"
+[[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
+
+dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+settings="$dir/settings.json"
+theme_file="$dir/themes/dotfiles.json"
+slug="custom:dotfiles"
+
+# A host without Claude Code has nothing to theme: skip, not fail, so
+# apply does not retry it forever.
+[[ -f "$settings" ]] || {
+  echo "claude handler: no $settings; skipping" >&2
+  exit 0
+}
+
+theme="$("${DOTFILES:-$HOME/.dotfiles}/local/bin/theme-mode")"
+[[ "$theme" = "dark" || "$theme" = "light" ]] || {
+  echo "claude handler: theme-mode printed '$theme'" >&2
+  exit 1
+}
+
+content="{\"name\": \"Dotfiles\", \"base\": \"$theme\"}"
+if [[ "$(cat -- "$theme_file" 2> /dev/null)" != "$content" ]]; then
+  _atomic_write "$theme_file" "$content" || {
+    echo "claude handler: cannot write $theme_file" >&2
+    exit 1
+  }
+fi
+
+# Selecting the theme edits settings.json, which needs jq and must never
+# replace a symlink with a regular file; either case leaves the theme
+# file written and the selection to /theme.
+command -v jq > /dev/null 2>&1 || {
+  echo "claude handler: jq not in PATH; select $slug with /theme" >&2
+  exit 0
+}
+[[ ! -L "$settings" ]] || {
+  echo "claude handler: $settings is a symlink; select $slug with /theme" >&2
+  exit 0
+}
+
+current="$(jq -r '.theme // empty' "$settings")" || {
+  echo "claude handler: cannot parse $settings" >&2
+  exit 1
+}
+[[ "$current" != "$slug" ]] || exit 0
+
+# Temp file beside the target, so mv is a same-filesystem rename and a
+# reader sees the old file or the new one, never a partial write.
+tmp="$(mktemp "$settings.XXXXXX")" || {
+  echo "claude handler: cannot create a temp file beside $settings" >&2
+  exit 1
+}
+if jq --arg t "$slug" '.theme = $t' "$settings" > "$tmp" && mv -f -- "$tmp" "$settings"; then
+  exit 0
+fi
+rm -f -- "$tmp"
+echo "claude handler: cannot write $settings" >&2
+exit 1

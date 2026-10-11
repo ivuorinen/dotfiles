@@ -1,0 +1,25 @@
+// Oasis Abyss Light 3 — derived from ../../catppuccin/light/gitui.ron by the
+// colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+(
+    selected_tab: Some("Reset"),
+    command_fg: Some("#181811"),
+    selection_bg: Some("#97cebe"),
+    selection_fg: Some("#181811"),
+    cmdbar_bg: Some("#d4d4d4"),
+    cmdbar_extra_lines_bg: Some("#d4d4d4"),
+    disabled_fg: Some("#7c7a74"),
+    diff_line_add: Some("#31572e"),
+    diff_line_delete: Some("#9e1010"),
+    diff_file_added: Some("#31572e"),
+    diff_file_removed: Some("#870f13"),
+    diff_file_moved: Some("#691fbe"),
+    diff_file_modified: Some("#744211"),
+    commit_hash: Some("#5049c1"),
+    commit_time: Some("#3d4047"),
+    commit_author: Some("#750202"),
+    danger_fg: Some("#9e1010"),
+    push_gauge_bg: Some("#11508d"),
+    push_gauge_fg: Some("#d8d8d8"),
+    tag_fg: Some("#5b3b28"),
+    branch_fg: Some("#2f564a")
+)

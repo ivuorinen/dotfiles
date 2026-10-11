@@ -29,8 +29,8 @@ setup()
 @test "install --links: applies the host overlay without shell steps" {
   run -0 bash "$BASE/install" --links
   run -0 cat "$LOG"
-  [[ "${lines[0]}" == *"-c dotbot-links.yaml"* ]]
-  [[ "${lines[1]}" == *"-c $BASE/hosts/testhost/install.conf.yaml --except shell"* ]]
+  [[ "${lines[0]}" == *"-c tools/dotbot-defaults.yaml dotbot-links.yaml"* ]]
+  [[ "${lines[1]}" == *"-c tools/dotbot-defaults.yaml $BASE/hosts/testhost/install.conf.yaml --except shell"* ]]
   [[ "${lines[1]}" != *"snap"* ]]
   [ "${#lines[@]}" -eq 2 ]
 }
@@ -38,9 +38,18 @@ setup()
 @test "install: full run applies the host overlay with every directive" {
   run -0 bash "$BASE/install"
   run -0 cat "$LOG"
-  [[ "${lines[0]}" == *"-c install.conf.yaml"* ]]
-  [[ "${lines[1]}" == *"-c $BASE/hosts/testhost/install.conf.yaml"* ]]
+  [[ "${lines[0]}" == *"-c tools/dotbot-defaults.yaml dotbot-links.yaml install.conf.yaml"* ]]
+  [[ "${lines[1]}" == *"-c tools/dotbot-defaults.yaml $BASE/hosts/testhost/install.conf.yaml"* ]]
   [[ "${lines[1]}" != *"--except"* ]]
+}
+
+@test "install: never loads a plugin directory" {
+  # dotbot runs several -c files in order; the include plugin that used to
+  # chain them broke on dotbot 1.24 and is gone.
+  run -0 bash "$BASE/install"
+  run -0 bash "$BASE/install" --links
+  run -0 cat "$LOG"
+  [[ "$output" != *"--plugin"* ]]
 }
 
 @test "install --links: a host without an overlay runs only the link config" {

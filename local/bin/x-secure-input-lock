@@ -46,29 +46,38 @@ holder_name()
   fi
 }
 
+# Process-supplied text (the holder's name or command line) made safe to
+# show: control characters become '?', so a crafted argv cannot drive the
+# terminal. Print the result with printf '%s', never msg, whose echo -e
+# would turn a literal \e in it into an escape sequence.
+printable()
+{
+  printf '%s' "${1//[[:cntrl:]]/?}"
+}
+
 main()
 {
   if ! command -v ioreg > /dev/null 2>&1; then
-    msgr err "ioreg not found — this tool only works on macOS."
+    msg_err "ioreg not found — this tool only works on macOS."
     exit 2
   fi
 
   pid="$(ioreg -l -w 0 2> /dev/null | secure_input_pid || true)"
 
   if [ -z "$pid" ]; then
-    msgr yay "Secure input is NOT held. Keyboard remappers should work."
+    msg_yay "Secure input is NOT held. Keyboard remappers should work."
     exit 0
   fi
 
   name="$(holder_name "$pid")"
   cmd="$(ps -p "$pid" -o command= 2> /dev/null || true)"
 
-  msgr warn "Secure input IS held — this can block Karabiner/Hammerspoon key handling."
-  msgr msg "Holder : ${name} (PID ${pid})"
+  msg_warn "Secure input IS held — this can block Karabiner/Hammerspoon key handling."
+  printf '%s Holder : %s (PID %s)\n' "$(__log_marker)" "$(printable "$name")" "$pid"
   if [ -n "$cmd" ]; then
-    msgr msg "Command: ${cmd}"
+    printf '%s Command: %s\n' "$(__log_marker)" "$(printable "$cmd")"
   fi
-  msgr msg "Release: quit or refocus that app; a full logout clears a stuck claim."
+  msg "Release: quit or refocus that app; a full logout clears a stuck claim."
   exit 1
 }
 

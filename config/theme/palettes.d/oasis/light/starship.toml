@@ -1,0 +1,229 @@
+# Oasis Abyss Light 3 — derived from ../../catppuccin/light/starship.toml by the
+# colour-role map below.
+# Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
+# theme), Oasis Abyss Light 3 (light).
+#
+# Mirror of dark/starship.toml with the palette swapped. The dark/light
+# variants are kept as separate complete files so the theme orchestrator
+# (config/theme/handlers.d/starship)
+# can switch them via a symlink at ~/.config/starship.toml. Starship reads
+# its config on every prompt subprocess invocation, so the swap takes
+# effect on the next prompt with no shell-side reload.
+#
+# MAINTAINER NOTE: any non-palette change made here MUST also be applied
+# to dark/starship.toml. The two files are intentionally identical except
+# for `palette = "..."` and the [palettes.*] block.
+#
+# Layout: line 1 = OS icon · user@host (SSH only) · path
+#                 · git · node · dotnet · go · php · ruby · python
+#         line 2 = ➜ (green on success, red on non-zero exit)
+# Transient prompt collapses prior prompts to just `➜ ` (wired by
+# `enable_transience` in config/fish/config.fish and base/zshrc).
+#
+# Username is peach, hostname is lavender (your "differentiated colours"
+# request); both still hidden outside SSH per starship defaults.
+#
+# Palette source: https://github.com/uhs-robert/oasis.nvim (Oasis Abyss Light 3),
+# extras/lua-theme/themes/light/3/oasis_abyss.lua at upstream a3ef178f.
+#
+# Two upstream keys miss WCAG AA 4.5:1 on #d8d8d8 and are darkened in
+# HSL lightness only: theme_accent #31732b -> #2e6b28 (4.07 -> 4.53)
+# and syntax_comment #625f54 -> #615e54 (4.49 -> 4.55).
+# Each Catppuccin role takes one Oasis key, in every Oasis palette
+# and in vim, fish, television and COSMIC (nvim and bat take the two
+# darkened values; wezterm uses upstream's own colours);
+# tests/theme-contrast.bats recomputes the ratios. Role, key, light value:
+#   rosewater syntax_func          #5b3b28
+#   flamingo  syntax_regex         #ba141a
+#   pink      theme_accent         #2e6b28
+#   mauve     magenta              #691fbe
+#   red       red                  #9e1010
+#   maroon    syntax_string        #870f13
+#   peach     bright_yellow        #744211
+#   yellow    yellow               #554f1c
+#   green     green                #31572e
+#   teal      bright_cyan          #2f564a
+#   sky       bright_blue          #1e546a
+#   sapphire  theme_primary        #750202
+#   blue      blue                 #11508d
+#   lavender  syntax_builtin_const #5049c1
+#   text      fg_core              #181811
+#   subtext1  syntax_bracket       #3d4047
+#   subtext0  syntax_comment       #615e54
+#   overlay2  fg_inlay             #647276
+#   overlay1  fg_dim               #7c7a74
+#   overlay0  fg_muted             #615f57
+#   surface2  hint_bg              #97cebe
+#   surface1  bg_surface           #b9b9b9
+#   surface0  bg_mantle            #cdcdcd
+#   base      bg_core              #d8d8d8
+#   mantle    bg_crust             #d4d4d4
+#   crust     bg_shadow            #d0d0d0
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+command_timeout = 2000
+
+format = """
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$dotnet\
+$golang\
+$php\
+$ruby\
+$python\
+$line_break\
+$character"""
+
+palette = "oasis_abyss_light_3"
+
+[palettes.oasis_abyss_light_3]
+rosewater = "#5b3b28"
+flamingo = "#ba141a"
+pink = "#2e6b28"
+mauve = "#691fbe"
+red = "#9e1010"
+maroon = "#870f13"
+peach = "#744211"
+yellow = "#554f1c"
+green = "#31572e"
+teal = "#2f564a"
+sky = "#1e546a"
+sapphire = "#750202"
+blue = "#11508d"
+lavender = "#5049c1"
+text = "#181811"
+subtext1 = "#3d4047"
+subtext0 = "#615e54"
+overlay2 = "#647276"
+overlay1 = "#7c7a74"
+overlay0 = "#615f57"
+surface2 = "#97cebe"
+surface1 = "#b9b9b9"
+surface0 = "#cdcdcd"
+base = "#d8d8d8"
+mantle = "#d4d4d4"
+crust = "#d0d0d0"
+
+[os]
+disabled = false
+style = "sky"
+format = "[$symbol]($style) "
+
+# Nerd Font glyphs via \uXXXX escapes — the Write/Edit pipeline strips
+# bare BMP Private-Use-Area characters (U+E000-U+F8FF), so the literal
+# glyphs would arrive as empty strings. Escapes survive verbatim and the
+# TOML parser converts them at load time.
+[os.symbols]
+Macos = "\uF179"
+Linux = "\uF17C"
+Ubuntu = "\uF31B"
+Debian = "\uF306"
+Fedora = "\uF30A"
+Arch = "\uF303"
+Windows = "\uF17A"
+Alpine = "\uF300"
+NixOS = "\uF313"
+Raspbian = "\uF315"
+Manjaro = "\uF312"
+Pop = "\uF32A"
+
+# Username — only shown over SSH (or as root) per starship defaults.
+# Differentiated from hostname via peach. The "@" separator lives in
+# the hostname format below so it only appears when hostname renders
+# (avoids a dangling "root@" when running as root locally without SSH).
+[username]
+style_user = "peach"
+style_root = "red bold"
+format = "[$user]($style)"
+
+# Hostname — SSH-only by default; lavender so it contrasts with peach user.
+# trim_at = "." matches tide_context_hostname_parts = 1 (drop domain).
+# The "@" separator is part of this format (subtext0) so it only renders
+# when hostname renders.
+[hostname]
+ssh_only = true
+trim_at = "."
+style = "lavender"
+format = "[@](subtext0)[$hostname]($style) "
+
+# Path — sky (Catppuccin's cyan) matches omp's cyan path colour.
+[directory]
+style = "sky"
+truncation_length = 3
+truncation_symbol = "…/"
+format = "[$path]($style)[$read_only]($read_only_style) "
+read_only = " "
+read_only_style = "red"
+fish_style_pwd_dir_length = 1
+
+# Git — lightGreen in omp = green here; branch and status share the colour.
+[git_branch]
+symbol = "\uE725 "
+style = "green"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "green"
+format = "[$all_status$ahead_behind]($style) "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇡${ahead_count}⇣${behind_count} "
+conflicted = "=${count}"
+deleted = "✘${count}"
+modified = "!${count}"
+renamed = "»${count}"
+staged = "+${count}"
+stashed = "≡${count}"
+untracked = "?${count}"
+up_to_date = ""
+
+[git_state]
+style = "yellow"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+# Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
+
+[nodejs]
+symbol = "\uE718 "
+style = "green"
+version_format = "${major}.${minor}"
+format = "[$symbol$version]($style) "
+
+[dotnet]
+symbol = "\uE77F "
+style = "mauve"
+version_format = "${major}"
+format = "[$symbol$version]($style) "
+
+[golang]
+symbol = "\uE626 "
+style = "teal"
+version_format = "${major}.${minor}.${patch}"
+format = "[$symbol$version]($style) "
+
+[php]
+symbol = "\uE73D "
+style = "lavender"
+format = "[$symbol$version]($style) "
+
+[ruby]
+symbol = "\uE739 "
+style = "red"
+format = "[$symbol$version]($style) "
+
+[python]
+symbol = "\uE73C "
+style = "yellow"
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+# Status arrow on its own line. Green on success, red on non-zero exit.
+[character]
+success_symbol = "[➜](green)"
+error_symbol = "[➜](red)"
+vimcmd_symbol = "[❮](green)"

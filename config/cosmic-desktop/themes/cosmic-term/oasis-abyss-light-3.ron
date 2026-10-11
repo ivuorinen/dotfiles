@@ -1,0 +1,39 @@
+(
+  name: "Oasis Abyss Light 3",
+  foreground: "#181811",
+  cursor: "#5b3b28",
+  bright_foreground: "#181811",
+  dim_foreground: "#615f57",
+  normal: (
+    black: "#3d4047",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    // ANSI white takes upstream's terminal ink, as wezterm does: the
+    // role-mapped surface shades were unreadable on #d8d8d8.
+    white: "#3a3a1b"
+  ),
+  bright: (
+    black: "#615e54",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    white: "#3a3a0c"
+  ),
+  dim: (
+    black: "#3d4047",
+    red: "#9e1010",
+    green: "#31572e",
+    yellow: "#554f1c",
+    blue: "#11508d",
+    magenta: "#2e6b28",
+    cyan: "#2f564a",
+    white: "#3a3a1b"
+  ),
+)

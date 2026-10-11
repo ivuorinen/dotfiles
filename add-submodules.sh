@@ -2,11 +2,9 @@
 
 git submodule sync --recursive
 
-# dotbot and plugins
+# dotbot
 git submodule add --name dotbot \
   -f https://github.com/anishathalye/dotbot.git tools/dotbot
-git submodule add --name dotbot-include \
-  -f https://gitlab.com/gnfzdz/dotbot-include.git tools/dotbot-include
 
 # other repos
 git submodule add --name cheat-community \
@@ -99,6 +97,7 @@ old_submodules=(
   "tmux/tmux-current-pane-hostname:config/tmux/plugins/tmux-current-pane-hostname"
   "tmux/tmux-dark-notify:config/tmux/plugins/tmux-dark-notify"
   "tmux/catppuccin:config/tmux/plugins/catppuccin"
+  "dotbot-include:tools/dotbot-include"
 )
 
 for entry in "${old_submodules[@]}"; do

@@ -130,7 +130,7 @@ Run `mise install` after adding new tools to the config.
 
 ### Git Submodules
 
-External dependencies (Dotbot, dotbot-include, antidote, cheat cheatsheets)
+External dependencies (Dotbot, antidote, cheat cheatsheets)
 are git submodules. All set to `ignore = dirty`. Updated automatically via
 the `update-submodules.yml` GitHub Actions workflow.
 

@@ -3,6 +3,9 @@ set -e
 
 CONFIG="install.conf.yaml"
 LINKS_CONFIG="dotbot-links.yaml"
+# dotbot runs several -c files in order as one task list, so the defaults
+# file goes first and its `defaults` reach every later file's directives.
+DEFAULTS_CONFIG="tools/dotbot-defaults.yaml"
 DOTBOT_DIR="tools/dotbot"
 
 DOTBOT_BIN="bin/dotbot"
@@ -63,8 +66,7 @@ run_host_config()
   echo "(!) Found ${host_config}"
   "${DOTBOT_BIN_PATH}" \
     -d "${BASEDIR}" \
-    --plugin-dir=tools/dotbot-include \
-    -c "${host_config}" \
+    -c "${DEFAULTS_CONFIG}" "${host_config}" \
     "$@" \
     "${DOTBOT_ARGS[@]}"
 }
@@ -87,8 +89,7 @@ fi
 if [ "$LINKS_ONLY" = true ]; then
   "${DOTBOT_BIN_PATH}" \
     -d "${BASEDIR}" \
-    --plugin-dir=tools/dotbot-include \
-    -c "${LINKS_CONFIG}" \
+    -c "${DEFAULTS_CONFIG}" "${LINKS_CONFIG}" \
     "${DOTBOT_ARGS[@]}"
   run_host_config --except shell
   exit 0
@@ -98,8 +99,7 @@ run_host_hooks before
 
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
-  --plugin-dir=tools/dotbot-include \
-  -c "${CONFIG}" \
+  -c "${DEFAULTS_CONFIG}" "${LINKS_CONFIG}" "${CONFIG}" \
   "${DOTBOT_ARGS[@]}"
 
 run_host_config

@@ -4,11 +4,6 @@
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
 
-[submodule "dotbot-include"]
-	path = tools/dotbot-include
-	url = https://gitlab.com/gnfzdz/dotbot-include.git
-	ignore = dirty
-
 [submodule "cheat-community"]
 	path = config/cheat/cheatsheets/community
 	url = https://github.com/cheat/cheatsheets.git

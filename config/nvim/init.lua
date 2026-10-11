@@ -55,6 +55,7 @@ vim.pack.add {
   'https://github.com/arborist-ts/arborist.nvim',
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
+  { src = 'https://github.com/uhs-robert/oasis.nvim', name = 'oasis' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
   'https://github.com/ray-x/lsp_signature.nvim',
@@ -590,7 +591,7 @@ require('arborist').setup {
 
 -- ── Colorscheme ──────────────────────────────────────────────────────
 -- The theme family comes from config/theme/family (DOTFILES_THEME_FAMILY
--- overrides it, as in config/theme/_lib.sh). Both families follow
+-- overrides it, as in config/theme/_lib.sh). Every family follows
 -- 'background', which auto-dark-mode below flips with the OS.
 local function theme_family()
   local env = vim.env.DOTFILES_THEME_FAMILY
@@ -641,6 +642,26 @@ require('kanagawa').setup {
   },
 }
 
+-- ── Oasis ────────────────────────────────────────────────────────────
+-- https://github.com/uhs-robert/oasis.nvim
+-- Abyss for both modes; the light variant uses intensity 3 to match the
+-- palettes in config/theme/palettes.d/oasis/. Two Abyss Light 3 colours
+-- miss WCAG AA on #d8d8d8 (accent #31732b 4.07:1, comment #625f54
+-- 4.49:1); they are darkened in lightness only, as in every other Oasis
+-- light palette here.
+require('oasis').setup {
+  style = 'abyss',
+  light_intensity = 3,
+  palette_overrides = {
+    abyss = {
+      light_3 = {
+        theme = { accent = '#2e6b28' },
+        syntax = { comment = '#615e54' },
+      },
+    },
+  },
+}
+
 -- ── Catppuccin ───────────────────────────────────────────────────────
 -- https://github.com/catppuccin/nvim
 require('catppuccin').setup {
@@ -673,7 +694,8 @@ require('catppuccin').setup {
   },
 }
 
-vim.cmd.colorscheme(theme_family() == 'kanagawa' and 'kanagawa' or 'catppuccin')
+local family_schemes = { kanagawa = 'kanagawa', oasis = 'oasis' }
+vim.cmd.colorscheme(family_schemes[theme_family()] or 'catppuccin')
 
 -- ── Auto dark mode ───────────────────────────────────────────────────
 -- https://github.com/f-person/auto-dark-mode.nvim

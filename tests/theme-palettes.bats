@@ -37,9 +37,10 @@ check_complete()
   fi
 }
 
-@test "palettes: at least catppuccin and kanagawa exist" {
+@test "palettes: at least catppuccin, kanagawa and oasis exist" {
   [ -d "$PD/catppuccin" ]
   [ -d "$PD/kanagawa" ]
+  [ -d "$PD/oasis" ]
 }
 
 @test "palettes: every family ships every handler file in both modes" {

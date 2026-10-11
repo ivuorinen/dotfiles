@@ -1,0 +1,19 @@
+# Oasis Abyss Dark — derived from ../../catppuccin/dark/gh-dash.theme.yml by the
+# colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+---
+theme:
+  colors:
+    text:
+      primary: "#f5f5dc"
+      secondary: "#c695ff"
+      inverted: "#121212"
+      faint: "#a3abb8"
+      warning: "#f0e68c"
+      success: "#7fcf78"
+      error: "#ff7979"
+    background:
+      selected: "#141414"
+    border:
+      primary: "#c695ff"
+      secondary: "#1c1c1c"
+      faint: "#141414"

@@ -197,18 +197,20 @@ Core parsers always installed: `html`, `lua`, `luadoc`, `markdown`,
 
 ## UI
 
-| Plugin              | Role                                                                     |
-|---------------------|--------------------------------------------------------------------------|
-| kanagawa.nvim       | Default colorscheme (Wave dark / Lotus light, AA-darkened Lotus accents) |
-| catppuccin/nvim     | Alternate colorscheme; `auto_integrations` picks up mini.nvim            |
-| auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state      |
-| nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled              |
+| Plugin              | Role                                                                       |
+|---------------------|----------------------------------------------------------------------------|
+| oasis.nvim          | Default colorscheme (Abyss dark / Abyss light, intensity 3)                |
+| kanagawa.nvim       | Alternate colorscheme (Wave dark / Lotus light, AA-darkened Lotus accents) |
+| catppuccin/nvim     | Alternate colorscheme; `auto_integrations` picks up mini.nvim              |
+| auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state        |
+| nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled                |
 
 The colorscheme follows the theme family in `config/theme/family`
-(`kanagawa` or `catppuccin`); both switch variant with `background`.
+(`oasis`, `kanagawa` or `catppuccin`); each switches variant with `background`.
 The family is read once at startup, so restart nvim after switching it.
 
-URLs: `github.com/rebelot/kanagawa.nvim` · `github.com/catppuccin/nvim` ·
+URLs: `github.com/uhs-robert/oasis.nvim` · `github.com/rebelot/kanagawa.nvim` ·
+`github.com/catppuccin/nvim` ·
 `github.com/f-person/auto-dark-mode.nvim` · `github.com/catgoose/nvim-colorizer.lua`
 
 ## Installed Tools (mason-tool-installer)

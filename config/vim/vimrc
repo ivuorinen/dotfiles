@@ -258,6 +258,7 @@ if !has('ideavim')
   " family falls back to catppuccin rather than leaving anything unset.
   let s:schemes = {
         \ 'kanagawa': {'dark': 'kanagawa_wave', 'light': 'kanagawa_lotus'},
+        \ 'oasis': {'dark': 'oasis_abyss_dark', 'light': 'oasis_abyss_light'},
         \ 'catppuccin': {'dark': 'catppuccin_mocha', 'light': 'catppuccin_latte'},
         \ }
 

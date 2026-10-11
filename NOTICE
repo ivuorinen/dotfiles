@@ -140,13 +140,40 @@ Kanagawa theme assets -- MIT
   config/theme/palettes.d/kanagawa/, are derived from these colours and
   from upstream's lua/kanagawa/colors.lua and themes.lua.
 
+Oasis theme assets -- MIT
+  oasis.nvim: Copyright (c) 2025 Robert
+    https://github.com/uhs-robert/oasis.nvim
+    @ a3ef178fe47c69691e676a8da98ce5735c3013db
+
+    config/bat/themes/Oasis Abyss Dark.tmTheme      (extras/bat, dark)
+    config/bat/themes/Oasis Abyss Light 3.tmTheme   (extras/bat, light/3)
+    config/wezterm/wezterm.lua                      (extras/wezterm, as tables)
+
+  Local changes to the vendored files: both tmThemes are re-indented with
+  spaces instead of tabs and end with a newline. In the dark one the diff
+  foregrounds, which upstream sets to background shades, use Abyss Dark's
+  green/red/blue: #1F3A2D -> #7FCF78 (inserted), #532E2E -> #FF7979
+  (deleted), #1C1C1C -> #81C0FF (changed). In the light one the comment
+  foreground #625f54 (4.49:1 on #d8d8d8) is darkened to #615e54 for WCAG
+  AA. The wezterm tables drop upstream's tab_bar block (the tab bar is
+  disabled).
+
+  Two Abyss Light 3 keys miss WCAG AA on #d8d8d8 and are darkened in HSL
+  lightness only wherever they are used (the derived palettes, the light
+  tmTheme and nvim's palette_overrides): theme_accent #31732b -> #2e6b28
+  and syntax_comment #625f54 -> #615e54.
+
+  The Oasis palettes under config/theme/palettes.d/oasis/, oasis-aa.theme,
+  the vim, television and COSMIC themes are derived from upstream's
+  extras/lua-theme values through a Catppuccin-role map; the map is in
+  config/theme/palettes.d/oasis/light/starship.toml.
+
 
 Submodules are not vendored into this tree: each is a git submodule pinned at
 a commit, carrying its own license, and updated from upstream rather than
 edited here. The MIT license above does not cover them.
 
     tools/dotbot                        MIT   LICENSE.md
-    tools/dotbot-include                MIT   LICENSE.txt
     tools/antidote                      MIT   LICENSE
     config/cheat/cheatsheets/community  CC0-1.0  .github/LICENSE.txt
     config/cheat/cheatsheets/tldr       MIT   .github/LICENSE.md

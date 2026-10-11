@@ -9,7 +9,8 @@ because a bats file names it inside a string --
 nodes that way, none of them an edge to the code it covers.
 
 So the test suite was invisible to the graph, which
-`.claude/rules/run-tests-before-commit.md` documented as a carve-out: "the
+`.claude/rules/run-tests-before-push.md` (then `run-tests-before-commit.md`)
+documented as a carve-out: "the
 knowledge graph contains no nodes from tests/, so a graphify query returns
 nothing for a test-to-code dependency."
 

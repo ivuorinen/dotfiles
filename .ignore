@@ -5,5 +5,4 @@ config/cheat/cheatsheets/community/**
 config/vim/plugged/**
 node_modules
 tools/antidote/**
-tools/dotbot-include/**
 tools/dotbot/**

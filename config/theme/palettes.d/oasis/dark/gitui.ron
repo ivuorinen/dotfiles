@@ -1,0 +1,25 @@
+// Oasis Abyss Dark — derived from ../../catppuccin/dark/gitui.ron by the
+// colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+(
+    selected_tab: Some("Reset"),
+    command_fg: Some("#f5f5dc"),
+    selection_bg: Some("#2b4a46"),
+    selection_fg: Some("#f5f5dc"),
+    cmdbar_bg: Some("#080808"),
+    cmdbar_extra_lines_bg: Some("#080808"),
+    disabled_fg: Some("#7b786d"),
+    diff_line_add: Some("#7fcf78"),
+    diff_line_delete: Some("#ff7979"),
+    diff_file_added: Some("#7fcf78"),
+    diff_file_removed: Some("#ffa0a0"),
+    diff_file_moved: Some("#c695ff"),
+    diff_file_modified: Some("#f8b471"),
+    commit_hash: Some("#8d8de7"),
+    commit_time: Some("#a3abb8"),
+    commit_author: Some("#ff7979"),
+    danger_fg: Some("#ff7979"),
+    push_gauge_bg: Some("#81c0ff"),
+    push_gauge_fg: Some("#000000"),
+    tag_fg: Some("#e9c0a5"),
+    branch_fg: Some("#8ad3be")
+)

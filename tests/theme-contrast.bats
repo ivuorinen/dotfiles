@@ -13,6 +13,10 @@
 # every Wave colour 4.5:1 on #1f1f28. The muted comment/overlay greys are a
 # deliberate exception held to 3:1, below WCAG 1.4.3's 4.5:1 for text. The
 # mapping lives in config/theme/palettes.d/kanagawa/light/starship.toml.
+#
+# Oasis: computed the same way, Abyss Light 3 on #d8d8d8 and Abyss Dark on
+# #000000. Upstream targets AA already; the checks keep a refresh honest.
+# The role map lives in config/theme/palettes.d/oasis/light/starship.toml.
 
 setup()
 {
@@ -130,6 +134,15 @@ PY
   grep -q 'kanagawa/light/tmux.thm.conf' "$ROOT/$KP/light/tmux.conf"
   grep -q 'kanagawa/dark/tmux.thm.conf' "$ROOT/$KP/dark/tmux.conf"
   grep -q "'kanagawa_lotus'" "$ROOT/config/vim/vimrc"
+  # Oasis: upstream's dark diff foregrounds are background shades; the
+  # "changed" one equals surface1, which the computed check treats as a
+  # fill, so pin the replacement here.
+  grep -A8 '<string>Diff changed</string>' "$ROOT/config/bat/themes/Oasis Abyss Dark.tmTheme" | grep -q '#81C0FF'
+  grep -q "'oasis_abyss_light'" "$ROOT/config/vim/vimrc"
+  # nvim takes its colours from the plugin, not these files, so the two
+  # Abyss Light 3 values darkened for AA are pinned in its overrides.
+  grep -q "accent = '#2e6b28'" "$ROOT/config/nvim/init.lua"
+  grep -q "comment = '#615e54'" "$ROOT/config/nvim/init.lua"
   # The fish theme name is resolved per family, never hardcoded.
   grep -q '__dotfiles_theme_name' "$ROOT/config/fish/conf.d/theme-switch.fish"
   grep -q '__dotfiles_theme_name' "$ROOT/config/fish/config.fish"
@@ -165,7 +178,7 @@ LOTUS_MUTED='#88877e #716e61 #766b90'
     "config/bat/themes/Kanagawa Lotus AA.tmTheme"
     "config/television/themes/kanagawa-lotus-aa.toml"
     "config/cosmic-desktop/themes/cosmic-term/kanagawa-lotus-aa.ron"
-    "config/wezterm/wezterm.lua@local kanagawa_lotus_aa = {@config.color_schemes"
+    "config/wezterm/wezterm.lua@local kanagawa_lotus_aa = {@"$'\n}\n'
     "config/nvim/init.lua@lotusGray3@autumnRed"
   )
   run check_contrast '#f2ecbc' 4.5 "$LOTUS_MUTED" "$LOTUS_BG" "${targets[@]}"
@@ -224,4 +237,87 @@ WAVE_MUTED='#727169 #717c7c'
   ROOT="$BATS_TEST_TMPDIR" run check_contrast '#1f1f28' 4.5 "$WAVE_MUTED" "$WAVE_BG" "p/planted.vim"
   [ "$status" -eq 1 ]
   [[ "$output" == *"#e82424 is 3.66:1"* ]]
+}
+
+# Abyss Light 3 fills: surfaces, the selection/search fills (#e1c99d),
+# the tmTheme findHighlight fill (#b9d17a, drawn under #d8d8d8 text) and
+# yazi's gauge label #ffffff.
+OASIS_LIGHT_BG='#d4d4d4 #d0d0d0 #cdcdcd #b9b9b9 #97cebe #e1c99d #b9d17a #ffffff'
+# Abyss Light 3 overlays (fg_inlay, fg_dim, fg_muted): muted, 3:1.
+OASIS_LIGHT_MUTED='#647276 #7c7a74 #615f57'
+
+# oasis_palette_targets <mode> — the family's palettes.d files for one mode
+# (bat.theme holds a name, not colours; starship's header quotes the map).
+oasis_palette_targets()
+{
+  local f
+  targets=()
+  for f in "$ROOT/config/theme/palettes.d/oasis/$1"/*; do
+    [[ "$(basename "$f")" == bat.theme ]] && continue
+    if [[ "$(basename "$f")" == starship.toml ]]; then
+      targets+=("config/theme/palettes.d/oasis/$1/starship.toml@palette = @[os]")
+      continue
+    fi
+    targets+=("${f#"$ROOT/"}")
+  done
+}
+
+@test "oasis abyss light: every non-muted foreground reaches WCAG AA on #d8d8d8" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local targets=()
+  oasis_palette_targets light
+  targets+=(
+    "config/fish/themes/oasis-aa.theme@"$'\n'"[light]"$'\n'"@"$'\n'"[dark]"$'\n'
+    "config/vim/colors/oasis_abyss_light.vim"
+    "config/vim/autoload/airline/themes/oasis_abyss_light.vim"
+    "config/bat/themes/Oasis Abyss Light 3.tmTheme"
+    "config/television/themes/oasis-abyss-light-3.toml"
+    "config/cosmic-desktop/themes/cosmic-term/oasis-abyss-light-3.ron"
+    "config/wezterm/wezterm.lua@local oasis_abyss_light_3 = {@"$'\n}\n'
+  )
+  run check_contrast '#d8d8d8' 4.5 "$OASIS_LIGHT_MUTED" "$OASIS_LIGHT_BG" "${targets[@]}"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "oasis abyss light: the contrast check catches upstream's accent ink" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  printf "accent = '#31732b'\n" > "$BATS_TEST_TMPDIR/p/planted.lua"
+  ROOT="$BATS_TEST_TMPDIR" run check_contrast '#d8d8d8' 4.5 "$OASIS_LIGHT_MUTED" "$OASIS_LIGHT_BG" "p/planted.lua"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"#31732b is 4.07:1"* ]]
+}
+
+# Abyss Dark fills: surfaces, the hint_bg surface2, the wezterm selection
+# fill #666666 and the tmTheme selection fill #532e2e (ui_visual_bg).
+OASIS_DARK_BG='#080808 #121212 #141414 #1c1c1c #2b4a46 #666666 #532e2e'
+# Abyss Dark overlays (fg_inlay, fg_dim, fg_muted): muted, 3:1.
+OASIS_DARK_MUTED='#607d85 #7b786d #605c4d'
+
+@test "oasis abyss dark: every non-muted foreground reaches WCAG AA on #000000" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local targets=()
+  oasis_palette_targets dark
+  targets+=(
+    "config/fish/themes/oasis-aa.theme@"$'\n'"[dark]"$'\n'"@"$'\n'"[unknown]"$'\n'
+    "config/vim/colors/oasis_abyss_dark.vim"
+    "config/vim/autoload/airline/themes/oasis_abyss_dark.vim"
+    "config/bat/themes/Oasis Abyss Dark.tmTheme"
+    "config/television/themes/oasis-abyss-dark.toml"
+    "config/cosmic-desktop/themes/cosmic-term/oasis-abyss-dark.ron"
+    "config/wezterm/wezterm.lua@local oasis_abyss_dark = {@"$'\n}\n'
+  )
+  run check_contrast '#000000' 4.5 "$OASIS_DARK_MUTED" "$OASIS_DARK_BG" "${targets[@]}"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "oasis abyss dark: the contrast check catches upstream's diff ink" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  printf '<string>#1F3A2D</string>\n' > "$BATS_TEST_TMPDIR/p/planted.tmTheme"
+  ROOT="$BATS_TEST_TMPDIR" run check_contrast '#000000' 4.5 "$OASIS_DARK_MUTED" "$OASIS_DARK_BG" "p/planted.tmTheme"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"#1f3a2d is 1.70:1"* ]]
 }

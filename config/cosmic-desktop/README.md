@@ -34,3 +34,18 @@ Lotus AA accents are darkened to WCAG AA 4.5:1 on `#f2ecbc`
 (`tests/theme-contrast.bats` checks them). Regenerate them from the
 Catppuccin sources with the same map rather than hand-editing, so the
 two stay structurally identical.
+
+## Oasis (repo-derived)
+
+Upstream [oasis.nvim](https://github.com/uhs-robert/oasis.nvim) ships no
+COSMIC themes either. These are derived the same way, from the same
+Catppuccin sources, through the colour-role map in
+`config/theme/palettes.d/oasis/light/starship.toml` (Abyss Dark /
+Abyss Light 3). The accent is Oasis's `theme_primary`, not blue.
+
+- `themes/cosmic-term/oasis-abyss-dark.ron`, `oasis-abyss-light-3.ron`
+- `themes/cosmic-settings/oasis-abyss-dark+round.ron`,
+  `oasis-abyss-light-3+round.ron`
+
+`tests/theme-contrast.bats` checks the cosmic-term foregrounds against
+the Oasis backgrounds.

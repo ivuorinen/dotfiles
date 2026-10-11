@@ -62,7 +62,6 @@ decide()
 
 @test "pre-edit-block: blocks files inside git submodules" {
   run -2 decide "$REPO/tools/dotbot/src/dotbot/cli.py"
-  run -2 decide "$REPO/tools/dotbot-include/plugin.py"
   run -2 decide "$REPO/tools/antidote/functions/antidote"
   [[ "$output" == *"submodule"* ]]
   run -2 decide "$REPO/config/cheat/cheatsheets/tldr/tldr/umask"
