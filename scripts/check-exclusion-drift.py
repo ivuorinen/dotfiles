@@ -66,9 +66,9 @@ def _yaml_list(path: Path, key: str) -> set[str]:
             in_block = True
             continue
         if in_block:
-            item = re.match(r"^\s*-\s*(.+?)\s*$", line)
-            if item:
-                out.add(normalise(item.group(1)))
+            stripped = line.strip()
+            if stripped.startswith("-") and stripped[1:].strip():
+                out.add(normalise(stripped[1:].strip()))
                 continue
             # A non-comment, non-blank line that is not a list item ends the block.
             if line.strip() and not line.lstrip().startswith("#"):
@@ -111,11 +111,18 @@ def from_megalinter() -> set[str]:
     path = REPO / ".mega-linter.yml"
     if not path.exists():
         return set()
-    text = path.read_text(encoding="utf-8")
-    block = re.search(r"^FILTER_REGEX_EXCLUDE\s*:\s*>?\s*\n((?:\s+.*\n)+)", text, re.MULTILINE)
-    if not block:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    header = re.compile(r"FILTER_REGEX_EXCLUDE\s*:\s*>?\s*")
+    start = next((i for i, line in enumerate(lines) if header.fullmatch(line)), None)
+    if start is None:
         return set()
-    joined = " ".join(block.group(1).split())
+    # The folded value is every following line that is blank or indented.
+    block = []
+    for line in lines[start + 1 :]:
+        if line and not line[0].isspace():
+            break
+        block.append(line)
+    joined = " ".join(" ".join(block).split())
     inner = re.search(r"\(([^)]*)\)", joined)
     if not inner:
         return set()

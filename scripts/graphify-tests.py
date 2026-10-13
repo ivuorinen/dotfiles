@@ -113,23 +113,29 @@ def collect(existing_ids: set[str]) -> tuple[list[dict], list[dict], list[str]]:
         targets = {node_id(m.group(1)) for m in TARGET_RE.finditer(text)}
         targets.add(node_id(f"local/bin/{path.stem}"))
 
-        matched = False
-        for target in sorted(targets):
-            if target == file_id:
-                continue
-            # graphify names a file's top-level node "<id>__entry" and only emits
-            # the bare "<id>" when another extractor happens to produce it too.
-            # Without this fallback the naming convention above silently resolved
-            # to nothing for 43 of the 71 test files -- including tests/msgr.bats,
-            # whose script is in the graph solely as local_bin_msgr__entry.
-            resolved = target if target in existing_ids else f"{target}__entry"
-            if resolved in existing_ids:
-                edges.append(_edge(file_id, resolved, "tests", rel, "L1"))
-                matched = True
-        if not matched:
+        target_edges = _target_edges(file_id, targets, existing_ids, rel)
+        edges.extend(target_edges)
+        if not target_edges:
             unresolved.append(rel)
 
     return nodes, edges, unresolved
+
+
+def _target_edges(file_id: str, targets: set[str], existing_ids: set[str], rel: str) -> list[dict]:
+    """Return a `tests` edge from file_id to each target present in the graph."""
+    edges = []
+    for target in sorted(targets):
+        if target == file_id:
+            continue
+        # graphify names a file's top-level node "<id>__entry" and only emits
+        # the bare "<id>" when another extractor happens to produce it too.
+        # Without this fallback the naming convention above silently resolved
+        # to nothing for 43 of the 71 test files -- including tests/msgr.bats,
+        # whose script is in the graph solely as local_bin_msgr__entry.
+        resolved = target if target in existing_ids else f"{target}__entry"
+        if resolved in existing_ids:
+            edges.append(_edge(file_id, resolved, "tests", rel, "L1"))
+    return edges
 
 
 def _edge(source: str, target: str, relation: str, source_file: str, loc: str) -> dict:

@@ -54,22 +54,13 @@ def lua_string(literal: str) -> str:
     return re.sub(r"\\(.)", r"\1", body)
 
 
-def return_table(source: str, name: str) -> str:
-    """Return the text of `return { ... }` inside MiniClue.gen_clues.<name>.
+def closing_brace(source: str, i: int) -> int:
+    """Return the index of the `}` matching the `{` at ``i``, or -1.
 
-    Raises ValueError when the generator or its table is missing, so a
-    renamed upstream function fails loudly instead of emitting empty labels.
+    Braces are counted outside string literals only: window keys such as
+    '<C-w>}' would otherwise close the table early and drop most entries.
     """
-    start = source.find(f"MiniClue.gen_clues.{name} = function")
-    if start < 0:
-        raise ValueError(f"MiniClue.gen_clues.{name} not found")
-    table = source.find("return {", start)
-    end = source.find("\nend", start)
-    if table < 0 or (0 <= end < table):
-        raise ValueError(f"no return table in MiniClue.gen_clues.{name}")
-    # Count braces outside string literals only: window keys such as
-    # '<C-w>}' would otherwise close the table early and drop most entries.
-    depth, quote, i = 0, "", table + len("return ")
+    depth, quote = 0, ""
     while i < len(source):
         ch = source[i]
         if quote:
@@ -84,9 +75,28 @@ def return_table(source: str, name: str) -> str:
         elif ch == "}":
             depth -= 1
             if depth == 0:
-                return source[table : i + 1]
+                return i
         i += 1
-    raise ValueError(f"unterminated return table in MiniClue.gen_clues.{name}")
+    return -1
+
+
+def return_table(source: str, name: str) -> str:
+    """Return the text of `return { ... }` inside MiniClue.gen_clues.<name>.
+
+    Raises ValueError when the generator or its table is missing, so a
+    renamed upstream function fails loudly instead of emitting empty labels.
+    """
+    start = source.find(f"MiniClue.gen_clues.{name} = function")
+    if start < 0:
+        raise ValueError(f"MiniClue.gen_clues.{name} not found")
+    table = source.find("return {", start)
+    end = source.find("\nend", start)
+    if table < 0 or (0 <= end < table):
+        raise ValueError(f"no return table in MiniClue.gen_clues.{name}")
+    close = closing_brace(source, table + len("return "))
+    if close < 0:
+        raise ValueError(f"unterminated return table in MiniClue.gen_clues.{name}")
+    return source[table : close + 1]
 
 
 def parse(source: str, name: str, prefix: str) -> dict[str, dict]:
