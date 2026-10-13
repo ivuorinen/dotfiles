@@ -1,44 +1,44 @@
 # Commands
 
 Quick reference for common workflows. Most commands are also
-discoverable via `dfm help` and the `scripts` block in `package.json`.
+discoverable via `dfm help` and the mise tasks in `.mise.toml`
+(`mise tasks` lists them).
 
 ## Setup
 
 ```bash
-yarn install   # Install dependencies (required before lint/test)
+mise install   # Install the pinned toolchain (required before lint/test)
 ```
 
 ## Linting
 
 ```bash
-yarn lint              # Runs all nine lint:* steps below, in order
-yarn lint:biome        # Biome only
-yarn lint:prettier     # Prettier (YAML) check only
-yarn lint:ec           # EditorConfig checker only
-yarn lint:md-table     # Markdown table formatting check
-yarn lint:markdownlint # markdownlint (honors .markdownlintignore)
-yarn lint:v8r          # JSON Schema validation of schema-backed configs
-yarn lint:usage        # usage lint for scripts/ and local/bin/
-yarn lint:bandit       # Python SAST (config in [tool.bandit], pyproject.toml)
-yarn lint:exclusions   # Third-party exclusion lists agree across gates (scripts/check-exclusion-drift.py)
-yarn fix               # Autofix everything (biome + prettier + md-table)
-yarn fix:md-table      # Auto-fix markdown tables
+mise run lint              # Runs all nine lint-* steps below, in order
+mise run lint-biome        # Biome only
+mise run lint-prettier     # Prettier (YAML) check only
+mise run lint-ec           # EditorConfig checker only
+mise run lint-md-table     # Markdown table formatting check
+mise run lint-markdownlint # markdownlint (honors .markdownlintignore)
+mise run lint-v8r          # JSON Schema validation of schema-backed configs
+mise run lint-usage        # usage lint for scripts/ and local/bin/
+mise run lint-bandit       # Python SAST (config in [tool.bandit], pyproject.toml)
+mise run lint-exclusions   # Third-party exclusion lists agree across gates (scripts/check-exclusion-drift.py)
+mise run fix               # Autofix everything (biome + prettier + md-table)
+mise run fix-md-table      # Auto-fix markdown tables
 ```
 
 ## Formatting
 
 ```bash
-yarn fix:biome     # Autofix with biome (JS/TS/JSON/MD)
-yarn fix:prettier  # Autofix with prettier (YAML)
-yarn format        # Format with biome
-yarn format:yaml   # Format YAML files with prettier
+mise run fix-biome     # Autofix with biome (JS/TS/JSON/MD)
+mise run fix-prettier  # Autofix with prettier (YAML); alias: format-yaml
+mise run format        # Format with biome
 ```
 
 ## Testing
 
 ```bash
-yarn test                  # Run all tests (bash test-all.sh)
+mise run test              # Run all tests (bash test-all.sh)
 scripts/bats-run.sh        # Run the suite as the hook and CI do; ends with a
                            # file:line list of every failing test
 bats tests/dfm.bats        # Run a single test file (bats from PATH, via mise)

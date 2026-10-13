@@ -1,5 +1,4 @@
 node_modules
-.yarn
 .pnp.*
 .mypy_cache
 Brewfile.lock.json

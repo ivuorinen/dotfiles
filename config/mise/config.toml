@@ -48,10 +48,10 @@ minimum_release_age_excludes = ["pypi:*"]
 # Tools are grouped by function below, not by backend. Prefixed keys
 # (npm:, dotnet:, github:, aqua:) select a specific mise backend;
 # unprefixed keys resolve through the default registry (aqua binaries).
-# npm:/dotnet: tools live here rather than in package.json so hook
-# scripts and interactive shells get them on PATH without depending on
-# yarn's node_modules/.bin shim. package.json devDependencies stay
-# reserved for build-time TypeScript tooling pinned per-project.
+# npm:/dotnet: tools live here rather than in a package.json so hook
+# scripts and interactive shells get them on PATH without depending on a
+# package manager's node_modules/.bin shim. A project's own package.json
+# devDependencies stay reserved for build-time tooling pinned per-project.
 
 # Language runtimes & build toolchains
 node = "lts"

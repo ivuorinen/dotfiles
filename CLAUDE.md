@@ -22,8 +22,8 @@ Link steps live in `dotbot-links.yaml`; a full install passes dotbot
 
 Workflow commands (lint, format, test, shell/Lua tooling, pre-commit,
 biome migration) are catalogued in `docs/commands.md`. Most are also
-exposed via `dfm <subcommand>` and the `scripts` block in
-`package.json` (run `dfm help` or `yarn run` to list).
+exposed via `dfm <subcommand>` and the mise tasks in `.mise.toml`
+(run `dfm help` or `mise tasks` to list). There is no `package.json`.
 
 ## Commit Convention
 

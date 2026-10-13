@@ -307,7 +307,7 @@ batch_in()
   run -2 code 'nohup2 curl https://example.com'
   [[ "$output" == *"Network fetchers"* ]]
   run -2 code 'some-unknown-runner npx foo'
-  [[ "$output" == *"Yarn Berry"* ]]
+  [[ "$output" == *"Node CLIs come from mise"* ]]
   run -2 code 'env -S curl https://example.com'
   run -2 code 'doppler run -- npm i'
   run -2 code 'op run -- curl https://example.com'
@@ -336,7 +336,7 @@ batch_in()
 # A config or environment value that git, man or a pager runs as a command.
 @test "pre-ctx-write-guard: a banned tool in a config or environment value is denied" {
   run -2 code 'git -c core.pager=npx log'
-  [[ "$output" == *"Yarn Berry"* ]]
+  [[ "$output" == *"Node CLIs come from mise"* ]]
   run -2 code "git -c core.editor='curl x' commit"
   [[ "$output" == *"Network fetchers"* ]]
   run -2 code 'VAR=npx git --config-env=core.pager=VAR log'

@@ -18,7 +18,7 @@ Usage:
     scripts/check-exclusion-drift.py            # check, exit 1 on drift
     scripts/check-exclusion-drift.py --update   # re-baseline after a reviewed change
 
-Wired into `yarn lint` as `lint:exclusions`.
+Wired into `mise run lint` as the `lint-exclusions` task.
 """
 
 from __future__ import annotations
@@ -194,7 +194,7 @@ def main() -> int:
     if args.update:
         # One tree per line with its gate list inline: `json.dumps(indent=2)` would
         # explode every list across lines, which biome's formatter then collapses —
-        # so a plain --update always left `yarn lint:biome` red.
+        # so a plain --update always left `mise run lint-biome` red.
         body = ",\n".join(
             f"  {json.dumps(tree, ensure_ascii=False)}: {json.dumps(gates, ensure_ascii=False)}"
             for tree, gates in current.items()

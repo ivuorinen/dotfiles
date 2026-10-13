@@ -137,7 +137,7 @@ emit_section "Fish" fish ${fishonly[@]+"${fishonly[@]}"}
 
 printf 'Total aliases: %d\n' "$total" >> "$OUTPUT_FILE"
 
-# Align table columns so the output satisfies markdown-table-formatter (lint:md-table).
+# Align table columns so the output satisfies markdown-table-formatter (mise run lint-md-table).
 if command -v markdown-table-formatter > /dev/null; then
   markdown-table-formatter "$OUTPUT_FILE"
 fi

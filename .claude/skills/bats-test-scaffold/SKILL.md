@@ -86,5 +86,5 @@ After scaffolding, the user should:
 
 1. Replace the placeholder `@test` blocks with real behaviour
     assertions.
-2. Run `yarn test` to confirm the new file is discovered and runs.
+2. Run `mise run test` to confirm the new file is discovered and runs.
 3. Commit the scaffold + behaviour tests together.

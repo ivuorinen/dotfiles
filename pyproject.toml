@@ -19,7 +19,7 @@ quote-style = "double"
 
 # Bandit reads this file only when invoked as `bandit -c pyproject.toml`
 # (it never auto-discovers pyproject.toml), and parsing TOML needs the
-# `bandit[toml]` extra. `yarn lint:bandit` passes both.
+# `bandit[toml]` extra. `mise run lint-bandit` passes both.
 [tool.bandit]
 # Third-party trees, mirroring tool.ruff's extend-exclude above. The extra
 # entries are the vendored fish helpers and vim-plug's plugin checkout: they
@@ -28,14 +28,13 @@ quote-style = "double"
 # against the scanned path, so naming the directory covers everything under it.
 #
 # config/vim/plugged is gitignored, so it exists only on machines where vim-plug
-# has run — CI never sees it, but a local `yarn lint:bandit` otherwise scans
+# has run — CI never sees it, but a local `mise run lint-bandit` otherwise scans
 # ~62k lines of jedi/parso/vint and fails. .prettierignore excludes it already.
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
   "./.claude/skills/graphify",
   "./node_modules",
-  "./.yarn",
   "./graphify-out",
   "./config/vim/plugged",
   "./config/fish/functions/__bass.py",

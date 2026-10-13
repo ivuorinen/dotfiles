@@ -72,8 +72,10 @@ decision()
 }
 
 @test "pre-bash-route: quality gates are denied" {
-  [ "$(decision 'yarn lint')" = "deny" ]
-  [ "$(decision 'yarn test')" = "deny" ]
+  [ "$(decision 'mise run lint')" = "deny" ]
+  [ "$(decision 'mise run test')" = "deny" ]
+  [ "$(decision 'mise r lint-ec')" = "deny" ]
+  [ "$(decision 'mise tasks run fix')" = "deny" ]
   [ "$(decision 'pre-commit run --all-files')" = "deny" ]
   # prek is the runner actually installed; denying only the old name left the
   # real command unrouted.
@@ -83,8 +85,9 @@ decision()
 }
 
 @test "pre-bash-route: package installs and in-place formatters are allowed" {
-  [ "$(decision 'yarn install')" = "allow" ]
   [ "$(decision 'mise install')" = "allow" ]
+  # `mise run` is denied above; the other mise subcommands are not gates.
+  [ "$(decision 'mise trust')" = "allow" ]
   [ "$(decision 'shfmt -w local/bin/dfm')" = "allow" ]
   [ "$(decision 'fish_indent --write config/fish/config.fish')" = "allow" ]
 }

@@ -1,12 +1,12 @@
 #!/usr/bin/env bats
 #
 # Coverage for .claude/hooks/stop-lint-gate.sh — the Stop hook that runs
-# `yarn lint` before a turn may finish, and returns exit 2 to push failures
-# back into the conversation.
+# `mise run lint` before a turn may finish, and returns exit 2 to push
+# failures back into the conversation.
 #
-# yarn, mise and corepack are all stubbed. Running the real chain here would
-# take minutes and would test yarn rather than the gate, and the branches
-# worth pinning are the failure paths: a gate that exits 0 on a broken lint is
+# mise is stubbed. Running the real chain here would take minutes and would
+# test the linters rather than the gate, and the branches worth pinning are
+# the failure paths: a gate that exits 0 on a broken lint is
 # indistinguishable from a passing one until something ships.
 
 bats_require_minimum_version 1.5.0
@@ -24,23 +24,19 @@ teardown()
   rm -rf "$WORK"
 }
 
-# Build a yarn stub whose `lint` prints $1 and exits $2. `install` always
-# succeeds unless install_rc is set. PATH holds only the stub dir, so the
-# hook's mise and corepack probes both miss and it falls through to plain
-# `yarn` — the path a CI box without mise would take.
-stub_yarn()
+# Build a mise stub whose `run lint` prints $1 and exits $2.
+stub_mise()
 {
-  local lint_output="$1" lint_rc="$2" install_rc="${3:-0}"
-  cat > "$WORK/bin/yarn" << EOF
+  local lint_output="$1" lint_rc="$2"
+  cat > "$WORK/bin/mise" << EOF
 #!/usr/bin/env bash
-case "\$1" in
-  --version) echo "4.17.1" ;;
-  install) exit $install_rc ;;
-  lint) printf '%s\n' "$lint_output"; exit $lint_rc ;;
-  *) exit 0 ;;
-esac
+if [[ "\$1 \$2" == "run lint" ]]; then
+  printf '%s\n' "$lint_output"
+  exit $lint_rc
+fi
+exit 0
 EOF
-  chmod +x "$WORK/bin/yarn"
+  chmod +x "$WORK/bin/mise"
 }
 
 gate()
@@ -50,14 +46,14 @@ gate()
 }
 
 @test "stop-lint-gate: passes a clean lint" {
-  stub_yarn "No issues found." 0
+  stub_mise "No issues found." 0
   run -0 gate
 }
 
 # Exit 2 is the contract: it feeds the output back and keeps Claude working.
 # Any other non-zero would end the turn with the failure unaddressed.
 @test "stop-lint-gate: fails a dirty lint with exit 2 and the output" {
-  stub_yarn "src/foo.ts:1:1 lint/style/useConst  FIXABLE" 1
+  stub_mise "src/foo.ts:1:1 lint/style/useConst  FIXABLE" 1
   run -2 gate
   [[ "$output" == *"Lint failed"* ]]
   [[ "$output" == *"useConst"* ]]
@@ -67,18 +63,20 @@ gate()
 # is an environment failure, not a code failure, and the message has to say so
 # or the reader hunts a lint error that does not exist.
 @test "stop-lint-gate: names the rate limit as the cause when that is the cause" {
-  stub_yarn "ec: Failed to download binary: HttpError: API rate limit exceeded" 1
+  stub_mise "ec: Failed to download binary: HttpError: API rate limit exceeded" 1
   run -2 gate
   [[ "$output" == *"rate-limited"* ]]
   [[ "$output" != *"Lint failed — fix before finishing"* ]]
 }
 
-@test "stop-lint-gate: a failed install aborts before linting" {
-  stub_yarn "unreachable" 0 1
+# Without mise the lint chain cannot run; passing silently would read as a
+# clean lint.
+@test "stop-lint-gate: a missing mise blocks instead of passing" {
+  if [[ -x /usr/bin/mise || -x /bin/mise ]]; then
+    skip "a system mise is on the stub PATH"
+  fi
   run -2 gate
-  [[ "$output" == *"yarn install failed"* ]]
-  # The lint must not have run — its output would be misleading noise.
-  [[ "$output" != *"unreachable"* ]]
+  [[ "$output" == *"mise not found"* ]]
 }
 
 # The hook cd's to CLAUDE_PROJECT_DIR and exits 0 if that fails, rather than

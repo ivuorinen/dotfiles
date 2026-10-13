@@ -59,7 +59,7 @@ fi
 # Allowlist: commands that mutate state, format in place, install packages, or
 # perform short interactive operations. First word of each pipeline segment is
 # checked against this set.
-allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish_indent|shfmt|yarn|brew|mise|cd|pwd|whoami|date|echo|printf|true|false|exit|return|export|unset|source|\.|alias|unalias|umask)$'
+allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish_indent|shfmt|brew|mise|cd|pwd|whoami|date|echo|printf|true|false|exit|return|export|unset|source|\.|alias|unalias|umask)$'
 
 # Allowlist: specific git subcommands that mutate state, plus the plumbing
 # queries that answer one question. Output-readers like `git log`, `git diff`,
@@ -82,9 +82,11 @@ allow_git_subcmd_re='^(status|commit|mv|rm|checkout|push|fetch|reset|restore|sta
 deny_first_word_re='^(rg|grep|fd|find|shellcheck|biome|yamllint|actionlint|stylua|ruff|pre-commit|dfm|ls|tree|cat|head|tail|wc|awk|sed|jq|less|more|bash|sh|zsh|dash|ksh|fish|'
 deny_first_word_re+='diff|cmp|bat|xxd|od|strings|base64|column|sort|uniq|cut|nl|fold|rev|tac|paste|comm|join|file|stat|du|lsof|ps)$'
 
-# Special denials for compound commands (e.g. `yarn lint`, `git log`, `shfmt --diff`).
+# Special denials for compound commands (e.g. `mise run lint`, `git log`, `shfmt --diff`).
 deny_compound_res=(
-  '^yarn[[:space:]]+(lint|test|check)'
+  # Every .mise.toml task is a quality gate (lint, test, fix) whose output is
+  # read; `mise r` and `mise tasks run` are the same command.
+  '^mise[[:space:]]+(run|r|tasks[[:space:]]+run)([[:space:]]|$)'
   '^git[[:space:]]+(log|diff|show|blame)'
   '^shfmt[[:space:]]+(--diff|-d)'
   '^fish_indent[[:space:]]+(--check|-c)'
@@ -184,7 +186,7 @@ for i in "${!segments[@]}"; do
   # subcommand checks below see the real subcommand (agent-loopholes-e0092417).
   [[ "$fw" = "git" ]] && segment=$(git_strip_globals "$segment")
 
-  # Compound checks run first — `yarn install` (allow) must beat `yarn` allow-first-word.
+  # Compound checks run first — `mise run lint` (deny) must beat `mise` allow-first-word.
   for re in "${deny_compound_res[@]}"; do
     if printf '%s' "$segment" | grep -qE "$re"; then
       deny_reason="matched compound pattern '$re' in segment '$segment'"
@@ -253,7 +255,7 @@ if [[ -n "$deny_reason" ]]; then
       permissionDecisionReason: (
         "Routed to ctx_batch_execute per .claude/rules/bash-routing.md (\($why)).\n\n" +
         "Bash is reserved for state mutations (git-hunk commit, git mv/rm/push, mkdir, chmod, mv, rm, touch), " +
-        "in-place formatters (shfmt -w, fish_indent --write), and package installs (yarn install, brew install, mise install).\n\n" +
+        "in-place formatters (shfmt -w, fish_indent --write), and package installs (brew install, mise install).\n\n" +
         "Output-producing commands belong in:\n" +
         "  - mcp__plugin_context-mode_context-mode__ctx_batch_execute  (multi-command sweeps with queries)\n" +
         "  - mcp__plugin_context-mode_context-mode__ctx_execute(language: \"shell\", code: ...)  (single command, print only what you need)\n\n" +

@@ -118,12 +118,9 @@ TODO              text
 .gitconfig        text
 .htaccess         text
 *.lock            text -diff
-package.json      text eol=lf
 package-lock.json text eol=lf -diff
 pnpm-lock.yaml    text eol=lf -diff
 .prettierrc       text
-# Ensure yarn.lock shows textual diffs
-yarn.lock         text eol=lf
 *.toml            text
 *.yaml            text
 *.yml             text

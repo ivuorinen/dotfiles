@@ -9,7 +9,7 @@
 # FILTER_REGEX_EXCLUDE (.mega-linter.yml), and the vendored trees listed in
 # .claude/rules/vendored-files.md. Keep the four in step when one moves.
 #
-# `yarn lint:exclusions` enforces this: scripts/check-exclusion-drift.py
+# `mise run lint-exclusions` enforces this: scripts/check-exclusion-drift.py
 # compares which gates cover which tree against .exclusion-baseline.json and
 # fails when that changes. Add a tree here and the check names the gates still
 # missing it. A difference that is intentional is recorded with
@@ -43,6 +43,5 @@ exclude_paths:
   - "config/zsh/completions.d/**"
   # Tool-managed trees, never hand-edited
   - "node_modules/**"
-  - ".yarn/**"
   - "graphify-out/**"
   - "config/tmux/plugins/**"

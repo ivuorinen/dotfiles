@@ -1,6 +1,5 @@
 {
   ".claude/skills/graphify": ["bandit", "codacy", "codeql", "ruff"],
-  ".yarn": ["bandit", "codacy", "codeql"],
   "config/bash/completions.d": ["codacy", "codeql"],
   "config/cheat/cheatsheets": ["bandit", "grype", "ruff"],
   "config/cheat/cheatsheets/community": ["codacy", "codeql", "megalinter"],

@@ -83,16 +83,5 @@
       "indentWidth": 2,
       "lineWidth": 90
     }
-  },
-  "overrides": [
-    {
-      "includes": ["package.json"],
-      "json": {
-        "formatter": {
-          "enabled": true,
-          "indentWidth": 2
-        }
-      }
-    }
-  ]
+  }
 }

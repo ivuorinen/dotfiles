@@ -17,8 +17,9 @@ If a shell command produces output you intend to read, use
 - `shellcheck`, `shfmt --diff`, `fish_indent --check` — every lint/format check.
 - `biome check`, `yamllint`, `actionlint`, `stylua --check` — every formatter check.
 - `ruff check`, `ruff format --check` — every Python check.
-- `prek run` (and `pre-commit run`), `yarn lint`, `yarn test` — every quality gate
-  (the prefix match covers `yarn lint:ec`, `yarn lint:bandit`, and friends).
+- `prek run` (and `pre-commit run`), `mise run lint`, `mise run test` — every
+  quality gate (`mise run`, `mise r` and `mise tasks run` are all denied, which
+  covers `mise run lint-ec`, `mise run lint-bandit`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
 - `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
   The hook lets `git status` (with or without `-s`) through as a one-line
@@ -56,9 +57,9 @@ Only these narrow cases:
 2. **In-place formatters with no output to capture:**
     `fish_indent --write <file>`, `shfmt -w <file>`.
 3. **Package installations that must stream output interactively:**
-    `yarn install`, `yarn add <pkg>`, `brew install <pkg>`.
+    `mise install`, `brew install <pkg>`.
 4. **A single one-line command the user names by tool in their most
-    recent message** (e.g. they typed "run `yarn build`" in the
+    recent message** (e.g. they typed "run `mise install`" in the
     immediately preceding turn) **whose expected output is under
     twenty lines.** A user instruction does not waive the routing
     rule for unbounded output. If the named command can emit more
@@ -142,8 +143,8 @@ Lint pass — batch the full quality gate:
 
 ```yaml
 commands:
-  - label: "yarn lint"
-    command: "yarn lint"
+  - label: "mise run lint"
+    command: "mise run lint"
 queries:
   - "lint errors"
   - "editorconfig violations"

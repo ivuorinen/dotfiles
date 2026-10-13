@@ -26,28 +26,27 @@ Linking is driven by `install.conf.yaml` at the repo root (and an optional
 ## Essential Commands
 
 ```bash
-# Install Node dependencies first (needed for linting/testing)
-yarn install
+# Install the pinned toolchain first (needed for linting/testing)
+mise install
 
-# Lint everything
-yarn lint              # biome + prettier + editorconfig-checker + markdownlint + md-table check
-yarn lint:biome        # JS/TS/JSON/MD via Biome
-yarn lint:ec           # EditorConfig checker
-yarn lint:markdownlint # Markdown linting
-yarn lint:md-table     # Markdown table formatting
+# Lint everything (`mise tasks` lists every task)
+mise run lint              # every lint-* step, in order
+mise run lint-biome        # JS/TS/JSON/MD via Biome
+mise run lint-ec           # EditorConfig checker
+mise run lint-markdownlint # Markdown linting
+mise run lint-md-table     # Markdown table formatting
 
 # Auto-fix
-yarn fix:biome         # Biome autofix
-yarn fix:prettier      # Prettier autofix (YAML)
-yarn fix:md-table      # Fix markdown tables
+mise run fix-biome         # Biome autofix
+mise run fix-prettier      # Prettier autofix (YAML)
+mise run fix-md-table      # Fix markdown tables
 
 # Format
-yarn format            # Biome format
-yarn format:yaml       # Prettier for YAML
+mise run format            # Biome format
 
 # Tests (Bats – Bash Automated Testing System)
-yarn test              # Run all tests in tests/
-bats tests/dfm.bats    # Run a single test file (bats from PATH, via mise)
+mise run test              # Run all tests in tests/
+bats tests/dfm.bats        # Run a single test file (bats from PATH, via mise)
 
 # Shell linting (individual files)
 shellcheck local/bin/<script>
@@ -56,12 +55,12 @@ shellcheck local/bin/<script>
 stylua config/nvim/
 
 # Pre-commit (all hooks at once)
-pre-commit run --all-files
+prek run --all-files
 ```
 
-**Package manager: Yarn v4+** — do NOT use `npm install` or `npm run`.
+**No package.json** — tools come from mise; do NOT use `npm`, `npx` or `yarn`.
 
-> **MANDATORY: Run `yarn lint` before every commit. All lint issues must be
+> **MANDATORY: Run `mise run lint` before every commit. All lint issues must be
 > fixed — no exceptions. A commit with lint errors is never acceptable.**
 
 ---
@@ -150,7 +149,6 @@ the cloud agent yet — this list is the only guard.
 - **Vendored graphify skill:** `.claude/skills/graphify/**`
 - **Vendored fish plugins:** `config/fish/functions/` — `fisher.fish`,
   `bass.fish`, `__bass.py`, `__z_add.fish`, `__z_clean.fish`
-- **Managed by Yarn:** `yarn.lock`, `.yarn/`
 - **Git submodules:** `tools/**`, `config/cheat/cheatsheets/{community,tldr}/**`
 - **Real secrets — never read, edit, or commit:** `config/fish/secrets.d/*`,
   `config/secrets.d/*` (only `*.example` and `README.md` are tracked)
@@ -182,7 +180,7 @@ Tests live in `tests/` and use [Bats](https://github.com/bats-core/bats-core).
 Each script in `local/bin/` that has a `.bats` counterpart is fully covered.
 
 ```bash
-yarn test             # run all tests
+mise run test         # run all tests
 bats tests/dfm.bats   # run a single file (bats from PATH, via mise)
 ```
 
@@ -190,15 +188,15 @@ bats tests/dfm.bats   # run a single file (bats from PATH, via mise)
 
 ## CI / GitHub Actions Workflows
 
-| Workflow file             | Purpose                                        |
-|---------------------------|------------------------------------------------|
-| `tests.yml`               | Bats suite (Linux + macOS), `yarn lint`, fish  |
-| `linters.yml`             | PR lint (Biome, EditorConfig, md-tables, etc.) |
-| `update-submodules.yml`   | Scheduled submodule auto-update                |
-| `new-release.yml`         | Daily date-versioned tag + GitHub release      |
-| `sync-labels.yml`         | Sync GitHub labels                             |
-| `semantic-pr.yml`         | Enforce semantic PR titles                     |
-| `copilot-setup-steps.yml` | Provision the Copilot agent's environment      |
+| Workflow file             | Purpose                                           |
+|---------------------------|---------------------------------------------------|
+| `tests.yml`               | Bats suite (Linux + macOS), `mise run lint`, fish |
+| `linters.yml`             | PR lint (Biome, EditorConfig, md-tables, etc.)    |
+| `update-submodules.yml`   | Scheduled submodule auto-update                   |
+| `new-release.yml`         | Daily date-versioned tag + GitHub release         |
+| `sync-labels.yml`         | Sync GitHub labels                                |
+| `semantic-pr.yml`         | Enforce semantic PR titles                        |
+| `copilot-setup-steps.yml` | Provision the Copilot agent's environment         |
 
 ---
 
@@ -212,7 +210,7 @@ bats tests/dfm.bats   # run a single file (bats from PATH, via mise)
 4. Add a corresponding `.md` sidecar (follow existing patterns). The usage spec stays inline as `#USAGE`
     lines, never a `.usage.kdl` file (`.claude/rules/local-bin-scripts.md`).
 5. Add a Bats test file in `tests/`.
-6. Run `shellcheck local/bin/<script>` and `yarn lint`.
+6. Run `shellcheck local/bin/<script>` and `mise run lint`.
 
 ### Adding a new fish function to `config/fish/functions/`
 
@@ -235,14 +233,14 @@ Add files under `hosts/<hostname>/` and update
 - Shell → `shfmt -i 2 -bn -ci -sr -fn -w <file>`
 - Fish → `fish_indent -w <file>`
 - Lua → `stylua <file>`
-- JSON/JS/TS/MD → `yarn fix:biome`
-- YAML → `yarn fix:prettier`
+- JSON/JS/TS/MD → `mise run fix-biome`
+- YAML → `mise run fix-prettier`
 
 ### Before every commit (mandatory, no exceptions)
 
 ```bash
-yarn lint        # must pass with zero errors before any commit
+mise run lint    # must pass with zero errors before any commit
 ```
 
-If `yarn lint` reports errors, fix them and re-run until it is clean. Do not
+If `mise run lint` reports errors, fix them and re-run until it is clean. Do not
 commit with lint failures under any circumstances.

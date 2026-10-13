@@ -27,8 +27,9 @@ a system or Homebrew path.
   checksums. `idiomatic_version_file = true` makes mise respect
   `.nvmrc`, `.python-version`, `.go-version`, etc. in other projects.
 - **npm/dotnet tools live in mise, not `package.json`**, so hook scripts
-  and interactive shells get them on PATH without relying on yarn's
-  `node_modules/.bin` shim.
+  and interactive shells get them on PATH without relying on a package
+  manager's `node_modules/.bin` shim. This repo has no `package.json`: its
+  lint, fix and test commands are mise tasks in `.mise.toml`.
 
 ## Everyday commands
 
