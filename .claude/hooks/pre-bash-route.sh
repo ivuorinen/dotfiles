@@ -111,7 +111,8 @@ deny_compound_res=(
 # BASH_OK override: these rules bind regardless of the escape.
 deny_policy()
 {
-  jq -n --arg cmd "$command" --arg why "$1" '{
+  local why=$1
+  jq -n --arg cmd "$command" --arg why "$why" '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
@@ -200,6 +201,9 @@ for i in "${!segments[@]}"; do
     *\\* | *\'* | *\"* | *\$* | *\`*)
       deny_reason="command word '$fw' in segment '$segment' carries unresolved quote or escape syntax"
       break
+      ;;
+    *)
+      # A fixed name: the denylists below decide.
       ;;
   esac
 

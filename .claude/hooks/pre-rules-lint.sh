@@ -24,7 +24,8 @@ esac
 
 deny()
 {
-  jq -n --arg why "$1" '{
+  local why=$1
+  jq -n --arg why "$why" '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",

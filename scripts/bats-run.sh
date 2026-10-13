@@ -74,6 +74,7 @@ gh_data()
   local s=${1//%/%25}
   s=${s//$'\r'/%0D}
   printf '%s' "${s//$'\n'/%0A}"
+  return 0
 }
 gh_prop()
 {
@@ -81,6 +82,7 @@ gh_prop()
   s=$(gh_data "$1")
   s=${s//:/%3A}
   printf '%s' "${s//,/%2C}"
+  return 0
 }
 
 {

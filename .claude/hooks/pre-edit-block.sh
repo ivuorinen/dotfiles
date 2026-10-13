@@ -51,7 +51,8 @@ glob_only_templates()
 {
   local g
   g=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
-  [[ "$g" == *.example || "$g" == readme.md || "$g" == */readme.md ]]
+  [[ "$g" == *.example || "$g" == readme.md || "$g" == */readme.md ]] && return 0
+  return 1
 }
 
 input=$(cat)
@@ -77,6 +78,9 @@ case "$tool" in
       fi
     fi
     exit 0
+    ;;
+  *)
+    # Every other tool carries a file path; the checks below apply.
     ;;
 esac
 

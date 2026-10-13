@@ -216,6 +216,7 @@ normalise_cmd()
     [[ "$w" == "$prev" ]] && break
   done
   printf '%s' "${w##*/}"
+  return 0
 }
 
 # Drop git's global options so the subcommand is the second word
@@ -871,8 +872,9 @@ _bp_bypass_args()
 # `--NAME` at least MIN characters long; git accepts any unambiguous prefix.
 _bp_long()
 {
-  local t=${1#--}
-  [[ ${#t} -ge $3 && $2 == "$t"* ]]
+  local t=${1#--} name=$2 min=$3
+  [[ ${#t} -ge $min && $name == "$t"* ]] && return 0
+  return 1
 }
 
 # _bp_commit_opts ARGS... — parse `git commit` (or `git-hunk commit`)
@@ -1067,7 +1069,7 @@ _bp_git_config()
         ;;
     esac
   done
-  ((read && !write)) && return 0
+  ((read && ! write)) && return 0
   _bp_bypass_args "$@"
   for a in "$@"; do
     [[ $a =~ $BP_ALIASCFG_RE ]] && _bp_deny "Defining a git alias renames a subcommand past every check (.claude/rules/git-hunk-commits.md). Spell the subcommand out."

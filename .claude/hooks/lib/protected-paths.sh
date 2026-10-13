@@ -62,11 +62,13 @@ t up
 # it into one (agent-hooks-84fa86e9).
 _pp_normalise()
 {
-  if [[ ${2:-} == parsed ]]; then
-    printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]' | sed -E "$_PP_NORM_SED"
+  local text=$1 mode=${2:-}
+  if [[ $mode == parsed ]]; then
+    printf '%s\n' "$text" | tr '[:upper:]' '[:lower:]' | sed -E "$_PP_NORM_SED"
     return 0
   fi
-  printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]' | tr -d "\"'\\\\" | sed -E "$_PP_NORM_SED"
+  printf '%s\n' "$text" | tr '[:upper:]' '[:lower:]' | tr -d "\"'\\\\" | sed -E "$_PP_NORM_SED"
+  return 0
 }
 
 # _pp_glob_hits TEXT PATH... — succeed when a token in TEXT carrying a glob
