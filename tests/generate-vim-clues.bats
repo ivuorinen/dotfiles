@@ -12,6 +12,8 @@ setup()
   FIX="$BATS_TEST_TMPDIR"
   mkdir -p "$FIX/rtp/autoload"
   OUT="$FIX/rtp/autoload/miniclue.vim"
+  # The script only writes under the working directory.
+  cd "$FIX" || return 1
 
   cat > "$FIX/clue.lua" << 'EOF'
 MiniClue.gen_clues.g = function()
@@ -92,5 +94,22 @@ vim_eval()
   run "$GEN" --source "$FIX/clue.lua" --output "$OUT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"MiniClue.gen_clues.windows not found"* ]]
+  [ ! -e "$OUT" ]
+}
+
+@test "generate-vim-clues: refuses an output outside the working directory" {
+  mkdir -p "$FIX/work"
+  cd "$FIX/work"
+  run "$GEN" --source "$FIX/clue.lua" --output "../escaped.vim"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"--output must be inside"* ]]
+  [ ! -e "$FIX/escaped.vim" ]
+}
+
+@test "generate-vim-clues: refuses a source that is not clue.lua" {
+  cp "$FIX/clue.lua" "$FIX/other.lua"
+  run "$GEN" --source "$FIX/other.lua" --output "$OUT"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"--source must name a clue.lua file"* ]]
   [ ! -e "$OUT" ]
 }

@@ -196,7 +196,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Vim autoload file to write")
     args = parser.parse_args(argv)
 
-    source_path = os.path.expanduser(args.source)
+    # Both paths are resolved before use: the source must be a clue.lua, and
+    # the output must land under the working directory (the repo, for the
+    # relative default), so a stray argument cannot overwrite a file elsewhere.
+    source_path = os.path.realpath(os.path.expanduser(args.source))
+    if os.path.basename(source_path) != "clue.lua":
+        print(f"generate-vim-clues: --source must name a clue.lua file: {args.source}", file=sys.stderr)
+        return 2
+    cwd = os.path.realpath(os.getcwd())
+    output_path = os.path.realpath(args.output)
+    if os.path.commonpath([cwd, output_path]) != cwd:
+        print(f"generate-vim-clues: --output must be inside {cwd}: {args.output}", file=sys.stderr)
+        return 2
+
     try:
         with open(source_path, encoding="utf-8") as fh:
             source = fh.read()
@@ -205,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"generate-vim-clues: {err}", file=sys.stderr)
         return 1
 
-    with open(args.output, "w", encoding="utf-8") as fh:
+    with open(output_path, "w", encoding="utf-8") as fh:
         fh.write(text)
     print(f"wrote {args.output}")
     return 0
