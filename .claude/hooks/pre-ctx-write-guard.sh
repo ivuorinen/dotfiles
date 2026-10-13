@@ -87,7 +87,7 @@ co_occurs()
     hit=1
   fi
   if [[ "$hit" -eq 1 ]] && printf '%s\n' "$cleaned" | grep -qE "$writeish"; then
-    echo "BLOCKED: sandbox code combines a hook-protected path (vendor/lock/submodule/git hook) with write-capable operations." >&2
+    echo "BLOCKED: sandbox code combines a hook-protected path (vendored/submodule/git hook) with write-capable operations." >&2
     echo "Protected files follow .claude/rules/vendored-files.md; make legitimate changes with Write/Edit so the edit hooks can vet them." >&2
     exit 2
   fi

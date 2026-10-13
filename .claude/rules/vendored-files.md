@@ -55,8 +55,8 @@ two B603, two Opengrep `dangerous-subprocess-use`).
 ## Enforcement
 
 One regex, `PROTECTED_RE` in `.claude/hooks/lib/protected-paths.sh`,
-covers every path listed above plus `yarn.lock`, `.yarn/` and the
-submodule trees. Three hooks source it: `pre-edit-block.sh` blocks
+covers every path listed above plus the submodule trees and the git
+hook files (`.git/hooks`, `.git/config`). Three hooks source it: `pre-edit-block.sh` blocks
 Edit/Write, `pre-ctx-write-guard.sh` blocks sandbox code that writes
 (each `ctx_batch_execute` command judged on its own, as each runs in its
 own shell), and `pre-bash-route.sh` blocks Bash commands that write (`>`, `cp`,
