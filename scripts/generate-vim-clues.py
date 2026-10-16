@@ -198,7 +198,9 @@ def main(argv: list[str] | None = None) -> int:
 
     # Both paths are resolved before use: the source must be a clue.lua, and
     # the output must land under the working directory (the repo, for the
-    # relative default), so a stray argument cannot overwrite a file elsewhere.
+    # relative default) as autoload/miniclue.vim, so a stray argument cannot
+    # overwrite a file elsewhere. vim only finds miniclue#get() in a file at
+    # that name, so nothing else is a valid destination anyway.
     source_path = os.path.realpath(os.path.expanduser(args.source))
     if os.path.basename(source_path) != "clue.lua":
         print(f"generate-vim-clues: --source must name a clue.lua file: {args.source}", file=sys.stderr)
@@ -207,6 +209,10 @@ def main(argv: list[str] | None = None) -> int:
     output_path = os.path.realpath(args.output)
     if os.path.commonpath([cwd, output_path]) != cwd:
         print(f"generate-vim-clues: --output must be inside {cwd}: {args.output}", file=sys.stderr)
+        return 2
+    autoload_dir, output_name = os.path.split(output_path)
+    if output_name != "miniclue.vim" or os.path.basename(autoload_dir) != "autoload":
+        print(f"generate-vim-clues: --output must be an autoload/miniclue.vim file: {args.output}", file=sys.stderr)
         return 2
 
     try:

@@ -106,6 +106,15 @@ vim_eval()
   [ ! -e "$FIX/escaped.vim" ]
 }
 
+@test "generate-vim-clues: refuses an output that is not autoload/miniclue.vim" {
+  mkdir -p "$FIX/.git"
+  printf '[core]\n' > "$FIX/.git/config"
+  run "$GEN" --source "$FIX/clue.lua" --output ".git/config"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"--output must be an autoload/miniclue.vim file"* ]]
+  [ "$(cat "$FIX/.git/config")" = "[core]" ]
+}
+
 @test "generate-vim-clues: refuses a source that is not clue.lua" {
   cp "$FIX/clue.lua" "$FIX/other.lua"
   run "$GEN" --source "$FIX/other.lua" --output "$OUT"
