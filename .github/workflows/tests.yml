@@ -59,7 +59,7 @@ jobs:
       # uv: x-compare-versions.py runs under `uv run --script`, which
       # installs the script's inline dependencies itself.
       - name: Install shfmt and uv
-        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           mise_toml: |
             [tools]
@@ -89,7 +89,7 @@ jobs:
       # linters.yml only runs on pull_request, so without this job a commit
       # pushed straight to main is never linted server-side.
       - name: Install the mise toolchain
-        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
 
       - name: Run lint
         run: mise run lint
