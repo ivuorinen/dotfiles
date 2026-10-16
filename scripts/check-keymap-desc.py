@@ -29,6 +29,23 @@ OPTS_INDEX = {"n": 2, "nl": 2, "d": 3, "ld": 3}
 CALL_RE = re.compile(r"\bK\.(n|nl|d|ld)\s*\(")
 
 
+def long_bracket_end(src: str, i: int, offset: int) -> int | None:
+    """Return the index past a ``[=*[ … ]=*]`` opening at ``i + offset``, else None."""
+    long = re.match(r"\[(=*)\[", src[i + offset :])
+    if not long:
+        return None
+    end = src.find("]" + long.group(1) + "]", i)
+    return len(src) if end < 0 else end + len(long.group(1)) + 2
+
+
+def quoted_end(src: str, i: int) -> int:
+    """Return the index just past the quoted string opening at ``i``."""
+    q, j = src[i], i + 1
+    while j < len(src) and src[j] != q:
+        j += 2 if src[j] == "\\" else 1
+    return j + 1
+
+
 def skip_string(src: str, i: int) -> int:
     """Return the index just past the Lua string or comment starting at ``i``.
 
@@ -36,26 +53,28 @@ def skip_string(src: str, i: int) -> int:
     caller can treat the character as code.
     """
     if src.startswith("--", i):
-        long = re.match(r"--\[(=*)\[", src[i:])
-        if long:
-            end = src.find("]" + long.group(1) + "]", i)
-            return len(src) if end < 0 else end + len(long.group(1)) + 2
+        end = long_bracket_end(src, i, 2)
+        if end is not None:
+            return end
         end = src.find("\n", i)
         return len(src) if end < 0 else end
-    long = re.match(r"\[(=*)\[", src[i:])
-    if long:
-        end = src.find("]" + long.group(1) + "]", i)
-        return len(src) if end < 0 else end + len(long.group(1)) + 2
+    end = long_bracket_end(src, i, 0)
+    if end is not None:
+        return end
     if src[i] in "'\"":
-        q, j = src[i], i + 1
-        while j < len(src) and src[j] != q:
-            j += 2 if src[j] == "\\" else 1
-        return j + 1
+        return quoted_end(src, i)
     return i
 
 
 BLOCK_OPEN = {"function", "if", "do", "repeat"}
 BLOCK_CLOSE = {"end", "until"}
+
+
+def word_at(src: str, i: int) -> re.Match[str] | None:
+    """Match an identifier starting at ``i``, unless ``i`` is mid-word."""
+    if i > 0 and re.match(r"\w", src[i - 1]):
+        return None
+    return re.match(r"[A-Za-z_]\w*", src[i:])
 
 
 def call_args(src: str, start: int) -> list[str]:
@@ -72,7 +91,7 @@ def call_args(src: str, start: int) -> list[str]:
         if j != i:
             i = j
             continue
-        word = re.match(r"[A-Za-z_]\w*", src[i:]) if (i == 0 or not re.match(r"\w", src[i - 1])) else None
+        word = word_at(src, i)
         if word:
             depth += (word.group() in BLOCK_OPEN) - (word.group() in BLOCK_CLOSE)
             i += len(word.group())

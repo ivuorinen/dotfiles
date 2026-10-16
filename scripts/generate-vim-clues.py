@@ -54,22 +54,13 @@ def lua_string(literal: str) -> str:
     return re.sub(r"\\(.)", r"\1", body)
 
 
-def return_table(source: str, name: str) -> str:
-    """Return the text of `return { ... }` inside MiniClue.gen_clues.<name>.
+def closing_brace(source: str, i: int) -> int:
+    """Return the index of the `}` matching the `{` at ``i``, or -1.
 
-    Raises ValueError when the generator or its table is missing, so a
-    renamed upstream function fails loudly instead of emitting empty labels.
+    Braces are counted outside string literals only: window keys such as
+    '<C-w>}' would otherwise close the table early and drop most entries.
     """
-    start = source.find(f"MiniClue.gen_clues.{name} = function")
-    if start < 0:
-        raise ValueError(f"MiniClue.gen_clues.{name} not found")
-    table = source.find("return {", start)
-    end = source.find("\nend", start)
-    if table < 0 or (0 <= end < table):
-        raise ValueError(f"no return table in MiniClue.gen_clues.{name}")
-    # Count braces outside string literals only: window keys such as
-    # '<C-w>}' would otherwise close the table early and drop most entries.
-    depth, quote, i = 0, "", table + len("return ")
+    depth, quote = 0, ""
     while i < len(source):
         ch = source[i]
         if quote:
@@ -84,9 +75,28 @@ def return_table(source: str, name: str) -> str:
         elif ch == "}":
             depth -= 1
             if depth == 0:
-                return source[table : i + 1]
+                return i
         i += 1
-    raise ValueError(f"unterminated return table in MiniClue.gen_clues.{name}")
+    return -1
+
+
+def return_table(source: str, name: str) -> str:
+    """Return the text of `return { ... }` inside MiniClue.gen_clues.<name>.
+
+    Raises ValueError when the generator or its table is missing, so a
+    renamed upstream function fails loudly instead of emitting empty labels.
+    """
+    start = source.find(f"MiniClue.gen_clues.{name} = function")
+    if start < 0:
+        raise ValueError(f"MiniClue.gen_clues.{name} not found")
+    table = source.find("return {", start)
+    end = source.find("\nend", start)
+    if table < 0 or (0 <= end < table):
+        raise ValueError(f"no return table in MiniClue.gen_clues.{name}")
+    close = closing_brace(source, table + len("return "))
+    if close < 0:
+        raise ValueError(f"unterminated return table in MiniClue.gen_clues.{name}")
+    return source[table : close + 1]
 
 
 def parse(source: str, name: str, prefix: str) -> dict[str, dict]:
@@ -186,7 +196,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Vim autoload file to write")
     args = parser.parse_args(argv)
 
-    source_path = os.path.expanduser(args.source)
+    # Both paths are resolved before use: the source must be a clue.lua, and
+    # the output must land under the working directory (the repo, for the
+    # relative default) as autoload/miniclue.vim, so a stray argument cannot
+    # overwrite a file elsewhere. vim only finds miniclue#get() in a file at
+    # that name, so nothing else is a valid destination anyway.
+    source_path = os.path.realpath(os.path.expanduser(args.source))
+    if os.path.basename(source_path) != "clue.lua":
+        print(f"generate-vim-clues: --source must name a clue.lua file: {args.source}", file=sys.stderr)
+        return 2
+    cwd = os.path.realpath(os.getcwd())
+    output_path = os.path.realpath(args.output)
+    if os.path.commonpath([cwd, output_path]) != cwd:
+        print(f"generate-vim-clues: --output must be inside {cwd}: {args.output}", file=sys.stderr)
+        return 2
+    autoload_dir, output_name = os.path.split(output_path)
+    if output_name != "miniclue.vim" or os.path.basename(autoload_dir) != "autoload":
+        print(f"generate-vim-clues: --output must be an autoload/miniclue.vim file: {args.output}", file=sys.stderr)
+        return 2
+
     try:
         with open(source_path, encoding="utf-8") as fh:
             source = fh.read()
@@ -195,7 +223,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"generate-vim-clues: {err}", file=sys.stderr)
         return 1
 
-    with open(args.output, "w", encoding="utf-8") as fh:
+    with open(output_path, "w", encoding="utf-8") as fh:
         fh.write(text)
     print(f"wrote {args.output}")
     return 0

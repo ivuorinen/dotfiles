@@ -78,16 +78,16 @@ writeish='>>|>|sed [^|;&]*-i|tee |rm |mv |cp |chmod |truncate |open\(|writeFile|
 # `echo x > /tmp/y` there still passes.
 co_occurs()
 {
-  local cleaned hit=0
+  local unit=$1 foreign=$2 cleaned hit=0
   # Strip stderr/stdout-to-null redirects so `2> /dev/null` does not read as
   # a write.
-  cleaned=$(printf '%s' "$1" | sed -E 's/[0-9]*>>?[[:space:]]*(\&[0-9]+|\/dev\/null)//g')
+  cleaned=$(printf '%s' "$unit" | sed -E 's/[0-9]*>>?[[:space:]]*(\&[0-9]+|\/dev\/null)//g')
   protected_referenced "$cleaned" && hit=1
-  if [[ "$hit" -eq 0 && "$2" -eq 1 && -n "$cwd" ]] && protected_referenced "$cwd/"; then
+  if [[ "$hit" -eq 0 && "$foreign" -eq 1 && -n "$cwd" ]] && protected_referenced "$cwd/"; then
     hit=1
   fi
   if [[ "$hit" -eq 1 ]] && printf '%s\n' "$cleaned" | grep -qE "$writeish"; then
-    echo "BLOCKED: sandbox code combines a hook-protected path (vendor/lock/submodule/git hook) with write-capable operations." >&2
+    echo "BLOCKED: sandbox code combines a hook-protected path (vendored/submodule/git hook) with write-capable operations." >&2
     echo "Protected files follow .claude/rules/vendored-files.md; make legitimate changes with Write/Edit so the edit hooks can vet them." >&2
     exit 2
   fi

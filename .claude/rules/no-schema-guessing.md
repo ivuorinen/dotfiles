@@ -73,7 +73,7 @@ search for "path-specific rules", quote `paths:` from the returned text.
 
 ## Relationship to validate-config-schemas.md
 
-- File **has** a schema (`v8r` finds one) → run `yarn dlx v8r <file>` per
+- File **has** a schema (`v8r` finds one) → run `mise exec -- v8r <file>` per
   `validate-config-schemas.md`. This rule still applies during writing; v8r
   is the commit-time gate.
 - File **has no** schema → this rule is the only safety net. No commit-time

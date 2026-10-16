@@ -38,11 +38,11 @@ Entries are normalised before comparison, so `./tools/**`, `tools/**` and
 ## Usage
 
 ```bash
-yarn lint:exclusions              # or: ./scripts/check-exclusion-drift.py
+mise run lint-exclusions          # or: ./scripts/check-exclusion-drift.py
 ./scripts/check-exclusion-drift.py --update   # re-baseline a reviewed change
 ```
 
-Runs as part of `yarn lint`, so the Stop-hook lint gate covers it.
+Runs as part of `mise run lint`, so the Stop-hook lint gate covers it.
 
 ## When it fires
 

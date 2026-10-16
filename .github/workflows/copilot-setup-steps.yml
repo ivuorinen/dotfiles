@@ -32,52 +32,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: "24"
+      # .mise.toml pins every linter, formatter and hook tool, the test runner
+      # and prek itself; the pre-commit hooks run them through `mise exec --`.
+      - name: Install the mise toolchain
+        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
 
-      - name: Enable Corepack (Yarn 4)
-        run: corepack enable
-
-      - name: Install Yarn release
-        run: corepack install
-
-      - name: Install JavaScript dependencies
-        # Third-party postinstall scripts stay off (sonar githubactions:S6505).
-        env:
-          YARN_ENABLE_SCRIPTS: false
-        run: yarn install --immutable
-
-      - name: Install shellcheck and shfmt
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends shellcheck shfmt
-
-      - name: Install stylua
-        run: |
-          # renovate: datasource=github-releases depName=JohnnyMorganz/StyLua
-          STYLUA_VERSION="2.4.1"
-          # -L follows redirects, so pin both the initial protocol and the
-          # redirect target to https (sonar githubactions:S6506).
-          curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
-            "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip" \
-            -o /tmp/stylua.zip
-          unzip -q /tmp/stylua.zip -d /tmp/stylua/
-          sudo install -m 0755 /tmp/stylua/stylua /usr/local/bin/stylua
-
-      - name: Set up Python for pre-commit
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.x"
-
-      - name: Install pre-commit
-        # --only-binary=:all: refuses sdists, so no package's setup.py runs
-        # during install (sonar githubactions:S8541). Quoted because the
-        # ":all: " colon-space would otherwise read as a YAML mapping.
-        run: "pip install --only-binary=:all: pre-commit==4.2.0"
-
-      - name: Install pre-commit hooks
-        run: |
-          pre-commit install
-          pre-commit install-hooks
+      - name: Install the git hooks
+        run: mise exec -- prek install --prepare-hooks

@@ -45,6 +45,12 @@ The default source is the mini.nvim checkout `vim.pack` installs
 (`~/.local/share/nvim/site/pack/core/opt/mini.nvim/lua/mini/clue.lua`). The
 generated file records the mini.nvim version it was built from.
 
+Both paths are resolved before use. `--source` must name a file called
+`clue.lua`, and `--output` must resolve to an `autoload/miniclue.vim` inside
+the working directory, so run it from the repo root. vim only loads
+`miniclue#get()` from a file at that name, so no other destination works
+anyway. Any violation exits 2 without writing.
+
 Run it after updating mini.nvim, and commit the regenerated file with the
 update. `tests/generate-vim-clues.bats` covers the parser.
 

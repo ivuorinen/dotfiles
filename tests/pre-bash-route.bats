@@ -72,8 +72,19 @@ decision()
 }
 
 @test "pre-bash-route: quality gates are denied" {
-  [ "$(decision 'yarn lint')" = "deny" ]
-  [ "$(decision 'yarn test')" = "deny" ]
+  [ "$(decision 'mise run lint')" = "deny" ]
+  [ "$(decision 'mise run test')" = "deny" ]
+  [ "$(decision 'mise r lint-ec')" = "deny" ]
+  [ "$(decision 'mise tasks run fix')" = "deny" ]
+  [ "$(decision 'mise t run fix')" = "deny" ]
+  [ "$(decision 'mise task run lint')" = "deny" ]
+  [ "$(decision 'mise watch lint')" = "deny" ]
+  # `mise <task>` is mise's shorthand for `mise run <task>`.
+  [ "$(decision 'mise lint')" = "deny" ]
+  [ "$(decision 'mise lint-ec')" = "deny" ]
+  [ "$(decision 'mise test')" = "deny" ]
+  [ "$(decision 'mise fix-md-table')" = "deny" ]
+  [ "$(decision 'mise format-yaml')" = "deny" ]
   [ "$(decision 'pre-commit run --all-files')" = "deny" ]
   # prek is the runner actually installed; denying only the old name left the
   # real command unrouted.
@@ -83,8 +94,10 @@ decision()
 }
 
 @test "pre-bash-route: package installs and in-place formatters are allowed" {
-  [ "$(decision 'yarn install')" = "allow" ]
   [ "$(decision 'mise install')" = "allow" ]
+  # `mise run` is denied above; the other mise subcommands are not gates.
+  [ "$(decision 'mise trust')" = "allow" ]
+  [ "$(decision 'mise fmt')" = "allow" ]
   [ "$(decision 'shfmt -w local/bin/dfm')" = "allow" ]
   [ "$(decision 'fish_indent --write config/fish/config.fish')" = "allow" ]
 }
@@ -427,8 +440,8 @@ policy_denied()
   policy_denied 'cp config/fish/secret?.d/github.fish /tmp/x'
   policy_denied 'cp config/secre*.d/* /tmp/'
   policy_denied 'cp config/fish/*/github.fish /tmp/x'
-  policy_denied 'cp README.md yarn.l?ck'
-  policy_denied 'cp README.md YARN.LOCK'
+  policy_denied 'cp README.md config/fish/functions/b?ss.fish'
+  policy_denied 'cp README.md CONFIG/FISH/FUNCTIONS/BASS.FISH'
   policy_denied 'rm tools//dotbot/x'
   policy_denied 'rm tools/./dotbot/x'
   [ "$(decision 'rm build/*')" = "allow" ]
@@ -703,19 +716,19 @@ EOF"
 }
 
 # In-place editors outside the copy/move/sed list rewrote vendored files and
-# yarn.lock unvetted (audit-5a6f71da).
+# config/fish/functions/bass.fish unvetted (audit-5a6f71da).
 @test "pre-bash-route: in-place editors writing protected paths are denied" {
   policy_denied 'perl -pi -e s/a/b/ config/fish/functions/fisher.fish'
-  policy_denied 'perl -i.bak -pe s/a/b/ yarn.lock'
-  policy_denied 'ruby -pi -e x yarn.lock'
-  policy_denied 'vim -c wq yarn.lock'
-  policy_denied 'ed yarn.lock'
-  policy_denied 'patch yarn.lock fix.diff'
-  policy_denied "awk '{print > \"yarn.lock\"}' /dev/null"
-  policy_denied 'gawk -i inplace 1 yarn.lock'
-  run policy_denied 'rg -n patch yarn.lock'
+  policy_denied 'perl -i.bak -pe s/a/b/ config/fish/functions/bass.fish'
+  policy_denied 'ruby -pi -e x config/fish/functions/bass.fish'
+  policy_denied 'vim -c wq config/fish/functions/bass.fish'
+  policy_denied 'ed config/fish/functions/bass.fish'
+  policy_denied 'patch config/fish/functions/bass.fish fix.diff'
+  policy_denied "awk '{print > \"config/fish/functions/bass.fish\"}' /dev/null"
+  policy_denied 'gawk -i inplace 1 config/fish/functions/bass.fish'
+  run policy_denied 'rg -n patch config/fish/functions/bass.fish'
   [ "$status" -ne 0 ]
-  run policy_denied "perl -ne 'print if /x/' yarn.lock"
+  run policy_denied "perl -ne 'print if /x/' config/fish/functions/bass.fish"
   [ "$status" -ne 0 ]
 }
 
@@ -774,7 +787,7 @@ EOF"
   chmod +x "$bin/shfmt"
   PATH="$bin:$PATH"
   [ "$(decision 'echo x > config/fish/functions/__bass.py')" = "deny" ]
-  [ "$(decision 'echo x >> yarn.lock')" = "deny" ]
+  [ "$(decision 'echo x >> config/fish/functions/bass.fish')" = "deny" ]
   [ "$(decision 'echo x > /tmp/out.txt')" = "allow" ]
   [ "$(decision 'git status 2>&1')" = "allow" ]
 }
@@ -782,8 +795,8 @@ EOF"
 # The git write alternative anchored the subcommand right after `git`, so a
 # global option in between let it rewrite a protected path.
 @test "pre-bash-route: git global options do not hide a protected-path write" {
-  [ "$(decision 'git -C . checkout -- yarn.lock')" = "deny" ]
-  [ "$(decision 'git --no-pager restore yarn.lock')" = "deny" ]
+  [ "$(decision 'git -C . checkout -- config/fish/functions/bass.fish')" = "deny" ]
+  [ "$(decision 'git --no-pager restore config/fish/functions/bass.fish')" = "deny" ]
   [ "$(decision 'git -c core.quotepath=off rm tools/dotbot/setup.py')" = "deny" ]
   [ "$(decision 'git -C . status')" = "allow" ]
 }
@@ -825,12 +838,12 @@ EOF"
   [ "$(decision "git commit --no-verify -m 'x'")" = "deny" ]
   # Every check sees the message removed, not only the per-word scan.
   [ "$(decision "git tag -a v1 -m '--no-verify'")" = "allow" ]
-  [ "$(decision "git commit -m 'git checkout yarn.lock'")" = "allow" ]
+  [ "$(decision "git commit -m 'git checkout config/fish/functions/bass.fish'")" = "allow" ]
   [ "$(decision "git stash push -m '--no-verify'")" = "allow" ]
   [ "$(decision "git tag -m x --no-verify v1")" = "deny" ]
   # Elsewhere -m is a flag and the next word a path that stays checked.
-  [ "$(decision 'git checkout -m yarn.lock')" = "deny" ]
+  [ "$(decision 'git checkout -m config/fish/functions/bass.fish')" = "deny" ]
   # git-hunk commit is how this repo commits; its message is text too.
-  [ "$(decision "git-hunk commit abc1234 -m 'fix: git checkout yarn.lock was allowed'")" = "allow" ]
+  [ "$(decision "git-hunk commit abc1234 -m 'fix: git checkout config/fish/functions/bass.fish was allowed'")" = "allow" ]
   [ "$(decision "git-hunk commit abc1234 --no-verify -m 'x'")" = "deny" ]
 }

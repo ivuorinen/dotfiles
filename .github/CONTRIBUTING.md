@@ -13,7 +13,6 @@ your home directory.
 git clone https://github.com/ivuorinen/dotfiles.git
 cd dotfiles
 mise install       # lint/test toolchain, bats and prek, from .mise.toml
-yarn install       # Yarn v4; never npm (.claude/rules/no-npm.md)
 prek install       # installs the pre-commit and commit-msg hooks
 ```
 
@@ -24,12 +23,12 @@ files and app configs. They are meant for the maintainer's machines.
 ## Checks
 
 Run these before opening a pull request. The full command catalogue, including
-each `lint:*` step, is [docs/commands.md](../docs/commands.md).
+each `lint-*` step, is [docs/commands.md](../docs/commands.md).
 
 ```bash
-yarn fix                 # autofixers first
-yarn lint                # every lint step; must pass with no warnings
-yarn test                # full test run
+mise run fix             # autofixers first
+mise run lint            # every lint step; must pass with no warnings
+mise run test            # full test run
 bats tests/<file>.bats   # one bats file
 ```
 

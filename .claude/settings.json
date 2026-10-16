@@ -22,6 +22,16 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/prompt-record.sh"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v sonar >/dev/null 2>&1; then sonar hook claude-prompt-submit; fi",
+            "timeout": 60
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -80,6 +90,16 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-graphify-nudge.sh read"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v sonar >/dev/null 2>&1; then sonar hook claude-pre-tool-use; fi",
+            "timeout": 60
           }
         ]
       }

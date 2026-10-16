@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pre-tool guard: block edits to vendor/lock/submodule files and
+# Pre-tool guard: block edits to vendored/submodule files and
 # reads or edits of real secrets.d files (fish and bash/zsh trees).
 # Receives tool input JSON on stdin.
 #
@@ -21,7 +21,7 @@
 # docs call their application to Grep "best-effort", so the hook stays.
 #
 # Path normalisation (case, `./`, `//`, `..`) happens inside the shared
-# predicates, so `./YARN.LOCK` and `tools//dotbot/x` are the protected files
+# predicates, so `./TOOLS/DOTBOT/x` and `tools//dotbot/x` are the protected files
 # they name on case-insensitive APFS (agent-loopholes-88c3bb49).
 
 # shellcheck source=lib/protected-paths.sh
@@ -51,7 +51,8 @@ glob_only_templates()
 {
   local g
   g=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
-  [[ "$g" == *.example || "$g" == readme.md || "$g" == */readme.md ]]
+  [[ "$g" == *.example || "$g" == readme.md || "$g" == */readme.md ]] && return 0
+  return 1
 }
 
 input=$(cat)
@@ -78,6 +79,9 @@ case "$tool" in
     fi
     exit 0
     ;;
+  *)
+    # Every other tool carries a file path; the checks below apply.
+    ;;
 esac
 
 if ! fp=$(printf '%s' "$input" | jq -er '.tool_input.file_path // .tool_input.notebook_path' 2> /dev/null); then
@@ -101,7 +105,7 @@ fi
 [[ "$tool" = "Read" ]] && exit 0
 
 if protected_referenced "$fp"; then
-  echo "BLOCKED: $fp is vendored, a lock file, or inside a submodule — do not edit it in place." >&2
+  echo "BLOCKED: $fp is vendored or inside a submodule — do not edit it in place." >&2
   echo "Each group's refresh procedure is in .claude/rules/vendored-files.md." >&2
   exit 2
 fi

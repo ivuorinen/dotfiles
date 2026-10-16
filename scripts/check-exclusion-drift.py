@@ -18,7 +18,7 @@ Usage:
     scripts/check-exclusion-drift.py            # check, exit 1 on drift
     scripts/check-exclusion-drift.py --update   # re-baseline after a reviewed change
 
-Wired into `yarn lint` as `lint:exclusions`.
+Wired into `mise run lint` as the `lint-exclusions` task.
 """
 
 from __future__ import annotations
@@ -66,9 +66,9 @@ def _yaml_list(path: Path, key: str) -> set[str]:
             in_block = True
             continue
         if in_block:
-            item = re.match(r"^\s*-\s*(.+?)\s*$", line)
-            if item:
-                out.add(normalise(item.group(1)))
+            stripped = line.strip()
+            if stripped.startswith("-") and stripped[1:].strip():
+                out.add(normalise(stripped[1:].strip()))
                 continue
             # A non-comment, non-blank line that is not a list item ends the block.
             if line.strip() and not line.lstrip().startswith("#"):
@@ -111,11 +111,18 @@ def from_megalinter() -> set[str]:
     path = REPO / ".mega-linter.yml"
     if not path.exists():
         return set()
-    text = path.read_text(encoding="utf-8")
-    block = re.search(r"^FILTER_REGEX_EXCLUDE\s*:\s*>?\s*\n((?:\s+.*\n)+)", text, re.MULTILINE)
-    if not block:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    header = re.compile(r"FILTER_REGEX_EXCLUDE\s*:\s*>?\s*")
+    start = next((i for i, line in enumerate(lines) if header.fullmatch(line)), None)
+    if start is None:
         return set()
-    joined = " ".join(block.group(1).split())
+    # The folded value is every following line that is blank or indented.
+    block = []
+    for line in lines[start + 1 :]:
+        if line and not line[0].isspace():
+            break
+        block.append(line)
+    joined = " ".join(" ".join(block).split())
     inner = re.search(r"\(([^)]*)\)", joined)
     if not inner:
         return set()
@@ -187,7 +194,7 @@ def main() -> int:
     if args.update:
         # One tree per line with its gate list inline: `json.dumps(indent=2)` would
         # explode every list across lines, which biome's formatter then collapses —
-        # so a plain --update always left `yarn lint:biome` red.
+        # so a plain --update always left `mise run lint-biome` red.
         body = ",\n".join(
             f"  {json.dumps(tree, ensure_ascii=False)}: {json.dumps(gates, ensure_ascii=False)}"
             for tree, gates in current.items()

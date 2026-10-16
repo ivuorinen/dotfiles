@@ -6,7 +6,7 @@ description: "EditorConfig adherence is mandatory for every file edit in this re
 
 Every edit and every write to a tracked file in this repo must
 conform to `.editorconfig`. The Stop-hook lint gate runs
-`editorconfig-checker` via `yarn lint:ec`, and a violation blocks
+`editorconfig-checker` via `mise run lint-ec`, and a violation blocks
 the turn from finishing.
 
 ## Default rules (`[*]`)
@@ -49,7 +49,7 @@ regardless of formatting; `.claude/rules/vendored-files.md` is the policy.
 
 ## When uncertain
 
-Run `yarn lint:ec` against the file you just touched, before
+Run `mise exec -- editorconfig-checker <file>` against the file you just touched, before
 declaring the turn complete. Faster feedback than waiting for the
 Stop-hook gate, and it isolates the failure to one file instead
 of every modified file in the turn.

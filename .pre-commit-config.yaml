@@ -18,18 +18,28 @@ default_install_hook_types: [pre-commit, commit-msg, pre-push]
 default_stages: [pre-commit]
 
 repos:
+  # Every linter and formatter below is a `language: system` hook that runs its
+  # tool through `mise exec --`, so the hook runs the version .mise.toml pins —
+  # the same one an interactive shell, `mise run lint` and CI run. A hook repo
+  # that bundles its own copy drifts from that pin: the shfmt hook repo sat a
+  # release behind mise and the two formatted `! write` differently.
+  #
+  # Three repos stay remote, each because mise cannot provide the tool:
+  #   * commitlint — see below.
+  #   * pre-commit-hooks — small Python checks with no standalone binary.
+  #   * pre-commit-fish — fish_indent ships with fish, and mise's fish is the
+  #     bare binary without it (config/mise/config.toml explains).
+
   # Commit message convention. .commitlintrc.json extends
   # @ivuorinen/commitlint-config, which is not installed anywhere in this repo
-  # (package.json declares no dependencies at all), so it is supplied here as a
-  # hook dependency: prek builds a node environment holding both commitlint and
-  # the config, and commitlint resolves the extends from inside it. That keeps
-  # the repo's no-npm-dependencies property intact.
+  # (the repo has no package.json), so it is supplied here as a hook
+  # dependency: prek builds a node environment holding both commitlint and the
+  # config, and commitlint resolves the extends from inside it.
   #
   # The upstream manifest declares no stages, so commit-msg is set here — and
-  # it is the one hook that must override default_stages above. Every other
-  # hook in this file is language: system on a mise-provided binary; this one
-  # is the exception because the config package has to sit on commitlint's own
-  # resolution path, which a system binary cannot offer.
+  # it is the one hook that must override default_stages above. The config
+  # package has to sit on commitlint's own resolution path, which a system
+  # binary cannot offer.
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.27.0
     hooks:
@@ -60,42 +70,41 @@ repos:
     hooks:
       - id: biome-check
         name: Biome Check
-        entry: biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
+        entry: mise exec -- biome check --write --files-ignore-unknown=true --no-errors-on-unmatched
         language: system
         files: \.(js|ts|jsx|tsx|json)$
       - id: markdown-table-formatter
         name: Markdown Table Formatter
-        # Mirrors the exclusion in `yarn lint:md-table`. docs/audit/findings/
-        # is a tool-managed store: `findings.py index` rewrites INDEX.md with
-        # unaligned tables on every run, so linting it only creates churn.
-        entry: markdown-table-formatter
+        # Mirrors the exclusion in `mise run lint-md-table`.
+        # docs/audit/findings/ is a tool-managed store: `findings.py index`
+        # rewrites INDEX.md with unaligned tables on every run, so linting it
+        # only creates churn.
+        entry: mise exec -- markdown-table-formatter
         language: system
         types: [markdown]
         exclude: ^docs/audit/findings/
       - id: markdownlint
         name: markdownlint
-        # Mirrors `yarn lint:markdownlint` so a commit can't pass the hook
+        # Mirrors `mise run lint-markdownlint` so a commit can't pass the hook
         # then fail the Stop-gate/CI. Honors .markdownlintignore.
-        entry: markdownlint --ignore-path .markdownlintignore
+        entry: mise exec -- markdownlint --ignore-path .markdownlintignore
         language: system
         types: [markdown]
       - id: editorconfig-checker
         name: EditorConfig Checker
-        # Mirrors `yarn lint:ec`. Exclusions live in .editorconfig-checker.json.
-        entry: editorconfig-checker -f gcc
+        # Mirrors `mise run lint-ec`. Exclusions live in
+        # .editorconfig-checker.json.
+        entry: mise exec -- editorconfig-checker -f gcc
         language: system
         types: [text]
-
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.38.0
-    hooks:
       - id: yamllint
-
-  - repo: local
-    hooks:
+        name: yamllint
+        entry: mise exec -- yamllint
+        language: system
+        types: [file, yaml]
       - id: prettier
         name: Prettier (YAML)
-        entry: prettier --write
+        entry: mise exec -- prettier --write
         language: system
         types_or: [yaml]
       - id: v8r
@@ -107,48 +116,86 @@ repos:
         # a pass, so only a file that validated and failed exits non-zero.
         # config/gh/ is rewritten by `gh config set`; its shape follows gh,
         # not schemastore (which rejects gh's `version: "1"`).
-        entry: v8r --ignore-errors
+        entry: mise exec -- v8r --ignore-errors
         language: system
         files: \.(ya?ml|json|toml)$
         exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|node_modules/|graphify-out/|docs/audit/)
-
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
-    hooks:
       - id: shellcheck
+        name: shellcheck
+        entry: mise exec -- shellcheck
+        language: system
+        types: [shell]
+        # shellcheck can follow `source` only when it sees the files together.
+        require_serial: true
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
-
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
-    hooks:
       - id: shfmt
+        name: shfmt
+        entry: mise exec -- shfmt -i 2 -bn -ci -sr -fn -w
+        language: system
+        types: [shell]
+        exclude_types: [csh, tcsh]
         exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
-        args: [-i, "2", -bn, -ci, -sr, -fn, -w]
-
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
-    hooks:
       - id: actionlint
-
-  # GitHub Actions security auditing. Already run by MegaLinter
-  # (ACTION_ZIZMOR); this brings it to commit time too.
-  - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.30.1
-    hooks:
+        name: actionlint
+        entry: mise exec -- actionlint
+        language: system
+        types: [yaml]
+        files: ^\.github/workflows/
+      # GitHub Actions security auditing. Already run by MegaLinter
+      # (ACTION_ZIZMOR); this brings it to commit time too. The files filter
+      # is upstream's: workflows, dependabot config, action.yml and the
+      # pre-commit configs.
       - id: zizmor
-
-  # Secret scanning. Stronger than detect-private-key (PEM headers only);
-  # covers secrets.d/ and ssh/. Scans staged changes only.
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
-    hooks:
+        name: zizmor
+        entry: mise exec -- zizmor --no-progress
+        language: system
+        types: [yaml]
+        files: (^|/)(\.github/(workflows/[^/]+|dependabot)\.ya?ml|action\.ya?ml|\.pre-commit-(config|hooks)\.ya?ml)$
+        require_serial: true
+      # Secret scanning. Stronger than detect-private-key (PEM headers only);
+      # covers secrets.d/ and ssh/. Scans staged changes only.
       - id: gitleaks
-
-  - repo: https://github.com/JohnnyMorganz/StyLua
-    rev: v2.5.2
-    hooks:
-      - id: stylua # or stylua-system / stylua-github
+        name: Detect hardcoded secrets
+        entry: mise exec -- gitleaks git --pre-commit --redact --staged --verbose
+        language: system
+        pass_filenames: false
+      - id: stylua
+        name: StyLua
+        entry: mise exec -- stylua
+        language: system
+        types: [lua]
         exclude: hammerspoon\.types\.lua$
+      - id: ruff-check
+        name: ruff check
+        entry: mise exec -- ruff check --force-exclude --fix
+        language: system
+        types_or: [python, pyi, jupyter]
+        require_serial: true
+        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
+      - id: ruff-format
+        name: ruff format
+        # ruff formats Python code blocks inside Markdown, but upstream's hook
+        # only passed python/pyi/jupyter, so `ruff format --check .` could fail
+        # on a rule file while every gate reported clean. The repo's rule files
+        # are dense with Python snippets, hence markdown.
+        entry: mise exec -- ruff format --force-exclude
+        language: system
+        types_or: [python, pyi, jupyter, markdown]
+        require_serial: true
+        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
+      - id: bandit
+        name: bandit
+        # Mirrors `mise run lint-bandit`. -c is mandatory: bandit never
+        # auto-discovers pyproject.toml, and parsing TOML needs the [toml]
+        # extra that .mise.toml installs.
+        entry: mise exec -- bandit -c pyproject.toml
+        language: system
+        types: [python]
+        require_serial: true
+        # exclude_dirs in pyproject.toml only prunes directory recursion.
+        # pre-commit hands bandit explicit filenames, so the vendored fish
+        # helper has to be excluded here as well or it is scanned anyway.
+        exclude: ^config/fish/functions/__bass\.py$
 
   - repo: https://github.com/hugoh/pre-commit-fish.git
     rev: v1.2
@@ -156,38 +203,11 @@ repos:
       - id: fish_syntax
       - id: fish_indent
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.10
-    hooks:
-      - id: ruff-check
-        args: [--fix]
-        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
-      - id: ruff-format
-        # ruff formats Python code blocks inside Markdown, but the upstream
-        # hook only passes python/pyi/jupyter, so `ruff format --check .`
-        # could fail on a rule file while every gate reported clean. The
-        # repo's rule files are dense with Python snippets, hence markdown.
-        types_or: [python, pyi, jupyter, markdown]
-        exclude: ^config/(bash/completions\.d|zsh/completions\.d)/
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.9.4
-    hooks:
-      - id: bandit
-        # Mirrors `yarn lint:bandit`. -c is mandatory: bandit never
-        # auto-discovers pyproject.toml, and parsing TOML needs the extra.
-        args: [-c, pyproject.toml]
-        additional_dependencies: ["bandit[toml]"]
-        # exclude_dirs in pyproject.toml only prunes directory recursion.
-        # pre-commit hands bandit explicit filenames, so the vendored fish
-        # helper has to be excluded here as well or it is scanned anyway.
-        exclude: ^config/fish/functions/__bass\.py$
-
   - repo: local
     hooks:
       - id: usage-lint
         name: usage lint (scripts/ and local/bin/)
-        entry: bash -c 'rc=0; for f in "$@"; do grep -q "#USAGE\|//USAGE" "$f" 2>/dev/null || continue; usage lint "$f" || rc=1; done; exit $rc' --
+        entry: mise exec -- bash -c 'rc=0; for f in "$@"; do grep -q "#USAGE\|//USAGE" "$f" 2>/dev/null || continue; usage lint "$f" || rc=1; done; exit $rc' --
         language: system
         files: ^(scripts/.*\.sh|local/bin/[^/]+)$
         exclude: \.(py|pl|php|md)$
@@ -223,7 +243,7 @@ repos:
         # scripts/bats-run.sh runs `bats --print-output-on-failure` and ends
         # with one block listing every failing test as file:line, so a
         # `not ok` is not lost among ~1000 lines of hook output.
-        entry: env -u GIT_INDEX_FILE -u GIT_DIR -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY
+        entry: mise exec -- env -u GIT_INDEX_FILE -u GIT_DIR -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY
           -u GIT_COMMON_DIR -u GIT_PREFIX scripts/bats-run.sh tests/
         language: system
         pass_filenames: false

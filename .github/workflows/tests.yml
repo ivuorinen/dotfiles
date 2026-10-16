@@ -77,7 +77,7 @@ jobs:
         run: scripts/bats-run.sh tests/
 
   lint:
-    name: Lint (yarn lint)
+    name: Lint (mise run lint)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -91,11 +91,8 @@ jobs:
       - name: Install the mise toolchain
         uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
 
-      - name: Enable corepack for the pinned yarn
-        run: corepack enable
-
       - name: Run lint
-        run: yarn lint
+        run: mise run lint
 
   fish-lint:
     name: Fish syntax and formatting

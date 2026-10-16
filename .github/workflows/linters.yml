@@ -32,10 +32,5 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Yarn Lock Changes
-        uses: Simek/yarn-lock-changes@59f47ee499424d2c2437c5aebf863b5c6d50a5bc # v0.14.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run PR Lint
         uses: ivuorinen/actions/pr-lint@94a4f68a6b95ecc1677fbcac1683119fd869adf7 # v2026.07.04

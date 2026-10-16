@@ -1,11 +1,11 @@
 #!/usr/bin/env bats
 #
 # Coverage for .claude/hooks/pre-edit-block.sh — the PreToolUse guard that
-# blocks edits to vendored, lock, and submodule files, and blocks both reads
+# blocks edits to vendored and submodule files, and blocks both reads
 # and edits of real secrets.d fish files.
 #
 # The guard's patterns are all anchored with a leading `*/`, so every path
-# here is absolute. A bare "yarn.lock" would not match, and a test using one
+# here is absolute. A bare "tools/dotbot/x" would not match, and a test using one
 # would pass while proving nothing.
 
 bats_require_minimum_version 1.5.0
@@ -27,10 +27,10 @@ decide()
     | bash "$HOOK"
 }
 
-@test "pre-edit-block: blocks lock and yarn-internal files" {
-  run -2 decide "$REPO/yarn.lock"
+@test "pre-edit-block: blocks vendored files" {
+  run -2 decide "$REPO/config/fish/functions/bass.fish"
   [[ "$output" == *"do not edit it in place"* ]]
-  run -2 decide "$REPO/.yarn/releases/yarn-4.17.1.cjs"
+  run -2 decide "$REPO/.claude/skills/graphify/SKILL.md"
 }
 
 # fzf is no longer vendored: its shell integration comes from the mise binary,
@@ -106,16 +106,16 @@ decide()
 }
 
 # Deliberate asymmetry: vendored files are read-only, not read-blocked. A Read
-# of yarn.lock is legitimate; only Edit/Write is refused.
+# of a vendored file is legitimate; only Edit/Write is refused.
 @test "pre-edit-block: reading a vendored file is allowed" {
-  run -0 decide "$REPO/yarn.lock" Read
+  run -0 decide "$REPO/.claude/skills/graphify/SKILL.md" Read
   run -0 decide "$REPO/config/fish/functions/fisher.fish" Read
 }
 
 # The raw path was matched unnormalised, so case (APFS is case-insensitive),
 # `./`, `//` and `..` spellings reached protected files (agent-loopholes-88c3bb49).
 @test "pre-edit-block: normalises case, dot and doubled-slash spellings" {
-  run -2 decide "./YARN.LOCK" Write
+  run -2 decide "./CONFIG/FISH/FUNCTIONS/BASS.FISH" Write
   run -2 decide "$REPO/tools/./dotbot/x" Write
   run -2 decide "$REPO/tools//dotbot/x" Write
   run -2 decide "$REPO/tools/x/../dotbot/x" Write
@@ -155,7 +155,7 @@ search()
   run -2 search Glob "$REPO" "config/fish/secret?.d/*"
   run -0 search Grep "$REPO/local/bin"
   run -0 search Glob "$REPO" "**/*.md"
-  run -0 search Grep "$REPO/yarn.lock"
+  run -0 search Grep "$REPO/config/fish/functions/bass.fish"
   run -0 bash -c 'jq -cn "{tool_name: \"Grep\", tool_input: {pattern: \"secrets.d\"}}" | bash "$1"' _ "$HOOK"
   run -2 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/.claude/skills/graphify/x.ipynb"
   run -0 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/notes/x.ipynb"

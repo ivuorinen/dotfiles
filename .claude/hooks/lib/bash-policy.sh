@@ -161,7 +161,7 @@ BP_ENV_BYPASS_TEXT_RE='(^|[^[:alnum:]_])(SKIP|PRE_COMMIT_ALLOW_NO_CONFIG|GIT_CON
 # from the AST's redirect records. The in-place editors (perl/ruby -i, the vi
 # family, ed, patch, rsync) and an awk program's own `print > file` write too
 # (audit-5a6f71da); they are anchored to the command word, since `patch` and
-# `vim` are ordinary search terms in a read of yarn.lock.
+# `vim` are ordinary search terms in a read of a protected file.
 BP_WRITE_SEG_RE='(^|[[:space:]])(tee|cp|mv|rm|ln|truncate|install|dd|chmod|unlink)([[:space:]]|$)|sed[[:space:]].*-i|git[[:space:]]+(checkout|restore|rm|mv|apply|reset)'
 BP_WRITE_SEG_RE+='|^(perl|ruby)[[:space:]](.*[[:space:]])?-[A-Za-z0-9]*i([[:space:]]|$|\.)|^(ed|ex|vi|vim|nvim|patch|rsync)([[:space:]]|$)'
 BP_WRITE_SEG_RE+='|^g?awk[[:space:]].*(printf?[^;}]*>|-i[[:space:]]*inplace)'
@@ -186,12 +186,12 @@ BP_HOOKCFG_RE+='|[Cc][Oo][Mm][Mm][Ii][Tt]\.[Gg][Pp][Gg][Ss][Ii][Gg][Nn][[:space:
 BP_ALIASCFG_RE='(^|=)[Aa][Ll][Ii][Aa][Ss]\.'
 
 BP_R_NET="Network fetchers are banned in shell commands (.claude/rules/context-mode.md). Use ctx_fetch_and_index(url, source), or ctx_execute(language: \"javascript\") with fetch()."
-BP_R_NPM="This repo uses Yarn Berry, never npm (.claude/rules/no-npm.md). Use yarn / yarn add / yarn dlx <package>."
+BP_R_NPM="Node CLIs come from mise, never npm/npx/pnpm (.claude/rules/no-npm.md). Pin the tool as \"npm:<package>\" in .mise.toml and run it with mise exec -- <tool>."
 BP_R_PIP="Python packages come from config/mise/default-python-packages, never pip or uv installs by hand (.claude/rules/mise-packages.md)."
 BP_R_BYPASS="The command bypasses the project's hook chain (.claude/rules/no-hook-bypass.md). Fix the failing hook instead."
 BP_R_STAGE="Stage with git-hunk, never git add (.claude/rules/git-hunk-commits.md): git-hunk list, then git-hunk commit <hash>... -m '...'."
 BP_R_SECRETS="The command names a secrets.d tree or a real secrets file, which hold live credentials (.claude/rules/secrets-files.md). Ask the user instead."
-BP_R_PROTECTED="The command writes to a protected path — vendored, lock, submodule or git hook file (.claude/rules/vendored-files.md, .claude/rules/no-hook-bypass.md). Refresh vendored files from upstream instead."
+BP_R_PROTECTED="The command writes to a protected path — vendored, submodule or git hook file (.claude/rules/vendored-files.md, .claude/rules/no-hook-bypass.md). Refresh vendored files from upstream instead."
 
 # Extract the first word (the command name) of a space-joined segment.
 first_word()
@@ -216,6 +216,7 @@ normalise_cmd()
     [[ "$w" == "$prev" ]] && break
   done
   printf '%s' "${w##*/}"
+  return 0
 }
 
 # Drop git's global options so the subcommand is the second word
@@ -348,7 +349,7 @@ _bp_has_after()
 # _bp_git_msgfree ARGV... — set BP_MF to a git or git-hunk argv without its
 # message values. Only the subcommands whose -m/--message is message text are
 # filtered (git commit, tag, merge, notes, stash; git-hunk commit); elsewhere
-# -m is a flag (`git checkout -m yarn.lock`) and the next word a path that
+# -m is a flag (`git checkout -m tools/dotbot`) and the next word a path that
 # must stay checked. _bp_commit_opts already knows every message spelling:
 # -m V, -mV, -amV, --message[=V] and its abbreviations.
 _bp_git_msgfree()
@@ -412,7 +413,7 @@ _bp_protected()
   protected_referenced "$*" && return 0
   for a in "$@"; do
     # The normaliser reads `{...}` as a brace expansion and collapses it to
-    # `*`, which swallowed the target of awk's `{print > "yarn.lock"}`.
+    # `*`, which swallowed the target of awk's `{print > "tools/dotbot/x"}`.
     if [[ $a == *[{}]* ]] && protected_referenced "${a//[\{\}]/ }"; then
       return 0
     fi
@@ -627,7 +628,7 @@ _bp_final()
   fw=${w[0]##*/}
   # Message text is never code: every check below sees git's argv with the
   # -m/--message values removed (_bp_git_msgfree), so `git commit -m 'git
-  # checkout yarn.lock'` and `git tag -m '--no-verify'` are text, not a write
+  # checkout tools/dotbot'` and `git tag -m '--no-verify'` are text, not a write
   # or a bypass flag.
   if [[ $fw == git || $fw == git-hunk ]]; then
     _bp_git_msgfree "${w[@]}"
@@ -752,7 +753,7 @@ _bp_final()
   fi
 
   # The git alternative of BP_WRITE_SEG_RE anchors the subcommand right after
-  # `git`, so global options (`git -C . checkout -- yarn.lock`, `git
+  # `git`, so global options (`git -C . checkout -- tools/dotbot`, `git
   # --no-pager restore …`) hid it; match the write check against the segment
   # with those options removed too.
   local wseg=$seg
@@ -871,8 +872,9 @@ _bp_bypass_args()
 # `--NAME` at least MIN characters long; git accepts any unambiguous prefix.
 _bp_long()
 {
-  local t=${1#--}
-  [[ ${#t} -ge $3 && $2 == "$t"* ]]
+  local t=${1#--} name=$2 min=$3
+  [[ ${#t} -ge $min && $name == "$t"* ]] && return 0
+  return 1
 }
 
 # _bp_commit_opts ARGS... — parse `git commit` (or `git-hunk commit`)
@@ -1067,7 +1069,7 @@ _bp_git_config()
         ;;
     esac
   done
-  ((read && !write)) && return 0
+  ((read && ! write)) && return 0
   _bp_bypass_args "$@"
   for a in "$@"; do
     [[ $a =~ $BP_ALIASCFG_RE ]] && _bp_deny "Defining a git alias renames a subcommand past every check (.claude/rules/git-hunk-commits.md). Spell the subcommand out."

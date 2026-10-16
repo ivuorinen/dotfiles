@@ -7,12 +7,10 @@
 # tests/protected-paths-parity.bats checks every `paths:` entry in
 # .claude/rules/vendored-files.md against the three hooks that source this.
 
-# Vendored files, lock files and submodule trees: never edited in place. The
-# list is the source; PROTECTED_RE and the glob check below are both built from
-# it, so a path is added in one place.
+# Vendored files and submodule trees: never edited in place. The list is the
+# source; PROTECTED_RE and the glob check below are both built from it, so a
+# path is added in one place.
 PROTECTED_PATHS=(
-  yarn.lock
-  .yarn
   tools/dotbot
   tools/antidote
   config/cheat/cheatsheets/community
@@ -39,7 +37,7 @@ PROTECTED_RE="($(printf '%s\n' "${PROTECTED_PATHS[@]}" | sed 's/\./\\./g' | past
 # Path normalisation applied before either predicate matches. Each step closes a
 # spelling that named a protected file without the literal string
 # (agent-loopholes-88c3bb49, agent-loopholes-6cb6e566):
-#   - lower-case: macOS APFS is case-insensitive, so ./YARN.LOCK is yarn.lock
+#   - lower-case: macOS APFS is case-insensitive, so ./TOOLS/DOTBOT is tools/dotbot
 #   - quotes and backslashes dropped: the shell removes them (secre""ts.d)
 #   - a brace expansion becomes `*`, so the glob check below sees it
 #   - `//`, `/./`, a leading `./` and `dir/../` collapse lexically
@@ -62,18 +60,20 @@ t up
 # it into one (agent-hooks-84fa86e9).
 _pp_normalise()
 {
-  if [[ ${2:-} == parsed ]]; then
-    printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]' | sed -E "$_PP_NORM_SED"
+  local text=$1 mode=${2:-}
+  if [[ $mode == parsed ]]; then
+    printf '%s\n' "$text" | tr '[:upper:]' '[:lower:]' | sed -E "$_PP_NORM_SED"
     return 0
   fi
-  printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]' | tr -d "\"'\\\\" | sed -E "$_PP_NORM_SED"
+  printf '%s\n' "$text" | tr '[:upper:]' '[:lower:]' | tr -d "\"'\\\\" | sed -E "$_PP_NORM_SED"
+  return 0
 }
 
 # _pp_glob_hits TEXT PATH... — succeed when a token in TEXT carrying a glob
 # metacharacter (`*`, `?`, `[`) could expand to one of PATHs.
 #
 # The literal predicates match text the hook sees, but the shell expands globs
-# afterwards: `secret?.d` and `yarn.l?ck` name the protected files without the
+# afterwards: `secret?.d` and `b?ss.fish` name the protected files without the
 # literal string (agent-loopholes-6cb6e566). Each token is split on `/` and
 # compared component-wise against each PATH, with the token's component as the
 # pattern (`[[ secrets.d == secret?.d ]]`), at every offset so a leading
@@ -81,7 +81,7 @@ _pp_normalise()
 #
 # At least one compared component must carry a literal character. A component
 # made only of `*`/`?` matches every name, and allowing it alone would refuse
-# `rm build/*` for matching yarn.lock. So `tools/*` still counts (the `tools`
+# `rm build/*` for matching a protected file. So `tools/*` still counts (the `tools`
 # component is literal) while a bare `*` does not.
 #
 # ponytail: a bare `*` in the protected directory itself (`cd tools; rm -rf *`)

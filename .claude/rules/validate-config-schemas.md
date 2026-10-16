@@ -27,19 +27,19 @@ The repeat failure mode this rule prevents:
 
 ## How to validate
 
-`yarn dlx v8r <file>` is the universal entry point — it auto-detects
+`mise exec -- v8r <file>` is the universal entry point — it auto-detects
 the schema from `schemastore.org` for most well-known formats. Run
 it after any edit to a file with a known schema and before
 committing.
 
-| File pattern                                   | Tool                                   | Checks                   |
-|------------------------------------------------|----------------------------------------|--------------------------|
-| `.mega-linter.yml`                             | `yarn dlx v8r .mega-linter.yml`        | JSON Schema              |
-| `.github/workflows/*.yml`                      | `actionlint` (already in pre-commit)   | GHA grammar (not schema) |
-| `package.json`, `biome.json`, `tsconfig*.json` | `yarn dlx v8r <file>`                  | JSON Schema              |
-| `.pre-commit-config.yaml`                      | `yarn dlx v8r .pre-commit-config.yaml` | JSON Schema              |
-| `install.conf.yaml` (Dotbot)                   | `dotbot-validate` skill                | YAML + link targets      |
-| Generic YAML without a schema                  | `yamllint` (already in pre-commit)     | Syntax/style only        |
+| File pattern                  | Tool                                       | Checks                   |
+|-------------------------------|--------------------------------------------|--------------------------|
+| `.mega-linter.yml`            | `mise exec -- v8r .mega-linter.yml`        | JSON Schema              |
+| `.github/workflows/*.yml`     | `actionlint` (already in pre-commit)       | GHA grammar (not schema) |
+| `.mise.toml`, `biome.json`    | `mise exec -- v8r <file>`                  | JSON Schema              |
+| `.pre-commit-config.yaml`     | `mise exec -- v8r .pre-commit-config.yaml` | JSON Schema              |
+| `install.conf.yaml` (Dotbot)  | `dotbot-validate` skill                    | YAML + link targets      |
+| Generic YAML without a schema | `yamllint` (already in pre-commit)         | Syntax/style only        |
 
 If `v8r` says "no schema found", the file is not schema-backed — run the
 project's existing syntax linter (yamllint, biome, ruff, …) for formatting
@@ -53,7 +53,7 @@ Which values need evidence and which are freeform is defined once, in
 
 ## What the gates cover
 
-`v8r --ignore-errors` runs in pre-commit and in `yarn lint:v8r` (the
+`v8r --ignore-errors` runs in pre-commit and in `mise run lint-v8r` (the
 Stop gate) over every tracked YAML, JSON and TOML file, excluding
 submodules, cheat sheets, `config/gh/` (rewritten by `gh config set`),
 `graphify-out/` and `docs/audit/`. A file with a schema-store match that

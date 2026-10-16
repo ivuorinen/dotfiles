@@ -6,8 +6,9 @@
 #
 # Without paths-ignore every finding lands in submodules (tools/dotbot's bundled
 # PyYAML, the tldr cheatsheets) -- code whose fixes the next upstream sync
-# discards. The list mirrors exclude_paths in .codacy.yml; `yarn lint:exclusions`
-# (scripts/check-exclusion-drift.py) fails when the two stop agreeing.
+# discards. The list mirrors exclude_paths in .codacy.yml;
+# `mise run lint-exclusions` (scripts/check-exclusion-drift.py) fails when the
+# two stop agreeing.
 #
 # Pattern rules differ from gitignore: `?`, `+`, `[`, `]` and `!` match
 # literally, and `**` may only appear at the start or end of a pattern or
@@ -39,6 +40,5 @@ paths-ignore:
   - "config/zsh/completions.d/**"
   # Tool-managed trees, never hand-edited
   - "node_modules/**"
-  - ".yarn/**"
   - "graphify-out/**"
   - "config/tmux/plugins/**"

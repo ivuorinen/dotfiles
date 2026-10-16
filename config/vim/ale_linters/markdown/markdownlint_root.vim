@@ -7,7 +7,7 @@
 " when vim starts in a subdirectory, ignored files get linted anyway, and
 " --ignore-path cannot help because the patterns still resolve against the
 " cwd. This linter runs from the directory that holds the nearest
-" .markdownlintignore, the same place `yarn lint:markdownlint` runs from,
+" .markdownlintignore, the same place `mise run lint-markdownlint` runs from,
 " which also makes markdownlint pick up that project's .markdownlint.json.
 " Without an ignore file it falls back to ALE's default cwd.
 "

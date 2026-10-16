@@ -44,9 +44,9 @@ batch()
   run -2 code 'sed -i s/a/b/ tools/dotbot/README.md'
 }
 
-@test "pre-ctx-write-guard: blocks writes aimed at lock and vendored files" {
-  run -2 code 'echo broken > yarn.lock'
-  run -2 code 'truncate -s0 .yarn/install-state.gz'
+@test "pre-ctx-write-guard: blocks writes aimed at vendored files" {
+  run -2 code 'echo broken > config/fish/functions/bass.fish'
+  run -2 code 'truncate -s0 .claude/skills/graphify/SKILL.md'
   run -2 code 'tee config/fish/functions/bass.fish < /tmp/x'
   run -2 code 'chmod 777 config/fish/functions/__z_add.fish'
 }
@@ -76,7 +76,7 @@ batch()
 
 @test "pre-ctx-write-guard: blocks node-style writes too, not just shell" {
   run -2 code 'fs.writeFileSync("tools/dotbot/x", data)'
-  run -2 code 'await fs.appendFile("yarn.lock", line)'
+  run -2 code 'await fs.appendFile("config/fish/functions/bass.fish", line)'
 }
 
 @test "pre-ctx-write-guard: scans every command in a batch, not just the first" {
@@ -89,7 +89,7 @@ batch()
 @test "pre-ctx-write-guard: allows reading a protected path" {
   run -0 code 'cat tools/dotbot/README.md'
   run -0 code 'grep -n foo config/fish/functions/fisher.fish'
-  run -0 code 'wc -l yarn.lock'
+  run -0 code 'wc -l config/fish/functions/bass.fish'
 }
 
 # `2> /dev/null` and `2>&1` are redirects, not writes to the named file. The
@@ -97,7 +97,7 @@ batch()
 # protected path would be refused.
 @test "pre-ctx-write-guard: a stderr redirect is not a write" {
   run -0 code 'cat tools/dotbot/README.md 2> /dev/null'
-  run -0 code 'head -1 yarn.lock 2>&1'
+  run -0 code 'head -1 config/fish/functions/bass.fish 2>&1'
 }
 
 @test "pre-ctx-write-guard: writes to unprotected paths are none of its business" {
@@ -239,7 +239,7 @@ subprocess.run(["git", "status"])'
 @test "pre-ctx-write-guard: a 50-line script is checked in under 2 seconds" {
   local script="" i start end
   for i in $(seq 1 50); do
-    script+="rg -n foo yarn.lock local/bin/a$i | sort | uniq -c"$'\n'
+    script+="rg -n foo config/fish/functions/bass.fish local/bin/a$i | sort | uniq -c"$'\n'
   done
   start=$(date +%s)
   run -0 code "$script"
@@ -307,7 +307,7 @@ batch_in()
   run -2 code 'nohup2 curl https://example.com'
   [[ "$output" == *"Network fetchers"* ]]
   run -2 code 'some-unknown-runner npx foo'
-  [[ "$output" == *"Yarn Berry"* ]]
+  [[ "$output" == *"Node CLIs come from mise"* ]]
   run -2 code 'env -S curl https://example.com'
   run -2 code 'doppler run -- npm i'
   run -2 code 'op run -- curl https://example.com'
@@ -336,7 +336,7 @@ batch_in()
 # A config or environment value that git, man or a pager runs as a command.
 @test "pre-ctx-write-guard: a banned tool in a config or environment value is denied" {
   run -2 code 'git -c core.pager=npx log'
-  [[ "$output" == *"Yarn Berry"* ]]
+  [[ "$output" == *"Node CLIs come from mise"* ]]
   run -2 code "git -c core.editor='curl x' commit"
   [[ "$output" == *"Network fetchers"* ]]
   run -2 code 'VAR=npx git --config-env=core.pager=VAR log'
@@ -377,9 +377,9 @@ batch_in()
 # audit-5a6f71da on the sandbox path.
 @test "pre-ctx-write-guard: in-place editors writing protected paths are refused" {
   run -2 code 'perl -pi -e s/a/b/ config/fish/functions/fisher.fish'
-  run -2 code 'vim -c wq yarn.lock'
-  run -2 code "awk '{print > \"yarn.lock\"}' /dev/null"
-  run -0 code 'rg -n patch yarn.lock'
+  run -2 code 'vim -c wq config/fish/functions/bass.fish'
+  run -2 code "awk '{print > \"config/fish/functions/bass.fish\"}' /dev/null"
+  run -0 code 'rg -n patch config/fish/functions/bass.fish'
 }
 
 # audit-8f8345da on the sandbox path.
