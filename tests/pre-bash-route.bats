@@ -76,6 +76,15 @@ decision()
   [ "$(decision 'mise run test')" = "deny" ]
   [ "$(decision 'mise r lint-ec')" = "deny" ]
   [ "$(decision 'mise tasks run fix')" = "deny" ]
+  [ "$(decision 'mise t run fix')" = "deny" ]
+  [ "$(decision 'mise task run lint')" = "deny" ]
+  [ "$(decision 'mise watch lint')" = "deny" ]
+  # `mise <task>` is mise's shorthand for `mise run <task>`.
+  [ "$(decision 'mise lint')" = "deny" ]
+  [ "$(decision 'mise lint-ec')" = "deny" ]
+  [ "$(decision 'mise test')" = "deny" ]
+  [ "$(decision 'mise fix-md-table')" = "deny" ]
+  [ "$(decision 'mise format-yaml')" = "deny" ]
   [ "$(decision 'pre-commit run --all-files')" = "deny" ]
   # prek is the runner actually installed; denying only the old name left the
   # real command unrouted.
@@ -88,6 +97,7 @@ decision()
   [ "$(decision 'mise install')" = "allow" ]
   # `mise run` is denied above; the other mise subcommands are not gates.
   [ "$(decision 'mise trust')" = "allow" ]
+  [ "$(decision 'mise fmt')" = "allow" ]
   [ "$(decision 'shfmt -w local/bin/dfm')" = "allow" ]
   [ "$(decision 'fish_indent --write config/fish/config.fish')" = "allow" ]
 }

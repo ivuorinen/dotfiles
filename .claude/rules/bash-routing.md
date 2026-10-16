@@ -18,8 +18,9 @@ If a shell command produces output you intend to read, use
 - `biome check`, `yamllint`, `actionlint`, `stylua --check` — every formatter check.
 - `ruff check`, `ruff format --check` — every Python check.
 - `prek run` (and `pre-commit run`), `mise run lint`, `mise run test` — every
-  quality gate (`mise run`, `mise r` and `mise tasks run` are all denied, which
-  covers `mise run lint-ec`, `mise run lint-bandit`, and friends).
+  quality gate (`mise run`, `mise r`, `mise tasks run`, `mise watch` and the
+  `mise <task>` shorthand are all denied, which covers `mise run lint-ec`,
+  `mise lint-bandit`, and friends).
 - `dfm <subcommand>` — dotfiles manager commands.
 - `git log`, `git diff`, `git diff --stat`, `git show`, `git blame` — always.
   The hook lets `git status` (with or without `-s`) through as a one-line
