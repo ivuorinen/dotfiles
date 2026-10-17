@@ -202,10 +202,12 @@ nvim_scheme()
   compgen -G "$data/site/pack/*/opt/kanagawa" > /dev/null || skip "kanagawa.nvim not installed"
   # Start on kanagawa, switch the family, and let the 3 s timer fire
   # (:sleep runs the event loop), as vim's live test does.
+  # auto-dark-mode re-reads the OS appearance during the sleep, so the
+  # flavour (mocha or latte) follows the host; only the family is asserted.
   run env DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
     "+lua vim.env.DOTFILES_THEME_FAMILY = 'catppuccin'" '+sleep 4' \
     '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa
-  [ "${lines[${#lines[@]} - 1]}" = "catppuccin-mocha" ]
+  [[ "${lines[${#lines[@]} - 1]}" == catppuccin-* ]]
 }
 
 @test "nvim: oasis selects abyss in both modes" {
