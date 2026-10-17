@@ -2,9 +2,21 @@
 extends: default
 
 ignore: |
+  .mypy_cache
+  Brewfile.lock.json
+  config/cheat/cheatsheets/community
+  config/cheat/cheatsheets/tldr
+  config/nvim
+  config/op/plugins/used_plugins
+  config/tmux/plugins
+  config/vim/extra
+  config/vim/plugged
+  config/zsh
+  lazy-lock.json
+  local/bin/antigen.zsh
+  local/bin/asdf
   node_modules
   tools
-  config/tmux/plugins
 
 rules:
   empty-lines:
