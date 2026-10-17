@@ -636,7 +636,6 @@ local function open()
     row = row,
     col = col,
     style = 'minimal',
-    border = 'rounded',
     title = ' vim.pack ',
     title_pos = 'center',
   })

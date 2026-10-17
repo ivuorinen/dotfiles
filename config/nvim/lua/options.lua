@@ -68,6 +68,7 @@ o.writebackup = false -- Don't backup on write
 o.pumblend = 10 -- Transparent popup menu (0 = opaque)
 o.pumheight = 10 -- Popup menu max height (0 = unlimited)
 o.winblend = 10 -- Transparent floating windows (0 = opaque)
+o.winborder = 'rounded' -- Default border for every float that does not set its own
 o.ruler = false -- position shown in mini.statusline; ruler in cmdline is redundant
 
 -- Folding via treesitter (native; no plugin required)
