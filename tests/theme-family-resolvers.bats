@@ -293,6 +293,44 @@ LUA
   [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 
+@test "wezterm: a saved choice must pass the shared family rule" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
+  cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
+local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
+local stub = setmetatable({}, { __index = function() return any end })
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.config_builder = function() return {} end
+stub.on = function() end
+stub.action = setmetatable({}, { __index = function() return function() return {} end end })
+package.loaded.wezterm = stub
+dofile(arg[1])
+print('pair=' .. Scheme_for_appearance 'Dark' .. '|' .. Scheme_for_appearance 'Light')
+LUA
+  mkdir -p "$TMPDIR_TEST/state/dotfiles-theme"
+  local choice="$TMPDIR_TEST/state/dotfiles-theme/choice"
+  # Surrounding whitespace is trimmed, as read -r does in _lib.sh.
+  echo '  kanagawa ' > "$choice"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Kanagawa Wave|Kanagawa Lotus AA"* ]]
+  # Inner whitespace is not a slug, so the tracked default (oasis) wins.
+  echo 'kana gawa' > "$choice"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
+  # A family with a scheme pair but no palettes.d dir is skipped too.
+  local dots="$TMPDIR_TEST/dots"
+  mkdir -p "$dots/config/theme/palettes.d/oasis"
+  echo oasis > "$dots/config/theme/family"
+  echo kanagawa > "$choice"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" DOTFILES="$dots" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
+}
+
 @test "wezterm: the orchestrator's mode file wins over the appearance" {
   command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'

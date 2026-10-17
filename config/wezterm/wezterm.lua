@@ -249,9 +249,10 @@ local schemes = {
 }
 
 -- Theme family, resolved as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
--- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/family, then
--- config/theme/family. A name with no scheme pair here is skipped (the name
--- is only ever a table key), and nothing usable means oasis.
+-- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/choice, then
+-- config/theme/family. A file value counts only under _theme_valid_family's
+-- rule (a slug naming a palettes.d/<family>/ dir) and with a scheme pair
+-- here; anything else is skipped, and nothing usable means oasis.
 local function theme_family()
   local env = os.getenv 'DOTFILES_THEME_FAMILY'
   if env and env ~= '' then
@@ -260,15 +261,26 @@ local function theme_family()
   local home = os.getenv 'HOME' or ''
   local state = os.getenv 'XDG_STATE_HOME' or (home .. '/.local/state')
   local dotfiles = os.getenv 'DOTFILES' or (home .. '/.dotfiles')
+  local function valid(family)
+    if not (family:match '^[a-z0-9][a-z0-9-]*$' and schemes[family]) then
+      return false
+    end
+    -- Opening "<dir>/" succeeds only when the directory exists.
+    local dir = io.open(dotfiles .. '/config/theme/palettes.d/' .. family .. '/', 'r')
+    if dir then
+      dir:close()
+    end
+    return dir ~= nil
+  end
   for _, path in ipairs {
     state .. '/dotfiles-theme/choice',
     dotfiles .. '/config/theme/family',
   } do
     local f = io.open(path, 'r')
     if f then
-      local family = (f:read '*l' or ''):gsub('%s+', '')
+      local family = (f:read '*l' or ''):match '^%s*(.-)%s*$'
       f:close()
-      if schemes[family] then
+      if valid(family) then
         return family
       end
     end
