@@ -260,10 +260,10 @@ repos:
         language: system
         files: ^\.claude/rules/.*\.md$
       - id: claude-md-length
-        name: CLAUDE.md at most 200 lines
+        name: CLAUDE.md and AGENTS.md at most 200 lines
         entry: bash -c 'rc=0; for f; do n=$(wc -l < "$f"); [ "$n" -le 200 ] || { echo "$f has $n lines, limit 200"; rc=1; }; done; exit $rc' --
         language: system
-        files: (^|/)CLAUDE\.md$
+        files: (^|/)(CLAUDE|AGENTS)\.md$
       - id: host-leak-check
         name: No host names or ~/Code paths added to shared config
         entry: scripts/check-host-leak.sh
