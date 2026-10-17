@@ -165,9 +165,12 @@ vim_scheme()
 
 # --- nvim -------------------------------------------------------------
 
+# Every nvim run here sets XDG_CONFIG_HOME to the checkout: nvim would
+# otherwise load ~/.config/nvim, the installed config rather than the one
+# under test.
 nvim_scheme()
 {
-  DOTFILES_THEME_FAMILY="${1:-}" timeout 60 nvim --headless \
+  XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY="${1:-}" timeout 60 nvim --headless \
     "+set background=${2:-dark}" \
     '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa 2> /dev/null | tail -1
 }
@@ -204,7 +207,7 @@ nvim_scheme()
   # (:sleep runs the event loop), as vim's live test does.
   # auto-dark-mode re-reads the OS appearance during the sleep, so the
   # flavour (mocha or latte) follows the host; only the family is asserted.
-  run env DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
+  run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
     "+lua vim.env.DOTFILES_THEME_FAMILY = 'catppuccin'" '+sleep 4' \
     '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa
   [[ "${lines[${#lines[@]} - 1]}" == catppuccin-* ]]
@@ -221,7 +224,7 @@ nvim_scheme()
   # palette: Abyss Dark and Abyss Light 3 (intensity 3) backgrounds.
   local bg
   for bg in dark:000000 light:d8d8d8; do
-    run env DOTFILES_THEME_FAMILY=oasis timeout 60 nvim --headless \
+    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=oasis timeout 60 nvim --headless \
       "+set background=${bg%%:*}" \
       '+lua io.stdout:write(string.format("%06x\n", vim.api.nvim_get_hl(0, { name = "Normal" }).bg))' \
       +qa
