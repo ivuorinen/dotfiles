@@ -4,6 +4,7 @@ local config = wezterm.config_builder()
 config.set_environment_variables = {
   COLORTERM = 'truecolor',
 }
+config.enable_kitty_keyboard = true
 
 -- Font and font size
 config.font_size = 12
