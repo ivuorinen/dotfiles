@@ -44,8 +44,10 @@ Dark/light theming is owned by a stand-alone orchestrator:
   no-OS-source environments.
 
 Fish reacts to flips via `config/fish/conf.d/theme-switch.fish`,
-which watches the mode state file. nvim, vim and wezterm read
-`config/theme/family` directly. nvim and vim follow the OS appearance;
+which watches the mode state file. fish (`__dotfiles_theme_name`), nvim,
+vim and wezterm each resolve the family themselves, in `_theme_family`'s
+order, and fall back to `oasis` (fish to no theme change) when nothing
+resolves. nvim and vim follow the OS appearance;
 wezterm follows the mode file (on its reload watch list), falling back to
 the OS appearance when there is none. After a family switch, running vim
 sessions update within 3 s and wezterm on its next config reload; nvim

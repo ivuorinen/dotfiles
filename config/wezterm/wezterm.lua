@@ -242,28 +242,39 @@ config.color_schemes = {
   ['Oasis Abyss Light 3'] = oasis_abyss_light_3,
 }
 
--- Theme family from config/theme/family (DOTFILES_THEME_FAMILY overrides
--- it, as in config/theme/_lib.sh). Unreadable means catppuccin.
-local function theme_family()
-  local env = os.getenv 'DOTFILES_THEME_FAMILY'
-  if env and env ~= '' then
-    return env
-  end
-  local dotfiles = os.getenv 'DOTFILES' or ((os.getenv 'HOME' or '') .. '/.dotfiles')
-  local f = io.open(dotfiles .. '/config/theme/family', 'r')
-  if not f then
-    return 'catppuccin'
-  end
-  local family = (f:read '*l' or ''):gsub('%s+', '')
-  f:close()
-  return family
-end
-
 local schemes = {
   kanagawa = { dark = 'Kanagawa Wave', light = 'Kanagawa Lotus AA' },
   oasis = { dark = 'Oasis Abyss Dark', light = 'Oasis Abyss Light 3' },
   catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
 }
+
+-- Theme family, resolved as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
+-- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/family, then
+-- config/theme/family. A name with no scheme pair here is skipped (the name
+-- is only ever a table key), and nothing usable means oasis.
+local function theme_family()
+  local env = os.getenv 'DOTFILES_THEME_FAMILY'
+  if env and env ~= '' then
+    return schemes[env] and env or 'oasis'
+  end
+  local home = os.getenv 'HOME' or ''
+  local state = os.getenv 'XDG_STATE_HOME' or (home .. '/.local/state')
+  local dotfiles = os.getenv 'DOTFILES' or (home .. '/.dotfiles')
+  for _, path in ipairs {
+    state .. '/dotfiles-theme/family',
+    dotfiles .. '/config/theme/family',
+  } do
+    local f = io.open(path, 'r')
+    if f then
+      local family = (f:read '*l' or ''):gsub('%s+', '')
+      f:close()
+      if schemes[family] then
+        return family
+      end
+    end
+  end
+  return 'oasis'
+end
 
 -- The orchestrator's mode, from the file local/bin/theme-mode reads
 -- ($XDG_STATE_HOME/dotfiles-theme/mode). The file is on the reload watch
@@ -290,7 +301,7 @@ end
 -- Scheme for the orchestrator's mode; without one (no orchestrator on this
 -- host yet), fall back to the window's OS appearance.
 function Scheme_for_appearance(appearance)
-  local s = schemes[theme_family()] or schemes.catppuccin
+  local s = schemes[theme_family()] or schemes.oasis
   local mode = theme_mode() or (appearance:find 'Dark' and 'dark' or 'light')
   return s[mode]
 end

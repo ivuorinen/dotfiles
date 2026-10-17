@@ -2,10 +2,10 @@
 # The theme family is resolved outside config/theme/_lib.sh in four
 # runtimes: fish (__dotfiles_theme_name), nvim (theme_family in init.lua),
 # vim (s:Schemes in vimrc) and wezterm (theme_family in wezterm.lua). Each
-# re-implements the same contract — DOTFILES_THEME_FAMILY overrides
-# config/theme/family, an unknown family never leaves the app unthemed —
-# so each is exercised here against the same cases. Every case skips when
-# its binary is absent.
+# re-implements the same contract — DOTFILES_THEME_FAMILY, then the saved
+# choice in $XDG_STATE_HOME/dotfiles-theme/family, then config/theme/family;
+# an unknown family never leaves the app unthemed — so each is exercised
+# here against the same cases. Every case skips when its binary is absent.
 
 setup()
 {
@@ -14,6 +14,14 @@ setup()
   unset DOTFILES_THEME_FAMILY
   TMPDIR_TEST="$(mktemp -d)"
   mkdir -p "$TMPDIR_TEST/dotfiles-theme"
+  # The saved family choice lives here; never read the developer's own.
+  export XDG_STATE_HOME="$TMPDIR_TEST"
+}
+
+# save_choice <family> — what local/bin/theme writes.
+save_choice()
+{
+  printf '%s\n' "$1" > "$TMPDIR_TEST/dotfiles-theme/family"
 }
 
 teardown()
@@ -48,6 +56,24 @@ fish_theme_name()
     DOTFILES_THEME_FAMILY="$bad" run fish_theme_name
     [ "$status" -eq 1 ]
     [ -z "$output" ]
+  done
+}
+
+@test "fish: the saved choice wins over the tracked family" {
+  command -v fish > /dev/null 2>&1 || skip "fish not installed"
+  save_choice kanagawa
+  run fish_theme_name
+  [ "$status" -eq 0 ]
+  [ "$output" = "kanagawa-aa" ]
+}
+
+@test "fish: an invalid saved choice falls back to the tracked family" {
+  command -v fish > /dev/null 2>&1 || skip "fish not installed"
+  for bad in 'nope' '../kanagawa' ''; do
+    save_choice "$bad"
+    run fish_theme_name
+    [ "$status" -eq 0 ]
+    [ "$output" = "$(cat "$ROOT/config/theme/family")-aa" ]
   done
 }
 
@@ -110,9 +136,21 @@ vim_scheme()
   [ "$(vim_scheme light catppuccin)" = "catppuccin_latte" ]
 }
 
-@test "vim: an unknown family falls back to catppuccin, never unthemed" {
+@test "vim: an unknown family falls back to oasis, never unthemed" {
   command -v vim > /dev/null 2>&1 || skip "vim not installed"
-  [ "$(vim_scheme dark nosuchfamily)" = "catppuccin_mocha" ]
+  [ "$(vim_scheme dark nosuchfamily)" = "oasis_abyss_dark" ]
+}
+
+@test "vim: the saved choice selects the scheme" {
+  command -v vim > /dev/null 2>&1 || skip "vim not installed"
+  save_choice kanagawa
+  [ "$(vim_scheme dark)" = "kanagawa_wave" ]
+}
+
+@test "vim: an invalid saved choice falls back to the tracked family" {
+  command -v vim > /dev/null 2>&1 || skip "vim not installed"
+  save_choice nope
+  [ "$(vim_scheme dark)" = "oasis_abyss_dark" ]
 }
 
 @test "vim: a running session follows a family switch at an unchanged mode" {
@@ -143,7 +181,18 @@ nvim_scheme()
   compgen -G "$data/site/pack/*/opt/kanagawa" > /dev/null || skip "kanagawa.nvim not installed"
   [ "$(nvim_scheme kanagawa)" = "kanagawa" ]
   [ "$(nvim_scheme catppuccin)" = "catppuccin-mocha" ]
-  [ "$(nvim_scheme nosuchfamily)" = "catppuccin-mocha" ]
+  [ "$(nvim_scheme nosuchfamily)" = "$(nvim_scheme oasis)" ]
+}
+
+@test "nvim: the saved choice selects the scheme" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
+  local data
+  data="$(nvim --clean --headless '+lua io.stdout:write(vim.fn.stdpath("data"))' +qa 2> /dev/null)"
+  compgen -G "$data/site/pack/*/opt/kanagawa" > /dev/null || skip "kanagawa.nvim not installed"
+  save_choice kanagawa
+  [ "$(nvim_scheme '')" = "kanagawa" ]
+  save_choice nope
+  [ "$(nvim_scheme '')" = "$(nvim_scheme oasis)" ]
 }
 
 @test "nvim: oasis selects abyss in both modes" {
@@ -198,7 +247,35 @@ LUA
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
   [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
-  [[ "$output" == *"nosuchfamily=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"nosuchfamily=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
+}
+
+@test "wezterm: the saved choice selects the scheme pair" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
+  cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
+local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
+local stub = setmetatable({}, { __index = function() return any end })
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.config_builder = function() return {} end
+stub.on = function() end
+stub.action = setmetatable({}, { __index = function() return function() return {} end end })
+package.loaded.wezterm = stub
+dofile(arg[1])
+print('pair=' .. Scheme_for_appearance 'Dark' .. '|' .. Scheme_for_appearance 'Light')
+LUA
+  mkdir -p "$TMPDIR_TEST/state/dotfiles-theme"
+  local choice="$TMPDIR_TEST/state/dotfiles-theme/family"
+  echo kanagawa > "$choice"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Kanagawa Wave|Kanagawa Lotus AA"* ]]
+  # A stale choice falls through to the tracked default (oasis).
+  echo nope > "$choice"
+  run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 
 @test "wezterm: the orchestrator's mode file wins over the appearance" {

@@ -252,10 +252,12 @@ if !has('ideavim')
     return 'dark'
   endfunction
 
-  " Theme family → {dark, light} colour schemes. The family comes from
-  " config/theme/family ($DOTFILES_THEME_FAMILY overrides it, as in
-  " config/theme/_lib.sh). vim cannot run without a scheme, so an unknown
-  " family falls back to catppuccin rather than leaving anything unset.
+  " Theme family → {dark, light} colour schemes. The family resolves as in
+  " config/theme/_lib.sh: $DOTFILES_THEME_FAMILY, then the saved choice in
+  " $XDG_STATE_HOME/dotfiles-theme/family (skipped unless it names a
+  " palettes.d family), then config/theme/family. vim cannot run without a
+  " scheme, so an unknown family falls back to oasis rather than leaving
+  " anything unset.
   let s:schemes = {
         \ 'kanagawa': {'dark': 'kanagawa_wave', 'light': 'kanagawa_lotus'},
         \ 'oasis': {'dark': 'oasis_abyss_dark', 'light': 'oasis_abyss_light'},
@@ -266,11 +268,18 @@ if !has('ideavim')
     let l:family = $DOTFILES_THEME_FAMILY
     if empty(l:family)
       let l:dotfiles = empty($DOTFILES) ? expand('~/.dotfiles') : $DOTFILES
-      let l:file = l:dotfiles . '/config/theme/family'
-      let l:lines = filereadable(l:file) ? readfile(l:file, '', 1) : []
-      let l:family = empty(l:lines) ? '' : trim(l:lines[0])
+      let l:state = empty($XDG_STATE_HOME) ? expand('~/.local/state') : $XDG_STATE_HOME
+      for l:file in [l:state . '/dotfiles-theme/family', l:dotfiles . '/config/theme/family']
+        let l:lines = filereadable(l:file) ? readfile(l:file, '', 1) : []
+        let l:name = empty(l:lines) ? '' : trim(l:lines[0])
+        if l:name =~# '^[a-z0-9][a-z0-9-]*$'
+              \ && isdirectory(l:dotfiles . '/config/theme/palettes.d/' . l:name)
+          let l:family = l:name
+          break
+        endif
+      endfor
     endif
-    return get(s:schemes, l:family, s:schemes.catppuccin)
+    return get(s:schemes, l:family, s:schemes.oasis)
   endfunction
 
   function! s:ApplyScheme(scheme) abort

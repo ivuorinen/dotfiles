@@ -590,15 +590,30 @@ require('arborist').setup {
 -- catppuccin can resolve auto_integrations).
 
 -- ── Colorscheme ──────────────────────────────────────────────────────
--- The theme family comes from config/theme/family (DOTFILES_THEME_FAMILY
--- overrides it, as in config/theme/_lib.sh). Every family follows
--- 'background', which auto-dark-mode below flips with the OS.
+-- The theme family resolves as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
+-- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/family (skipped
+-- unless it names a palettes.d family), then config/theme/family; oasis when
+-- nothing does. Every family follows 'background', which auto-dark-mode below
+-- flips with the OS.
 local function theme_family()
-  local env = vim.env.DOTFILES_THEME_FAMILY
-  if env and env ~= '' then return env end
   local dotfiles = vim.env.DOTFILES or (vim.env.HOME .. '/.dotfiles')
-  local ok, lines = pcall(vim.fn.readfile, dotfiles .. '/config/theme/family', '', 1)
-  return ok and lines[1] and vim.trim(lines[1]) or 'catppuccin'
+  -- The name feeds a filesystem path, so only a plain slug naming a family.
+  local function valid(name)
+    return name:match '^[a-z0-9][a-z0-9%-]*$' ~= nil
+      and vim.fn.isdirectory(dotfiles .. '/config/theme/palettes.d/' .. name) == 1
+  end
+  local env = vim.env.DOTFILES_THEME_FAMILY
+  if env and env ~= '' then return valid(env) and env or 'oasis' end
+  local state = vim.env.XDG_STATE_HOME or (vim.env.HOME .. '/.local/state')
+  for _, file in ipairs {
+    state .. '/dotfiles-theme/family',
+    dotfiles .. '/config/theme/family',
+  } do
+    local ok, lines = pcall(vim.fn.readfile, file, '', 1)
+    local name = ok and lines[1] and vim.trim(lines[1]) or ''
+    if valid(name) then return name end
+  end
+  return 'oasis'
 end
 
 -- ── Kanagawa ─────────────────────────────────────────────────────────
