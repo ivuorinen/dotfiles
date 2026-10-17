@@ -1,11 +1,11 @@
 {
   "plugins": {
     "arborist.nvim": {
-      "rev": "fdeef56c2840c6772b9f68c5774ed87e9340ec7d",
+      "rev": "a34436d6b5efdc86e6f80f8c79844aae8d649a92",
       "src": "https://github.com/arborist-ts/arborist.nvim"
     },
     "auto-dark-mode.nvim": {
-      "rev": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df",
+      "rev": "2b16a24c202892e61fca7df4d2d7c4c872a44165",
       "src": "https://github.com/f-person/auto-dark-mode.nvim"
     },
     "catppuccin": {
@@ -29,7 +29,7 @@
       "src": "https://github.com/zapling/mason-conform.nvim"
     },
     "mason-lspconfig.nvim": {
-      "rev": "b5576cd62899a1a478d0e67ef3d378ee55dba82d",
+      "rev": "00b5473cca4db5b410ff4bae724e3b6e21f2687f",
       "src": "https://github.com/williamboman/mason-lspconfig.nvim"
     },
     "mason-tool-installer.nvim": {
@@ -41,7 +41,7 @@
       "src": "https://github.com/williamboman/mason.nvim"
     },
     "mini.nvim": {
-      "rev": "25f25d3e6661d942323e56711096de1850d814ec",
+      "rev": "295af26358628c8ba8f007ff6a7e0aec2f642a31",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "nvim-colorizer.lua": {
@@ -49,15 +49,15 @@
       "src": "https://github.com/catgoose/nvim-colorizer.lua"
     },
     "nvim-lint": {
-      "rev": "3d55c8f67c6ae5c15e1042571e107c7a3d5c5f4e",
+      "rev": "f6230a5c06ba59e6059c14637f1dbe29a7978b9b",
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "19576de1c1b6d1b5e231ea6ef9cba9a811c322bb",
+      "rev": "45a3a444b710511c39abca3b60bb6e23a21e3de5",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-shellspec": {
-      "rev": "118b51b83efcf4cbb2897bbbda0912d6827d0089",
+      "rev": "eb9432bae813f5f9276dfba062c9c04569c7eed6",
       "src": "https://github.com/ivuorinen/nvim-shellspec"
     },
     "oasis": {
