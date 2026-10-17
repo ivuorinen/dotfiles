@@ -1,8 +1,10 @@
 # config/fish/conf.d/theme-switch.fish
 #
-# Reacts to dark/light flips published by the theme orchestrator.
-# Watches $XDG_STATE_HOME/dotfiles-theme/mode and reapplies fish
-# syntax colours + LS_COLORS in the running session.
+# Reacts to dark/light flips and family switches published by the theme
+# orchestrator. Watches $XDG_STATE_HOME/dotfiles-theme/generation, which
+# config/theme/apply rewrites once every handler has finished, and
+# reapplies fish syntax colours, LS_COLORS, BAT_THEME and the fzf palette
+# in the running session. config/theme/shell-env.sh is the bash/zsh twin.
 
 if not status is-interactive
     return
@@ -28,24 +30,26 @@ end
 set -l bat_theme_file "$state_dir/dotfiles-theme/bat-theme"
 test -r $bat_theme_file; and set -gx BAT_THEME (cat $bat_theme_file)
 
-# Seed the mtime tracker so the first prompt is a no-op (otherwise
-# `__theme_switch_last_mtime` is unset and the first fish_prompt
-# event always trips the "mtime changed" branch and re-saves the theme).
-if test -r $mode_file
-    set -g __theme_switch_last_mtime (stat -c %Y $mode_file 2>/dev/null; or stat -f %m $mode_file 2>/dev/null)
+# Seed the generation tracker so the first prompt is a no-op (otherwise
+# `__theme_switch_last_generation` is unset and the first fish_prompt
+# event always trips the "generation changed" branch and re-saves the theme).
+set -l gen_file "$state_dir/dotfiles-theme/generation"
+if test -r $gen_file
+    read -g __theme_switch_last_generation <$gen_file
 end
 
-# Per-prompt cheap watcher: stat the mode file's mtime; only do real
-# work when it's changed since the last prompt we saw.
+# Per-prompt cheap watcher: read the stamp (a builtin, no subprocess); only
+# do real work when it has changed since the last prompt we saw.
 function __theme_switch_check --on-event fish_prompt
     set -l state_dir (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
     set -l mode_file "$state_dir/dotfiles-theme/mode"
+    set -l gen_file "$state_dir/dotfiles-theme/generation"
     set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
-    test -r $mode_file; or return 0
+    test -r $gen_file; or return 0
 
-    set -l mtime (stat -c %Y $mode_file 2>/dev/null; or stat -f %m $mode_file 2>/dev/null)
-    if not set -q __theme_switch_last_mtime; or test "$__theme_switch_last_mtime" != "$mtime"
-        set -g __theme_switch_last_mtime $mtime
+    read -l gen <$gen_file
+    if not set -q __theme_switch_last_generation; or test "$__theme_switch_last_generation" != "$gen"
+        set -g __theme_switch_last_generation $gen
         # Re-save the active family's dual-palette theme (<family>-aa,
         # e.g. kanagawa-aa); the name changes only by family, which also
         # rewrites the mode file and lands here. The themes are repo-owned;
@@ -56,7 +60,8 @@ function __theme_switch_check --on-event fish_prompt
         # in panes open across a flip. fish 3.x lacks the option (see the
         # probe in handlers.d/fish). `echo y |` bypasses the interactive
         # overwrite prompt that would otherwise pollute the next prompt line.
-        set -l mode (string trim < $mode_file)
+        set -l mode
+        test -r $mode_file; and set mode (string trim < $mode_file)
         set -l save_opts
         if contains -- "$mode" dark light
             and string match -q '*color-theme=*' -- (functions fish_config)
@@ -80,5 +85,9 @@ function __theme_switch_check --on-event fish_prompt
         else
             set -e BAT_THEME
         end
+        # The fzf palette assigns FZF_DEFAULT_OPTS whole, so sourcing it
+        # again replaces the previous family's colours.
+        set -l fzf_active "$state_dir/dotfiles-theme/fzf-active.fish"
+        test -r $fzf_active; and source $fzf_active
     end
 end
