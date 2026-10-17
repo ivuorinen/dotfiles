@@ -76,10 +76,10 @@ cr.md
 # copilot coding harness
 config/copilot/*
 !config/copilot/copilot-instructions.md
-!config/copilot/hooks/*
+!config/copilot/hooks/
 !config/copilot/mcp-config.json
 !config/copilot/settings.json
-!config/copilot/skills/*
+!config/copilot/skills/
 
 # pi.dev coding harness
 config/pi/*
