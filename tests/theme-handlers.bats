@@ -334,12 +334,15 @@ STUB
   mkdir -p "$cfg/fish/themes" "$TMPDIR_TEST/dotfiles-theme"
   cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$cfg/fish/themes/"
   echo dark > "$TMPDIR_TEST/dotfiles-theme/mode"
+  # apply's generation stamp is what the watcher reacts to; clearing the
+  # tracker below makes the next prompt see it as new.
+  echo g1 > "$TMPDIR_TEST/dotfiles-theme/generation"
   expected="$(awk '/^\[/ { s = $0 } s == "[dark]" && $1 == "fish_color_command" { print $2 }' \
     "$DOTFILES/config/fish/themes/catppuccin-aa.theme")"
   XDG_CONFIG_HOME="$cfg" run fish --no-config -i -c "
     source '$DOTFILES/config/fish/functions/__dotfiles_theme_name.fish'
     source '$DOTFILES/config/fish/conf.d/theme-switch.fish'
-    set -e __theme_switch_last_mtime
+    set -e __theme_switch_last_generation
     emit fish_prompt
     echo \$fish_color_command"
   [ "$status" -eq 0 ]
