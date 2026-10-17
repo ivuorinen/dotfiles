@@ -14,7 +14,8 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
-# msgr reads unset variables, so it is sourced with nounset off.
+# msgr reads unset variables, so it is sourced with nounset off. Sourcing
+# defines msg_ok/msg_warn/msg_err; a bare `msgr` would need it on PATH.
 set +u
 # shellcheck source=msgr
 . "$(dirname "$0")/msgr"
@@ -42,7 +43,7 @@ families()
 warn_override()
 {
   if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
-    msgr warn "DOTFILES_THEME_FAMILY=$DOTFILES_THEME_FAMILY overrides the saved choice while it is set"
+    msg_warn "DOTFILES_THEME_FAMILY=$DOTFILES_THEME_FAMILY overrides the saved choice while it is set"
   fi
 }
 
@@ -62,7 +63,7 @@ list_families()
   if [[ -r "$choice" ]]; then
     read -r saved < "$choice" || true
     if ! _theme_valid_family "$saved"; then
-      msgr warn "ignoring the saved choice '$saved' in $choice: not a theme family; using the default"
+      msg_warn "ignoring the saved choice '$saved' in $choice: not a theme family; using the default"
     fi
   fi
   warn_override
@@ -83,20 +84,20 @@ switch_family()
 {
   local family="$1" active
   if ! _theme_valid_family "$family"; then
-    msgr err "unknown theme family '$family'; choose one of: $(families | paste -sd ' ' -)"
+    msg_err "unknown theme family '$family'; choose one of: $(families | paste -sd ' ' -)"
     exit 2
   fi
   warn_override
   active="$(_theme_family 2> /dev/null)" || active=""
   if ! _atomic_write "$(_theme_choice_file)" "$family"; then
-    msgr err "cannot save the theme choice to $(_theme_choice_file)"
+    msg_err "cannot save the theme choice to $(_theme_choice_file)"
     exit 1
   fi
   apply_theme
   if [[ "$family" == "$active" ]]; then
-    msgr ok "$family is already the active theme family; saved it as the choice"
+    msg_ok "$family is already the active theme family; saved it as the choice"
   else
-    msgr ok "switched to the $family theme family"
+    msg_ok "switched to the $family theme family"
   fi
 }
 
@@ -104,7 +105,7 @@ reset_family()
 {
   rm -f -- "$(_theme_choice_file)"
   apply_theme
-  msgr ok "back to the default theme family ($(_theme_family 2> /dev/null || echo none))"
+  msg_ok "back to the default theme family ($(_theme_family 2> /dev/null || echo none))"
 }
 
 main()
