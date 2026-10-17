@@ -1,3 +1,4 @@
+---
 # Scope grype to content this repo actually authors. The excluded trees are
 # untracked or vendored caches whose CVEs flow through their own upstream
 # update channels (vim-plug, submodule sync) — finding SEC-001.
