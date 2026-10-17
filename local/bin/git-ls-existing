@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#USAGE about "git ls-files, minus tracked files deleted from the work tree"
+#USAGE flag "-z" help="End each path with NUL instead of a newline"
+#USAGE arg "[arg]..." help="Options and pathspecs, as git ls-files takes them"
+#
+# git ls-files reads the index, which keeps listing a file removed with a
+# plain rm until the removal is staged. A tool handed that path fails with
+# ENOENT, so linters and pickers list files through this instead.
+#
+# Prints only paths, so it does not source msgr.
+
+set -euo pipefail
+
+usage()
+{
+  echo "Usage: git ls-existing [-z] [git ls-files option|pathspec]..."
+}
+
+nul=0
+for arg; do
+  case "$arg" in
+    -h | --help) usage && exit 0 ;;
+    -z) nul=1 ;;
+  esac
+done
+
+git ls-files -z "$@" | while IFS= read -r -d '' f; do
+  [[ -e $f ]] || continue
+  if ((nul)); then printf '%s\0' "$f"; else printf '%s\n' "$f"; fi
+done

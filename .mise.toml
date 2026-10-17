@@ -72,7 +72,7 @@ run = "editorconfig-checker -f gcc"
 
 [tasks.lint-md-table]
 description = "Markdown table formatting check"
-run = "git ls-files '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter --check"
+run = "local/bin/git-ls-existing --cached --others --exclude-standard '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter --check"
 
 [tasks.lint-markdownlint]
 description = "markdownlint (honors .markdownlintignore)"
@@ -80,7 +80,7 @@ run = "markdownlint --ignore-path .markdownlintignore '**/*.md'"
 
 [tasks.lint-v8r]
 description = "JSON Schema validation of schema-backed configs"
-run = "git ls-files '*.yml' '*.yaml' '*.json' '*.toml' | grep -vE '^(tools/|config/cheat/cheatsheets/|config/gh/|node_modules/|graphify-out/|docs/audit/|\\.claude/skills/graphify/)' | xargs v8r --ignore-errors"
+run = "local/bin/git-ls-existing --cached --others --exclude-standard '*.yml' '*.yaml' '*.json' '*.toml' | grep -vE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|\\.claude/skills/graphify/)' | xargs v8r --ignore-errors"
 
 [tasks.lint-usage]
 description = "usage lint for scripts/ and local/bin/"
@@ -121,7 +121,7 @@ run = "prettier --write '**/*.{yml,yaml}'"
 
 [tasks.fix-md-table]
 description = "Fix Markdown table formatting"
-run = "git ls-files '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter"
+run = "local/bin/git-ls-existing --cached --others --exclude-standard '*.md' | grep -v '^docs/audit/findings/' | xargs markdown-table-formatter"
 
 [tasks.format]
 description = "Format with Biome"

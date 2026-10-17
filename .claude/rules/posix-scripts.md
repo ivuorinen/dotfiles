@@ -17,8 +17,9 @@ paths:
 Validate POSIX shell scripts with `sh -n`, never `bash -n`.
 
 The following scripts are POSIX, not bash. Keep this list in step with
-reality — `git ls-files | xargs head -1` and look for `sh` shebangs, since a
-script missing from here gets validated as bash and a bashism slips through:
+reality — `local/bin/git-ls-existing | xargs head -1` and look for `sh`
+shebangs, since a script missing from here gets validated as bash and a
+bashism slips through:
 
 - `local/bin/x-ssh-audit`
 - `local/bin/x-codeql`

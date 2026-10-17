@@ -116,10 +116,13 @@ repos:
         # a pass, so only a file that validated and failed exits non-zero.
         # config/gh/ is rewritten by `gh config set`; its shape follows gh,
         # not schemastore (which rejects gh's `version: "1"`).
+        # config/gh-dash/: schemastore maps it to gh-dash.dev/schema.json,
+        # whose relative $refs v8r opens as local files (ENOENT), so it can
+        # never validate.
         entry: mise exec -- v8r --ignore-errors
         language: system
         files: \.(ya?ml|json|toml)$
-        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/)
+        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/)
       - id: shellcheck
         name: shellcheck
         entry: mise exec -- shellcheck

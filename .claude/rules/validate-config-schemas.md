@@ -53,10 +53,12 @@ Which values need evidence and which are freeform is defined once, in
 
 ## What the gates cover
 
-`v8r --ignore-errors` runs in pre-commit and in `mise run lint-v8r` (the
-Stop gate) over every tracked YAML, JSON and TOML file, excluding
-submodules, cheat sheets, `config/gh/` (rewritten by `gh config set`),
-`graphify-out/` and `docs/audit/`. A file with a schema-store match that
+`v8r --ignore-errors` runs in pre-commit (on staged files) and in
+`mise run lint-v8r` (the Stop gate, on every YAML, JSON and TOML file git
+tracks or does not ignore, so a new file counts before it is staged),
+excluding submodules, cheat sheets, `config/gh/` (rewritten by
+`gh config set`), `config/gh-dash/` (its schema's relative `$ref`s never
+resolve), `graphify-out/` and `docs/audit/`. A file with a schema-store match that
 fails validation fails both gates. A file with no match, or with several
 candidate schemas (`.github/renovate.json`, `.prettierrc.json`), passes
 unchecked — for those, `no-schema-guessing.md` is the only safety net.
