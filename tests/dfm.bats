@@ -310,6 +310,7 @@ fake_dotfiles()
   [ -f "$tmp/config/fish/secrets.d/github.fish" ]
   [ -f "$tmp/config/secrets.d/github.sh" ]
   [[ "$(cat "$tmp/config/fish/secrets.d/github.fish")" == *"set -x GITHUB_TOKEN 'secretvalue'"* ]]
+  # checkov:skip=CKV_SECRET_6:test fixture, not a credential
   [[ "$(cat "$tmp/config/secrets.d/github.sh")" == *"export GITHUB_TOKEN='secretvalue'"* ]]
   rm -rf "$tmp"
 }
