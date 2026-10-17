@@ -5,6 +5,8 @@ setup()
 {
   TMPDIR_TEST="$(mktemp -d)"
   export THEME_LIB="$BATS_TEST_DIRNAME/../config/theme/_lib.sh"
+  # The saved family choice lives here; never read the developer's own.
+  export XDG_STATE_HOME="$TMPDIR_TEST/state"
 }
 
 teardown()
@@ -118,6 +120,7 @@ teardown()
 
 @test "_log: rotates to 200 lines when over threshold" {
   source "$THEME_LIB"
+  # shellcheck disable=SC2030,SC2031
   export XDG_STATE_HOME="$TMPDIR_TEST"
   for i in $(seq 1 220); do _log "line $i"; done
   count=$(wc -l < "$TMPDIR_TEST/dotfiles-theme/log")
@@ -166,6 +169,78 @@ make_family_tree()
   unset DOTFILES_THEME_FAMILY
   run _theme_family
   [ "$status" -eq 1 ]
+}
+
+save_choice()
+{
+  # shellcheck disable=SC2030,SC2031
+  local dir="$XDG_STATE_HOME/dotfiles-theme"
+  mkdir -p "$dir"
+  printf '%s\n' "$1" > "$dir/family"
+}
+
+@test "_theme_family: a saved choice wins over the tracked file" {
+  source "$THEME_LIB"
+  make_family_tree
+  unset DOTFILES_THEME_FAMILY
+  mkdir -p "$DOTFILES/config/theme/palettes.d/other"
+  save_choice other
+  run _theme_family
+  [ "$status" -eq 0 ]
+  [ "$output" = "other" ]
+}
+
+@test "_theme_family: env override wins over a saved choice" {
+  source "$THEME_LIB"
+  make_family_tree
+  mkdir -p "$DOTFILES/config/theme/palettes.d/other"
+  save_choice other
+  DOTFILES_THEME_FAMILY=fam run _theme_family
+  [ "$status" -eq 0 ]
+  [ "$output" = "fam" ]
+}
+
+@test "_theme_family: an empty or invalid saved choice falls back to the tracked file" {
+  source "$THEME_LIB"
+  make_family_tree
+  unset DOTFILES_THEME_FAMILY
+  for bad in '' '  ' 'nope' '../fam' '-'; do
+    save_choice "$bad"
+    run _theme_family
+    [ "$status" -eq 0 ]
+    [ "$output" = "fam" ]
+  done
+}
+
+@test "_theme_family: a saved choice is trimmed of surrounding whitespace" {
+  source "$THEME_LIB"
+  make_family_tree
+  unset DOTFILES_THEME_FAMILY
+  mkdir -p "$DOTFILES/config/theme/palettes.d/other"
+  save_choice '  other  '
+  run _theme_family
+  [ "$status" -eq 0 ]
+  [ "$output" = "other" ]
+}
+
+@test "_theme_choice_file: names the file under XDG_STATE_HOME" {
+  source "$THEME_LIB"
+  run _theme_choice_file
+  [ "$status" -eq 0 ]
+  # shellcheck disable=SC2030,SC2031
+  [ "$output" = "$XDG_STATE_HOME/dotfiles-theme/family" ]
+}
+
+@test "_theme_valid_family: accepts a family dir and rejects the rest" {
+  source "$THEME_LIB"
+  make_family_tree
+  run _theme_valid_family fam
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+  for bad in '' '../fam' 'nope' 'Fam' '-x'; do
+    run _theme_valid_family "$bad"
+    [ "$status" -eq 1 ]
+  done
 }
 
 @test "_palette: prints an existing palette, fails for a missing one" {

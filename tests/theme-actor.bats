@@ -20,10 +20,12 @@ STUB
   chmod +x "$THEME_HANDLERS_DIR/count"
 }
 
-@test "apply: records the family next to the mode" {
+@test "apply: records the applied family" {
   run "$APPLY" dark
   [ "$status" -eq 0 ]
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "catppuccin" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "catppuccin" ]
+  # The choice file belongs to the user (local/bin/theme); apply never writes it.
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/family" ]
 }
 
 @test "apply: same mode and family skips the handlers" {
@@ -38,7 +40,7 @@ STUB
   TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
   DOTFILES_THEME_FAMILY=kanagawa TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
   [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 2 ]
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "kanagawa" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "kanagawa" ]
 }
 
 @test "apply: logs stderr from a handler that exits 0 at INFO" {
@@ -60,6 +62,7 @@ STUB
   [ "$status" -eq 0 ]
   [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
   grep -q 'family unresolvable' "$TMPDIR_TEST/dotfiles-theme/log"
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "-" ]
 }
 
 teardown()
@@ -277,4 +280,48 @@ STUB
   [ "$status" -eq 0 ]
   [ "$elapsed" -lt 10 ]
   grep -q "WARN handler 'slow' exit=124" "$TMPDIR_TEST/dotfiles-theme/log"
+}
+
+@test "apply: a saved choice switches the family" {
+  unset DOTFILES_THEME_FAMILY
+  mkdir -p "$TMPDIR_TEST/dotfiles-theme"
+  echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/family"
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "kanagawa" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "kanagawa" ]
+}
+
+# Records the generation a handler sees while it runs, or "none".
+generation_handler()
+{
+  cat > "$THEME_HANDLERS_DIR/gen" << 'STUB'
+#!/usr/bin/env bash
+gen="$XDG_STATE_HOME/dotfiles-theme/generation"
+if [[ -r "$gen" ]]; then cat "$gen" > "$TMPDIR_TEST/seen"; else echo none > "$TMPDIR_TEST/seen"; fi
+STUB
+  chmod +x "$THEME_HANDLERS_DIR/gen"
+}
+
+@test "apply: writes a new generation after the handlers finish" {
+  generation_handler
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  first="$(cat "$TMPDIR_TEST/dotfiles-theme/generation")"
+  [ -n "$first" ]
+  [ "$(cat "$TMPDIR_TEST/seen")" = "none" ]
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" light
+  [ "$status" -eq 0 ]
+  # The handler still saw the first stamp: the new one lands after it.
+  [ "$(cat "$TMPDIR_TEST/seen")" = "$first" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/generation")" != "$first" ]
+}
+
+@test "apply: a skipped apply leaves the generation unchanged" {
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  first="$(cat "$TMPDIR_TEST/dotfiles-theme/generation")"
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/generation")" = "$first" ]
 }

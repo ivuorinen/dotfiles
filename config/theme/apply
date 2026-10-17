@@ -9,7 +9,7 @@
 # Env overrides (test seams):
 #   THEME_HANDLERS_DIR     defaults to $DOTFILES/config/theme/handlers.d
 #   XDG_STATE_HOME         defaults to $HOME/.local/state
-#   DOTFILES_THEME_FAMILY  defaults to the contents of config/theme/family
+#   DOTFILES_THEME_FAMILY  defaults to the saved choice, then config/theme/family
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -31,7 +31,12 @@ esac
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
-family_file="$state_dir/family"
+# apply's own record of the family it last applied. Never "$state_dir/family":
+# that is the user's saved choice (local/bin/theme), which apply only reads.
+applied_family_file="$state_dir/applied-family"
+# Rewritten after every handler run so open shells know to reload the
+# colour caches the handlers just wrote (config/exports, theme-switch.fish).
+generation_file="$state_dir/generation"
 retry_file="$state_dir/retry"
 RETRY_MINUTES=10
 
@@ -41,22 +46,26 @@ lock_file="$state_dir/apply.lock"
 LOCK_WAIT_TRIES=100
 handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
 
-# The theme family (config/theme/family) is part of the applied state: a
-# family switch at an unchanged mode must still re-run the handlers. An
+# The theme family (_theme_family) is part of the applied state: a family
+# switch at an unchanged mode must still re-run the handlers. An
 # unresolvable family is recorded as "-", so it is a state of its own:
 # the first apply runs the handlers (each fails closed and leaves its
 # destination untouched), and later ones take the retry backoff below
 # instead of fanning out from every shell.
-family="$(_theme_family 2> /dev/null)" || family=""
-family_key="${family:--}"
+resolve_family()
+{
+  family="$(_theme_family 2> /dev/null)" || family=""
+  family_key="${family:--}"
+}
+resolve_family
 
 state_unchanged()
 {
   local current="" current_family=""
   [[ -r "$state_file" ]] || return 1
   read -r current < "$state_file" || true
-  [[ -r "$family_file" ]] && {
-    read -r current_family < "$family_file" || true
+  [[ -r "$applied_family_file" ]] && {
+    read -r current_family < "$applied_family_file" || true
   }
   [[ "$current" = "$mode" && "$current_family" = "$family_key" ]]
 }
@@ -101,6 +110,10 @@ else
 fi
 trap 'rm -f -- "$lock_file"' EXIT
 
+# Resolve again now the lock is held: a `theme` run that saved a newer
+# choice while this apply waited must win over the value read above.
+resolve_family
+
 # Assigned, not just declared: bash 3.2 under `set -u` treats a
 # declared-but-empty array as unbound in ${#arr[@]}.
 handlers=()
@@ -123,7 +136,7 @@ else
   # Both are written before any handler forks: handlers.d/tmux re-sources
   # tmux.conf, whose bootstrap reads the mode back through theme-mode.
   _atomic_write "$state_file" "$mode"
-  _atomic_write "$family_file" "$family_key"
+  _atomic_write "$applied_family_file" "$family_key"
   [[ -n "$family" ]] || _log "WARN actor: theme family unresolvable; handlers will fail closed"
   _log "INFO actor flipped to $mode${family:+ ($family)}"
   for h in "$handlers_dir"/*; do
@@ -195,5 +208,9 @@ if ((${#failed_names[@]} > 0)); then
 else
   rm -f -- "$retry_file"
 fi
+
+# Every handler has finished or timed out, so the caches they write are
+# final: a new stamp tells open shells to reload them at their next prompt.
+_atomic_write "$generation_file" "$(date +%s)-$$"
 
 exit 0
