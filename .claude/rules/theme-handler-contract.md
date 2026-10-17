@@ -13,7 +13,7 @@ paths:
 - Name palette files
   `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]`. The
   active family comes from `_theme_family`: the saved choice in
-  `$XDG_STATE_HOME/dotfiles-theme/family`, else the one word in
+  `$XDG_STATE_HOME/dotfiles-theme/choice`, else the one word in
   `config/theme/family` (`DOTFILES_THEME_FAMILY` overrides both in tests).
 - Resolve palettes with `_palette <mode> <file>` from `_lib.sh`, never
   by building the path by hand. When the active family ships no file,

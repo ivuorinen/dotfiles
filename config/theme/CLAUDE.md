@@ -28,9 +28,10 @@ Dark/light theming is owned by a stand-alone orchestrator:
   (`theme-handler-scaffold` skill).
 - The active theme family (`_theme_family` in `_lib.sh`):
   `DOTFILES_THEME_FAMILY` (test seam; an invalid value fails closed),
-  else the per-machine saved choice in `$XDG_STATE_HOME/dotfiles-theme/family`
+  else the per-machine saved choice in `$XDG_STATE_HOME/dotfiles-theme/choice`
   (skipped when missing, empty or invalid), else the tracked default
-  `config/theme/family` (`oasis`). apply only reads the saved choice.
+  `config/theme/family` (`oasis`). apply only reads the saved choice, and
+  deletes the `family` file older applies kept their record in.
   `local/bin/theme` lists the families and marks the active one, switches
   (`theme <family>`) and resets (`theme --reset`): it writes or removes the
   saved choice, then runs apply at the current mode.

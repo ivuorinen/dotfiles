@@ -31,8 +31,8 @@ esac
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
-# apply's own record of the family it last applied. Never "$state_dir/family":
-# that is the user's saved choice (local/bin/theme), which apply only reads.
+# apply's own record of the family it last applied. The user's saved choice
+# is "$state_dir/choice" (local/bin/theme), which apply only reads.
 applied_family_file="$state_dir/applied-family"
 # Rewritten after every handler run so open shells know to reload the
 # colour caches the handlers just wrote (config/exports, theme-switch.fish).
@@ -45,6 +45,10 @@ lock_file="$state_dir/apply.lock"
 # fork and log overhead.
 LOCK_WAIT_TRIES=100
 handlers_dir="${THEME_HANDLERS_DIR:-${DOTFILES:-$HOME/.dotfiles}/config/theme/handlers.d}"
+
+# Older applies kept their record in "$state_dir/family". Nothing reads it
+# now, so drop it rather than leave it to be mistaken for a choice.
+rm -f -- "$state_dir/family"
 
 # The theme family (_theme_family) is part of the applied state: a family
 # switch at an unchanged mode must still re-run the handlers. An

@@ -18,7 +18,7 @@ wezterm), Vimscript, bats.
 
 ## Global Constraints
 
-- Choice file: `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/family`. apply's record:
+- Choice file: `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/choice`. apply's record:
   `.../dotfiles-theme/applied-family`. Refresh stamp: `.../dotfiles-theme/generation`. Tracked default:
   `${DOTFILES:-$HOME/.dotfiles}/config/theme/family` (`oasis`).
 - Resolution order everywhere: non-empty `DOTFILES_THEME_FAMILY` → choice file → tracked default.
@@ -78,7 +78,7 @@ wezterm), Vimscript, bats.
 @test "_theme_family: a saved choice wins over the tracked file" {
   source "$THEME_LIB"; make_family_tree; unset DOTFILES_THEME_FAMILY
   mkdir -p "$DOTFILES/config/theme/palettes.d/other" "$XDG_STATE_HOME/dotfiles-theme"
-  echo other > "$XDG_STATE_HOME/dotfiles-theme/family"
+  echo other > "$XDG_STATE_HOME/dotfiles-theme/choice"
   run _theme_family
   [ "$status" -eq 0 ] && [ "$output" = "other" ]
 }
@@ -95,12 +95,12 @@ wezterm), Vimscript, bats.
 
 - [ ] **Step 3: Write the failing apply tests** in `tests/theme-actor.bats`. Rename "apply: records the family next
   to the mode" to "apply: records the applied family" and assert `applied-family` holds `catppuccin` and
-  `dotfiles-theme/family` does not exist. Change the family-switch test's assertion to `applied-family`, and the
+  `dotfiles-theme/choice` does not exist. Change the family-switch test's assertion to `applied-family`, and the
   unresolvable-family test's `-` assertion likewise. Add:
 
 ```bash
 @test "apply: a saved choice switches the family" {
-  # unset DOTFILES_THEME_FAMILY; echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/family"; apply dark
+  # unset DOTFILES_THEME_FAMILY; echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/choice"; apply dark
   # → applied-family is kanagawa and the choice file still says kanagawa
 }
 
@@ -157,7 +157,7 @@ wezterm), Vimscript, bats.
 
 ```bash
 @test "fish: the saved choice wins over the tracked family" {
-  # echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/family" → __dotfiles_theme_name prints kanagawa-aa
+  # echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/choice" → __dotfiles_theme_name prints kanagawa-aa
 }
 @test "fish: an invalid saved choice falls back to the tracked family" { }  # 'nope' → oasis-aa
 @test "vim: the saved choice selects the scheme" { }    # kanagawa saved, family arg '' → kanagawa_wave
@@ -173,7 +173,7 @@ oasis" (expect `oasis_abyss_dark`); nvim's `nosuchfamily` line expects `"$(nvim_
 - [ ] **Step 3: Run the tests to verify they fail.** `bats tests/theme-family-resolvers.bats`.
 
 - [ ] **Step 4: Implement** the order in the four readers. Each reads the choice from
-  `($XDG_STATE_HOME or $HOME/.local/state)/dotfiles-theme/family` and applies the family rule before using it.
+  `($XDG_STATE_HOME or $HOME/.local/state)/dotfiles-theme/choice` and applies the family rule before using it.
   vim, nvim and wezterm fall back to `oasis`.
 
 - [ ] **Step 5: Run the tests to verify they pass**, then `stylua --check config/nvim/init.lua

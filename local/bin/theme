@@ -5,7 +5,7 @@
 #
 # theme — list the dotfiles theme families or switch between them.
 #
-# The choice is saved per machine in $XDG_STATE_HOME/dotfiles-theme/family,
+# The choice is saved per machine in $XDG_STATE_HOME/dotfiles-theme/choice,
 # outside the repo, and config/theme/apply re-themes everything running.
 # The tracked config/theme/family is the default wherever no choice was
 # saved. config/theme/CLAUDE.md describes the orchestrator.
@@ -58,7 +58,7 @@ list_families()
   active="$(_theme_family 2> /dev/null)" || active=""
   choice="$(_theme_choice_file)"
   # Any choice file that _theme_family would skip is worth a word: empty,
-  # whitespace, a removed family, or the "-" an older apply recorded there.
+  # whitespace, or a family that has since been removed.
   if [[ -r "$choice" ]]; then
     read -r saved < "$choice" || true
     if ! _theme_valid_family "$saved"; then

@@ -176,7 +176,7 @@ save_choice()
   # shellcheck disable=SC2030,SC2031
   local dir="$XDG_STATE_HOME/dotfiles-theme"
   mkdir -p "$dir"
-  printf '%s\n' "$1" > "$dir/family"
+  printf '%s\n' "$1" > "$dir/choice"
 }
 
 @test "_theme_family: a saved choice wins over the tracked file" {
@@ -228,7 +228,7 @@ save_choice()
   run _theme_choice_file
   [ "$status" -eq 0 ]
   # shellcheck disable=SC2030,SC2031
-  [ "$output" = "$XDG_STATE_HOME/dotfiles-theme/family" ]
+  [ "$output" = "$XDG_STATE_HOME/dotfiles-theme/choice" ]
 }
 
 @test "_theme_valid_family: accepts a family dir and rejects the rest" {

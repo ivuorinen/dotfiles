@@ -58,7 +58,7 @@ expected_list()
 @test "theme: switching saves the choice and applies it" {
   run "$THEME" kanagawa
   [ "$status" -eq 0 ]
-  [ "$(cat "$STATE/family")" = "kanagawa" ]
+  [ "$(cat "$STATE/choice")" = "kanagawa" ]
   [ "$(cat "$STATE/applied-family")" = "kanagawa" ]
   run "$THEME"
   [ "$output" = "$(expected_list kanagawa)" ]
@@ -68,7 +68,7 @@ expected_list()
   run "$THEME" "$DEFAULT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"already"* ]]
-  [ "$(cat "$STATE/family")" = "$DEFAULT" ]
+  [ "$(cat "$STATE/choice")" = "$DEFAULT" ]
 }
 
 @test "theme: an unknown or path-like family is rejected" {
@@ -76,7 +76,7 @@ expected_list()
     run "$THEME" "$bad"
     [ "$status" -eq 2 ]
     [[ "$output" == *"catppuccin"* ]]
-    [ ! -e "$STATE/family" ]
+    [ ! -e "$STATE/choice" ]
   done
 }
 
@@ -84,12 +84,12 @@ expected_list()
   "$THEME" kanagawa
   run "$THEME" --reset
   [ "$status" -eq 0 ]
-  [ ! -e "$STATE/family" ]
+  [ ! -e "$STATE/choice" ]
   [ "$(cat "$STATE/applied-family")" = "$DEFAULT" ]
 }
 
 @test "theme: a stale saved choice is reported and the default is marked" {
-  echo gone > "$STATE/family"
+  echo gone > "$STATE/choice"
   run "$THEME"
   [ "$status" -eq 0 ]
   [[ "$output" == *"gone"* ]]
@@ -99,7 +99,7 @@ expected_list()
 @test "theme: an empty or whitespace saved choice is reported too" {
   local bad
   for bad in '' '   '; do
-    printf '%s\n' "$bad" > "$STATE/family"
+    printf '%s\n' "$bad" > "$STATE/choice"
     run "$THEME"
     [ "$status" -eq 0 ]
     [[ "$output" == *"saved"* ]] || {
@@ -114,7 +114,7 @@ expected_list()
   DOTFILES_THEME_FAMILY=catppuccin run "$THEME" kanagawa
   [ "$status" -eq 0 ]
   [[ "$output" == *"DOTFILES_THEME_FAMILY"* ]]
-  [ "$(cat "$STATE/family")" = "kanagawa" ]
+  [ "$(cat "$STATE/choice")" = "kanagawa" ]
 }
 
 @test "theme: works before apply has ever run" {
@@ -123,7 +123,7 @@ expected_list()
   # the developer's through); /dev/null keeps it on the dark default.
   run "$THEME" kanagawa < /dev/null
   [ "$status" -eq 0 ]
-  [ "$(cat "$STATE/family")" = "kanagawa" ]
+  [ "$(cat "$STATE/choice")" = "kanagawa" ]
 }
 
 @test "theme: piped output carries no escape codes" {

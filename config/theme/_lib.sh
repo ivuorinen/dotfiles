@@ -52,7 +52,7 @@ _idempotent_ln_sf()
 # and outside the repo, so switching never leaves a tracked change.
 _theme_choice_file()
 {
-  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/family"
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/choice"
 }
 
 # True when $1 is a usable family: the name feeds a filesystem path, so

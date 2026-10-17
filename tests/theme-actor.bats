@@ -25,7 +25,19 @@ STUB
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "catppuccin" ]
   # The choice file belongs to the user (local/bin/theme); apply never writes it.
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/family" ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/choice" ]
+}
+
+@test "apply: drops an older apply's family record and never reads it" {
+  local state="$TMPDIR_TEST/dotfiles-theme"
+  mkdir -p "$state"
+  # The record older applies kept; it must not act as a saved choice.
+  echo kanagawa > "$state/family"
+  unset DOTFILES_THEME_FAMILY
+  run "$APPLY" dark
+  [ "$status" -eq 0 ]
+  [ ! -e "$state/family" ]
+  [ "$(cat "$state/applied-family")" = "$(cat "$DOTFILES/config/theme/family")" ]
 }
 
 @test "apply: same mode and family skips the handlers" {
@@ -285,11 +297,11 @@ STUB
 @test "apply: a saved choice switches the family" {
   unset DOTFILES_THEME_FAMILY
   mkdir -p "$TMPDIR_TEST/dotfiles-theme"
-  echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/family"
+  echo kanagawa > "$TMPDIR_TEST/dotfiles-theme/choice"
   run "$APPLY" dark
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "kanagawa" ]
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/family")" = "kanagawa" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/choice")" = "kanagawa" ]
 }
 
 # Records the generation a handler sees while it runs, or "none".

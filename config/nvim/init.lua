@@ -591,7 +591,7 @@ require('arborist').setup {
 
 -- ── Colorscheme ──────────────────────────────────────────────────────
 -- The theme family resolves as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
--- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/family (skipped
+-- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/choice (skipped
 -- unless it names a palettes.d family), then config/theme/family; oasis when
 -- nothing does. Every family follows 'background', which auto-dark-mode below
 -- flips with the OS.
@@ -606,7 +606,7 @@ local function theme_family()
   if env and env ~= '' then return valid(env) and env or 'oasis' end
   local state = vim.env.XDG_STATE_HOME or (vim.env.HOME .. '/.local/state')
   for _, file in ipairs {
-    state .. '/dotfiles-theme/family',
+    state .. '/dotfiles-theme/choice',
     dotfiles .. '/config/theme/family',
   } do
     local ok, lines = pcall(vim.fn.readfile, file, '', 1)

@@ -10,8 +10,8 @@ one command that lists the families, switches between them live, and keeps the c
 ## Goals
 
 - `theme` with no arguments lists every family and marks the active one.
-- `theme <family>` saves the choice to `$XDG_STATE_HOME/dotfiles-theme/family` (default
-  `~/.local/state/dotfiles-theme/family`) and switches the running theme at once.
+- `theme <family>` saves the choice to `$XDG_STATE_HOME/dotfiles-theme/choice` (default
+  `~/.local/state/dotfiles-theme/choice`) and switches the running theme at once.
 - `theme --reset` drops the saved choice, so the tracked default (`config/theme/family`, `oasis`) applies again.
 - Running nvim sessions follow a family switch live, as vim already does.
 - Every open bash, zsh and fish shell, including the one `theme` ran in, picks up the new `ls`, bat and fzf colours
@@ -42,7 +42,7 @@ These would make the work a failure even if it ran:
 Every reader resolves the active family in this order:
 
 1. `DOTFILES_THEME_FAMILY`, when set (test seam, unchanged).
-2. `$XDG_STATE_HOME/dotfiles-theme/family`, the saved choice, when present.
+2. `$XDG_STATE_HOME/dotfiles-theme/choice`, the saved choice, when present.
 3. `$DOTFILES/config/theme/family`, the tracked default (`oasis`).
 
 The readers are `_theme_family` in `config/theme/_lib.sh` (used by `apply` and every handler),
@@ -54,9 +54,10 @@ reader keeps today's rule: a slug matching `^[a-z0-9][a-z0-9-]*$` that names a d
 ### apply's own record moves
 
 `config/theme/apply` currently writes the family it applied to `$state_dir/family` and compares against it to skip
-unchanged flips. That file becomes the user's choice, so apply's record moves to its own file (`applied-family` is
-the working name). apply never writes the choice file. The first apply after the change finds no record and re-runs
-every handler once, which is harmless.
+unchanged flips. apply's record moves to its own file (`applied-family` is the working name), and the choice gets a
+new name (`choice`) rather than reusing `family`: an old record there would otherwise read as a saved choice of the
+then-default family and pin it. apply never writes the choice file and deletes the old `family` file. The first apply
+after the change finds no record and re-runs every handler once, which is harmless.
 
 ### `local/bin/theme`
 

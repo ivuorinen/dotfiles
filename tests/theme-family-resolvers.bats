@@ -3,7 +3,7 @@
 # runtimes: fish (__dotfiles_theme_name), nvim (theme_family in init.lua),
 # vim (s:Schemes in vimrc) and wezterm (theme_family in wezterm.lua). Each
 # re-implements the same contract — DOTFILES_THEME_FAMILY, then the saved
-# choice in $XDG_STATE_HOME/dotfiles-theme/family, then config/theme/family;
+# choice in $XDG_STATE_HOME/dotfiles-theme/choice, then config/theme/family;
 # an unknown family never leaves the app unthemed — so each is exercised
 # here against the same cases. Every case skips when its binary is absent.
 
@@ -21,7 +21,7 @@ setup()
 # save_choice <family> — what local/bin/theme writes.
 save_choice()
 {
-  printf '%s\n' "$1" > "$TMPDIR_TEST/dotfiles-theme/family"
+  printf '%s\n' "$1" > "$TMPDIR_TEST/dotfiles-theme/choice"
 }
 
 teardown()
@@ -279,7 +279,7 @@ dofile(arg[1])
 print('pair=' .. Scheme_for_appearance 'Dark' .. '|' .. Scheme_for_appearance 'Light')
 LUA
   mkdir -p "$TMPDIR_TEST/state/dotfiles-theme"
-  local choice="$TMPDIR_TEST/state/dotfiles-theme/family"
+  local choice="$TMPDIR_TEST/state/dotfiles-theme/choice"
   echo kanagawa > "$choice"
   run env XDG_STATE_HOME="$TMPDIR_TEST/state" \
     nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"

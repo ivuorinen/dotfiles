@@ -1,6 +1,6 @@
 function __dotfiles_theme_name --description 'Print the fish theme name for the active dotfiles theme family'
     # The family resolves as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
-    # then the saved choice in $XDG_STATE_HOME/dotfiles-theme/family (skipped
+    # then the saved choice in $XDG_STATE_HOME/dotfiles-theme/choice (skipped
     # unless it names a palettes.d family), then config/theme/family. Its
     # fish theme is the repo-owned dual-palette
     # config/fish/themes/<family>-aa.theme. Prints nothing and returns 1 when
@@ -10,7 +10,7 @@ function __dotfiles_theme_name --description 'Print the fish theme name for the 
     set -l state (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
     set -l family $DOTFILES_THEME_FAMILY
     if test -z "$family"
-        for file in "$state/dotfiles-theme/family" "$dotfiles/config/theme/family"
+        for file in "$state/dotfiles-theme/choice" "$dotfiles/config/theme/family"
             test -r $file; or continue
             read -l line <$file
             set line (string trim -- "$line")

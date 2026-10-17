@@ -261,7 +261,7 @@ local function theme_family()
   local state = os.getenv 'XDG_STATE_HOME' or (home .. '/.local/state')
   local dotfiles = os.getenv 'DOTFILES' or (home .. '/.dotfiles')
   for _, path in ipairs {
-    state .. '/dotfiles-theme/family',
+    state .. '/dotfiles-theme/choice',
     dotfiles .. '/config/theme/family',
   } do
     local f = io.open(path, 'r')
