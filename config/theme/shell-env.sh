@@ -61,7 +61,10 @@ _theme_prompt_hook_install()
     return
   fi
   # An array PROMPT_COMMAND (bash 5.1+) is safe: this rewrites element 0.
-  case ";${PROMPT_COMMAND:-};" in
+  # starship's init moves the existing PROMPT_COMMAND into
+  # STARSHIP_PROMPT_COMMAND and runs it from starship_precmd, so a re-sourced
+  # rc file must look there too or the hook would run twice per prompt.
+  case ";${PROMPT_COMMAND:-};${STARSHIP_PROMPT_COMMAND:-};" in
     *";_theme_prompt_check;"*) ;;
     *) PROMPT_COMMAND="_theme_prompt_check${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
   esac

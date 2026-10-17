@@ -106,6 +106,17 @@ printf "export FZF_DEFAULT_OPTS=\"--color=fg:#222222\"\n" > "$XDG_STATE_HOME/dot
   [ "$output" = "_theme_prompt_check;existing" ]
 }
 
+@test "shell-env: a re-sourced bashrc does not add the hook back after starship" {
+  # starship's bash init moves the existing PROMPT_COMMAND into
+  # STARSHIP_PROMPT_COMMAND and runs it from starship_precmd; a second
+  # install must find the hook there instead of adding it again.
+  run in_shell bash 'PROMPT_COMMAND=existing; _theme_prompt_hook_install
+    STARSHIP_PROMPT_COMMAND="$PROMPT_COMMAND"; PROMPT_COMMAND=starship_precmd
+    _theme_prompt_hook_install; echo "$PROMPT_COMMAND|$STARSHIP_PROMPT_COMMAND"'
+  [ "$status" -eq 0 ]
+  [ "$output" = "starship_precmd|_theme_prompt_check;existing" ]
+}
+
 @test "shell-env: the zsh variant passes the same checks" {
   command -v zsh > /dev/null 2>&1 || skip "zsh not installed"
   write_caches 'di=01;34' 'Nord' '--color=fg:#111111'
