@@ -13,21 +13,23 @@ or `Esc` discards. `:restart` afterwards to load the updated code.
 
 ## Completion
 
-**mini.completion** — part of `https://github.com/nvim-mini/mini.nvim`
+**blink.cmp** — `https://github.com/saghen/blink.cmp` (pinned to `1.*`)
 
-LSP-aware completion via `completefunc`. `<C-Space>` triggers manually;
-completion fires automatically after a short delay. `<Tab>`/`<S-Tab>` navigate,
-`<CR>` confirms, `<C-e>` dismisses.
+Completion from LSP, paths, snippets and buffer words, with the `default`
+keymap preset. The menu opens while typing; `<C-y>` accepts, `<C-n>`/`<C-p>`
+select, `<C-Space>` shows the menu or docs, `<C-e>` cancels, `<Tab>`/`<S-Tab>`
+jump between snippet fields. The docs popup opens on its own; `<C-f>`/`<C-b>`
+scroll it. Signature help opens on trigger characters; `<C-k>` toggles it. LSP
+capabilities come from blink's own `plugin/blink-cmp.lua`.
 
 ## Editor
 
 ### mini.nvim — `https://github.com/nvim-mini/mini.nvim`
 
-19 independent modules from a single plugin:
+18 independent modules from a single plugin:
 
 | Module           | Role                                                                  |
 |------------------|-----------------------------------------------------------------------|
-| mini.completion  | LSP-aware completion via `completefunc`; auto-trigger + `<C-Space>`   |
 | mini.comment     | `gc` toggle comment operator; `gcc` for current line                  |
 | mini.ai          | Textobjects: `va)`, `yinq`, `ci'`; 750-line lookahead                 |
 | mini.operators   | `g=` evaluate, `gx` exchange, `gm` duplicate, `gR` replace, `gs` sort |
@@ -64,8 +66,8 @@ URLs: `github.com/neovim/nvim-lspconfig` · `github.com/williamboman/mason.nvim`
 `github.com/williamboman/mason-lspconfig.nvim` ·
 `github.com/WhoIsSethDaniel/mason-tool-installer.nvim`
 
-`vim.lsp.protocol.make_client_capabilities()` is registered on `vim.lsp.config('*', ...)`
-before mason-lspconfig enables servers. `fish_lsp` and `taplo` are mise-managed and
+Client capabilities on `vim.lsp.config('*', ...)` come from blink.cmp's
+`plugin/blink-cmp.lua`. `fish_lsp` and `taplo` are mise-managed and
 enabled explicitly via `vim.lsp.enable { 'fish_lsp', 'taplo' }`.
 
 ### LSP Servers

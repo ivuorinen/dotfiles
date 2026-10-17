@@ -35,8 +35,8 @@ require 'pack'
 require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
--- version = vim.version.range '*' is set only on plugins that publish
--- semver-tagged releases (snacks.nvim). The remaining plugins
+-- version = vim.version.range is set only on plugins that publish
+-- semver-tagged releases (snacks.nvim, blink.cmp). The remaining plugins
 -- have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
   'https://github.com/nvim-mini/mini.nvim',
@@ -50,6 +50,8 @@ vim.pack.add {
   'https://github.com/mfussenegger/nvim-lint',
   'https://github.com/zapling/mason-conform.nvim',
   { src = 'https://github.com/folke/snacks.nvim', version = vim.version.range '*' },
+  -- 1.*: main is unreleased v2, and the prebuilt fuzzy binary is fetched only on a tag
+  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '1.*' },
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
   'https://github.com/arborist-ts/arborist.nvim',
@@ -62,9 +64,13 @@ vim.pack.add {
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
--- Lightweight LSP-aware completion from mini.nvim
--- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-completion.md
-require('mini.completion').setup()
+-- https://github.com/saghen/blink.cmp
+-- LSP capabilities are registered by blink's plugin/blink-cmp.lua.
+require('blink.cmp').setup {
+  keymap = { preset = 'default' }, -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+  completion = { documentation = { auto_show = true } },
+  signature = { enabled = true },
+}
 
 -- ── Editor ───────────────────────────────────────────────────────────
 -- mini.nvim suite + vim-sleuth
@@ -333,12 +339,6 @@ require 'lspconfig'
 
 -- Mason manages LSP server binary downloads and installations
 require('mason').setup {}
-
--- Set capabilities before mason-lspconfig enables servers so the config store
--- is fully populated regardless of enable timing.
-vim.lsp.config('*', {
-  capabilities = vim.lsp.protocol.make_client_capabilities(),
-})
 
 -- Automatically calls vim.lsp.enable() for every server mason has installed.
 -- Servers from mise (fish_lsp, taplo) are not visible to mason so they are

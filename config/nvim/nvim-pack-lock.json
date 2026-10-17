@@ -4,6 +4,11 @@
       "rev": "fdeef56c2840c6772b9f68c5774ed87e9340ec7d",
       "src": "https://github.com/arborist-ts/arborist.nvim"
     },
+    "blink.cmp": {
+      "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
+      "src": "https://github.com/saghen/blink.cmp",
+      "version": "1.0.0 - 2.0.0"
+    },
     "auto-dark-mode.nvim": {
       "rev": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df",
       "src": "https://github.com/f-person/auto-dark-mode.nvim"

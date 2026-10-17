@@ -115,8 +115,9 @@ Source of truth: the `clues` table in the `-- Editor` section of `init.lua`.
 **Stack:** `nvim-lspconfig` (default server definitions) +
 mason (installs binaries via `mason-tool-installer`) +
 `mason-lspconfig` (auto-enables all mason-installed servers via `vim.lsp.enable`) +
-native `lsp/*.lua` files (customizations only) +
-`vim.lsp.config('*', ...)` in the `-- LSP` section of `init.lua`.
+native `lsp/*.lua` files (customizations only). Client capabilities for every
+server (`vim.lsp.config('*', …)`) are set by blink.cmp's `plugin/blink-cmp.lua`,
+not by `init.lua`.
 
 **How it works:** The `-- LSP` section of `init.lua` calls `require('lspconfig')` to populate
 `vim.lsp.config` with nvim-lspconfig's defaults for all servers. Any
