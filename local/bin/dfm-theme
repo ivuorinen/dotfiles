@@ -42,6 +42,12 @@ dfm_theme()
   # before ./install links them. theme-reapply is the shell function the
   # full bootstrap defines by sourcing config/exports; its LS_COLORS and
   # BAT_THEME refresh reaches only this process.
+  # reset and mode take no arguments: `dfm theme reset kanagawa` is a
+  # mistake, and acting on it would drop the saved choice.
+  if [[ "${1:-}" == reset || "${1:-}" == mode ]] && (($# > 1)); then
+    msgr err "Usage: $SCRIPT theme $1 (takes no arguments)"
+    exit 2
+  fi
   case "${1:-}" in
     family)
       shift

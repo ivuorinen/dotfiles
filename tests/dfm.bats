@@ -124,6 +124,18 @@ setup()
   [[ "${lines[${#lines[@]} - 1]}" =~ ^(dark|light)$ ]]
 }
 
+@test "dfm theme reset and mode reject extra arguments" {
+  mkdir -p "$BATS_TEST_TMPDIR/dotfiles-theme"
+  printf 'kanagawa\n' > "$BATS_TEST_TMPDIR/dotfiles-theme/choice"
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme reset kanagawa
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"takes no arguments"* ]]
+  # The saved choice survives the rejected reset.
+  [ "$(cat "$BATS_TEST_TMPDIR/dotfiles-theme/choice")" = "kanagawa" ]
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode dark < /dev/null
+  [ "$status" -eq 2 ]
+}
+
 @test "dfm dotfiles menu shows entries" {
   run bash local/bin/dfm dotfiles
   [ "$status" -eq 0 ]
