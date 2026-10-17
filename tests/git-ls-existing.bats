@@ -66,3 +66,22 @@ teardown()
   [ "$status" -eq 0 ]
   [ "$output" = "kept.md|with space.md|" ]
 }
+
+@test "git-ls-existing: keeps a tracked symlink whose target is missing" {
+  ln -s missing-target dangling.md
+  git add dangling.md
+  run "$SCRIPT" '*.md'
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dangling.md"* ]]
+}
+
+@test "git-ls-existing: --full-name from a subdirectory checks from the top" {
+  mkdir sub
+  touch sub/inner.md
+  git add sub/inner.md
+  rm gone.md
+  cd sub
+  run "$SCRIPT" --full-name ':/*.md'
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(printf '%s\n' kept.md sub/inner.md 'with space.md')" ]
+}

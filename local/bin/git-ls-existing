@@ -17,14 +17,19 @@ usage()
 }
 
 nul=0
+# Paths are relative to the current directory, except under --full-name,
+# which makes them relative to the top of the work tree.
+base=""
 for arg; do
   case "$arg" in
     -h | --help) usage && exit 0 ;;
     -z) nul=1 ;;
+    --full-name) base="$(git rev-parse --show-cdup)" ;;
   esac
 done
 
 git ls-files -z "$@" | while IFS= read -r -d '' f; do
-  [[ -e $f ]] || continue
+  # -L keeps a tracked symlink whose target is missing: the entry exists.
+  [[ -e $base$f || -L $base$f ]] || continue
   if ((nul)); then printf '%s\0' "$f"; else printf '%s\n' "$f"; fi
 done
