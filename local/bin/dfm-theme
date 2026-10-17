@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#USAGE cmd "theme" help="List and switch theme families" {
+#USAGE   cmd "family" help="List theme families, or switch to one" {
+#USAGE     arg "[name]" help="Family to switch to (lists the families when omitted)"
+#USAGE   }
+#USAGE   cmd "reset" help="Return to the default theme family"
+#USAGE   cmd "mode" help="Print the current dark/light mode"
+#USAGE   cmd "reapply" help="Re-run every theme handler" {
+#USAGE     arg "[mode]" help="dark or light (default: the current mode)"
+#USAGE   }
+#USAGE }
+#
+# @description List and switch theme families (dfm theme)
+# dfm theme — the theme family switcher, mode and reapply in one place.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(
+  unset CDPATH
+  cd -- "$(dirname -- "$0")" && pwd
+)
+# shellcheck source=local/bin/dfm-lib
+if ! source "$_dfm_dir/dfm-lib"; then
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+fi
+dfm_bootstrap_for "$@"
+
+dfm_theme()
+{
+  USAGE_PREFIX="$SCRIPT theme <command>"
+
+  MENU=(
+    "family:List theme families, or switch to one"
+    "reset:Return to the default theme family"
+    "mode:Print the current dark/light mode"
+    "reapply:Re-run every theme handler"
+  )
+
+  # theme and theme-mode are siblings of this script, so a checkout works
+  # before ./install links them. theme-reapply is the shell function the
+  # full bootstrap defines by sourcing config/exports; its LS_COLORS and
+  # BAT_THEME refresh reaches only this process.
+  case "${1:-}" in
+    family)
+      shift
+      "$_dfm_dir/theme" "$@"
+      ;;
+    reset) "$_dfm_dir/theme" --reset ;;
+    mode) "$_dfm_dir/theme-mode" ;;
+    reapply)
+      shift
+      theme-reapply "$@"
+      ;;
+    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+  esac
+}
+
+dfm_theme "$@"

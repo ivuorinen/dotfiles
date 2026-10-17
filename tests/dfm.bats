@@ -95,6 +95,33 @@ setup()
   [[ "$output" == *"Documentation not found"* ]]
 }
 
+@test "dfm theme menu shows entries" {
+  run bash local/bin/dfm theme
+  [ "$status" -eq 0 ]
+  local e
+  for e in family reset mode reapply; do
+    [[ "$output" == *"$e"* ]] || {
+      echo "dfm theme menu lacks '$e'"
+      return 1
+    }
+  done
+}
+
+@test "dfm theme family lists the families" {
+  # A private state dir: listing reads the saved choice, never the real one.
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme family
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catppuccin"* ]]
+  [[ "$output" == *"kanagawa"* ]]
+  [[ "$output" == *"oasis"* ]]
+}
+
+@test "dfm theme mode prints dark or light" {
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode
+  [ "$status" -eq 0 ]
+  [[ "${lines[${#lines[@]} - 1]}" =~ ^(dark|light)$ ]]
+}
+
 @test "dfm dotfiles menu shows entries" {
   run bash local/bin/dfm dotfiles
   [ "$status" -eq 0 ]
