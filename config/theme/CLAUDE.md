@@ -31,6 +31,9 @@ Dark/light theming is owned by a stand-alone orchestrator:
   else the per-machine saved choice in `$XDG_STATE_HOME/dotfiles-theme/family`
   (skipped when missing, empty or invalid), else the tracked default
   `config/theme/family` (`oasis`). apply only reads the saved choice.
+  `local/bin/theme` lists the families and marks the active one, switches
+  (`theme <family>`) and resets (`theme --reset`): it writes or removes the
+  saved choice, then runs apply at the current mode.
 - `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — theme
   assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`). A handler
   whose active family ships no file removes its stale link instead of
@@ -39,7 +42,8 @@ Dark/light theming is owned by a stand-alone orchestrator:
   palette; called by `config/tmux/tmux.conf`'s bootstrap. On a flip,
   `handlers.d/tmux` re-sources the whole `tmux.conf` (so the bootstrap
   must never call that handler back — it would recurse).
-- `local/bin/theme-mode` (and bash/fish functions) — public read API.
+- `local/bin/theme-mode` (and bash/fish functions) — public read API for
+  the mode; `local/bin/theme` — the public family switcher.
 - Fallback: `config/theme/probe-osc11` — OSC 11 query for SSH and
   no-OS-source environments.
 
