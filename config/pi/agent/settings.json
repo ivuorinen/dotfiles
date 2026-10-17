@@ -15,7 +15,7 @@
   "collapseChangelog": true,
   "quietStartup": true,
   "enableInstallTelemetry": false,
-  "defaultProjectTrust": "always",
+  "defaultProjectTrust": "ask",
   "showHardwareCursor": false,
   "packages": [
     "npm:pi-simplify",
