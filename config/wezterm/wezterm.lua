@@ -248,6 +248,12 @@ local schemes = {
   catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
 }
 
+-- $name, or `default` when it is unset or empty, as ${name:-default} in sh.
+local function env_or(name, default)
+  local value = os.getenv(name)
+  return (value and value ~= '') and value or default
+end
+
 -- Theme family, resolved as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
 -- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/choice, then
 -- config/theme/family. A file value counts only under _theme_valid_family's
@@ -259,8 +265,8 @@ local function theme_family()
     return schemes[env] and env or 'oasis'
   end
   local home = os.getenv 'HOME' or ''
-  local state = os.getenv 'XDG_STATE_HOME' or (home .. '/.local/state')
-  local dotfiles = os.getenv 'DOTFILES' or (home .. '/.dotfiles')
+  local state = env_or('XDG_STATE_HOME', home .. '/.local/state')
+  local dotfiles = env_or('DOTFILES', home .. '/.dotfiles')
   local function valid(family)
     if not (family:match '^[a-z0-9][a-z0-9-]*$' and schemes[family]) then
       return false
@@ -292,9 +298,8 @@ end
 -- ($XDG_STATE_HOME/dotfiles-theme/mode). The file is on the reload watch
 -- list, so `config/theme/apply` re-runs this config and every window picks
 -- the new scheme. nil when the file is missing or holds anything else.
-local mode_file = (
-  os.getenv 'XDG_STATE_HOME' or ((os.getenv 'HOME' or '') .. '/.local/state')
-) .. '/dotfiles-theme/mode'
+local mode_file = env_or('XDG_STATE_HOME', (os.getenv 'HOME' or '') .. '/.local/state')
+  .. '/dotfiles-theme/mode'
 wezterm.add_to_config_reload_watch_list(mode_file)
 
 local function theme_mode()

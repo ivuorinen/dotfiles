@@ -596,7 +596,9 @@ require('arborist').setup {
 -- nothing does. Every family follows 'background', which auto-dark-mode below
 -- flips with the OS.
 local function theme_family()
-  local dotfiles = vim.env.DOTFILES or (vim.env.HOME .. '/.dotfiles')
+  -- An empty variable counts as unset, as ${VAR:-default} does in _lib.sh.
+  local dotfiles = vim.env.DOTFILES ~= '' and vim.env.DOTFILES
+    or (vim.env.HOME .. '/.dotfiles')
   -- The name feeds a filesystem path, so only a plain slug naming a family.
   local function valid(name)
     return name:match '^[a-z0-9][a-z0-9%-]*$' ~= nil
@@ -604,7 +606,8 @@ local function theme_family()
   end
   local env = vim.env.DOTFILES_THEME_FAMILY
   if env and env ~= '' then return valid(env) and env or 'oasis' end
-  local state = vim.env.XDG_STATE_HOME or (vim.env.HOME .. '/.local/state')
+  local state = vim.env.XDG_STATE_HOME ~= '' and vim.env.XDG_STATE_HOME
+    or (vim.env.HOME .. '/.local/state')
   for _, file in ipairs {
     state .. '/dotfiles-theme/choice',
     dotfiles .. '/config/theme/family',

@@ -6,8 +6,8 @@ function __dotfiles_theme_name --description 'Print the fish theme name for the 
     # config/fish/themes/<family>-aa.theme. Prints nothing and returns 1 when
     # either is missing, so callers leave the current theme alone instead of
     # mixing families.
-    set -l dotfiles (set -q DOTFILES; and echo $DOTFILES; or echo "$HOME/.dotfiles")
-    set -l state (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
+    set -l dotfiles (test -n "$DOTFILES"; and echo $DOTFILES; or echo "$HOME/.dotfiles")
+    set -l state (test -n "$XDG_STATE_HOME"; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
     set -l family $DOTFILES_THEME_FAMILY
     if test -z "$family"
         for file in "$state/dotfiles-theme/choice" "$dotfiles/config/theme/family"

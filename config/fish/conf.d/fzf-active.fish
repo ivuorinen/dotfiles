@@ -7,7 +7,7 @@
 # once apply bumps the generation stamp (config/theme/shell-env.sh does
 # the same for bash and zsh).
 
-set -l state_dir (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
+set -l state_dir (test -n "$XDG_STATE_HOME"; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
 set -l fzf_active "$state_dir/dotfiles-theme/fzf-active.fish"
 
 if test -r $fzf_active

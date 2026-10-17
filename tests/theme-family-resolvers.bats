@@ -334,6 +334,35 @@ LUA
   [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 
+@test "wezterm and fish: an empty XDG_STATE_HOME counts as unset" {
+  # _lib.sh reads ${XDG_STATE_HOME:-$HOME/.local/state}; an empty value
+  # must not turn the choice path into /dotfiles-theme/choice.
+  local home="$TMPDIR_TEST/home"
+  mkdir -p "$home/.local/state/dotfiles-theme"
+  echo kanagawa > "$home/.local/state/dotfiles-theme/choice"
+  if command -v fish > /dev/null 2>&1; then
+    run env HOME="$home" XDG_STATE_HOME= fish --no-config -c \
+      "source '$ROOT/config/fish/functions/__dotfiles_theme_name.fish'; __dotfiles_theme_name"
+    [ "$output" = "kanagawa-aa" ]
+  fi
+  command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
+  cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
+local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
+local stub = setmetatable({}, { __index = function() return any end })
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.config_builder = function() return {} end
+stub.on = function() end
+stub.action = setmetatable({}, { __index = function() return function() return {} end end })
+package.loaded.wezterm = stub
+dofile(arg[1])
+print('pair=' .. Scheme_for_appearance 'Dark' .. '|' .. Scheme_for_appearance 'Light')
+LUA
+  run env HOME="$home" XDG_STATE_HOME= \
+    nvim --clean --headless -l "$TMPDIR_TEST/stub.lua" "$ROOT/config/wezterm/wezterm.lua"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pair=Kanagawa Wave|Kanagawa Lotus AA"* ]]
+}
+
 @test "wezterm: the orchestrator's mode file wins over the appearance" {
   command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'

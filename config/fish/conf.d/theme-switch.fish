@@ -10,7 +10,7 @@ if not status is-interactive
     return
 end
 
-set -l state_dir (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
+set -l state_dir (test -n "$XDG_STATE_HOME"; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
 set -l mode_file "$state_dir/dotfiles-theme/mode"
 set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
 
@@ -41,7 +41,7 @@ end
 # Per-prompt cheap watcher: read the stamp (a builtin, no subprocess); only
 # do real work when it has changed since the last prompt we saw.
 function __theme_switch_check --on-event fish_prompt
-    set -l state_dir (set -q XDG_STATE_HOME; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
+    set -l state_dir (test -n "$XDG_STATE_HOME"; and echo $XDG_STATE_HOME; or echo "$HOME/.local/state")
     set -l mode_file "$state_dir/dotfiles-theme/mode"
     set -l gen_file "$state_dir/dotfiles-theme/generation"
     set -l ls_cache "$state_dir/dotfiles-theme/ls-colors"
