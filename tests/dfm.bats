@@ -117,7 +117,9 @@ setup()
 }
 
 @test "dfm theme mode prints dark or light" {
-  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode
+  # No mode file in the private state dir, so stdin must not be a terminal:
+  # theme-mode would otherwise send an OSC 11 query to the developer's.
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode < /dev/null
   [ "$status" -eq 0 ]
   [[ "${lines[${#lines[@]} - 1]}" =~ ^(dark|light)$ ]]
 }

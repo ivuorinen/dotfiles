@@ -119,7 +119,9 @@ expected_list()
 
 @test "theme: works before apply has ever run" {
   rm -rf "$XDG_STATE_HOME"
-  run "$THEME" kanagawa
+  # No mode file, so theme-mode would probe a terminal on stdin (bats passes
+  # the developer's through); /dev/null keeps it on the dark default.
+  run "$THEME" kanagawa < /dev/null
   [ "$status" -eq 0 ]
   [ "$(cat "$STATE/family")" = "kanagawa" ]
 }
