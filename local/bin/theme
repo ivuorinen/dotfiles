@@ -57,10 +57,12 @@ list_families()
   local active choice saved="" f
   active="$(_theme_family 2> /dev/null)" || active=""
   choice="$(_theme_choice_file)"
+  # Any choice file that _theme_family would skip is worth a word: empty,
+  # whitespace, a removed family, or the "-" an older apply recorded there.
   if [[ -r "$choice" ]]; then
     read -r saved < "$choice" || true
-    if [[ -n "$saved" ]] && ! _theme_valid_family "$saved"; then
-      msgr warn "saved choice '$saved' names no theme family; using the default"
+    if ! _theme_valid_family "$saved"; then
+      msgr warn "ignoring the saved choice '$saved' in $choice: not a theme family; using the default"
     fi
   fi
   warn_override

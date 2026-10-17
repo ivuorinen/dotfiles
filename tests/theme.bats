@@ -96,6 +96,20 @@ expected_list()
   [[ "$output" == *"* $DEFAULT"* ]]
 }
 
+@test "theme: an empty or whitespace saved choice is reported too" {
+  local bad
+  for bad in '' '   '; do
+    printf '%s\n' "$bad" > "$STATE/family"
+    run "$THEME"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"saved"* ]] || {
+      echo "no warning for saved choice '$bad'"
+      return 1
+    }
+    [[ "$output" == *"* $DEFAULT"* ]]
+  done
+}
+
 @test "theme: warns when DOTFILES_THEME_FAMILY overrides the choice" {
   DOTFILES_THEME_FAMILY=catppuccin run "$THEME" kanagawa
   [ "$status" -eq 0 ]
