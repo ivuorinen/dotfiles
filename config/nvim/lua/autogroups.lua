@@ -91,11 +91,13 @@ autocmd({ 'FileType' }, {
 -- Tree-sitter highlight + indent for any filetype with a parser. A parser
 -- nvim-treesitter knows but has not built yet is installed on first open (as
 -- arborist did), then started in every buffer of that language. Indent is set
--- only when the parser loads, so buffers without one (and snacks.bigfile's
--- `bigfile` filetype) keep their default indentexpr.
-local function ts_start(buf)
+-- only when the parser loads and the language has an indents query, so other
+-- buffers (and snacks.bigfile's `bigfile` filetype) keep their indentexpr.
+local function ts_start(buf, lang)
   if vim.api.nvim_buf_is_valid(buf) and pcall(vim.treesitter.start, buf) then
-    vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    if vim.treesitter.query.get(lang, 'indents') then
+      vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
   end
 end
 
@@ -105,7 +107,7 @@ autocmd('FileType', {
   callback = function(ev)
     local lang = vim.treesitter.language.get_lang(ev.match)
     if not lang or ts_installing[lang] then return end
-    if vim.treesitter.language.add(lang) then return ts_start(ev.buf) end
+    if vim.treesitter.language.add(lang) then return ts_start(ev.buf, lang) end
 
     local ok, ts = pcall(require, 'nvim-treesitter')
     if not ok or not vim.list_contains(ts.get_available(), lang) then return end
@@ -113,9 +115,14 @@ autocmd('FileType', {
     ts.install(lang):await(vim.schedule_wrap(function(err)
       ts_installing[lang] = nil
       if err then return end
+      -- Loaded buffers only: vim.treesitter.start would :edit an unloaded one,
+      -- and FileType starts it here anyway once it is loaded again.
       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.treesitter.language.get_lang(vim.bo[buf].filetype) == lang then
-          ts_start(buf)
+        if
+          vim.api.nvim_buf_is_loaded(buf)
+          and vim.treesitter.language.get_lang(vim.bo[buf].filetype) == lang
+        then
+          ts_start(buf, lang)
         end
       end
     end))
