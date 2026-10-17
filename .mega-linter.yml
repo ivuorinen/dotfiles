@@ -30,9 +30,10 @@ BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/zsh|config/tmux/plugins|config/pi/agent/tmp|config/pi/agent/npm|config/mise/locks)
 # bash-exec checks for the executable bit on bash-shaped files. The
-# theme palettes under config/theme/palettes.d/ are sourced (bat config
-# directives, fzf FZF_DEFAULT_OPTS exports), not executed, so the
-# linter's expectation does not apply.
-BASH_EXEC_FILTER_REGEX_EXCLUDE: "config/theme/palettes\\.d/"
+# theme palettes under config/theme/palettes.d/ (bat config directives,
+# fzf FZF_DEFAULT_OPTS exports) and the theme libraries _lib.sh and
+# shell-env.sh are sourced, not executed, so the linter's expectation
+# does not apply.
+BASH_EXEC_FILTER_REGEX_EXCLUDE: "config/theme/(palettes\\.d/|_lib\\.sh$|shell-env\\.sh$)"
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
