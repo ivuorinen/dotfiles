@@ -47,8 +47,11 @@ Dark/light theming is owned by a stand-alone orchestrator:
 - Fallback: `config/theme/probe-osc11` — OSC 11 query for SSH and
   no-OS-source environments.
 
-Fish reacts to flips via `config/fish/conf.d/theme-switch.fish`,
-which watches the mode state file. fish (`__dotfiles_theme_name`), nvim,
+Open shells react to flips at their next prompt: bash and zsh through the
+hook in `config/theme/shell-env.sh`, fish through
+`config/fish/conf.d/theme-switch.fish` (which also re-saves its theme).
+Both watch the `generation` stamp and reload LS_COLORS, BAT_THEME and the
+fzf palette. fish (`__dotfiles_theme_name`), nvim,
 vim and wezterm each resolve the family themselves, in `_theme_family`'s
 order, and fall back to `oasis` (fish to no theme change) when nothing
 resolves. nvim and vim follow the OS appearance;

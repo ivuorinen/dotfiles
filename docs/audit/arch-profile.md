@@ -20,7 +20,8 @@ runtime by a co-located orchestrator:
   `config/theme/CLAUDE.md` ("Add new apps by dropping a file here")
 - `config/theme/palettes.d/<family>/<variant>/<app>[.<ext>]` — per-app
   palette assets keyed by theme family + variant + app; the active
-  family is named in `config/theme/family`.
+  family is the per-machine saved choice (`local/bin/theme`), else the
+  tracked default in `config/theme/family`.
 - `config/fish/conf.d/` (3 entries) — fish auto-loaded config
   fragments.
 - `config/fish/secrets.d/` (3 entries; only `*.example` and
