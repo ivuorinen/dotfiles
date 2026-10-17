@@ -86,7 +86,7 @@ set -q COPILOT_HOME; or set -x COPILOT_HOME "$XDG_CONFIG_HOME/copilot"
 set -q PI_CODING_AGENT_DIR; or set -x PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi/agent"
 set -q PI_CODING_AGENT_SESSION_DIR; or set -x PI_CODING_AGENT_SESSION_DIR "$XDG_STATE_HOME/pi/sessions"
 set -q PI_LENS_HOME; or set -x PI_LENS_HOME "$XDG_STATE_HOME/pi/pi-lens"
-set -q PI_LENS_CONFIG_PATH; or set -x PI_LENS_CONFIG_PATH "$XDG_CONFIG_HOME/pi/pi-lens"
+set -q PI_LENS_CONFIG_PATH; or set -x PI_LENS_CONFIG_PATH "$XDG_CONFIG_HOME/pi/pi-lens/config.json"
 
 # gh-dash / television — read their themed config from the theme state dir
 # so config/gh-dash and config/television stay plain symlinks with no

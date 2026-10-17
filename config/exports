@@ -362,7 +362,7 @@ msg "Setting up pi.dev configuration"
 export PI_CODING_AGENT_DIR="$XDG_CONFIG_HOME/pi/agent"
 export PI_CODING_AGENT_SESSION_DIR="$XDG_STATE_HOME/pi/sessions"
 export PI_LENS_HOME="$XDG_STATE_HOME/pi/pi-lens"
-export PI_LENS_CONFIG_PATH="$XDG_CONFIG_HOME/pi/pi-lens"
+export PI_LENS_CONFIG_PATH="$XDG_CONFIG_HOME/pi/pi-lens/config.json"
 
 # Yarn
 msg "Setting up Yarn configuration"
