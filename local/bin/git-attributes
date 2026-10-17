@@ -437,7 +437,7 @@ detect_shell_scripts()
 
   # Get all shell scripts regardless of extension
   local shell_scripts
-  shell_scripts=$(git ls-files | xargs file | grep "shell script" | cut -d: -f1)
+  shell_scripts=$(git ls-files -z | xargs -0 file | grep "shell script" | cut -d: -f1)
 
   if [[ -n "$shell_scripts" ]]; then
     shell_scripts_found=$(echo "$shell_scripts" | wc -l | tr -d ' ')
