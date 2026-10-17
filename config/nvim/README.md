@@ -169,7 +169,6 @@ Multi-feature plugin; each snack is independently toggleable:
 | bigfile  | Disables treesitter/LSP for large files to prevent UI freezes            |
 | image    | Inline image rendering (Kitty/WezTerm/iTerm2; silent fallback on others) |
 | input    | Replaces `vim.ui.input` with a styled floating prompt                    |
-| notifier | Toast notification UI; replaces `vim.notify`                             |
 | picker   | Fuzzy finder replacing telescope; `<C-t>` sends results to trouble       |
 | rename   | LSP-aware file rename that updates all import references                 |
 | terminal | Floating terminal                                                        |

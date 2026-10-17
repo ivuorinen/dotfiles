@@ -469,7 +469,7 @@ let g:wordy#ring = [
 " coc.nvim, trouble -> quickfix/location lists, mini.files -> NERDTree,
 " mini.bufremove -> s:BufRemove. nvim keys with no vim counterpart are left
 " unmapped: <leader>ct (treesitter), <leader>xc and <leader>xt (trouble
-" cascade/test) and <leader>tn (snacks notifier).
+" cascade/test) and <leader>tn (dismiss ui2 messages).
 " Guarded to vim only: IdeaVim sources this file and keeps its own
 " IDE-action scheme in config/ideavim/ideavimrc.
 if !has('ideavim')

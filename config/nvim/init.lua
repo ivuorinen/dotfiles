@@ -518,9 +518,6 @@ require('snacks').setup {
   -- Replaces vim.ui.input with a styled floating prompt
   input = { enabled = true },
 
-  -- Notification UI: replaces nvim-notify and noice's notification routing
-  notifier = { enabled = true },
-
   -- Fuzzy picker: replaces telescope
   picker = {
     enabled = true,

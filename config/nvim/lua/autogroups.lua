@@ -37,7 +37,6 @@ autocmd('FileType', {
     'lspinfo',
     'man',
     'qf',
-    'snacks_notif',
     'startuptime',
   },
   callback = function(event)
@@ -59,7 +58,6 @@ autocmd('FileType', {
     'help',
     'man',
     'lspinfo',
-    'snacks_notif',
     'startuptime',
   },
   callback = function() vim.wo.winfixbuf = true end,

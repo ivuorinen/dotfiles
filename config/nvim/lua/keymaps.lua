@@ -86,6 +86,13 @@ K.n('-', function()
   if MiniFiles then MiniFiles.open(vim.api.nvim_buf_get_name(0)) end
 end, { desc = 'File Explorer (current file)' })
 K.nl('tl', ToggleBackground, 'Toggle Light/Dark Mode')
+-- ui2 (init.lua) shows messages in its own window; msg_clear is its private
+-- API, so when ui2 is not running fall back to clearing the cmdline.
+K.nl('tn', function()
+  if not pcall(function() require('vim._core.ui2.messages').msg_clear() end) then
+    vim.cmd.echo "''"
+  end
+end, 'Dismiss Messages')
 
 -- ── Option toggles ────────────────────────────────────────────────────
 -- Convention is 'tm' followed by the option letter
@@ -156,12 +163,26 @@ vim.schedule(function()
   K.nl('sg', function() sp.grep() end, 'Live Grep')
   K.nl('sh', function() sp.help() end, 'Help tags')
   K.nl('sk', function() sp.keymaps() end, 'Search Keymaps')
-  K.nl('sn', function() sp.notifications() end, 'Notification History')
+  -- :messages history (vim.notify included) as a picker, newest first. Each
+  -- line is one item: :messages keeps no boundaries between multi-line ones.
+  K.nl('sn', function()
+    local out = vim.api.nvim_exec2('messages', { output = true }).output
+    local items = {}
+    for _, line in ipairs(vim.split(out, '\n', { trimempty = true })) do
+      table.insert(items, 1, { text = line, preview = { text = line } })
+    end
+    sp.pick {
+      title = 'Message History',
+      items = items,
+      format = 'text',
+      preview = 'preview',
+      confirm = 'close',
+    }
+  end, 'Message History')
   K.nl('so', function() sp.recent() end, 'Old Files')
   K.nl('sq', function() sp.qflist() end, 'Quickfix')
   K.nl('ss', function() sp.lines() end, 'Search Buffer Lines')
 
   -- Toggle (Snacks-powered)
-  K.nl('tn', function() s.notifier.hide() end, 'Dismiss Notifications')
   K.nl('tt', function() s.terminal() end, 'Toggle Terminal')
 end)
