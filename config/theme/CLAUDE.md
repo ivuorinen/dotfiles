@@ -50,8 +50,8 @@ order, and fall back to `oasis` (fish to no theme change) when nothing
 resolves. nvim and vim follow the OS appearance;
 wezterm follows the mode file (on its reload watch list), falling back to
 the OS appearance when there is none. After a family switch, running vim
-sessions update within 3 s and wezterm on its next config reload; nvim
-reads the family only at startup and needs a restart.
+and nvim sessions update within 3 s, and wezterm reloads when apply
+rewrites the mode file on its watch list.
 
 Claude Code follows the mode, not the family. `handlers.d/claude` sets
 `theme` to `custom:dotfiles` once and, on each flip, rewrites

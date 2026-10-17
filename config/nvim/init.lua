@@ -709,8 +709,21 @@ require('catppuccin').setup {
   },
 }
 
-local family_schemes = { kanagawa = 'kanagawa', oasis = 'oasis' }
-vim.cmd.colorscheme(family_schemes[theme_family()] or 'catppuccin')
+-- Applied at startup and re-checked every 3 s, so a family switch
+-- (local/bin/theme) reaches running sessions the way vim's timer does. It acts
+-- only when the family's scheme changes, so a manual :colorscheme stays until
+-- the next switch; 'background' stays with auto-dark-mode below.
+local family_schemes =
+  { kanagawa = 'kanagawa', oasis = 'oasis', catppuccin = 'catppuccin' }
+local applied_scheme
+local function apply_family_scheme()
+  local scheme = family_schemes[theme_family()] or 'oasis'
+  if scheme == applied_scheme then return end
+  applied_scheme = scheme
+  vim.cmd.colorscheme(scheme)
+end
+apply_family_scheme()
+vim.uv.new_timer():start(3000, 3000, vim.schedule_wrap(apply_family_scheme))
 
 -- ── Auto dark mode ───────────────────────────────────────────────────
 -- https://github.com/f-person/auto-dark-mode.nvim

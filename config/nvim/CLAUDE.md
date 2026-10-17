@@ -7,7 +7,8 @@ when working with code in this repository.
 
 Neovim configuration using **vim.pack** (Neovim 0.12+ built-in) for plugin
 management, **oasis** (Abyss) as the default colorscheme (kanagawa and
-catppuccin as alternates, chosen by `config/theme/family`), and **mini.nvim** as
+catppuccin as alternates, chosen by the active theme family and re-checked every
+3 s — see `config/theme/CLAUDE.md`), and **mini.nvim** as
 the foundation for many core features.
 
 ## Load Order

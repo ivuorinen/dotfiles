@@ -195,6 +195,19 @@ nvim_scheme()
   [ "$(nvim_scheme '')" = "$(nvim_scheme oasis)" ]
 }
 
+@test "nvim: a running session follows a family switch at an unchanged mode" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
+  local data
+  data="$(nvim --clean --headless '+lua io.stdout:write(vim.fn.stdpath("data"))' +qa 2> /dev/null)"
+  compgen -G "$data/site/pack/*/opt/kanagawa" > /dev/null || skip "kanagawa.nvim not installed"
+  # Start on kanagawa, switch the family, and let the 3 s timer fire
+  # (:sleep runs the event loop), as vim's live test does.
+  run env DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
+    "+lua vim.env.DOTFILES_THEME_FAMILY = 'catppuccin'" '+sleep 4' \
+    '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa
+  [ "${lines[${#lines[@]} - 1]}" = "catppuccin-mocha" ]
+}
+
 @test "nvim: oasis selects abyss in both modes" {
   command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
   local data
