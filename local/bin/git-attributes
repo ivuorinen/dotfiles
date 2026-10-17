@@ -435,9 +435,10 @@ detect_shell_scripts()
   local existing_rules
   existing_rules=$(grep -v "^#" .gitattributes || true)
 
-  # Get all shell scripts regardless of extension
+  # Get all shell scripts regardless of extension. git-ls-existing (a sibling
+  # of this script) leaves out tracked files deleted from the work tree.
   local shell_scripts
-  shell_scripts=$(git ls-files | xargs file | grep "shell script" | cut -d: -f1)
+  shell_scripts=$("$(dirname -- "$0")/git-ls-existing" -z | xargs -0 file | grep "shell script" | cut -d: -f1)
 
   if [[ -n "$shell_scripts" ]]; then
     shell_scripts_found=$(echo "$shell_scripts" | wc -l | tr -d ' ')

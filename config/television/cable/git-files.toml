@@ -4,7 +4,7 @@ description = "A channel to list the files currently tracked in the Git reposito
 requirements = ["git", "bat"]
 
 [source]
-command = "git ls-files $(git rev-parse --show-toplevel)"
+command = "git ls-existing $(git rev-parse --show-toplevel)"
 
 [preview]
 command = "tv-preview '{}'"

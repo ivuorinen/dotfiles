@@ -1,6 +1,6 @@
 # check-exclusion-drift
 
-Keeps the repo's five third-party exclusion lists in step with each other.
+Keeps the repo's seven third-party exclusion lists in step with each other.
 
 ## Why
 
@@ -18,8 +18,8 @@ caused it.
 
 ## What it checks
 
-The five gates do **not** have identical scope: ruff and bandit only ever see
-Python files, grype only scans dependency manifests. Requiring every gate to
+The seven gates do **not** have identical scope: ruff and bandit only ever see
+Python files, yamllint only YAML, grype only scans dependency manifests. Requiring every gate to
 list every tree would report ~40 differences on day one, all of them correct.
 
 So the check compares the **coverage matrix** — which gates exclude which tree
@@ -56,20 +56,23 @@ is the only record of which gates were intended to cover what.
 
 ## Sources parsed
 
-| Gate       | File               | Key                            |
-|------------|--------------------|--------------------------------|
-| grype      | `.grype.yaml`      | `exclude`                      |
-| codacy     | `.codacy.yml`      | `exclude_paths`                |
-| ruff       | `pyproject.toml`   | `[tool.ruff]` `extend-exclude` |
-| bandit     | `pyproject.toml`   | `[tool.bandit]` `exclude_dirs` |
-| megalinter | `.mega-linter.yml` | `FILTER_REGEX_EXCLUDE`         |
+| Gate       | File                               | Key                            |
+|------------|------------------------------------|--------------------------------|
+| grype      | `.grype.yaml`                      | `exclude`                      |
+| codacy     | `.codacy.yml`                      | `exclude_paths`                |
+| ruff       | `pyproject.toml`                   | `[tool.ruff]` `extend-exclude` |
+| bandit     | `pyproject.toml`                   | `[tool.bandit]` `exclude_dirs` |
+| megalinter | `.mega-linter.yml`                 | `FILTER_REGEX_EXCLUDE`         |
+| codeql     | `.github/codeql/codeql-config.yml` | `paths-ignore`                 |
+| yamllint   | `.yamllint.yml`                    | `ignore` (block scalar)        |
 
 `.claude/rules/vendored-files.md` is the prose policy behind the set. It is not
 parsed — it is documentation, and a regex over prose would be the kind of
 brittle coupling this script exists to avoid. Update it by hand when a tree
 moves.
 
-Stdlib only (`tomllib` plus regex for the two flat YAML lists), so the check
+Stdlib only (`tomllib` plus regex for the YAML lists and yamllint's
+gitignore-style `ignore` string), so the check
 needs nothing installed beyond Python.
 
 ## Tests

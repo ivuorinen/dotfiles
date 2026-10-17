@@ -2,6 +2,8 @@
 *.pyc
 .git/**
 config/cheat/cheatsheets/community/**
+config/pi/agent/tmp/**
+config/pi/agent/npm/node_modules/**
 config/vim/plugged/**
 node_modules
 tools/antidote/**

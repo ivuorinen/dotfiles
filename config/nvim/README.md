@@ -214,9 +214,9 @@ Building parsers needs `tree-sitter` CLI (a global mise tool) and a C compiler.
 | auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state        |
 | nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled                |
 
-The colorscheme follows the theme family in `config/theme/family`
-(`oasis`, `kanagawa` or `catppuccin`); each switches variant with `background`.
-The family is read once at startup, so restart nvim after switching it.
+The colorscheme follows the active theme family — the choice saved by `theme`,
+else `config/theme/family` — (`oasis`, `kanagawa` or `catppuccin`); each switches
+variant with `background`. Running sessions pick up a family switch within 3 s.
 
 URLs: `github.com/uhs-robert/oasis.nvim` · `github.com/rebelot/kanagawa.nvim` ·
 `github.com/catppuccin/nvim` ·

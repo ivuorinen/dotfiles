@@ -12,7 +12,7 @@ Scaffolds a new entry in the theme orchestrator's handler chain. Per
 `docs/audit/arch-profile.md` rules 1 and 2, each app gets:
 
 - An executable handler at `config/theme/handlers.d/<app>` that
-  receives `dark` or `light` as `$1` and applies the theme.
+  receives `dark` or `light` as `\$1` and applies the theme.
 - One palette per mode, per theme family, under
   `config/theme/palettes.d/<family>/dark/<app>.<ext>` and
   `config/theme/palettes.d/<family>/light/<app>.<ext>` (extension
@@ -39,7 +39,7 @@ Scaffolds a new entry in the theme orchestrator's handler chain. Per
 set -uo pipefail
 
 # shellcheck disable=SC1091
-source "$(dirname -- "$0")/../_lib.sh"
+source "$(dirname -- "\$0")/../_lib.sh"
 
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2

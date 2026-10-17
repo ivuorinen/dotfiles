@@ -48,19 +48,45 @@ _idempotent_ln_sf()
   return 0
 }
 
-# Active theme family: $DOTFILES_THEME_FAMILY (test seam) or the tracked
-# config/theme/family file. The name feeds a filesystem path, so accept
-# only a plain slug that names an existing palettes.d/<family>/ dir.
+# The user's saved family choice, written by local/bin/theme. Per machine
+# and outside the repo, so switching never leaves a tracked change.
+_theme_choice_file()
+{
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/choice"
+}
+
+# True when $1 is a usable family: the name feeds a filesystem path, so
+# accept only a plain slug that names an existing palettes.d/<family>/ dir.
+_theme_valid_family()
+{
+  [[ "${1-}" =~ ^[a-z0-9][a-z0-9-]*$ && -d "${DOTFILES:-$HOME/.dotfiles}/config/theme/palettes.d/$1" ]]
+}
+
+# Active theme family, first match wins:
+#   1. $DOTFILES_THEME_FAMILY (test seam); an invalid value fails closed.
+#   2. The saved choice (_theme_choice_file); a missing, empty or invalid
+#      one is skipped, so a removed family never leaves things unthemed.
+#   3. The tracked default, config/theme/family.
 # Prints the family; returns 1 (with a stderr note) otherwise.
 _theme_family()
 {
-  local root="${DOTFILES:-$HOME/.dotfiles}/config/theme" family=""
+  local root="${DOTFILES:-$HOME/.dotfiles}/config/theme" family="" choice
   if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
     family="$DOTFILES_THEME_FAMILY"
-  elif [[ -r "$root/family" ]]; then
-    read -r family < "$root/family" || true
+  else
+    choice="$(_theme_choice_file)"
+    # read -r trims surrounding whitespace, so "  kanagawa " still counts.
+    [[ -r "$choice" ]] && {
+      read -r family < "$choice" || true
+    }
+    if ! _theme_valid_family "$family"; then
+      family=""
+      [[ -r "$root/family" ]] && {
+        read -r family < "$root/family" || true
+      }
+    fi
   fi
-  if [[ ! "$family" =~ ^[a-z0-9][a-z0-9-]*$ || ! -d "$root/palettes.d/$family" ]]; then
+  if ! _theme_valid_family "$family"; then
     printf 'theme: invalid or unknown theme family %q\n' "$family" >&2
     return 1
   fi

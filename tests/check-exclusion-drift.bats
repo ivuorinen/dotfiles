@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 #
-# check-exclusion-drift is the only thing keeping the five third-party
-# exclusion lists (.grype.yaml, .codacy.yml, [tool.ruff], [tool.bandit],
-# .mega-linter.yml) in step -- .codacy.yml states the requirement in prose but
+# check-exclusion-drift is the only thing keeping the third-party exclusion
+# lists (.grype.yaml, .codacy.yml, [tool.ruff], [tool.bandit],
+# .mega-linter.yml, codeql-config.yml, .yamllint.yml) in step -- .codacy.yml states the requirement in prose but
 # nothing enforced it before this gate. The tests that matter are the failing
 # ones: a checker that always exits 0 reports green forever and is worse than
 # no checker at all.
@@ -39,6 +39,17 @@ EOF
   cat > "$EXCLUSION_CHECK_ROOT/.mega-linter.yml" << 'EOF'
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools)
+EOF
+
+  cat > "$EXCLUSION_CHECK_ROOT/.yamllint.yml" << 'EOF'
+extends: default
+
+ignore: |
+  node_modules
+  tools/*
+
+rules:
+  line-length: disable
 EOF
 }
 
@@ -94,6 +105,10 @@ EOF
 FILTER_REGEX_EXCLUDE: >
   (tools)
 EOF
+  cat > "$EXCLUSION_CHECK_ROOT/.yamllint.yml" << 'EOF'
+ignore: |
+  tools
+EOF
   run "$CHECK"
   [ "$status" -eq 1 ]
   [[ "$output" == *"DROPPED"* ]]
@@ -127,6 +142,30 @@ EOF
   [ "$status" -eq 0 ]
   run grep -c 'tools/\*\*' "$baseline"
   [ "$output" = "0" ]
+}
+
+@test "check-exclusion-drift: reads the yamllint ignore block scalar" {
+  "$CHECK" --update
+  # yamllint's ignore list is one gitignore-style string, not a YAML list:
+  # the `rules:` key after the block must not be read as an entry, and an
+  # entry added inside the block must count.
+  run grep -cE 'rules|line-length' "$EXCLUSION_CHECK_ROOT/.exclusion-baseline.json"
+  [ "$output" = "0" ]
+  cat > "$EXCLUSION_CHECK_ROOT/.yamllint.yml" << 'EOF'
+extends: default
+
+ignore: |
+  node_modules
+  tools/*
+  config/pi/agent/tmp
+
+rules:
+  line-length: disable
+EOF
+  run "$CHECK"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"NEW      config/pi/agent/tmp"* ]]
+  [[ "$output" == *"covered by: yamllint"* ]]
 }
 
 @test "check-exclusion-drift: real repo config is in step with its baseline" {

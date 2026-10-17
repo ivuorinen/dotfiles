@@ -24,7 +24,7 @@ usage_cmds()
 }
 
 @test "dfm sections: every USAGE-declared subcommand appears in its menu" {
-  for section in check dotfiles helpers secrets tests; do
+  for section in check dotfiles helpers secrets tests theme; do
     run env DOTFILES="$REPO" "$DFM" "$section"
     [ "$status" -eq 0 ] || {
       echo "dfm $section exited $status"
@@ -40,7 +40,7 @@ usage_cmds()
 }
 
 @test "dfm sections: an unknown subcommand shows the menu instead of acting" {
-  for section in check dotfiles helpers secrets tests; do
+  for section in check dotfiles helpers secrets tests theme; do
     run env DOTFILES="$REPO" "$DFM" "$section" definitely-not-a-subcommand
     first=$(usage_cmds "$section" | head -1)
     [[ "$output" == *"$first"* ]] || {

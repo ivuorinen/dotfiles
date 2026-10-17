@@ -42,3 +42,6 @@ paths-ignore:
   - "node_modules/**"
   - "graphify-out/**"
   - "config/tmux/plugins/**"
+  - "config/pi/agent/tmp/**"
+  - "config/pi/agent/npm/**"
+  - "config/mise/locks/**"

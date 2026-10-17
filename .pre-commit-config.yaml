@@ -116,10 +116,13 @@ repos:
         # a pass, so only a file that validated and failed exits non-zero.
         # config/gh/ is rewritten by `gh config set`; its shape follows gh,
         # not schemastore (which rejects gh's `version: "1"`).
+        # config/gh-dash/: schemastore maps it to gh-dash.dev/schema.json,
+        # whose relative $refs v8r opens as local files (ENOENT), so it can
+        # never validate.
         entry: mise exec -- v8r --ignore-errors
         language: system
         files: \.(ya?ml|json|toml)$
-        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|node_modules/|graphify-out/|docs/audit/)
+        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/)
       - id: shellcheck
         name: shellcheck
         entry: mise exec -- shellcheck
@@ -260,10 +263,10 @@ repos:
         language: system
         files: ^\.claude/rules/.*\.md$
       - id: claude-md-length
-        name: CLAUDE.md at most 200 lines
+        name: CLAUDE.md and AGENTS.md at most 200 lines
         entry: bash -c 'rc=0; for f; do n=$(wc -l < "$f"); [ "$n" -le 200 ] || { echo "$f has $n lines, limit 200"; rc=1; }; done; exit $rc' --
         language: system
-        files: (^|/)CLAUDE\.md$
+        files: (^|/)(CLAUDE|AGENTS)\.md$
       - id: host-leak-check
         name: No host names or ~/Code paths added to shared config
         entry: scripts/check-host-leak.sh

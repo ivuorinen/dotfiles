@@ -9,7 +9,14 @@ line-length = 120
 # Third-party trees. The cheatsheets submodule holds tldr templates with a
 # .py extension that are not Python, so a bare `ruff check .` reports
 # hundreds of parse errors without this.
-extend-exclude = ["config/cheat/cheatsheets", "tools", ".claude/skills/graphify"]
+extend-exclude = [
+  "config/cheat/cheatsheets",
+  "tools",
+  ".claude/skills/graphify",
+  "config/pi/agent/tmp",
+  "config/pi/agent/npm",
+  "config/mise/locks",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4"]
@@ -30,6 +37,8 @@ quote-style = "double"
 # config/vim/plugged is gitignored, so it exists only on machines where vim-plug
 # has run — CI never sees it, but a local `mise run lint-bandit` otherwise scans
 # ~62k lines of jedi/parso/vint and fails. .prettierignore excludes it already.
+# config/copilot/Library is the same case: Copilot CLI's gitignored cache of
+# marketplace plugins, Python scripts included.
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
@@ -37,6 +46,10 @@ exclude_dirs = [
   "./node_modules",
   "./graphify-out",
   "./config/vim/plugged",
+  "./config/copilot/Library",
+  "./config/pi/agent/tmp",
+  "./config/pi/agent/npm",
+  "./config/mise/locks",
   "./config/fish/functions/__bass.py",
   "./config/fish/functions/fisher.fish",
 ]

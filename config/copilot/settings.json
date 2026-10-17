@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {},
+  "allowedUrls": ["http://localhost:4200"],
+  "theme": "default"
+}

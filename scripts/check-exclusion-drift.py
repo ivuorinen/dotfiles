@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Detect drift between the repo's third-party exclusion lists.
 
-Five gates each carry their own copy of "which trees are third-party and must
+Seven gates each carry their own copy of "which trees are third-party and must
 not be analysed". `.codacy.yml` states the requirement in prose -- "Keep the
 four in step when one moves" -- but nothing enforced it, so a tree added to one
 gate could silently stay missing from the rest.
 
 The gates do not have identical scope: ruff and bandit only ever see Python,
-grype only scans dependency manifests, so demanding that every gate list every
+yamllint only YAML, grype only scans dependency manifests, so demanding that every gate list every
 tree would report dozens of differences that are all correct. Instead this
 checks the *coverage matrix* -- which gates cover which tree -- against a
 reviewed baseline, and fails when that matrix changes. Adding a tree to one
@@ -129,6 +129,31 @@ def from_megalinter() -> set[str]:
     return {normalise(part) for part in inner.group(1).split("|") if part.strip()}
 
 
+def from_yamllint() -> set[str]:
+    """Collect the lines of the `ignore: |` block scalar in .yamllint.yml.
+
+    yamllint takes its ignore list as one gitignore-style string, not a YAML
+    list, so `_yaml_list` cannot read it: every indented line is one entry.
+    """
+    path = REPO / ".yamllint.yml"
+    if not path.exists():
+        return set()
+    out: set[str] = set()
+    in_block = False
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if re.match(r"^ignore\s*:\s*[|>]", line):
+            in_block = True
+            continue
+        if in_block:
+            # The next top-level key ends the block scalar.
+            if line and not line[0].isspace():
+                break
+            entry = line.strip()
+            if entry and not entry.startswith("#"):
+                out.add(normalise(entry))
+    return out
+
+
 GATES = {
     "grype": from_grype,
     "codacy": from_codacy,
@@ -136,6 +161,7 @@ GATES = {
     "bandit": from_bandit,
     "megalinter": from_megalinter,
     "codeql": lambda: _yaml_list(REPO / ".github/codeql/codeql-config.yml", "paths-ignore"),
+    "yamllint": from_yamllint,
 }
 
 
@@ -177,11 +203,25 @@ def report_drift(current: dict[str, list[str]], baseline: dict[str, list[str]]) 
 
     print(
         "\nAdd the tree to the other gates (.grype.yaml, .codacy.yml, pyproject.toml "
-        "[tool.ruff]/[tool.bandit], .mega-linter.yml, .github/codeql/codeql-config.yml)\n"
+        "[tool.ruff]/[tool.bandit], .mega-linter.yml, .github/codeql/codeql-config.yml, .yamllint.yml)\n"
         "and to .claude/rules/vendored-files.md, "
         "or record the difference as intentional with:  scripts/check-exclusion-drift.py --update"
     )
     return 1
+
+
+# biome.json formatter.lineWidth. Biome keeps an array on one line only while
+# that line, trailing comma included, fits; past it, one item per line.
+LINE_WIDTH = 90
+
+
+def _baseline_entry(tree: str, gates: list[str], trailing_comma: bool) -> str:
+    key = json.dumps(tree, ensure_ascii=False)
+    inline = f"  {key}: {json.dumps(gates, ensure_ascii=False)}"
+    if len(inline) + trailing_comma <= LINE_WIDTH:
+        return inline
+    items = ",\n".join(f"    {json.dumps(gate, ensure_ascii=False)}" for gate in gates)
+    return f"  {key}: [\n{items}\n  ]"
 
 
 def main() -> int:
@@ -195,9 +235,9 @@ def main() -> int:
         # One tree per line with its gate list inline: `json.dumps(indent=2)` would
         # explode every list across lines, which biome's formatter then collapses —
         # so a plain --update always left `mise run lint-biome` red.
+        last = len(current) - 1
         body = ",\n".join(
-            f"  {json.dumps(tree, ensure_ascii=False)}: {json.dumps(gates, ensure_ascii=False)}"
-            for tree, gates in current.items()
+            _baseline_entry(tree, gates, trailing_comma=i != last) for i, (tree, gates) in enumerate(current.items())
         )
         BASELINE.write_text("{\n" + body + "\n}\n", encoding="utf-8")
         print(f"baseline written: {BASELINE.relative_to(REPO)} ({len(current)} trees)")

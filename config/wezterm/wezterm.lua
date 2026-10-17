@@ -4,6 +4,7 @@ local config = wezterm.config_builder()
 config.set_environment_variables = {
   COLORTERM = 'truecolor',
 }
+config.enable_kitty_keyboard = true
 
 -- Font and font size
 config.font_size = 12
@@ -241,36 +242,64 @@ config.color_schemes = {
   ['Oasis Abyss Light 3'] = oasis_abyss_light_3,
 }
 
--- Theme family from config/theme/family (DOTFILES_THEME_FAMILY overrides
--- it, as in config/theme/_lib.sh). Unreadable means catppuccin.
-local function theme_family()
-  local env = os.getenv 'DOTFILES_THEME_FAMILY'
-  if env and env ~= '' then
-    return env
-  end
-  local dotfiles = os.getenv 'DOTFILES' or ((os.getenv 'HOME' or '') .. '/.dotfiles')
-  local f = io.open(dotfiles .. '/config/theme/family', 'r')
-  if not f then
-    return 'catppuccin'
-  end
-  local family = (f:read '*l' or ''):gsub('%s+', '')
-  f:close()
-  return family
-end
-
 local schemes = {
   kanagawa = { dark = 'Kanagawa Wave', light = 'Kanagawa Lotus AA' },
   oasis = { dark = 'Oasis Abyss Dark', light = 'Oasis Abyss Light 3' },
   catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
 }
 
+-- $name, or `default` when it is unset or empty, as ${name:-default} in sh.
+local function env_or(name, default)
+  local value = os.getenv(name)
+  return (value and value ~= '') and value or default
+end
+
+-- Theme family, resolved as in config/theme/_lib.sh: DOTFILES_THEME_FAMILY,
+-- then the saved choice in $XDG_STATE_HOME/dotfiles-theme/choice, then
+-- config/theme/family. A file value counts only under _theme_valid_family's
+-- rule (a slug naming a palettes.d/<family>/ dir) and with a scheme pair
+-- here; anything else is skipped, and nothing usable means oasis.
+local function theme_family()
+  local env = os.getenv 'DOTFILES_THEME_FAMILY'
+  if env and env ~= '' then
+    return schemes[env] and env or 'oasis'
+  end
+  local home = os.getenv 'HOME' or ''
+  local state = env_or('XDG_STATE_HOME', home .. '/.local/state')
+  local dotfiles = env_or('DOTFILES', home .. '/.dotfiles')
+  local function valid(family)
+    if not (family:match '^[a-z0-9][a-z0-9-]*$' and schemes[family]) then
+      return false
+    end
+    -- Opening "<dir>/" succeeds only when the directory exists.
+    local dir = io.open(dotfiles .. '/config/theme/palettes.d/' .. family .. '/', 'r')
+    if dir then
+      dir:close()
+    end
+    return dir ~= nil
+  end
+  for _, path in ipairs {
+    state .. '/dotfiles-theme/choice',
+    dotfiles .. '/config/theme/family',
+  } do
+    local f = io.open(path, 'r')
+    if f then
+      local family = (f:read '*l' or ''):match '^%s*(.-)%s*$'
+      f:close()
+      if valid(family) then
+        return family
+      end
+    end
+  end
+  return 'oasis'
+end
+
 -- The orchestrator's mode, from the file local/bin/theme-mode reads
 -- ($XDG_STATE_HOME/dotfiles-theme/mode). The file is on the reload watch
 -- list, so `config/theme/apply` re-runs this config and every window picks
 -- the new scheme. nil when the file is missing or holds anything else.
-local mode_file = (
-  os.getenv 'XDG_STATE_HOME' or ((os.getenv 'HOME' or '') .. '/.local/state')
-) .. '/dotfiles-theme/mode'
+local mode_file = env_or('XDG_STATE_HOME', (os.getenv 'HOME' or '') .. '/.local/state')
+  .. '/dotfiles-theme/mode'
 wezterm.add_to_config_reload_watch_list(mode_file)
 
 local function theme_mode()
@@ -289,7 +318,7 @@ end
 -- Scheme for the orchestrator's mode; without one (no orchestrator on this
 -- host yet), fall back to the window's OS appearance.
 function Scheme_for_appearance(appearance)
-  local s = schemes[theme_family()] or schemes.catppuccin
+  local s = schemes[theme_family()] or schemes.oasis
   local mode = theme_mode() or (appearance:find 'Dark' and 'dark' or 'light')
   return s[mode]
 end

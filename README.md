@@ -1,6 +1,6 @@
-# .dotfiles
+# `.dotfiles`
 
-Welcome to [ivuorinen](https://github.com/ivuorinen)'s .dotfiles repository.
+Welcome to [ivuorinen](https://github.com/ivuorinen)'s `.dotfiles` repository.
 It's a hodgepodge of scripts and configurations, tests and mistakes I'm not
 aware of yet. As I find more interesting tools, configs and other stuff,
 this repository will live accordingly.
@@ -15,11 +15,10 @@ see what interesting stuff you've done with it. Sharing is caring.
 
 ### First time setup
 
+0. Prerequisites: `git`, `bash` and `python3` (Dotbot runs on Python)
 1. Clone this repository to `$HOME/.dotfiles`
 2. `git submodule update --init --recursive`
 3. `./install`
-4. ???
-5. Profit
 
 ### Updates
 
@@ -45,7 +44,7 @@ provisioning):
 | `.github`           | GitHub Repository configuration files, meta. |
 | `hosts/{hostname}/` | Configs that should apply to that host only. |
 | `local/bin`         | Helper scripts that I've collected or wrote. |
-| `scripts`           | Setup scripts.                               |
+| `scripts`           | Setup, lint, test and doc-generator scripts. |
 
 ### Host specific configuration
 
@@ -114,19 +113,21 @@ run:
 git submodule update --init --recursive
 ```
 
-To pull submodule updates later use:
+To pick up submodule updates later, pull the pins the workflow committed:
 
 ```bash
-git submodule update --remote --merge
+git pull && git submodule update --init --recursive
 ```
 
-The helper script `add-submodules.sh` documents how each submodule is added and
-configured. Submodules are automatically updated by the
+`add-submodules.sh` declares every submodule and removes stale ones; `./install`
+runs it on each full install. Submodules are automatically updated to their
+newest release tag by the
 [update-submodules.yml](.github/workflows/update-submodules.yml) workflow.
 
 ## Testing
 
-Shell scripts under `local/bin` are validated with [Bats](https://github.com/bats-core/bats-core).
+Scripts across the repo (`local/bin`, `scripts/`, `config/`, the installer and
+the Claude hooks) are tested with [Bats](https://github.com/bats-core/bats-core).
 Run `mise run test` to execute every test file. Bats is pinned in `.mise.toml`,
 so run `mise install` first if needed.
 

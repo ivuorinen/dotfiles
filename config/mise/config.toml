@@ -58,15 +58,15 @@ node = "lts"
 bun = "1.4.3"
 python = "3.14"
 go = "1.27.2"
-rust = "1.98.1"
-uv = "0.12.23"
+rust = "1.99.0"
+uv = "0.13.1"
 cmake = "4.4.4"
 
 # Shell, prompt & terminal sessions
 starship = "1.26.0"
 tmux = "3.7c"
-usage = "6.12.1"
-"github:joshmedeski/sesh" = "2.31.0"
+usage = "7.0.1"
+"github:joshmedeski/sesh" = "2.33.0"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # File navigation, search & viewing
@@ -88,7 +88,7 @@ choose = "1.3.7"
 # Git & version control
 github-cli = "2.102.0"
 gitui = "0.28.1"
-lazygit = "0.65.1"
+lazygit = "0.66.1"
 delta = "0.20.1"
 difftastic = "0.71.0"
 "github:dotzero/git-profile" = "1.9.1"      # ships macOS-all universal binary
@@ -98,25 +98,25 @@ difftastic = "0.71.0"
 "github:ivuorinen/gh-history" = "2026.03.0"
 
 # Editors & language servers
-neovim = "0.12.5"
+neovim = "0.12.6"
 tree-sitter = "0.27.1"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
 "npm:fish-lsp" = "1.1.5"
 
 # Task runners & caching
-just = "1.58.0"
+just = "1.59.0"
 "github:dimo414/bkt" = "0.8.2"
 
 # Linters & formatters
 editorconfig-checker = "4.0.2"
-biome = "2.5.13"
-"npm:prettier" = "3.9.9"
+biome = "2.5.15"
+"npm:prettier" = "3.9.10"
 "npm:markdownlint-cli" = "0.49.1"
 "npm:markdown-table-formatter" = "1.7.0"
 "npm:v8r" = "6.1.0"
 yamllint = "1.38.0"
 yamlfmt = "0.21.0"
-ruff = "0.16.10"
+ruff = "0.17.1"
 taplo = "0.10.0"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
@@ -146,10 +146,10 @@ golangci-lint = "2.14.0"
 
 # Security & supply chain
 age = "1.3.2"
-gopass = "1.17.3"     # pass-compatible password manager (gopasspw/gopass)
+gopass = "1.17.4"     # pass-compatible password manager (gopasspw/gopass)
 cosign = "3.1.3"
 gitleaks = "8.30.1"
-trufflehog = "3.97.9"
+trufflehog = "3.99.2"
 # grype and syft are pinned to the github backend rather than left bare, because
 # it is the only backend that verifies them beyond a checksum. Measured, not
 # assumed — `mise install --force` prints what it actually verified:
@@ -163,39 +163,44 @@ trufflehog = "3.97.9"
 # signature check. A bare entry also lets the registry absorb an upstream org
 # rename — which is exactly how gitui moved from extrawurst to gitui-org
 # without a config change.
-"github:anchore/grype" = "0.119.0"
-trivy = "0.74.0"
-"github:anchore/syft" = "1.52.0"
-opengrep = "1.30.2"
-osv-scanner = "2.6.0"
+"github:anchore/grype" = "0.120.1"
+trivy = "0.76.0"
+"github:anchore/syft" = "1.54.1"
+opengrep = "1.31.0"
+osv-scanner = "2.7.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
-checkov = "3.3.26"
+checkov = "3.3.29"
 pinact = "5.0.0"
-zizmor = "1.30.1"
+zizmor = "1.31.1"
 # Go vulnerability scanner. Neither the registry nor the github backend knows
 # golang/vuln, so the go backend is the only route — same case as gocyclo above.
-"go:golang.org/x/vuln/cmd/govulncheck" = "1.8.0"
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # Build, test & CI
 bats = "1.14.0"
 shellspec = "0.28.1"
 prek = "0.5.5"
 "npm:corepack" = "0.36.0"
-"dotnet:coverlet.console" = "10.0.1"
+"dotnet:coverlet.console" = "10.1.0"
 
 # System monitoring & misc utilities
 bottom = "0.14.9"
 cheat = "5.1.0"
-"github:binwiederhier/ntfy" = "2.28.0"
-"github:wakatime/wakatime-cli" = "2.26.15"
-"github:o2sh/onefetch" = "2.28.1"
-"npm:ccusage" = "20.0.26"
+"github:binwiederhier/ntfy" = "2.31.0"
+"github:wakatime/wakatime-cli" = "2.27.5"
+"github:o2sh/onefetch" = "3.0.0"
+"npm:ccusage" = "20.0.34"
 adr-tools = "3.0.0"
-codeql = { version = "latest", bin_path = "codeql", platforms = { linux-x64 = { asset_pattern = "codeql-linux64.zip" }, macos-arm64 = { asset_pattern = "codeql-osx64.zip" }, macos-x64 = { asset_pattern = "codeql-osx64.zip" }, windows-x64 = { asset_pattern = "codeql-win64.zip" } } }
-"aqua:SonarSource/sonarqube-cli" = "1.9.0.15656"
+codeql = "2.27.2"
+copilot = "1.0.98"
+herdr = "0.9.5"
+pi = "1.3.0"
+"npm:context-mode" = "latest"
+"npm:@tobilu/qmd" = "latest"
+"aqua:SonarSource/sonarqube-cli" = "1.10.0.16040"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix

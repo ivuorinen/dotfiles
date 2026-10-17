@@ -43,6 +43,10 @@ if command -v gpgconf > /dev/null 2>&1; then
   unset _gpg_ssh_sock
 fi
 
+# Reload the theme colour caches at the next prompt after a theme switch
+# (config/theme/shell-env.sh, sourced through config/exports).
+command -v _theme_prompt_hook_install > /dev/null && _theme_prompt_hook_install
+
 # config/alias is sourced via shared.sh (above) before antidote, so the OMZ
 # git plugin's aliases would otherwise shadow ours. Re-apply the alias file so
 # config/alias stays authoritative (the secret-file loop is guarded to run once).
