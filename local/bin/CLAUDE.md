@@ -14,7 +14,7 @@ invoked via a `~/.local/bin/dfm` symlink — dropping a new `dfm-<sub>`
 into `local/bin/` works immediately, before `./install` links it. Each
 section lives in its own executable:
 
-- `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,ssh,cleanup}`
+- `local/bin/dfm-{install,brew,apt,check,dotfiles,helpers,docs,scripts,tests,secrets,ssh,cleanup,theme}`
   — one file per section, each carrying its own `#USAGE` subtree.
 - `local/bin/dfm-lib` — sourced (non-executable) shared library:
   the bootstrap family, `menu_builder`, `get_script_description`, and the
@@ -61,3 +61,6 @@ every section. Key commands:
   runs the `--fix` form last.
 - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
 - `dfm tests` — test visualization helpers
+- `dfm theme family [name]` / `reset` / `mode` / `reapply [mode]` — the
+  `theme` family switcher, `theme-mode`, and the `theme-reapply` shell
+  function (whose env refresh reaches only dfm's own process)

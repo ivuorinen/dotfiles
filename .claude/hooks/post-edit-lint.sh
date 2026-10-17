@@ -6,7 +6,7 @@
 # it (agent-hooks-5c0be1dd). This hook runs the same checks every time.
 # Also enforces the 200-line CLAUDE.md guideline that overran three times
 # with no guard (agent-hooks-87e53452; the pre-commit `claude-md-length` hook
-# is the commit-time twin).
+# is the commit-time twin). AGENTS.md, the root instruction file, counts too.
 #
 # PostToolUse cannot block — the edit has landed. Exit 2 puts the failure in
 # front of the agent to fix; it is feedback, not a gate. A missing linter is
@@ -39,7 +39,7 @@ run_check()
 }
 
 case "$fp" in
-  */CLAUDE.md)
+  */CLAUDE.md | */AGENTS.md)
     lines=$(wc -l < "$fp")
     ((lines > 200)) && problems+="$fp: $lines lines > 200 — move detail into .claude/rules/ or a subdirectory CLAUDE.md."$'\n'
     ;;

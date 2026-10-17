@@ -1,0 +1,37 @@
+{
+  "lastChangelogVersion": "1.2.0",
+  "defaultProvider": "github-copilot",
+  "defaultModel": "gpt-5.4",
+  "images": {
+    "blockImages": true
+  },
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "hideThinkingBlock": true,
+  "markdown": {
+    "mermaid": "final"
+  },
+  "collapseChangelog": true,
+  "quietStartup": true,
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "ask",
+  "showHardwareCursor": false,
+  "packages": [
+    "npm:pi-simplify",
+    "npm:context-mode",
+    "npm:@moyai/pi-session-hoarder",
+    "npm:cc-safety-net",
+    "npm:pi-goal-x",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "npm:pi-powerline-footer"
+  ],
+  "editorPaddingX": 0,
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "all",
+  "theme": "system/system",
+  "autocompleteMaxVisible": 10,
+  "steeringMode": "all",
+  "followUpMode": "all",
+  "showCacheMissNotices": true
+}

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # handlers.d/dircolors — regenerate the LS_COLORS cache from the active
-# family's palette for the mode. Cache is sourced by shells via
-# `eval "$(< $cache/ls-colors)"`. A family without a dircolors palette
-# gets the cache removed (shells then keep the system default) so a
+# family's palette for the mode. Shells load the cache at startup and
+# again after a flip (config/theme/shell-env.sh,
+# config/fish/conf.d/theme-switch.fish). A family without a dircolors
+# palette gets the cache removed, and shells then drop LS_COLORS, so a
 # previous family's colours never linger.
 set -uo pipefail
 

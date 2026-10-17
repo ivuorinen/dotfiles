@@ -17,10 +17,12 @@ runtime by a co-located orchestrator:
 - `config/theme/handlers.d/` — one executable per app, per-app theme flip
   executables; the orchestrator forks each one in parallel under a
   5 s timeout. Add a new app by dropping a file here. Documented in
-  root CLAUDE.md ("Add new apps by dropping a file here.")
+  `config/theme/CLAUDE.md` ("Add new apps by dropping a file here")
 - `config/theme/palettes.d/<family>/<variant>/<app>[.<ext>]` — per-app
   palette assets keyed by theme family + variant + app; the active
-  family is named in `config/theme/family`.
+  family is `DOTFILES_THEME_FAMILY` when set, else the per-machine saved
+  choice (`local/bin/theme`), else the tracked default in
+  `config/theme/family`.
 - `config/fish/conf.d/` (3 entries) — fish auto-loaded config
   fragments.
 - `config/fish/secrets.d/` (3 entries; only `*.example` and
@@ -64,7 +66,7 @@ Evidence — directory layout dedicated to per-machine overrides:
   global config at install time.
 
 Not in the canonical pattern list, but the convention is explicit
-in CLAUDE.md and enforced by `.claude/rules/host-specific-config.md`.
+in AGENTS.md and enforced by `.claude/rules/host-specific-config.md`.
 
 ### XDG Base Directory layout — High confidence
 

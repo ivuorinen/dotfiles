@@ -3,8 +3,9 @@
 # up via state-dir symlinks. Bash/zsh source fzf-active.sh, fish sources
 # fzf-active.fish; both files are symlinks rewritten on every flip, and
 # removed when the active family ships no fzf palette for the mode.
-# Live shells keep their old palette until restart; new shells inherit
-# the latest. Same trade-off as fish in-process refresh — acceptable.
+# New shells source the latest at startup; open ones reload it at their
+# next prompt once apply bumps the generation stamp
+# (config/theme/shell-env.sh, config/fish/conf.d/theme-switch.fish).
 set -uo pipefail
 
 # shellcheck disable=SC1091

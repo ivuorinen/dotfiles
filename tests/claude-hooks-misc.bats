@@ -80,6 +80,14 @@ with_path()
   run -0 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/d/CLAUDE.md" "$HOOKS/post-edit-lint.sh"
 }
 
+# The root instruction file is AGENTS.md, so the same limit applies to it.
+@test "post-edit-lint: an AGENTS.md over 200 lines is reported" {
+  mkdir -p "$WORK/d"
+  seq 201 > "$WORK/d/AGENTS.md"
+  run -2 bash -c 'jq -cn --arg fp "$1" "{tool_input: {file_path: \$fp}}" | bash "$2"' _ "$WORK/d/AGENTS.md" "$HOOKS/post-edit-lint.sh"
+  [[ "$output" == *"201 lines > 200"* ]]
+}
+
 # --- prompt-record.sh -----------------------------------------------------
 
 @test "prompt-record: writes the prompt 0600 for the BASH_OK check" {

@@ -4,6 +4,11 @@
 config/cheat/cheatsheets/community/*
 config/cheat/cheatsheets/tldr/*
 config/op/plugins/used_plugins/*
+# Copilot CLI runtime state (plugins, caches, its vendored graphify skill copy).
+config/copilot/*
+!config/copilot/copilot-instructions.md
+config/pi/agent/tmp/*
+config/pi/agent/npm/*
 config/vim/*
 docs/*
 # graphify generated report/wiki — machine-generated, regenerable.

@@ -95,6 +95,47 @@ setup()
   [[ "$output" == *"Documentation not found"* ]]
 }
 
+@test "dfm theme menu shows entries" {
+  run bash local/bin/dfm theme
+  [ "$status" -eq 0 ]
+  local e
+  for e in family reset mode reapply; do
+    [[ "$output" == *"$e"* ]] || {
+      echo "dfm theme menu lacks '$e'"
+      return 1
+    }
+  done
+}
+
+@test "dfm theme family lists the families" {
+  # A private state dir: listing reads the saved choice, never the real one.
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme family
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catppuccin"* ]]
+  [[ "$output" == *"kanagawa"* ]]
+  [[ "$output" == *"oasis"* ]]
+}
+
+@test "dfm theme mode prints dark or light" {
+  # No mode file in the private state dir, so stdin must not be a terminal:
+  # theme-mode would otherwise send an OSC 11 query to the developer's.
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode < /dev/null
+  [ "$status" -eq 0 ]
+  [[ "${lines[${#lines[@]} - 1]}" =~ ^(dark|light)$ ]]
+}
+
+@test "dfm theme reset and mode reject extra arguments" {
+  mkdir -p "$BATS_TEST_TMPDIR/dotfiles-theme"
+  printf 'kanagawa\n' > "$BATS_TEST_TMPDIR/dotfiles-theme/choice"
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme reset kanagawa
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"takes no arguments"* ]]
+  # The saved choice survives the rejected reset.
+  [ "$(cat "$BATS_TEST_TMPDIR/dotfiles-theme/choice")" = "kanagawa" ]
+  run env XDG_STATE_HOME="$BATS_TEST_TMPDIR" bash local/bin/dfm theme mode dark < /dev/null
+  [ "$status" -eq 2 ]
+}
+
 @test "dfm dotfiles menu shows entries" {
   run bash local/bin/dfm dotfiles
   [ "$status" -eq 0 ]
@@ -269,6 +310,7 @@ fake_dotfiles()
   [ -f "$tmp/config/fish/secrets.d/github.fish" ]
   [ -f "$tmp/config/secrets.d/github.sh" ]
   [[ "$(cat "$tmp/config/fish/secrets.d/github.fish")" == *"set -x GITHUB_TOKEN 'secretvalue'"* ]]
+  # checkov:skip=CKV_SECRET_6:test fixture, not a credential
   [[ "$(cat "$tmp/config/secrets.d/github.sh")" == *"export GITHUB_TOKEN='secretvalue'"* ]]
   rm -rf "$tmp"
 }

@@ -1,7 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code)
-when working with code in this repository.
+# AGENTS.md
 
 ## Repository Overview
 
@@ -62,7 +59,9 @@ constants; the mandate is `.claude/rules/lib-sh-side-effects.md`.
 
 Dark/light theming is owned by a stand-alone orchestrator. The details
 live in `config/theme/CLAUDE.md`, which loads when you work in that
-directory; `local/bin/theme-mode` is the public read API.
+directory; `local/bin/theme-mode` is the public read API, and
+`local/bin/theme` lists and switches theme families (the choice is saved
+per machine under `$XDG_STATE_HOME`, never in the repo).
 
 ### msgr — Messaging Helper
 

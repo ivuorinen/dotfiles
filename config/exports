@@ -352,6 +352,18 @@ export COMPOSER_HOME="$XDG_STATE_HOME/composer"
 export COMPOSER_BIN="$COMPOSER_HOME/vendor/bin"
 export PATH="$COMPOSER_BIN:$PATH"
 
+# copilot
+msg "Setting up copilot configuration"
+export COPILOT_HOME="$XDG_CONFIG_HOME/copilot"
+
+# pi.dev
+msg "Setting up pi.dev configuration"
+# The agent dir itself: pi appends /agent only to its ~/.pi default.
+export PI_CODING_AGENT_DIR="$XDG_CONFIG_HOME/pi/agent"
+export PI_CODING_AGENT_SESSION_DIR="$XDG_STATE_HOME/pi/sessions"
+export PI_LENS_HOME="$XDG_STATE_HOME/pi/pi-lens"
+export PI_LENS_CONFIG_PATH="$XDG_CONFIG_HOME/pi/pi-lens/config.json"
+
 # Yarn
 msg "Setting up Yarn configuration"
 export YARN_GLOBAL_FOLDER="$XDG_DATA_HOME/yarn"
@@ -408,9 +420,9 @@ theme_mode()
 }
 
 # theme-reapply — re-fire all theme handlers for the current mode (or
-# $1), bypassing apply's idempotency guard. Refreshes LS_COLORS in the
-# current shell from the dircolors handler's cache. Use after editing a
-# palette to see the result without restarting the shell.
+# $1), bypassing apply's idempotency guard. Reloads the colour caches into
+# the current shell (_theme_refresh_env). Use after editing a palette to
+# see the result without restarting the shell.
 theme-reapply()
 {
   local mode="${1:-$(theme_mode)}"
@@ -433,13 +445,7 @@ theme-reapply()
       "$h" "$mode" || rc=1
     fi
   done
-  local cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
-  if [ -r "$cache" ]; then
-    # shellcheck source=/dev/null
-    . "$cache"
-  fi
-  local bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"
-  [ -r "$bat_theme_file" ] && BAT_THEME="$(cat "$bat_theme_file")" && export BAT_THEME
+  _theme_refresh_env
   echo "theme-reapply: applied $mode"
   return $rc
 }
@@ -482,17 +488,14 @@ if [ "$_theme_interactive" = 1 ] \
 fi
 unset _theme_interactive
 
-# Source LS_COLORS cache produced by the dircolors handler.
-ls_cache="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/ls-colors"
-[ -r "$ls_cache" ] && eval "$(cat "$ls_cache")"
-unset ls_cache
-
-# bat — export the active theme family's bat theme published by the bat theme
-# handler so bat (and bat-driven previews) honour the current mode without
-# any file under ~/.config/bat. Mirrors the LS_COLORS cache above.
-bat_theme_file="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme/bat-theme"
-[ -r "$bat_theme_file" ] && BAT_THEME="$(cat "$bat_theme_file")" && export BAT_THEME
-unset bat_theme_file
+# Load the colour caches the theme handlers publish — LS_COLORS (dircolors),
+# BAT_THEME (bat, so bat-driven previews follow the mode without any file
+# under ~/.config/bat) and the fzf palette — and note their generation. The
+# prompt hook that base/bashrc and base/zshrc install reloads them after a
+# theme switch.
+# shellcheck source=config/theme/shell-env.sh
+. "${DOTFILES:-$HOME/.dotfiles}/config/theme/shell-env.sh"
+_theme_refresh_env
 
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks

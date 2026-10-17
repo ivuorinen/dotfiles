@@ -4,8 +4,10 @@
 
 set -g fish_greeting
 
-# The active theme family (config/theme/family) controls fish syntax and
-# completion colours; the prompt itself is rendered by starship (see
+# The active theme family (DOTFILES_THEME_FAMILY, else the saved choice,
+# else config/theme/family; __dotfiles_theme_name resolves it) controls
+# fish syntax and completion colours; the prompt itself is rendered by
+# starship (see
 # below). The repo-owned <family>-aa theme (e.g. kanagawa-aa) holds both
 # [light] (AA-darkened) and [dark] palettes; conf.d/theme-switch.fish
 # re-saves it on a dark/light flip so syntax colours follow the OS.

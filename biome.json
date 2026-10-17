@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -18,6 +18,8 @@
       "!!**/config/cheat/cheatsheets/tldr",
       "!!**/config/nvim",
       "!!**/config/op/plugins/used_plugins",
+      "!!**/config/pi/agent/tmp",
+      "!!**/config/pi/agent/npm",
       "!!**/config/tmux/plugins",
       "!!**/config/zsh",
       "!!**/config/karabiner",

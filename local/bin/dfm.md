@@ -14,6 +14,7 @@ Common commands include:
 - `install` – install tools or run platform specific setup
 - `brew` – manage Homebrew packages
 - `docs` – regenerate markdown documentation
+- `theme` – list and switch theme families, print the mode, re-run handlers
 
 Set `VERBOSE=1` to see debug output.
 

@@ -14,6 +14,8 @@
     "config/fish/conf.d/.*",
     "config/fish/functions/.*",
     "config/irssi/scripts/autorun/.*",
+    "config/pi/agent/tmp/.*",
+    "config/pi/agent/npm/.*",
     "config/vim/autoload/.*",
     "docs/.*",
     "local/man/.*",

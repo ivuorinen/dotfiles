@@ -21,11 +21,13 @@ named after the script.
 
 ## Process
 
-1. Verify the script exists at `local/bin/<script>`. Read its first
-    30 lines to extract:
+1. If `local/bin/<script>` exists, read its first 30 lines to extract:
     - shebang (`/usr/bin/env bash` vs `/bin/sh` vs `python3` etc.)
     - `# @description` tag if present (`dfm scripts` uses it)
     - first `usage()` / `--help` block, to seed `@test` cases
+
+    When the test comes first (TDD), the script does not exist yet:
+    take the shebang and interface from the planned script instead.
 
 2. Reject if `tests/<script>.bats` already exists. Suggest editing
     the existing file instead.
@@ -63,6 +65,8 @@ teardown()
 
 For `/bin/sh` POSIX scripts, replace `bash local/bin/...` with
 `sh local/bin/...`. For Python scripts, use `python3 local/bin/...`.
+A script with no required argument gets a test of its other failure
+mode in place of the missing-argument test.
 
 4. Print the path of the new file and run `bats tests/<script>.bats`
     once to confirm the scaffold runs cleanly (the placeholder
@@ -76,7 +80,7 @@ For `/bin/sh` POSIX scripts, replace `bash local/bin/...` with
 - `setup()`/`teardown()` always present, with `TMPDIR_TEST` named
   to avoid clobbering the standard `TMPDIR` env var (per the fix
   in finding N-029).
-- At minimum: one `--help` test and one missing-arg test. Real
+- At minimum: one `--help` test and one error-path test. Real
   behaviour assertions go in subsequent `@test` blocks added by
   the user.
 

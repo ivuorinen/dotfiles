@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+#USAGE about "List theme families, or switch to one"
+#USAGE flag "--reset" help="Drop the saved choice and return to the default family"
+#USAGE arg "[family]" help="Family to switch to (lists the families when omitted)"
+#
+# theme — list the dotfiles theme families or switch between them.
+#
+# The choice is saved per machine in $XDG_STATE_HOME/dotfiles-theme/choice,
+# outside the repo, and config/theme/apply re-themes everything running.
+# The tracked config/theme/family is the default wherever no choice was
+# saved. config/theme/CLAUDE.md describes the orchestrator.
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+# msgr reads unset variables, so it is sourced with nounset off. Sourcing
+# defines msg_ok/msg_warn/msg_err; a bare `msgr` would need it on PATH.
+set +u
+# shellcheck source=msgr
+. "$(dirname "$0")/msgr"
+set -u
+# shellcheck source=config/theme/_lib.sh
+. "$DOTFILES/config/theme/_lib.sh"
+
+usage()
+{
+  echo "Usage: theme [<family> | --reset]"
+  echo "  With no arguments, list the families and mark the active one."
+}
+
+# Every family a switch accepts, one per line, in glob (sorted) order.
+families()
+{
+  local d f
+  for d in "$DOTFILES/config/theme/palettes.d"/*/; do
+    d="${d%/}"
+    f="${d##*/}"
+    if _theme_valid_family "$f"; then printf '%s\n' "$f"; fi
+  done
+}
+
+warn_override()
+{
+  if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
+    msg_warn "DOTFILES_THEME_FAMILY=$DOTFILES_THEME_FAMILY overrides the saved choice while it is set"
+  fi
+}
+
+# Re-theme everything running at the current mode, under apply's lock.
+apply_theme()
+{
+  "$DOTFILES/config/theme/apply" "$("$DOTFILES/local/bin/theme-mode")"
+}
+
+list_families()
+{
+  local active choice saved="" f
+  active="$(_theme_family 2> /dev/null)" || active=""
+  choice="$(_theme_choice_file)"
+  # Any choice file that _theme_family would skip is worth a word: empty,
+  # whitespace, or a family that has since been removed.
+  if [[ -r "$choice" ]]; then
+    read -r saved < "$choice" || true
+    if ! _theme_valid_family "$saved"; then
+      msg_warn "ignoring the saved choice '$saved' in $choice: not a theme family; using the default"
+    fi
+  fi
+  warn_override
+  while IFS= read -r f; do
+    if [[ "$f" != "$active" ]]; then
+      printf '  %s\n' "$f"
+    elif [[ -t 1 ]]; then
+      printf '\033[1m→ %s\033[0m\n' "$f"
+    else
+      printf '* %s\n' "$f"
+    fi
+  done < <(families)
+}
+
+# Save the choice even when the family is already active: saving is what
+# pins it, so a later change to the tracked default leaves it alone.
+switch_family()
+{
+  local family="$1" active
+  if ! _theme_valid_family "$family"; then
+    msg_err "unknown theme family '$family'; choose one of: $(families | paste -sd ' ' -)"
+    exit 2
+  fi
+  warn_override
+  active="$(_theme_family 2> /dev/null)" || active=""
+  if ! _atomic_write "$(_theme_choice_file)" "$family"; then
+    msg_err "cannot save the theme choice to $(_theme_choice_file)"
+    exit 1
+  fi
+  apply_theme
+  if [[ "$family" == "$active" ]]; then
+    msg_ok "$family is already the active theme family; saved it as the choice"
+  else
+    msg_ok "switched to the $family theme family"
+  fi
+}
+
+reset_family()
+{
+  rm -f -- "$(_theme_choice_file)"
+  apply_theme
+  msg_ok "back to the default theme family ($(_theme_family 2> /dev/null || echo none))"
+}
+
+main()
+{
+  if (($# == 0)); then
+    list_families
+    return
+  fi
+  if (($# > 1)); then
+    usage >&2
+    exit 2
+  fi
+  case "$1" in
+    -h | --help) usage ;;
+    --reset) reset_family ;;
+    -*)
+      usage >&2
+      exit 2
+      ;;
+    *) switch_family "$1" ;;
+  esac
+}
+
+main "$@"
