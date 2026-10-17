@@ -88,11 +88,38 @@ autocmd({ 'FileType' }, {
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 
--- Disable mini.completion in Snacks.picker buffers (input + list)
+-- Tree-sitter highlight + indent for any filetype with a parser. A parser
+-- nvim-treesitter knows but has not built yet is installed on first open (as
+-- arborist did), then started in every buffer of that language. Indent is set
+-- only when the parser loads, so buffers without one (and snacks.bigfile's
+-- `bigfile` filetype) keep their default indentexpr.
+local function ts_start(buf)
+  if vim.api.nvim_buf_is_valid(buf) and pcall(vim.treesitter.start, buf) then
+    vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end
+end
+
+local ts_installing = {} -- lang -> true while an install is in flight
 autocmd('FileType', {
-  group = augroup('minicompletion-picker-disable', { clear = true }),
-  pattern = { 'snacks_picker_input', 'snacks_picker_list' },
-  callback = function(event) vim.b[event.buf].minicompletion_disable = true end,
+  group = augroup('treesitter-start', { clear = true }),
+  callback = function(ev)
+    local lang = vim.treesitter.language.get_lang(ev.match)
+    if not lang or ts_installing[lang] then return end
+    if vim.treesitter.language.add(lang) then return ts_start(ev.buf) end
+
+    local ok, ts = pcall(require, 'nvim-treesitter')
+    if not ok or not vim.list_contains(ts.get_available(), lang) then return end
+    ts_installing[lang] = true
+    ts.install(lang):await(vim.schedule_wrap(function(err)
+      ts_installing[lang] = nil
+      if err then return end
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.treesitter.language.get_lang(vim.bo[buf].filetype) == lang then
+          ts_start(buf)
+        end
+      end
+    end))
+  end,
 })
 
 -- ── Diagnostic Config ────────────────────────────────────────────────
@@ -221,9 +248,11 @@ autocmd('PackChanged', {
   group = augroup('pack-changed', { clear = true }),
   callback = function(ev)
     local name, kind = ev.data.spec.name, ev.data.kind
-    if name == 'arborist' and (kind == 'install' or kind == 'update') then
-      if not ev.data.active then vim.cmd.packadd 'arborist' end
-      vim.cmd 'ArboristUpdate'
+    -- Update only: on install the plugin is not loaded yet, so :TSUpdate does
+    -- not exist; first-time parsers come from the install {} list in init.lua.
+    if name == 'nvim-treesitter' and kind == 'update' then
+      if not ev.data.active then vim.cmd.packadd 'nvim-treesitter' end
+      vim.cmd 'TSUpdate'
     end
   end,
 })

@@ -28,17 +28,17 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 ## init.lua Sections
 
-| Section         | Content                                                         |
-|-----------------|-----------------------------------------------------------------|
-| `-- Completion` | mini.completion (LSP-aware, from mini.nvim)                     |
-| `-- Editor`     | mini.nvim suite + vim-sleuth                                    |
-| `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`               |
-| `-- Navigation` | trouble.nvim                                                    |
-| `-- QA`         | conform.nvim (format-on-save) + nvim-lint                       |
-| `-- Snacks`     | snacks.nvim: picker, notifier, terminal, input, rename, bigfile |
-| `-- Tools`      | wakatime, shellspec, mini.comment                               |
-| `-- Treesitter` | arborist.nvim (parser manager, Neovim 0.12+)                    |
-| `-- UI`         | kanagawa, oasis, catppuccin, auto-dark-mode, colorizer          |
+| Section         | Content                                                |
+|-----------------|--------------------------------------------------------|
+| `-- Completion` | blink.cmp (`1.*`; completion + signature help)         |
+| `-- Editor`     | mini.nvim suite + vim-sleuth                           |
+| `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`      |
+| `-- Navigation` | trouble.nvim                                           |
+| `-- QA`         | conform.nvim (format-on-save) + nvim-lint              |
+| `-- Snacks`     | snacks.nvim: picker, terminal, input, rename, bigfile  |
+| `-- Tools`      | wakatime, shellspec, mini.comment                      |
+| `-- Treesitter` | nvim-treesitter `main` (installs parsers on open)      |
+| `-- UI`         | kanagawa, oasis, catppuccin, auto-dark-mode, colorizer |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is

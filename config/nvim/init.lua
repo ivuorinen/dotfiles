@@ -54,7 +54,8 @@ vim.pack.add {
   { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '1.*' },
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
-  'https://github.com/arborist-ts/arborist.nvim',
+  -- Branch pin, not a range: the semver tags are the frozen `master` API
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
   { src = 'https://github.com/uhs-robert/oasis.nvim', name = 'oasis' },
@@ -561,18 +562,22 @@ require('shellspec').setup {
 require('mini.comment').setup()
 
 -- ── Treesitter ────────────────────────────────────────────────────────
--- Parser manager for Neovim 0.12+ (highlight, indent, folds via built-in API)
--- https://github.com/arborist-ts/arborist.nvim
-
-require('arborist').setup {
-  -- install_popular covers lua, markdown, markdown_inline, html, yaml and more.
-  install_popular = true,
-
-  -- Parsers not in the popular set but needed for injection queries.
-  ensure_installed = {
-    'luadoc',
-    'regex',
-  },
+-- Parser + query manager. The FileType autocmd in lua/autogroups.lua installs
+-- a missing parser on first open and starts highlight + indent per buffer.
+-- https://github.com/nvim-treesitter/nvim-treesitter
+--
+-- Only what that autocmd cannot reach is listed: parsers Neovim bundles (they
+-- load, so it never installs them, yet Neovim ships no indents.scm and
+-- nvim-treesitter links its queries only for languages it installs), and
+-- languages seen only as injections. install() is a no-op once installed.
+require('nvim-treesitter').install {
+  'lua',
+  'luadoc',
+  'markdown',
+  'query',
+  'regex',
+  'vim',
+  'vimdoc',
 }
 
 -- ── UI ───────────────────────────────────────────────────────────────

@@ -188,13 +188,21 @@ URLs: `github.com/wakatime/vim-wakatime` · `github.com/ivuorinen/nvim-shellspec
 ## Treesitter
 
 **nvim-treesitter** — `https://github.com/nvim-treesitter/nvim-treesitter`
+(pinned to the `main` branch)
 
-Syntax highlighting, smart indentation, and incremental selection.
-`auto_install = true` downloads parsers for any opened filetype. A `PackChanged`
-autocmd runs `:TSUpdate` after vim.pack operations to keep parsers in sync.
+Installs parsers and queries. A `FileType` autocmd in `lua/autogroups.lua`
+installs a missing parser the first time a file of that language opens, then
+starts highlighting and indentation; folding uses the built-in
+`vim.treesitter.foldexpr()`.
 
-Core parsers always installed: `html`, `lua`, `luadoc`, `markdown`,
-`markdown_inline`, `regex`, `yaml`.
+The `install {}` list in the `-- Treesitter` section of `init.lua` covers what
+that autocmd cannot reach: the parsers Neovim bundles (`lua`, `markdown`,
+`query`, `vim`, `vimdoc` — listed so their indent queries are installed) and
+injection-only languages (`luadoc`, `regex`). A `PackChanged` autocmd runs
+`:TSUpdate` when vim.pack updates the plugin. `:TSInstall`, `:TSUninstall` and
+`:checkhealth nvim-treesitter` manage and inspect parsers by hand.
+
+Building parsers needs `tree-sitter` CLI (a global mise tool) and a C compiler.
 
 ## UI
 
