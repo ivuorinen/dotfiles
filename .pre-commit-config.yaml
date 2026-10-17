@@ -119,7 +119,7 @@ repos:
         entry: mise exec -- v8r --ignore-errors
         language: system
         files: \.(ya?ml|json|toml)$
-        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|node_modules/|graphify-out/|docs/audit/)
+        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/)
       - id: shellcheck
         name: shellcheck
         entry: mise exec -- shellcheck

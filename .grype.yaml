@@ -4,8 +4,11 @@
 # update channels (vim-plug, submodule sync) — finding SEC-001.
 # Key reference: `grype config` (exclude: a list of globs, same as --exclude).
 exclude:
+  - "./config/cheat/cheatsheets/**"
+  - "./config/mise/locks/**"
+  - "./config/pi/agent/npm/**"
+  - "./config/pi/agent/tmp/**"
   - "./config/vim/extra/**"
   - "./config/vim/plugged/**"
   - "./node_modules/**"
   - "./tools/**"
-  - "./config/cheat/cheatsheets/**"
