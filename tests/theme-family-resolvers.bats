@@ -298,7 +298,7 @@ stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
 package.loaded.wezterm = stub
 local cfg = dofile(arg[1])
-for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'nosuchfamily' } do
+for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'warm-burnout', 'nosuchfamily' } do
   vim.env.DOTFILES_THEME_FAMILY = fam
   local d, l = Scheme_for_appearance 'Dark', Scheme_for_appearance 'Light'
   for _, s in ipairs { d, l } do
@@ -315,6 +315,7 @@ LUA
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
   [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"warm-burnout=Warm Burnout Dark|Warm Burnout Light"* ]]
   [[ "$output" == *"nosuchfamily=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 
