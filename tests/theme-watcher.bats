@@ -11,15 +11,15 @@ setup()
 
   # Curated PATH sandbox for the linux-source tests below. $BIN holds
   # fake gsettings/busctl binaries that each test installs as needed;
-  # $UTIL holds symlinks to the coreutils + bash + timeout the watcher
-  # and _lib.sh actually rely on. With PATH=$BIN:$UTIL only, the
+  # $UTIL holds symlinks to the coreutils + bash + timeout + lock tool the
+  # watcher and _lib.sh actually rely on. With PATH=$BIN:$UTIL only, the
   # watcher's `command -v gsettings` / `command -v busctl` reflect
   # exactly what the test placed in $BIN — host-installed binaries on
   # /usr/bin become invisible.
   BIN="$TMPDIR_TEST/bin"
   UTIL="$TMPDIR_TEST/util"
   mkdir -p "$BIN" "$UTIL"
-  for cmd in bash env mkdir dirname basename mktemp mv ln rm cat date tail wc kill sleep printf timeout gtimeout awk grep find pkill; do
+  for cmd in bash env mkdir dirname basename mktemp mv ln rm cat date tail wc kill sleep printf timeout gtimeout awk grep find pkill flock lockf; do
     real="$(command -v "$cmd" 2> /dev/null || true)"
     [[ -n "$real" && -e "$real" ]] && ln -sf "$real" "$UTIL/$cmd" || true
   done
@@ -115,7 +115,7 @@ run_watcher_linux()
 }
 
 # Send TERM to a background watcher (pid $1) once its pidfile exists and
-# assert it exits 143 and removes the pidfile. The watcher and the
+# assert it exits 143 and empties the pidfile. The watcher and the
 # watchdog run with fd 3 closed and their output on /dev/null: bats waits
 # for every holder of its descriptors, so an orphaned `sleep` holding
 # one would stall the test for the full watchdog window.
@@ -141,10 +141,10 @@ assert_term_exits_143()
   pkill -P "$dog" 2> /dev/null || true
   kill "$dog" 2> /dev/null || true
   [ "$rc" -eq 143 ]
-  [ ! -e "$pidfile" ]
+  [ ! -s "$pidfile" ]
 }
 
-@test "watcher: TERM exits 143 and removes the pidfile" {
+@test "watcher: TERM exits 143 and empties the pidfile" {
   # Before the fix the signal trap only removed the pidfile and the loop
   # kept running, leaving an unlocked daemon a second watcher could join.
   cat > "$BIN/defaults" << 'STUB'
@@ -208,70 +208,30 @@ STUB
 }
 
 @test "watcher: second invocation exits 1 when first holds the lock" {
-  echo $$ > "$TMPDIR_TEST/dotfiles-theme/daemon.pid" 2> /dev/null || {
-    mkdir -p "$TMPDIR_TEST/dotfiles-theme"
-    echo $$ > "$TMPDIR_TEST/dotfiles-theme/daemon.pid"
-  }
-  run "$WATCHER" --source stub --stub-input /dev/null
-  [ "$status" -eq 1 ]
-}
-
-# Regression: _acquire_lock must never hand the same lock to two processes.
-#
-# The stale-reclaim path used to unlink the dead pidfile and then ln its own,
-# unguarded. Two racers that both saw the same dead pid could both return 0 —
-# the second's `rm -f` deleted the first's *live* pidfile. Against that code
-# this test reports 2 winners; against the break-lock version it reports 1.
-#
-# A dead pid is manufactured by starting a subshell and waiting for it to
-# exit, so the pid is real, unambiguously gone, and not a guess.
-@test "_acquire_lock: concurrent stale reclaim produces exactly one winner" {
-  local libsh="${BATS_TEST_DIRNAME}/../config/theme/_lib.sh"
-  local dir="$TMPDIR_TEST/lockrace"
-  mkdir -p "$dir"
-  local pidfile="$dir/daemon.pid"
-
-  # A pid that is certainly dead: spawn, reap, reuse the number.
-  sh -c 'exit 0' &
-  local dead=$!
-  wait "$dead" 2> /dev/null || true
-  printf '%s\n' "$dead" > "$pidfile"
-
-  # Race N acquirers. Each writes a line only if _acquire_lock returned 0.
-  local n=8 i
-  for ((i = 0; i < n; i++)); do
-    (
-      # shellcheck source=/dev/null
-      . "$libsh"
-      if _acquire_lock "$pidfile"; then
-        printf 'won\n' >> "$dir/winners"
-      fi
-    ) &
+  cat > "$BIN/defaults" << 'STUB'
+#!/usr/bin/env bash
+echo Dark
+STUB
+  chmod +x "$BIN/defaults"
+  PATH="$ISO_PATH" "$WATCHER" --source macos 3>&- > /dev/null 2>&1 &
+  local first=$! _
+  for _ in $(seq 1 50); do
+    [[ -s "$TMPDIR_TEST/dotfiles-theme/daemon.pid" ]] && break
+    sleep 0.1
   done
-  wait
-
-  local winners=0
-  [ -f "$dir/winners" ] && winners="$(grep -c '^won$' "$dir/winners")"
-  [ "$winners" -eq 1 ]
-
-  # The survivor's pid must be the one actually recorded in the lock.
-  [ -f "$pidfile" ]
-  [ -s "$pidfile" ]
+  run "$WATCHER" --source stub --stub-input /dev/null
+  kill "$first"
+  wait "$first" || true
+  [ "$status" -eq 1 ]
 }
 
-@test "_acquire_lock: a live holder is never displaced" {
-  local libsh="${BATS_TEST_DIRNAME}/../config/theme/_lib.sh"
-  local dir="$TMPDIR_TEST/lockLive"
-  mkdir -p "$dir"
-  local pidfile="$dir/daemon.pid"
-
-  # $$ is this bats process — definitively alive for the whole test.
-  printf '%s\n' "$$" > "$pidfile"
-
-  run bash -c '. "$1"; _acquire_lock "$2"' _ "$libsh" "$pidfile"
+# Without a lock tool the watcher cannot hold its singleton lock. It must
+# say so in the log, not exit as if another instance held it.
+@test "watcher: exits 1 and logs an ERROR when no lock tool is installed" {
+  rm -f "$UTIL/flock" "$UTIL/lockf"
+  run env PATH="$ISO_PATH" "$WATCHER" --source stub --stub-input /dev/null
   [ "$status" -eq 1 ]
-  # The live holder's pid is still the recorded owner.
-  [ "$(cat "$pidfile")" = "$$" ]
+  grep -q 'ERROR lock: neither flock nor lockf' "$TMPDIR_TEST/dotfiles-theme/log"
 }
 
 # --- Linux source-selection + initial-seed tests ---

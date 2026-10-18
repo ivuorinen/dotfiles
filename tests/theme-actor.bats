@@ -154,6 +154,14 @@ age_retry_file()
   touch -t 202001010000 "$TMPDIR_TEST/dotfiles-theme/retry"
 }
 
+# apply.lock outlives every apply (a lock file is never unlinked), so a
+# released lock is one another process can take.
+lock_is_free()
+{
+  bash -c '. "$1"; _acquire_lock "$2"' _ \
+    "$DOTFILES/config/theme/_lib.sh" "$TMPDIR_TEST/dotfiles-theme/apply.lock"
+}
+
 @test "apply: a failed handler is re-run alone once the backoff passes" {
   failing_handler
   counting_handler
@@ -214,7 +222,7 @@ STUB
   # One run from the flip, one retry for the whole window.
   [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 2 ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/retry")" = "flaky" ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
+  lock_is_free
 }
 
 @test "apply: a flip during a retry runs after it and keeps its retry list" {
@@ -259,12 +267,20 @@ STUB
   failing_handler
   TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
   age_retry_file
-  # A live pid (this shell) holds the lock.
-  echo $$ > "$TMPDIR_TEST/dotfiles-theme/apply.lock"
+  # Another process holds the lock. fd 3 closed and output on /dev/null:
+  # bats waits for every holder of its descriptors.
+  bash -c '. "$1"; _acquire_lock "$2" && : > "$3" && exec sleep 30' _ \
+    "$DOTFILES/config/theme/_lib.sh" "$TMPDIR_TEST/dotfiles-theme/apply.lock" \
+    "$TMPDIR_TEST/held" 3>&- > /dev/null 2>&1 &
+  local holder=$! _
+  for _ in $(seq 1 50); do
+    [[ -e "$TMPDIR_TEST/held" ]] && break
+    sleep 0.1
+  done
   TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
+  kill "$holder"
   [ "$status" -eq 0 ]
   [ "$(wc -l < "$TMPDIR_TEST/flaky-runs")" -eq 1 ]
-  [ -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
 }
 
 @test "apply: a stale lock from a dead apply does not block a flip" {
@@ -277,7 +293,7 @@ STUB
   TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" dark
   [ "$status" -eq 0 ]
   [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/apply.lock" ]
+  lock_is_free
 }
 
 @test "apply: kills handlers that exceed 5s timeout" {

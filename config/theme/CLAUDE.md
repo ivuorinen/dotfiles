@@ -6,6 +6,11 @@ Dark/light theming is owned by a stand-alone orchestrator:
   (skipped in SSH sessions). Subscribes to portal/gsettings on Linux,
   polls `defaults read` on macOS. If a Linux monitor stream ends it logs
   an ERROR and exits 1; the next interactive shell respawns it.
+- Locks: the watcher's `daemon.pid` and apply's `apply.lock` are kernel
+  flock(2) locks on fd 9 (`_acquire_lock`: flock(1), else macOS
+  lockf(1)), so a killed holder never leaves one held. The pid inside is
+  diagnostic only. Never unlink either file: a process that opened the
+  old inode would lock it beside a new holder of the path.
 - `config/theme/apply <mode>` — actor; atomic-writes
   `$XDG_STATE_HOME/dotfiles-theme/mode` (and its own record of the family,
   `applied-family`) and forks each `handlers.d/<name>` in parallel under a

@@ -112,7 +112,6 @@ else
     sleep 0.1
   done
 fi
-trap 'rm -f -- "$lock_file"' EXIT
 
 # Resolve again now the lock is held: a `theme` run that saved a newer
 # choice while this apply waited must win over the value read above.
@@ -157,7 +156,8 @@ if [[ -z "$TIMEOUT_CMD" ]]; then
 fi
 
 # Fork each handler under the resolved timeout. Capture stderr per handler
-# so the actor can label the lines on the way to the log.
+# so the actor can label the lines on the way to the log. Handlers run with
+# fd 9 closed, so nothing one leaves running can hold apply.lock.
 declare -a pids names
 failed_names=()
 for h in ${handlers[@]+"${handlers[@]}"}; do
@@ -165,9 +165,9 @@ for h in ${handlers[@]+"${handlers[@]}"}; do
   errlog="$state_dir/.handler-$name.err"
   : > "$errlog"
   if [[ -n "$TIMEOUT_CMD" ]]; then
-    ("$TIMEOUT_CMD" 5s "$h" "$mode" 2> "$errlog") &
+    ("$TIMEOUT_CMD" 5s "$h" "$mode" 2> "$errlog" 9>&-) &
   else
-    ("$h" "$mode" 2> "$errlog") &
+    ("$h" "$mode" 2> "$errlog" 9>&-) &
   fi
   pids+=("$!")
   names+=("$name")
