@@ -35,8 +35,8 @@ require 'pack'
 require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
--- version = vim.version.range '*' is set only on plugins that publish
--- semver-tagged releases (snacks.nvim). The remaining plugins
+-- version = vim.version.range is set only on plugins that publish
+-- semver-tagged releases (snacks.nvim, blink.cmp). The remaining plugins
 -- have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
   'https://github.com/nvim-mini/mini.nvim',
@@ -50,21 +50,27 @@ vim.pack.add {
   'https://github.com/mfussenegger/nvim-lint',
   'https://github.com/zapling/mason-conform.nvim',
   { src = 'https://github.com/folke/snacks.nvim', version = vim.version.range '*' },
+  -- 1.*: main is unreleased v2, and the prebuilt fuzzy binary is fetched only on a tag
+  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '1.*' },
   'https://github.com/wakatime/vim-wakatime',
   'https://github.com/ivuorinen/nvim-shellspec',
-  'https://github.com/arborist-ts/arborist.nvim',
+  -- Branch pin, not a range: the semver tags are the frozen `master` API
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
   { src = 'https://github.com/uhs-robert/oasis.nvim', name = 'oasis' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
-  'https://github.com/ray-x/lsp_signature.nvim',
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
--- Lightweight LSP-aware completion from mini.nvim
--- https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-completion.md
-require('mini.completion').setup()
+-- https://github.com/saghen/blink.cmp
+-- LSP capabilities are registered by blink's plugin/blink-cmp.lua.
+require('blink.cmp').setup {
+  keymap = { preset = 'default' }, -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+  completion = { documentation = { auto_show = true } },
+  signature = { enabled = true },
+}
 
 -- ── Editor ───────────────────────────────────────────────────────────
 -- mini.nvim suite + vim-sleuth
@@ -334,12 +340,6 @@ require 'lspconfig'
 -- Mason manages LSP server binary downloads and installations
 require('mason').setup {}
 
--- Set capabilities before mason-lspconfig enables servers so the config store
--- is fully populated regardless of enable timing.
-vim.lsp.config('*', {
-  capabilities = vim.lsp.protocol.make_client_capabilities(),
-})
-
 -- Automatically calls vim.lsp.enable() for every server mason has installed.
 -- Servers from mise (fish_lsp, taplo) are not visible to mason so they are
 -- enabled explicitly below.
@@ -381,12 +381,6 @@ require('mason-tool-installer').setup {
 -- mason-lspconfig (above) auto-enables all mason-installed servers.
 -- Enable mise-managed servers that mason cannot see.
 vim.lsp.enable { 'fish_lsp', 'taplo', 'zizmor' }
-
--- lsp_signature
-require('lsp_signature').setup {
-  hint_enable = false,
-  padding = ' ',
-}
 
 -- ── Navigation ───────────────────────────────────────────────────────
 -- Fuzzy finding is handled by snacks.nvim (below).
@@ -518,9 +512,6 @@ require('snacks').setup {
   -- Replaces vim.ui.input with a styled floating prompt
   input = { enabled = true },
 
-  -- Notification UI: replaces nvim-notify and noice's notification routing
-  notifier = { enabled = true },
-
   -- Fuzzy picker: replaces telescope
   picker = {
     enabled = true,
@@ -571,18 +562,22 @@ require('shellspec').setup {
 require('mini.comment').setup()
 
 -- ── Treesitter ────────────────────────────────────────────────────────
--- Parser manager for Neovim 0.12+ (highlight, indent, folds via built-in API)
--- https://github.com/arborist-ts/arborist.nvim
-
-require('arborist').setup {
-  -- install_popular covers lua, markdown, markdown_inline, html, yaml and more.
-  install_popular = true,
-
-  -- Parsers not in the popular set but needed for injection queries.
-  ensure_installed = {
-    'luadoc',
-    'regex',
-  },
+-- Parser + query manager. The FileType autocmd in lua/autogroups.lua installs
+-- a missing parser on first open and starts highlight + indent per buffer.
+-- https://github.com/nvim-treesitter/nvim-treesitter
+--
+-- Only what that autocmd cannot reach is listed: parsers Neovim bundles (they
+-- load, so it never installs them, yet Neovim ships no indents.scm and
+-- nvim-treesitter links its queries only for languages it installs), and
+-- languages seen only as injections. install() is a no-op once installed.
+require('nvim-treesitter').install {
+  'lua',
+  'luadoc',
+  'markdown',
+  'query',
+  'regex',
+  'vim',
+  'vimdoc',
 }
 
 -- ── UI ───────────────────────────────────────────────────────────────

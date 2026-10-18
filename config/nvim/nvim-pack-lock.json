@@ -1,12 +1,13 @@
 {
   "plugins": {
-    "arborist.nvim": {
-      "rev": "a34436d6b5efdc86e6f80f8c79844aae8d649a92",
-      "src": "https://github.com/arborist-ts/arborist.nvim"
-    },
     "auto-dark-mode.nvim": {
       "rev": "2b16a24c202892e61fca7df4d2d7c4c872a44165",
       "src": "https://github.com/f-person/auto-dark-mode.nvim"
+    },
+    "blink.cmp": {
+      "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
+      "src": "https://github.com/saghen/blink.cmp",
+      "version": "1.0.0 - 2.0.0"
     },
     "catppuccin": {
       "rev": "edefef779ab08ce1a4a404713e3012b0d202bd35",
@@ -19,10 +20,6 @@
     "kanagawa": {
       "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
       "src": "https://github.com/rebelot/kanagawa.nvim"
-    },
-    "lsp_signature.nvim": {
-      "rev": "1997451c4c9956a1380d8bea4b0e33ebdf07976e",
-      "src": "https://github.com/ray-x/lsp_signature.nvim"
     },
     "mason-conform.nvim": {
       "rev": "48da2ebd5efbaf8a99566eadc3ece82d523f03c5",
@@ -59,6 +56,11 @@
     "nvim-shellspec": {
       "rev": "eb9432bae813f5f9276dfba062c9c04569c7eed6",
       "src": "https://github.com/ivuorinen/nvim-shellspec"
+    },
+    "nvim-treesitter": {
+      "rev": "d4a9b23a383266bdb0bfb42d565f31e83f27be5e",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
     },
     "oasis": {
       "rev": "a3ef178fe47c69691e676a8da98ce5735c3013db",
