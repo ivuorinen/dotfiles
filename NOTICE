@@ -168,6 +168,41 @@ Oasis theme assets -- MIT
   extras/lua-theme values through a Catppuccin-role map; the map is in
   config/theme/palettes.d/oasis/light/starship.toml.
 
+Warm Burnout theme assets -- MIT
+  warm-burnout: Copyright (c) 2026 Felipe Lima
+    https://github.com/felipefdl/warm-burnout
+    @ 6e1f75fd769adf2ecd45ac1e46f7c7e705b2356c
+
+    config/bat/themes/Warm Burnout Dark.tmTheme     (bat/, dark)
+    config/bat/themes/Warm Burnout Light.tmTheme    (bat/, light)
+    config/vim/colors/warm_burnout_dark.vim         (vim/colors/, renamed)
+    config/vim/colors/warm_burnout_light.vim        (vim/colors/, renamed)
+    config/wezterm/wezterm.lua                      (wezterm/, as tables)
+
+  The nvim colorscheme is the upstream plugin itself, installed by
+  vim.pack; config/nvim/colors/warm-burnout.lua wraps it.
+
+  Local changes to the vendored files: both tmThemes end with a newline.
+  The vim files set g:colors_name to warm_burnout_dark / warm_burnout_light
+  (airline autoload names cannot hold a dash). The wezterm tables drop
+  upstream's tab_bar, copy_mode and quick_select blocks.
+
+  Colours below WCAG AA on the background are changed in HSL lightness
+  only wherever they are used (vim, wezterm, the nvim wrapper; cterm
+  indices recomputed in vim):
+    accent / warn, dark   #b8522e -> #cd5d36  (3.70 -> 4.50 on #1a1510)
+    accent / warn, light  #b8522e -> #b04e2c  (4.22 -> 4.55 on #f5ede0)
+    ANSI 11, light        #9a7008 -> #8b6507  (3.85 -> 4.56)
+    ANSI 12, light        #2870b0 -> #286faf  (4.48 -> 4.54)
+    ANSI 14, light        #208870 -> #1d7964  (3.75 -> 4.55)
+    line-number grey, light (vim; muted, 3:1)
+                          #a89f8c -> #938871  (2.26 -> 3.01)
+
+  The Warm Burnout palettes under config/theme/palettes.d/warm-burnout/,
+  warm-burnout-aa.theme, the airline, television and COSMIC themes are
+  derived from upstream's palette through a Catppuccin-role map; the map
+  is in config/theme/palettes.d/warm-burnout/light/starship.toml.
+
 
 Submodules are not vendored into this tree: each is a git submodule pinned at
 a commit, carrying its own license, and updated from upstream rather than
