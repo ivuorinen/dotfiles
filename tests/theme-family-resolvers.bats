@@ -137,6 +137,12 @@ vim_scheme()
   [ "$(vim_scheme light oasis)" = "oasis_abyss_light" ]
 }
 
+@test "vim: warm-burnout maps dark/light to warm_burnout_dark/light" {
+  command -v vim > /dev/null 2>&1 || skip "vim not installed"
+  [ "$(vim_scheme dark warm-burnout)" = "warm_burnout_dark" ]
+  [ "$(vim_scheme light warm-burnout)" = "warm_burnout_light" ]
+}
+
 @test "vim: catppuccin maps dark/light to mocha/latte" {
   command -v vim > /dev/null 2>&1 || skip "vim not installed"
   [ "$(vim_scheme dark catppuccin)" = "catppuccin_mocha" ]
