@@ -50,6 +50,13 @@ fish_theme_name()
   [ "$output" = "catppuccin-aa" ]
 }
 
+@test "fish: warm-burnout resolves to its -aa theme" {
+  command -v fish > /dev/null 2>&1 || skip "fish not installed"
+  DOTFILES_THEME_FAMILY=warm-burnout run fish_theme_name
+  [ "$status" -eq 0 ]
+  [ "$output" = "warm-burnout-aa" ]
+}
+
 @test "fish: a non-slug or themeless family prints nothing and fails" {
   command -v fish > /dev/null 2>&1 || skip "fish not installed"
   for bad in '../catppuccin' 'Kanagawa' 'nosuchfamily'; do

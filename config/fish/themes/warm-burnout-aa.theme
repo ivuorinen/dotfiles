@@ -1,0 +1,94 @@
+# name: 'warm-burnout-aa'
+# Repo-owned. [dark] and [unknown] are Warm Burnout Dark, [light] is Warm
+# Burnout Light (https://github.com/felipefdl/warm-burnout). Each line is
+# catppuccin-aa.theme with its colour replaced by the Warm Burnout value for
+# the same Catppuccin role (role map in
+# config/theme/palettes.d/warm-burnout/light/starship.toml). Comments and
+# autosuggestions use the muted overlay greys (3:1).
+
+[light]
+# preferred_background: f5ede0
+fish_color_normal 3a3630
+fish_color_command 2868a0
+fish_color_param 8e4632
+fish_color_keyword 7e4060
+fish_color_quote 4d5c1a
+fish_color_redirection 924800
+fish_color_end 8f4418
+fish_color_comment 8a8070
+fish_color_error b03434
+fish_color_gray 938871
+fish_color_selection --background=ece4d6
+fish_color_search_match --background=ece4d6
+fish_color_option 4d5c1a
+fish_color_operator 924800
+fish_color_escape 883850
+fish_color_autosuggestion 6a6258
+fish_color_cancel b03434
+fish_color_cwd 855700
+fish_color_user 286a48
+fish_color_host 2868a0
+fish_color_host_remote 4d5c1a
+fish_color_status b03434
+fish_pager_color_progress 938871
+fish_pager_color_prefix 924800
+fish_pager_color_completion 3a3630
+fish_pager_color_description 6a6258
+
+[dark]
+# preferred_background: 1a1510
+fish_color_normal bfbdb6
+fish_color_command 73b8ff
+fish_color_param dc9e92
+fish_color_keyword d4a8b8
+fish_color_quote b4bc78
+fish_color_redirection ff8f40
+fish_color_end f29668
+fish_color_comment 746f67
+fish_color_error f49090
+fish_color_gray 6b6860
+fish_color_selection --background=222018
+fish_color_search_match --background=222018
+fish_color_option b4bc78
+fish_color_operator ff8f40
+fish_color_escape ec9878
+fish_color_autosuggestion 6b6860
+fish_color_cancel f49090
+fish_color_cwd ffb454
+fish_color_user 96b898
+fish_color_host 73b8ff
+fish_color_host_remote b4bc78
+fish_color_status f49090
+fish_pager_color_progress 6b6860
+fish_pager_color_prefix ff8f40
+fish_pager_color_completion bfbdb6
+fish_pager_color_description 6b6860
+
+[unknown]
+# preferred_background: 1a1510
+fish_color_normal bfbdb6
+fish_color_command 73b8ff
+fish_color_param dc9e92
+fish_color_keyword d4a8b8
+fish_color_quote b4bc78
+fish_color_redirection ff8f40
+fish_color_end f29668
+fish_color_comment 746f67
+fish_color_error f49090
+fish_color_gray 6b6860
+fish_color_selection --background=222018
+fish_color_search_match --background=222018
+fish_color_option b4bc78
+fish_color_operator ff8f40
+fish_color_escape ec9878
+fish_color_autosuggestion 6b6860
+fish_color_cancel f49090
+fish_color_cwd ffb454
+fish_color_user 96b898
+fish_color_host 73b8ff
+fish_color_host_remote b4bc78
+fish_color_status f49090
+fish_pager_color_progress 6b6860
+fish_pager_color_prefix ff8f40
+fish_pager_color_completion bfbdb6
+fish_pager_color_description 6b6860
