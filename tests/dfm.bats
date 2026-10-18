@@ -114,6 +114,7 @@ setup()
   [[ "$output" == *"catppuccin"* ]]
   [[ "$output" == *"kanagawa"* ]]
   [[ "$output" == *"oasis"* ]]
+  [[ "$output" == *"warm-burnout"* ]]
 }
 
 @test "dfm theme mode prints dark or light" {

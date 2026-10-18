@@ -1,0 +1,19 @@
+# Warm Burnout Dark — derived from ../../catppuccin/dark/gh-dash.theme.yml by the
+# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+---
+theme:
+  colors:
+    text:
+      primary: "#bfbdb6"
+      secondary: "#d4a8b8"
+      inverted: "#14120f"
+      faint: "#ada69c"
+      warning: "#ffb454"
+      success: "#b4bc78"
+      error: "#f49090"
+    background:
+      selected: "#222018"
+    border:
+      primary: "#d4a8b8"
+      secondary: "#2e3a41"
+      faint: "#222018"

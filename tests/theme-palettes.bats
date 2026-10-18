@@ -37,10 +37,11 @@ check_complete()
   fi
 }
 
-@test "palettes: at least catppuccin, kanagawa and oasis exist" {
+@test "palettes: at least catppuccin, kanagawa, oasis and warm-burnout exist" {
   [ -d "$PD/catppuccin" ]
   [ -d "$PD/kanagawa" ]
   [ -d "$PD/oasis" ]
+  [ -d "$PD/warm-burnout" ]
 }
 
 @test "palettes: every family ships every handler file in both modes" {

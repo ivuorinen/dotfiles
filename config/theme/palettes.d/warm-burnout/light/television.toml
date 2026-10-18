@@ -1,0 +1,6 @@
+# Warm Burnout Light — derived from ../../catppuccin/light/television.toml by the
+# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# television light palette — Warm Burnout Light (keyword accent), the
+# light counterpart to dark/television.toml. Appended to base.toml by the handler.
+[ui]
+theme = "warm-burnout-light.toml"

@@ -1,0 +1,25 @@
+// Warm Burnout Light — derived from ../../catppuccin/light/gitui.ron by the
+// colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+(
+    selected_tab: Some("Reset"),
+    command_fg: Some("#3a3630"),
+    selection_bg: Some("#e0c890"),
+    selection_fg: Some("#3a3630"),
+    cmdbar_bg: Some("#ede6da"),
+    cmdbar_extra_lines_bg: Some("#ede6da"),
+    disabled_fg: Some("#8a8070"),
+    diff_line_add: Some("#4d5c1a"),
+    diff_line_delete: Some("#b03434"),
+    diff_file_added: Some("#4d5c1a"),
+    diff_file_removed: Some("#883850"),
+    diff_file_moved: Some("#7e4060"),
+    diff_file_modified: Some("#8f4418"),
+    commit_hash: Some("#74501c"),
+    commit_time: Some("#5c5750"),
+    commit_author: Some("#7a5a1c"),
+    danger_fg: Some("#b03434"),
+    push_gauge_bg: Some("#2868a0"),
+    push_gauge_fg: Some("#f5ede0"),
+    tag_fg: Some("#8a6600"),
+    branch_fg: Some("#286a48")
+)
