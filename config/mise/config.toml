@@ -184,7 +184,6 @@ bats = "1.14.0"
 shellspec = "0.28.1"
 prek = "0.5.5"
 "npm:corepack" = "0.36.0"
-"dotnet:coverlet.console" = "10.1.0"
 
 # System monitoring & misc utilities
 bottom = "0.14.9"
