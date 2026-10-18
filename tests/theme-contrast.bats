@@ -17,6 +17,11 @@
 # Oasis: computed the same way, Abyss Light 3 on #d8d8d8 and Abyss Dark on
 # #000000. Upstream targets AA already; the checks keep a refresh honest.
 # The role map lives in config/theme/palettes.d/oasis/light/starship.toml.
+#
+# Warm Burnout: computed the same way, Light on #f5ede0 and Dark on #1a1510.
+# Upstream's accent and three light ANSI brights miss AA and are adjusted in
+# lightness only; the map and the fixes are in
+# config/theme/palettes.d/warm-burnout/light/starship.toml.
 
 setup()
 {
@@ -320,4 +325,79 @@ OASIS_DARK_MUTED='#607d85 #7b786d #605c4d'
   ROOT="$BATS_TEST_TMPDIR" run check_contrast '#000000' 4.5 "$OASIS_DARK_MUTED" "$OASIS_DARK_BG" "p/planted.tmTheme"
   [ "$status" -eq 1 ]
   [[ "$output" == *"#1f3a2d is 1.70:1"* ]]
+}
+
+# Warm Burnout Light fills: surfaces, the search fill (#e0c890), the vim
+# diff/visual/border fills, the tmTheme and wezterm selection fills, the
+# light ANSI whites (#c0b8aa, #faf6f0) and yazi's gauge label #ffffff.
+WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #faf6f0 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4d4e4 #e0c890 #c0b8aa #e5e8e2 #e2dace #c5beb2 #ffffff'
+# Warm Burnout Light overlays (fg_gutter, the AA-darkened LineNr grey): muted, 3:1.
+WB_LIGHT_MUTED='#8a8070 #938871'
+
+# wb_palette_targets <mode> — the family's palettes.d files for one mode
+# (bat.theme holds a name, not colours; starship's header quotes the map).
+wb_palette_targets()
+{
+  local f
+  targets=()
+  for f in "$ROOT/config/theme/palettes.d/warm-burnout/$1"/*; do
+    [[ "$(basename "$f")" == bat.theme ]] && continue
+    if [[ "$(basename "$f")" == starship.toml ]]; then
+      targets+=("config/theme/palettes.d/warm-burnout/$1/starship.toml@palette = @[os]")
+      continue
+    fi
+    targets+=("${f#"$ROOT/"}")
+  done
+}
+
+@test "warm burnout light: every non-muted foreground reaches WCAG AA on #f5ede0" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local targets=()
+  wb_palette_targets light
+  targets+=(
+    "config/fish/themes/warm-burnout-aa.theme@"$'\n'"[light]"$'\n'"@"$'\n'"[dark]"$'\n'
+    "config/vim/colors/warm_burnout_light.vim"
+    "config/vim/autoload/airline/themes/warm_burnout_light.vim"
+    "config/bat/themes/Warm Burnout Light.tmTheme"
+    "config/television/themes/warm-burnout-light.toml"
+    "config/cosmic-desktop/themes/cosmic-term/warm-burnout-light.ron"
+    "config/wezterm/wezterm.lua@local warm_burnout_light = {@"$'\n}\n'
+  )
+  run check_contrast '#f5ede0' 4.5 "$WB_LIGHT_MUTED" "$WB_LIGHT_BG" "${targets[@]}"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+# Warm Burnout Dark fills: surfaces, the search fill (#4c4126), the vim
+# diff/visual/border fills, the tmTheme and wezterm selection fills and the
+# ANSI black #23211b.
+WB_DARK_BG='#14120f #1f1d17 #222018 #23211b #2a2820 #2e3a41 #2e1a1c #1a242e #1e2a1c #2c3e52 #33393a #3a342a #4c4126'
+# Warm Burnout Dark overlays (fg_gutter, LineNr, ANSI bright black): muted, 3:1.
+WB_DARK_MUTED='#746f67 #6b6860 #686868'
+
+@test "warm burnout dark: every non-muted foreground reaches WCAG AA on #1a1510" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local targets=()
+  wb_palette_targets dark
+  targets+=(
+    "config/fish/themes/warm-burnout-aa.theme@"$'\n'"[dark]"$'\n'"@"$'\n'"[unknown]"$'\n'
+    "config/vim/colors/warm_burnout_dark.vim"
+    "config/vim/autoload/airline/themes/warm_burnout_dark.vim"
+    "config/bat/themes/Warm Burnout Dark.tmTheme"
+    "config/television/themes/warm-burnout-dark.toml"
+    "config/cosmic-desktop/themes/cosmic-term/warm-burnout-dark.ron"
+    "config/wezterm/wezterm.lua@local warm_burnout_dark = {@"$'\n}\n'
+  )
+  run check_contrast '#1a1510' 4.5 "$WB_DARK_MUTED" "$WB_DARK_BG" "${targets[@]}"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "warm burnout: the contrast check catches upstream's accent" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  printf 'hi WarningMsg guifg=#b8522e\n' > "$BATS_TEST_TMPDIR/p/planted.vim"
+  ROOT="$BATS_TEST_TMPDIR" run check_contrast '#1a1510' 4.5 "$WB_DARK_MUTED" "$WB_DARK_BG" "p/planted.vim"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"#b8522e is 3.70:1"* ]]
 }
