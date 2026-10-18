@@ -94,11 +94,26 @@ teardown()
   [ -f "$TMPDIR_TEST/lock.pid" ]
 }
 
-@test "_acquire_lock: fails when live PID holds lock" {
+@test "_acquire_lock: a holder keeps the lock until it dies, even by SIGKILL" {
   source "$THEME_LIB"
-  echo $$ > "$TMPDIR_TEST/lock.pid"
-  run _acquire_lock "$TMPDIR_TEST/lock.pid"
+  local lock="$TMPDIR_TEST/lock.pid" _
+  # fd 3 closed and output on /dev/null: bats waits for every holder of
+  # its descriptors. `exec sleep` makes the holder's pid the sleep itself.
+  (_acquire_lock "$lock" && exec sleep 30) 3>&- > /dev/null 2>&1 &
+  local holder=$!
+  for _ in $(seq 1 50); do
+    [[ -s "$lock" ]] && break
+    sleep 0.1
+  done
+  [ -s "$lock" ]
+  run bash -c '. "$1"; _acquire_lock "$2"' _ "$THEME_LIB" "$lock"
   [ "$status" -eq 1 ]
+  # A refused acquirer leaves the holder's record alone.
+  [ "$(cat "$lock")" = "$$" ]
+  kill -KILL "$holder"
+  wait "$holder" 2> /dev/null || true
+  run bash -c '. "$1"; _acquire_lock "$2"' _ "$THEME_LIB" "$lock"
+  [ "$status" -eq 0 ]
 }
 
 @test "_acquire_lock: reclaims stale PID file" {
@@ -108,6 +123,50 @@ teardown()
   run _acquire_lock "$TMPDIR_TEST/lock.pid"
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/lock.pid")" = "$$" ]
+}
+
+# Regression: the pidfile lock serialised its stale-break under a second
+# lock, "<lock>.break", hard-linked to the breaker's temp file. A breaker
+# killed inside that window left both behind beside a dead holder's pid,
+# nothing could reclaim them, and the watcher never started again. This
+# is that debris, as found in a live state dir.
+@test "_acquire_lock: debris from a killed acquirer never blocks the lock" {
+  source "$THEME_LIB"
+  local lock="$TMPDIR_TEST/lock.pid" dead
+  sh -c 'exit 0' &
+  dead=$!
+  wait "$dead" || true
+  echo "$dead" > "$lock"
+  echo "$dead" > "$lock.tmp.debris"
+  ln "$lock.tmp.debris" "$lock.break"
+  run _acquire_lock "$lock"
+  [ "$status" -eq 0 ]
+}
+
+# A winner keeps the lock until every racer has reported, so a racer that
+# starts late cannot win the lock the first winner has already released.
+@test "_acquire_lock: concurrent acquirers produce exactly one winner" {
+  source "$THEME_LIB"
+  local lock="$TMPDIR_TEST/lock.pid" results="$TMPDIR_TEST/results"
+  local n=8 i _
+  for ((i = 0; i < n; i++)); do
+    (
+      if _acquire_lock "$lock"; then
+        echo won >> "$results"
+        until [[ -e "$TMPDIR_TEST/done" ]]; do sleep 0.1; done
+      else
+        echo lost >> "$results"
+      fi
+    ) 3>&- > /dev/null 2>&1 &
+  done
+  for _ in $(seq 1 100); do
+    [[ -f "$results" && "$(wc -l < "$results")" -ge "$n" ]] && break
+    sleep 0.1
+  done
+  touch "$TMPDIR_TEST/done"
+  wait
+  [ "$(wc -l < "$results")" -eq "$n" ]
+  [ "$(grep -c '^won$' "$results")" -eq 1 ]
 }
 
 @test "_log: appends ISO8601-prefixed line" {

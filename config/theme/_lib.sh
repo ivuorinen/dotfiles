@@ -124,58 +124,41 @@ _link_palette()
   return 0
 }
 
-# Atomic, race-safe lock. ln(1) is the classic atomic create-if-not-exists
-# primitive on POSIX filesystems, and it is the ONLY thing that grants the
-# lock here. A loser silently fails the ln and we return 1.
+# Non-blocking exclusive lock on $1, held on fd 9 of the calling shell until
+# that process exits. It is a kernel flock(2) lock, taken with flock(1)
+# (util-linux on Linux) or else lockf(1) (macOS base system), so the kernel
+# drops it however the holder dies, SIGKILL included. The file's content is
+# never consulted: the holder's pid is written there for diagnostics only.
 #
-# Breaking a stale lock is the hard half, because it is inherently two
-# operations (unlink the dead file, link ours) and a pair of syscalls is not
-# atomic. The previous version ran them unguarded, so two processes that both
-# saw the same dead pid could both succeed: the first won its ln, then the
-# second's `rm -f` deleted the *live* pidfile and let it link over the top.
-# Both returned 0 and the watcher's singleton guard admitted two daemons.
+# This replaced a pidfile lock whose stale-break ran under a second lock
+# file. A process killed inside that window left the second lock behind,
+# and no later process could reclaim the first. In practice that happened:
+# shells spawned at login are killed mid-acquire, and the watcher stayed
+# down for good.
 #
-# A read-back after the write does not fix this — each racer reads its own
-# write and every one of them concludes it won. The break must instead be
-# serialised, so the unlink-then-link pair runs under a second lock that is
-# itself taken with ln. A process that cannot take the break lock does not
-# break anything; it just returns 1 and lets the winner proceed.
-#
-# Residual risk, stated rather than hidden: a process SIGKILLed while holding
-# the break lock leaves "${pidfile}.break" behind and no later process can
-# reclaim a stale lock until it is removed by hand. That window spans one
-# cat + kill -0 + rm + ln — orders of magnitude smaller than the whole
-# watcher lifetime this guards, and it fails closed (no daemon) rather than
-# open (two daemons).
+# Never unlink a lock file. A process that opened the old inode would lock
+# it while the next one locks a new file at the same path, and both hold
+# "the" lock.
 _acquire_lock()
 {
-  local pidfile=$1 tmp breaklock pid rc
-  tmp="$(mktemp "${pidfile}.tmp.XXXXXX")" || return 1
-  printf '%s\n' "$$" > "$tmp"
-
-  # Uncontended: nothing holds the lock.
-  if ln -- "$tmp" "$pidfile" 2> /dev/null; then
-    rm -f -- "$tmp"
-    return 0
-  fi
-
-  # Contended. Serialise the stale-break so only one process may unlink.
-  breaklock="${pidfile}.break"
-  if ! ln -- "$tmp" "$breaklock" 2> /dev/null; then
-    rm -f -- "$tmp"
+  local lockfile=$1
+  exec 9>> "$lockfile" || return 1
+  if command -v flock > /dev/null 2>&1; then
+    flock -n 9 || {
+      exec 9>&-
+      return 1
+    }
+  elif command -v lockf > /dev/null 2>&1; then
+    lockf -s -t 0 9 || {
+      exec 9>&-
+      return 1
+    }
+  else
+    exec 9>&-
+    _log "ERROR lock: neither flock nor lockf is installed; cannot lock $lockfile"
     return 1
   fi
-
-  rc=1
-  pid=$(cat -- "$pidfile" 2> /dev/null || true)
-  if [[ -z "$pid" ]] || ! kill -0 "$pid" 2> /dev/null; then
-    # Holder is gone. Safe to replace: we are the only breaker.
-    rm -f -- "$pidfile"
-    ln -- "$tmp" "$pidfile" 2> /dev/null && rc=0
-  fi
-
-  rm -f -- "$breaklock" "$tmp"
-  return "$rc"
+  printf '%s\n' "$$" > "$lockfile"
 }
 
 # Append a timestamped line to the orchestrator log. Single-writer
