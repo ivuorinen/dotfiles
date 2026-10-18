@@ -1,0 +1,26 @@
+# Warm Burnout Light — derived from catppuccin-latte-mauve.toml by the colour-role map
+# in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# general
+background = '#f5ede0'
+border_fg = '#cfdae2'
+text_fg = '#3a3630'
+dimmed_text_fg = '#938871'
+# input
+input_text_fg = '#7e4060'
+result_count_fg = '#7e4060'
+# results
+# accents AA-darkened (4.5:1 on #f5ede0); mapping in
+# config/theme/palettes.d/catppuccin/light/starship.toml
+result_name_fg = '#2868a0'
+result_line_number_fg = '#855700'
+result_value_fg = '#74501c'
+selection_fg = '#4d5c1a'
+selection_bg = '#ece4d6'
+match_fg = '#4d5c1a'
+# preview
+preview_title_fg = '#7e4060'
+# modes
+channel_mode_fg = '#f5ede0'
+channel_mode_bg = '#7e4060'
+remote_control_mode_fg = '#f5ede0'
+remote_control_mode_bg = '#4d5c1a'

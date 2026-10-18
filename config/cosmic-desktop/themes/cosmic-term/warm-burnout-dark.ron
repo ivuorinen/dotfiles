@@ -1,0 +1,37 @@
+(
+  name: "Warm Burnout Dark",
+  foreground: "#bfbdb6",
+  cursor: "#f5c56e",
+  bright_foreground: "#bfbdb6",
+  dim_foreground: "#6b6860",
+  normal: (
+    black: "#2e3a41",
+    red: "#f49090",
+    green: "#b4bc78",
+    yellow: "#ffb454",
+    blue: "#73b8ff",
+    magenta: "#ff8f40",
+    cyan: "#96b898",
+    white: "#ada69c"
+  ),
+  bright: (
+    black: "#4c4126",
+    red: "#f49090",
+    green: "#b4bc78",
+    yellow: "#ffb454",
+    blue: "#73b8ff",
+    magenta: "#ff8f40",
+    cyan: "#96b898",
+    white: "#b4a89c"
+  ),
+  dim: (
+    black: "#2e3a41",
+    red: "#f49090",
+    green: "#b4bc78",
+    yellow: "#ffb454",
+    blue: "#73b8ff",
+    magenta: "#ff8f40",
+    cyan: "#96b898",
+    white: "#ada69c"
+  ),
+)

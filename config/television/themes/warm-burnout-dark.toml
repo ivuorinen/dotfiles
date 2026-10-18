@@ -1,0 +1,24 @@
+# Warm Burnout Dark — derived from catppuccin-mocha-mauve.toml by the colour-role map
+# in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# general
+background = '#1a1510'
+border_fg = '#2e3a41'
+text_fg = '#bfbdb6'
+dimmed_text_fg = '#6b6860'
+# input
+input_text_fg = '#d4a8b8'
+result_count_fg = '#d4a8b8'
+# results
+result_name_fg = '#73b8ff'
+result_line_number_fg = '#ffb454'
+result_value_fg = '#deb074'
+selection_fg = '#b4bc78'
+selection_bg = '#222018'
+match_fg = '#b4bc78'
+# preview
+preview_title_fg = '#d4a8b8'
+# modes
+channel_mode_fg = '#1a1510'
+channel_mode_bg = '#d4a8b8'
+remote_control_mode_fg = '#1a1510'
+remote_control_mode_bg = '#b4bc78'
