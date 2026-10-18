@@ -59,6 +59,7 @@ vim.pack.add {
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
   { src = 'https://github.com/uhs-robert/oasis.nvim', name = 'oasis' },
+  { src = 'https://github.com/felipefdl/warm-burnout', name = 'warm-burnout' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
 }
@@ -675,6 +676,18 @@ require('oasis').setup {
   },
 }
 
+-- ── Warm Burnout ─────────────────────────────────────────────────────
+-- https://github.com/felipefdl/warm-burnout
+-- The plugin lives in the repo's nvim/ subdirectory, which upstream asks to
+-- be added to the runtimepath. colors/warm-burnout.lua (in this config) picks
+-- the variant from 'background' and carries the WCAG AA fixes. vim.pack.get
+-- raises when the plugin is not installed (a declined install); the family
+-- then falls back to oasis in apply_family_scheme below.
+local wb_ok, wb_plugins = pcall(vim.pack.get, { 'warm-burnout' }, { info = false })
+for _, plugin in ipairs(wb_ok and wb_plugins or {}) do
+  vim.opt.rtp:append(plugin.path .. '/nvim')
+end
+
 -- ── Catppuccin ───────────────────────────────────────────────────────
 -- https://github.com/catppuccin/nvim
 require('catppuccin').setup {
@@ -711,14 +724,19 @@ require('catppuccin').setup {
 -- (local/bin/theme) reaches running sessions the way vim's timer does. It acts
 -- only when the family's scheme changes, so a manual :colorscheme stays until
 -- the next switch; 'background' stays with auto-dark-mode below.
-local family_schemes =
-  { kanagawa = 'kanagawa', oasis = 'oasis', catppuccin = 'catppuccin' }
+local family_schemes = {
+  kanagawa = 'kanagawa',
+  oasis = 'oasis',
+  catppuccin = 'catppuccin',
+  ['warm-burnout'] = 'warm-burnout',
+}
 local applied_scheme
 local function apply_family_scheme()
   local scheme = family_schemes[theme_family()] or 'oasis'
   if scheme == applied_scheme then return end
   applied_scheme = scheme
-  vim.cmd.colorscheme(scheme)
+  -- A family whose plugin is not installed yet still gets a theme.
+  if not pcall(vim.cmd.colorscheme, scheme) then vim.cmd.colorscheme 'oasis' end
 end
 apply_family_scheme()
 vim.uv.new_timer():start(3000, 3000, vim.schedule_wrap(apply_family_scheme))

@@ -82,6 +82,10 @@
     "vim-wakatime": {
       "rev": "9f8a1d3b9c6f3a948988a0896b3227c1e1f74a58",
       "src": "https://github.com/wakatime/vim-wakatime"
+    },
+    "warm-burnout": {
+      "rev": "6e1f75fd769adf2ecd45ac1e46f7c7e705b2356c",
+      "src": "https://github.com/felipefdl/warm-burnout"
     }
   }
 }

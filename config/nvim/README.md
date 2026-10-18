@@ -211,15 +211,17 @@ Building parsers needs `tree-sitter` CLI (a global mise tool) and a C compiler.
 | oasis.nvim          | Default colorscheme (Abyss dark / Abyss light, intensity 3)                |
 | kanagawa.nvim       | Alternate colorscheme (Wave dark / Lotus light, AA-darkened Lotus accents) |
 | catppuccin/nvim     | Alternate colorscheme; `auto_integrations` picks up mini.nvim              |
+| warm-burnout        | Alternate colorscheme; `colors/warm-burnout.lua` follows `background`      |
 | auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state        |
 | nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled                |
 
 The colorscheme follows the active theme family — the choice saved by `theme`,
-else `config/theme/family` — (`oasis`, `kanagawa` or `catppuccin`); each switches
-variant with `background`. Running sessions pick up a family switch within 3 s.
+else `config/theme/family` — (`oasis`, `kanagawa`, `catppuccin` or `warm-burnout`);
+each switches variant with `background`. Running sessions pick up a family switch
+within 3 s. A family whose plugin is not installed falls back to oasis.
 
 URLs: `github.com/uhs-robert/oasis.nvim` · `github.com/rebelot/kanagawa.nvim` ·
-`github.com/catppuccin/nvim` ·
+`github.com/catppuccin/nvim` · `github.com/felipefdl/warm-burnout` ·
 `github.com/f-person/auto-dark-mode.nvim` · `github.com/catgoose/nvim-colorizer.lua`
 
 ## Installed Tools (mason-tool-installer)
