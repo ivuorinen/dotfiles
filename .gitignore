@@ -97,6 +97,10 @@ config/pi/pi-lens/*
 !config/pi/agent/settings.json
 !config/pi/agent/zentui.json
 !config/pi/agent/open-tui.json
+!config/pi/agent/mcp.json
+!config/pi/agent/extensions/
+config/pi/agent/extensions/*
+!config/pi/agent/extensions/deja.ts
 !config/pi/agent/npm/
 config/pi/agent/npm/*
 !config/pi/agent/npm/package.json
