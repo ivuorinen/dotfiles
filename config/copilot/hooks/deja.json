@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "hooks": {
     "PreCompact": [
       {
@@ -19,13 +20,6 @@
       {
         "bash": "deja-hook hook-tool-after --copilot",
         "matcher": "bash|powershell",
-        "timeoutSec": 10,
-        "type": "command"
-      }
-    ],
-    "preMcpToolCall": [
-      {
-        "bash": "deja-hook hook-mcp-call",
         "timeoutSec": 10,
         "type": "command"
       }
