@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#USAGE about "Run deja for agent hooks; exit 0 when deja is not installed"
+#USAGE arg "[args]" help="Arguments passed through to deja" var=#true
 
 # Dotfiles-managed wrapper for Pi's deja extension.
 # Resolve the real deja binary at runtime so updates can move it without
