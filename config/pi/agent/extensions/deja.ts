@@ -195,18 +195,18 @@ export default function (pi: PiApi) {
           }
         }
         // Nothing to recall: either there is no history yet, or the first
-        // index is still building. Only a build is worth retrying, since its
-        // digest comes on a later turn; with none running the lookup is done
-        // and later turns get prompt recall. A build is worth saying, once.
-        if (!showBuild(ctx)) {
-          contextDone.add(sessionID())
+        // index is still building. A build is worth retrying, since its digest
+        // comes on a later turn, and worth saying, once.
+        if (showBuild(ctx)) {
+          if (!toldBuilding) {
+            toldBuilding = true
+            ctx.ui.notify(run(['warmup-status'], ''), 'info')
+          }
           return
         }
-        if (!toldBuilding) {
-          toldBuilding = true
-          ctx.ui.notify(run(['warmup-status'], ''), 'info')
-        }
-        return
+        // With no build running the lookup is done, and this prompt goes on to
+        // prompt recall like every later one.
+        contextDone.add(sessionID())
       }
       const raw = run(
         ['hook-prompt'],
