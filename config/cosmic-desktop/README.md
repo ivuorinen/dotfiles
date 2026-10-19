@@ -49,3 +49,18 @@ Abyss Light 3). The accent is Oasis's `theme_primary`, not blue.
 
 `tests/theme-contrast.bats` checks the cosmic-term foregrounds against
 the Oasis backgrounds.
+
+## Warm Burnout (repo-derived)
+
+Upstream [warm-burnout](https://github.com/felipefdl/warm-burnout) ships no
+COSMIC themes either. These are derived the same way, from the same
+Catppuccin sources, through the colour-role map in
+`config/theme/palettes.d/warm-burnout/light/starship.toml` (Dark / Light).
+The accent and window hint are Warm Burnout's keyword orange, not blue.
+
+- `themes/cosmic-term/warm-burnout-dark.ron`, `warm-burnout-light.ron`
+- `themes/cosmic-settings/warm-burnout-dark+round.ron`,
+  `warm-burnout-light+round.ron`
+
+`tests/theme-contrast.bats` checks the cosmic-term foregrounds against
+the Warm Burnout backgrounds. Importing them is manual and untested here.

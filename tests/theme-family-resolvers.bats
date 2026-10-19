@@ -50,6 +50,13 @@ fish_theme_name()
   [ "$output" = "catppuccin-aa" ]
 }
 
+@test "fish: warm-burnout resolves to its -aa theme" {
+  command -v fish > /dev/null 2>&1 || skip "fish not installed"
+  DOTFILES_THEME_FAMILY=warm-burnout run fish_theme_name
+  [ "$status" -eq 0 ]
+  [ "$output" = "warm-burnout-aa" ]
+}
+
 @test "fish: a non-slug or themeless family prints nothing and fails" {
   command -v fish > /dev/null 2>&1 || skip "fish not installed"
   for bad in '../catppuccin' 'Kanagawa' 'nosuchfamily'; do
@@ -128,6 +135,12 @@ vim_scheme()
   command -v vim > /dev/null 2>&1 || skip "vim not installed"
   [ "$(vim_scheme dark oasis)" = "oasis_abyss_dark" ]
   [ "$(vim_scheme light oasis)" = "oasis_abyss_light" ]
+}
+
+@test "vim: warm-burnout maps dark/light to warm_burnout_dark/light" {
+  command -v vim > /dev/null 2>&1 || skip "vim not installed"
+  [ "$(vim_scheme dark warm-burnout)" = "warm_burnout_dark" ]
+  [ "$(vim_scheme light warm-burnout)" = "warm_burnout_light" ]
 }
 
 @test "vim: catppuccin maps dark/light to mocha/latte" {
@@ -232,6 +245,43 @@ nvim_scheme()
   done
 }
 
+@test "nvim: warm-burnout follows background in one colorscheme" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
+  local data
+  data="$(nvim --clean --headless '+lua io.stdout:write(vim.fn.stdpath("data"))' +qa 2> /dev/null)"
+  compgen -G "$data/site/pack/*/opt/warm-burnout" > /dev/null || skip "warm-burnout not installed"
+  [ "$(nvim_scheme warm-burnout dark)" = "warm-burnout" ]
+  [ "$(nvim_scheme warm-burnout light)" = "warm-burnout" ]
+  # Upstream ships one colorscheme per variant; the wrapper must reach the
+  # mode's palette (Normal bg) and carry the AA fixes: warn (DiagnosticWarn),
+  # accent (MatchParen) and the light terminal bright yellow (colour 11).
+  local want
+  for want in dark:1a1510:cd5d36:#ffb454 light:f5ede0:b04e2c:#8b6507; do
+    IFS=: read -r mode bg fix ansi11 <<< "$want"
+    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=warm-burnout timeout 60 nvim --headless \
+      "+set background=$mode" \
+      '+lua local function fg(n) return vim.api.nvim_get_hl(0, { name = n, link = false }).fg end io.stdout:write(string.format("%06x %06x %06x %s\n", vim.api.nvim_get_hl(0, { name = "Normal" }).bg, fg "DiagnosticWarn", fg "MatchParen", vim.g.terminal_color_11))' \
+      +qa
+    [ "${lines[${#lines[@]} - 1]}" = "$bg $fix $fix $ansi11" ]
+  done
+}
+
+@test "nvim: a missing warm-burnout plugin leaves the rest of the config running" {
+  command -v nvim > /dev/null 2>&1 || skip "nvim not installed"
+  local data
+  data="$(nvim --clean --headless '+lua io.stdout:write(vim.fn.stdpath("data"))' +qa 2> /dev/null)"
+  compgen -G "$data/site/pack/*/opt/oasis" > /dev/null || skip "oasis.nvim not installed"
+  # vim.pack.get raises for a plugin that is not installed (an install the
+  # user declined); init.lua must survive it and still theme every family.
+  local fam
+  for fam in oasis warm-burnout; do
+    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY="$fam" timeout 60 nvim --headless \
+      "+lua io.stdout:write(tostring(vim.g.colors_name) .. '\n')" +qa \
+      --cmd "lua local get = vim.pack.get; vim.pack.get = function(n, o) if n and vim.tbl_contains(n, 'warm-burnout') then error(\"Plugin 'warm-burnout' is not installed\") end return get(n, o) end"
+    [[ "${lines[${#lines[@]} - 1]}" == oasis* ]]
+  done
+}
+
 # --- wezterm ------------------------------------------------------------
 
 @test "wezterm: family selects the scheme pair; unknown falls back" {
@@ -248,7 +298,7 @@ stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
 package.loaded.wezterm = stub
 local cfg = dofile(arg[1])
-for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'nosuchfamily' } do
+for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'warm-burnout', 'nosuchfamily' } do
   vim.env.DOTFILES_THEME_FAMILY = fam
   local d, l = Scheme_for_appearance 'Dark', Scheme_for_appearance 'Light'
   for _, s in ipairs { d, l } do
@@ -265,6 +315,7 @@ LUA
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
   [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"warm-burnout=Warm Burnout Dark|Warm Burnout Light"* ]]
   [[ "$output" == *"nosuchfamily=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 

@@ -262,6 +262,7 @@ if !has('ideavim')
         \ 'kanagawa': {'dark': 'kanagawa_wave', 'light': 'kanagawa_lotus'},
         \ 'oasis': {'dark': 'oasis_abyss_dark', 'light': 'oasis_abyss_light'},
         \ 'catppuccin': {'dark': 'catppuccin_mocha', 'light': 'catppuccin_latte'},
+        \ 'warm-burnout': {'dark': 'warm_burnout_dark', 'light': 'warm_burnout_light'},
         \ }
 
   function! s:Schemes() abort

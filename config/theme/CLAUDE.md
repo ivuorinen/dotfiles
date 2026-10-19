@@ -41,7 +41,8 @@ Dark/light theming is owned by a stand-alone orchestrator:
   (`theme <family>`) and resets (`theme --reset`): it writes or removes the
   saved choice, then runs apply at the current mode.
 - `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — theme
-  assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`). A handler
+  assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`,
+  `warm-burnout`). A handler
   whose active family ships no file removes its stale link instead of
   keeping another family's palette.
 - `config/theme/tmux-palette <mode>` — sources the active family's tmux

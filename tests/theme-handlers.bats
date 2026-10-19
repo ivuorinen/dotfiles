@@ -232,6 +232,24 @@ STUB
   grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
+@test "handlers: warm-burnout resolves every palette" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  # shellcheck disable=SC2030,SC2031
+  export DOTFILES_THEME_FAMILY=warm-burnout
+  for h in starship eza gitui yazi fzf gh-dash television bat; do
+    run "$HD/$h" dark
+    [ "$status" -eq 0 ]
+  done
+  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/warm-burnout/dark/starship.toml" ]]
+  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/warm-burnout/dark/yazi.toml" ]]
+  [ -L "$HOME/.config/yazi/Warm-Burnout-Dark.tmTheme" ]
+  [ -L "$HOME/.config/yazi/Warm-Burnout-Light.tmTheme" ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Warm Burnout Dark" ]
+  grep -q "warm-burnout-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
+}
+
 @test "starship handler: swaps ~/.config/starship.toml symlink" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"

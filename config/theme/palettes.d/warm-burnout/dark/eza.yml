@@ -1,0 +1,107 @@
+# Warm Burnout Dark — derived from ../../catppuccin/dark/eza.yml by the
+# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# Source: catppuccin/eza, mocha flavor, green accent
+# https://github.com/catppuccin/eza (MIT)
+# Vendored on: 2026-04-27
+---
+colourful: true
+
+filekinds:
+  normal: {foreground: "#bfbdb6"}
+  directory: {foreground: "#b4bc78"}
+  symlink: {foreground: "#73b8ff"}
+  pipe: {foreground: "#ada69c"}
+  block_device: {foreground: "#ec9878"}
+  char_device: {foreground: "#ec9878"}
+  socket: {foreground: "#ada69c"}
+  special: {foreground: "#d4a8b8"}
+  executable: {foreground: "#b4bc78"}
+  mount_point: {foreground: "#96b898"}
+
+perms:
+  user_read: {foreground: "#f49090", is_bold: true}
+  user_write: {foreground: "#ffb454", is_bold: true}
+  user_execute_file: {foreground: "#b4bc78", is_bold: true}
+  user_execute_other: {foreground: "#b4bc78", is_bold: true}
+  group_read: {foreground: "#f49090"}
+  group_write: {foreground: "#ffb454"}
+  group_execute: {foreground: "#b4bc78"}
+  other_read: {foreground: "#f49090"}
+  other_write: {foreground: "#ffb454"}
+  other_execute: {foreground: "#b4bc78"}
+  special_user_file: {foreground: "#d4a8b8"}
+  special_other: {foreground: "#746f67"}
+  attribute: {foreground: "#a59f96"}
+
+size:
+  major: {foreground: "#b4a89c"}
+  minor: {foreground: "#90aec0"}
+  number_byte: {foreground: "#ada69c"}
+  number_kilo: {foreground: "#b4a89c"}
+  number_mega: {foreground: "#73b8ff"}
+  number_giga: {foreground: "#d4a8b8"}
+  number_huge: {foreground: "#d4a8b8"}
+  unit_byte: {foreground: "#b4a89c"}
+  unit_kilo: {foreground: "#90aec0"}
+  unit_mega: {foreground: "#d4a8b8"}
+  unit_giga: {foreground: "#d4a8b8"}
+  unit_huge: {foreground: "#96b898"}
+
+users:
+  user_you: {foreground: "#bfbdb6"}
+  user_root: {foreground: "#f49090"}
+  user_other: {foreground: "#ec9878"}
+  group_yours: {foreground: "#b4a89c"}
+  group_other: {foreground: "#a59f96"}
+  group_root: {foreground: "#f49090"}
+
+links:
+  normal: {foreground: "#73b8ff"}
+  multi_link_file: {foreground: "#73b8ff"}
+
+git:
+  new: {foreground: "#b4bc78"}
+  modified: {foreground: "#ffb454"}
+  deleted: {foreground: "#ec9878"}
+  renamed: {foreground: "#96b898"}
+  typechange: {foreground: "#ff8f40"}
+  ignored: {foreground: "#746f67"}
+  conflicted: {foreground: "#f29668"}
+
+git_repo:
+  branch_main: {foreground: "#b4a89c"}
+  branch_other: {foreground: "#d4a8b8"}
+  git_clean: {foreground: "#b4bc78"}
+  git_dirty: {foreground: "#ec9878"}
+
+security_context:
+  colon: {foreground: "#6b6860"}
+  user: {foreground: "#746f67"}
+  role: {foreground: "#d4a8b8"}
+  typ: {foreground: "#4c4126"}
+  range: {foreground: "#d4a8b8"}
+
+file_type:
+  image: {foreground: "#ffb454"}
+  video: {foreground: "#f49090"}
+  music: {foreground: "#b4bc78"}
+  lossless: {foreground: "#96b898"}
+  crypto: {foreground: "#746f67"}
+  document: {foreground: "#bfbdb6"}
+  compressed: {foreground: "#ff8f40"}
+  temp: {foreground: "#ec9878"}
+  compiled: {foreground: "#e6c08a"}
+  source: {foreground: "#73b8ff"}
+
+punctuation: {foreground: "#6b6860"}
+date: {foreground: "#ffb454"}
+inode: {foreground: "#b4a89c"}
+blocks: {foreground: "#6b6860"}
+header: {foreground: "#bfbdb6"}
+octal: {foreground: "#96b898"}
+flags: {foreground: "#d4a8b8"}
+
+symlink_path: {foreground: "#90aec0"}
+control_char: {foreground: "#e6c08a"}
+broken_symlink: {foreground: "#f49090"}
+broken_path_overlay: {foreground: "#4c4126"}

@@ -6,10 +6,10 @@ when working with code in this repository.
 ## Overview
 
 Neovim configuration using **vim.pack** (Neovim 0.12+ built-in) for plugin
-management, **oasis** (Abyss) as the default colorscheme (kanagawa and
-catppuccin as alternates, chosen by the active theme family and re-checked every
-3 s — see `config/theme/CLAUDE.md`), and **mini.nvim** as
-the foundation for many core features.
+management, **oasis** (Abyss) as the default colorscheme (kanagawa,
+catppuccin and warm-burnout as alternates, chosen by the active theme family and
+re-checked every 3 s — see `config/theme/CLAUDE.md`), and **mini.nvim** as the
+foundation for many core features.
 
 ## Load Order
 
@@ -29,17 +29,17 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 ## init.lua Sections
 
-| Section         | Content                                                |
-|-----------------|--------------------------------------------------------|
-| `-- Completion` | blink.cmp (`1.*`; completion + signature help)         |
-| `-- Editor`     | mini.nvim suite + vim-sleuth                           |
-| `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`      |
-| `-- Navigation` | trouble.nvim                                           |
-| `-- QA`         | conform.nvim (format-on-save) + nvim-lint              |
-| `-- Snacks`     | snacks.nvim: picker, terminal, input, rename, bigfile  |
-| `-- Tools`      | wakatime, shellspec, mini.comment                      |
-| `-- Treesitter` | nvim-treesitter `main` (installs parsers on open)      |
-| `-- UI`         | kanagawa, oasis, catppuccin, auto-dark-mode, colorizer |
+| Section         | Content                                               |
+|-----------------|-------------------------------------------------------|
+| `-- Completion` | blink.cmp (`1.*`; completion + signature help)        |
+| `-- Editor`     | mini.nvim suite + vim-sleuth                          |
+| `-- LSP`        | mason stack + `vim.lsp.config` / `vim.lsp.enable`     |
+| `-- Navigation` | trouble.nvim                                          |
+| `-- QA`         | conform.nvim (format-on-save) + nvim-lint             |
+| `-- Snacks`     | snacks.nvim: picker, terminal, input, rename, bigfile |
+| `-- Tools`      | wakatime, shellspec, mini.comment                     |
+| `-- Treesitter` | nvim-treesitter `main` (installs parsers on open)     |
+| `-- UI`         | 4 colorscheme families, auto-dark-mode, colorizer     |
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is

@@ -1,0 +1,37 @@
+(
+  name: "Warm Burnout Light",
+  foreground: "#3a3630",
+  cursor: "#8a6600",
+  bright_foreground: "#3a3630",
+  dim_foreground: "#938871",
+  normal: (
+    black: "#5c5750",
+    red: "#b03434",
+    green: "#4d5c1a",
+    yellow: "#855700",
+    blue: "#2868a0",
+    magenta: "#924800",
+    cyan: "#286a48",
+    white: "#e0c890"
+  ),
+  bright: (
+    black: "#544c40",
+    red: "#b03434",
+    green: "#4d5c1a",
+    yellow: "#855700",
+    blue: "#2868a0",
+    magenta: "#924800",
+    cyan: "#286a48",
+    white: "#cfdae2"
+  ),
+  dim: (
+    black: "#5c5750",
+    red: "#b03434",
+    green: "#4d5c1a",
+    yellow: "#855700",
+    blue: "#2868a0",
+    magenta: "#924800",
+    cyan: "#286a48",
+    white: "#e0c890"
+  ),
+)

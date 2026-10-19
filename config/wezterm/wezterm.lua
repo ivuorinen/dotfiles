@@ -234,18 +234,97 @@ local oasis_abyss_light_3 = {
   indexed = { [16] = '#875221', [17] = '#9e1116' },
 }
 
+-- Warm Burnout Dark and Light: upstream felipefdl/warm-burnout
+-- wezterm/warm-burnout-{dark,light}.toml (@ 6e1f75fd). The tab_bar,
+-- copy_mode and quick_select blocks are left out (the tab bar is disabled
+-- above; the other two keep WezTerm's defaults, as every other family here).
+-- Colours below WCAG AA are adjusted in lightness only (NOTICE): the accent
+-- #b8522e (split, indexed 16) and the light ANSI brights 11, 12 and 14.
+local warm_burnout_dark = {
+  foreground = '#bfbdb6',
+  background = '#1a1510',
+  cursor_bg = '#f5c56e',
+  cursor_border = '#f5c56e',
+  cursor_fg = '#1a1510',
+  selection_bg = '#33393a',
+  selection_fg = '#bfbdb6',
+  split = '#cd5d36',
+  compose_cursor = '#f5c56e',
+  scrollbar_thumb = '#3a342a',
+  visual_bell = '#ffb454',
+  ansi = {
+    '#23211b',
+    '#f06b73',
+    '#70bf56',
+    '#fdb04c',
+    '#4fbfff',
+    '#d0a1ff',
+    '#93e2c8',
+    '#c7c7c7',
+  },
+  brights = {
+    '#686868',
+    '#f07178',
+    '#aad94c',
+    '#ffb454',
+    '#59c2ff',
+    '#d2a6ff',
+    '#95e6cb',
+    '#ffffff',
+  },
+  indexed = { [16] = '#cd5d36', [17] = '#ffb454' },
+}
+
+local warm_burnout_light = {
+  foreground = '#3a3630',
+  background = '#f5ede0',
+  cursor_bg = '#8a6600',
+  cursor_border = '#8a6600',
+  cursor_fg = '#f5ede0',
+  selection_bg = '#e5e8e2',
+  selection_fg = '#3a3630',
+  split = '#b04e2c',
+  compose_cursor = '#8a6600',
+  scrollbar_thumb = '#c5beb2',
+  visual_bell = '#855700',
+  ansi = {
+    '#3a3630',
+    '#b82820',
+    '#2d6a14',
+    '#8a6000',
+    '#2060a0',
+    '#8a3090',
+    '#146858',
+    '#c0b8aa',
+  },
+  brights = {
+    '#686868',
+    '#c83028',
+    '#3a7a20',
+    '#8b6507',
+    '#286faf',
+    '#9a38a0',
+    '#1d7964',
+    '#faf6f0',
+  },
+  indexed = { [16] = '#b04e2c', [17] = '#855700' },
+}
+
 config.color_schemes = {
   ['Catppuccin Latte AA'] = latte_aa,
   ['Kanagawa Wave'] = kanagawa_wave,
   ['Kanagawa Lotus AA'] = kanagawa_lotus_aa,
   ['Oasis Abyss Dark'] = oasis_abyss_dark,
   ['Oasis Abyss Light 3'] = oasis_abyss_light_3,
+  ['Warm Burnout Dark'] = warm_burnout_dark,
+  ['Warm Burnout Light'] = warm_burnout_light,
 }
 
 local schemes = {
   kanagawa = { dark = 'Kanagawa Wave', light = 'Kanagawa Lotus AA' },
   oasis = { dark = 'Oasis Abyss Dark', light = 'Oasis Abyss Light 3' },
   catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
+  ['warm-burnout'] = { dark = 'Warm Burnout Dark', light = 'Warm Burnout Light' },
 }
 
 -- $name, or `default` when it is unset or empty, as ${name:-default} in sh.
