@@ -80,8 +80,9 @@ function run(args: string[], input: string, timeout = 10000): string {
 export default function (pi: PiApi) {
   // Once per session, not once per process: /new, a resume and a fork keep the
   // process and switch the session, and a flag set on the first one left every
-  // later session with no digest.
-  const injected = new Set<string>()
+  // later session with no digest. A session joins once its context lookup is
+  // done, whether or not that lookup found anything.
+  const contextDone = new Set<string>()
   let toldBuilding = false
   // The tool and compaction events carry no session id, and recall dedupes per
   // session: without one it repeats itself and forgets nothing. pi keeps the id
@@ -152,7 +153,7 @@ export default function (pi: PiApi) {
   pi.on('before_agent_start', (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
     try {
       remember(ctx)
-      if (!injected.has(sessionID())) {
+      if (!contextDone.has(sessionID())) {
         // The session goes with it: hook-context marks the one starting as
         // live, which keeps it out of its own MCP recall on this first turn
         // (#4394, as #4246 and #4273 did for Hermes and opencode). pi has no
@@ -176,7 +177,7 @@ export default function (pi: PiApi) {
           digest = raw
         }
         if (digest) {
-          injected.add(sessionID())
+          contextDone.add(sessionID())
           ctx.ui.setStatus('deja', '')
           // The receipt is what tells the user memory arrived; without it the
           // recall is invisible and reads as the model guessing.
@@ -194,8 +195,14 @@ export default function (pi: PiApi) {
           }
         }
         // Nothing to recall: either there is no history yet, or the first
-        // index is still building. Only the second is worth saying, once.
-        if (!toldBuilding && showBuild(ctx)) {
+        // index is still building. Only a build is worth retrying, since its
+        // digest comes on a later turn; with none running the lookup is done
+        // and later turns get prompt recall. A build is worth saying, once.
+        if (!showBuild(ctx)) {
+          contextDone.add(sessionID())
+          return
+        }
+        if (!toldBuilding) {
           toldBuilding = true
           ctx.ui.notify(run(['warmup-status'], ''), 'info')
         }
