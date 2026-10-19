@@ -1,9 +1,12 @@
 // repo-managed adaptation of `deja install pi-auto`.
-// Runs `deja-hook` from PATH so the file stays portable. The launcher resolves
+// Runs the `deja-hook` launcher that ./install links into ~/.local/bin, by its
+// absolute path so no PATH lookup decides what runs. The launcher resolves
 // $DEJA_HOOK_BIN itself, so a stale override still falls back to deja.
 import { execFileSync } from 'node:child_process'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 
-const DEJA = 'deja-hook'
+const DEJA = join(homedir(), '.local', 'bin', 'deja-hook')
 
 interface SessionManager {
   getSessionId?: () => string | undefined
