@@ -61,7 +61,8 @@ o.smartcase = true -- Smart case for search (with ignorecase)
 o.infercase = true -- Smart case for completion
 o.smartindent = true -- Auto indentation
 o.virtualedit = 'block' -- Virtual editing in visual block mode
-o.completeopt = { 'menuone', 'noselect', 'popup' } -- no auto-select; popup docs
+-- no auto-select; popup docs; fuzzy matching
+o.completeopt = { 'menu', 'menuone', 'noselect', 'popup', 'fuzzy' }
 o.formatoptions = 'qjl1' -- q=gq on comments; j=strip leader on join; l,1=no insert-break
 o.mouse = 'a' -- Enable mouse support
 o.writebackup = false -- Don't backup on write
@@ -70,6 +71,8 @@ o.pumheight = 10 -- Popup menu max height (0 = unlimited)
 o.winblend = 10 -- Transparent floating windows (0 = opaque)
 o.winborder = 'rounded' -- Default border for every float that does not set its own
 o.ruler = false -- position shown in mini.statusline; ruler in cmdline is redundant
+o.cmdheight = 0 -- cmdline hidden; ui2 (init.lua) shows it while typing a command
+o.showcmdloc = 'statusline' -- pending keys go to %S in mini.statusline (init.lua)
 
 -- Folding via treesitter (native; no plugin required)
 o.foldmethod = 'expr'

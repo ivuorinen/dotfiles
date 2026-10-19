@@ -11,6 +11,5 @@
     "HasConfig",
     "Gated"
   ],
-  "runtime.version": "LuaJIT",
-  "workspace.library": ["${3rd}/luv/library"]
+  "runtime.version": "LuaJIT"
 }
