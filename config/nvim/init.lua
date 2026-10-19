@@ -24,7 +24,8 @@ _path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
 vim.g.python3_host_prog = vim.env.HOME .. '/.local/share/mise/shims/python3'
 
 -- nvim 0.12+ niceness (private API — pcall so a future rename doesn't break startup)
-pcall(function() require('vim._core.ui2').enable {} end)
+-- cmdheight = 0 (options.lua): messages go to ui2's float, which hides after 4 s
+pcall(function() require('vim._core.ui2').enable { msg = { targets = 'msg' } } end)
 
 require 'options'
 require 'autogroups'
@@ -294,8 +295,12 @@ sl.setup {
       local filename = sl.section_filename { trunc_width = 140 }
       local fileinfo = sl.section_fileinfo { trunc_width = 9999 }
       local location = sl.section_location { trunc_width = 9999 }
+      local search = sl.section_searchcount { trunc_width = 75 }
+      -- cmdheight = 0 hides ui2's "recording @q", so the statusline carries it
+      local reg = vim.fn.reg_recording()
+      local recording = reg ~= '' and ('recording @' .. reg) or ''
       return sl.combine_groups {
-        { hl = mode_hl, strings = { mode } },
+        { hl = mode_hl, strings = { mode, recording } },
         {
           hl = 'MiniStatuslineDevinfo',
           strings = { git, lsp },
@@ -303,13 +308,14 @@ sl.setup {
         '%<', -- Mark general truncate point
         { hl = 'statuslineFilename', strings = { filename } },
         '%=', -- End left alignment
+        '%S', -- Pending keys ('showcmdloc' in options.lua)
         { hl = 'statuslineFileinfo', strings = { diagnostics } },
         { hl = 'statuslineFileinfo', strings = { fileinfo } },
         {
           hl = 'MiniStatuslineDevinfo',
           strings = { fmt, lsp_status },
         },
-        { hl = mode_hl, strings = { location } },
+        { hl = mode_hl, strings = { search, location } },
       }
     end,
   },
