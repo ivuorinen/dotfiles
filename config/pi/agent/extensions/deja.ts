@@ -1,8 +1,9 @@
 // repo-managed adaptation of `deja install pi-auto`.
-// Uses `deja-hook` from PATH (or $DEJA_HOOK_BIN) so the file stays portable
+// Runs `deja-hook` from PATH so the file stays portable. The launcher resolves
+// $DEJA_HOOK_BIN itself, so a stale override still falls back to deja.
 import { execFileSync } from 'node:child_process'
 
-const DEJA = process.env.DEJA_HOOK_BIN || 'deja-hook'
+const DEJA = 'deja-hook'
 
 type SessionManager = {
   getSessionId?: () => string | undefined
