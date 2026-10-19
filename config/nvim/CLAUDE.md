@@ -135,8 +135,9 @@ that differ from nvim-lspconfig's defaults — typically `settings`,
 `tailwindcss`, `yamlls`.
 
 **Lua API completions:** `lsp/lua_ls.lua` sets `workspace.library = { vim.env.VIMRUNTIME }`
-directly. Known globals are declared in `.luarc.json` (`diagnostics.globals`). `lazydev.nvim`
-is not installed.
+directly. Known globals are declared in `.luarc.json` (`diagnostics.globals`). Never set
+`workspace.library` in `.luarc.json`: lua_ls lets it replace the client's list, which drops
+`$VIMRUNTIME` and leaves `vim` typed `unknown`. `lazydev.nvim` is not installed.
 
 **Default keymaps** (nvim 0.11): `grn` (rename), `gra` (code action),
 `grr` (references), `gri` (implementations) work out of the box.
