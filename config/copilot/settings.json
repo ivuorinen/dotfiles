@@ -1,5 +1,10 @@
 {
   "enabledPlugins": {},
   "allowedUrls": ["http://localhost:4200"],
-  "theme": "default"
+  "theme": "default",
+  "statusLine": {
+    "command": "deja-hook statusline",
+    "refreshInterval": 1,
+    "type": "command"
+  }
 }

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#USAGE about "Run deja for agent hooks; exit 0 when deja is not installed"
+#USAGE arg "[args]" help="Arguments passed through to deja" var=#true
+
+# Dotfiles-managed wrapper for Pi's deja extension.
+# Resolve the real deja binary at runtime so updates can move it without
+# rewriting tracked config, and so the extension can call a stable PATH name.
+
+if [[ -n ${DEJA_HOOK_BIN:-} && -x ${DEJA_HOOK_BIN} ]]; then
+  exec "$DEJA_HOOK_BIN" "$@"
+fi
+
+if [[ -n ${DEJA_BIN:-} && -x ${DEJA_BIN} ]]; then
+  exec "$DEJA_BIN" "$@"
+fi
+
+deja_bin=$(command -v deja 2> /dev/null || true)
+if [[ -n $deja_bin ]]; then
+  exec "$deja_bin" "$@"
+fi
+
+# deja is optional; return an empty success like deja's generated wrapper does.
+exit 0

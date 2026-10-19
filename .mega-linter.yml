@@ -17,6 +17,7 @@ DISABLE_LINTERS:
   - JAVASCRIPT_ES # using biome
   - JAVASCRIPT_PRETTIER # using biome
   - TYPESCRIPT_PRETTIER # using biome
+  - TYPESCRIPT_STANDARD # using biome
   - JSON_PRETTIER # using biome
   - PYTHON_BLACK # using ruff
   - PYTHON_FLAKE8 # using ruff
