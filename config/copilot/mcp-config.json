@@ -1,3 +1,10 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "deja": {
+      "args": ["mcp"],
+      "command": "deja",
+      "tools": ["*"],
+      "type": "local"
+    }
+  }
 }

@@ -77,9 +77,16 @@ cr.md
 config/copilot/*
 !config/copilot/copilot-instructions.md
 !config/copilot/hooks/
+config/copilot/hooks/*
+!config/copilot/hooks/context-mode.json
+!config/copilot/hooks/deja.json
 !config/copilot/mcp-config.json
 !config/copilot/settings.json
 !config/copilot/skills/
+config/copilot/skills/*
+!config/copilot/skills/deja-history/
+config/copilot/skills/deja-history/*
+!config/copilot/skills/deja-history/SKILL.md
 
 # pi.dev coding harness
 config/pi/*

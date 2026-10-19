@@ -1,0 +1,63 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "bash": "deja-hook hook-precompact",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "postToolUse": [
+      {
+        "bash": "deja-hook hook-tool-after --copilot",
+        "matcher": "bash|powershell",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "bash": "deja-hook hook-tool-after --copilot",
+        "matcher": "bash|powershell",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "preMcpToolCall": [
+      {
+        "bash": "deja-hook hook-mcp-call",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "preToolUse": [
+      {
+        "bash": "deja-hook hook-tool --copilot",
+        "matcher": "bash|powershell|edit|create",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "bash": "deja-hook hook-session-end",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "sessionStart": [
+      {
+        "bash": "deja-hook hook-context --copilot",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ],
+    "userPromptSubmitted": [
+      {
+        "bash": "deja-hook hook-prompt --copilot",
+        "timeoutSec": 10,
+        "type": "command"
+      }
+    ]
+  }
+}
