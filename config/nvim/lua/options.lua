@@ -61,7 +61,8 @@ o.smartcase = true -- Smart case for search (with ignorecase)
 o.infercase = true -- Smart case for completion
 o.smartindent = true -- Auto indentation
 o.virtualedit = 'block' -- Virtual editing in visual block mode
-o.completeopt = { 'menuone', 'noselect', 'popup' } -- no auto-select; popup docs
+-- no auto-select; popup docs; fuzzy matching
+o.completeopt = { 'menu', 'menuone', 'noselect', 'popup', 'fuzzy' }
 o.formatoptions = 'qjl1' -- q=gq on comments; j=strip leader on join; l,1=no insert-break
 o.mouse = 'a' -- Enable mouse support
 o.writebackup = false -- Don't backup on write
