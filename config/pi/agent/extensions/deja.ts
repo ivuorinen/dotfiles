@@ -5,14 +5,14 @@ import { execFileSync } from 'node:child_process'
 
 const DEJA = 'deja-hook'
 
-type SessionManager = {
+interface SessionManager {
   getSessionId?: () => string | undefined
   sessionId?: string
   getSessionFile?: () => string | undefined
   sessionFile?: string
 }
 
-type ExtensionContext = {
+interface ExtensionContext {
   sessionManager?: SessionManager
   ui: {
     setStatus: (name: string, status: string) => void
@@ -20,28 +20,28 @@ type ExtensionContext = {
   }
 }
 
-type PiApi = {
+interface PiApi {
   on: (...args: unknown[]) => void
   registerCommand: (...args: unknown[]) => void
 }
 
-type BeforeAgentStartEvent = {
+interface BeforeAgentStartEvent {
   prompt?: string
 }
 
-type HookResponse = {
+interface HookResponse {
   systemMessage?: string
   hookSpecificOutput?: {
     additionalContext?: string
   }
 }
 
-type ToolTextPart = {
+interface ToolTextPart {
   type: 'text'
   text: string
 }
 
-type ToolResultEvent = {
+interface ToolResultEvent {
   toolName?: string
   input?: {
     path?: string
@@ -94,7 +94,9 @@ export default function (pi: PiApi) {
         ? manager.getSessionFile()
         : manager?.sessionFile
       if (file) sessionFile = String(file)
-    } catch {}
+    } catch {
+      // memory is optional: never break the session over it
+    }
   }
   const sessionID = () => session
 
@@ -111,7 +113,7 @@ export default function (pi: PiApi) {
     return false
   }
 
-  pi.on('session_start', async (_event: unknown, ctx: ExtensionContext) => {
+  pi.on('session_start', (_event: unknown, ctx: ExtensionContext) => {
     try {
       remember(ctx)
       showBuild(ctx)
@@ -124,10 +126,10 @@ export default function (pi: PiApi) {
   // who never read the docs finds this at all.
   pi.registerCommand('deja', {
     description: 'Search your own past coding sessions',
-    handler: async (args: string, ctx: ExtensionContext) => {
+    handler: (args: string, ctx: ExtensionContext) => {
       const query = (args || '').trim()
       if (!query) {
-        ctx.ui.notify('Usage: /deja <what you are looking for>', 'info')
+        ctx.ui.notify('Usage: /deja followed by what you are looking for', 'info')
         return
       }
       // The user is waiting on this one, so it may outlive the hook budget:
@@ -144,77 +146,74 @@ export default function (pi: PiApi) {
     },
   })
 
-  pi.on(
-    'before_agent_start',
-    async (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
-      try {
-        remember(ctx)
-        if (!injected.has(sessionID())) {
-          // The session goes with it: hook-context marks the one starting as
-          // live, which keeps it out of its own MCP recall on this first turn
-          // (#4394, as #4246 and #4273 did for Hermes and opencode). pi has no
-          // MCP of its own, so the lead names the shell command, not the tool
-          // (#4584).
-          const raw = run(
-            ['hook-context'],
-            JSON.stringify({
-              session_id: sessionID(),
-              cwd: process.cwd(),
-              deja_shell: true,
-            }),
-          )
-          let digest = ''
-          let receipt = ''
-          try {
-            const parsed = JSON.parse(raw) as HookResponse
-            digest = parsed.hookSpecificOutput?.additionalContext || ''
-            receipt = parsed.systemMessage || ''
-          } catch {
-            digest = raw
-          }
-          if (digest) {
-            injected.add(sessionID())
-            ctx.ui.setStatus('deja', '')
-            // The receipt is what tells the user memory arrived; without it the
-            // recall is invisible and reads as the model guessing.
-            if (receipt) ctx.ui.notify(receipt, 'info')
-            // pi keeps the footer until it is cleared, so the session carries a
-            // quiet reminder that memory is on rather than a one-off toast.
-            const stats = run(['statusline'], '')
-            if (stats) ctx.ui.setStatus('deja', stats)
-            return {
-              message: {
-                customType: 'deja-recall',
-                content: digest,
-                display: false,
-              },
-            }
-          }
-          // Nothing to recall: either there is no history yet, or the first
-          // index is still building. Only the second is worth saying, once.
-          if (!toldBuilding && showBuild(ctx)) {
-            toldBuilding = true
-            ctx.ui.notify(run(['warmup-status'], ''), 'info')
-          }
-          return
-        }
+  pi.on('before_agent_start', (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
+    try {
+      remember(ctx)
+      if (!injected.has(sessionID())) {
+        // The session goes with it: hook-context marks the one starting as
+        // live, which keeps it out of its own MCP recall on this first turn
+        // (#4394, as #4246 and #4273 did for Hermes and opencode). pi has no
+        // MCP of its own, so the lead names the shell command, not the tool
+        // (#4584).
         const raw = run(
-          ['hook-prompt'],
-          JSON.stringify({ prompt: event.prompt || '', session_id: sessionID() }),
+          ['hook-context'],
+          JSON.stringify({
+            session_id: sessionID(),
+            cwd: process.cwd(),
+            deja_shell: true,
+          }),
         )
-        if (!raw) return
-        const resp = JSON.parse(raw) as HookResponse
-        if (resp.systemMessage) ctx.ui.notify(resp.systemMessage, 'info')
-        const extra = resp.hookSpecificOutput?.additionalContext
-        if (!extra) return
-        return {
-          message: { customType: 'deja-recall', content: extra, display: false },
+        let digest = ''
+        let receipt = ''
+        try {
+          const parsed = JSON.parse(raw) as HookResponse
+          digest = parsed.hookSpecificOutput?.additionalContext ?? ''
+          receipt = parsed.systemMessage ?? ''
+        } catch {
+          digest = raw
         }
-      } catch {
-        // memory is optional: never break the session over it
+        if (digest) {
+          injected.add(sessionID())
+          ctx.ui.setStatus('deja', '')
+          // The receipt is what tells the user memory arrived; without it the
+          // recall is invisible and reads as the model guessing.
+          if (receipt) ctx.ui.notify(receipt, 'info')
+          // pi keeps the footer until it is cleared, so the session carries a
+          // quiet reminder that memory is on rather than a one-off toast.
+          const stats = run(['statusline'], '')
+          if (stats) ctx.ui.setStatus('deja', stats)
+          return {
+            message: {
+              customType: 'deja-recall',
+              content: digest,
+              display: false,
+            },
+          }
+        }
+        // Nothing to recall: either there is no history yet, or the first
+        // index is still building. Only the second is worth saying, once.
+        if (!toldBuilding && showBuild(ctx)) {
+          toldBuilding = true
+          ctx.ui.notify(run(['warmup-status'], ''), 'info')
+        }
+        return
       }
-    },
-  )
+      const raw = run(
+        ['hook-prompt'],
+        JSON.stringify({ prompt: event.prompt ?? '', session_id: sessionID() }),
+      )
+      if (!raw) return
+      const resp = JSON.parse(raw) as HookResponse
+      if (resp.systemMessage) ctx.ui.notify(resp.systemMessage, 'info')
+      const extra = resp.hookSpecificOutput?.additionalContext
+      if (!extra) return
+      return {
+        message: { customType: 'deja-recall', content: extra, display: false },
+      }
+    } catch {
+      // memory is optional: never break the session over it
+    }
+  })
 
   // The other half of the point of action: a command has just failed, and this
   // machine has fixed that same error before. pi hands tool_result the content
@@ -222,10 +221,9 @@ export default function (pi: PiApi) {
   // goes in beside the error in the same turn. tool_execution_start and
   // tool_execution_end are observe-only — their return reaches nothing — which
   // is why this is the one that carries it.
-  const repaired: Record<string, string> = {}
-  pi.on('tool_result', async (event: ToolResultEvent) => {
+  const repaired = new Map<string, string>()
+  pi.on('tool_result', (event: ToolResultEvent) => {
     try {
-      if (!event) return
       // A file the agent just opened is the step before it changes that file,
       // and pi has no handler that runs earlier whose return the model reads.
       // So the file's own history goes out here: what was decided about it,
@@ -237,22 +235,25 @@ export default function (pi: PiApi) {
         event.toolName === 'edit' ||
         event.toolName === 'write'
       ) {
-        const path = String(event.input?.path || event.input?.file_path || '')
+        const path = String(event.input?.path ?? event.input?.file_path ?? '')
         if (!path) return
         const parts = Array.isArray(event.content) ? event.content : []
-        const id = `file:${String(event.toolCallId || '')}`
-        if (!(id in repaired)) {
-          repaired[id] = run(
-            ['hook-tool', '--plain'],
-            JSON.stringify({
-              tool_name: event.toolName,
-              tool_input: { file_path: path },
-              session_id: sessionID(),
-              cwd: process.cwd(),
-            }),
+        const id = `file:${String(event.toolCallId ?? '')}`
+        if (!repaired.has(id)) {
+          repaired.set(
+            id,
+            run(
+              ['hook-tool', '--plain'],
+              JSON.stringify({
+                tool_name: event.toolName,
+                tool_input: { file_path: path },
+                session_id: sessionID(),
+                cwd: process.cwd(),
+              }),
+            ),
           )
         }
-        const note = repaired[id]
+        const note = repaired.get(id)
         if (!note) return
         return { content: parts.concat([{ type: 'text', text: note }]) }
       }
@@ -265,19 +266,22 @@ export default function (pi: PiApi) {
         .map((part) => part.text)
         .join('\n')
       if (!output.trim()) return
-      const id = String(event.toolCallId || '')
-      if (!(id in repaired)) {
-        repaired[id] = run(
-          ['hook-tool-after', '--plain'],
-          JSON.stringify({
-            tool_name: event.toolName,
-            tool_response: output,
-            session_id: sessionID(),
-            cwd: process.cwd(),
-          }),
+      const id = String(event.toolCallId ?? '')
+      if (!repaired.has(id)) {
+        repaired.set(
+          id,
+          run(
+            ['hook-tool-after', '--plain'],
+            JSON.stringify({
+              tool_name: event.toolName,
+              tool_response: output,
+              session_id: sessionID(),
+              cwd: process.cwd(),
+            }),
+          ),
         )
       }
-      const line = repaired[id]
+      const line = repaired.get(id)
       if (!line) return
       return { content: parts.concat([{ type: 'text', text: line }]) }
     } catch {
@@ -291,7 +295,7 @@ export default function (pi: PiApi) {
   // allowed to see those blocks again. The session file keeps the turns the
   // summary replaced, so deja reads them from it and the next prompt carries
   // what the agent was in the middle of.
-  pi.on('session_compact', async (_event: unknown, ctx: ExtensionContext) => {
+  pi.on('session_compact', (_event: unknown, ctx: ExtensionContext) => {
     try {
       remember(ctx)
       run(
@@ -302,17 +306,21 @@ export default function (pi: PiApi) {
           cwd: process.cwd(),
         }),
       )
-    } catch {}
+    } catch {
+      // memory is optional: never break the session over it
+    }
   })
 
   // The session is over: quit, /new, /resume, /fork or a reload. Its live
   // stamp goes with it, so the next session's MCP recall can answer with it
   // now rather than twenty minutes from now (#4210). The id is the one this
   // extension saw last; on a switch ctx may already name the next session.
-  pi.on('session_shutdown', async (_event: unknown) => {
+  pi.on('session_shutdown', () => {
     try {
       const id = sessionID()
       if (id) run(['hook-session-end'], JSON.stringify({ session_id: id }), 2000)
-    } catch {}
+    } catch {
+      // memory is optional: never break the session over it
+    }
   })
 }
