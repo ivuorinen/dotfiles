@@ -559,6 +559,13 @@ fi
 
 # mise — unified tool version manager
 # https://mise.jdx.dev
+#
+# Platform config environments (unix, macos, linux, macos-arm64, …), so files
+# such as conf.d/brew/mise.macos.toml load on the matching OS. miserc.toml sets
+# the same for processes outside these shells; the variable also wins over any
+# project .miserc.toml. Exported before the check below so a mise that
+# `dfm install mise` puts on PATH later in this process sees it too.
+export MISE_AUTO_ENV=true
 if command -v mise &> /dev/null; then
   if [[ -n "${ZSH_VERSION:-}" ]]; then
     eval "$(env -u MISE_SHELL SHELL=zsh mise activate zsh)"

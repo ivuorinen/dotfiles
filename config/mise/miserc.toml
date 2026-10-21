@@ -3,5 +3,7 @@
 #
 # auto_env turns on the platform environments (unix, macos, macos-arm64, …),
 # which load files such as conf.d/brew/mise.macos.toml. It is the default from
-# mise 2027.6.0; setting it now adopts that behaviour early.
+# mise 2027.6.0; setting it now adopts that behaviour early. The shells also
+# export MISE_AUTO_ENV=true (config/exports, config/fish/exports.fish), which
+# overrides any project .miserc.toml.
 auto_env = true

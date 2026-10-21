@@ -112,6 +112,11 @@ set -e GOROOT
 # 1Password configuration
 set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 
+# mise platform config environments (unix, macos, linux, macos-arm64, …), so
+# conf.d/brew/mise.macos.toml loads on macOS. Mirrors config/exports;
+# config/mise/miserc.toml sets the same outside these shells.
+set -gx MISE_AUTO_ENV true
+
 # Set precompiled Python arch+OS so mise downloads the right binary
 # Each output line from mise-python-arch has the format: export KEY="value"
 if command -v mise-python-arch >/dev/null 2>&1

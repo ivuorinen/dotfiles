@@ -66,7 +66,9 @@ brew bootstrap instead of the `brew` CLI. They live under
 Homebrew prefix (`/opt/homebrew`), so paths match a native
 `brew install`. `mise.toml` there holds the formulae every platform gets;
 `mise.macos.toml` holds the macOS-only ones and loads through the
-`auto_env = true` platform environment set in `config/mise/miserc.toml`.
+`auto_env = true` platform environment set in `config/mise/miserc.toml`
+and exported as `MISE_AUTO_ENV=true` by `config/exports` and
+`config/fish/exports.fish`.
 
 | Command                                       | Does                                     |
 |-----------------------------------------------|------------------------------------------|
