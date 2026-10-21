@@ -1,0 +1,31 @@
+# homelab
+# vim: ft=sshconfig
+
+Host macmini01
+  User ubuntu
+  HostName macmini.h.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
+
+Host nuc2
+  User ubuntu
+  HostName nuc2.h.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
+
+# clovers (4 x Raspberry Pi cluster)
+# https://www.kickstarter.com/projects/cloverpi/cloverpi-take-your-raspberry-pi-to-the-next-level
+Host clover01
+  User ubuntu
+  HostName clover01.c.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
+Host clover02
+  User ubuntu
+  HostName clover02.c.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
+Host clover03
+  User ubuntu
+  HostName clover03.c.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
+Host clover04
+  User ubuntu
+  HostName clover04.c.9b11.xyz
+  IdentityFile ~/.ssh/id_rsa
