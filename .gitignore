@@ -79,7 +79,6 @@ config/copilot/*
 !config/copilot/hooks/
 config/copilot/hooks/*
 !config/copilot/hooks/context-mode.json
-!config/copilot/hooks/deja.json
 !config/copilot/mcp-config.json
 !config/copilot/settings.json
 !config/copilot/skills/
