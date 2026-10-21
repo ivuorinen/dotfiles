@@ -17,7 +17,8 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 1. `lua/options.lua` — vim options, leader key (Space), nerd font flag
 2. `lua/autogroups.lua` — autocmds (yank highlight, close-with-q, filetype tweaks,
-    PackChanged, sessions, linting trigger)
+    PackChanged, sessions, linting trigger, otter activation) plus the
+    `is-mise?` treesitter predicate used by `after/queries/toml/`
 3. `lua/utils.lua` — registers K, HasConfig, Gated, TOOL_CONFIGS globals
 4. `lua/keymaps.lua` — all non-plugin keybindings
 5. `lua/pack.lua` — PackUpdate / PackRemove user commands (vim.pack built-in,

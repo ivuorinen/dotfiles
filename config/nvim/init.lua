@@ -37,8 +37,8 @@ require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
 -- version = vim.version.range is set only on plugins that publish
--- semver-tagged releases (snacks.nvim, blink.cmp). The remaining plugins
--- have no tags vim.pack can constrain, so they track their default branch.
+-- semver-tagged releases (snacks.nvim, blink.cmp, otter.nvim). The remaining
+-- plugins have no tags vim.pack can constrain, so they track their default branch.
 vim.pack.add {
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/tpope/vim-sleuth',
@@ -57,6 +57,7 @@ vim.pack.add {
   'https://github.com/ivuorinen/nvim-shellspec',
   -- Branch pin, not a range: the semver tags are the frozen `master` API
   { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
+  { src = 'https://github.com/jmbuhr/otter.nvim', version = vim.version.range '*' },
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
   { src = 'https://github.com/rebelot/kanagawa.nvim', name = 'kanagawa' },
   { src = 'https://github.com/uhs-robert/oasis.nvim', name = 'oasis' },
@@ -388,6 +389,26 @@ require('mason-tool-installer').setup {
 -- mason-lspconfig (above) auto-enables all mason-installed servers.
 -- Enable mise-managed servers that mason cannot see.
 vim.lsp.enable { 'fish_lsp', 'taplo', 'zizmor' }
+
+-- otter.nvim (activated in lua/autogroups.lua) copies each embedded chunk to
+-- column 0 of its hidden buffer but forwards LSP positions unchanged, so a chunk
+-- that starts mid-line (every inline `run = "…"` in a mise.toml) gets hover,
+-- completion and diagnostics at the wrong column. Pad the first line back out.
+-- ponytail: wraps an otter internal; drop it once otter keeps the start column.
+local otter_keeper = require 'otter.keeper'
+local extract_code_chunks = otter_keeper.extract_code_chunks
+otter_keeper.extract_code_chunks = function(...)
+  local chunks = extract_code_chunks(...)
+  for _, lang_chunks in pairs(chunks) do
+    for _, chunk in ipairs(lang_chunks) do
+      local col = chunk.range.from[2]
+      if col > 0 and chunk.text[1] then
+        chunk.text[1] = (' '):rep(col) .. chunk.text[1]
+      end
+    end
+  end
+  return chunks
+end
 
 -- ── Navigation ───────────────────────────────────────────────────────
 -- Fuzzy finding is handled by snacks.nvim (below).

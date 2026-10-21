@@ -147,6 +147,17 @@ vim.treesitter.query.add_predicate(
   { force = true }
 )
 
+-- LSP for embedded code (mise run scripts, markdown code blocks): otter.nvim
+-- mirrors each injected language into a hidden buffer its server attaches to.
+-- https://github.com/jmbuhr/otter.nvim
+autocmd('FileType', {
+  group = augroup('otter', { clear = true }),
+  pattern = { 'markdown', 'toml' },
+  callback = function(ev)
+    if ev.match == 'markdown' or is_mise(ev.buf) then require('otter').activate() end
+  end,
+})
+
 -- ── Diagnostic Config ────────────────────────────────────────────────
 vim.diagnostic.config {
   severity_sort = true,

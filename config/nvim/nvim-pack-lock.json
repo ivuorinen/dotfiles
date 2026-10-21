@@ -66,6 +66,11 @@
       "rev": "a3ef178fe47c69691e676a8da98ce5735c3013db",
       "src": "https://github.com/uhs-robert/oasis.nvim"
     },
+    "otter.nvim": {
+      "rev": "6f05811621460eca983bf2cd877e63c59a40720e",
+      "src": "https://github.com/jmbuhr/otter.nvim",
+      "version": ">=0.0.0"
+    },
     "snacks.nvim": {
       "rev": "e6fd58c82f2f3fcddd3fe81703d47d6d48fc7b9f",
       "src": "https://github.com/folke/snacks.nvim",

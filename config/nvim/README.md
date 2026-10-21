@@ -219,6 +219,13 @@ From the [mise cookbook](https://mise.jdx.dev/mise-cookbook/neovim.html):
   and `php_only` (inherited by php) takes both markers. Keep the copies equal.
   Lua is absent because mise reads only `#`, `//` and `::` markers.
 
+**otter.nvim** — `https://github.com/jmbuhr/otter.nvim` (latest semver tag)
+
+Gives LSP to embedded code: mise `run` scripts and markdown code blocks. It
+mirrors each injected language into a hidden buffer that the language's own
+server attaches to. A `FileType` autocmd in `lua/autogroups.lua` activates it
+in markdown and mise TOML buffers.
+
 ## UI
 
 | Plugin              | Role                                                                       |
