@@ -201,6 +201,7 @@ pi = "1.3.0"
 "npm:@tobilu/qmd" = "2.8.3"
 "aqua:SonarSource/sonarqube-cli" = "1.10.0.16040"
 "npm:@vshulcz/deja-vu" = "0.22.2"
+lefthook = "2.2.2"
 
 # Homebrew formulae installed by mise's experimental brew bootstrap, without
 # requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
