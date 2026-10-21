@@ -198,11 +198,26 @@ starts highlighting and indentation; folding uses the built-in
 The `install {}` list in the `-- Treesitter` section of `init.lua` covers what
 that autocmd cannot reach: the parsers Neovim bundles (`lua`, `markdown`,
 `query`, `vim`, `vimdoc` — listed so their indent queries are installed) and
-injection-only languages (`luadoc`, `regex`). A `PackChanged` autocmd runs
-`:TSUpdate` when vim.pack updates the plugin. `:TSInstall`, `:TSUninstall` and
-`:checkhealth nvim-treesitter` manage and inspect parsers by hand.
+injection-only languages (`luadoc`, `regex`, plus `bash`, `kdl` and `toml` for the
+mise injections below). A `PackChanged` autocmd runs `:TSUpdate` when vim.pack
+updates the plugin. `:TSInstall`, `:TSUninstall` and `:checkhealth nvim-treesitter`
+manage and inspect parsers by hand.
 
 Building parsers needs `tree-sitter` CLI (a global mise tool) and a C compiler.
+
+### mise files
+
+From the [mise cookbook](https://mise.jdx.dev/mise-cookbook/neovim.html):
+
+- `after/queries/toml/injections.scm` highlights string `run` values in mise
+  files as the language their shebang names, else bash. The `is-mise?`
+  predicate in `lua/autogroups.lua` keeps other TOML files plain.
+- `after/queries/<lang>/injections.scm` highlights file-task headers, with
+  `#MISE`/`//MISE` lines as TOML and `#USAGE`/`//USAGE` lines as KDL. The `#`
+  copies are `bash`, `zsh`, `fish`, `python` and `perl`. The `//` copies are
+  `ecma` (javascript, typescript, tsx) and `go`. `rust` matches `line_comment`,
+  and `php_only` (inherited by php) takes both markers. Keep the copies equal.
+  Lua is absent because mise reads only `#`, `//` and `::` markers.
 
 ## UI
 

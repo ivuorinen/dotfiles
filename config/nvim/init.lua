@@ -577,12 +577,16 @@ require('mini.comment').setup()
 -- load, so it never installs them, yet Neovim ships no indents.scm and
 -- nvim-treesitter links its queries only for languages it installs), and
 -- languages seen only as injections. install() is a no-op once installed.
+-- bash, kdl and toml back the mise injections in after/queries/.
 require('nvim-treesitter').install {
+  'bash',
+  'kdl',
   'lua',
   'luadoc',
   'markdown',
   'query',
   'regex',
+  'toml',
   'vim',
   'vimdoc',
 }

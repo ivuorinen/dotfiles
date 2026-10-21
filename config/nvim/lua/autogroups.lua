@@ -129,6 +129,24 @@ autocmd('FileType', {
   end,
 })
 
+-- ── mise files ───────────────────────────────────────────────────────
+-- https://mise.jdx.dev/mise-cookbook/neovim.html
+-- mise.toml, .mise.local.toml, mise/config*.toml, mise/conf.d/*.toml
+local function is_mise(buf)
+  local path = vim.api.nvim_buf_get_name(buf)
+  return vim.fs.basename(path):match '^%.?mise.*%.toml$' ~= nil
+    or path:match '/%.?mise/config[^/]*%.toml$' ~= nil
+    or path:match '/%.?mise/conf%.d/[^/]+%.toml$' ~= nil
+end
+
+-- Gates the run-script injections in after/queries/toml/injections.scm so
+-- other TOML files stay plain. A string source (get_string_parser) has no file.
+vim.treesitter.query.add_predicate(
+  'is-mise?',
+  function(_, _, source) return type(source) == 'number' and is_mise(source) end,
+  { force = true }
+)
+
 -- ── Diagnostic Config ────────────────────────────────────────────────
 vim.diagnostic.config {
   severity_sort = true,
