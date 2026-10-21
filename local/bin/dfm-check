@@ -10,7 +10,7 @@
 #USAGE     arg "[hostname]" help="Hostname to check against"
 #USAGE   }
 #USAGE   cmd "all" help="Run brew, mise, tools, perms, updates, and disk checks"
-#USAGE   cmd "brew" help="Verify all Brewfile packages are installed"
+#USAGE   cmd "brew" help="Verify Brewfile and mise bootstrap packages are installed"
 #USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
 #USAGE   cmd "perms" help="Verify declared directory and secret-file modes" {
@@ -48,7 +48,7 @@ dfm_check()
     "arch <arch>:Empty <arch> returns current. Exit code 0=match to current, 1=no match."
     "host <host>:Empty <host> returns current. Exit code 0=match to current, 1=no match."
     "all:Run brew, mise, tools, perms, updates, and disk checks in sequence"
-    "brew:Verify all Brewfile packages are installed"
+    "brew:Verify Brewfile and mise bootstrap packages are installed"
     "disk:Show disk usage for mise installs and brew cache"
     "mise:Run mise doctor to check mise health"
     "perms [--fix]:Verify declared directory and secret-file modes; --fix repairs drift"
@@ -276,6 +276,16 @@ dfm_check()
         return 1
       fi
       msgr yay "All Brewfile packages installed"
+      # The homebrew/core formulae mise installs (config/mise/conf.d/brew/).
+      # `dfm install mise` applies them on macOS only, so only check there.
+      if [[ "$(uname -s)" == "Darwin" ]] && command -v mise > /dev/null 2>&1; then
+        msgr run "Checking mise bootstrap packages..."
+        if ! mise bootstrap packages status --missing > /dev/null; then
+          msgr err "Some mise bootstrap packages missing — see 'mise bootstrap packages status', then run 'dfm install mise'"
+          return 1
+        fi
+        msgr yay "All mise bootstrap packages installed"
+      fi
       ;;
 
     disk)
