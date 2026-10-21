@@ -241,10 +241,12 @@ dfm_install()
         || msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
       mise reshim \
         || msgr warn "mise reshim failed (non-fatal)"
-      # Apply [bootstrap.packages] — Homebrew formulae mise installs into the
-      # canonical prefix (/opt/homebrew) without the brew CLI. macOS-only, since
-      # these mirror the macOS Brewfile; scoped to the brew manager and kept
-      # non-fatal because the feature is experimental.
+      # Apply [bootstrap.packages] (config/mise/conf.d/brew/) — Homebrew
+      # formulae mise installs into the canonical prefix (/opt/homebrew) without
+      # the brew CLI. The macOS-only ones sit in mise.macos.toml, which auto_env
+      # loads on macOS alone; the gate stays because Linux hosts get their
+      # packages from apt/dnf, not a linuxbrew prefix. Scoped to the brew
+      # manager and kept non-fatal because the feature is experimental.
       if [[ "$(uname -s)" == "Darwin" ]]; then
         msgr nested "Applying mise bootstrap brew packages..."
         mise bootstrap packages apply --manager brew --yes \
