@@ -19,6 +19,11 @@ test -e "$HOME/.config/fish/alias.fish" &&
 test -e "$HOME/.config/fish/exports.fish" &&
     source "$HOME/.config/fish/exports.fish"
 
+# Homebrew before mise, as in config/exports: `brew shellenv` moves
+# /opt/homebrew/bin to the front of PATH, so run after mise it would shadow
+# every mise tool Homebrew also ships (python3, pip3, corepack, yarn, …).
+test -x /opt/homebrew/bin/brew; and eval "$(/opt/homebrew/bin/brew shellenv fish)"
+
 if status is-interactive
     # Commands to run in interactive shell
 
@@ -106,7 +111,6 @@ end
 if status is-interactive; and not set -q GITHUB_TOKEN
     echo "Warning: GITHUB_TOKEN is not set" >&2
 end
-test -x /opt/homebrew/bin/brew; and eval "$(/opt/homebrew/bin/brew shellenv fish)"
 
 # Spawn the theme orchestrator watcher (no-op if one is already running;
 # the watcher self-locks). Skip in SSH sessions — the remote OS is the
