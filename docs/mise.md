@@ -61,10 +61,12 @@ a system or Homebrew path.
 
 Plain `homebrew/core` CLI formulae are installed by mise's experimental
 brew bootstrap instead of the `brew` CLI. They live under
-`[bootstrap.packages]` in `config/mise/config.toml` as
+`[bootstrap.packages]` in the `config/mise/conf.d/brew/` folder fragment as
 `"brew:<formula>" = "latest"`, and mise pours them into the canonical
 Homebrew prefix (`/opt/homebrew`), so paths match a native
-`brew install`.
+`brew install`. `mise.toml` there holds the formulae every platform gets;
+`mise.macos.toml` holds the macOS-only ones and loads through the
+`auto_env = true` platform environment set in `config/mise/miserc.toml`.
 
 | Command                                       | Does                                     |
 |-----------------------------------------------|------------------------------------------|

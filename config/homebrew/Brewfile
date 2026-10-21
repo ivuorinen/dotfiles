@@ -1,6 +1,6 @@
 # Native Homebrew bundle. This is now a PARTIAL Brewfile: plain homebrew/core
 # CLI formulae were migrated to mise's experimental brew bootstrap and live in
-# config/mise/config.toml under [bootstrap.packages] (installed by
+# config/mise/conf.d/brew/ under [bootstrap.packages] (installed by
 # `dfm install mise` via `mise bootstrap packages apply`).
 #
 # What stays here on native brew, on purpose:

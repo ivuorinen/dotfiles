@@ -28,7 +28,7 @@ dfm_bootstrap_for "$@"
 
 # Report a brew subcommand as deprecated by the mise brew-bootstrap migration.
 # Plain homebrew/core CLI formulae now live in mise's [bootstrap.packages]
-# (config/mise/config.toml); commands that dump or prune the Brewfile would
+# (config/mise/conf.d/brew/); commands that dump or prune the Brewfile would
 # fight that split, so they no-op with a pointer to the mise equivalent.
 # $1 = subcommand name, $2 = guidance line. Always returns 0.
 brew_deprecated()

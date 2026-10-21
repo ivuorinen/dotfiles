@@ -1,0 +1,7 @@
+# Read before any config file (~/.config/mise/miserc.toml), so only settings
+# that decide which config files load belong here.
+#
+# auto_env turns on the platform environments (unix, macos, macos-arm64, …),
+# which load files such as conf.d/brew/mise.macos.toml. It is the default from
+# mise 2027.6.0; setting it now adopts that behaviour early.
+auto_env = true

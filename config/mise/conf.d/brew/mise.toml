@@ -1,0 +1,103 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+# Homebrew formulae installed by mise's experimental brew bootstrap, without
+# requiring the `brew` CLI. mise pours these into the canonical Homebrew prefix
+# (/opt/homebrew), so binary paths are identical to a native `brew install`.
+# Applied by `mise bootstrap packages apply` (wired into `dfm install mise`).
+#
+# This folder fragment loads from ~/.config/mise/conf.d/ on every machine.
+# Formulae every platform can install live in this file; the macOS-only ones
+# (Homebrew lists a `macos` requirement for them) are in mise.macos.toml, which
+# loads through `auto_env = true` in ../../miserc.toml.
+#
+# Only homebrew/core, on-request LEAVES live here — mise resolves each formula's
+# dependency closure automatically, so transitive deps are intentionally omitted.
+# Kept on native brew (config/homebrew/Brewfile) on purpose: imagemagick,
+# ffmpeg, coreutils (GNU, not uutils), and all casks — 1password-cli included,
+# since it is a cask and not a formula.
+# PHP is managed by phpenv.fish (homebrew provider), not here.
+# Anything already in [tools] in ../../config.toml (e.g. jq) is not re-introduced.
+#
+# Every entry is "latest" by necessity, not by omission: Homebrew installs only
+# the current revision of a plain formula, so there is no version to pin here.
+#
+# Why these stay on brew rather than becoming [tools] entries — all 49 were
+# checked and none can move:
+#
+#   * 48 of 49 have no mise registry entry. The one that does,
+#     dependency-check, is a Java application: mise installs it, but it dies
+#     with "JAVA_HOME is not defined correctly" because brew resolves its JRE
+#     dependency and mise does not.
+#   * 26 are GitHub-hosted, but only 5 publish prebuilt binaries rather than
+#     source tarballs — the rest (chafa, htop, irssi, flock, …) ship a .tar.gz
+#     that the github backend cannot use, and git-extras, kcov, testssl.sh,
+#     luarocks and tree publish no release assets at all.
+#   * Of those 5: Mole has no Linux asset and fails outright,
+#     terminal-notifier unpacks a macOS .app that is inert on Linux, and
+#     gpg-tui installs but cannot run — "libgpgme.so.11: cannot open shared
+#     object file", again a dependency brew supplies and mise does not.
+#
+#   * fish installs and runs, and was moved here briefly before being put
+#     back: its release tarball contains the `fish` binary ALONE. No
+#     fish_indent. This repo gates on `fish_indent --check` in both
+#     .pre-commit-config.yaml and the Tests workflow, so pinning fish at 4.8.1
+#     would have left the formatter floating at whatever apt or brew supplies
+#     (3.7.0 here) — a formatter decoupled from its shell, across a major
+#     version, guarding 38 tracked files.
+#
+# The pattern is the point: brew resolves a dependency closure, mise installs a
+# single self-contained artifact. A formula that needs system libraries, a
+# runtime, or sibling binaries belongs here, not in [tools]. config.toml has no
+# platform conditionals either, so a macOS-only tool moved to [tools] would
+# break `mise install` on Linux.
+#
+# fswatch is the one clean technical candidate — prebuilt Linux and macOS
+# binaries, no dependencies — but nothing in this repo references it at all, so
+# deleting it beats moving it.
+[bootstrap.packages]
+"brew:autoconf-archive" = "latest"
+"brew:autogen" = "latest"
+"brew:automake" = "latest"
+"brew:bash" = "latest"
+"brew:bison" = "latest"
+"brew:bzip2" = "latest"
+"brew:certifi" = "latest"
+"brew:chafa" = "latest"
+"brew:cryptography" = "latest"
+"brew:dependency-check" = "latest"
+"brew:dnsmasq" = "latest"
+"brew:enchant" = "latest"
+"brew:exiftool" = "latest"
+"brew:figlet" = "latest"
+"brew:fish" = "latest"
+"brew:flock" = "latest"
+"brew:fswatch" = "latest"
+"brew:ghostscript" = "latest"
+"brew:git" = "latest"
+"brew:git-extras" = "latest"
+"brew:gnu-sed" = "latest"
+"brew:gpg-tui" = "latest"
+"brew:graphviz" = "latest"
+"brew:grep" = "latest"
+"brew:gzip" = "latest"
+"brew:htop" = "latest"
+"brew:hwloc" = "latest"
+"brew:irssi" = "latest"
+"brew:jpeg" = "latest"
+"brew:json-c" = "latest"
+"brew:kcov" = "latest"
+"brew:libedit" = "latest"
+"brew:libressl" = "latest"
+"brew:libuv" = "latest"
+"brew:libvoikko" = "latest"
+"brew:libxml2" = "latest"
+"brew:libyaml" = "latest"
+"brew:luarocks" = "latest"
+"brew:lzip" = "latest"
+"brew:moreutils" = "latest"
+"brew:ossp-uuid" = "latest"
+"brew:re2c" = "latest"
+"brew:testssl" = "latest"
+"brew:tree" = "latest"
+"brew:watch" = "latest"
+"brew:wget" = "latest"
+"brew:zlib" = "latest"

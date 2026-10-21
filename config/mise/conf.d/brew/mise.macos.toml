@@ -1,0 +1,7 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+# macOS-only formulae: Homebrew lists a `macos` requirement for both, so they
+# have no Linux bottle. This file loads only in the `macos` platform
+# environment, which `auto_env = true` in ../../miserc.toml turns on.
+[bootstrap.packages]
+"brew:mole" = "latest"
+"brew:terminal-notifier" = "latest"
