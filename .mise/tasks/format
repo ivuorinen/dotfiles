@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Format with Biome"
+exec biome format --write .

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="JSON Schema validation of schema-backed configs"
+set -euo pipefail
+
+local/bin/git-ls-existing -z --cached --others --exclude-standard \
+  '*.yml' '*.yaml' '*.json' '*.toml' \
+  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|\.claude/skills/graphify/)' \
+  | xargs -0 v8r --ignore-errors

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Biome check (JS/TS/JSON/Markdown)"
+exec biome check .

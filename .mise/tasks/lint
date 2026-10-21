@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Run every lint step, in order"
+#
+# The quality gate CI and the Stop hook run. Steps run one at a time and the
+# chain stops at the first failure; `#MISE depends` would run them in parallel.
+set -euo pipefail
+
+for task in lint-biome lint-prettier lint-ec lint-md-table lint-markdownlint \
+  lint-v8r lint-usage lint-bandit lint-exclusions; do
+  mise run "$task"
+done

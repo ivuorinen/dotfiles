@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Run the bats test suite"
+exec bash test-all.sh

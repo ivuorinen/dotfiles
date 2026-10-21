@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Python SAST (config in [tool.bandit], pyproject.toml)"
+exec bandit -c pyproject.toml --ini .bandit -r . -q

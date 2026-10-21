@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="markdownlint (honors .markdownlintignore)"
+exec markdownlint --ignore-path .markdownlintignore '**/*.md'

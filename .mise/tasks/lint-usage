@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="usage lint for scripts/ and local/bin/"
+rc=0
+for f in scripts/*.sh; do usage lint "$f" || rc=1; done
+while IFS= read -r f; do
+  usage lint "$f" || rc=1
+done < <(grep -rl "#USAGE\|//USAGE" local/bin/ 2> /dev/null | grep -Ev "\.(py|pl|php|md)$")
+exit $rc

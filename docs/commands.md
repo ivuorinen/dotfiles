@@ -1,7 +1,7 @@
 # Commands
 
 Quick reference for common workflows. Most commands are also
-discoverable via `dfm help` and the mise tasks in `.mise.toml`
+discoverable via `dfm help` and the mise file tasks in `.mise/tasks/`
 (`mise tasks` lists them).
 
 ## Setup

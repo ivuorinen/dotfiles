@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Run every autofixer, in order"
+#
+# Steps run one at a time and the chain stops at the first failure, like `lint`.
+set -euo pipefail
+
+for task in fix-biome fix-prettier fix-md-table; do
+  mise run "$task"
+done

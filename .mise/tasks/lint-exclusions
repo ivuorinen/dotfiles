@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Third-party exclusion lists agree across gates"
+exec ./scripts/check-exclusion-drift.py

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Prettier check (YAML)"
+exec prettier --check '**/*.{yml,yaml}'

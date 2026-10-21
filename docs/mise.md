@@ -29,7 +29,7 @@ a system or Homebrew path.
 - **npm/dotnet tools live in mise, not `package.json`**, so hook scripts
   and interactive shells get them on PATH without relying on a package
   manager's `node_modules/.bin` shim. This repo has no `package.json`: its
-  lint, fix and test commands are mise tasks in `.mise.toml`.
+  lint, fix and test commands are mise file tasks in `.mise/tasks/`.
 
 ## Everyday commands
 

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Autofix YAML with Prettier"
+#MISE alias="format-yaml"
+exec prettier --write '**/*.{yml,yaml}'

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Fix Markdown table formatting"
+set -euo pipefail
+
+local/bin/git-ls-existing -z --cached --others --exclude-standard '*.md' \
+  | grep -zv '^docs/audit/findings/' \
+  | xargs -0 markdown-table-formatter

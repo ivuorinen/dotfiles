@@ -84,11 +84,11 @@ deny_first_word_re+='diff|cmp|bat|xxd|od|strings|base64|column|sort|uniq|cut|nl|
 
 # Special denials for compound commands (e.g. `mise run lint`, `git log`, `shfmt --diff`).
 deny_compound_res=(
-  # Every .mise.toml task is a quality gate (lint, test, fix) whose output is
+  # Every .mise/tasks/ task is a quality gate (lint, test, fix) whose output is
   # read. `mise r`, `mise tasks|task|t run` and `mise watch` run tasks too, and
   # `mise <task>` is mise's own shorthand, so the task families (lint, fix,
   # format, test and their `-*` subtasks) are matched by name as well; a new
-  # family in .mise.toml joins this list. It also catches `mise test-tool`,
+  # family in .mise/tasks/ joins this list. It also catches `mise test-tool`,
   # whose output is read the same way.
   '^mise[[:space:]]+(run|r|watch|(tasks|task|t)[[:space:]]+run|(lint|fix|format|test)(-[^[:space:]]*)?)([[:space:]]|$)'
   '^git[[:space:]]+(log|diff|show|blame)'

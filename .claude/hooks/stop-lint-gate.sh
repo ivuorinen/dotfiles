@@ -4,7 +4,7 @@
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 
-# The lint chain is the `lint` task in .mise.toml; mise puts its pinned tools
+# The lint chain is the `lint` file task in .mise/tasks/; mise puts its pinned tools
 # on PATH itself. Without mise there is no gate to run, and saying so beats a
 # silent pass.
 if ! command -v mise > /dev/null 2>&1; then

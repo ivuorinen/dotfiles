@@ -177,7 +177,9 @@ config/yazi/*.tmTheme
 mise.lock
 # Per-tool install locks (aube-lock.yaml, uv.lock) mise writes for npm: and
 # pipx: tools. Generated on install for the same reason as mise.lock above.
-.mise/
+# .mise/tasks/ holds the repo's file tasks and is tracked.
+.mise/*
+!.mise/tasks/
 
 # Local CodeQL runs: x-codeql writes codeql-<lang>.sarif to the working
 # directory, and the CLI leaves a symlink to the source root. No trailing
