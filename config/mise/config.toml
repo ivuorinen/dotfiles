@@ -1,7 +1,7 @@
 #:schema https://mise.jdx.dev/schema/mise.json
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
-pipx.uvx = true
+pypi.uvx = true
 # Python libraries to install into every python mise installs. Kept in this
 # directory rather than the default ~/.default-python-packages so it lives
 # with the rest of the mise config and is version-controlled.
@@ -33,7 +33,6 @@ idiomatic_version_file_enable_tools = [
 lockfile = true
 
 # Save disk space — don't keep downloaded archives or failed installs
-always_keep_download = false
 always_keep_install = false
 experimental = true
 auto_update = true
