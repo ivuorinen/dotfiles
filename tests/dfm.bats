@@ -196,6 +196,17 @@ setup()
   fi
 }
 
+# `brew autoupdate` is an external tap command the Brewfile never taps, so the
+# old branch failed with "Unknown command". It is a deprecation notice now and
+# must not reach brew at all.
+@test "dfm brew autoupdate prints the deprecation notice and exits 0" {
+  command -v brew > /dev/null 2>&1 || skip "brew not installed"
+  run bash local/bin/dfm brew autoupdate
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dfm brew autoupdate is deprecated"* ]]
+  [[ "$output" != *"Unknown command"* ]]
+}
+
 @test "bare dfm omits tool-gated sections whose tool is absent" {
   run bash local/bin/dfm
   [ "$status" -eq 0 ]

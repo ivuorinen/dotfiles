@@ -3,7 +3,7 @@
 #USAGE   cmd "install" help="Install packages from Brewfile"
 #USAGE   cmd "update" help="Update Homebrew and packages"
 #USAGE   cmd "updatebundle" help="Deprecated: formulae now managed by mise"
-#USAGE   cmd "autoupdate" help="Setup Homebrew auto-update"
+#USAGE   cmd "autoupdate" help="Deprecated: no autoupdate tap; use dfm brew update"
 #USAGE   cmd "leaves" help="Deprecated: use mise bootstrap packages status"
 #USAGE   cmd "clean" help="Deprecated: would remove mise-managed formulae"
 #USAGE   cmd "untracked" help="Deprecated: formulae now tracked by mise"
@@ -47,7 +47,7 @@ dfm_brew()
     "install:Installs items defined in Brewfile"
     "update:Updates and upgrades brew packages"
     "updatebundle:Deprecated (formulae now managed by mise)"
-    "autoupdate:Setups brew auto-update and runs it immediately"
+    "autoupdate:Deprecated (no autoupdate tap; use dfm brew update)"
     "leaves:Deprecated (use mise bootstrap packages status)"
     "clean:Deprecated (would remove mise-managed formulae)"
     "untracked:Deprecated (formulae now tracked by mise)"
@@ -100,8 +100,11 @@ dfm_brew()
       ;;
 
     autoupdate)
-      brew autoupdate delete
-      brew autoupdate start 43200 --upgrade --cleanup --immediate
+      # `brew autoupdate` is an external tap command this repo never taps, so
+      # it failed with "Unknown command"; with the tap, its --upgrade agent
+      # would also upgrade the mise-owned formulae behind mise's back.
+      brew_deprecated autoupdate \
+        "Run 'dfm brew update' for casks and the Brewfile stack, and 'mise bootstrap packages upgrade --manager brew' for mise-owned formulae."
       ;;
 
     clean)
