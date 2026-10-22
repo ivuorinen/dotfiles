@@ -76,19 +76,28 @@ dfm_bootstrap()
 {
   dfm_bootstrap_vars
 
-  # Require bash 4.0+ for associative arrays and mapfile
+  # Require bash 4.0+ for associative arrays and mapfile. Stock macOS ships
+  # bash 3.2, so the guard offers an install, but only to a person at a
+  # terminal: a test run or CI job that reaches an action path must never
+  # install packages. mise's brew bootstrap installs brew:bash (declared in
+  # config/mise/conf.d/brew/) without Homebrew; the guard no longer pipes
+  # Homebrew's unpinned HEAD installer into bash, and says "Done" only when
+  # the install succeeded.
   if ((BASH_VERSINFO[0] < 4)); then
     echo "dfm requires bash 4.0+, found ${BASH_VERSION}"
-    if [[ "$(uname)" == "Darwin" ]]; then
-      if ! command -v brew &> /dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      fi
-      echo "Installing modern bash via Homebrew..."
-      brew install bash
-      echo "Done. Restart your shell and run dfm again."
-    else
+    if [[ "$(uname)" != "Darwin" ]]; then
       echo "Install bash 4.0+ and try again."
+    elif [[ ! -t 0 ]]; then
+      echo "Install bash 4.0+ (mise bootstrap packages apply brew:bash) and try again."
+    elif command -v mise &> /dev/null; then
+      echo "Installing modern bash via mise (brew:bash)..."
+      mise bootstrap packages apply --yes brew:bash \
+        && echo "Done. Restart your shell and run dfm again."
+    elif command -v brew &> /dev/null; then
+      echo "Installing modern bash via Homebrew..."
+      brew install bash && echo "Done. Restart your shell and run dfm again."
+    else
+      echo "Install mise (https://mise.jdx.dev), then run: mise bootstrap packages apply brew:bash"
     fi
     exit 1
   fi
