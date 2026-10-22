@@ -16,6 +16,16 @@ mise install       # lint/test toolchain, bats and prek, from .mise.toml
 prek install       # installs the pre-commit and commit-msg hooks
 ```
 
+On macOS the suite also needs bash 4+ and GNU coreutils (`gtimeout`) ahead of
+`/bin/bash` on PATH, as CI installs them; fish is optional (its tests skip
+without it):
+
+```bash
+brew install bash coreutils fish
+# or, without Homebrew (mise's experimental brew bootstrap):
+mise bootstrap packages apply brew:bash brew:coreutils brew:fish
+```
+
 Do not run `./install` or `./install --links` to contribute. They symlink these
 dotfiles into `~` and `~/.config` with forced links, replacing your own shell rc
 files and app configs. They are meant for the maintainer's machines.
