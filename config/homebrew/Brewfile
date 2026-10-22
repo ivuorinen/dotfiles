@@ -14,6 +14,8 @@
 # PHP is no longer managed here — phpenv.fish (homebrew provider) owns it.
 # Applied with `dfm brew install` (brew bundle). Do not re-add the migrated
 # formulae here — mise resolves their dependency closure automatically.
+# Never run `mise bootstrap packages prune --manager brew`: it removes every
+# formula mise config does not declare, this file's and phpenv's included.
 tap "cormacrelf/tap"
 tap "doron-cohen/tap"
 # GNU File, Shell, and Text utilities

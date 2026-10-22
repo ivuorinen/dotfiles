@@ -77,6 +77,12 @@ and exported as `MISE_AUTO_ENV=true` by `config/exports` and
 | `mise bootstrap packages upgrade -m brew`     | Upgrade installed bootstrap formulae     |
 | `mise bootstrap packages import -m brew`      | Snapshot on-request formulae into config |
 
+> **Do not run `mise bootstrap packages prune --manager brew` here.** prune
+> removes every formula mise config does not declare, including the Brewfile
+> stack (imagemagick, ffmpeg, coreutils, antidot, dark-notify) and phpenv's
+> PHP and its extensions. Use `dfm cleanup brew` (brew cleanup + autoremove)
+> instead.
+
 `dfm install mise` runs `apply` automatically (macOS only). Only
 on-request **leaves** are listed — mise resolves each formula's
 dependency closure, so transitive deps must not be added. Casks and the
