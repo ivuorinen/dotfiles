@@ -66,7 +66,7 @@ check_dependencies()
 
   if ! command -v age &> /dev/null; then
     echo "Error: age is not installed. Please install it first." >&2
-    echo "  brew install age    # macOS" >&2
+    echo "  mise install age    # dotfiles (pinned in config/mise/config.toml)" >&2
     echo "  apt install age     # Debian/Ubuntu" >&2
     echo "  dnf install age     # Fedora" >&2
     exit 1

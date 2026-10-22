@@ -55,8 +55,9 @@ dfm_bootstrap_vars()
 # Minimal bootstrap for menu/help paths. Sets the shared variables and
 # sources msgr (cheap — just colour-function definitions) but
 # deliberately SKIPS config/shared.sh. shared.sh pulls in config/exports,
-# which runs `mise activate` and `brew shellenv` (each forks a subprocess
-# and costs hundreds of milliseconds). Rendering a static menu needs none
+# which runs `mise activate`, `brew shellenv` and the rest of the export
+# chain; together they cost far more than a static menu needs (each of those
+# two alone forks a ~20-30 ms subprocess). Rendering a static menu needs none
 # of that, so the listing path stays fast. Action paths use dfm_bootstrap
 # (full) instead. Call once near the top of a subcommand via
 # dfm_bootstrap_for, after sourcing this file. msgr's bare msg() prints

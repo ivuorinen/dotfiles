@@ -118,7 +118,7 @@ fi
 # We leave XDG_BIN_HOME alone and let mise take precedence via PATH.
 
 # --- Homebrew-installed version managers ---
-# These will be removed when `brew bundle cleanup` runs after Brewfile update.
+# Uninstall the Homebrew copies of tools mise now manages.
 if command -v brew &> /dev/null; then
   BREW_REMOVE=(
     pyenv pyenv-pip-migrate pyenv-virtualenv goenv cargo-binstall

@@ -10,7 +10,7 @@ Encrypt or decrypt files and directories using `age` and your GitHub SSH keys.
 Install age:
 
 ```bash
-brew install age     # macOS
+mise install age     # dotfiles (pinned in config/mise/config.toml)
 apt install age      # Debian/Ubuntu
 dnf install age      # Fedora
 ```
