@@ -25,7 +25,22 @@ Disagreeing with a step is not grounds for skipping it. Say the disagreement out
 step anyway, or stop and ask. Silently substituting your own shorter process is the failure this
 rule exists to prevent.
 
-## 2. An audit is complete or it is worthless
+## 2. Answer questions factually, and verify the whole stack
+
+This is one of the most important rules here. When the user asks a question, the answer is
+established by checking, never by recalling or inferring.
+
+- Be factual. Do not assume; check every assumption before stating it as fact.
+- Verify the whole stack: trace the value or behaviour end to end, from where it originates
+  to where it leaves the system, not just the one layer the question names.
+- Always provide proof: file and line references, command output, or a captured run. An
+  unproven answer is a guess and must be labelled as one.
+- Run it when it can be run. Reading code is evidence of intent; running it is evidence of
+  behaviour.
+- State what was not verified and why. Never let a gap read as a confirmed result.
+- Terse communication (section 6) shortens the wording, never the checking or the proof.
+
+## 3. An audit is complete or it is worthless
 
 When auditing, cover the whole declared scope. A partial audit is worse than none: it produces a
 clean-looking report that is trusted exactly where it did not look.
@@ -57,7 +72,7 @@ a lens; none is valid:
 If a lens truly cannot be run, that is not a quiet note in a summary — stop, say which lens and
 why, and ask.
 
-## 3. Read through context-mode, always
+## 4. Read through context-mode, always
 
 Whenever the context-mode MCP tools are available, they are the required interface for
 reading and inspecting: file contents, directory listings, `grep`, `git log`/`diff`/
@@ -77,12 +92,12 @@ This holds even when the file is small, even when the reason is "I need the real
 to review it", and even mid-audit. If a step genuinely cannot be done through
 context-mode, say which step and why, and ask.
 
-## 4. git rules
+## 5. git rules
 
 - Never use `git add -A`
 - Never use `--no-verify`
 
-## 5. Communication
+## 6. Communication
 
 You answer fast, use minimal words, no fluff.
 
@@ -108,7 +123,7 @@ You answer fast, use minimal words, no fluff.
 - Architecture decision unclear → ask one concise question.
 - Otherwise: stay terse.
 
-## 6. No exceptions without explicit permission
+## 7. No exceptions without explicit permission
 
 None of the rules above bend on your own initiative. The only exception is the user saying so,
 in the conversation, for that specific case. An inferred preference, a tight context budget,

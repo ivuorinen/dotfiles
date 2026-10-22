@@ -1,7 +1,7 @@
 {
   "enabledPlugins": {},
   "allowedUrls": ["http://localhost:4200"],
-  "theme": "default",
+  "theme": "github",
   "statusLine": {
     "command": "deja-hook statusline",
     "refreshInterval": 1,
