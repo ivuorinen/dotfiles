@@ -1,6 +1,6 @@
 # Architecture Profile
 
-Generated: 2026-05-05
+Generated: 2026-10-22 (re-detected; first profile 2026-05-05, see Drift)
 
 This is a personal dotfiles repository, not an application. Standard
 application patterns (DDD, Hexagonal, Clean, Onion, MVC, CQRS,
@@ -23,15 +23,24 @@ runtime by a co-located orchestrator:
   family is `DOTFILES_THEME_FAMILY` when set, else the per-machine saved
   choice (`local/bin/theme`), else the tracked default in
   `config/theme/family`.
-- `config/fish/conf.d/` (3 entries) — fish auto-loaded config
+- `config/fish/conf.d/` (4 entries) — fish auto-loaded config
   fragments.
 - `config/fish/secrets.d/` (3 entries; only `*.example` and
   `README.md` tracked) — gitignored shell secrets sourced by
   `exports.fish`.
-- `config/fish/functions/` (14 entries) — fish autoloaded function
+- `config/fish/functions/` (16 entries) — fish autoloaded function
   files.
-- `config/fish/completions/` (87 entries) — generated and hand-
+- `config/fish/completions/` (13 tracked entries) — generated and hand-
   rolled fish completions.
+- `local/bin/dfm` — git-style dispatcher: it resolves
+  `"$_dfm_selfdir/dfm-$sub"` (or `dfm-$sub` on PATH) and execs it; 14
+  `local/bin/dfm-*` files serve the sections. Dependency direction is
+  one-way: no `dfm-*` sources another `dfm-*`, only `dfm-lib`, `msgr`
+  and (on action paths) `config/shared.sh`.
+- `.mise/tasks/` (16 entries) — mise file tasks, discovered by name.
+- `config/mise/conf.d/brew/` — mise folder fragment for
+  `[bootstrap.packages]`, split by platform (`mise.toml`,
+  `mise.macos.toml`, the latter loaded through `auto_env`).
 
 The contract is uniform: a directory's files are discovered by name
 or extension, no central registry, no manual wiring.
@@ -59,8 +68,8 @@ parallel under a timeout rather than chained.
 
 Evidence — directory layout dedicated to per-machine overrides:
 
-- `hosts/` contains 4 active overlays (`air/`, `lakka/`, `s/`,
-  `tunkki/`) plus a `README.md`.
+- `hosts/` contains 5 active overlays (`air/`, `lakka/`, `s/`,
+  `tunkki/`, `twonky/`) plus a `README.md`.
 - Each overlay has its own `base/`, `config/`, and
   `install.conf.yaml`. Dotbot applies the host overlay after the
   global config at install time.
@@ -100,9 +109,9 @@ neighbours, not collaborating components.
 
 ### Vendored boundary via submodules — High confidence
 
-Evidence — five git submodules:
+Evidence — four git submodules:
 
-- `tools/dotbot`, `tools/dotbot-include`, `tools/antidote`
+- `tools/dotbot`, `tools/antidote`
 - `config/cheat/cheatsheets/community`,
   `config/cheat/cheatsheets/tldr`
 
@@ -167,16 +176,52 @@ Items already enforced by `.claude/rules/` are flagged.
    (`shared.sh`, `exports`, `alias`).
 8. **Bats tests live in `tests/*.bats`** — bats is the only test
    framework. New scripts should ship with a matching `.bats`.
+9. **A `dfm-*` subcommand reaches shared behaviour only through
+   `dfm-lib`** — never by sourcing or calling another `dfm-*`. Menu
+   and help paths use `dfm_bootstrap_min`; only action paths pay for
+   the full `config/shared.sh` chain.
+10. **Every package has exactly one owner**: a tool pinned in mise
+    `[tools]`, a formula declared in mise `[bootstrap.packages]`
+    (`config/mise/conf.d/brew/`), a leaf in `config/homebrew/Brewfile`,
+    or PHP owned by `phpenv.fish` — never two. Checked 2026-10-22: the
+    Brewfile, conf.d/brew and `[tools]` leaf sets are disjoint.
 
 ## Ambiguities & Contradictions
 
-None significant. The structure is internally consistent: the
-plugin-extension idiom is uniform across `*.d/` directories, the
-host-overlay pattern is documented and used as designed, and the
-XDG mapping is mechanical via dotbot.
+The plugin-extension idiom is uniform across `*.d/` directories, the
+host-overlay pattern is documented and used as designed, and the XDG
+mapping is mechanical via dotbot. Rule 10 is where the structure strains:
+
+- `mise bootstrap packages prune` assumes mise config is the sole
+  owner of the Homebrew prefix, which the three-owner split does not
+  satisfy. It stays a standing hazard, documented in `docs/mise.md` and
+  the Brewfile header rather than removed (finding audit-b1d8b796).
+- Resolved 2026-10-22: the Brewfile also listed the dependency closure
+  of formulae owned elsewhere (mise-declared formulae and phpenv's PHP);
+  it now lists leaves only (finding audit-ef569197).
 
 One minor mismatch: `config/theme/_lib.sh` lives at the same level
 as the `apply`/`watcher` actors and the `handlers.d/` extension
 point, but the underscore prefix marks it as private. Some
 maintainers prefer `lib/` or `internal/` for clarity. Not a defect,
 just a convention choice.
+
+## Drift
+
+Since the 2026-05-05 profile:
+
+- **Added extension points:** `.mise/tasks/` (mise file tasks, moved out
+  of inline `.mise.toml` tasks) and the `config/mise/conf.d/brew/` folder
+  fragment (Homebrew formulae for mise's brew bootstrap, split by
+  platform). The `dfm` dispatcher was present before but not profiled;
+  it is now listed under Plugin / Extension.
+- **New structural rules:** 9 (dfm-lib as the only shared surface) and 10
+  (single package owner), the latter introduced by the brew → mise
+  bootstrap migration.
+- **Host overlays:** 4 → 5 (`twonky/` added).
+- **Submodules:** 5 → 4 (`tools/dotbot-include` removed;
+  `add-submodules.sh` lists it under `old_submodules`).
+- **Counts:** `config/fish/conf.d/` 3 → 4, `config/fish/functions/` 14 → 16,
+  `config/fish/completions/` 87 → 13 tracked entries.
+- **Contradictions:** none before; two found against rule 10, one
+  resolved, one documented as a standing hazard (see above).
