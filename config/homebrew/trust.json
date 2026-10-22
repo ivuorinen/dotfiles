@@ -12,7 +12,6 @@
     "shivammathur/php/php"
   ],
   "trustedtaps": [
-    "1password/tap",
     "cormacrelf/tap",
     "doron-cohen/tap"
   ]
