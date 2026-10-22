@@ -63,7 +63,7 @@ jobs:
       # age: the a/ad/ae real-age round-trip tests skip without it, and they
       # are the only tests that prove an encrypted file decrypts.
       - name: Install pinned tools
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
         with:
           mise_toml: |
             [tools]
@@ -97,7 +97,7 @@ jobs:
       # linters.yml only runs on pull_request, so without this job a commit
       # pushed straight to main is never linted server-side.
       - name: Install the mise toolchain
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
 
       - name: Run lint
         run: mise run lint
