@@ -59,11 +59,19 @@ dfm_cleanup()
         msgr warn "brew not found — skipping"
         return 0
       fi
+      # Collect both statuses: the branch used to end on msgr, so a failed
+      # cleanup still printed success and `dfm cleanup all` never saw it.
+      local brew_rc=0
       msgr run "Running brew cleanup..."
-      brew cleanup --prune=all
+      brew cleanup --prune=all || brew_rc=1
       msgr run "Running brew autoremove..."
-      brew autoremove
-      msgr yay "Homebrew cleanup complete"
+      brew autoremove || brew_rc=1
+      if ((brew_rc == 0)); then
+        msgr yay "Homebrew cleanup complete"
+      else
+        msgr err "Homebrew cleanup failed"
+      fi
+      return "$brew_rc"
       ;;
 
     caches)
