@@ -265,27 +265,34 @@ dfm_check()
       ;;
 
     brew)
-      if ! command -v brew > /dev/null 2>&1; then
-        msgr warn "brew not found — skipping"
-        return 0
+      local rc=0
+      # Only the Brewfile half needs the brew CLI: mise installs its
+      # [bootstrap.packages] formulae without it, so a brew-less Mac must
+      # still get the mise check instead of an early "skipping" return.
+      if command -v brew > /dev/null 2>&1; then
+        local brewfile="$DOTFILES/config/homebrew/Brewfile"
+        msgr run "Checking Brewfile..."
+        if brew bundle check --file="$brewfile" --no-upgrade; then
+          msgr yay "All Brewfile packages installed"
+        else
+          msgr err "Some Brewfile packages missing — run 'dfm brew install' to sync"
+          rc=1
+        fi
+      else
+        msgr warn "brew not found — skipping the Brewfile check"
       fi
-      local brewfile="$DOTFILES/config/homebrew/Brewfile"
-      msgr run "Checking Brewfile..."
-      if ! brew bundle check --file="$brewfile" --no-upgrade; then
-        msgr err "Some Brewfile packages missing — run 'dfm brew install' to sync"
-        return 1
-      fi
-      msgr yay "All Brewfile packages installed"
       # The homebrew/core formulae mise installs (config/mise/conf.d/brew/).
       # `dfm install mise` applies them on macOS only, so only check there.
       if [[ "$(uname -s)" == "Darwin" ]] && command -v mise > /dev/null 2>&1; then
         msgr run "Checking mise bootstrap packages..."
-        if ! mise bootstrap packages status --missing > /dev/null; then
+        if mise bootstrap packages status --missing > /dev/null; then
+          msgr yay "All mise bootstrap packages installed"
+        else
           msgr err "Some mise bootstrap packages missing — see 'mise bootstrap packages status', then run 'dfm install mise'"
-          return 1
+          rc=1
         fi
-        msgr yay "All mise bootstrap packages installed"
       fi
+      return "$rc"
       ;;
 
     disk)
