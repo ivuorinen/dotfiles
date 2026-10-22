@@ -95,11 +95,34 @@ decision()
 
 @test "pre-bash-route: package installs and in-place formatters are allowed" {
   [ "$(decision 'mise install')" = "allow" ]
-  # `mise run` is denied above; the other mise subcommands are not gates.
+  # `mise run` is denied above; the state-changing mise subcommands pass.
   [ "$(decision 'mise trust')" = "allow" ]
   [ "$(decision 'mise fmt')" = "allow" ]
+  [ "$(decision 'mise bootstrap packages apply --manager brew --yes')" = "allow" ]
+  [ "$(decision 'brew install age')" = "allow" ]
+  [ "$(decision 'brew untap 1password/tap')" = "allow" ]
+  [ "$(decision 'brew bundle install --file=config/homebrew/Brewfile')" = "allow" ]
   [ "$(decision 'shfmt -w local/bin/dfm')" = "allow" ]
   [ "$(decision 'fish_indent --write config/fish/config.fish')" = "allow" ]
+}
+
+# brew and mise used to pass as bare first words, so every reader subcommand
+# skipped the routing (audit-8b0dc545). Only the state-changing ones may run on
+# Bash now; the listings route through context-mode like any other reader.
+@test "pre-bash-route: brew and mise readers are denied" {
+  [ "$(decision 'brew list')" = "deny" ]
+  [ "$(decision 'brew info --json=v2 ffmpeg')" = "deny" ]
+  [ "$(decision 'brew deps --tree ffmpeg')" = "deny" ]
+  [ "$(decision 'brew outdated')" = "deny" ]
+  [ "$(decision 'brew --prefix')" = "deny" ]
+  [ "$(decision 'mise ls')" = "deny" ]
+  [ "$(decision 'mise outdated')" = "deny" ]
+  # mise exec is transparent: the wrapped command is classified on its own.
+  [ "$(decision 'mise exec -- cat README.md')" = "deny" ]
+  [ "$(decision 'mise x -- shfmt --diff local/bin/a')" = "deny" ]
+  [ "$(decision 'mise bootstrap packages status')" = "deny" ]
+  [ "$(decision 'mise bs ls')" = "deny" ]
+  [ "$(decision 'mise bootstrap packages where brew:unzip')" = "deny" ]
 }
 
 @test "pre-bash-route: a denied command in any pipeline segment is caught" {

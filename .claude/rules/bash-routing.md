@@ -26,6 +26,11 @@ If a shell command produces output you intend to read, use
   The hook lets `git status` (with or without `-s`) through as a one-line
   check, along with the state and plumbing subcommands on its allowlist;
   every other git subcommand is denied as a reader.
+- `brew list`/`info`/`deps`/`outdated`/`--prefix`, `mise ls`/`outdated`/
+  `bootstrap packages status` — package-manager readers. Like git, brew and
+  mise pass only for the subcommands that install, upgrade, remove or
+  reconfigure (the hook's `allow_brew_subcmd_re` / `allow_mise_subcmd_re`).
+  `mise exec -- <cmd>` is classified as `<cmd>` itself.
 - `git-hunk list`/`show`/`diff`, `graphify query`/`path`/`explain`, and
   `gh api` / `gh pr view` and friends — readers the project rules mandate.
 - `ls`, `tree`, `cat`, `head`, `tail`, `wc`, `less`, `more`, `awk`, `sed`,

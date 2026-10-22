@@ -58,7 +58,8 @@ fi
 
 # Allowlist: commands that mutate state, format in place, install packages, or
 # perform short interactive operations. First word of each pipeline segment is
-# checked against this set.
+# checked against this set; git, brew and mise reach it only after their
+# subcommand allowlists below have passed.
 allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish_indent|shfmt|brew|mise|cd|pwd|whoami|date|echo|printf|true|false|exit|return|export|unset|source|\.|alias|unalias|umask)$'
 
 # Allowlist: specific git subcommands that mutate state, plus the plumbing
@@ -70,6 +71,15 @@ allow_first_word_re='^(git|mkdir|chmod|chown|mv|rm|cp|touch|ln|unlink|rmdir|fish
 # `add` is deliberately absent: staging goes through git-hunk
 # (.claude/rules/git-hunk-commits.md), and the policy tier denies it outright.
 allow_git_subcmd_re='^(status|commit|mv|rm|checkout|push|fetch|reset|restore|stash|tag|init|clone|branch|merge|rebase|remote|cherry-pick|revert|switch|am|apply|format-patch|gc|prune|reflog|worktree|notes|submodule|rerere|update-ref|symbolic-ref|update-index|hash-object|cat-file|rev-parse|rev-list|ls-files|check-ignore|config)$'
+
+# Allowlist: the brew and mise subcommands that install, upgrade, remove or
+# reconfigure, same shape as the git list. `brew` and `mise` used to pass as
+# bare first words, so readers with unbounded output (`brew list`, `brew deps
+# --tree`, `brew info --json`, `mise ls`, `mise exec -- <reader>`) skipped the
+# routing (audit-8b0dc545). `mise bootstrap` is allowed here and its readers
+# are denied in deny_compound_res; `mise run` and the task shorthands are too.
+allow_brew_subcmd_re='^(install|reinstall|uninstall|remove|rm|upgrade|update|tap|untap|link|unlink|pin|unpin|cleanup|autoremove|tab|trust|untrust|bundle)$'
+allow_mise_subcmd_re='^(install|i|use|u|unuse|uninstall|rm|remove|upgrade|up|reshim|trust|untrust|prune|cache|fmt|lock|self-update|bootstrap|bs)$'
 
 # Denylist: first-word commands that almost always produce reviewable output.
 # Includes `bash`/`sh`/`zsh`/`dash`/`ksh`/`fish` to block `bash script.sh` and
@@ -91,6 +101,9 @@ deny_compound_res=(
   # family in .mise/tasks/ joins this list. It also catches `mise test-tool`,
   # whose output is read the same way.
   '^mise[[:space:]]+(run|r|watch|(tasks|task|t)[[:space:]]+run|(lint|fix|format|test)(-[^[:space:]]*)?)([[:space:]]|$)'
+  # `mise bootstrap` is allowed for apply/upgrade/use/prune; its listings are
+  # readers whose output grows with every formula moved to mise.
+  '^mise[[:space:]]+(bootstrap|bs)[[:space:]]+(packages[[:space:]]+)?(status|ls|list|where|plan|export)([[:space:]]|$)'
   '^git[[:space:]]+(log|diff|show|blame)'
   '^shfmt[[:space:]]+(--diff|-d)'
   '^fish_indent[[:space:]]+(--check|-c)'
@@ -186,6 +199,15 @@ for i in "${!segments[@]}"; do
   fw=$(normalise_cmd "$(first_word "$segment")")
   [[ -z "$fw" ]] && continue
 
+  # `mise exec|x [tool@version...] -- cmd` runs cmd, so cmd is what gets
+  # classified: the wrapper must neither hide a reader (`mise exec -- cat x`)
+  # nor block an in-place formatter (`mise exec -- shfmt -w x`).
+  if [[ "$fw" = "mise" && "$segment" =~ ^[^[:space:]]+[[:space:]]+(exec|x)[[:space:]] && "$segment" == *" -- "* ]]; then
+    segment=${segment#* -- }
+    fw=$(normalise_cmd "$(first_word "$segment")")
+    [[ -z "$fw" ]] && continue
+  fi
+
   # git's global options (`git -C dir status`) are dropped first, so the
   # subcommand checks below see the real subcommand (agent-loopholes-e0092417).
   [[ "$fw" = "git" ]] && segment=$(git_strip_globals "$segment")
@@ -224,6 +246,18 @@ for i in "${!segments[@]}"; do
     git_sub=$(printf '%s' "$segment" | awk '{print $2}')
     if [[ -n "$git_sub" ]] && ! printf '%s' "$git_sub" | grep -qE "$allow_git_subcmd_re"; then
       deny_reason="git subcommand '$git_sub' is not on the allow list (output-reader)"
+      break
+    fi
+  fi
+
+  # Specific brew and mise subcommand checks, same shape as git's above:
+  # `brew install` allowed, `brew list` denied.
+  if [[ "$fw" = "brew" || "$fw" = "mise" ]]; then
+    pkg_sub=$(printf '%s' "$segment" | awk '{print $2}')
+    pkg_re=$allow_brew_subcmd_re
+    [[ "$fw" = "mise" ]] && pkg_re=$allow_mise_subcmd_re
+    if [[ -n "$pkg_sub" ]] && ! printf '%s' "$pkg_sub" | grep -qE "$pkg_re"; then
+      deny_reason="$fw subcommand '$pkg_sub' is not on the allow list (output-reader)"
       break
     fi
   fi
