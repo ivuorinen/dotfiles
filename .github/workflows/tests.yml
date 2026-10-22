@@ -31,41 +31,49 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install bats and fish (Linux)
+      - name: Install fish and zsh (Linux)
         if: runner.os == 'Linux'
-        # tmux, yamllint: the theme tests skip without them — the tmux
-        # reload-recursion and 5 s budget guards, and the palette parse checks.
-        # age: the a/ad/ae real-age round-trip tests skip without it, and they
-        # are the only tests that prove an encrypted file decrypts.
+        # fish stays a distro package: the mise fish tarball ships no
+        # fish_indent (config/mise/conf.d/brew/mise.toml).
         # zsh: zsh-antidote.bats runs zshrc and antidote.zsh under zsh itself.
         # macOS ships it; the Ubuntu image does not.
         run: |
           sudo apt-get update
-          sudo apt-get install -y age bats fish tmux yamllint zsh
+          sudo apt-get install -y fish zsh
 
-      - name: Install bats and fish (macOS)
+      - name: Install fish, bash and coreutils (macOS)
         if: runner.os == 'macOS'
         # bash: the runner's /bin/bash is 3.2 and dfm's full bootstrap
         # requires 4+; coreutils: gtimeout for the theme actor's 5s kill;
-        # age, tmux, yamllint: see the Linux step
+        # fish: see the Linux step
         run: |
-          brew install age bats-core fish bash coreutils tmux yamllint
+          brew install fish bash coreutils
 
-      # The agent policy hooks parse every command with `shfmt --to-json`
-      # and fail closed without shfmt. Only 3.14.0+ writes operators as
-      # strings (earlier releases emit enum numbers), and apt ships 3.8, so
-      # mise installs the version config/mise/config.toml pins. install_args
-      # limits it to shfmt and uv instead of the whole .mise.toml toolchain.
+      # Every pin here mirrors config/mise/config.toml, so the suite runs on
+      # the versions the dotfiles install; tests/ci-pins.bats fails when they
+      # drift. install_args limits mise to these tools instead of the whole
+      # .mise.toml toolchain.
+      # shfmt: the agent policy hooks parse every command with
+      # `shfmt --to-json` and fail closed without it; only 3.14.0+ writes
+      # operators as strings, and apt ships 3.8.
       # uv: x-compare-versions.py runs under `uv run --script`, which
       # installs the script's inline dependencies itself.
-      - name: Install shfmt and uv
+      # tmux, yamllint: the theme tests skip without them — the tmux
+      # reload-recursion and 5 s budget guards, and the palette parse checks.
+      # age: the a/ad/ae real-age round-trip tests skip without it, and they
+      # are the only tests that prove an encrypted file decrypts.
+      - name: Install pinned tools
         uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
           mise_toml: |
             [tools]
             shfmt = "3.14.1"
-            uv = "0.12.19"
-          install_args: shfmt uv
+            uv = "0.13.1"
+            age = "1.3.2"
+            bats = "1.14.0"
+            tmux = "3.7c"
+            yamllint = "1.38.0"
+          install_args: shfmt uv age bats tmux yamllint
 
       - name: Run test suite
         # scripts/bats-run.sh is the same runner as the pre-commit hook:
