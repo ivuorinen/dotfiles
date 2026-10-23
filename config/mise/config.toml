@@ -201,6 +201,7 @@ pi = "1.3.0"
 "aqua:SonarSource/sonarqube-cli" = "1.10.0.16040"
 "npm:@vshulcz/deja-vu" = "0.22.2"
 lefthook = "2.2.2"
+"github:ivuorinen/git-dirty" = "2026.10.0"
 
 # Homebrew formulae for mise's brew bootstrap ([bootstrap.packages]) live in
 # the conf.d/brew/ folder fragment, split by platform.

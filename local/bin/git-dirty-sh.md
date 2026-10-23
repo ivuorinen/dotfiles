@@ -1,11 +1,11 @@
-# git-dirty
+# git-dirty.sh
 
 A powerful tool to recursively check Git repository status across
 multiple directories.
 
 ## Overview
 
-`git-dirty` scans directories to identify Git repositories and reports their
+`git-dirty.sh` scans directories to identify Git repositories and reports their
 status. It quickly shows which repositories have uncommitted changes,
 untracked files, or need to be pushed, making it easy to maintain clean
 workspaces across multiple projects.
@@ -30,19 +30,19 @@ Place the script in your PATH and make it executable:
 
 ```bash
 # Clone the repository or download the script
-curl -o ~/.local/bin/git-dirty https://raw.githubusercontent.com/ivuorinen/dotfiles/main/local/bin/git-dirty
-chmod +x ~/.local/bin/git-dirty
+curl -o ~/.local/bin/git-dirty.sh https://raw.githubusercontent.com/ivuorinen/dotfiles/main/local/bin/git-dirty.sh
+chmod +x ~/.local/bin/git-dirty.sh
 ```
 
 ## Usage
 
 ```bash
-git-dirty [OPTIONS] [DIRECTORY]
+git-dirty.sh [OPTIONS] [DIRECTORY]
 # or if the file is in the PATH, you can use it as an git command
-git dirty [OPTIONS] [DIRECTORY]
+git dirty.sh [OPTIONS] [DIRECTORY]
 
 # to show help
-git dirty -h
+git dirty.sh -h
 ```
 
 If no directory is specified, it will use `$HOME/Code` as the default.
@@ -64,22 +64,22 @@ If no directory is specified, it will use `$HOME/Code` as the default.
 
 ```bash
 # Check default directory
-git-dirty
+git-dirty.sh
 
 # Check specific directory
-git-dirty ~/Projects
+git-dirty.sh ~/Projects
 
 # Check with extended status information
-git-dirty -a ~/Code
+git-dirty.sh -a ~/Code
 
 # Exclude certain directories
-git-dirty -e 'build,dist,node_modules' ~/Code
+git-dirty.sh -e 'build,dist,node_modules' ~/Code
 
 # Use parallel processing for faster results
-git-dirty -p ~/large-directory
+git-dirty.sh -p ~/large-directory
 
 # Hide branch names in output
-git-dirty -b ~/Code
+git-dirty.sh -b ~/Code
 ```
 
 ## Status Indicators
@@ -111,6 +111,7 @@ You can customize the default behavior using environment variables:
 export GIT_DIRTY_DIR="$HOME/Projects"   # Set default directory
 export GIT_DIRTY_DEPTH=3                # Show non-git dirs up to depth 3
 export GIT_DIRTY_MAXDEPTH=15            # Maximum recursion depth
+export GIT_DIRTY_CHECK_STASH=1          # Enable stash checking
 export GIT_DIRTY_COLOR=1                # Enable colorized output (0 to disable)
 export GIT_DIRTY_TRUNCATE=1             # Enable path truncation (0 to disable)
 export GIT_DIRTY_SHOW_BRANCH=1          # Show branch names (0 to disable)
@@ -153,25 +154,25 @@ to avoid committing these files.
 Add an alias: Create an alias in your shell configuration:
 
 ```bash
-alias gd='git-dirty'
+alias gd='git-dirty.sh'
 ```
 
 Use it with specific directories:
 
 ```bash
-git-dirty ~/specific/project
+git-dirty.sh ~/specific/project
 ```
 
 Run in parallel mode for large codebases:
 
 ```bash
-git-dirty -p ~/huge-monorepo
+git-dirty.sh -p ~/huge-monorepo
 ```
 
 Turn off branch display for cleaner output:
 
 ```bash
-git-dirty -b
+git-dirty.sh -b
 ```
 
 ## Requirements
