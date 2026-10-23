@@ -19,7 +19,7 @@ setup()
   # environment a commit hook inherits (GIT_INDEX_FILE and friends).
   unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_COMMON_DIR GIT_PREFIX
 
-  GD="$BATS_TEST_DIRNAME/../local/bin/git-dirty"
+  GD="$BATS_TEST_DIRNAME/../local/bin/git-dirty-sh"
   TMP="$(mktemp -d)"
   TREE="$TMP/tree"
   mkdir -p "$TREE" "$TMP/config"
