@@ -40,5 +40,11 @@ bats = "1.14.0"
 prek = "0.5.5"
 stylua = "latest"
 
+# What the bats suite needs beyond bats itself; the Tests workflow installs
+# them by name through install_args. Same pins as config/mise/config.toml.
+uv = "0.13.1"
+age = "1.3.2"
+tmux = "3.7c"
+
 # Quality gates are file tasks in .mise/tasks/, one script per task (`mise
 # tasks` lists them). `mise run lint` is what CI and the Stop hook run.
