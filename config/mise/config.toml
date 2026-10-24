@@ -187,7 +187,7 @@ prek = "0.5.5"
 # System monitoring & misc utilities
 bottom = "0.14.9"
 cheat = "5.1.0"
-"github:binwiederhier/ntfy" = "2.31.0"
+"github:binwiederhier/ntfy" = "2.32.0"
 "github:wakatime/wakatime-cli" = "2.27.13"
 "github:o2sh/onefetch" = "3.0.0"
 "npm:ccusage" = "20.0.34"
