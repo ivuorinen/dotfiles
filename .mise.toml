@@ -11,7 +11,7 @@ dotnet = "10"
 # copies.
 biome = "2.5.15"
 editorconfig-checker = "4.0.2"
-usage = "7.0.1"
+usage = "7.1.0"
 "npm:prettier" = "3.9.10"
 "npm:markdownlint-cli" = "0.49.1"
 "npm:markdown-table-formatter" = "1.7.0"

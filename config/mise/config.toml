@@ -64,7 +64,7 @@ cmake = "4.4.4"
 # Shell, prompt & terminal sessions
 starship = "1.27.0"
 tmux = "3.7c"
-usage = "7.0.1"
+usage = "7.1.0"
 "github:joshmedeski/sesh" = "2.33.0"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
