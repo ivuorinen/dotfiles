@@ -181,7 +181,7 @@ zizmor = "1.31.1"
 # Build, test & CI
 bats = "1.14.0"
 shellspec = "0.28.1"
-prek = "0.5.5"
+prek = "0.5.7"
 "npm:corepack" = "0.36.0"
 
 # System monitoring & misc utilities
