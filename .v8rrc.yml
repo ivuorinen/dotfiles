@@ -1,0 +1,14 @@
+---
+# Pin the pyproject.toml schema to a SchemaStore commit instead of the
+# catalog's moving master URL. From SchemaStore#6521 on, master's
+# pyproject.json $refs https://www.schemastore.org/complexipy.json before
+# the site serves it, and v8r fails the whole lint run on that 404.
+# Drop this entry once that URL returns 200 (open finding under
+# docs/audit/findings/deps/).
+customCatalog:
+  schemas:
+    - name: PyProject (pinned)
+      description: pyproject.json at SchemaStore 6ae72b03, the commit before complexipy
+      fileMatch:
+        - pyproject.toml
+      location: https://raw.githubusercontent.com/SchemaStore/schemastore/6ae72b035a4dec50dc3d395b203b4d14129a6feb/src/schemas/json/pyproject.json
