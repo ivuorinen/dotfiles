@@ -144,13 +144,16 @@ truncation_symbol = "…/"
 format = "[$path]($style)[$read_only]($read_only_style) "
 read_only = " "
 read_only_style = "red"
-fish_style_pwd_dir_length = 1
+# Cap the path at 40 chars: first 23 + … + last 14, after the 2-char
+# truncation_symbol. Any substitution turns off fish-style parent dirs.
+substitutions = [{ from = '^(.{23}).{2,}(.{14})$', to = '${1}…${2}', regex = true }]
 
 # Git — lightGreen in omp = green here; branch and status share the colour.
 [git_branch]
 symbol = "\uE725 "
 style = "green"
 format = "[$symbol$branch]($style) "
+truncation_length = 40
 
 [git_status]
 style = "green"
