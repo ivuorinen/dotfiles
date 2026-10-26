@@ -37,7 +37,7 @@ gitleaks = "8.30.1"
 # contributor to use. Same pins as config/mise/config.toml, so `mise install`
 # in a fresh clone provides them without linking the global config into ~.
 bats = "1.14.0"
-prek = "0.5.5"
+prek = "0.5.7"
 stylua = "latest"
 
 # What the bats suite needs beyond bats itself; the Tests workflow installs
