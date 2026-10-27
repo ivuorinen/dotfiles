@@ -86,7 +86,25 @@ bashcompinit
 # `enable_transience` collapses prior prompts to just the character symbol
 # so scrollback stays clean (matches tide --transient=Yes).
 if command -v starship > /dev/null 2>&1; then
-  lib::init_cached starship starship init zsh
+  # The init calls starship by the versioned install path it sees under the
+  # mise shim, and `mise prune` deletes that path from under a running shell
+  # after a version bump. precmd runs before the prompt is drawn, so run the
+  # init again there once that binary is gone.
+  _dotfiles_starship_init()
+  {
+    [[ -x ${_dotfiles_starship_bin-} ]] && return
+    # starship wraps whatever zle-keymap-select it finds and remembers that
+    # widget, so drop its own before a re-init or it wraps its own wrapper.
+    [[ -n ${_dotfiles_starship_bin+set} ]] && zle -D zle-keymap-select
+    lib::init_cached starship starship init zsh
+    local re='^\$\((/[^ ]+) prompt'
+    _dotfiles_starship_bin=
+    # shellcheck disable=SC2154 # zsh sets $match on =~
+    [[ $PROMPT =~ $re ]] && _dotfiles_starship_bin=${match[1]}
+  }
+  _dotfiles_starship_init
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _dotfiles_starship_init
   function starship_transient_prompt_func() {
     starship module character
   }

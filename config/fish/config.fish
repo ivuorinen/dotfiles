@@ -51,7 +51,19 @@ if status is-interactive
     if type -q starship
         # `starship init fish` is only a wrapper that sources
         # --print-full-init, so cache the full init directly.
-        __init_cached starship starship init fish --print-full-init
+        #
+        # The init calls starship by the versioned install path it sees under
+        # the mise shim, and `mise prune` deletes that path from under a running
+        # shell after a version bump. fish_prompt fires before the prompt is
+        # drawn, so run the init again there once that binary is gone. Defined
+        # here rather than in functions/ for the autoload reason given at
+        # __gpg_ssh_updatetty below.
+        function __dotfiles_starship_init --on-event fish_prompt
+            test -x "$__dotfiles_starship_bin"; and return
+            __init_cached starship starship init fish --print-full-init
+            set -g __dotfiles_starship_bin (functions fish_prompt | string match -rg '^\s*(/\S+) prompt')
+        end
+        __dotfiles_starship_init
         function starship_transient_prompt_func
             starship module character
         end
