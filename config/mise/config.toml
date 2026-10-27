@@ -28,6 +28,13 @@ idiomatic_version_file_enable_tools = [
   "deno",
   "dotnet",
 ]
+# A go.mod `go X.Y` line only declares the oldest Go a module supports.
+# mise is dropping it as a version request and warns until then, on every
+# `mise install`, since that reads the go.mod of every tracked project.
+# This opts into the 2026.11.0 behaviour now; `toolchain` lines and
+# .go-version still select Go. mise removes the setting in 2026.11.0, so
+# delete it then.
+idiomatic_version_file_ignore_minimum_versions = true
 
 # Generate mise.lock for reproducible installs
 lockfile = true
