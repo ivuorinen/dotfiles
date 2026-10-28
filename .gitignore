@@ -77,9 +77,6 @@ cr.md
 # copilot coding harness
 config/copilot/*
 !config/copilot/copilot-instructions.md
-!config/copilot/hooks/
-config/copilot/hooks/*
-!config/copilot/hooks/context-mode.json
 !config/copilot/mcp-config.json
 !config/copilot/settings.json
 !config/copilot/skills/
