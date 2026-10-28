@@ -85,5 +85,15 @@
       "indentWidth": 2,
       "lineWidth": 90
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["config/copilot/*.json"],
+      "json": {
+        "formatter": {
+          "expand": "always"
+        }
+      }
+    }
+  ]
 }

@@ -1,6 +1,8 @@
 {
   "enabledPlugins": {},
-  "allowedUrls": ["http://localhost:4200"],
+  "allowedUrls": [
+    "http://localhost:4200"
+  ],
   "theme": "default",
   "statusLine": {
     "command": "deja-hook statusline",
