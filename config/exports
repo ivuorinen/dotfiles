@@ -356,6 +356,15 @@ export PATH="$COMPOSER_BIN:$PATH"
 msg "Setting up copilot configuration"
 export COPILOT_HOME="$XDG_CONFIG_HOME/copilot"
 
+# Claude Code: CLAUDE_CONFIG_DIR moves ~/.claude and ~/.claude.json (to
+# $CLAUDE_CONFIG_DIR/.claude.json) together. State, not config: none of it
+# belongs in this repo. It stays unset while ~/.claude is still the live dir,
+# until scripts/cleanup-move-claude-to-state.sh has moved it on this machine.
+msg "Setting up Claude Code configuration"
+if [ ! -d "$HOME/.claude" ] || [ -d "$XDG_STATE_HOME/claude" ]; then
+  export CLAUDE_CONFIG_DIR="$XDG_STATE_HOME/claude"
+fi
+
 # pi.dev
 msg "Setting up pi.dev configuration"
 # The agent dir itself: pi appends /agent only to its ~/.pi default.

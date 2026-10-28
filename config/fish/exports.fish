@@ -81,6 +81,12 @@ set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
 # copilot environment
 set -q COPILOT_HOME; or set -x COPILOT_HOME "$XDG_CONFIG_HOME/copilot"
 
+# Claude Code environment (rationale in config/exports): unset while ~/.claude
+# is still the live dir, until scripts/cleanup-move-claude-to-state.sh has run
+if not test -d "$HOME/.claude"; or test -d "$XDG_STATE_HOME/claude"
+    set -q CLAUDE_CONFIG_DIR; or set -x CLAUDE_CONFIG_DIR "$XDG_STATE_HOME/claude"
+end
+
 # pi.dev environment
 # The agent dir itself: pi appends /agent only to its ~/.pi default.
 set -q PI_CODING_AGENT_DIR; or set -x PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi/agent"
