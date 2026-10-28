@@ -61,7 +61,7 @@ minimum_release_age_excludes = ["pypi:*"]
 
 # Language runtimes & build toolchains
 node = "lts"
-bun = "1.4.3"
+bun = "1.4.4"
 python = "3.14"
 go = "1.27.3"
 rust = "1.99.1"
