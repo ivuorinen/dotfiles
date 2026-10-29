@@ -1,9 +1,4 @@
 [tools]
-node = "26.12.1"
-python = "3.14"
-go = "1.27.3"
-dotnet = "10"
-
 # The `mise run lint` toolchain. These are also pinned in
 # config/mise/config.toml (the global config, symlinked to ~/.config/mise/),
 # which is what provides them on a workstation. CI checks out the repo and
