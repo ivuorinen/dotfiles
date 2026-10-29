@@ -4,7 +4,7 @@
 # which is what provides them on a workstation. CI checks out the repo and
 # never sees that file, so the gate needs them here too — renovate tracks both
 # copies.
-biome = "2.5.15"
+biome = "2.6.3"
 editorconfig-checker = "4.0.2"
 usage = { version = "7.1.3", workflow = "publish-cli.yml" }
 "npm:prettier" = "3.9.10"

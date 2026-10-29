@@ -1,3 +1,23 @@
 #!/usr/bin/env bash
 #MISE description="Biome check (JS/TS/JSON/Markdown)"
+set -euo pipefail
+
+# A new biome pin can need biome.json migrated, and no install hook can be
+# relied on to do it here (see config/mise/config.toml). Migrate before the
+# check so a bump never fails on a stale config. In CI the same migration
+# fails the task instead, so an unmigrated config never reaches main: a
+# stale $schema is only an info diagnostic, which `biome check` passes.
+before=$(cksum biome.json)
+if ! out=$(biome migrate --write 2>&1); then
+  printf '%s\n' "$out" >&2
+  exit 1
+fi
+if [[ $(cksum biome.json) != "$before" ]]; then
+  if [[ -n ${CI:-} ]]; then
+    echo "lint-biome: biome.json needs \`biome migrate --write\` for this biome version" >&2
+    exit 1
+  fi
+  echo "lint-biome: biome migrate updated biome.json; commit it with the pin bump" >&2
+fi
+
 exec biome check .

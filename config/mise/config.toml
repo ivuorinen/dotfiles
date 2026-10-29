@@ -115,7 +115,10 @@ just = "1.59.0"
 
 # Linters & formatters
 editorconfig-checker = "4.0.2"
-biome = "2.5.15"
+# A new biome version can need its config migrated; do it on install, in
+# whichever project triggered it, so biome.json never lags the pin. CI skips it
+# and fails on an unmigrated config.
+biome = { version = "2.6.3", postinstall = '[ -n "$CI" ] || [ ! -f "$MISE_PROJECT_ROOT/biome.json" ] || biome migrate --write --config-path="$MISE_PROJECT_ROOT/biome.json"' }
 "npm:prettier" = "3.9.10"
 "npm:markdownlint-cli" = "0.50.0"
 "npm:markdown-table-formatter" = "1.7.0"
