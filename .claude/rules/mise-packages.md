@@ -2,7 +2,7 @@
 description: "Python packages come from mise's default-packages file; run mise install after adding a tool."
 paths:
   - "config/mise/**"
-  - ".mise.toml"
+  - ".mise/config.toml"
 ---
 
 # mise-managed tools and Python packages

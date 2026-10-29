@@ -19,7 +19,7 @@ default_stages: [pre-commit]
 
 repos:
   # Every linter and formatter below is a `language: system` hook that runs its
-  # tool through `mise exec --`, so the hook runs the version .mise.toml pins —
+  # tool through `mise exec --`, so the hook runs the version .mise/config.toml pins —
   # the same one an interactive shell, `mise run lint` and CI run. A hook repo
   # that bundles its own copy drifts from that pin: the shfmt hook repo sat a
   # release behind mise and the two formatted `! write` differently.
@@ -190,7 +190,7 @@ repos:
         name: bandit
         # Mirrors `mise run lint-bandit`. -c is mandatory: bandit never
         # auto-discovers pyproject.toml, and parsing TOML needs the [toml]
-        # extra that .mise.toml installs.
+        # extra that .mise/config.toml installs.
         entry: mise exec -- bandit -c pyproject.toml
         language: system
         types: [python]

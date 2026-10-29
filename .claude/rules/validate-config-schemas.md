@@ -36,7 +36,8 @@ committing.
 |-------------------------------|--------------------------------------------|--------------------------|
 | `.mega-linter.yml`            | `mise exec -- v8r .mega-linter.yml`        | JSON Schema              |
 | `.github/workflows/*.yml`     | `actionlint` (already in pre-commit)       | GHA grammar (not schema) |
-| `.mise.toml`, `biome.json`    | `mise exec -- v8r <file>`                  | JSON Schema              |
+| `.mise/config.toml`           | `mise exec -- v8r <file>`                  | JSON Schema              |
+| `biome.json`                  | `mise exec -- v8r <file>`                  | JSON Schema              |
 | `.pre-commit-config.yaml`     | `mise exec -- v8r .pre-commit-config.yaml` | JSON Schema              |
 | `install.conf.yaml` (Dotbot)  | `dotbot-validate` skill                    | YAML + link targets      |
 | Generic YAML without a schema | `yamllint` (already in pre-commit)         | Syntax/style only        |

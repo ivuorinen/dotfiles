@@ -14,7 +14,7 @@ trusted_config_paths = [
   "~/Code/eslefi",
 ]
 # Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
-# This repo uses .mise.toml at the repo root for pinned versions.
+# This repo uses .mise/config.toml for pinned versions.
 idiomatic_version_file = true
 idiomatic_version_file_enable_tools = [
   "node",

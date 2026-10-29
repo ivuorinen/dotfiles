@@ -5,11 +5,11 @@ description: "Node CLIs come from mise; never npm, npx or pnpm."
 # Node tools
 
 This repo has no `package.json` and no JavaScript package manager. Every
-Node CLI it uses (prettier, markdownlint, v8r, …) is pinned in `.mise.toml`
-through mise's `npm:` backend, and the lint, fix and test commands are mise
-tasks (`mise tasks` lists them).
+Node CLI it uses (prettier, markdownlint, v8r, …) is pinned in
+`.mise/config.toml` through mise's `npm:` backend, and the lint, fix and test
+commands are mise tasks (`mise tasks` lists them).
 
-- Add a Node CLI as `"npm:<package>" = "<version>"` in `.mise.toml` (and in
+- Add a Node CLI as `"npm:<package>" = "<version>"` in `.mise/config.toml` (and in
   `config/mise/config.toml` when a shell outside the repo needs it too).
 - Run a one-off with `mise exec -- <tool>`, never `npx <package>`.
 - Never `npm install`, `npm run`, `npx`, `pnpm` or `pnpx`.

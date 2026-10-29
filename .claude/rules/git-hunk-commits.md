@@ -41,7 +41,7 @@ rename these subcommands (`.claude/rules/no-hook-bypass.md`).
     separate so they can go to different commits.
 - **Group by concern.** Leave hunks you did not author out unless asked.
     For "smart groups", split by what a revert would need to isolate:
-    repo toolchain (`.mise.toml`), security tools, other global pins.
+    repo toolchain (`.mise/config.toml`), security tools, other global pins.
 - `git-hunk list` prints output, so route it through context-mode
     (`bash-routing.md`); `git-hunk commit` is a state mutation and may
     run under `Bash`.
