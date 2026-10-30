@@ -1,4 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>ivuorinen/renovate-config"]
+  "extends": ["local>ivuorinen/renovate-config"],
+  "packageRules": [
+    {
+      "description": "Hold python on 3.14: pyyaml and tree-sitter ship no cp315 wheels yet, so mise's uv-backed yamllint/bandit installs fail on 3.15",
+      "matchManagers": ["mise"],
+      "matchDepNames": ["python"],
+      "allowedVersions": "<3.15"
+    }
+  ]
 }
