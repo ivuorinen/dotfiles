@@ -143,6 +143,7 @@ STUB
     [ "$status" -eq 0 ]
   done
   [ ! -e "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
   [ ! -L "$HOME/.config/eza/theme.yml" ]
   [ ! -L "$HOME/.config/gitui/theme.ron" ]
 }
@@ -220,7 +221,8 @@ STUB
     run "$HD/$h" light
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/kanagawa/light/starship.toml" ]]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#f2ecbc"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -235,7 +237,8 @@ STUB
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/oasis/dark/starship.toml" ]]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#000000"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
   grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -250,20 +253,27 @@ STUB
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/warm-burnout/dark/starship.toml" ]]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#1a1510"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Warm Burnout Dark" ]
   grep -q "warm-burnout-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
-@test "starship handler: swaps ~/.config/starship.toml symlink" {
+@test "starship handler: composes the prompt with the family palette and links it" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
+  local out="$TMPDIR_TEST/dotfiles-theme/starship.toml"
   run "$HD/starship" light
   [ "$status" -eq 0 ]
-  [ -L "$HOME/.config/starship.toml" ]
-  target="$(readlink "$HOME/.config/starship.toml")"
-  [[ "$target" == *"/catppuccin/light/starship.toml" ]]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$out" ]
+  # The shared prompt, then this family's palette for the mode.
+  [ "$(head -n 1 "$out")" = "$(head -n 1 "$DOTFILES/config/starship/starship.toml")" ]
+  grep -qxF 'palette = "active"' "$out"
+  grep -qxF 'base = "#eff1f5"' "$out"
+  run "$HD/starship" dark
+  [ "$status" -eq 0 ]
+  grep -qxF 'base = "#1e1e2e"' "$out"
 }
 
 @test "starship handler: refuses to clobber a regular file" {

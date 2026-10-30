@@ -67,8 +67,8 @@ x-have antidot && lib::init_cached antidot antidot init --shell bash
 
 PROMPT_DIRTRIM=3
 
-# Starship prompt — colours flip via ~/.config/starship.toml symlink swap
-# managed by the theme orchestrator (config/theme/handlers.d/starship).
+# Starship prompt — ~/.config/starship.toml is composed per family and mode
+# by the theme orchestrator (config/theme/handlers.d/starship).
 command -v starship > /dev/null 2>&1 && lib::init_cached starship starship init bash
 
 if command -v wt > /dev/null 2>&1; then

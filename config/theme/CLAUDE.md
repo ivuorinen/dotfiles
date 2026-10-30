@@ -44,9 +44,13 @@ Dark/light theming is owned by a stand-alone orchestrator:
   assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`,
   `warm-burnout`). A handler
   whose active family ships no file removes its stale link instead of
-  keeping another family's palette.
 - `config/theme/tmux-palette <mode>` — sources the active family's tmux
   palette; called by `config/tmux/tmux.conf`'s bootstrap. On a flip,
+  keeping another family's palette. Shared app config stays out of the
+  tree: `handlers.d/starship` appends the family's `[palettes.active]`
+  table to `config/starship/starship.toml` (named so v8r's catalog
+  validates it), so an edit to that file shows after
+  `dfm theme reapply`.
   `handlers.d/tmux` re-sources the whole `tmux.conf` (so the bootstrap
   must never call that handler back — it would recurse).
 - `local/bin/theme-mode` (and bash/fish functions) — public read API for

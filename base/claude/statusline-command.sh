@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Claude Code statusline.
 #
-# Ports the colors from the starship prompt (config/starship.toml in the
-# dotfiles repo — sky directory, green git branch) and prepends the
+# Ports the colors from the starship prompt (config/starship/starship.toml
+# in the dotfiles repo — sky directory, green git branch) and prepends the
 # ponytail plugin's mode badge when active.
 set -euo pipefail
 

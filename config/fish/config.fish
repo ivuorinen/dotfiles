@@ -44,8 +44,8 @@ if status is-interactive
     # a raw install path — see `which -a gh`.
     type -q mise; and fish_add_path --move --prepend --path "$XDG_DATA_HOME/mise/shims"
 
-    # Starship prompt — colours flip via ~/.config/starship.toml symlink
-    # swap managed by the theme orchestrator (handlers.d/starship).
+    # Starship prompt — ~/.config/starship.toml is composed per family and
+    # mode by the theme orchestrator (handlers.d/starship).
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship

@@ -164,11 +164,6 @@ LOTUS_MUTED='#88877e #716e61 #766b90'
   local f
   for f in "$ROOT/$KP"/light/*; do
     [[ "$(basename "$f")" == bat.theme ]] && continue
-    # The starship header quotes the upstream values it replaced.
-    if [[ "$(basename "$f")" == starship.toml ]]; then
-      targets+=("$KP/light/starship.toml@palette = @[os]")
-      continue
-    fi
     targets+=("${f#"$ROOT/"}")
   done
   targets+=(
@@ -209,10 +204,6 @@ WAVE_MUTED='#727169 #717c7c #6a6780'
   local f
   for f in "$ROOT/$KP"/dark/*; do
     [[ "$(basename "$f")" == bat.theme ]] && continue
-    if [[ "$(basename "$f")" == starship.toml ]]; then
-      targets+=("$KP/dark/starship.toml@palette = @[os]")
-      continue
-    fi
     targets+=("${f#"$ROOT/"}")
   done
   targets+=(
@@ -246,17 +237,13 @@ OASIS_LIGHT_BG='#d4d4d4 #d0d0d0 #cdcdcd #b9b9b9 #97cebe #e1c99d #b9d17a'
 OASIS_LIGHT_MUTED='#647276 #7c7a74 #615f57'
 
 # oasis_palette_targets <mode> — the family's palettes.d files for one mode
-# (bat.theme holds a name, not colours; starship's header quotes the map).
+# (bat.theme holds a name, not colours).
 oasis_palette_targets()
 {
   local f
   targets=()
   for f in "$ROOT/config/theme/palettes.d/oasis/$1"/*; do
     [[ "$(basename "$f")" == bat.theme ]] && continue
-    if [[ "$(basename "$f")" == starship.toml ]]; then
-      targets+=("config/theme/palettes.d/oasis/$1/starship.toml@palette = @[os]")
-      continue
-    fi
     targets+=("${f#"$ROOT/"}")
   done
 }
@@ -331,17 +318,13 @@ WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4
 WB_LIGHT_MUTED='#8a8070 #938871'
 
 # wb_palette_targets <mode> — the family's palettes.d files for one mode
-# (bat.theme holds a name, not colours; starship's header quotes the map).
+# (bat.theme holds a name, not colours).
 wb_palette_targets()
 {
   local f
   targets=()
   for f in "$ROOT/config/theme/palettes.d/warm-burnout/$1"/*; do
     [[ "$(basename "$f")" == bat.theme ]] && continue
-    if [[ "$(basename "$f")" == starship.toml ]]; then
-      targets+=("config/theme/palettes.d/warm-burnout/$1/starship.toml@palette = @[os]")
-      continue
-    fi
     targets+=("${f#"$ROOT/"}")
   done
 }

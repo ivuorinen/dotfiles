@@ -1,0 +1,161 @@
+# Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
+# theme), shared by every theme family.
+#
+# Colours are palette roles. config/theme/handlers.d/starship appends the
+# active family's palette for the mode
+# (config/theme/palettes.d/<family>/<mode>/starship.toml, one
+# [palettes.active] table) to this file and links the result at
+# ~/.config/starship.toml. Starship reads its config on every prompt, so a
+# flip shows on the next one; an edit here shows after `dfm theme reapply`.
+#
+# Layout: line 1 = OS icon · user@host (SSH only) · path
+#                 · git · node · dotnet · go · php · ruby · python
+#         line 2 = ➜ (green on success, red on non-zero exit)
+# Transient prompt collapses prior prompts to just `➜ ` (wired by
+# `enable_transience` in config/fish/config.fish and base/zshrc).
+#
+# Username is peach, hostname is lavender (your "differentiated colours"
+# request); both still hidden outside SSH per starship defaults.
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+command_timeout = 2000
+
+format = """
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$dotnet\
+$golang\
+$php\
+$ruby\
+$python\
+$line_break\
+$character"""
+
+palette = "active"
+
+[os]
+disabled = false
+style = "sky"
+format = "[$symbol]($style) "
+
+# Nerd Font glyphs via \uXXXX escapes — the Write/Edit pipeline strips
+# bare BMP Private-Use-Area characters (U+E000-U+F8FF), so the literal
+# glyphs would arrive as empty strings. Escapes survive verbatim and the
+# TOML parser converts them at load time.
+[os.symbols]
+Macos = ""
+Linux = ""
+Ubuntu = ""
+Debian = ""
+Fedora = ""
+Arch = ""
+Windows = ""
+Alpine = ""
+NixOS = ""
+Raspbian = ""
+Manjaro = ""
+Pop = ""
+
+# Username — only shown over SSH (or as root) per starship defaults.
+# Differentiated from hostname via peach. The "@" separator lives in
+# the hostname format below so it only appears when hostname renders
+# (avoids a dangling "root@" when running as root locally without SSH).
+[username]
+style_user = "peach"
+style_root = "red bold"
+format = "[$user]($style)"
+
+# Hostname — SSH-only by default; lavender so it contrasts with peach user.
+# trim_at = "." matches tide_context_hostname_parts = 1 (drop domain).
+# The "@" separator is part of this format (subtext0) so it only renders
+# when hostname renders.
+[hostname]
+ssh_only = true
+trim_at = "."
+style = "lavender"
+format = "[@](subtext0)[$hostname]($style) "
+
+# Path — sky (Catppuccin's cyan) matches omp's cyan path colour.
+[directory]
+style = "sky"
+truncation_length = 3
+truncation_symbol = "…/"
+format = "[$path]($style)[$read_only]($read_only_style) "
+read_only = " "
+read_only_style = "red"
+# Cap the path at 40 chars: first 23 + … + last 14, after the 2-char
+# truncation_symbol. Any substitution turns off fish-style parent dirs.
+substitutions = [{ from = '^(.{23}).{2,}(.{14})$', to = '${1}…${2}', regex = true }]
+
+# Git — lightGreen in omp = green here; branch and status share the colour.
+[git_branch]
+symbol = " "
+style = "green"
+format = "[$symbol$branch]($style) "
+truncation_length = 40
+
+[git_status]
+style = "green"
+format = "[$all_status$ahead_behind]($style) "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇡${ahead_count}⇣${behind_count} "
+conflicted = "=${count}"
+deleted = "✘${count}"
+modified = "!${count}"
+renamed = "»${count}"
+staged = "+${count}"
+stashed = "≡${count}"
+untracked = "?${count}"
+up_to_date = ""
+
+[git_state]
+style = "yellow"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+# Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
+
+[nodejs]
+symbol = " "
+style = "green"
+version_format = "${major}.${minor}"
+format = "[$symbol$version]($style) "
+
+[dotnet]
+symbol = " "
+style = "mauve"
+version_format = "${major}"
+format = "[$symbol$version]($style) "
+
+[golang]
+symbol = " "
+style = "teal"
+version_format = "${major}.${minor}.${patch}"
+format = "[$symbol$version]($style) "
+
+[php]
+symbol = " "
+style = "lavender"
+format = "[$symbol$version]($style) "
+
+[ruby]
+symbol = " "
+style = "red"
+format = "[$symbol$version]($style) "
+
+[python]
+symbol = " "
+style = "yellow"
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+# Status arrow on its own line. Green on success, red on non-zero exit.
+[character]
+success_symbol = "[➜](green)"
+error_symbol = "[➜](red)"
+vimcmd_symbol = "[❮](green)"
