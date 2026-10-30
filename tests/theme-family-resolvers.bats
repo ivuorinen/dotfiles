@@ -288,11 +288,11 @@ nvim_scheme()
   command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
   # Load wezterm.lua under nvim's Lua with a stub `wezterm` module, then
   # call Scheme_for_appearance per family. Every scheme name it returns
-  # must be a builtin (Catppuccin Mocha) or registered in color_schemes.
+  # must be registered in color_schemes.
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -302,7 +302,7 @@ for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'warm-burnout', 'nosuc
   vim.env.DOTFILES_THEME_FAMILY = fam
   local d, l = Scheme_for_appearance 'Dark', Scheme_for_appearance 'Light'
   for _, s in ipairs { d, l } do
-    assert(s == 'Catppuccin Mocha' or cfg.color_schemes[s], 'unregistered scheme ' .. s)
+    assert(cfg.color_schemes[s], 'unregistered scheme ' .. s)
   end
   print(fam .. '=' .. d .. '|' .. l)
 end
@@ -314,7 +314,7 @@ LUA
   [ "$status" -eq 0 ]
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
-  [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"catppuccin=Catppuccin Mocha AA|Catppuccin Latte AA"* ]]
   [[ "$output" == *"warm-burnout=Warm Burnout Dark|Warm Burnout Light"* ]]
   [[ "$output" == *"nosuchfamily=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
@@ -324,7 +324,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -352,7 +352,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -400,7 +400,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -419,7 +419,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 local watched = {}

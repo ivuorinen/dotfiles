@@ -65,7 +65,9 @@ config.scrollback_lines = 3000
 -- is in config/theme/palettes.d/catppuccin/light/starship.toml. Black and white use
 -- the Catppuccin style guide's Latte mapping (black = subtext1/subtext0,
 -- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
--- which leaves text printed in "black" unreadable.
+-- which leaves text printed in "black" unreadable. White has the same flaw
+-- (surface2 1.91:1, surface1 1.61:1), so both whites are darkened in OKLCH
+-- lightness to 4.5:1.
 local latte_aa = wezterm.color.get_builtin_schemes()['Catppuccin Latte']
 latte_aa.ansi = {
   '#5c5f77',
@@ -75,7 +77,7 @@ latte_aa.ansi = {
   '#1761f5',
   '#c71f9a',
   '#13797e',
-  '#acb0be',
+  '#6a6e7a',
 }
 latte_aa.brights = {
   '#6c6f85',
@@ -85,14 +87,22 @@ latte_aa.brights = {
   '#1761f5',
   '#c71f9a',
   '#13797e',
-  '#bcc0cc',
+  '#6a6e79',
 }
 latte_aa.indexed = { [16] = '#be4601', [17] = '#bb4930' }
+
+-- Catppuccin Mocha with black and bright black raised to overlay0/overlay1,
+-- the pair catppuccin.nvim gives its terminal: the builtin's surface1 and
+-- surface2 sit at 1.80:1 and 2.46:1 on base #1e1e2e, below the 3:1 floor.
+local mocha_aa = wezterm.color.get_builtin_schemes()['Catppuccin Mocha']
+mocha_aa.ansi[1] = '#6c7086'
+mocha_aa.brights[1] = '#7f849c'
 
 -- Kanagawa Wave: upstream rebelot/kanagawa.nvim extras/wezterm/kanagawa.lua
 -- (@ bb85e4bf), except the two reds below WCAG AA on #1f1f28, lifted with
 -- hue and saturation unchanged: ANSI red autumnRed #c34043 (3.22:1) to
--- #cf6769, bright red samuraiRed #e82424 (3.66:1) to #ed4f4f.
+-- #cf6769, bright red samuraiRed #e82424 (3.66:1) to #ed4f4f. ANSI black
+-- #090618 (1.22:1) is raised in OKLCH lightness to #6a6780, 3:1 like a dim.
 local kanagawa_wave = {
   foreground = '#dcd7ba',
   background = '#1f1f28',
@@ -104,7 +114,7 @@ local kanagawa_wave = {
   scrollbar_thumb = '#16161d',
   split = '#16161d',
   ansi = {
-    '#090618',
+    '#6a6780',
     '#cf6769',
     '#76946a',
     '#c0a36e',
@@ -162,7 +172,8 @@ local kanagawa_lotus_aa = {
 }
 
 -- Oasis Abyss Dark and Light 3: upstream uhs-robert/oasis.nvim
--- extras/wezterm/themes/{dark,light/3}/*.toml (@ a3ef178f), unchanged.
+-- extras/wezterm/themes/{dark,light/3}/*.toml (@ a3ef178f), except dark ANSI
+-- black: #000000 is the background itself, so it is raised to #5a5a5a (3:1).
 -- The tab_bar block is left out because the tab bar is disabled above.
 local oasis_abyss_dark = {
   foreground = '#f5f5dc',
@@ -177,7 +188,7 @@ local oasis_abyss_dark = {
   scrollbar_thumb = '#1c1c1c',
   visual_bell = '#141414',
   ansi = {
-    '#000000',
+    '#5a5a5a',
     '#ff7979',
     '#7fcf78',
     '#f0e68c',
@@ -239,7 +250,9 @@ local oasis_abyss_light_3 = {
 -- copy_mode and quick_select blocks are left out (the tab bar is disabled
 -- above; the other two keep WezTerm's defaults, as every other family here).
 -- Colours below WCAG AA are adjusted in lightness only (NOTICE): the accent
--- #b8522e (split, indexed 16) and the light ANSI brights 11, 12 and 14.
+-- #b8522e (split, indexed 16), the light ANSI brights 11, 12 and 14, the
+-- light ANSI whites 7 and 15 and the dark ANSI black 0, which upstream keeps
+-- near the background.
 local warm_burnout_dark = {
   foreground = '#bfbdb6',
   background = '#1a1510',
@@ -253,7 +266,7 @@ local warm_burnout_dark = {
   scrollbar_thumb = '#3a342a',
   visual_bell = '#ffb454',
   ansi = {
-    '#23211b',
+    '#65635c',
     '#f06b73',
     '#70bf56',
     '#fdb04c',
@@ -295,7 +308,7 @@ local warm_burnout_light = {
     '#2060a0',
     '#8a3090',
     '#146858',
-    '#c0b8aa',
+    '#736b5f',
   },
   brights = {
     '#686868',
@@ -305,13 +318,14 @@ local warm_burnout_light = {
     '#286faf',
     '#9a38a0',
     '#1d7964',
-    '#faf6f0',
+    '#6f6c66',
   },
   indexed = { [16] = '#b04e2c', [17] = '#855700' },
 }
 
 config.color_schemes = {
   ['Catppuccin Latte AA'] = latte_aa,
+  ['Catppuccin Mocha AA'] = mocha_aa,
   ['Kanagawa Wave'] = kanagawa_wave,
   ['Kanagawa Lotus AA'] = kanagawa_lotus_aa,
   ['Oasis Abyss Dark'] = oasis_abyss_dark,
@@ -323,7 +337,7 @@ config.color_schemes = {
 local schemes = {
   kanagawa = { dark = 'Kanagawa Wave', light = 'Kanagawa Lotus AA' },
   oasis = { dark = 'Oasis Abyss Dark', light = 'Oasis Abyss Light 3' },
-  catppuccin = { dark = 'Catppuccin Mocha', light = 'Catppuccin Latte AA' },
+  catppuccin = { dark = 'Catppuccin Mocha AA', light = 'Catppuccin Latte AA' },
   ['warm-burnout'] = { dark = 'Warm Burnout Dark', light = 'Warm Burnout Light' },
 }
 

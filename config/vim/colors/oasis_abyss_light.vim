@@ -159,8 +159,10 @@ hi link StatusLineTermNC StatusLineNC
 hi link Terminal Normal
 hi link Ignore Comment
 
-" Set terminal colors for playing well with plugins like fzf
+" Set terminal colors for playing well with plugins like fzf. White and bright
+" white are upstream's terminal ink, as in wezterm: surface2/surface1 sit at
+" 1.24:1 and 1.38:1 on the background, so text printed in white vanished.
 let g:terminal_ansi_colors = [
-  \ s:subtext1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:surface2,
-  \ s:subtext0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:surface1
+  \ s:subtext1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#3a3a1b',
+  \ s:subtext0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#3a3a0c'
 \ ]

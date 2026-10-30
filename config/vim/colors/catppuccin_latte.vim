@@ -159,8 +159,10 @@ hi link StatusLineTermNC StatusLineNC
 hi link Terminal Normal
 hi link Ignore Comment
 
-" Set terminal colors for playing well with plugins like fzf
+" Set terminal colors for playing well with plugins like fzf. White and bright
+" white are surface2/surface1 darkened in OKLCH lightness to 4.5:1, as in
+" wezterm's Latte AA: upstream's sit at 1.91:1 and 1.61:1 on base.
 let g:terminal_ansi_colors = [
-  \ s:subtext1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:surface2,
-  \ s:subtext0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:surface1
+  \ s:subtext1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#6a6e7a',
+  \ s:subtext0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#6a6e79'
 \ ]
