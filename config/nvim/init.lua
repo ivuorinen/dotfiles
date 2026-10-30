@@ -32,6 +32,7 @@ require 'autogroups'
 require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
 
 require 'keymaps'
+require 'keymap-labels' -- descriptions for plugin and built-in maps that lack one
 require 'pack'
 require 'pack-ui'
 

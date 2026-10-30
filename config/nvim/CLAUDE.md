@@ -20,7 +20,8 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
     PackChanged, sessions, linting trigger, otter activation) plus the
     `is-mise?` treesitter predicate used by `after/queries/toml/`
 3. `lua/utils.lua` — registers K, HasConfig, Gated, TOOL_CONFIGS globals
-4. `lua/keymaps.lua` — all non-plugin keybindings
+4. `lua/keymaps.lua` — all non-plugin keybindings; `lua/keymap-labels.lua` adds
+    descriptions to plugin and built-in maps that ship without one
 5. `lua/pack.lua` — PackUpdate / PackRemove user commands (vim.pack built-in,
     no plugin dependency) plus the `FileType nvim-pack` hook that makes the
     update confirm buffer navigable (`:w` applies, `q` / `Esc` discards)
@@ -45,7 +46,7 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 
 Special-buffer pinning (formerly `stickybuf.nvim`) lives in
 `lua/autogroups.lua` as a `winfixbuf` autocmd. The file explorer is
-`mini.files` (opened via `<leader>te` and `-`).
+`mini.files`.
 
 ## Keymap Helpers (`lua/utils.lua`)
 
@@ -97,21 +98,20 @@ Always-on tools (standard / opinion-free) are intentionally omitted
 from TOOL_CONFIGS: `shfmt`, `fish_indent`, `gofmt`, `goimports`,
 `terraform_fmt` (formatters); `shellcheck`, `fish` (linters).
 
-## Leader Key Groups (mini.clue)
+## Keybindings
 
-| Prefix       | Group                  |
-|--------------|------------------------|
-| `<leader>b`  | Buffers                |
-| `<leader>c`  | Code                   |
-| `<leader>cc` | Calls                  |
-| `<leader>q`  | Quit                   |
-| `<leader>s`  | Search (snacks.picker) |
-| `<leader>t`  | Toggle                 |
-| `<leader>tm` | Toggle Options         |
-| `<leader>x`  | Trouble                |
-| `<leader>?`  | Help                   |
+`docs/nvim-keybindings.md` lists every map: global ones, the buffer-local ones
+every buffer gets, and those org buffers add. `lua/keymaps-doc.lua` writes it
+from a running Neovim, and `scripts/create-nvim-keymaps.sh` runs that headless;
+rerun it after changing a map rather than listing keys here or in `README.md`.
+A plugin or built-in map without a description gets one in
+`lua/keymap-labels.lua`. mini.clue's leader group labels come from the `clues`
+table in the `-- Editor` section of `init.lua`.
 
-Source of truth: the `clues` table in the `-- Editor` section of `init.lua`.
+orgmode owns `<leader>o`. Its global maps arrive on a deferred timer and
+overwrite synchronous ones, and its buffer-local maps in org, agenda, capture
+and src buffers shadow globals. Check orgmode's `config/defaults.lua` before
+adding a `<leader>o` key.
 
 ## LSP Architecture
 
@@ -141,12 +141,10 @@ directly. Known globals are declared in `.luarc.json` (`diagnostics.globals`). N
 `workspace.library` in `.luarc.json`: lua_ls lets it replace the client's list, which drops
 `$VIMRUNTIME` and leaves `vim` typed `unknown`. `lazydev.nvim` is not installed.
 
-**Default keymaps** (nvim 0.11): `grn` (rename), `gra` (code action),
-`grr` (references), `gri` (implementations) work out of the box.
-`<leader>c*` keymaps in `lua/keymaps.lua` provide snacks.picker-powered
-variants. `lua/autogroups.lua` wraps `grt` and `gri` with a
-capability check so unsupported servers get a friendly notification
-instead of the default "… is not supported" error.
+**Default keymaps:** Neovim's built-in LSP maps work as is, and
+`lua/keymaps.lua` adds snacks.picker-powered variants. `lua/autogroups.lua`
+wraps `grt` and `gri` with a capability check so unsupported servers get a
+friendly notification instead of the default "… is not supported" error.
 
 **Servers from mise (not mason):** `fish_lsp`, `taplo`, `zizmor`. These are
 excluded from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`.
@@ -158,7 +156,7 @@ and `lua/org.lua` enables it.
 
 ## Formatting
 
-- **conform.nvim** formats on save (disable with `<leader>tf`)
+- **conform.nvim** formats on save (a keymap toggles it)
 - Formatters by filetype: bash/sh→shfmt, lua→stylua, go→golangci-lint,
   ansible→ansible-lint, docker→hadolint
 - LSP formatting is used as fallback for filetypes without a

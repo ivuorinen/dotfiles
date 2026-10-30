@@ -5,6 +5,9 @@ Plugin manager: **vim.pack** (Neovim 0.12+ built-in). All plugins are loaded via
 lives inline in `init.lua` in named sections (`-- Completion`, `-- Editor`, `-- LSP`, etc.),
 except the orgmode stack, which lives in `lua/org.lua`.
 
+Keybindings are listed in [`docs/nvim-keybindings.md`](../../docs/nvim-keybindings.md), generated from a
+running Neovim by `scripts/create-nvim-keymaps.sh`; this file does not repeat them.
+
 User commands (`PackUpdate`, `PackRemove`) live in `lua/pack.lua`; the `:Pack`
 dashboard that lists and manages plugins lives in `lua/pack-ui.lua`.
 
@@ -17,11 +20,9 @@ or `Esc` discards. `:restart` afterwards to load the updated code.
 **blink.cmp** — `https://github.com/saghen/blink.cmp` (pinned to `1.*`)
 
 Completion from LSP, paths, snippets and buffer words, with the `default`
-keymap preset. The menu opens while typing; `<C-y>` accepts, `<C-n>`/`<C-p>`
-select, `<C-Space>` shows the menu or docs, `<C-e>` cancels, `<Tab>`/`<S-Tab>`
-jump between snippet fields. The docs popup opens on its own; `<C-f>`/`<C-b>`
-scroll it. Signature help opens on trigger characters; `<C-k>` toggles it. LSP
-capabilities come from blink's own `plugin/blink-cmp.lua`.
+keymap preset. The menu and its docs popup open while typing; signature help
+opens on trigger characters. LSP capabilities come from blink's own
+`plugin/blink-cmp.lua`.
 
 ## Editor
 
@@ -29,26 +30,26 @@ capabilities come from blink's own `plugin/blink-cmp.lua`.
 
 18 independent modules from a single plugin:
 
-| Module           | Role                                                                  |
-|------------------|-----------------------------------------------------------------------|
-| mini.comment     | `gc` toggle comment operator; `gcc` for current line                  |
-| mini.ai          | Textobjects: `va)`, `yinq`, `ci'`; 750-line lookahead                 |
-| mini.operators   | `g=` evaluate, `gx` exchange, `gm` duplicate, `gR` replace, `gs` sort |
-| mini.splitjoin   | Split/join arguments and lists (`gS`)                                 |
-| mini.surround    | `sa` add, `sd` delete, `sr` replace surrounding delimiters            |
-| mini.bufremove   | Delete/wipeout buffer without disrupting the window layout            |
-| mini.files       | Column-based file explorer (`<leader>te`, `-`); preview pane enabled  |
-| mini.clue        | Key clue popup for `<leader>`, `g`, marks, registers, `<C-w>`, `z`    |
-| mini.diff        | Inline git diff signs in the sign column                              |
-| mini.sessions    | Per-directory sessions; auto-read on start, auto-write on exit        |
-| mini.animate     | Smooth animations for scroll, cursor, and resize                      |
-| mini.cursorword  | Highlight all occurrences of the word under the cursor                |
-| mini.hipatterns  | Highlight `FIXME`, `HACK`, `TODO`, `NOTE`, `BUG`, `PERF`, hex colors  |
-| mini.icons       | Icon provider; mocks `nvim-web-devicons` for plugins that require it  |
-| mini.indentscope | Indent scope indicator; animation disabled                            |
-| mini.statusline  | Mode, git, LSP status, diagnostics, format-on-save indicator          |
-| mini.trailspace  | Highlights and trims trailing whitespace                              |
-| mini.keymap      | `jk`/`kj` → Escape in insert, command, visual, select, terminal       |
+| Module           | Role                                                                 |
+|------------------|----------------------------------------------------------------------|
+| mini.comment     | Toggle-comment operator                                              |
+| mini.ai          | Extended textobjects; 750-line lookahead                             |
+| mini.operators   | Evaluate, exchange, duplicate, replace and sort operators            |
+| mini.splitjoin   | Split/join arguments and lists                                       |
+| mini.surround    | Add, delete and replace surrounding delimiters                       |
+| mini.bufremove   | Delete/wipeout buffer without disrupting the window layout           |
+| mini.files       | Column-based file explorer; preview pane enabled                     |
+| mini.clue        | Key clue popup for the leader and built-in prefixes                  |
+| mini.diff        | Inline git diff signs in the sign column                             |
+| mini.sessions    | Per-directory sessions; auto-read on start, auto-write on exit       |
+| mini.animate     | Smooth animations for scroll, cursor, and resize                     |
+| mini.cursorword  | Highlight all occurrences of the word under the cursor               |
+| mini.hipatterns  | Highlight `FIXME`, `HACK`, `TODO`, `NOTE`, `BUG`, `PERF`, hex colors |
+| mini.icons       | Icon provider; mocks `nvim-web-devicons` for plugins that require it |
+| mini.indentscope | Indent scope indicator; animation disabled                           |
+| mini.statusline  | Mode, git, LSP status, diagnostics, format-on-save indicator         |
+| mini.trailspace  | Highlights and trims trailing whitespace                             |
+| mini.keymap      | `jk`/`kj` → Escape in insert, command, visual, select, terminal      |
 
 ### vim-sleuth — `https://github.com/tpope/vim-sleuth`
 
@@ -116,8 +117,6 @@ Diagnostics list, quickfix, and LSP results UI (`auto_close = true`).
 | cascade     | Shows only the highest-severity items in the current buffer   |
 | test        | Diagnostics in a right-side split (25% width) for test output |
 
-`<C-t>` in snacks.picker sends all current picker results to trouble.
-
 ## Quality Assurance
 
 | Plugin             | Role                                            |
@@ -129,7 +128,7 @@ Diagnostics list, quickfix, and LSP results UI (`auto_close = true`).
 URLs: `github.com/stevearc/conform.nvim` · `github.com/mfussenegger/nvim-lint` ·
 `github.com/zapling/mason-conform.nvim`
 
-`<leader>tf` toggles format-on-save. Skips `node_modules/`, `vendor/`, `dist/`.
+Format-on-save can be toggled off, and skips `node_modules/`, `vendor/`, `dist/`.
 
 ### Formatters (conform)
 
@@ -182,7 +181,7 @@ Multi-feature plugin; each snack is independently toggleable:
 |----------------|----------------------------------------------------------|
 | vim-wakatime   | Automatic coding time tracking via WakaTime              |
 | nvim-shellspec | ShellSpec filetype support (auto-format, 2-space indent) |
-| mini.comment   | Toggle comments via `gc`/`gcc` (from mini.nvim)          |
+| mini.comment   | Toggle comments (from mini.nvim)                         |
 
 URLs: `github.com/wakatime/vim-wakatime` · `github.com/ivuorinen/nvim-shellspec`
 
