@@ -67,10 +67,11 @@ config.scrollback_lines = 3000
 -- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
 -- which leaves text printed in "black" unreadable. White has the same flaw
 -- (surface2 1.91:1, surface1 1.61:1), so both whites are darkened in OKLCH
--- lightness to 4.5:1.
+-- lightness to 4.5:1. Black is then Mocha's base #1e1e2e instead of
+-- subtext1, so black on white (`30;47`) keeps 3:1.
 local latte_aa = wezterm.color.get_builtin_schemes()['Catppuccin Latte']
 latte_aa.ansi = {
-  '#5c5f77',
+  '#1e1e2e',
   '#d20f39',
   '#327c21',
   '#996114',
@@ -94,15 +95,19 @@ latte_aa.indexed = { [16] = '#be4601', [17] = '#bb4930' }
 -- Catppuccin Mocha with black and bright black raised to overlay0/overlay1,
 -- the pair catppuccin.nvim gives its terminal: the builtin's surface1 and
 -- surface2 sit at 1.80:1 and 2.46:1 on base #1e1e2e, below the 3:1 floor.
+-- White is text, as catppuccin.nvim has it: subtext1 is 2.76:1 over overlay0,
+-- under the 3:1 black on white (`30;47`) needs.
 local mocha_aa = wezterm.color.get_builtin_schemes()['Catppuccin Mocha']
 mocha_aa.ansi[1] = '#6c7086'
+mocha_aa.ansi[8] = '#cdd6f4'
 mocha_aa.brights[1] = '#7f849c'
 
 -- Kanagawa Wave: upstream rebelot/kanagawa.nvim extras/wezterm/kanagawa.lua
 -- (@ bb85e4bf), except the two reds below WCAG AA on #1f1f28, lifted with
 -- hue and saturation unchanged: ANSI red autumnRed #c34043 (3.22:1) to
 -- #cf6769, bright red samuraiRed #e82424 (3.66:1) to #ed4f4f. ANSI black
--- #090618 (1.22:1) is raised in OKLCH lightness to #6a6780, 3:1 like a dim.
+-- #090618 (1.22:1) is raised in OKLCH lightness to #6a6780, 3:1 like a dim,
+-- and ANSI white oldWhite #c8c093 to #cac295, so black on white keeps 3:1.
 local kanagawa_wave = {
   foreground = '#dcd7ba',
   background = '#1f1f28',
@@ -121,7 +126,7 @@ local kanagawa_wave = {
     '#7e9cd8',
     '#957fb8',
     '#6a9589',
-    '#c8c093',
+    '#cac295',
   },
   brights = {
     '#727169',
@@ -252,7 +257,8 @@ local oasis_abyss_light_3 = {
 -- Colours below WCAG AA are adjusted in lightness only (NOTICE): the accent
 -- #b8522e (split, indexed 16), the light ANSI brights 11, 12 and 14, the
 -- light ANSI whites 7 and 15 and the dark ANSI black 0, which upstream keeps
--- near the background.
+-- near the background. The light ANSI black is the dark background #1a1510,
+-- so black on the darkened white (`30;47`) keeps 3:1.
 local warm_burnout_dark = {
   foreground = '#bfbdb6',
   background = '#1a1510',
@@ -301,7 +307,7 @@ local warm_burnout_light = {
   scrollbar_thumb = '#c5beb2',
   visual_bell = '#855700',
   ansi = {
-    '#3a3630',
+    '#1a1510',
     '#b82820',
     '#2d6a14',
     '#8a6000',

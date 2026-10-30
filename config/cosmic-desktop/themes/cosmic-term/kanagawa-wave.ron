@@ -12,7 +12,7 @@
     blue: "#7e9cd8",
     magenta: "#d27e99",
     cyan: "#7aa89f",
-    white: "#c8c093"
+    white: "#cac295"
   ),
   bright: (
     black: "#727169",
@@ -32,6 +32,6 @@
     blue: "#7e9cd8",
     magenta: "#d27e99",
     cyan: "#7aa89f",
-    white: "#c8c093"
+    white: "#cac295"
   ),
 )

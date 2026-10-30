@@ -416,7 +416,10 @@ WB_DARK_MUTED='#746f67 #6b6860 #686868 #65635c'
 # bright) or a wezterm ansi/brights pair (the text from <start> to <end>, or
 # to the next line holding only `}`), and fails for any colour under 4.5:1
 # on <bg>. Bright black, and black on a dark <bg>, are dims and need 3:1.
-# Catppuccin Mocha's wezterm scheme is the builtin with two entries patched,
+# Black on white (ANSI 0 over 7, as `30;47` draws it) needs 3:1 too, except
+# in a row whose <bg> ends in `!`: Kanagawa Lotus and Oasis Light keep
+# upstream's ink whites, which no black reaches 3:1 against.
+# Catppuccin Mocha's wezterm scheme is the builtin with three entries patched,
 # so its vim and COSMIC files stand in for it.
 check_terminal()
 {
@@ -453,6 +456,8 @@ def colours(text, whole):
 bad = []
 for row in rows:
     bg, spec = row.split("|", 1)
+    pair = not bg.endswith("!")
+    bg = bg.rstrip("!")
     rel, *cut = spec.split("@")
     whole = (pathlib.Path(root) / rel).read_text()
     text = whole
@@ -468,6 +473,8 @@ for row in rows:
         floor = 3.0 if i == 8 or (i == 0 and lum(bg) < 0.2) else 4.5
         if ratio(c, bg) < floor:
             bad.append(f"{rel}: ANSI {i} {c} is {ratio(c, bg):.2f}:1 on {bg} (needs {floor})")
+    if pair and ratio(cols[0], cols[7]) < 3.0:
+        bad.append(f"{rel}: ANSI 0 {cols[0]} on 7 {cols[7]} is {ratio(cols[0], cols[7]):.2f}:1 (needs 3.0)")
 print("\n".join(bad))
 sys.exit(1 if bad else 0)
 PY
@@ -479,9 +486,9 @@ PY
   run check_terminal \
     "#f5ede0|$V/warm_burnout_light.vim" "#f5ede0|$C/warm-burnout-light.ron" "#f5ede0|$W@local warm_burnout_light = {" \
     "#1a1510|$V/warm_burnout_dark.vim" "#1a1510|$C/warm-burnout-dark.ron" "#1a1510|$W@local warm_burnout_dark = {" \
-    "#f2ecbc|$C/kanagawa-lotus-aa.ron" "#f2ecbc|$W@local kanagawa_lotus_aa = {" \
+    "#f2ecbc!|$C/kanagawa-lotus-aa.ron" "#f2ecbc!|$W@local kanagawa_lotus_aa = {" \
     "#1f1f28|$C/kanagawa-wave.ron" "#1f1f28|$W@local kanagawa_wave = {" \
-    "#d8d8d8|$V/oasis_abyss_light.vim" "#d8d8d8|$C/oasis-abyss-light-3.ron" "#d8d8d8|$W@local oasis_abyss_light_3 = {" \
+    "#d8d8d8!|$V/oasis_abyss_light.vim" "#d8d8d8!|$C/oasis-abyss-light-3.ron" "#d8d8d8!|$W@local oasis_abyss_light_3 = {" \
     "#000000|$V/oasis_abyss_dark.vim" "#000000|$C/oasis-abyss-dark.ron" "#000000|$W@local oasis_abyss_dark = {" \
     "#eff1f5|$V/catppuccin_latte.vim" "#eff1f5|$C/catppuccin-latte.ron" "#eff1f5|$W@latte_aa.ansi = {@latte_aa.indexed" \
     "#1e1e2e|$V/catppuccin_mocha.vim" "#1e1e2e|$C/catppuccin-mocha.ron"
@@ -504,6 +511,25 @@ VIM
   [ "$status" -eq 1 ]
   [[ "$output" == *"ANSI 7 #c0b8aa is 1.69:1"* ]]
   [[ "$output" == *"ANSI 15 #faf6f0 is 1.08:1"* ]]
+}
+
+@test "terminal palettes: the check catches black on white under 3:1" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  # Warm Burnout Light's AA whites over upstream's black #3a3630.
+  cat > "$BATS_TEST_TMPDIR/p/planted.vim" << 'VIM'
+let g:terminal_ansi_colors = [
+      \ '#3a3630', '#b82820', '#2d6a14', '#8a6000',
+      \ '#2060a0', '#8a3090', '#146858', '#736b5f',
+      \ '#686868', '#c83028', '#3a7a20', '#8b6507',
+      \ '#286faf', '#9a38a0', '#1d7964', '#6f6c66',
+      \ ]
+VIM
+  ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0|p/planted.vim"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ANSI 0 #3a3630 on 7 #736b5f is 2.28:1"* ]]
+  ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0!|p/planted.vim"
+  [ "$status" -eq 0 ]
 }
 
 # --- file colours -----------------------------------------------------------

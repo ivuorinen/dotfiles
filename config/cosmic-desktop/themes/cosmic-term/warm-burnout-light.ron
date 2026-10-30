@@ -5,7 +5,7 @@
   bright_foreground: "#3a3630",
   dim_foreground: "#938871",
   normal: (
-    black: "#5c5750",
+    black: "#1a1510",
     red: "#b03434",
     green: "#4d5c1a",
     yellow: "#855700",
@@ -25,7 +25,7 @@
     white: "#6f6c66"
   ),
   dim: (
-    black: "#5c5750",
+    black: "#1a1510",
     red: "#b03434",
     green: "#4d5c1a",
     yellow: "#855700",

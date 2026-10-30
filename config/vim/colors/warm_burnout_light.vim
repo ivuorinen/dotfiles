@@ -20,7 +20,7 @@ let g:colors_name = 'warm_burnout_light'
 
 " -- Terminal ANSI colors (16) --
 let g:terminal_ansi_colors = [
-      \ '#3a3630', '#b82820', '#2d6a14', '#8a6000',
+      \ '#1a1510', '#b82820', '#2d6a14', '#8a6000',
       \ '#2060a0', '#8a3090', '#146858', '#736b5f',
       \ '#686868', '#c83028', '#3a7a20', '#8b6507',
       \ '#286faf', '#9a38a0', '#1d7964', '#6f6c66',

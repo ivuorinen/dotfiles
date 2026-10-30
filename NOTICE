@@ -134,9 +134,10 @@ Kanagawa theme assets -- MIT
   Local changes to the vendored Wave files: foregrounds below WCAG AA on
   #1f1f28 are lifted (autumnRed, samuraiRed, dragonBlue), the wezterm ANSI
   black #090618 (1.22:1) is raised in OKLCH lightness to #6a6780 (3:1, a
-  dim), and kanagawa_wave.vim sets g:colors_name after `hi clear`. Each
-  file's header lists its changes; diff against the commits above to
-  refresh.
+  dim), the wezterm ANSI white #c8c093 to #cac295 so black on white keeps
+  3:1 (2.95 -> 3.02), and kanagawa_wave.vim sets g:colors_name after
+  `hi clear`. Each file's header lists its changes; diff against the
+  commits above to refresh.
 
   The Lotus AA variants, and the Kanagawa palettes under
   config/theme/palettes.d/kanagawa/, are derived from these colours and
@@ -211,6 +212,10 @@ Warm Burnout theme assets -- MIT
   #faf6f0's 67% saturation and turns it brown. Upstream keeps all three
   near the background, where text that terminal apps print in them
   vanishes. The COSMIC terminal themes use the same values.
+
+  The light ANSI black #3a3630 becomes the dark background #1a1510: on the
+  darkened white 7 it sat at 2.28:1, and black on white (`30;47`) needs
+  3:1 (now 3.45).
 
   The Warm Burnout palettes under config/theme/palettes.d/warm-burnout/,
   warm-burnout-aa.theme, the airline, television and COSMIC themes are

@@ -161,8 +161,9 @@ hi link Ignore Comment
 
 " Set terminal colors for playing well with plugins like fzf. White and bright
 " white are surface2/surface1 darkened in OKLCH lightness to 4.5:1, as in
-" wezterm's Latte AA: upstream's sit at 1.91:1 and 1.61:1 on base.
+" wezterm's Latte AA: upstream's sit at 1.91:1 and 1.61:1 on base. Black is
+" Mocha's base, so black on white keeps 3:1 over the darkened white.
 let g:terminal_ansi_colors = [
-  \ s:subtext1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#6a6e7a',
+  \ '#1e1e2e', s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#6a6e7a',
   \ s:subtext0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, '#6a6e79'
 \ ]
