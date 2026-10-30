@@ -128,8 +128,8 @@ newest release tag by the
 
 Scripts across the repo (`local/bin`, `scripts/`, `config/`, the installer and
 the Claude hooks) are tested with [Bats](https://github.com/bats-core/bats-core).
-Run `mise run test` to execute every test file. Bats is pinned in `.mise.toml`,
-so run `mise install` first if needed.
+Run `mise run test` to execute every test file. Bats is pinned in
+`.mise/config.toml`, so run `mise install` first if needed.
 
 [dfm]: https://github.com/ivuorinen/dotfiles/blob/main/local/bin/dfm
 [docs-folders]: https://github.com/ivuorinen/dotfiles/blob/main/docs/folders.md

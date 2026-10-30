@@ -313,7 +313,7 @@ lib::init_cached()
   for stamp in \
     "$resolved" \
     "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml" \
-    "${DOTFILES:-$HOME/.dotfiles}/.mise.toml"; do
+    "${DOTFILES:-$HOME/.dotfiles}/.mise/config.toml"; do
     [[ -e "$stamp" ]] && [[ "$stamp" -nt "$cache" ]] && stale=1
   done
 

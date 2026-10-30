@@ -14,7 +14,7 @@ trusted_config_paths = [
   "~/Code/eslefi",
 ]
 # Respect .nvmrc, .python-version, .ruby-version, etc. in other projects.
-# This repo uses .mise.toml at the repo root for pinned versions.
+# This repo uses .mise/config.toml for pinned versions.
 idiomatic_version_file = true
 idiomatic_version_file_enable_tools = [
   "node",
@@ -65,20 +65,20 @@ bun = "1.4.4"
 python = "3.14"
 go = "1.27.3"
 rust = "1.99.1"
-uv = "0.13.1"
-cmake = "4.4.4"
+uv = "0.13.6"
+cmake = "4.4.5"
 
 # Shell, prompt & terminal sessions
 starship = "1.27.0"
 tmux = "3.7c"
-usage = "7.1.0"
-"github:joshmedeski/sesh" = "2.33.0"
+usage = "7.1.3"
+"github:joshmedeski/sesh" = "2.34.0"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # File navigation, search & viewing
 fd = "10.5.0"
 ripgrep = "15.2.0"
-eza = "0.23.5"
+"cargo:eza" = "0.23.5"
 zoxide = "0.10.0"
 fzf = "0.74.5"
 "github:alexpasmantier/television" = "0.15.9"
@@ -89,18 +89,18 @@ glow = "3.0.0"
 jq = "1.8.2"
 yq = "4.54.1"
 choose = "1.3.7"
-"github:jgm/pandoc" = "3.12.1"
+"github:jgm/pandoc" = "3.13"
 
 # Git & version control
-github-cli = "2.102.0"
+github-cli = "2.103.3"
 gitui = "0.28.1"
 lazygit = "0.66.2"
 delta = "0.20.1"
 difftastic = "0.71.0"
 "github:dotzero/git-profile" = "1.9.2"      # ships macOS-all universal binary
-"github:max-sixty/worktrunk" = "0.80.0"
+"github:max-sixty/worktrunk" = "0.81.0"
 "npm:github-release-notes" = "0.17.3"
-"github:shhac/git-hunk" = "0.20.0"
+"github:shhac/git-hunk" = "0.21.1"
 "github:ivuorinen/gh-history" = "2026.03.0"
 
 # Editors & language servers
@@ -115,14 +115,17 @@ just = "1.59.0"
 
 # Linters & formatters
 editorconfig-checker = "4.0.2"
-biome = "2.5.15"
+# A new biome version can need its config migrated; do it on install, in
+# whichever project triggered it, so biome.json never lags the pin. CI skips it
+# and fails on an unmigrated config.
+biome = { version = "2.6.3", postinstall = '[ -n "$CI" ] || [ ! -f "$MISE_PROJECT_ROOT/biome.json" ] || biome migrate --write --config-path="$MISE_PROJECT_ROOT/biome.json"' }
 "npm:prettier" = "3.9.10"
-"npm:markdownlint-cli" = "0.49.1"
+"npm:markdownlint-cli" = "0.50.0"
 "npm:markdown-table-formatter" = "1.7.0"
 "npm:v8r" = "6.1.0"
 yamllint = "1.38.0"
 yamlfmt = "0.21.0"
-ruff = "0.17.2"
+ruff = "0.17.3"
 taplo = "0.10.0"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
@@ -148,7 +151,7 @@ hadolint = "2.15.1"
 "github:segmentio/golines" = "0.13.0"
 "github:mgechev/revive" = "1.17.1"
 "go:github.com/fzipp/gocyclo/cmd/gocyclo" = "0.6.0"
-golangci-lint = "2.14.0"
+golangci-lint = "2.15.0"
 
 # Security & supply chain
 age = "1.3.2"
@@ -169,17 +172,17 @@ trufflehog = "3.99.7"
 # signature check. A bare entry also lets the registry absorb an upstream org
 # rename — which is exactly how gitui moved from extrawurst to gitui-org
 # without a config change.
-"github:anchore/grype" = "0.120.1"
-trivy = "0.76.0"
-"github:anchore/syft" = "1.54.1"
-opengrep = "1.31.0"
+"github:anchore/grype" = "0.121.0"
+trivy = "0.76.1"
+"github:anchore/syft" = "1.55.0"
+opengrep = "1.33.0"
 osv-scanner = "2.7.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
 checkov = "3.3.30"
-pinact = "5.0.1"
+pinact = "5.0.2"
 zizmor = "1.31.1"
 # Go vulnerability scanner. Neither the registry nor the github backend knows
 # golang/vuln, so the go backend is the only route — same case as gocyclo above.
@@ -194,19 +197,19 @@ prek = "0.5.7"
 # System monitoring & misc utilities
 bottom = "0.14.9"
 cheat = "5.1.0"
-"github:binwiederhier/ntfy" = "2.32.0"
-"github:wakatime/wakatime-cli" = "2.27.13"
-"github:o2sh/onefetch" = "3.0.0"
-"npm:ccusage" = "20.0.34"
+"github:binwiederhier/ntfy" = "2.34.0"
+"github:wakatime/wakatime-cli" = "2.28.0"
+"github:o2sh/onefetch" = "3.1.0"
+"npm:ccusage" = "20.0.45"
 adr-tools = "3.0.0"
 codeql = "2.27.3"
-copilot = "1.0.103"
+copilot = "1.0.105"
 herdr = "0.9.5"
-pi = "1.3.0"
+pi = "1.4.0"
 "npm:context-mode" = "1.0.169"
 "npm:@tobilu/qmd" = "2.8.3"
-"aqua:SonarSource/sonarqube-cli" = "1.10.0.16040"
-"npm:@vshulcz/deja-vu" = "0.22.2"
+"aqua:SonarSource/sonarqube-cli" = "1.11.0.16877"
+"npm:@vshulcz/deja-vu" = "0.23.1"
 lefthook = "2.2.2"
 "github:ivuorinen/git-dirty" = "2026.10.0"
 

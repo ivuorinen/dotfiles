@@ -19,6 +19,15 @@ DISABLE_LINTERS:
   - TYPESCRIPT_PRETTIER # using biome
   - TYPESCRIPT_STANDARD # using biome
   - JSON_PRETTIER # using biome
+  # MegaLinter bundles its own biome, which lags the pin and rejects a
+  # biome.json migrated for a newer one; `mise run lint` runs the pinned biome.
+  - CSS_BIOME
+  - GRAPHQL_BIOME
+  - JAVASCRIPT_BIOME
+  - JSON_BIOME
+  - JSX_BIOME
+  - TSX_BIOME
+  - TYPESCRIPT_BIOME
   - PYTHON_BLACK # using ruff
   - PYTHON_FLAKE8 # using ruff
   - PYTHON_PYLINT # using ruff
@@ -30,11 +39,12 @@ REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
 BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn
 FILTER_REGEX_EXCLUDE: >
   (node_modules|tools|config/cheat/cheatsheets/community|config/cheat/cheatsheets/tldr|config/zsh|config/tmux/plugins|config/pi/agent/tmp|config/pi/agent/npm|config/mise/locks)
-# bash-exec checks for the executable bit on bash-shaped files. The
+# bash-exec checks for the executable bit on bash-shaped files. These are
+# sourced, not executed, so the linter's expectation does not apply: the
 # theme palettes under config/theme/palettes.d/ (bat config directives,
-# fzf FZF_DEFAULT_OPTS exports) and the theme libraries _lib.sh and
-# shell-env.sh are sourced, not executed, so the linter's expectation
-# does not apply.
-BASH_EXEC_FILTER_REGEX_EXCLUDE: "config/theme/(palettes\\.d/|_lib\\.sh$|shell-env\\.sh$)"
+# fzf FZF_DEFAULT_OPTS exports), the theme libraries _lib.sh and
+# shell-env.sh, the hook libraries bash-policy.sh and protected-paths.sh,
+# config/lib.sh, config/fzf/fzf.bash and config/op/plugins.sh.
+BASH_EXEC_FILTER_REGEX_EXCLUDE: "(config/theme/(palettes\\.d/|_lib\\.sh$|shell-env\\.sh$)|\\.claude/hooks/lib/(bash-policy|protected-paths)\\.sh$|config/(lib\\.sh|fzf/fzf\\.bash|op/plugins\\.sh)$)"
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN

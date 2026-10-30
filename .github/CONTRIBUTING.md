@@ -12,7 +12,7 @@ your home directory.
 ```bash
 git clone https://github.com/ivuorinen/dotfiles.git
 cd dotfiles
-mise install       # lint/test toolchain, bats and prek, from .mise.toml
+mise install       # lint/test toolchain, bats and prek, from .mise/config.toml
 prek install       # installs the pre-commit and commit-msg hooks
 ```
 

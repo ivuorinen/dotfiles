@@ -31,7 +31,7 @@ function __init_cached --description 'Source a tool init script from cache, rege
     # $XDG_CACHE_HOME/fish/init` forces a rebuild if a tool ever misbehaves.
     set -l stamps $path
     test -n "$XDG_CONFIG_HOME"; and set -a stamps "$XDG_CONFIG_HOME/mise/config.toml"
-    test -n "$DOTFILES"; and set -a stamps "$DOTFILES/.mise.toml"
+    test -n "$DOTFILES"; and set -a stamps "$DOTFILES/.mise/config.toml"
 
     set -l stale 0
     test -s "$cache"; or set stale 1

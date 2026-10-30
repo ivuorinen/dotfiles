@@ -49,12 +49,13 @@ jobs:
         run: |
           brew install fish bash coreutils
 
-      # The pins live in .mise.toml, which mirrors config/mise/config.toml, so
-      # the suite runs on the versions the dotfiles install. install_args
-      # limits mise to these tools instead of the whole .mise.toml toolchain.
-      # No mise_toml input: mise merges it with .mise.toml rather than
-      # replacing it, and .mise.toml wins wherever both pin a tool.
-      # python: .mise.toml pins it, which makes it an install dependency of
+      # The pins live in .mise/config.toml, which mirrors
+      # config/mise/config.toml, so the suite runs on the versions the
+      # dotfiles install. install_args limits mise to these tools instead of
+      # the whole .mise/config.toml toolchain. No mise_toml input: mise merges
+      # it with .mise/config.toml rather than replacing it, and
+      # .mise/config.toml wins wherever both pin a tool.
+      # python: .mise/config.toml pins it, which makes it an install dependency of
       # the pypi-backed yamllint; without it, installing yamllint fails.
       # shfmt: the agent policy hooks parse every command with
       # `shfmt --to-json` and fail closed without it; only 3.14.0+ writes
@@ -66,7 +67,7 @@ jobs:
       # age: the a/ad/ae real-age round-trip tests skip without it, and they
       # are the only tests that prove an encrypted file decrypts.
       - name: Install pinned tools
-        uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
+        uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
         with:
           install_args: python shfmt uv age bats tmux yamllint
 
@@ -92,7 +93,7 @@ jobs:
       # linters.yml only runs on pull_request, so without this job a commit
       # pushed straight to main is never linted server-side.
       - name: Install the mise toolchain
-        uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
+        uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
 
       - name: Run lint
         run: mise run lint

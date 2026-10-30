@@ -1,19 +1,21 @@
 [tools]
-node = "26.12.1"
+# The interpreter the pypi-backed yamllint installs into in CI, and the one
+# ruff and SonarCloud target (.sonarcloud.properties).
 python = "3.14"
-go = "1.27.3"
-dotnet = "10"
+# The runtime the npm-backed lint tools below run on. A CI runner happens to
+# ship one; a fresh clone following .github/CONTRIBUTING.md may not.
+node = "lts"
 
 # The `mise run lint` toolchain. These are also pinned in
 # config/mise/config.toml (the global config, symlinked to ~/.config/mise/),
 # which is what provides them on a workstation. CI checks out the repo and
 # never sees that file, so the gate needs them here too — renovate tracks both
 # copies.
-biome = "2.5.15"
+biome = "2.6.3"
 editorconfig-checker = "4.0.2"
-usage = "7.1.0"
+usage = { version = "7.1.3", workflow = "publish-cli.yml" }
 "npm:prettier" = "3.9.10"
-"npm:markdownlint-cli" = "0.49.1"
+"npm:markdownlint-cli" = "0.50.0"
 "npm:markdown-table-formatter" = "1.7.0"
 "npm:v8r" = "6.1.0"
 # `lint-bandit` is part of the `lint` chain, so the CI gate needs bandit even
@@ -28,7 +30,7 @@ usage = "7.1.0"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
 yamllint = "1.38.0"
-ruff = "0.17.2"
+ruff = "0.17.3"
 actionlint = "1.7.12"
 zizmor = "1.31.1"
 gitleaks = "8.30.1"
@@ -42,7 +44,7 @@ stylua = "latest"
 
 # What the bats suite needs beyond bats itself; the Tests workflow installs
 # them by name through install_args. Same pins as config/mise/config.toml.
-uv = "0.13.1"
+uv = "0.13.6"
 age = "1.3.2"
 tmux = "3.7c"
 
