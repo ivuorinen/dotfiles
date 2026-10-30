@@ -49,18 +49,18 @@ format = "[$symbol]($style) "
 # glyphs would arrive as empty strings. Escapes survive verbatim and the
 # TOML parser converts them at load time.
 [os.symbols]
-Macos = ""
-Linux = ""
-Ubuntu = ""
-Debian = ""
-Fedora = ""
-Arch = ""
-Windows = ""
-Alpine = ""
-NixOS = ""
-Raspbian = ""
-Manjaro = ""
-Pop = ""
+Macos = "\uF179"
+Linux = "\uF17C"
+Ubuntu = "\uF31B"
+Debian = "\uF306"
+Fedora = "\uF30A"
+Arch = "\uF303"
+Windows = "\uF17A"
+Alpine = "\uF300"
+NixOS = "\uF313"
+Raspbian = "\uF315"
+Manjaro = "\uF312"
+Pop = "\uF32A"
 
 # Username — only shown over SSH (or as root) per starship defaults.
 # Differentiated from hostname via peach. The "@" separator lives in
@@ -95,7 +95,7 @@ substitutions = [{ from = '^(.{23}).{2,}(.{14})$', to = '${1}…${2}', regex = t
 
 # Git — lightGreen in omp = green here; branch and status share the colour.
 [git_branch]
-symbol = " "
+symbol = "\uE725 "
 style = "green"
 format = "[$symbol$branch]($style) "
 truncation_length = 40
@@ -122,35 +122,35 @@ format = '\([$state( $progress_current/$progress_total)]($style)\) '
 # Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
 
 [nodejs]
-symbol = " "
+symbol = "\uE718 "
 style = "green"
 version_format = "${major}.${minor}"
 format = "[$symbol$version]($style) "
 
 [dotnet]
-symbol = " "
+symbol = "\uE77F "
 style = "mauve"
 version_format = "${major}"
 format = "[$symbol$version]($style) "
 
 [golang]
-symbol = " "
+symbol = "\uE626 "
 style = "teal"
 version_format = "${major}.${minor}.${patch}"
 format = "[$symbol$version]($style) "
 
 [php]
-symbol = " "
+symbol = "\uE73D "
 style = "lavender"
 format = "[$symbol$version]($style) "
 
 [ruby]
-symbol = " "
+symbol = "\uE739 "
 style = "red"
 format = "[$symbol$version]($style) "
 
 [python]
-symbol = " "
+symbol = "\uE73C "
 style = "yellow"
 format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 
