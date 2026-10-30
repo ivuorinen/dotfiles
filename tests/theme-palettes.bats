@@ -10,7 +10,7 @@ setup()
   PD="$ROOT/config/theme/palettes.d"
   # tmux.thm.conf is optional: only families that override @thm_* ship it.
   REQUIRED=(starship.toml eza.yml gitui.ron fzf
-    gh-dash.theme.yml television.toml dircolors tmux.conf bat.theme)
+    gh-dash.theme.yml television.toml dircolors bat.theme)
 }
 
 families()
@@ -171,7 +171,7 @@ teardown()
   # the theme watcher with this test's environment.
   tmux -f /dev/null new-session -d -s parse 'sleep 300'
   local f rc=0
-  for f in "$PD"/*/*/tmux*.conf; do
+  for f in "$PD"/*/*/tmux.thm.conf "$ROOT/config/tmux/catppuccin.conf"; do
     tmux source-file -n "$f" || {
       echo "parse error: $f"
       rc=1

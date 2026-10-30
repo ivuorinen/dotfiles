@@ -128,13 +128,13 @@ PY
 @test "AA overrides stay wired into each app" {
   grep -q 'color_overrides' "$ROOT/config/nvim/init.lua"
   grep -q "light = 'Catppuccin Latte AA'" "$ROOT/config/wezterm/wezterm.lua"
-  grep -q 'light/tmux.thm.conf' "$ROOT/$CP/light/tmux.conf"
   grep -q "'catppuccin_latte'" "$ROOT/config/vim/vimrc"
+  # tmux takes each family's tmux.thm.conf through the shared loader.
+  # shellcheck disable=SC2016
+  grep -q '_palette "$mode" tmux.thm.conf' "$ROOT/config/theme/tmux-palette"
   # Kanagawa
   grep -q "lotusYellow3 = '#8d6100'" "$ROOT/config/nvim/init.lua"
   grep -q "light = 'Kanagawa Lotus AA'" "$ROOT/config/wezterm/wezterm.lua"
-  grep -q 'kanagawa/light/tmux.thm.conf' "$ROOT/$KP/light/tmux.conf"
-  grep -q 'kanagawa/dark/tmux.thm.conf' "$ROOT/$KP/dark/tmux.conf"
   grep -q "'kanagawa_lotus'" "$ROOT/config/vim/vimrc"
   # Oasis: upstream's dark diff foregrounds are background shades; the
   # "changed" one equals surface1, which the computed check treats as a

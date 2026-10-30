@@ -107,11 +107,34 @@ STUB
   [ "$status" -eq 1 ]
 }
 
-@test "tmux-palette: a family without a tmux palette sources nothing" {
+@test "tmux-palette: loads the family's colours, and a flip leaves none behind" {
+  command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
+  [[ -r "$HOME/.local/share/tmux/plugins/tmux/catppuccin_tmux.conf" ]] || skip "catppuccin/tmux not installed"
+  test_server
+  local tp="$BATS_TEST_DIRNAME/../config/theme/tmux-palette"
+  DOTFILES_THEME_FAMILY=oasis run "$tp" dark
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#000000" ]
+  [ "$(tmux show -gv @_win_active_bg)" = "#{@thm_pink}" ]
+  # catppuccin ships no dark tmux.thm.conf: the plugin's options pass resets
+  # every @thm_* and its theme pass fills in upstream Mocha.
+  DOTFILES_THEME_FAMILY=catppuccin run "$tp" dark
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#1e1e2e" ]
+  [ "$(tmux show -gv @_win_active_bg)" = "#{@thm_mauve}" ]
+  # A family that ships no tmux palette at all gets the same upstream colours.
   bare_family
+  run "$tp" light
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#eff1f5" ]
+}
+
+@test "tmux-palette: without the catppuccin/tmux plugin it is a skip" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
   run "$BATS_TEST_DIRNAME/../config/theme/tmux-palette" dark
   [ "$status" -eq 0 ]
-  [[ "$output" == *"ships no tmux palette"* ]]
+  [[ "$output" == *"catppuccin/tmux is not installed"* ]]
 }
 
 @test "handlers: an invalid family exits 1 and leaves the link untouched" {
