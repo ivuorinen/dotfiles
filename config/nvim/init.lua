@@ -761,9 +761,13 @@ local term_fixes = {
   oasis = { dark = { [0] = '#5a5a5a' } },
   catppuccin = { light = { [0] = '#5c5f77', [8] = '#6c6f85' } },
 }
+-- Keyed by the name before the first '-': oasis and catppuccin set
+-- g:colors_name to a variant ('oasis-abyss', 'catppuccin-latte'), and a
+-- 'background' change reloads the scheme under that name.
 vim.api.nvim_create_autocmd('ColorScheme', {
   callback = function(ev)
-    for i, hex in pairs((term_fixes[ev.match] or {})[vim.o.background] or {}) do
+    local fixes = term_fixes[ev.match:match '^[^-]+'] or {}
+    for i, hex in pairs(fixes[vim.o.background] or {}) do
       vim.g['terminal_color_' .. i] = hex
     end
   end,
