@@ -2,7 +2,7 @@
 # config/theme/shell-env.sh — bash/zsh side of the theme orchestrator.
 #
 # The theme handlers publish colour caches under
-# $XDG_STATE_HOME/dotfiles-theme (ls-colors, bat-theme, fzf-active.sh), and
+# $XDG_STATE_HOME/dotfiles-theme (ls-colors, bat-theme), and
 # config/theme/apply rewrites `generation` once every handler has finished.
 # A shell loads the caches at startup and, through the prompt hook, again
 # whenever the stamp moves — so a theme switch reaches shells that are
@@ -13,8 +13,8 @@
 # Load the colour caches into this shell and remember the stamp they belong
 # to. A missing cache unsets its variable only while the orchestrator runs
 # on this host (a generation stamp exists): elsewhere the inherited value
-# (a system LS_COLORS, a hand-set BAT_THEME) stays. fzf-active.sh assigns
-# FZF_DEFAULT_OPTS whole, so sourcing it again never stacks options.
+# (a system LS_COLORS, a hand-set BAT_THEME) stays. fzf needs nothing here:
+# it reads its colours from FZF_DEFAULT_OPTS_FILE at every start.
 _theme_refresh_env()
 {
   local dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme" gen=""
@@ -29,10 +29,6 @@ _theme_refresh_env()
     read -r BAT_THEME < "$dir/bat-theme" && export BAT_THEME
   elif [[ -n "$gen" ]]; then
     unset BAT_THEME
-  fi
-  if [[ -r "$dir/fzf-active.sh" ]]; then
-    # shellcheck source=/dev/null
-    . "$dir/fzf-active.sh"
   fi
   _THEME_GENERATION="$gen"
   return 0

@@ -57,8 +57,10 @@ Dark/light theming is owned by a stand-alone orchestrator:
 Open shells react to flips at their next prompt: bash and zsh through the
 hook in `config/theme/shell-env.sh`, fish through
 `config/fish/conf.d/theme-switch.fish` (which also re-saves its theme).
-Both watch the `generation` stamp and reload LS_COLORS, BAT_THEME and the
-fzf palette. fish (`__dotfiles_theme_name`), nvim,
+Both watch the `generation` stamp and reload LS_COLORS and BAT_THEME. fzf
+needs no reload: both shells export `FZF_DEFAULT_OPTS_FILE` pointing at the
+link `handlers.d/fzf` rewrites, and fzf reads it at every start. fish
+(`__dotfiles_theme_name`), nvim,
 vim and wezterm each resolve the family themselves, in `_theme_family`'s
 order, and fall back to `oasis` (fish to no theme change) when nothing
 resolves. nvim and vim follow the OS appearance;

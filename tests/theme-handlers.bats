@@ -159,18 +159,34 @@ STUB
 }
 
 @test "state handlers: a family without palettes clears the stale state" {
-  "$HD/fzf" dark
   "$HD/bat" dark
-  [ -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
   [ -f "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+  bare_family
+  run "$HD/bat" dark
+  [ "$status" -eq 0 ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+}
+
+@test "fzf handler: links the colours; a family without them leaves an empty file" {
+  local f="$TMPDIR_TEST/dotfiles-theme/fzf-colors"
+  run "$HD/fzf" dark
+  [ "$status" -eq 0 ]
+  [[ "$(readlink "$f")" == *"/catppuccin/dark/fzf" ]]
+  # FZF_DEFAULT_OPTS_FILE stays exported, and fzf exits 2 on a missing file.
   bare_family
   run "$HD/fzf" dark
   [ "$status" -eq 0 ]
-  run "$HD/bat" dark
+  [ -f "$f" ] && [ ! -L "$f" ]
+  [ -z "$(tr -d '[:space:]' < "$f")" ]
+  # The next family with colours replaces that file with a link again.
+  DOTFILES="$BATS_TEST_DIRNAME/.." DOTFILES_THEME_FAMILY=kanagawa run "$HD/fzf" light
   [ "$status" -eq 0 ]
-  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
-  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.fish" ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+  [[ "$(readlink "$f")" == *"/kanagawa/light/fzf" ]]
+}
+
+@test "fzf handler: rejects invalid mode" {
+  run "$HD/fzf" purple
+  [ "$status" -eq 2 ]
 }
 
 @test "dircolors handler: a family without a palette removes the cache" {

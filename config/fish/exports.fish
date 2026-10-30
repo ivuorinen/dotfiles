@@ -74,9 +74,11 @@ x-dc "$DOCKER_CONFIG"
 set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
 set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
-# fzf configuration
-set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
-    '--height 40% --tmux bottom,40% --layout reverse --border top'
+# fzf: colours come from the theme orchestrator's state file
+# (config/theme/handlers.d/fzf); config/exports explains the guard and erase.
+set -e FZF_DEFAULT_OPTS
+test -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+and set -x FZF_DEFAULT_OPTS_FILE "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
 
 # copilot environment
 set -q COPILOT_HOME; or set -x COPILOT_HOME "$XDG_CONFIG_HOME/copilot"

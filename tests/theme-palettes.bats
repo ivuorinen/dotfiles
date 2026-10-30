@@ -9,7 +9,7 @@ setup()
   ROOT="$BATS_TEST_DIRNAME/.."
   PD="$ROOT/config/theme/palettes.d"
   # tmux.thm.conf is optional: only families that override @thm_* ship it.
-  REQUIRED=(starship.toml eza.yml gitui.ron fzf.sh fzf.fish
+  REQUIRED=(starship.toml eza.yml gitui.ron fzf
     gh-dash.theme.yml television.toml dircolors tmux.conf bat.theme)
 }
 
@@ -76,6 +76,18 @@ print("\n".join(bad))
 sys.exit(1 if bad else 0)
 PY
   [ "$status" -eq 0 ]
+}
+
+@test "palettes: every fzf palette loads as fzf's options file" {
+  command -v fzf > /dev/null 2>&1 || skip "fzf not installed"
+  local f
+  for f in "$PD"/*/*/fzf; do
+    # A bad option makes fzf exit 2; a clean load filters "x" and exits 0.
+    printf 'x\n' | FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE="$f" fzf --filter x > /dev/null || {
+      echo "fzf rejects $f"
+      return 1
+    }
+  done
 }
 
 @test "palettes: every YAML palette parses" {
