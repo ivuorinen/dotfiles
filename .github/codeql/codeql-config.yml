@@ -29,6 +29,7 @@ paths-ignore:
   - "config/cheat/cheatsheets/tldr/**"
   # Vendored in-tree (.claude/rules/vendored-files.md)
   - ".claude/skills/graphify/**"
+  - "config/copilot/skills/**"
   # Vendored fish helpers, refreshed from upstream rather than edited
   - "config/fish/functions/__bass.py"
   - "config/fish/functions/bass.fish"

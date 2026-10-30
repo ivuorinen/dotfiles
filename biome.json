@@ -30,6 +30,7 @@
       "!!**/tools/antidote",
       "!!**/tools/dotbot",
       "!!**/node_modules",
+      "!!**/config/copilot/skills",
       "!!**/cr.md"
     ]
   },

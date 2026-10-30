@@ -1,8 +1,9 @@
 ---
-# Vendored graphify skill: third-party content that does not follow this
-# repo's editorconfig/markdown rules. Exclude from every hook, the same
-# way tools/** and other vendored trees are treated.
-exclude: ^\.claude/skills/graphify/
+# Vendored skills (graphify, and Copilot CLI's installed skills): third-party
+# content that does not follow this repo's editorconfig/markdown rules.
+# Exclude from every hook, the same way tools/** and other vendored trees
+# are treated.
+exclude: ^(\.claude/skills/graphify|config/copilot/skills)/
 
 # commit-msg and pre-push are not installed by default — without them here,
 # `prek install` wires only pre-commit, and the commitlint and bats hooks

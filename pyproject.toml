@@ -13,6 +13,7 @@ extend-exclude = [
   "config/cheat/cheatsheets",
   "tools",
   ".claude/skills/graphify",
+  "config/copilot/skills",
   "config/pi/agent/tmp",
   "config/pi/agent/npm",
   "config/mise/locks",
@@ -37,16 +38,22 @@ quote-style = "double"
 # config/vim/plugged is gitignored, so it exists only on machines where vim-plug
 # has run — CI never sees it, but a local `mise run lint-bandit` otherwise scans
 # ~62k lines of jedi/parso/vint and fails. .prettierignore excludes it already.
-# config/copilot/Library is the same case: Copilot CLI's gitignored cache of
-# marketplace plugins, Python scripts included.
+# config/copilot/Library and config/copilot/plugins are the same case: Copilot
+# CLI's gitignored caches of marketplace plugins, Python scripts included, and
+# config/copilot/skills holds its installed skills. .claude/worktrees holds Claude
+# Code's gitignored worktrees, whole nested checkouts whose vendored files the
+# root-relative entries here do not match.
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
   "./.claude/skills/graphify",
+  "./config/copilot/skills",
   "./node_modules",
   "./graphify-out",
   "./config/vim/plugged",
   "./config/copilot/Library",
+  "./config/copilot/plugins",
+  "./.claude/worktrees",
   "./config/pi/agent/tmp",
   "./config/pi/agent/npm",
   "./config/mise/locks",

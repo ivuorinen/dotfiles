@@ -131,6 +131,9 @@ graphify-out/
 !.claude/**
 .claude/**/*.log
 .claude/settings.local.json
+# Claude Code's git worktrees: whole checkouts nested in this one, which the
+# linters would otherwise walk with this checkout's root-relative ignores.
+.claude/worktrees/
 # Latest user prompt, written by .claude/hooks/prompt-record.sh for the
 # BASH_OK check in pre-bash-route.sh. Prompts can carry anything.
 .claude/.last-prompt
