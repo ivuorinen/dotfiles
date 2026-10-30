@@ -12,7 +12,7 @@
     blue: "#4d699b",
     magenta: "#a54c6b",
     cyan: "#51706b",
-    white: "#a09cac"
+    white: "#545464"
   ),
   bright: (
     black: "#6d6a5e",
@@ -22,7 +22,7 @@
     blue: "#4d699b",
     magenta: "#a54c6b",
     cyan: "#51706b",
-    white: "#d5cea3"
+    white: "#43436c"
   ),
   dim: (
     black: "#43436c",
@@ -32,6 +32,6 @@
     blue: "#4d699b",
     magenta: "#a54c6b",
     cyan: "#51706b",
-    white: "#a09cac"
+    white: "#545464"
   ),
 )

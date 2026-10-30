@@ -4,7 +4,8 @@
 " Local changes: g:colors_name is 'warm_burnout_light' (airline autoload names cannot
 " hold a dash), and colours below WCAG AA on the background are adjusted
 " in HSL lightness only, with cterm indices recomputed: #b8522e -> #b04e2c, #a89f8c -> #938871, #9a7008 -> #8b6507, #2870b0 -> #286faf, #208870 -> #1d7964.
-" The list is in NOTICE.
+" ANSI white and bright white #c0b8aa / #faf6f0 (1.69:1 / 1.08:1) are darkened
+" in OKLCH lightness to #736b5f / #6f6c66 (4.5:1). The list is in NOTICE.
 
 " Warm Burnout Light: sepia cream, zero halation
 " Background: #F5EDE0. All tokens >= 4.5:1 contrast (WCAG AA).
@@ -19,10 +20,10 @@ let g:colors_name = 'warm_burnout_light'
 
 " -- Terminal ANSI colors (16) --
 let g:terminal_ansi_colors = [
-      \ '#3a3630', '#b82820', '#2d6a14', '#8a6000',
-      \ '#2060a0', '#8a3090', '#146858', '#c0b8aa',
+      \ '#1a1510', '#b82820', '#2d6a14', '#8a6000',
+      \ '#2060a0', '#8a3090', '#146858', '#736b5f',
       \ '#686868', '#c83028', '#3a7a20', '#8b6507',
-      \ '#286faf', '#9a38a0', '#1d7964', '#faf6f0',
+      \ '#286faf', '#9a38a0', '#1d7964', '#6f6c66',
       \ ]
 
 " -- Editor UI --

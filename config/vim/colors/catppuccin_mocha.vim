@@ -156,8 +156,11 @@ hi link StatusLineTermNC StatusLineNC
 hi link Terminal Normal
 hi link Ignore Comment
 
-" Set terminal colors for playing well with plugins like fzf
+" Set terminal colors for playing well with plugins like fzf. Black and bright
+" black are overlay0/overlay1, as catppuccin.nvim sets them: surface1/surface2
+" sit below 3:1 on base. White is text, also as catppuccin.nvim has it, so
+" black on white keeps 3:1 (subtext1 is 2.76:1 over overlay0).
 let g:terminal_ansi_colors = [
-  \ s:surface1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext1,
-  \ s:surface2, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext0
+  \ s:overlay0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:text,
+  \ s:overlay1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext0
 \ ]

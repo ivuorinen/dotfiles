@@ -5,6 +5,7 @@
 # WCAG AA 4.5:1 on base #eff1f5. Upstream green is 2.96:1 and sky is
 # 2.47:1. Muted greys are left as upstream on purpose, because they mark
 # low-priority fields. The mapping is in light/starship.toml.
+# Colours below 3:1 on #eff1f5 (the surface roles) are raised to overlay2 #7c7f93.
 ---
 colourful: true
 
@@ -32,7 +33,7 @@ perms:
   other_write: {foreground: "#996114"}
   other_execute: {foreground: "#327c21"}
   special_user_file: {foreground: "#8839ef"}
-  special_other: {foreground: "#8c8fa1"}
+  special_other: {foreground: "#7c7f93"}
   attribute: {foreground: "#7c7f93"}
 
 size:
@@ -67,7 +68,7 @@ git:
   deleted: {foreground: "#d61d2d"}
   renamed: {foreground: "#13797e"}
   typechange: {foreground: "#c71f9a"}
-  ignored: {foreground: "#8c8fa1"}
+  ignored: {foreground: "#7c7f93"}
   conflicted: {foreground: "#be4601"}
 
 git_repo:
@@ -77,10 +78,10 @@ git_repo:
   git_dirty: {foreground: "#d61d2d"}
 
 security_context:
-  colon: {foreground: "#9ca0b0"}
-  user: {foreground: "#8c8fa1"}
+  colon: {foreground: "#7c7f93"}
+  user: {foreground: "#7c7f93"}
   role: {foreground: "#8839ef"}
-  typ: {foreground: "#acb0be"}
+  typ: {foreground: "#7c7f93"}
   range: {foreground: "#8839ef"}
 
 file_type:
@@ -88,17 +89,17 @@ file_type:
   video: {foreground: "#d20f39"}
   music: {foreground: "#327c21"}
   lossless: {foreground: "#13797e"}
-  crypto: {foreground: "#8c8fa1"}
+  crypto: {foreground: "#7c7f93"}
   document: {foreground: "#4c4f69"}
   compressed: {foreground: "#c71f9a"}
   temp: {foreground: "#d61d2d"}
   compiled: {foreground: "#187787"}
   source: {foreground: "#1761f5"}
 
-punctuation: {foreground: "#9ca0b0"}
+punctuation: {foreground: "#7c7f93"}
 date: {foreground: "#996114"}
 inode: {foreground: "#6c6f85"}
-blocks: {foreground: "#9ca0b0"}
+blocks: {foreground: "#7c7f93"}
 header: {foreground: "#4c4f69"}
 octal: {foreground: "#13797e"}
 flags: {foreground: "#8839ef"}
@@ -106,4 +107,4 @@ flags: {foreground: "#8839ef"}
 symlink_path: {foreground: "#0374a1"}
 control_char: {foreground: "#187787"}
 broken_symlink: {foreground: "#d20f39"}
-broken_path_overlay: {foreground: "#acb0be"}
+broken_path_overlay: {foreground: "#7c7f93"}

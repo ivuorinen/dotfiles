@@ -159,8 +159,11 @@ hi link StatusLineTermNC StatusLineNC
 hi link Terminal Normal
 hi link Ignore Comment
 
-" Set terminal colors for playing well with plugins like fzf
+" Set terminal colors for playing well with plugins like fzf. Black and bright
+" black match wezterm: surface1/surface2 sit at 1.23:1 and 2.17:1 on the
+" background, below the 3:1 a dim colour needs. White is text, as in wezterm,
+" so black on white keeps 3:1 (subtext1 is 2.98:1 over the raised black).
 let g:terminal_ansi_colors = [
-  \ s:surface1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext1,
-  \ s:surface2, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext0
+  \ '#5a5a5a', s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:text,
+  \ s:overlay0, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext0
 \ ]

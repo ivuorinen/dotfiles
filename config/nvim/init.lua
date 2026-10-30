@@ -751,6 +751,33 @@ require('catppuccin').setup {
   },
 }
 
+-- :terminal colours the plugins leave on the background, set to the values
+-- the wezterm, vim and COSMIC palettes use: dark ANSI black at 3:1 (it was
+-- 1.10:1 in Kanagawa, 1.00:1 in Oasis), and Latte's black pair, which
+-- catppuccin.nvim takes from overlay0/overlay1 (2.30:1 / 2.83:1). Black on
+-- white (`30;47`) keeps 3:1, so Wave's white is lifted to match its raised
+-- black, and Latte's black is Mocha's base over the shared AA whites
+-- (catppuccin.nvim's text-coloured whites sit at 1.28:1 over subtext1). Warm
+-- Burnout's own fixes live in colors/warm-burnout.lua.
+local term_fixes = {
+  kanagawa = { dark = { [0] = '#6a6780', [7] = '#cac295' } },
+  oasis = { dark = { [0] = '#5a5a5a' } },
+  catppuccin = {
+    light = { [0] = '#1e1e2e', [7] = '#6a6e7a', [8] = '#6c6f85', [15] = '#6a6e79' },
+  },
+}
+-- Keyed by the name before the first '-': oasis and catppuccin set
+-- g:colors_name to a variant ('oasis-abyss', 'catppuccin-latte'), and a
+-- 'background' change reloads the scheme under that name.
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = function(ev)
+    local fixes = term_fixes[ev.match:match '^[^-]+'] or {}
+    for i, hex in pairs(fixes[vim.o.background] or {}) do
+      vim.g['terminal_color_' .. i] = hex
+    end
+  end,
+})
+
 -- Applied at startup and re-checked every 3 s, so a family switch
 -- (local/bin/theme) reaches running sessions the way vim's timer does. It acts
 -- only when the family's scheme changes, so a manual :colorscheme stays until

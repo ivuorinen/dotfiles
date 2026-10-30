@@ -7,6 +7,7 @@
 # accent reaches WCAG AA 4.5:1 on base #f5ede0. Muted greys stay muted on
 # purpose, because they mark low-priority fields. The mapping is in
 # light/starship.toml.
+# Colours below 3:1 on #f5ede0 (the surface roles) are raised to overlay0 #938871.
 ---
 colourful: true
 
@@ -82,7 +83,7 @@ security_context:
   colon: {foreground: "#938871"}
   user: {foreground: "#8a8070"}
   role: {foreground: "#7e4060"}
-  typ: {foreground: "#e0c890"}
+  typ: {foreground: "#938871"}
   range: {foreground: "#7e4060"}
 
 file_type:
@@ -108,4 +109,4 @@ flags: {foreground: "#7e4060"}
 symlink_path: {foreground: "#285464"}
 control_char: {foreground: "#7a5a1c"}
 broken_symlink: {foreground: "#b03434"}
-broken_path_overlay: {foreground: "#e0c890"}
+broken_path_overlay: {foreground: "#938871"}

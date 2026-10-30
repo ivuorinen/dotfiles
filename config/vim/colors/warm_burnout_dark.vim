@@ -4,6 +4,7 @@
 " Local changes: g:colors_name is 'warm_burnout_dark' (airline autoload names cannot
 " hold a dash), and colours below WCAG AA on the background are adjusted
 " in HSL lightness only, with cterm indices recomputed: #b8522e -> #cd5d36.
+" ANSI black #23211b (1.13:1) is raised in OKLCH lightness to #65635c (3:1).
 " The list is in NOTICE.
 
 " Warm Burnout Dark: clinically warm, emotionally cold
@@ -19,7 +20,7 @@ let g:colors_name = 'warm_burnout_dark'
 
 " -- Terminal ANSI colors (16) --
 let g:terminal_ansi_colors = [
-      \ '#23211b', '#f06b73', '#70bf56', '#fdb04c',
+      \ '#65635c', '#f06b73', '#70bf56', '#fdb04c',
       \ '#4fbfff', '#d0a1ff', '#93e2c8', '#c7c7c7',
       \ '#686868', '#f07178', '#aad94c', '#ffb454',
       \ '#59c2ff', '#d2a6ff', '#95e6cb', '#ffffff',

@@ -178,12 +178,25 @@ vim_scheme()
 
 # --- nvim -------------------------------------------------------------
 
-# Every nvim run here sets XDG_CONFIG_HOME to the checkout: nvim would
-# otherwise load ~/.config/nvim, the installed config rather than the one
-# under test.
+# Every nvim run here sets XDG_CONFIG_HOME to a copy of the checkout's
+# config/nvim: nvim would otherwise load ~/.config/nvim, the installed config
+# rather than the one under test. A copy, because vim.pack rewrites
+# nvim-pack-lock.json with every plugin installed in the shared data dir, so a
+# run against the checkout itself dirtied the tracked lockfile. The first
+# start does that repair and reports it on stderr without a newline, so it is
+# done here rather than in a run whose last line a test reads.
+nvim_config()
+{
+  [ -d "$TMPDIR_TEST/xdg/nvim" ] || {
+    mkdir -p "$TMPDIR_TEST/xdg" && cp -R "$ROOT/config/nvim" "$TMPDIR_TEST/xdg/nvim"
+    XDG_CONFIG_HOME="$TMPDIR_TEST/xdg" timeout 60 nvim --headless +qa > /dev/null 2>&1
+  }
+  printf '%s\n' "$TMPDIR_TEST/xdg"
+}
+
 nvim_scheme()
 {
-  XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY="${1:-}" timeout 60 nvim --headless \
+  XDG_CONFIG_HOME="$(nvim_config)" DOTFILES_THEME_FAMILY="${1:-}" timeout 60 nvim --headless \
     "+set background=${2:-dark}" \
     '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa 2> /dev/null | tail -1
 }
@@ -220,7 +233,7 @@ nvim_scheme()
   # (:sleep runs the event loop), as vim's live test does.
   # auto-dark-mode re-reads the OS appearance during the sleep, so the
   # flavour (mocha or latte) follows the host; only the family is asserted.
-  run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
+  run env XDG_CONFIG_HOME="$(nvim_config)" DOTFILES_THEME_FAMILY=kanagawa timeout 60 nvim --headless '+set background=dark' \
     "+lua vim.env.DOTFILES_THEME_FAMILY = 'catppuccin'" '+sleep 4' \
     '+lua io.stdout:write(vim.g.colors_name .. "\n")' +qa
   [[ "${lines[${#lines[@]} - 1]}" == catppuccin-* ]]
@@ -237,7 +250,7 @@ nvim_scheme()
   # palette: Abyss Dark and Abyss Light 3 (intensity 3) backgrounds.
   local bg
   for bg in dark:000000 light:d8d8d8; do
-    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=oasis timeout 60 nvim --headless \
+    run env XDG_CONFIG_HOME="$(nvim_config)" DOTFILES_THEME_FAMILY=oasis timeout 60 nvim --headless \
       "+set background=${bg%%:*}" \
       '+lua io.stdout:write(string.format("%06x\n", vim.api.nvim_get_hl(0, { name = "Normal" }).bg))' \
       +qa
@@ -258,7 +271,7 @@ nvim_scheme()
   local want
   for want in dark:1a1510:cd5d36:#ffb454 light:f5ede0:b04e2c:#8b6507; do
     IFS=: read -r mode bg fix ansi11 <<< "$want"
-    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY=warm-burnout timeout 60 nvim --headless \
+    run env XDG_CONFIG_HOME="$(nvim_config)" DOTFILES_THEME_FAMILY=warm-burnout timeout 60 nvim --headless \
       "+set background=$mode" \
       '+lua local function fg(n) return vim.api.nvim_get_hl(0, { name = n, link = false }).fg end io.stdout:write(string.format("%06x %06x %06x %s\n", vim.api.nvim_get_hl(0, { name = "Normal" }).bg, fg "DiagnosticWarn", fg "MatchParen", vim.g.terminal_color_11))' \
       +qa
@@ -275,7 +288,7 @@ nvim_scheme()
   # user declined); init.lua must survive it and still theme every family.
   local fam
   for fam in oasis warm-burnout; do
-    run env XDG_CONFIG_HOME="$ROOT/config" DOTFILES_THEME_FAMILY="$fam" timeout 60 nvim --headless \
+    run env XDG_CONFIG_HOME="$(nvim_config)" DOTFILES_THEME_FAMILY="$fam" timeout 60 nvim --headless \
       "+lua io.stdout:write(tostring(vim.g.colors_name) .. '\n')" +qa \
       --cmd "lua local get = vim.pack.get; vim.pack.get = function(n, o) if n and vim.tbl_contains(n, 'warm-burnout') then error(\"Plugin 'warm-burnout' is not installed\") end return get(n, o) end"
     [[ "${lines[${#lines[@]} - 1]}" == oasis* ]]
@@ -288,11 +301,11 @@ nvim_scheme()
   command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
   # Load wezterm.lua under nvim's Lua with a stub `wezterm` module, then
   # call Scheme_for_appearance per family. Every scheme name it returns
-  # must be a builtin (Catppuccin Mocha) or registered in color_schemes.
+  # must be registered in color_schemes.
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -302,7 +315,7 @@ for _, fam in ipairs { 'kanagawa', 'oasis', 'catppuccin', 'warm-burnout', 'nosuc
   vim.env.DOTFILES_THEME_FAMILY = fam
   local d, l = Scheme_for_appearance 'Dark', Scheme_for_appearance 'Light'
   for _, s in ipairs { d, l } do
-    assert(s == 'Catppuccin Mocha' or cfg.color_schemes[s], 'unregistered scheme ' .. s)
+    assert(cfg.color_schemes[s], 'unregistered scheme ' .. s)
   end
   print(fam .. '=' .. d .. '|' .. l)
 end
@@ -314,7 +327,7 @@ LUA
   [ "$status" -eq 0 ]
   [[ "$output" == *"kanagawa=Kanagawa Wave|Kanagawa Lotus AA"* ]]
   [[ "$output" == *"oasis=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
-  [[ "$output" == *"catppuccin=Catppuccin Mocha|Catppuccin Latte AA"* ]]
+  [[ "$output" == *"catppuccin=Catppuccin Mocha AA|Catppuccin Latte AA"* ]]
   [[ "$output" == *"warm-burnout=Warm Burnout Dark|Warm Burnout Light"* ]]
   [[ "$output" == *"nosuchfamily=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
@@ -324,7 +337,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -352,7 +365,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -400,7 +413,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 stub.action = setmetatable({}, { __index = function() return function() return {} end end })
@@ -419,7 +432,7 @@ LUA
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end
 local stub = setmetatable({}, { __index = function() return any end })
-stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {} } end }
+stub.color = { get_builtin_schemes = function() return { ['Catppuccin Latte'] = {}, ['Catppuccin Mocha'] = { ansi = {}, brights = {} } } end }
 stub.config_builder = function() return {} end
 stub.on = function() end
 local watched = {}

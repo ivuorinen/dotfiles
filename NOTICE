@@ -132,9 +132,12 @@ Kanagawa theme assets -- MIT
     config/wezterm/wezterm.lua                    (kanagawa_wave table)
 
   Local changes to the vendored Wave files: foregrounds below WCAG AA on
-  #1f1f28 are lifted (autumnRed, samuraiRed, dragonBlue), and
-  kanagawa_wave.vim sets g:colors_name after `hi clear`. Each file's
-  header lists its changes; diff against the commits above to refresh.
+  #1f1f28 are lifted (autumnRed, samuraiRed, dragonBlue), the wezterm ANSI
+  black #090618 (1.22:1) is raised in OKLCH lightness to #6a6780 (3:1, a
+  dim), the wezterm ANSI white #c8c093 to #cac295 so black on white keeps
+  3:1 (2.95 -> 3.02), and kanagawa_wave.vim sets g:colors_name after
+  `hi clear`. Each file's header lists its changes; diff against the
+  commits above to refresh.
 
   The Lotus AA variants, and the Kanagawa palettes under
   config/theme/palettes.d/kanagawa/, are derived from these colours and
@@ -156,7 +159,8 @@ Oasis theme assets -- MIT
   (deleted), #1C1C1C -> #81C0FF (changed). In the light one the comment
   foreground #625f54 (4.49:1 on #d8d8d8) is darkened to #615e54 for WCAG
   AA. The wezterm tables drop upstream's tab_bar block (the tab bar is
-  disabled).
+  disabled), and the dark one's ANSI black #000000, the background itself,
+  is raised to #5a5a5a (3:1, a dim).
 
   Two Abyss Light 3 keys miss WCAG AA on #d8d8d8 and are darkened in HSL
   lightness only wherever they are used (the derived palettes, the light
@@ -197,6 +201,21 @@ Warm Burnout theme assets -- MIT
     ANSI 14, light        #208870 -> #1d7964  (3.75 -> 4.55)
     line-number grey, light (vim; muted, 3:1)
                           #a89f8c -> #938871  (2.26 -> 3.01)
+    ANSI 7, light         #c0b8aa -> #736b5f  (1.69 -> 4.52)
+    ANSI 15, light        #faf6f0 -> #6f6c66  (1.08 -> 4.50)
+    ANSI 0, dark (dim, 3:1)
+                          #23211b -> #65635c  (1.13 -> 3.01)
+    whitespace grey, light (nvim; muted, 3:1)
+                          #a09888 -> #928876  (2.46 -> 3.01)
+
+  The ANSI whites and black move in OKLCH lightness instead: HSL keeps
+  #faf6f0's 67% saturation and turns it brown. Upstream keeps all three
+  near the background, where text that terminal apps print in them
+  vanishes. The COSMIC terminal themes use the same values.
+
+  The light ANSI black #3a3630 becomes the dark background #1a1510: on the
+  darkened white 7 it sat at 2.28:1, and black on white (`30;47`) needs
+  3:1 (now 3.45).
 
   The Warm Burnout palettes under config/theme/palettes.d/warm-burnout/,
   warm-burnout-aa.theme, the airline, television and COSMIC themes are

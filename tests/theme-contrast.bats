@@ -201,12 +201,12 @@ LOTUS_MUTED='#88877e #716e61 #766b90'
 }
 
 # Wave background inks (sumiInk surfaces, waveBlue selections, diff fills,
-# ANSI black #090618, the tmTheme selection border #222218). #54546d is
+# the tmTheme selection border #222218). #54546d is
 # also nontext/line-number ink, the same role Catppuccin's surface colours
 # play, so it is held to the background set, not to text contrast.
-WAVE_BG='#181820 #16161d #1a1a22 #2a2a37 #363646 #54546d #223249 #2d4f67 #252535 #2b3328 #43242b #49443c #090618 #222218'
-# Wave comment greys: muted by design, 3:1.
-WAVE_MUTED='#727169 #717c7c'
+WAVE_BG='#181820 #16161d #1a1a22 #2a2a37 #363646 #54546d #223249 #2d4f67 #252535 #2b3328 #43242b #49443c #222218'
+# Wave comment greys and the dim ANSI black #6a6780: muted by design, 3:1.
+WAVE_MUTED='#727169 #717c7c #6a6780'
 
 @test "kanagawa wave: every non-muted foreground reaches WCAG AA on #1f1f28" {
   command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
@@ -297,8 +297,9 @@ oasis_palette_targets()
 # Abyss Dark fills: surfaces, the hint_bg surface2, the wezterm selection
 # fill #666666 and the tmTheme selection fill #532e2e (ui_visual_bg).
 OASIS_DARK_BG='#080808 #121212 #141414 #1c1c1c #2b4a46 #666666 #532e2e'
-# Abyss Dark overlays (fg_inlay, fg_dim, fg_muted): muted, 3:1.
-OASIS_DARK_MUTED='#607d85 #7b786d #605c4d'
+# Abyss Dark overlays (fg_inlay, fg_dim, fg_muted) and the dim ANSI black
+# #5a5a5a: muted, 3:1.
+OASIS_DARK_MUTED='#607d85 #7b786d #605c4d #5a5a5a'
 
 @test "oasis abyss dark: every non-muted foreground reaches WCAG AA on #000000" {
   command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
@@ -328,9 +329,10 @@ OASIS_DARK_MUTED='#607d85 #7b786d #605c4d'
 }
 
 # Warm Burnout Light fills: surfaces, the search fill (#e0c890), the vim
-# diff/visual/border fills, the tmTheme and wezterm selection fills, the
-# light ANSI whites (#c0b8aa, #faf6f0) and yazi's gauge label #ffffff.
-WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #faf6f0 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4d4e4 #e0c890 #c0b8aa #e5e8e2 #e2dace #c5beb2 #ffffff'
+# diff/visual/border fills, the tmTheme and wezterm selection fills and
+# yazi's gauge label #ffffff. The ANSI whites are not fills: terminal apps
+# print text in them, so they are held to AA like every other foreground.
+WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4d4e4 #e0c890 #e5e8e2 #e2dace #c5beb2 #ffffff'
 # Warm Burnout Light overlays (fg_gutter, the AA-darkened LineNr grey): muted, 3:1.
 WB_LIGHT_MUTED='#8a8070 #938871'
 
@@ -369,11 +371,11 @@ wb_palette_targets()
 }
 
 # Warm Burnout Dark fills: surfaces, the search fill (#4c4126), the vim
-# diff/visual/border fills, the tmTheme and wezterm selection fills and the
-# ANSI black #23211b.
-WB_DARK_BG='#14120f #1f1d17 #222018 #23211b #2a2820 #2e3a41 #2e1a1c #1a242e #1e2a1c #2c3e52 #33393a #3a342a #4c4126'
-# Warm Burnout Dark overlays (fg_gutter, LineNr, ANSI bright black): muted, 3:1.
-WB_DARK_MUTED='#746f67 #6b6860 #686868'
+# diff/visual/border fills and the tmTheme and wezterm selection fills.
+WB_DARK_BG='#14120f #1f1d17 #222018 #2a2820 #2e3a41 #2e1a1c #1a242e #1e2a1c #2c3e52 #33393a #3a342a #4c4126'
+# Warm Burnout Dark overlays (fg_gutter, LineNr, ANSI black and bright black):
+# muted, 3:1.
+WB_DARK_MUTED='#746f67 #6b6860 #686868 #65635c'
 
 @test "warm burnout dark: every non-muted foreground reaches WCAG AA on #1a1510" {
   command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
@@ -400,4 +402,196 @@ WB_DARK_MUTED='#746f67 #6b6860 #686868'
   ROOT="$BATS_TEST_TMPDIR" run check_contrast '#1a1510' 4.5 "$WB_DARK_MUTED" "$WB_DARK_BG" "p/planted.vim"
   [ "$status" -eq 1 ]
   [[ "$output" == *"#b8522e is 3.70:1"* ]]
+}
+
+# --- terminal palettes ----------------------------------------------------
+# The computed checks above exempt every surface hex as a fill, and the ANSI
+# palettes reuse those hexes for text: Warm Burnout Light shipped white at
+# 1.69:1 and bright white at 1.08:1, dark black sat at 1.00-1.22:1 in three
+# families. This reads the 16 colours by position, so a fill elsewhere in the
+# family is no excuse.
+
+# check_terminal <bg>|<path>[@<start>[@<end>]]...
+# Reads a vim g:terminal_ansi_colors list, a COSMIC terminal .ron (normal +
+# bright) or a wezterm ansi/brights pair (the text from <start> to <end>, or
+# to the next line holding only `}`), and fails for any colour under 4.5:1
+# on <bg>. Bright black, and black on a dark <bg>, are dims and need 3:1.
+# Black on white (ANSI 0 over 7, as `30;47` draws it) needs 3:1 too, except
+# in a row whose <bg> ends in `!`: Kanagawa Lotus and Oasis Light keep
+# upstream's ink whites, which no black reaches 3:1 against.
+# Catppuccin Mocha's wezterm scheme is the builtin with three entries patched,
+# so its vim and COSMIC files stand in for it.
+check_terminal()
+{
+  python3 - "$ROOT" "$@" << 'PY'
+import pathlib, re, sys
+
+root, *rows = sys.argv[1:]
+ORDER = ("black", "red", "green", "yellow", "blue", "magenta", "cyan", "white")
+
+
+def lum(h):
+    c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def ratio(a, b):
+    la, lb = sorted([lum(a), lum(b)], reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def colours(text, whole):
+    if "terminal_ansi_colors" in text:
+        body = re.search(r"terminal_ansi_colors\s*=\s*\[(.*?)\]", text, re.S).group(1)
+        var = dict(re.findall(r"let s:(\w+)\s*=\s*['\"](#[0-9a-fA-F]{6})['\"]", whole))
+        return [(var[v] if v else h) for v, h in re.findall(r"s:(\w+)|'(#[0-9a-fA-F]{6})'", body)]
+    if "normal:" in text:
+        groups = dict(re.findall(r"\b(normal|bright):\s*\((.*?)\)", text, re.S))
+        return [dict(re.findall(r'(\w+):\s*"(#[0-9a-fA-F]{6})"', groups[g]))[k] for g in ("normal", "bright") for k in ORDER]
+    pairs = re.findall(r"(?:ansi|brights)\s*=\s*\{(.*?)\}", text, re.S)
+    return [h for p in pairs for h in re.findall(r"'(#[0-9a-fA-F]{6})'", p)]
+
+
+bad = []
+for row in rows:
+    bg, spec = row.split("|", 1)
+    pair = not bg.endswith("!")
+    bg = bg.rstrip("!")
+    rel, *cut = spec.split("@")
+    whole = (pathlib.Path(root) / rel).read_text()
+    text = whole
+    if cut:
+        start = whole.index(cut[0])
+        end = whole.index(cut[1], start) if len(cut) > 1 else whole.index("\n}\n", start)
+        text = whole[start:end]
+    cols = [c.lower() for c in colours(text, whole)]
+    if len(cols) != 16:
+        bad.append(f"{rel}: read {len(cols)} ANSI colours, not 16")
+        continue
+    for i, c in enumerate(cols):
+        floor = 3.0 if i == 8 or (i == 0 and lum(bg) < 0.2) else 4.5
+        if ratio(c, bg) < floor:
+            bad.append(f"{rel}: ANSI {i} {c} is {ratio(c, bg):.2f}:1 on {bg} (needs {floor})")
+    if pair and ratio(cols[0], cols[7]) < 3.0:
+        bad.append(f"{rel}: ANSI 0 {cols[0]} on 7 {cols[7]} is {ratio(cols[0], cols[7]):.2f}:1 (needs 3.0)")
+print("\n".join(bad))
+sys.exit(1 if bad else 0)
+PY
+}
+
+@test "terminal palettes: every ANSI colour reaches its floor in every family" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local V=config/vim/colors C=config/cosmic-desktop/themes/cosmic-term W=config/wezterm/wezterm.lua
+  run check_terminal \
+    "#f5ede0|$V/warm_burnout_light.vim" "#f5ede0|$C/warm-burnout-light.ron" "#f5ede0|$W@local warm_burnout_light = {" \
+    "#1a1510|$V/warm_burnout_dark.vim" "#1a1510|$C/warm-burnout-dark.ron" "#1a1510|$W@local warm_burnout_dark = {" \
+    "#f2ecbc!|$C/kanagawa-lotus-aa.ron" "#f2ecbc!|$W@local kanagawa_lotus_aa = {" \
+    "#1f1f28|$C/kanagawa-wave.ron" "#1f1f28|$W@local kanagawa_wave = {" \
+    "#d8d8d8!|$V/oasis_abyss_light.vim" "#d8d8d8!|$C/oasis-abyss-light-3.ron" "#d8d8d8!|$W@local oasis_abyss_light_3 = {" \
+    "#000000|$V/oasis_abyss_dark.vim" "#000000|$C/oasis-abyss-dark.ron" "#000000|$W@local oasis_abyss_dark = {" \
+    "#eff1f5|$V/catppuccin_latte.vim" "#eff1f5|$C/catppuccin-latte.ron" "#eff1f5|$W@latte_aa.ansi = {@latte_aa.indexed" \
+    "#1e1e2e|$V/catppuccin_mocha.vim" "#1e1e2e|$C/catppuccin-mocha.ron"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "terminal palettes: the check catches Warm Burnout's upstream whites" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  cat > "$BATS_TEST_TMPDIR/p/planted.vim" << 'VIM'
+let g:terminal_ansi_colors = [
+      \ '#3a3630', '#b82820', '#2d6a14', '#8a6000',
+      \ '#2060a0', '#8a3090', '#146858', '#c0b8aa',
+      \ '#686868', '#c83028', '#3a7a20', '#8b6507',
+      \ '#286faf', '#9a38a0', '#1d7964', '#faf6f0',
+      \ ]
+VIM
+  ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0|p/planted.vim"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ANSI 7 #c0b8aa is 1.69:1"* ]]
+  [[ "$output" == *"ANSI 15 #faf6f0 is 1.08:1"* ]]
+}
+
+@test "terminal palettes: the check catches black on white under 3:1" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  # Warm Burnout Light's AA whites over upstream's black #3a3630.
+  cat > "$BATS_TEST_TMPDIR/p/planted.vim" << 'VIM'
+let g:terminal_ansi_colors = [
+      \ '#3a3630', '#b82820', '#2d6a14', '#8a6000',
+      \ '#2060a0', '#8a3090', '#146858', '#736b5f',
+      \ '#686868', '#c83028', '#3a7a20', '#8b6507',
+      \ '#286faf', '#9a38a0', '#1d7964', '#6f6c66',
+      \ ]
+VIM
+  ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0|p/planted.vim"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ANSI 0 #3a3630 on 7 #736b5f is 2.28:1"* ]]
+  ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0!|p/planted.vim"
+  [ "$status" -eq 0 ]
+}
+
+# --- file colours -----------------------------------------------------------
+# yazi's file and icon rules and eza's columns come from Catppuccin's upstream
+# files through each family's role map, which hands some of them the surface
+# roles: 38 icons per light palette were the page background itself. They are
+# icons and dimmed names, so 3:1 (WCAG 1.4.11) is the floor, not 4.5:1.
+
+# check_file_colours <palette-dir>... — yazi.toml rule/icon fg and eza.yml
+# foregrounds against the dir's starship.toml base.
+check_file_colours()
+{
+  python3 - "$ROOT" "$@" << 'PY'
+import pathlib, re, sys
+
+root, *dirs = sys.argv[1:]
+RULE = re.compile(r'^\s*\{\s*(?:name|mime|url)\s*=.*?\bfg\s*=\s*"(#[0-9a-fA-F]{6})"')
+EZA = re.compile(r'foreground:\s*"(#[0-9a-fA-F]{6})"')
+
+
+def lum(h):
+    c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def ratio(a, b):
+    la, lb = sorted([lum(a), lum(b)], reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+bad = []
+for d in dirs:
+    base = pathlib.Path(root, d)
+    bg = re.search(r'^base\s*=\s*"(#[0-9a-fA-F]{6})"', (base / "starship.toml").read_text(), re.M).group(1).lower()
+    for name, rx in (("yazi.toml", RULE), ("eza.yml", EZA)):
+        for n, line in enumerate((base / name).read_text().splitlines(), 1):
+            m = rx.search(line)
+            if m and ratio(m.group(1).lower(), bg) < 3.0:
+                bad.append(f"{d}/{name}:{n}: {m.group(1).lower()} is {ratio(m.group(1).lower(), bg):.2f}:1 on {bg}")
+print("\n".join(bad))
+sys.exit(1 if bad else 0)
+PY
+}
+
+@test "file colours: yazi icons and eza columns reach 3:1 in every palette" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  local P=config/theme/palettes.d
+  run check_file_colours \
+    "$P/catppuccin/light" "$P/catppuccin/dark" "$P/kanagawa/light" "$P/kanagawa/dark" \
+    "$P/oasis/light" "$P/oasis/dark" "$P/warm-burnout/light" "$P/warm-burnout/dark"
+  echo "$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "file colours: the check catches an icon drawn in the background colour" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  mkdir -p "$BATS_TEST_TMPDIR/p"
+  printf '[palettes.p]\nbase = "#f5ede0"\n' > "$BATS_TEST_TMPDIR/p/starship.toml"
+  printf '  { name = ".gtkrc-2.0", text = "x", fg = "#f5ede0" },\n' > "$BATS_TEST_TMPDIR/p/yazi.toml"
+  : > "$BATS_TEST_TMPDIR/p/eza.yml"
+  ROOT="$BATS_TEST_TMPDIR" run check_file_colours p
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"p/yazi.toml:1: #f5ede0 is 1.00:1"* ]]
 }
