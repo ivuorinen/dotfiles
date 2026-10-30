@@ -385,16 +385,6 @@ x-dc "$DOCKER_CONFIG"
 export DOCKER_SCAN_SUGGEST=false
 export DOCKER_HIDE_LEGACY_COMMANDS=true
 
-# fzf: colours come from the theme orchestrator's state file
-# (config/theme/handlers.d/fzf), which fzf reads at every start. Exported only
-# when it exists: fzf exits 2 when FZF_DEFAULT_OPTS_FILE names a missing file.
-# An FZF_DEFAULT_OPTS inherited from an older shell or the tmux server would
-# override the file, so it is cleared.
-unset FZF_DEFAULT_OPTS
-if [ -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors" ]; then
-  export FZF_DEFAULT_OPTS_FILE="$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
-fi
-
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
 msg "Setting up GnuPG configuration"
@@ -511,6 +501,17 @@ unset _theme_interactive
 # shellcheck source=config/theme/shell-env.sh
 . "${DOTFILES:-$HOME/.dotfiles}/config/theme/shell-env.sh"
 _theme_refresh_env
+
+# fzf: colours come from the theme orchestrator's state file
+# (config/theme/handlers.d/fzf), which fzf reads at every start. Exported only
+# when it exists, since fzf exits 2 when FZF_DEFAULT_OPTS_FILE names a missing
+# file, and only after the apply above, which writes it on a machine's first
+# shell. An FZF_DEFAULT_OPTS inherited from an older shell or the tmux server
+# would override the file, so it is cleared.
+unset FZF_DEFAULT_OPTS
+if [ -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors" ]; then
+  export FZF_DEFAULT_OPTS_FILE="$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+fi
 
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks

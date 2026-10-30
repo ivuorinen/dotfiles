@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # handlers.d/fzf — link the active family's fzf colours for the mode at
 # $XDG_STATE_HOME/dotfiles-theme/fzf-colors, the FZF_DEFAULT_OPTS_FILE that
-# config/exports and config/fish/exports.fish export. fzf reads the file on
+# config/exports and config/fish/config.fish export. fzf reads the file on
 # every start, so a flip needs no shell reload. A family without colours
 # gets an empty file instead of no file: fzf exits 2 when
 # FZF_DEFAULT_OPTS_FILE names a missing one.

@@ -213,6 +213,20 @@ STUB
   [ "$status" -eq 2 ]
 }
 
+# after <file> <first> <then> — <then> sits on a later line than <first>.
+after()
+{
+  awk -v a="$2" -v b="$3" 'index($0, a) && !x { x = NR } index($0, b) { y = NR }
+    END { exit !(x && y > x) }' "$1"
+}
+
+@test "fzf: both shells export the colours file only after their first apply" {
+  # The export waits for the file to exist, and a machine's first apply is
+  # what writes it: a check above the apply leaves that shell uncoloured.
+  after "$DOTFILES/config/exports" 'config/theme/apply" "$m"' 'export FZF_DEFAULT_OPTS_FILE='
+  after "$DOTFILES/config/fish/config.fish" '$apply $m' 'set -x FZF_DEFAULT_OPTS_FILE'
+}
+
 @test "dircolors handler: a family without a palette removes the cache" {
   mkdir -p "$TMPDIR_TEST/dotfiles-theme"
   echo "LS_COLORS=stale" > "$TMPDIR_TEST/dotfiles-theme/ls-colors"
