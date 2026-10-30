@@ -2,6 +2,9 @@
 # The interpreter the pypi-backed yamllint installs into in CI, and the one
 # ruff and SonarCloud target (.sonarcloud.properties).
 python = "3.14"
+# The runtime the npm-backed lint tools below run on. A CI runner happens to
+# ship one; a fresh clone following .github/CONTRIBUTING.md may not.
+node = "lts"
 
 # The `mise run lint` toolchain. These are also pinned in
 # config/mise/config.toml (the global config, symlinked to ~/.config/mise/),
