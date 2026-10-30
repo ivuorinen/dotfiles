@@ -506,12 +506,14 @@ _theme_refresh_env
 # (config/theme/handlers.d/fzf), which fzf reads at every start. Exported only
 # when it exists, since fzf exits 2 when FZF_DEFAULT_OPTS_FILE names a missing
 # file, and only after the apply above, which writes it on a machine's first
-# shell. An FZF_DEFAULT_OPTS inherited from an older shell or the tmux server
-# would override the file, so it is cleared.
+# shell. For the same reason an inherited FZF_DEFAULT_OPTS_FILE that names a
+# missing file is dropped. An FZF_DEFAULT_OPTS inherited from an older shell
+# or the tmux server would override the file, so it is cleared.
 unset FZF_DEFAULT_OPTS
 if [ -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors" ]; then
   export FZF_DEFAULT_OPTS_FILE="$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
 fi
+[ -e "${FZF_DEFAULT_OPTS_FILE:-}" ] || unset FZF_DEFAULT_OPTS_FILE
 
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks

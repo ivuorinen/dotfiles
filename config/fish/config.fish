@@ -155,11 +155,12 @@ if status is-interactive
 end
 
 # fzf: colours come from the theme orchestrator's state file
-# (config/theme/handlers.d/fzf); config/exports explains the guard, the erase
-# and why this follows the apply above.
+# (config/theme/handlers.d/fzf); config/exports explains the guards, the
+# erase and why this follows the apply above.
 set -e FZF_DEFAULT_OPTS
 test -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
 and set -x FZF_DEFAULT_OPTS_FILE "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+test -e "$FZF_DEFAULT_OPTS_FILE"; or set -e FZF_DEFAULT_OPTS_FILE
 
 # Added by get-aspire-cli.sh
 fish_add_path $HOME/.aspire/bin
