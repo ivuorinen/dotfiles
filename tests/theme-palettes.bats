@@ -9,7 +9,7 @@ setup()
   ROOT="$BATS_TEST_DIRNAME/.."
   PD="$ROOT/config/theme/palettes.d"
   # tmux.thm.conf is optional: only families that override @thm_* ship it.
-  REQUIRED=(starship.toml eza.yml gitui.ron yazi.toml fzf.sh fzf.fish
+  REQUIRED=(starship.toml eza.yml gitui.ron fzf.sh fzf.fish
     gh-dash.theme.yml television.toml dircolors tmux.conf bat.theme)
 }
 

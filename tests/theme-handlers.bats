@@ -119,7 +119,7 @@ STUB
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
   ln -s /somewhere "$HOME/.config/starship.toml"
-  for h in starship eza gitui yazi fzf dircolors gh-dash television bat fish; do
+  for h in starship eza gitui fzf dircolors gh-dash television bat fish; do
     DOTFILES_THEME_FAMILY=../catppuccin run "$HD/$h" dark
     [ "$status" -eq 1 ] || {
       echo "$h exited $status"
@@ -132,21 +132,19 @@ STUB
 @test "symlink handlers: a family without the palette removes the stale link" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   "$HD/starship" dark
   "$HD/eza" dark
   "$HD/gitui" dark
-  "$HD/yazi" dark
   [ -L "$HOME/.config/starship.toml" ]
   bare_family
-  for h in starship eza gitui yazi; do
+  for h in starship eza gitui; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
   [ ! -e "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]
   [ ! -L "$HOME/.config/eza/theme.yml" ]
   [ ! -L "$HOME/.config/gitui/theme.ron" ]
-  [ ! -L "$HOME/.config/yazi/theme.toml" ]
 }
 
 @test "symlink handlers: a family without the palette keeps a regular file" {
@@ -199,17 +197,14 @@ STUB
 @test "handlers: kanagawa resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=kanagawa
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" light
     [ "$status" -eq 0 ]
   done
   [[ "$(readlink "$HOME/.config/starship.toml")" == *"/kanagawa/light/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/kanagawa/light/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Kanagawa-Lotus-AA.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Kanagawa-Wave.tmTheme" ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -217,17 +212,14 @@ STUB
 @test "handlers: oasis resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=oasis
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
   [[ "$(readlink "$HOME/.config/starship.toml")" == *"/oasis/dark/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/oasis/dark/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Oasis-Abyss-Dark.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Oasis-Abyss-Light-3.tmTheme" ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
   grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -235,17 +227,14 @@ STUB
 @test "handlers: warm-burnout resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=warm-burnout
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
   [[ "$(readlink "$HOME/.config/starship.toml")" == *"/warm-burnout/dark/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/warm-burnout/dark/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Warm-Burnout-Dark.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Warm-Burnout-Light.tmTheme" ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Warm Burnout Dark" ]
   grep -q "warm-burnout-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }

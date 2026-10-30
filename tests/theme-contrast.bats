@@ -3,8 +3,8 @@
 #
 # Catppuccin: the AA-darkened Latte (4.5:1 on #eff1f5). Upstream Latte
 # accents sit at 2.3-3.5:1 on base, and several of these files originate
-# upstream (bat .tmTheme, eza, catppuccin/tmux, the fish theme fisher
-# manages). A refresh silently restores the unreadable values, so each
+# upstream (bat .tmTheme, eza, catppuccin/tmux, catppuccin/fish). A
+# refresh silently restores the unreadable values, so each
 # check fails naming the file that regressed. The mapping lives in
 # config/theme/palettes.d/catppuccin/light/starship.toml.
 #
@@ -96,7 +96,6 @@ PY
     "$CP/light/gitui.ron"
     "$CP/light/fzf.fish"
     "$CP/light/fzf.sh"
-    "$CP/light/yazi.toml"
     "$CP/light/gh-dash.theme.yml"
     "$CP/light/tmux.thm.conf"
     "config/bat/themes/Catppuccin Latte.tmTheme"
@@ -105,7 +104,6 @@ PY
     "config/cosmic-desktop/themes/cosmic-term/catppuccin-latte.ron"
     "config/vim/colors/catppuccin_latte.vim"
     "config/vim/autoload/airline/themes/catppuccin_latte.vim"
-    "config/vim/autoload/lightline/colorscheme/catppuccin_latte.vim"
     "config/nvim/init.lua"
     "config/wezterm/wezterm.lua"
   )
@@ -154,10 +152,8 @@ PY
   grep -q 'theme="${family}-aa"' "$ROOT/config/theme/handlers.d/fish"
 }
 
-# Lotus background inks (surfaces, selection, diff/search fills), plus
-# #ffffff: yazi's progress label, drawn on the gauge fill rather than on
-# the page background (the Catppuccin palettes use it the same way).
-LOTUS_BG='#e5ddb0 #dcd5ac #e7dba0 #d5cea3 #a09cac #e4d794 #c7d7e0 #b5cbd2 #d7e3d8 #b7d0ae #d9a594 #f9d791 #c9cbd1 #dcd7ba #ffffff'
+# Lotus background inks (surfaces, selection, diff/search fills).
+LOTUS_BG='#e5ddb0 #dcd5ac #e7dba0 #d5cea3 #a09cac #e4d794 #c7d7e0 #b5cbd2 #d7e3d8 #b7d0ae #d9a594 #f9d791 #c9cbd1 #dcd7ba'
 # Lotus overlays: muted by design, 3:1. They render text — comments, fish
 # autosuggestions and pager descriptions, vim line numbers — so this is a
 # deliberate exception below WCAG 1.4.3's 4.5:1, not AA compliance.
@@ -244,10 +240,9 @@ WAVE_MUTED='#727169 #717c7c #6a6780'
   [[ "$output" == *"#e82424 is 3.66:1"* ]]
 }
 
-# Abyss Light 3 fills: surfaces, the selection/search fills (#e1c99d),
-# the tmTheme findHighlight fill (#b9d17a, drawn under #d8d8d8 text) and
-# yazi's gauge label #ffffff.
-OASIS_LIGHT_BG='#d4d4d4 #d0d0d0 #cdcdcd #b9b9b9 #97cebe #e1c99d #b9d17a #ffffff'
+# Abyss Light 3 fills: surfaces, the selection/search fills (#e1c99d) and
+# the tmTheme findHighlight fill (#b9d17a, drawn under #d8d8d8 text).
+OASIS_LIGHT_BG='#d4d4d4 #d0d0d0 #cdcdcd #b9b9b9 #97cebe #e1c99d #b9d17a'
 # Abyss Light 3 overlays (fg_inlay, fg_dim, fg_muted): muted, 3:1.
 OASIS_LIGHT_MUTED='#647276 #7c7a74 #615f57'
 
@@ -329,10 +324,10 @@ OASIS_DARK_MUTED='#607d85 #7b786d #605c4d #5a5a5a'
 }
 
 # Warm Burnout Light fills: surfaces, the search fill (#e0c890), the vim
-# diff/visual/border fills, the tmTheme and wezterm selection fills and
-# yazi's gauge label #ffffff. The ANSI whites are not fills: terminal apps
-# print text in them, so they are held to AA like every other foreground.
-WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4d4e4 #e0c890 #e5e8e2 #e2dace #c5beb2 #ffffff'
+# diff/visual/border fills and the tmTheme and wezterm selection fills. The
+# ANSI whites are not fills: terminal apps print text in them, so they are
+# held to AA like every other foreground.
+WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4d4e4 #e0c890 #e5e8e2 #e2dace #c5beb2'
 # Warm Burnout Light overlays (fg_gutter, the AA-darkened LineNr grey): muted, 3:1.
 WB_LIGHT_MUTED='#8a8070 #938871'
 
@@ -533,20 +528,18 @@ VIM
 }
 
 # --- file colours -----------------------------------------------------------
-# yazi's file and icon rules and eza's columns come from Catppuccin's upstream
-# files through each family's role map, which hands some of them the surface
-# roles: 38 icons per light palette were the page background itself. They are
-# icons and dimmed names, so 3:1 (WCAG 1.4.11) is the floor, not 4.5:1.
+# eza's columns come from Catppuccin's upstream file through each family's
+# role map, which hands some of them the surface roles. They are dimmed names
+# and metadata, so 3:1 (WCAG 1.4.11) is the floor, not 4.5:1.
 
-# check_file_colours <palette-dir>... — yazi.toml rule/icon fg and eza.yml
-# foregrounds against the dir's starship.toml base.
+# check_file_colours <palette-dir>... — eza.yml foregrounds against the dir's
+# starship.toml base.
 check_file_colours()
 {
   python3 - "$ROOT" "$@" << 'PY'
 import pathlib, re, sys
 
 root, *dirs = sys.argv[1:]
-RULE = re.compile(r'^\s*\{\s*(?:name|mime|url)\s*=.*?\bfg\s*=\s*"(#[0-9a-fA-F]{6})"')
 EZA = re.compile(r'foreground:\s*"(#[0-9a-fA-F]{6})"')
 
 
@@ -565,17 +558,16 @@ bad = []
 for d in dirs:
     base = pathlib.Path(root, d)
     bg = re.search(r'^base\s*=\s*"(#[0-9a-fA-F]{6})"', (base / "starship.toml").read_text(), re.M).group(1).lower()
-    for name, rx in (("yazi.toml", RULE), ("eza.yml", EZA)):
-        for n, line in enumerate((base / name).read_text().splitlines(), 1):
-            m = rx.search(line)
-            if m and ratio(m.group(1).lower(), bg) < 3.0:
-                bad.append(f"{d}/{name}:{n}: {m.group(1).lower()} is {ratio(m.group(1).lower(), bg):.2f}:1 on {bg}")
+    for n, line in enumerate((base / "eza.yml").read_text().splitlines(), 1):
+        m = EZA.search(line)
+        if m and ratio(m.group(1).lower(), bg) < 3.0:
+            bad.append(f"{d}/eza.yml:{n}: {m.group(1).lower()} is {ratio(m.group(1).lower(), bg):.2f}:1 on {bg}")
 print("\n".join(bad))
 sys.exit(1 if bad else 0)
 PY
 }
 
-@test "file colours: yazi icons and eza columns reach 3:1 in every palette" {
+@test "file colours: eza columns reach 3:1 in every palette" {
   command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
   local P=config/theme/palettes.d
   run check_file_colours \
@@ -585,13 +577,12 @@ PY
   [ "$status" -eq 0 ]
 }
 
-@test "file colours: the check catches an icon drawn in the background colour" {
+@test "file colours: the check catches a column drawn in the background colour" {
   command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
   mkdir -p "$BATS_TEST_TMPDIR/p"
   printf '[palettes.p]\nbase = "#f5ede0"\n' > "$BATS_TEST_TMPDIR/p/starship.toml"
-  printf '  { name = ".gtkrc-2.0", text = "x", fg = "#f5ede0" },\n' > "$BATS_TEST_TMPDIR/p/yazi.toml"
-  : > "$BATS_TEST_TMPDIR/p/eza.yml"
+  printf 'date:\n  foreground: "#f5ede0"\n' > "$BATS_TEST_TMPDIR/p/eza.yml"
   ROOT="$BATS_TEST_TMPDIR" run check_file_colours p
   [ "$status" -eq 1 ]
-  [[ "$output" == *"p/yazi.toml:1: #f5ede0 is 1.00:1"* ]]
+  [[ "$output" == *"p/eza.yml:2: #f5ede0 is 1.00:1"* ]]
 }
