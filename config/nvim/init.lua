@@ -86,7 +86,19 @@ vim.pack.add {
 -- https://github.com/saghen/blink.cmp
 -- LSP capabilities are registered by blink's plugin/blink-cmp.lua.
 require('blink.cmp').setup {
-  keymap = { preset = 'default' }, -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+  keymap = {
+    preset = 'default', -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+    -- <C-Space> is the tmux prefix, so it never reaches Neovim inside tmux.
+    ['<C-space>'] = false,
+    ['<C-l>'] = { 'show', 'show_documentation', 'hide_documentation' },
+  },
+  cmdline = {
+    keymap = {
+      preset = 'cmdline',
+      ['<C-space>'] = false,
+      ['<C-l>'] = { 'show', 'fallback' },
+    },
+  },
   completion = { documentation = { auto_show = true } },
   signature = { enabled = true },
 }
