@@ -13,8 +13,15 @@ K.d/K.ld ``(key, mode, cmd, opts)``, matching ``lua/utils.lua``. The opts
 argument passes when it is a string literal (``handleDesc`` makes that the
 description) or a table containing ``desc``.
 
+A raw ``vim.keymap.set(mode, lhs, rhs, opts)`` is held to the same rule when
+its lhs is a ``<leader>`` literal: those are the maps mini.clue labels, and a
+leader map written without the helpers otherwise commits unlabelled
+(audit-1ca7cb00). Non-leader raw maps (buffer-local UI keys such as ``q``) are
+not checked.
+
 Ceiling: an opts argument passed as a variable is accepted only if its name
-contains ``desc``; the scanner does not follow assignments.
+contains ``desc``; the scanner does not follow assignments. A ``vim.keymap.set``
+reached through a local alias is not seen.
 
 Usage: check-keymap-desc.py [FILE...]   (default: config/nvim/**/*.lua)
 """
@@ -25,8 +32,9 @@ import pathlib
 import re
 import sys
 
-OPTS_INDEX = {"n": 2, "nl": 2, "d": 3, "ld": 3}
-CALL_RE = re.compile(r"\bK\.(n|nl|d|ld)\s*\(")
+OPTS_INDEX = {"K.n": 2, "K.nl": 2, "K.d": 3, "K.ld": 3, "vim.keymap.set": 3}
+CALL_RE = re.compile(r"\b(K\.(?:n|nl|d|ld)|vim\.keymap\.set)\s*\(")
+LEADER_RE = re.compile(r"""['"]<[Ll]eader>""")
 
 
 def long_bracket_end(src: str, i: int, offset: int) -> int | None:
@@ -126,17 +134,20 @@ def strip_code(src: str) -> str:
 
 
 def check(path: pathlib.Path) -> list[str]:
-    """Return one problem line per helper call in ``path`` lacking a desc."""
+    """Return one problem line per helper or leader ``vim.keymap.set`` lacking a desc."""
     src = path.read_text(encoding="utf-8")
     problems = []
     for m in CALL_RE.finditer(strip_code(src)):
+        name = m.group(1)
         args = call_args(src, m.end())
-        idx = OPTS_INDEX[m.group(1)]
+        if name == "vim.keymap.set" and not (len(args) > 1 and LEADER_RE.match(args[1])):
+            continue
+        idx = OPTS_INDEX[name]
         opts = args[idx] if len(args) > idx else ""
         # handleDesc in utils.lua turns a bare string opts into { desc = … }.
         if not (re.match(r"""['"]|\[=*\[""", opts) or re.search(r"\bdesc\b", opts)):
             line = src.count("\n", 0, m.start()) + 1
-            problems.append(f"{path}:{line}: K.{m.group(1)} call has no desc in its opts")
+            problems.append(f"{path}:{line}: {name} call has no desc in its opts")
     return problems
 
 
