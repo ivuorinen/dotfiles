@@ -27,6 +27,7 @@ All configuration runs in `init.lua` at step 7b of `:h initialization`:
 6. `vim.pack.add {}` — loads all plugins onto the rtp
 7. Plugin configuration — inline sections in `init.lua` in this order:
     Completion → Editor → LSP → Navigation → QA → Snacks → Tools → Treesitter → UI
+8. `lua/org.lua` — orgmode stack setup, required last; specs stay in step 6
 
 ## init.lua Sections
 
@@ -152,7 +153,8 @@ excluded from `mason-tool-installer` and enabled explicitly via `vim.lsp.enable`
 All other active servers are derived from `ensure_installed` (mason-tool-installer
 installs them; mason-lspconfig auto-enables them). `.claude/rules/lsp-list-parity.md`
 requires every server in the bare `vim.lsp.enable` call to be a mise tool and
-absent from `ensure_installed`.
+absent from `ensure_installed`. `org` is the exception: orgmode ships its config,
+and `lua/org.lua` enables it.
 
 ## Formatting
 

@@ -2,7 +2,8 @@
 
 Plugin manager: **vim.pack** (Neovim 0.12+ built-in). All plugins are loaded via a single
 `vim.pack.add {}` call in `init.lua` at step 7b of `:h initialization`. Plugin configuration
-lives inline in `init.lua` in named sections (`-- Completion`, `-- Editor`, `-- LSP`, etc.).
+lives inline in `init.lua` in named sections (`-- Completion`, `-- Editor`, `-- LSP`, etc.),
+except the orgmode stack, which lives in `lua/org.lua`.
 
 User commands (`PackUpdate`, `PackRemove`) live in `lua/pack.lua`; the `:Pack`
 dashboard that lists and manages plugins lives in `lua/pack-ui.lua`.
@@ -184,6 +185,24 @@ Multi-feature plugin; each snack is independently toggleable:
 | mini.comment   | Toggle comments via `gc`/`gcc` (from mini.nvim)          |
 
 URLs: `github.com/wakatime/vim-wakatime` · `github.com/ivuorinen/nvim-shellspec`
+
+## Orgmode
+
+Configured in `lua/org.lua`, which `init.lua` requires last. Org files live in
+`~/orgfiles`; its keys sit under the leader `o` prefix, which orgmode itself also
+maps (see `CLAUDE.md`). `lua/org.lua` adds visual-mode emphasis keys in org buffers.
+
+| Plugin                     | Role                                                |
+|----------------------------|-----------------------------------------------------|
+| orgmode                    | Org-mode core: agenda, capture, LSP (`org`)         |
+| org-bullets.nvim           | Unicode heading bullets                             |
+| org-virtual-clocktime.nvim | Logbook clock totals as virtual text                |
+| org-super-agenda.nvim      | Grouped agenda with custom views                    |
+| org-roam.nvim              | Linked-notes knowledge base under `~/orgfiles/roam` |
+
+URLs: `github.com/nvim-orgmode/orgmode` · `github.com/nvim-orgmode/org-bullets.nvim` ·
+`github.com/hugginsio/org-virtual-clocktime.nvim` · `github.com/hamidi-dev/org-super-agenda.nvim` ·
+`github.com/chipsenkbeil/org-roam.nvim`
 
 ## Treesitter
 
