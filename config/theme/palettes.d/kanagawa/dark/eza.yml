@@ -3,6 +3,7 @@
 # Source: catppuccin/eza, mocha flavor, green accent
 # https://github.com/catppuccin/eza (MIT)
 # Vendored on: 2026-04-27
+# Colours below 3:1 on #1f1f28 (the surface roles) are raised to overlay0 #727169.
 ---
 colourful: true
 
@@ -78,7 +79,7 @@ security_context:
   colon: {foreground: "#727169"}
   user: {foreground: "#717c7c"}
   role: {foreground: "#957fb8"}
-  typ: {foreground: "#54546d"}
+  typ: {foreground: "#727169"}
   range: {foreground: "#957fb8"}
 
 file_type:
@@ -104,4 +105,4 @@ flags: {foreground: "#957fb8"}
 symlink_path: {foreground: "#7fb4ca"}
 control_char: {foreground: "#a3d4d5"}
 broken_symlink: {foreground: "#e46876"}
-broken_path_overlay: {foreground: "#54546d"}
+broken_path_overlay: {foreground: "#727169"}
