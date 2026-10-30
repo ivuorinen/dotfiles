@@ -19,6 +19,15 @@ DISABLE_LINTERS:
   - TYPESCRIPT_PRETTIER # using biome
   - TYPESCRIPT_STANDARD # using biome
   - JSON_PRETTIER # using biome
+  # MegaLinter bundles its own biome, which lags the pin and rejects a
+  # biome.json migrated for a newer one; `mise run lint` runs the pinned biome.
+  - CSS_BIOME
+  - GRAPHQL_BIOME
+  - JAVASCRIPT_BIOME
+  - JSON_BIOME
+  - JSX_BIOME
+  - TSX_BIOME
+  - TYPESCRIPT_BIOME
   - PYTHON_BLACK # using ruff
   - PYTHON_FLAKE8 # using ruff
   - PYTHON_PYLINT # using ruff
