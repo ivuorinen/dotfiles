@@ -51,7 +51,6 @@ config/gnupg/s
 config/iterm2/AppSupport
 config/karabiner/automatic_backups
 config/npm/npmrc
-config/nvim/lazy-lock.json
 config/nvim/spell/*
 config/op/plugins/gh.json
 config/op/plugins/used_items/gh.json
@@ -64,7 +63,6 @@ config/zed/settings.json
 config/zsh/.zcompdump
 dependency-check-report.html
 iTermServer-*
-lazy-lock.json
 local/bin/asdf/plugins/*
 local/share/fonts/*
 lock

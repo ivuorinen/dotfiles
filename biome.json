@@ -24,7 +24,6 @@
       "!!**/config/zsh",
       "!!**/config/karabiner",
       "!!**/config/vim",
-      "!!**/lazy-lock.json",
       "!!**/local/bin/antigen.zsh",
       "!!**/local/bin/asdf",
       "!!**/tools/antidote",

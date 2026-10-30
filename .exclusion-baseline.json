@@ -51,7 +51,6 @@
   "config/zsh": ["megalinter", "yamllint"],
   "config/zsh/completions.d": ["codacy", "codeql"],
   "graphify-out": ["bandit", "codacy", "codeql"],
-  "lazy-lock.json": ["yamllint"],
   "local/bin/antigen.zsh": ["yamllint"],
   "local/bin/asdf": ["yamllint"],
   "node_modules": ["bandit", "codacy", "codeql", "grype", "megalinter", "yamllint"],
