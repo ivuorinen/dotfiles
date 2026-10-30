@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#USAGE about "Open Neovim in ~/orgfiles with the org agenda"
+
+set -euo pipefail
+
+cd "$HOME/orgfiles"
+exec nvim tasks.org +'Org agenda'
