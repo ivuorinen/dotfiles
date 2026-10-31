@@ -146,7 +146,6 @@ The authoritative lists are `.claude/rules/vendored-files.md` (its `paths:`
 frontmatter) and `.claude/rules/secrets-files.md`. No hook enforces them for
 the cloud agent yet — this list is the only guard.
 
-- **Vendored graphify skill:** `.claude/skills/graphify/**`
 - **Vendored fish plugins:** `config/fish/functions/` — `fisher.fish`,
   `bass.fish`, `__bass.py`, `__z_add.fish`, `__z_clean.fish`
 - **Git submodules:** `tools/**`, `config/cheat/cheatsheets/{community,tldr}/**`

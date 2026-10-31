@@ -6,8 +6,7 @@ trees listed below are vendored from upstream projects and remain under their
 own terms. They are refreshed from upstream rather than edited in place; the
 edit policy and refresh instructions live in .claude/rules/vendored-files.md.
 
-Anyone reusing files from here should check this list first: not every entry
-has an established license (see the graphify skill below).
+Anyone reusing files from here should check this list first.
 
 
 fisher -- MIT
@@ -28,15 +27,6 @@ z (fish port) -- MIT
 
     config/fish/functions/__z_add.fish
     config/fish/functions/__z_clean.fish
-
-
-graphify skill -- license not recorded
-  Copied in from the Claude Code plugin cache rather than authored here.
-
-    .claude/skills/graphify/
-
-  The upstream license has not been established. Verify it against the plugin
-  source before redistributing this tree or reusing anything from it.
 
 
 mini.nvim (mini.clue key labels) -- MIT

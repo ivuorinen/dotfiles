@@ -21,8 +21,8 @@ libtmux
 # interpreter holding this package.
 pynvim
 
-# Imported by the vendored graphify skill (.claude/skills/graphify/, Step 1
-# probes `python3 -c "import graphify"`). With it here the probe succeeds and
+# Imported by the graphify skill (its setup step probes
+# `python3 -c "import graphify"`). With it here the probe succeeds and
 # the skill never reaches its `uv tool install` / `pip install` branch, which
 # the project forbids and pre-bash-route.sh denies. PyPI name has two y's.
 graphifyy

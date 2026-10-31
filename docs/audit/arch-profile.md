@@ -115,8 +115,8 @@ Evidence — four git submodules:
 - `config/cheat/cheatsheets/community`,
   `config/cheat/cheatsheets/tldr`
 
-Plus in-tree vendored files (the graphify skill and five fish plugin
-functions), tracked under `.claude/rules/vendored-files.md`.
+Plus in-tree vendored files (five fish plugin functions), tracked under
+`.claude/rules/vendored-files.md`.
 
 The boundary rule is consistent: third-party code lives under
 `tools/` or specifically-named subdirectories; updates flow via
@@ -163,8 +163,8 @@ Items already enforced by `.claude/rules/` are flagged.
    `tools/` (or the specific cheatsheets paths), or as an explicitly
    vendored tree — never as ad-hoc copied files.** The in-tree
    vendored set is authoritative in
-   `.claude/rules/vendored-files.md`: `.claude/skills/graphify/` and five
-   fish plugin functions under `config/fish/functions/`. Each is
+   `.claude/rules/vendored-files.md`: five fish plugin functions under
+   `config/fish/functions/`. Each is
    excluded from the relevant linters and blocked by the PreToolUse
    edit guard.
 6. **Helper scripts go in `local/bin/`** — they are symlinked into

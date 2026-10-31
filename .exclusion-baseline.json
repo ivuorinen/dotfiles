@@ -1,5 +1,4 @@
 {
-  ".claude/skills/graphify": ["bandit", "codacy", "codeql", "ruff"],
   ".claude/worktrees": ["bandit"],
   ".mise/locks": ["yamllint"],
   ".mypy_cache": ["yamllint"],
