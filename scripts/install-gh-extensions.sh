@@ -44,10 +44,21 @@ extensions=(
 # remove or install is reported and the rest still run; the function then
 # returns 1, because main calls it in an && list, where set -e does not stop
 # on a failure and only the return value reaches the exit status.
+#
+# gh has no staged replace (`install --force` upgrades to latest, ignoring a
+# pin), so a replacement that fails to install puts the removed version back
+# from the listing. That restore needs the network too: after an outage the
+# extension stays removed until the next run.
 install_extensions()
 {
   local entry repo pin installed version failed=0
-  installed="$(gh extension list 2> /dev/null || true)"
+  # An unreadable listing must stop the run: as an empty inventory every
+  # installed extension reads as absent, and `install --pin` then exits 0
+  # without changing its version.
+  installed="$(gh extension list)" || {
+    msgr err "Could not list installed gh extensions"
+    return 1
+  }
   for entry in "${extensions[@]}"; do
     read -r repo pin <<< "$entry"
     version="$(awk -F '\t' -v repo="$repo" '$2 == repo { print $3 }' <<< "$installed")"
@@ -67,6 +78,9 @@ install_extensions()
     gh extension install "$repo" --pin "$pin" || {
       msgr err "Failed to install $repo"
       failed=1
+      if [[ -n "$version" ]] && gh extension install "$repo" --pin "$version"; then
+        msgr warn "Restored $repo $version"
+      fi
     }
     echo ""
   done

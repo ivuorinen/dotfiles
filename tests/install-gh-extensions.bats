@@ -24,12 +24,19 @@ setup()
   printf 'gh clean-branches\tdavidraviv/gh-clean-branches\t85fcbd7e\n' >> "$TMP/list"
   printf 'gh changelog\tchelnak/gh-changelog\tv0.14.0\n' >> "$TMP/list"
 
-  # FAIL_REPO makes the install of that one repository fail.
+  # FAIL_REPO makes every install of that repository fail; FAIL_PIN makes an
+  # install at that one pin fail, the way a pin that does not exist would.
+  # LIST_FAIL makes `gh extension list` fail.
   cat > "$TMP/bin/gh" << STUB
 #!/usr/bin/env bash
-if [ "\$1 \$2" = "extension list" ]; then cat "$TMP/list"; exit 0; fi
+if [ "\$1 \$2" = "extension list" ]; then
+  [ -n "\${LIST_FAIL:-}" ] && exit 1
+  cat "$TMP/list"
+  exit 0
+fi
 printf 'gh %s\n' "\$*" >> "$CALLS"
 [ -n "\${FAIL_REPO:-}" ] && [ "\$3" = "\$FAIL_REPO" ] && exit 1
+[ -n "\${FAIL_PIN:-}" ] && [ "\${5:-}" = "\$FAIL_PIN" ] && exit 1
 exit 0
 STUB
   printf '#!/bin/sh\nprintf "%%s\\n" "$*"\n' > "$TMP/bin/msgr"
@@ -44,7 +51,16 @@ teardown()
 # Run the script against the stubs.
 run_install()
 {
-  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" FAIL_REPO="${FAIL_REPO:-}" bash "$SCRIPT"
+  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" FAIL_REPO="${FAIL_REPO:-}" \
+    FAIL_PIN="${FAIL_PIN:-}" LIST_FAIL="${LIST_FAIL:-}" bash "$SCRIPT"
+}
+
+@test "install-gh-extensions: a failed listing stops before installing anything" {
+  LIST_FAIL=1
+  run_install
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Could not list installed gh extensions"* ]]
+  [ ! -s "$CALLS" ]
 }
 
 @test "install-gh-extensions: extensions already at their pin are left alone" {
@@ -68,6 +84,16 @@ run_install()
   grep -qx 'gh extension install rsese/gh-actions-status --pin v1.3.1' "$CALLS"
   grep -qx 'gh extension install andyfeller/gh-montage --pin 93491361febeab8038c95d3ca717e8b5d542a80e' "$CALLS"
   [ "$(grep -c 'extension remove' "$CALLS")" -eq 1 ]
+}
+
+@test "install-gh-extensions: a replacement that fails to install restores the removed version" {
+  FAIL_PIN=v0.15.3
+  run_install
+  [ "$status" -ne 0 ]
+  grep -qx 'gh extension remove changelog' "$CALLS"
+  grep -qx 'gh extension install chelnak/gh-changelog --pin v0.15.3' "$CALLS"
+  grep -qx 'gh extension install chelnak/gh-changelog --pin v0.14.0' "$CALLS"
+  [[ "$output" == *"Restored chelnak/gh-changelog v0.14.0"* ]]
 }
 
 @test "install-gh-extensions: a failed install fails the run after the rest are tried" {
