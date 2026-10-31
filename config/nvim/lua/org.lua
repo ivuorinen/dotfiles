@@ -91,14 +91,15 @@ local function surround(segs, before, after, toggle)
 end
 
 -- Fence the selected lines in a source block, or remove the fence when the
--- selection starts and ends on one.
+-- selection starts and ends on one. A fence is the whole keyword: #+BEGIN_SRC
+-- may carry a language after whitespace, #+END_SRC nothing at all.
 local function src_block(segs)
   local s, e = segs[1][1][2], segs[#segs][1][2]
   local first, last = vim.fn.getline(s), vim.fn.getline(e)
   if
     s < e
-    and first:lower():match '^%s*#%+begin_src'
-    and last:lower():match '^%s*#%+end_src'
+    and first:lower():match '^%s*#%+begin_src%f[%s%z]'
+    and last:lower():match '^%s*#%+end_src%s*$'
   then
     vim.api.nvim_buf_set_lines(0, e - 1, e, true, {})
     vim.api.nvim_buf_set_lines(0, s - 1, s, true, {})
