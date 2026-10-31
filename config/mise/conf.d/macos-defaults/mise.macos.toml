@@ -1,0 +1,206 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+# macOS preferences, the login shell, and the root-level settings `defaults`
+# cannot write. This folder fragment loads from ~/.config/mise/conf.d/ on
+# every machine, but mise reads mise.macos.toml only in the `macos` platform
+# environment, which `auto_env = true` in ../../miserc.toml turns on.
+# Applied by `dfm install macos` (`mise bootstrap --only macos-defaults,user`);
+# `mise bootstrap macos defaults status` shows what differs.
+#
+# Adapted from mathiasbynens/dotfiles `.macos` (MIT, see NOTICE), by way of
+# freekmurze/dotfiles macos/set-defaults.sh.
+#
+# mise writes preferences the way `defaults write` does, as the user and never
+# with sudo, and uses every value exactly as written: no templates, no $HOME.
+# The settings that need either live in the post-defaults hook at the end of
+# this file.
+
+[bootstrap.user]
+# mise resolves the name on PATH and in the Homebrew prefix, adds it to
+# /etc/shells and runs chsh. fish comes from conf.d/brew/, so `dfm install
+# all` applies this after the mise step.
+login_shell = "fish"
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+# Sidebar icon size: small
+NSTableViewDefaultSizeMode = 1
+# Faster window resize for Cocoa applications
+NSWindowResizeTime = 0.001
+# Expand the save and print panels by default
+NSNavPanelExpandedStateForSaveMode = true
+NSNavPanelExpandedStateForSaveMode2 = true
+PMPrintingExpandedStateForPrint = true
+PMPrintingExpandedStateForPrint2 = true
+# Save to disk, not to iCloud, by default
+NSDocumentSaveNewDocumentsToCloud = false
+# Disable Resume system-wide
+NSQuitAlwaysKeepsWindows = false
+# Disable automatic termination of inactive apps
+NSDisableAutomaticTermination = true
+# Disable smart quotes, smart dashes and auto-correct when typing code
+NSAutomaticQuoteSubstitutionEnabled = false
+NSAutomaticDashSubstitutionEnabled = false
+NSAutomaticSpellingCorrectionEnabled = false
+# Full keyboard access for all controls (Tab moves through modal dialogs)
+AppleKeyboardUIMode = 3
+# Language and text formats
+AppleLanguages = ["en"]
+AppleLocale = "en_GB@currency=EUR"
+AppleMeasurementUnits = "Centimeters"
+AppleMetricUnits = true
+# Finder: show all filename extensions
+AppleShowAllExtensions = true
+# Move windows by dragging any part of the window
+# (https://nikitabobko.github.io/AeroSpace/goodies)
+NSWindowShouldDragOnGesture = true
+
+[bootstrap.macos.defaults."com.apple.print.PrintingPrefs"]
+# Quit the printer app once the print jobs complete
+"Quit When Finished" = true
+
+[bootstrap.macos.defaults."com.apple.LaunchServices"]
+# Disable the "Are you sure you want to open this application?" dialog
+LSQuarantine = false
+
+[bootstrap.macos.defaults."com.apple.BluetoothAudioAgent"]
+# Higher sound quality for Bluetooth headphones and headsets. Strings, not
+# integers: the script these came from wrote them without a type flag, and
+# `defaults write` stores an untyped value as a string.
+"Apple Bitpool Max (editable)" = "80"
+"Apple Bitpool Min (editable)" = "80"
+"Apple Initial Bitpool (editable)" = "80"
+"Apple Initial Bitpool Min (editable)" = "80"
+"Negotiated Bitpool" = "80"
+"Negotiated Bitpool Max" = "80"
+"Negotiated Bitpool Min" = "80"
+
+[bootstrap.macos.defaults."com.apple.screensaver"]
+# Require the password immediately after sleep or the screen saver begins
+askForPassword = 1
+askForPasswordDelay = 0
+
+[bootstrap.macos.defaults."com.apple.finder"]
+# New Finder windows open the Desktop. NewWindowTargetPath holds $HOME, so the
+# post-defaults hook writes it.
+NewWindowTarget = "PfDe"
+# Icons for external drives, servers and removable media on the desktop;
+# none for internal drives
+ShowExternalHardDrivesOnDesktop = true
+ShowHardDrivesOnDesktop = false
+ShowMountedServersOnDesktop = true
+ShowRemovableMediaOnDesktop = true
+# Allow text selection in Quick Look
+QLEnableTextSelection = true
+# Full POSIX path as the window title
+_FXShowPosixPathInTitle = true
+# Search the current folder by default
+FXDefaultSearchScope = "SCcf"
+# No warning when changing a file extension or emptying the Trash
+FXEnableExtensionChangeWarning = false
+WarnOnEmptyTrash = false
+# Icon view in all Finder windows (the other codes: `Nlsv` list, `clmv`
+# column, `glyv` gallery)
+FXPreferredViewStyle = "icnv"
+# Expand the "General", "Open with" and "Sharing & Permissions" info panes.
+# A table replaces the whole dictionary, as `defaults write -dict` does.
+FXInfoPanesExpanded = { General = true, OpenWith = true, Privileges = true }
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+# Avoid creating .DS_Store files on network volumes
+DSDontWriteNetworkStores = true
+
+[bootstrap.macos.defaults."com.apple.frameworks.diskimages"]
+# Disable disk image verification
+skip-verify = true
+skip-verify-locked = true
+skip-verify-remote = true
+
+[bootstrap.macos.defaults."com.apple.screencapture"]
+# Keep the date and time in screenshot filenames, and name them "screenshot".
+# The save location holds $HOME, so the post-defaults hook writes it.
+include-date = true
+name = "screenshot"
+
+[bootstrap.macos.defaults."com.apple.dock"]
+# No bouncing app icons
+no-bouncing = true
+# Icon size of Dock items, in pixels
+tilesize = 30
+# Show indicator lights for open applications
+show-process-indicators = true
+# Don't rearrange Spaces by most recent use
+mru-spaces = false
+# Translucent Dock icons for hidden applications
+showhidden = true
+
+[bootstrap.macos.defaults."com.apple.Safari"]
+# The debug and Develop menus, and the Web Inspector. Safari is sandboxed:
+# writing this domain needs Full Disk Access for the terminal running mise.
+IncludeInternalDebugMenu = true
+IncludeDevelopMenu = true
+WebKitDeveloperExtrasEnabledPreferenceKey = true
+"com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true
+
+[bootstrap.macos.defaults."com.googlecode.iterm2"]
+# No confirmation prompt when quitting iTerm2
+PromptOnQuit = false
+
+[bootstrap.macos.defaults."com.apple.TimeMachine"]
+# Don't offer new disks as Time Machine backup volumes
+DoNotOfferNewDisksForBackup = true
+
+[bootstrap.macos.defaults."com.apple.ActivityMonitor"]
+# Open the main window, show CPU usage in the Dock icon, list all processes,
+# sorted by CPU usage
+OpenMainWindow = true
+IconType = 5
+ShowCategory = 0
+SortColumn = "CPUUsage"
+SortDirection = 0
+
+[bootstrap.macos.defaults."com.apple.TextEdit"]
+# Plain text for new documents, opened and saved as UTF-8
+RichText = 0
+PlainTextEncoding = 4
+PlainTextEncodingForWrite = 4
+
+# Messages: no smart quotes or continuous spell checking. `path` changes one
+# key inside SOInputLineSettings and keeps the rest, as `-dict-add` does.
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.messageshelper.MessageController"
+key = "SOInputLineSettings"
+path = ["automaticQuoteSubstitutionEnabled"]
+value = false
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.messageshelper.MessageController"
+key = "SOInputLineSettings"
+path = ["continuousSpellCheckingEnabled"]
+value = false
+
+# Runs after the preferences above, in three parts:
+#   1. preferences whose value holds $HOME, which the hook's shell expands;
+#   2. the restarts mise leaves to the user: Dock, Finder and the menu bar
+#      read most preferences only at launch;
+#   3. settings `defaults` cannot write as the user (boot chime in NVRAM,
+#      power management, system timezone, the login window's system-wide
+#      preference), with sudo prompting once.
+# mise runs hooks under `sh -o errexit`, so a failing command stops the hook
+# and fails the run. The root commands come last so that such a failure can no
+# longer cost the preferences or the restarts, and is reported instead of
+# swallowed.
+[bootstrap.hooks.post-defaults]
+description = "Write $HOME-relative preferences, restart apps, apply root-level settings (sudo)"
+run = '''
+defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/"
+mkdir -p "$HOME/Documents/Screenshots"
+defaults write com.apple.screencapture location -string "$HOME/Documents/Screenshots"
+for app in "Activity Monitor" "Address Book" Calendar Contacts cfprefsd \
+  Dock Finder Mail Messages Safari SizeUp SystemUIServer; do
+  killall "$app" > /dev/null 2>&1 || true
+done
+sudo nvram SystemAudioVolume=" "
+sudo pmset -a hibernatemode 0
+sudo pmset -a sms 0
+sudo systemsetup -settimezone "Europe/Helsinki" > /dev/null
+sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+'''

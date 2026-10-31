@@ -8,45 +8,83 @@ source "${DOTFILES}/config/shared.sh"
 
 msgr run "Installing gh (GitHub Client) extensions"
 
+# A missing gh is a skip, not a failure: say so in a warning, so the caller's
+# success message does not follow an error.
 if ! command -v gh &> /dev/null; then
-  msgr err "gh (GitHub Client) could not be found, please install it first"
+  msgr warn "gh (GitHub Client) not found, skipping extensions"
   exit 0
 fi
 
+# "<owner/repo> <pin>" — each extension is third-party code that gh runs, so
+# every entry is pinned: a release tag for binary extensions, a full commit
+# SHA for script extensions (gh clones those). `gh extension list` shows the
+# installed versions; install_extensions reinstalls any that differ.
 extensions=(
-  # GitHub CLI extension for generating a report on repository dependencies.
-  andyfeller/gh-dependency-report
-  # GitHub CLI extension to generate montage from GitHub user avatars
-  andyfeller/gh-montage
-  # An opinionated GitHub Cli extension for creating
-  # changelogs that adhere to the keep a changelog specification.
-  chelnak/gh-changelog
-  # Safely deletes local branches with no upstream and no un-pushed commits
-  davidraviv/gh-clean-branches
-  # A beautiful CLI dashboard for GitHub 🚀
-  dlvhdr/gh-dash
-  # A github-cli extension script to clone all repositories
-  # in an organization, optionally filtering by topic.
-  matt-bartel/gh-clone-org
-  # being an extension to view the overall health of
-  # an organization's use of actions
-  rsese/gh-actions-status
+  # Report on repository dependencies
+  "andyfeller/gh-dependency-report v0.5.0"
+  # Montage from GitHub user avatars
+  "andyfeller/gh-montage 93491361febeab8038c95d3ca717e8b5d542a80e"
+  # Changelogs in the keep-a-changelog format
+  "chelnak/gh-changelog v0.15.3"
+  # Delete local branches with no upstream and no unpushed commits
+  "davidraviv/gh-clean-branches 85fcbd7e3d956b63a547f6c7de3f8aec2f96a7f8"
+  # Terminal dashboard for pull requests and issues
+  "dlvhdr/gh-dash v4.24.1"
+  # Clone every repository in an organization, optionally by topic
+  "matt-bartel/gh-clone-org ed1bec58e997a8ecb8a451ea6ac2ef1e91367487"
+  # Health of an organization's GitHub Actions use
+  "rsese/gh-actions-status v1.3.1"
 )
 
-# Function to install GitHub CLI extensions
+# Install each extension at its pinned version. `gh extension install` exits 0
+# for an extension that is already installed without applying --pin, so an
+# installed one at another version is removed first. `gh extension list` prints
+# "gh <name>\t<owner/repo>\t<version>", the version being the release tag or
+# the first 8 characters of the commit for a script extension. A failed
+# remove or install is reported and the rest still run; the function then
+# returns 1, because main calls it in an && list, where set -e does not stop
+# on a failure and only the return value reaches the exit status.
+#
+# gh has no staged replace (`install --force` upgrades to latest, ignoring a
+# pin), so a replacement that fails to install puts the removed version back
+# from the listing. That restore needs the network too: after an outage the
+# extension stays removed until the next run.
 install_extensions()
 {
-  for ext in "${extensions[@]}"; do
-    # Trim spaces
-    ext=${ext// /}
-    # Skip comments
-    if [[ ${ext:0:1} == "#" ]]; then continue; fi
-
-    msgr nested "Installing $ext"
-    gh extension install "$ext"
+  local entry repo pin installed version failed=0
+  # An unreadable listing must stop the run: as an empty inventory every
+  # installed extension reads as absent, and `install --pin` then exits 0
+  # without changing its version.
+  installed="$(gh extension list)" || {
+    msgr err "Could not list installed gh extensions"
+    return 1
+  }
+  for entry in "${extensions[@]}"; do
+    read -r repo pin <<< "$entry"
+    version="$(awk -F '\t' -v repo="$repo" '$2 == repo { print $3 }' <<< "$installed")"
+    if [[ "$version" == "$pin" || "$version" == "${pin:0:8}" ]]; then
+      msgr nested "$repo already at $version"
+      continue
+    fi
+    if [[ -n "$version" ]]; then
+      msgr nested "Replacing $repo $version with $pin"
+      gh extension remove "${repo#*/gh-}" || {
+        msgr err "Failed to remove $repo"
+        failed=1
+        continue
+      }
+    fi
+    msgr nested "Installing $repo@$pin"
+    gh extension install "$repo" --pin "$pin" || {
+      msgr err "Failed to install $repo"
+      failed=1
+      if [[ -n "$version" ]] && gh extension install "$repo" --pin "$version"; then
+        msgr warn "Restored $repo $version"
+      fi
+    }
     echo ""
   done
-  return 0
+  return "$failed"
 }
 
 # Install all GitHub CLI extensions
@@ -54,7 +92,6 @@ main()
 {
   install_extensions \
     && msgr run_done "Done"
-  return 0
 }
 
 main "$@"

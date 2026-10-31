@@ -15,49 +15,77 @@ source "${DOTFILES}/config/shared.sh"
 
 msgr run "Installing herdr plugins"
 
+# A missing herdr is a skip, not a failure: say so in a warning.
 if ! command -v herdr &> /dev/null; then
-  msgr err "herdr could not be found, please install it first"
+  msgr warn "herdr not found, skipping plugins"
   exit 0
 fi
 
-# "<plugin-id> <owner/repo> [ref]" — the id is what herdr registers, which is
+# jq reads each installed plugin's ref out of `herdr plugin list --json`.
+if ! command -v jq &> /dev/null; then
+  msgr warn "jq not found, skipping herdr plugins"
+  exit 0
+fi
+
+# "<plugin-id> <owner/repo> <ref>" — the id is what herdr registers, which is
 # not always derivable from the repo name (kryptamine/herdr-auto-title
-# registers as herdr.auto-title). Refresh with: herdr plugin list --json
+# registers as herdr.auto-title). Each plugin is built from source and run,
+# so every entry is pinned: a tag where the project publishes one, otherwise
+# a full commit SHA. `herdr plugin list --json` shows each plugin's
+# requested_ref and resolved_commit.
 plugins=(
   "herdr-navigator thanhdat77/herdr-navigator v0.3.6"
-  "sessionizer andrewchng/herdr-sessionizer"
-  "branch-cleanup dutifuldev/herdr-branch-cleanup"
-  "herdr.auto-title kryptamine/herdr-auto-title"
+  "sessionizer andrewchng/herdr-sessionizer 9aba5d0e4e14eca1a6d5be0a69e828b8a72c0e5c"
+  "branch-cleanup dutifuldev/herdr-branch-cleanup 8b6774e60008f971f16894e95d074caf9342d96b"
+  "herdr.auto-title kryptamine/herdr-auto-title 636286baf931fa71966083d1e8294fc4a38f11fb"
 )
 
+# Install each plugin at its ref. An installed plugin is skipped only when its
+# requested ref, or the commit herdr resolved, equals the configured ref: a
+# check on the plugin id alone kept a plugin at its old ref after the pin
+# changed. Reinstalling replaces the managed checkout and re-runs the build,
+# which for these Rust plugins is minutes of cargo, so a match is left alone.
+# A failed install is reported and the rest still run; the function then
+# returns 1, because main calls it in an && list, where set -e does not stop
+# on a failure and only the return value reaches the exit status.
 install_plugins()
 {
-  local installed entry id repo ref
+  local installed entry id repo ref refs failed=0
 
-  # Reinstalling replaces the managed checkout and re-runs the build, which for
-  # these Rust plugins is minutes of cargo. Ask once, then skip what is there.
-  installed="$(herdr plugin list --json 2> /dev/null || echo '[]')"
+  installed="$(herdr plugin list --json 2> /dev/null || echo '{}')"
 
   for entry in "${plugins[@]}"; do
     read -r id repo ref <<< "$entry"
+    # "<requested_ref> <resolved_commit>" of the installed plugin; empty when
+    # it is not installed. requested_ref is null for a plugin installed
+    # without --ref.
+    refs="$(jq -r --arg id "$id" '[.. | objects | select(.plugin_id? == $id)
+      | .source | (.requested_ref // ""), (.resolved_commit // "")] | join(" ")' \
+      <<< "$installed")"
 
-    if grep -q "\"plugin_id\"[[:space:]]*:[[:space:]]*\"${id}\"" <<< "$installed"; then
-      msgr nested "$id already installed, skipping"
+    if [[ " $refs " == *" $ref "* ]]; then
+      msgr nested "$id already at $ref, skipping"
       continue
     fi
 
-    msgr nested "Installing $repo"
-    herdr plugin install "$repo" ${ref:+--ref "$ref"} --yes
+    if [[ -n "${refs// /}" ]]; then
+      msgr nested "Reinstalling $id at $ref"
+    else
+      msgr nested "Installing $repo"
+    fi
+    herdr plugin install "$repo" ${ref:+--ref "$ref"} --yes || {
+      msgr err "Failed to install $repo"
+      failed=1
+    }
     echo ""
   done
-  return 0
+  return "$failed"
 }
 
 main()
 {
   install_plugins \
     && msgr run_done "Done"
-  return 0
 }
 
 main "$@"
