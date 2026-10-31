@@ -24,10 +24,13 @@ setup()
   printf 'gh clean-branches\tdavidraviv/gh-clean-branches\t85fcbd7e\n' >> "$TMP/list"
   printf 'gh changelog\tchelnak/gh-changelog\tv0.14.0\n' >> "$TMP/list"
 
+  # FAIL_REPO makes the install of that one repository fail.
   cat > "$TMP/bin/gh" << STUB
 #!/usr/bin/env bash
 if [ "\$1 \$2" = "extension list" ]; then cat "$TMP/list"; exit 0; fi
 printf 'gh %s\n' "\$*" >> "$CALLS"
+[ -n "\${FAIL_REPO:-}" ] && [ "\$3" = "\$FAIL_REPO" ] && exit 1
+exit 0
 STUB
   printf '#!/bin/sh\nprintf "%%s\\n" "$*"\n' > "$TMP/bin/msgr"
   chmod +x "$TMP/bin/"*
@@ -41,7 +44,7 @@ teardown()
 # Run the script against the stubs.
 run_install()
 {
-  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" bash "$SCRIPT"
+  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" FAIL_REPO="${FAIL_REPO:-}" bash "$SCRIPT"
 }
 
 @test "install-gh-extensions: extensions already at their pin are left alone" {
@@ -65,4 +68,13 @@ run_install()
   grep -qx 'gh extension install rsese/gh-actions-status --pin v1.3.1' "$CALLS"
   grep -qx 'gh extension install andyfeller/gh-montage --pin 93491361febeab8038c95d3ca717e8b5d542a80e' "$CALLS"
   [ "$(grep -c 'extension remove' "$CALLS")" -eq 1 ]
+}
+
+@test "install-gh-extensions: a failed install fails the run after the rest are tried" {
+  FAIL_REPO=andyfeller/gh-montage
+  run_install
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to install andyfeller/gh-montage"* ]]
+  [[ "$output" != *"Done"* ]]
+  grep -q 'rsese/gh-actions-status' "$CALLS"
 }

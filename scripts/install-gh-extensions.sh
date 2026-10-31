@@ -40,10 +40,13 @@ extensions=(
 # for an extension that is already installed without applying --pin, so an
 # installed one at another version is removed first. `gh extension list` prints
 # "gh <name>\t<owner/repo>\t<version>", the version being the release tag or
-# the first 8 characters of the commit for a script extension.
+# the first 8 characters of the commit for a script extension. A failed
+# remove or install is reported and the rest still run; the function then
+# returns 1, because main calls it in an && list, where set -e does not stop
+# on a failure and only the return value reaches the exit status.
 install_extensions()
 {
-  local entry repo pin installed version
+  local entry repo pin installed version failed=0
   installed="$(gh extension list 2> /dev/null || true)"
   for entry in "${extensions[@]}"; do
     read -r repo pin <<< "$entry"
@@ -54,13 +57,20 @@ install_extensions()
     fi
     if [[ -n "$version" ]]; then
       msgr nested "Replacing $repo $version with $pin"
-      gh extension remove "${repo#*/gh-}"
+      gh extension remove "${repo#*/gh-}" || {
+        msgr err "Failed to remove $repo"
+        failed=1
+        continue
+      }
     fi
     msgr nested "Installing $repo@$pin"
-    gh extension install "$repo" --pin "$pin"
+    gh extension install "$repo" --pin "$pin" || {
+      msgr err "Failed to install $repo"
+      failed=1
+    }
     echo ""
   done
-  return 0
+  return "$failed"
 }
 
 # Install all GitHub CLI extensions
@@ -68,7 +78,6 @@ main()
 {
   install_extensions \
     && msgr run_done "Done"
-  return 0
 }
 
 main "$@"

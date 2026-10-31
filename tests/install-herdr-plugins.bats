@@ -31,10 +31,13 @@ setup()
 ]}}
 JSON
 
+  # FAIL_REPO makes the install of that one repository fail.
   cat > "$TMP/bin/herdr" << STUB
 #!/usr/bin/env bash
 if [ "\$1 \$2" = "plugin list" ]; then cat "$TMP/list.json"; exit 0; fi
 printf 'herdr %s\n' "\$*" >> "$CALLS"
+[ -n "\${FAIL_REPO:-}" ] && [ "\$3" = "\$FAIL_REPO" ] && exit 1
+exit 0
 STUB
   printf '#!/bin/sh\nprintf "%%s\\n" "$*"\n' > "$TMP/bin/msgr"
   chmod +x "$TMP/bin/"*
@@ -48,7 +51,7 @@ teardown()
 # Run the script against the stubs.
 run_install()
 {
-  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" bash "$SCRIPT"
+  run env PATH="$TMP/bin:$PATH" DOTFILES="$TMP/dotfiles" FAIL_REPO="${FAIL_REPO:-}" bash "$SCRIPT"
 }
 
 @test "install-herdr-plugins: plugins already at their ref are left alone" {
@@ -70,4 +73,13 @@ run_install()
   [ "$status" -eq 0 ]
   grep -qx 'herdr plugin install kryptamine/herdr-auto-title --ref 636286baf931fa71966083d1e8294fc4a38f11fb --yes' "$CALLS"
   [ "$(wc -l < "$CALLS")" -eq 2 ]
+}
+
+@test "install-herdr-plugins: a failed install fails the run after the rest are tried" {
+  FAIL_REPO=dutifuldev/herdr-branch-cleanup
+  run_install
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to install dutifuldev/herdr-branch-cleanup"* ]]
+  [[ "$output" != *"Done"* ]]
+  grep -q 'kryptamine/herdr-auto-title' "$CALLS"
 }

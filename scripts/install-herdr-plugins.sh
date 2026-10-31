@@ -45,9 +45,12 @@ plugins=(
 # check on the plugin id alone kept a plugin at its old ref after the pin
 # changed. Reinstalling replaces the managed checkout and re-runs the build,
 # which for these Rust plugins is minutes of cargo, so a match is left alone.
+# A failed install is reported and the rest still run; the function then
+# returns 1, because main calls it in an && list, where set -e does not stop
+# on a failure and only the return value reaches the exit status.
 install_plugins()
 {
-  local installed entry id repo ref refs
+  local installed entry id repo ref refs failed=0
 
   installed="$(herdr plugin list --json 2> /dev/null || echo '{}')"
 
@@ -70,17 +73,19 @@ install_plugins()
     else
       msgr nested "Installing $repo"
     fi
-    herdr plugin install "$repo" ${ref:+--ref "$ref"} --yes
+    herdr plugin install "$repo" ${ref:+--ref "$ref"} --yes || {
+      msgr err "Failed to install $repo"
+      failed=1
+    }
     echo ""
   done
-  return 0
+  return "$failed"
 }
 
 main()
 {
   install_plugins \
     && msgr run_done "Done"
-  return 0
 }
 
 main "$@"
