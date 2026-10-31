@@ -51,6 +51,18 @@ mini.nvim (mini.clue key labels) -- MIT
   strings are mini.nvim's; regenerate the file rather than editing it.
 
 
+macOS defaults -- MIT
+  https://github.com/mathiasbynens/dotfiles
+  Copyright Mathias Bynens <https://mathiasbynens.be/>
+
+    config/mise/conf.d/macos-defaults/mise.macos.toml
+
+  Adapted, not vendored: the preference keys, values and most comments come
+  from the repository's .macos script, by way of
+  https://github.com/freekmurze/dotfiles (macos/set-defaults.sh, which
+  carries no license), rewritten as mise [bootstrap.macos.defaults] tables.
+
+
 Other third-party files
 -----------------------
 

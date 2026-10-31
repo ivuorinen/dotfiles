@@ -105,6 +105,28 @@ platform environment, and mise skips the entries whose manager is not on
 when the user has no sudo rights. They install the mise binary first when
 it is missing, because `dfm install all` runs them before the mise step.
 
+## macOS defaults
+
+`config/mise/conf.d/macos-defaults/mise.macos.toml` holds the macOS
+preferences as `[bootstrap.macos.defaults."<domain>"]` tables, the login
+shell (`[bootstrap.user] login_shell = "fish"`), and a `post-defaults`
+hook. It loads only in the `macos` platform environment. mise writes
+preferences as the user and never templates them, so the hook covers the
+rest: the three preferences whose value holds `$HOME`, the app restarts,
+and the root-level settings (`nvram`, `pmset`, `systemsetup`, the login
+window). The hook runs under `sh -o errexit`, so a failing command fails
+the run instead of being skipped silently.
+
+| Command                                          | Does                                        |
+|--------------------------------------------------|---------------------------------------------|
+| `dfm install macos`                              | `mise bootstrap --only macos-defaults,user` |
+| `mise bootstrap macos defaults status`           | Show which preferences differ               |
+| `mise bootstrap --only macos-defaults --dry-run` | Preview the writes and the hook             |
+
+`dfm install all` applies it after the mise step, which installs fish.
+Writing the `com.apple.Safari` domain needs Full Disk Access for the
+terminal running mise, because Safari is sandboxed.
+
 ## Gotchas
 
 - `experimental = true` is set — some commands (`deps`, `oci`, `mcp`) are
