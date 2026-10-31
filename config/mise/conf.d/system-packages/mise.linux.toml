@@ -1,0 +1,57 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+# Distribution packages for Debian/Ubuntu (apt) and Fedora/RHEL (dnf): build
+# toolchains, headers for compiling languages, and CLI utilities no mise
+# backend provides. mise reads this file only in the `linux` platform
+# environment (`auto_env = true` in ../../miserc.toml), and on each distro it
+# skips the entries whose manager is not on PATH, so one list serves both.
+# Applied by `dfm install apt-packages` / `dfm install dnf-packages`
+# (`mise bootstrap packages apply --manager apt|dnf`), which use sudo.
+#
+# Tools pinned in [tools] in ../../config.toml (cmake, jq, shellcheck, tmux)
+# are not repeated here: a distro copy runs instead of the pinned one whenever
+# it comes first on PATH.
+#
+# "latest" accepts any installed version: apply installs what is missing and
+# never upgrades. `mise bootstrap packages upgrade` updates installed ones.
+
+[bootstrap.packages]
+# Build essentials
+"apt:build-essential" = "latest" # gcc, g++, make
+"apt:pkg-config" = "latest"
+"apt:autoconf" = "latest"
+"apt:automake" = "latest"
+"apt:libtool" = "latest"
+"dnf:@development-tools" = "latest" # package group: gcc, make and friends
+"dnf:pkgconfig" = "latest"
+"dnf:autoconf" = "latest"
+"dnf:automake" = "latest"
+"dnf:libtool" = "latest"
+
+# Libraries for compiling languages
+"apt:libssl-dev" = "latest"
+"apt:libffi-dev" = "latest"
+"apt:zlib1g-dev" = "latest"
+"apt:libreadline-dev" = "latest"
+"apt:libbz2-dev" = "latest"
+"apt:libsqlite3-dev" = "latest"
+"apt:libncurses-dev" = "latest"
+"dnf:openssl-devel" = "latest"
+"dnf:libffi-devel" = "latest"
+"dnf:zlib-devel" = "latest"
+"dnf:readline-devel" = "latest"
+"dnf:bzip2-devel" = "latest"
+"dnf:sqlite-devel" = "latest"
+"dnf:ncurses-devel" = "latest"
+
+# CLI utilities. dig is needed by x-ip and x-multi-ping.
+"apt:dnsutils" = "latest" # dig
+"apt:tree" = "latest"
+"apt:unzip" = "latest"
+"apt:socat" = "latest"
+"apt:gnupg" = "latest"
+"apt:software-properties-common" = "latest" # add-apt-repository
+"dnf:bind-utils" = "latest" # dig
+"dnf:tree" = "latest"
+"dnf:unzip" = "latest"
+"dnf:socat" = "latest"
+"dnf:gnupg2" = "latest"

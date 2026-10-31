@@ -66,6 +66,24 @@ require_bin()
   return 1
 }
 
+# Install the mise binary when it is missing. The apt, dnf and macos steps
+# apply mise config ([bootstrap.*] under config/mise/conf.d/), and in
+# `install all` the apt/dnf steps run before the mise step, so each of them
+# calls this first rather than assuming the mise step has run. No binary is
+# the one fatal case: the caller records the failure and later steps that
+# need mise skip.
+ensure_mise()
+{
+  command -v mise &> /dev/null && return 0
+  msgr nested "Installing mise..."
+  curl -fsSL https://mise.run | sh || {
+    msgr err "Failed to install mise"
+    return 1
+  }
+  export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
+  return 0
+}
+
 # Handle install section commands
 dfm_install()
 {
@@ -93,7 +111,9 @@ dfm_install()
       _install_failures=()
       _install_skips=()
 
-      # Tier 0: Platform foundations (OS packages, build tools)
+      # Tier 0: Platform foundations (build tools, OS packages). The apt and
+      # dnf lists are mise [bootstrap.packages], so those steps install the
+      # mise binary first when it is missing.
       [[ "$(uname)" == "Darwin" ]] && run_step "macos defaults" dfm_install macos
       [[ "$(uname)" == "Darwin" ]] && run_step "xcode cli tools" dfm_install xcode-cli-tools
       command -v apt &> /dev/null && run_step "apt packages" dfm_install apt-packages
@@ -206,17 +226,7 @@ dfm_install()
 
     mise)
       msgr run "Installing tools via mise..."
-      if ! command -v mise &> /dev/null; then
-        msgr nested "Installing mise..."
-        curl -fsSL https://mise.run | sh || {
-          # No mise binary means nothing downstream can run — the one case
-          # where the mise step is genuinely fatal (caller records it and
-          # skips the mise-dependent steps).
-          msgr err "Failed to install mise"
-          return 1
-        }
-        export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
-      fi
+      ensure_mise || return 1
       if [[ -z "${GITHUB_TOKEN:-}" ]]; then
         msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
         msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
@@ -263,9 +273,12 @@ dfm_install()
     apt-packages)
       # System packages need sudo; auto-skip on hosts where this user has no
       # sudo rights (e.g. shared servers) rather than failing mid-install.
+      # Both package lists are [bootstrap.packages] in
+      # config/mise/conf.d/system-packages/mise.linux.toml.
       if "$DOTFILES/local/bin/is-sudoer"; then
         msgr run "Installing apt packages..."
-        bash "$DOTFILES/scripts/install-apt-packages.sh" \
+        ensure_mise || return 1
+        mise bootstrap packages apply --manager apt --yes \
           && msgr yay "apt packages installed!"
       else
         msgr warn "Skipping apt packages: $(id -un) has no sudo privileges"
@@ -275,7 +288,8 @@ dfm_install()
     dnf-packages)
       if "$DOTFILES/local/bin/is-sudoer"; then
         msgr run "Installing dnf packages..."
-        bash "$DOTFILES/scripts/install-dnf-packages.sh" \
+        ensure_mise || return 1
+        mise bootstrap packages apply --manager dnf --yes \
           && msgr yay "dnf packages installed!"
       else
         msgr warn "Skipping dnf packages: $(id -un) has no sudo privileges"

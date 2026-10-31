@@ -90,6 +90,21 @@ imagemagick/ffmpeg/coreutils stack stay on native brew
 in `config/homebrew/Brewfile` (see its header). PHP is managed by
 `phpenv.fish` (homebrew provider), not brew or mise.
 
+## Linux distribution packages
+
+`config/mise/conf.d/system-packages/mise.linux.toml` lists the apt
+(Debian/Ubuntu) and dnf (Fedora/RHEL) packages under
+`[bootstrap.packages]`: build toolchains, headers for compiling languages,
+and CLI utilities no mise backend provides. It loads only in the `linux`
+platform environment, and mise skips the entries whose manager is not on
+`PATH`, so one list serves both distros. Tools already pinned in
+`[tools]` are not repeated there.
+
+`dfm install apt-packages` and `dfm install dnf-packages` run
+`mise bootstrap packages apply --manager apt|dnf --yes` (sudo), skipping
+when the user has no sudo rights. They install the mise binary first when
+it is missing, because `dfm install all` runs them before the mise step.
+
 ## Gotchas
 
 - `experimental = true` is set — some commands (`deps`, `oci`, `mcp`) are

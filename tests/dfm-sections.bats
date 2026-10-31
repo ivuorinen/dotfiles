@@ -69,7 +69,7 @@ usage_cmds()
   # A script whose @description line went missing would still be listed, but
   # with an empty label — the menu would say nothing about what it does.
   run env DOTFILES="$REPO" "$DFM" scripts
-  [[ "$output" == *"Install essential apt packages"* ]]
+  [[ "$output" == *"Install fonts from GitHub releases"* ]]
   [[ "$output" == *"Install GitHub CLI extensions"* ]]
 }
 
