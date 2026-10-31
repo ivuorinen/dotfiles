@@ -71,13 +71,18 @@ require_bin()
 # the one fatal case: the caller records the failure and later steps that
 # need mise skip. MISE_INSTALL_PATH puts the binary in the directory added to
 # PATH: mise.run defaults to ~/.local/bin/mise whatever XDG_BIN_HOME says, so
-# a custom XDG_BIN_HOME left mise installed but not found.
+# a custom XDG_BIN_HOME left mise installed but not found. The pipeline runs
+# under pipefail in a subshell: a failed download hands sh empty input, sh
+# exits 0, and without it the failure read as a successful install.
 ensure_mise()
 {
   command -v mise &> /dev/null && return 0
   local bin_dir="${XDG_BIN_HOME:-$HOME/.local/bin}"
   msgr nested "Installing mise..."
-  curl -fsSL https://mise.run | MISE_INSTALL_PATH="$bin_dir/mise" sh || {
+  (
+    set -o pipefail
+    curl -fsSL https://mise.run | MISE_INSTALL_PATH="$bin_dir/mise" sh
+  ) || {
     msgr err "Failed to install mise"
     return 1
   }

@@ -20,8 +20,10 @@ setup()
   # bash 3.2, which dfm-lib's guard would refuse.
   ln -s "$BASH" "$TMP/bin/bash"
 
+  # CURL_FAIL makes the download fail the way `curl -f` does: no output.
   cat > "$TMP/bin/curl" << 'STUB'
 #!/usr/bin/env bash
+[ -n "${CURL_FAIL:-}" ] && exit 22
 cat << 'INSTALLER'
 p="${MISE_INSTALL_PATH:-$HOME/.local/bin/mise}"
 mkdir -p "${p%/*}"
@@ -59,6 +61,13 @@ install_mise()
   [ -x "$TMP/xdgbin/mise" ]
   [ ! -e "$TMP/home/.local/bin/mise" ]
   [[ "$output" == *"mise tools installed!"* ]]
+}
+
+@test "dfm install mise: a failed installer download fails the step" {
+  install_mise XDG_BIN_HOME="$TMP/xdgbin" CURL_FAIL=1
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to install mise"* ]]
+  [[ "$output" != *"mise tools installed!"* ]]
 }
 
 @test "dfm install mise: without XDG_BIN_HOME mise goes to ~/.local/bin" {
