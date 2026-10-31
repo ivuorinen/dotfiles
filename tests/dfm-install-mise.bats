@@ -20,16 +20,26 @@ setup()
   # bash 3.2, which dfm-lib's guard would refuse.
   ln -s "$BASH" "$TMP/bin/bash"
 
-  # CURL_FAIL makes the download fail the way `curl -f` does: no output.
+  # The installer goes to -o FILE, or to stdout without it. CURL_FAIL fails
+  # the way `curl -f` does, writing nothing; CURL_CUT delivers the whole
+  # script and then reports a broken transfer (exit 18), the case where a
+  # piped-in installer had already run.
   cat > "$TMP/bin/curl" << 'STUB'
 #!/usr/bin/env bash
 [ -n "${CURL_FAIL:-}" ] && exit 22
-cat << 'INSTALLER'
+out=/dev/stdout
+while [ $# -gt 0 ]; do
+  [ "$1" = "-o" ] && out="$2"
+  shift
+done
+cat > "$out" << 'INSTALLER'
 p="${MISE_INSTALL_PATH:-$HOME/.local/bin/mise}"
 mkdir -p "${p%/*}"
 printf '#!/bin/sh\nexit 0\n' > "$p"
 chmod +x "$p"
 INSTALLER
+[ -n "${CURL_CUT:-}" ] && exit 18
+exit 0
 STUB
   chmod +x "$TMP/bin/curl"
 
@@ -68,6 +78,13 @@ install_mise()
   [ "$status" -ne 0 ]
   [[ "$output" == *"Failed to install mise"* ]]
   [[ "$output" != *"mise tools installed!"* ]]
+}
+
+@test "dfm install mise: a transfer cut after the script arrives runs nothing" {
+  install_mise XDG_BIN_HOME="$TMP/xdgbin" CURL_CUT=1
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to install mise"* ]]
+  [ ! -e "$TMP/xdgbin/mise" ]
 }
 
 @test "dfm install mise: without XDG_BIN_HOME mise goes to ~/.local/bin" {
