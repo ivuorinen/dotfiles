@@ -18,25 +18,28 @@ check_required_tools()
 {
   for t in "${PBB_REQUIRED_TOOLS[@]}"; do
     if ! x-have "$t"; then
-      echo "(!) $t is missing, can't continue..."
+      msgr err "$t is missing, can't continue"
       exit 1
     fi
   done
   return 0
 }
 
-# Clone or update the pure-bash-bible repository
+# Clone or update the pure-bash-bible repository. Messages go through the
+# msgr command, not the msg_* helpers: msg_yay is defined only inside msgr
+# itself, so a call here exited 127 under set -e before any chapter was
+# processed.
 clone_or_update_repo()
 {
   if [[ ! -d "$PBB_TEMP_DIR/.git" ]]; then
-    msg_run "Starting to clone $PBB_GIT"
+    msgr run "Starting to clone $PBB_GIT"
     git clone --depth 1 --single-branch -q "$PBB_GIT" "$PBB_TEMP_DIR"
-    msg_yay "Cloned $PBB_GIT"
+    msgr yay "Cloned $PBB_GIT"
   else
-    msg_run "Starting to update $PBB_GIT"
+    msgr run "Starting to update $PBB_GIT"
     git -C "$PBB_TEMP_DIR" reset --hard origin/master
     git -C "$PBB_TEMP_DIR" pull -q
-    msg_yay "Updated $PBB_GIT"
+    msgr yay "Updated $PBB_GIT"
   fi
   return 0
 }
@@ -84,7 +87,7 @@ process_chapters()
     cheat_file="$cheat_dest/$header"
 
     if ! replaceable "$f" "$cheat_file"; then
-      cp "$f" "$cheat_file" && msg_run "Updated: $cheat_file"
+      cp "$f" "$cheat_file" && msgr run "Updated: $cheat_file"
     fi
 
     LC_ALL=C perl -pi.bak -e 's/\<\!-- CHAPTER END --\>//' "$cheat_file"
