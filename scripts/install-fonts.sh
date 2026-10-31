@@ -55,7 +55,9 @@ EOF
 
 # ── GitHub API ─────────────────────────────────────────────────
 # Fetch release JSON from GitHub API.
-# Prefers gh CLI (handles auth/rate limits), falls back to curl.
+# Prefers gh CLI (handles auth/rate limits) and falls back to anonymous curl
+# when gh is missing *or fails*: `gh api` needs a login, so on a fresh
+# machine with gh installed but unauthenticated it exits 4 for every font.
 # $1 - github repo (owner/repo)
 # $2 - version ("latest" or a tag like "v3.3.0")
 fetch_release_json()
@@ -70,14 +72,13 @@ fetch_release_json()
     endpoint="repos/${repo}/releases/tags/${version}"
   fi
 
-  if command -v gh > /dev/null 2>&1; then
-    gh api "$endpoint" 2> /dev/null
-  else
-    # -L follows redirects, so pin the protocol on both the initial request
-    # and any redirect target (sonar shell:S6506).
-    curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
-      "https://api.github.com/${endpoint}" 2> /dev/null
+  if command -v gh > /dev/null 2>&1 && gh api "$endpoint" 2> /dev/null; then
+    return 0
   fi
+  # -L follows redirects, so pin the protocol on both the initial request
+  # and any redirect target (sonar shell:S6506).
+  curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    "https://api.github.com/${endpoint}" 2> /dev/null
 }
 
 # Find asset download URL matching a glob pattern.
@@ -161,7 +162,10 @@ install_font()
 
   local zip_file="${tmp_dir}/font.zip"
 
-  curl -fsSL -o "$zip_file" "$url" || {
+  # Same https-only pinning as fetch_release_json: the asset URL redirects to
+  # GitHub's object storage, and -L would otherwise follow a downgrade.
+  curl -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 \
+    -o "$zip_file" "$url" || {
     msgr warn "Failed to download $url — skipping"
     return 1
   }
