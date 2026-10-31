@@ -34,6 +34,9 @@ DISABLE_LINTERS:
   - PYTHON_ISORT # using ruff (I rules)
   - PHP_PHPCSFIXER # no composer.json; false positives on non-PHP files
   - PHP_PSALM # no psalm.xml baseline; type annotations not maintained
+  # The repo has no lockfile, manifest or SBOM for osv-scanner to read (it
+  # warns "no package sources found" on every run); mise pins the tools.
+  - REPOSITORY_OSV_SCANNER
 YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
 BASH_SHFMT_ARGUMENTS: -i 2 -bn -ci -sr -fn
@@ -45,5 +48,8 @@ FILTER_REGEX_EXCLUDE: >
 # bash-policy.sh and protected-paths.sh, config/lib.sh, config/fzf/fzf.bash
 # and config/op/plugins.sh.
 BASH_EXEC_FILTER_REGEX_EXCLUDE: "(config/theme/(_lib\\.sh$|shell-env\\.sh$)|\\.claude/hooks/lib/(bash-policy|protected-paths)\\.sh$|config/(lib\\.sh|fzf/fzf\\.bash|op/plugins\\.sh)$)"
+# The findings store is written by the nitpicker tooling, INDEX.md included;
+# .mise/tasks/lint-md-table skips the same tree.
+MARKDOWN_MARKDOWN_TABLE_FORMATTER_FILTER_REGEX_EXCLUDE: "(docs/audit/findings/)"
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
