@@ -21,10 +21,11 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
-      # persist-credentials MUST stay true: the "Push changes" step below runs a
-      # raw `git push`, which needs the token persisted in git's config. The
+      # persist-credentials MUST stay true: "Update submodules" ends in a raw
+      # `git push`, which needs the token persisted in git's config. The
       # token: input only authenticates the initial clone, not later pushes.
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,15 +57,20 @@ jobs:
       # unshallowed first, and a describe failure on a tagged submodule now
       # fails the step instead of being reported as tagless.
       #
-      # Changes are pushed straight to main rather than opened as a PR: no
-      # workflow here uses a PR-creating action, and a PR opened with
-      # GITHUB_TOKEN would not trigger the checks that make review useful.
+      # Changes go to a PR from $BRANCH, not straight to main: main requires
+      # status checks, and a GITHUB_TOKEN push cannot bypass branch
+      # protection. A PR opened with GITHUB_TOKEN triggers no workflows, so its
+      # checks never report and an admin merges it. The branch is rebuilt from
+      # main on every run, so the force push refreshes a PR left open.
       # Every tagged submodule follows its default branch's newest tag, major
       # bumps included and with no per-submodule exceptions: a tag is the
       # upstream's own release point, so the pin is always a release. A pin
       # sitting on untagged commits is moved to that tag too.
       - name: Update submodules
         shell: bash
+        env:
+          BRANCH: chore/update-submodules
+          GH_TOKEN: ${{ github.token }}
         run: |
           git submodule sync
           # shellcheck disable=SC2016 # expansion must happen per submodule
@@ -87,11 +93,18 @@ jobs:
 
           if git diff --quiet; then
             echo "No updates for submodules."
-          else
-            # --update stages only tracked paths (the submodule pointers),
-            # never stray untracked files in the runner's checkout.
-            git add --update
-            git commit -m "chore(git): Update submodules (automated)"
-            git show --raw
-            git push
+            exit 0
+          fi
+          git switch --quiet --force-create "$BRANCH"
+          # --update stages only tracked paths (the submodule pointers),
+          # never stray untracked files in the runner's checkout.
+          git add --update
+          git commit -m "chore(git): Update submodules (automated)"
+          git show --raw
+          git push --force origin "$BRANCH"
+          open_pr="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$open_pr" ]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "chore(git): Update submodules (automated)" \
+              --body "Moves each tagged submodule to its newest tag. Opened with GITHUB_TOKEN, so no checks run on it; merge it as an admin."
           fi
