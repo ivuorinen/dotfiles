@@ -58,13 +58,14 @@ local function selection()
   return segs, mode
 end
 
-local function surround(segs, before, after, toggle)
+local function surround(buf, segs, before, after, toggle)
   local parts, wrapped = {}, toggle
   for _, seg in ipairs(segs) do
     local lnum, s, e = seg[1][2], seg[1][3], seg[2][3]
+    local line = vim.api.nvim_buf_get_lines(buf, lnum - 1, lnum, true)[1]
     -- Emphasis may not start or end with whitespace, so the markers go
     -- inside any the selection picked up.
-    local lead, body, trail = vim.fn.getline(lnum):sub(s, e):match '^(%s*)(.-)(%s*)$'
+    local lead, body, trail = line:sub(s, e):match '^(%s*)(.-)(%s*)$'
     if body ~= '' then
       table.insert(
         parts,
@@ -80,7 +81,7 @@ local function surround(segs, before, after, toggle)
     local body = wrapped and p.body:sub(#before + 1, -#after - 1)
       or before .. p.body .. after
     vim.api.nvim_buf_set_text(
-      0,
+      buf,
       p.lnum - 1,
       p.s - 1,
       p.lnum - 1,
@@ -113,11 +114,11 @@ end
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'org',
   callback = function(ev)
-    K.d('<C-b>', 'x', function() surround(selection(), '*', '*', true) end, {
+    K.d('<C-b>', 'x', function() surround(ev.buf, selection(), '*', '*', true) end, {
       buffer = ev.buf,
       desc = 'org: bold',
     })
-    K.d('<C-i>', 'x', function() surround(selection(), '/', '/', true) end, {
+    K.d('<C-i>', 'x', function() surround(ev.buf, selection(), '/', '/', true) end, {
       buffer = ev.buf,
       desc = 'org: italic',
     })
@@ -126,15 +127,18 @@ vim.api.nvim_create_autocmd('FileType', {
       if mode == 'V' then
         src_block(segs)
       else
-        surround(segs, '~', '~', true)
+        surround(ev.buf, segs, '~', '~', true)
       end
     end, { buffer = ev.buf, desc = 'org: code (source block when linewise)' })
     K.d('<C-k>', 'x', function()
       -- Read the selection before the prompt: an async vim.ui.input ends
-      -- visual mode before its callback runs.
+      -- visual mode before its callback runs, and another buffer may be
+      -- current by then, so the edit names this one.
       local segs = selection()
       vim.ui.input({ prompt = 'URL: ' }, function(url)
-        if url and url ~= '' then surround(segs, '[[' .. url .. '][', ']]', false) end
+        if url and url ~= '' then
+          surround(ev.buf, segs, '[[' .. url .. '][', ']]', false)
+        end
       end)
     end, { buffer = ev.buf, desc = 'org: link' })
   end,
