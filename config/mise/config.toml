@@ -209,7 +209,7 @@ pi = "1.4.0"
 "npm:context-mode" = "1.0.169"
 "npm:@tobilu/qmd" = "2.8.3"
 "aqua:SonarSource/sonarqube-cli" = "1.11.0.16877"
-"npm:@vshulcz/deja-vu" = "0.23.1"
+"npm:@vshulcz/deja-vu" = "0.23.2"
 lefthook = "2.2.2"
 "github:ivuorinen/git-dirty" = "2026.10.0"
 
