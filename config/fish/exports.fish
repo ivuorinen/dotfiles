@@ -74,10 +74,6 @@ x-dc "$DOCKER_CONFIG"
 set -q DOCKER_HIDE_LEGACY_COMMANDS; or set -x DOCKER_HIDE_LEGACY_COMMANDS true
 set -q DOCKER_SCAN_SUGGEST; or set -x DOCKER_SCAN_SUGGEST false
 
-# fzf configuration
-set -q FZF_DEFAULT_OPTS; or set -x FZF_DEFAULT_OPTS \
-    '--height 40% --tmux bottom,40% --layout reverse --border top'
-
 # copilot environment
 set -q COPILOT_HOME; or set -x COPILOT_HOME "$XDG_CONFIG_HOME/copilot"
 

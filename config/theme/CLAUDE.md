@@ -44,9 +44,15 @@ Dark/light theming is owned by a stand-alone orchestrator:
   assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`,
   `warm-burnout`). A handler
   whose active family ships no file removes its stale link instead of
-  keeping another family's palette.
-- `config/theme/tmux-palette <mode>` — sources the active family's tmux
-  palette; called by `config/tmux/tmux.conf`'s bootstrap. On a flip,
+  keeping another family's palette. Shared app config stays out of the
+  tree: `handlers.d/starship` appends the family's `[palettes.active]`
+  table to `config/starship/starship.toml` (named so v8r's catalog
+  validates it), so an edit to that file shows after
+  `dfm theme reapply`.
+- `config/theme/tmux-palette <mode>` — loads the catppuccin/tmux status
+  engine with `config/tmux/catppuccin.conf` and the active family's
+  `tmux.thm.conf` (a family without one keeps the flavour's upstream
+  colours); called by `config/tmux/tmux.conf`'s bootstrap. On a flip,
   `handlers.d/tmux` re-sources the whole `tmux.conf` (so the bootstrap
   must never call that handler back — it would recurse).
 - `local/bin/theme-mode` (and bash/fish functions) — public read API for
@@ -57,8 +63,10 @@ Dark/light theming is owned by a stand-alone orchestrator:
 Open shells react to flips at their next prompt: bash and zsh through the
 hook in `config/theme/shell-env.sh`, fish through
 `config/fish/conf.d/theme-switch.fish` (which also re-saves its theme).
-Both watch the `generation` stamp and reload LS_COLORS, BAT_THEME and the
-fzf palette. fish (`__dotfiles_theme_name`), nvim,
+Both watch the `generation` stamp and reload LS_COLORS and BAT_THEME. fzf
+needs no reload: both shells export `FZF_DEFAULT_OPTS_FILE` pointing at the
+link `handlers.d/fzf` rewrites, and fzf reads it at every start. fish
+(`__dotfiles_theme_name`), nvim,
 vim and wezterm each resolve the family themselves, in `_theme_family`'s
 order, and fall back to `oasis` (fish to no theme change) when nothing
 resolves. nvim and vim follow the OS appearance;

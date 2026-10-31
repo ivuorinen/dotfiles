@@ -385,9 +385,6 @@ x-dc "$DOCKER_CONFIG"
 export DOCKER_SCAN_SUGGEST=false
 export DOCKER_HIDE_LEGACY_COMMANDS=true
 
-# fzf
-export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
-
 # GnuPG
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html
 msg "Setting up GnuPG configuration"
@@ -497,14 +494,26 @@ if [ "$_theme_interactive" = 1 ] \
 fi
 unset _theme_interactive
 
-# Load the colour caches the theme handlers publish — LS_COLORS (dircolors),
-# BAT_THEME (bat, so bat-driven previews follow the mode without any file
-# under ~/.config/bat) and the fzf palette — and note their generation. The
-# prompt hook that base/bashrc and base/zshrc install reloads them after a
-# theme switch.
+# Load the colour caches the theme handlers publish — LS_COLORS (dircolors)
+# and BAT_THEME (bat, so bat-driven previews follow the mode without any file
+# under ~/.config/bat) — and note their generation. The prompt hook that
+# base/bashrc and base/zshrc install reloads them after a theme switch.
 # shellcheck source=config/theme/shell-env.sh
 . "${DOTFILES:-$HOME/.dotfiles}/config/theme/shell-env.sh"
 _theme_refresh_env
+
+# fzf: colours come from the theme orchestrator's state file
+# (config/theme/handlers.d/fzf), which fzf reads at every start. Exported only
+# when it exists, since fzf exits 2 when FZF_DEFAULT_OPTS_FILE names a missing
+# file, and only after the apply above, which writes it on a machine's first
+# shell. For the same reason an inherited FZF_DEFAULT_OPTS_FILE that names a
+# missing file is dropped. An FZF_DEFAULT_OPTS inherited from an older shell
+# or the tmux server would override the file, so it is cleared.
+unset FZF_DEFAULT_OPTS
+if [ -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors" ]; then
+  export FZF_DEFAULT_OPTS_FILE="$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+fi
+[ -e "${FZF_DEFAULT_OPTS_FILE:-}" ] || unset FZF_DEFAULT_OPTS_FILE
 
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks

@@ -3,8 +3,9 @@
 # Reacts to dark/light flips and family switches published by the theme
 # orchestrator. Watches $XDG_STATE_HOME/dotfiles-theme/generation, which
 # config/theme/apply rewrites once every handler has finished, and
-# reapplies fish syntax colours, LS_COLORS, BAT_THEME and the fzf palette
-# in the running session. config/theme/shell-env.sh is the bash/zsh twin.
+# reapplies fish syntax colours, LS_COLORS and BAT_THEME in the running
+# session (fzf reads its colours from FZF_DEFAULT_OPTS_FILE at every start).
+# config/theme/shell-env.sh is the bash/zsh twin.
 
 if not status is-interactive
     return
@@ -85,9 +86,5 @@ function __theme_switch_check --on-event fish_prompt
         else
             set -e BAT_THEME
         end
-        # The fzf palette assigns FZF_DEFAULT_OPTS whole, so sourcing it
-        # again replaces the previous family's colours.
-        set -l fzf_active "$state_dir/dotfiles-theme/fzf-active.fish"
-        test -r $fzf_active; and source $fzf_active
     end
 end

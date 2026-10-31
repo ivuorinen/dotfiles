@@ -107,11 +107,34 @@ STUB
   [ "$status" -eq 1 ]
 }
 
-@test "tmux-palette: a family without a tmux palette sources nothing" {
+@test "tmux-palette: loads the family's colours, and a flip leaves none behind" {
+  command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
+  [[ -r "$HOME/.local/share/tmux/plugins/tmux/catppuccin_tmux.conf" ]] || skip "catppuccin/tmux not installed"
+  test_server
+  local tp="$BATS_TEST_DIRNAME/../config/theme/tmux-palette"
+  DOTFILES_THEME_FAMILY=oasis run "$tp" dark
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#000000" ]
+  [ "$(tmux show -gv @_win_active_bg)" = "#{@thm_pink}" ]
+  # catppuccin ships no dark tmux.thm.conf: the plugin's options pass resets
+  # every @thm_* and its theme pass fills in upstream Mocha.
+  DOTFILES_THEME_FAMILY=catppuccin run "$tp" dark
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#1e1e2e" ]
+  [ "$(tmux show -gv @_win_active_bg)" = "#{@thm_mauve}" ]
+  # A family that ships no tmux palette at all gets the same upstream colours.
   bare_family
+  run "$tp" light
+  [ "$status" -eq 0 ]
+  [ "$(tmux show -gv @thm_bg)" = "#eff1f5" ]
+}
+
+@test "tmux-palette: without the catppuccin/tmux plugin it is a skip" {
+  # shellcheck disable=SC2030,SC2031
+  export HOME="$TMPDIR_TEST/home"
   run "$BATS_TEST_DIRNAME/../config/theme/tmux-palette" dark
   [ "$status" -eq 0 ]
-  [[ "$output" == *"ships no tmux palette"* ]]
+  [[ "$output" == *"catppuccin/tmux is not installed"* ]]
 }
 
 @test "handlers: an invalid family exits 1 and leaves the link untouched" {
@@ -119,7 +142,7 @@ STUB
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
   ln -s /somewhere "$HOME/.config/starship.toml"
-  for h in starship eza gitui yazi fzf dircolors gh-dash television bat fish; do
+  for h in starship eza gitui fzf dircolors gh-dash television bat fish; do
     DOTFILES_THEME_FAMILY=../catppuccin run "$HD/$h" dark
     [ "$status" -eq 1 ] || {
       echo "$h exited $status"
@@ -132,21 +155,20 @@ STUB
 @test "symlink handlers: a family without the palette removes the stale link" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   "$HD/starship" dark
   "$HD/eza" dark
   "$HD/gitui" dark
-  "$HD/yazi" dark
   [ -L "$HOME/.config/starship.toml" ]
   bare_family
-  for h in starship eza gitui yazi; do
+  for h in starship eza gitui; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
   [ ! -e "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
   [ ! -L "$HOME/.config/eza/theme.yml" ]
   [ ! -L "$HOME/.config/gitui/theme.ron" ]
-  [ ! -L "$HOME/.config/yazi/theme.toml" ]
 }
 
 @test "symlink handlers: a family without the palette keeps a regular file" {
@@ -161,18 +183,48 @@ STUB
 }
 
 @test "state handlers: a family without palettes clears the stale state" {
-  "$HD/fzf" dark
   "$HD/bat" dark
-  [ -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
   [ -f "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+  bare_family
+  run "$HD/bat" dark
+  [ "$status" -eq 0 ]
+  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+}
+
+@test "fzf handler: links the colours; a family without them leaves an empty file" {
+  local f="$TMPDIR_TEST/dotfiles-theme/fzf-colors"
+  run "$HD/fzf" dark
+  [ "$status" -eq 0 ]
+  [[ "$(readlink "$f")" == *"/catppuccin/dark/fzf" ]]
+  # FZF_DEFAULT_OPTS_FILE stays exported, and fzf exits 2 on a missing file.
   bare_family
   run "$HD/fzf" dark
   [ "$status" -eq 0 ]
-  run "$HD/bat" dark
+  [ -f "$f" ] && [ ! -L "$f" ]
+  [ -z "$(tr -d '[:space:]' < "$f")" ]
+  # The next family with colours replaces that file with a link again.
+  DOTFILES="$BATS_TEST_DIRNAME/.." DOTFILES_THEME_FAMILY=kanagawa run "$HD/fzf" light
   [ "$status" -eq 0 ]
-  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.sh" ]
-  [ ! -L "$TMPDIR_TEST/dotfiles-theme/fzf-active.fish" ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
+  [[ "$(readlink "$f")" == *"/kanagawa/light/fzf" ]]
+}
+
+@test "fzf handler: rejects invalid mode" {
+  run "$HD/fzf" purple
+  [ "$status" -eq 2 ]
+}
+
+# after <file> <first> <then> — <then> sits on a later line than <first>.
+after()
+{
+  awk -v a="$2" -v b="$3" 'index($0, a) && !x { x = NR } index($0, b) { y = NR }
+    END { exit !(x && y > x) }' "$1"
+}
+
+@test "fzf: both shells export the colours file only after their first apply" {
+  # The export waits for the file to exist, and a machine's first apply is
+  # what writes it: a check above the apply leaves that shell uncoloured.
+  after "$DOTFILES/config/exports" 'config/theme/apply" "$m"' 'export FZF_DEFAULT_OPTS_FILE='
+  after "$DOTFILES/config/fish/config.fish" '$apply $m' 'set -x FZF_DEFAULT_OPTS_FILE'
 }
 
 @test "dircolors handler: a family without a palette removes the cache" {
@@ -199,17 +251,15 @@ STUB
 @test "handlers: kanagawa resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=kanagawa
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" light
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/kanagawa/light/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/kanagawa/light/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Kanagawa-Lotus-AA.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Kanagawa-Wave.tmTheme" ]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#f2ecbc"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -217,17 +267,15 @@ STUB
 @test "handlers: oasis resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=oasis
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/oasis/dark/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/oasis/dark/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Oasis-Abyss-Dark.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Oasis-Abyss-Light-3.tmTheme" ]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#000000"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
   grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
@@ -235,30 +283,34 @@ STUB
 @test "handlers: warm-burnout resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui" "$HOME/.config/yazi"
+  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=warm-burnout
-  for h in starship eza gitui yazi fzf gh-dash television bat; do
+  for h in starship eza gitui fzf gh-dash television bat; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [[ "$(readlink "$HOME/.config/starship.toml")" == *"/warm-burnout/dark/starship.toml" ]]
-  [[ "$(readlink "$HOME/.config/yazi/theme.toml")" == *"/warm-burnout/dark/yazi.toml" ]]
-  [ -L "$HOME/.config/yazi/Warm-Burnout-Dark.tmTheme" ]
-  [ -L "$HOME/.config/yazi/Warm-Burnout-Light.tmTheme" ]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
+  grep -qxF 'base = "#1a1510"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Warm Burnout Dark" ]
   grep -q "warm-burnout-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
-@test "starship handler: swaps ~/.config/starship.toml symlink" {
+@test "starship handler: composes the prompt with the family palette and links it" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
+  local out="$TMPDIR_TEST/dotfiles-theme/starship.toml"
   run "$HD/starship" light
   [ "$status" -eq 0 ]
-  [ -L "$HOME/.config/starship.toml" ]
-  target="$(readlink "$HOME/.config/starship.toml")"
-  [[ "$target" == *"/catppuccin/light/starship.toml" ]]
+  [ "$(readlink "$HOME/.config/starship.toml")" = "$out" ]
+  # The shared prompt, then this family's palette for the mode.
+  [ "$(head -n 1 "$out")" = "$(head -n 1 "$DOTFILES/config/starship/starship.toml")" ]
+  grep -qxF 'palette = "active"' "$out"
+  grep -qxF 'base = "#eff1f5"' "$out"
+  run "$HD/starship" dark
+  [ "$status" -eq 0 ]
+  grep -qxF 'base = "#1e1e2e"' "$out"
 }
 
 @test "starship handler: refuses to clobber a regular file" {

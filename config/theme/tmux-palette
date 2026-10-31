@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
-# config/theme/tmux-palette <mode> — source the active family's tmux
-# palette into the running tmux server. Called by the bootstrap line at
-# the end of config/tmux/tmux.conf. Deliberately NOT in handlers.d/:
-# handlers.d/tmux re-sources the whole tmux.conf on a flip, and if
-# tmux.conf called that handler back it would recurse. A family without a
-# tmux palette sources nothing (tmux keeps the plugin's defaults).
+# config/theme/tmux-palette <mode> — load the catppuccin/tmux status engine
+# in the active family's colours into the running tmux server. Called by
+# the bootstrap line at the end of config/tmux/tmux.conf. Deliberately NOT
+# in handlers.d/: handlers.d/tmux re-sources the whole tmux.conf on a flip,
+# and if tmux.conf called that handler back it would recurse.
+#
+# One tmux call, in order: the shared settings (config/tmux/catppuccin.conf),
+# the plugin's options pass (it unsets every @thm_* colour), the family's
+# tmux.thm.conf, the plugin's theme pass (it fills only unset @thm_* with
+# the flavour's upstream colours) and the window blocks, re-asserted last so
+# the plugin's window style does not win. A family without a tmux.thm.conf
+# (catppuccin in dark mode) keeps the flavour's upstream colours.
 set -uo pipefail
 
 # shellcheck disable=SC1091
@@ -13,9 +19,23 @@ source "$(dirname -- "$0")/_lib.sh"
 mode="${1:-}"
 [[ "$mode" = "dark" || "$mode" = "light" ]] || exit 2
 
-palette="$(_palette "$mode" tmux.conf)" || {
-  echo "tmux-palette: active family ships no tmux palette for $mode" >&2
+flavor=mocha
+[[ "$mode" = "light" ]] && flavor=latte
+# The checkout this script belongs to, not $DOTFILES: tests point that at
+# a stub tree with palettes only.
+conf="$(cd -- "$(dirname -- "$0")/../tmux" && pwd)"
+plugin="$HOME/.local/share/tmux/plugins/tmux"
+[[ -r "$plugin/catppuccin_tmux.conf" ]] || {
+  echo "tmux-palette: catppuccin/tmux is not installed in $plugin" >&2
   exit 0
 }
 
-tmux source-file "$palette"
+cmd=(set -g @catppuccin_flavor "$flavor"
+  \; source-file "$conf/catppuccin.conf"
+  \; source-file "$plugin/catppuccin_options_tmux.conf")
+if thm="$(_palette "$mode" tmux.thm.conf)"; then
+  cmd+=(\; source-file "$thm")
+fi
+cmd+=(\; source-file "$plugin/catppuccin_tmux.conf"
+  \; source-file "$conf/window-blocks.conf")
+tmux "${cmd[@]}"

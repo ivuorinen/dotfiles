@@ -9,8 +9,8 @@ setup()
   ROOT="$BATS_TEST_DIRNAME/.."
   PD="$ROOT/config/theme/palettes.d"
   # tmux.thm.conf is optional: only families that override @thm_* ship it.
-  REQUIRED=(starship.toml eza.yml gitui.ron yazi.toml fzf.sh fzf.fish
-    gh-dash.theme.yml television.toml dircolors tmux.conf bat.theme)
+  REQUIRED=(starship.toml eza.yml gitui.ron fzf
+    gh-dash.theme.yml television.toml dircolors bat.theme)
 }
 
 families()
@@ -78,6 +78,68 @@ PY
   [ "$status" -eq 0 ]
 }
 
+@test "palettes: every starship palette defines the colours the shared prompt uses" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  # handlers.d/starship appends one [palettes.active] table to
+  # config/starship/starship.toml. Starship renders a missing role or a
+  # malformed colour uncoloured, without a warning, and its schema types
+  # palette entries as plain strings, so neither v8r nor starship catches
+  # either; this does.
+  run python3 - "$ROOT" << 'PY'
+import pathlib, re, sys, tomllib
+
+root = pathlib.Path(sys.argv[1])
+base = tomllib.loads((root / "config/starship/starship.toml").read_text())
+MODS = {"bold", "italic", "underline", "dimmed", "inverted", "blink", "hidden",
+        "strikethrough", "none", "prev_fg", "prev_bg"}
+
+
+def styles(v, key=""):
+    if isinstance(v, dict):
+        for k, x in v.items():
+            yield from styles(x, k)
+    elif isinstance(v, list):
+        for x in v:
+            yield from styles(x, key)
+    elif isinstance(v, str):
+        if "style" in key:
+            yield v
+        yield from re.findall(r"\]\(([^)$]+)\)", v)
+
+
+used = {w.split(":", 1)[-1] for s in styles(base) for w in s.split()} - MODS
+bad, checked = [], 0
+for p in sorted((root / "config/theme/palettes.d").glob("*/*/starship.toml")):
+    palette = tomllib.loads(p.read_text())["palettes"]["active"]
+    missing = used - set(palette)
+    if missing:
+        bad.append(f"{p}: missing {sorted(missing)}")
+    for role, value in palette.items():
+        checked += 1
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+            bad.append(f"{p}: {role} = {value!r} is not #rrggbb")
+print("\n".join(bad) if bad else f"roles used: {sorted(used)}; colours checked: {checked}")
+sys.exit(1 if bad else 0)
+PY
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"sky"* ]]
+  # Every family and mode was read: 8 palettes of 26 roles.
+  [[ "$output" == *"colours checked: 208"* ]]
+}
+
+@test "palettes: every fzf palette loads as fzf's options file" {
+  command -v fzf > /dev/null 2>&1 || skip "fzf not installed"
+  local f
+  for f in "$PD"/*/*/fzf; do
+    # A bad option makes fzf exit 2; a clean load filters "x" and exits 0.
+    printf 'x\n' | FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE="$f" fzf --filter x > /dev/null || {
+      echo "fzf rejects $f"
+      return 1
+    }
+  done
+}
+
 @test "palettes: every YAML palette parses" {
   command -v yamllint > /dev/null 2>&1 || skip "yamllint not installed"
   run yamllint -d '{extends: relaxed, rules: {line-length: disable}}' "$PD"
@@ -109,7 +171,7 @@ teardown()
   # the theme watcher with this test's environment.
   tmux -f /dev/null new-session -d -s parse 'sleep 300'
   local f rc=0
-  for f in "$PD"/*/*/tmux*.conf; do
+  for f in "$PD"/*/*/tmux.thm.conf "$ROOT/config/tmux/catppuccin.conf"; do
     tmux source-file -n "$f" || {
       echo "parse error: $f"
       rc=1

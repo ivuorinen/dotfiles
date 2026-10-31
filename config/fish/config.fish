@@ -44,8 +44,8 @@ if status is-interactive
     # a raw install path — see `which -a gh`.
     type -q mise; and fish_add_path --move --prepend --path "$XDG_DATA_HOME/mise/shims"
 
-    # Starship prompt — colours flip via ~/.config/starship.toml symlink
-    # swap managed by the theme orchestrator (handlers.d/starship).
+    # Starship prompt — ~/.config/starship.toml is composed per family and
+    # mode by the theme orchestrator (handlers.d/starship).
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship
@@ -153,6 +153,14 @@ if status is-interactive
         $apply $m >/dev/null 2>&1
     end
 end
+
+# fzf: colours come from the theme orchestrator's state file
+# (config/theme/handlers.d/fzf); config/exports explains the guards, the
+# erase and why this follows the apply above.
+set -e FZF_DEFAULT_OPTS
+test -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+and set -x FZF_DEFAULT_OPTS_FILE "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
+test -e "$FZF_DEFAULT_OPTS_FILE"; or set -e FZF_DEFAULT_OPTS_FILE
 
 # Added by get-aspire-cli.sh
 fish_add_path $HOME/.aspire/bin

@@ -81,8 +81,8 @@ fpath=("${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions.d" $fpath)
 autoload -Uz bashcompinit
 bashcompinit
 
-# Starship prompt — colours flip via ~/.config/starship.toml symlink swap
-# managed by the theme orchestrator (config/theme/handlers.d/starship).
+# Starship prompt — ~/.config/starship.toml is composed per family and mode
+# by the theme orchestrator (config/theme/handlers.d/starship).
 # `enable_transience` collapses prior prompts to just the character symbol
 # so scrollback stays clean (matches tide --transient=Yes).
 if command -v starship > /dev/null 2>&1; then
