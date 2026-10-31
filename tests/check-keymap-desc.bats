@@ -33,6 +33,18 @@ EOF
   run -0 python3 "$SCRIPT" "$F"
 }
 
+@test "check-keymap-desc: a raw leader vim.keymap.set needs a description" {
+  cat > "$F" << 'EOF'
+vim.keymap.set('n', 'q', '<cmd>close<cr>', opts)
+vim.keymap.set('n', '<leader>zy', '<cmd>echo<cr>', { desc = 'Label' })
+vim.keymap.set('n', '<leader>zz', '<cmd>echo<cr>')
+EOF
+  run -1 python3 "$SCRIPT" "$F"
+  [[ "$output" == *"keys.lua:3: vim.keymap.set"* ]]
+  [[ "$output" != *"keys.lua:1"* ]]
+  [[ "$output" != *"keys.lua:2"* ]]
+}
+
 @test "check-keymap-desc: the committed nvim config passes" {
   cd "${BATS_TEST_DIRNAME}/.."
   run -0 python3 "$SCRIPT"

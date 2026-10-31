@@ -22,4 +22,4 @@ If stylua is not available, say so in the response: `stylua not available — <f
 
 ## Files to never format
 
-- Files inside `config/nvim/` managed by plugins (lazy.nvim lockfile)
+- Files inside `config/nvim/` managed by plugins (the vim.pack lockfile, `nvim-pack-lock.json`)

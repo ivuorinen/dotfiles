@@ -16,7 +16,6 @@ ignore: |
   config/vim/extra
   config/vim/plugged
   config/zsh
-  lazy-lock.json
   local/bin/antigen.zsh
   local/bin/asdf
   node_modules

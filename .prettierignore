@@ -2,7 +2,6 @@ node_modules
 .pnp.*
 .mypy_cache
 Brewfile.lock.json
-lazy-lock.json
 config/cheat/cheatsheets/community
 config/cheat/cheatsheets/tldr
 config/nvim

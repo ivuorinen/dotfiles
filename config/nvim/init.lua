@@ -32,13 +32,15 @@ require 'autogroups'
 require 'utils' -- registers K + HasConfig/Gated/TOOL_CONFIGS globals
 
 require 'keymaps'
+require 'keymap-labels' -- descriptions for plugin and built-in maps that lack one
 require 'pack'
 require 'pack-ui'
 
 -- ── Plugins ─────────────────────────────────────────────────────────
 -- version = vim.version.range is set only on plugins that publish
--- semver-tagged releases (snacks.nvim, blink.cmp, otter.nvim). The remaining
--- plugins have no tags vim.pack can constrain, so they track their default branch.
+-- semver-tagged releases (snacks.nvim, blink.cmp, otter.nvim, orgmode and three
+-- of its add-ons). The remaining plugins have no tags vim.pack can constrain, so
+-- they track their default branch.
 vim.pack.add {
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/tpope/vim-sleuth',
@@ -64,13 +66,40 @@ vim.pack.add {
   { src = 'https://github.com/felipefdl/warm-burnout', name = 'warm-burnout' },
   'https://github.com/f-person/auto-dark-mode.nvim',
   'https://github.com/catgoose/nvim-colorizer.lua',
+  -- orgmode stack, configured in lua/org.lua
+  { src = 'https://github.com/nvim-orgmode/orgmode', version = vim.version.range '*' },
+  'https://github.com/nvim-orgmode/org-bullets.nvim',
+  {
+    src = 'https://github.com/hugginsio/org-virtual-clocktime.nvim',
+    version = vim.version.range '*',
+  },
+  {
+    src = 'https://github.com/hamidi-dev/org-super-agenda.nvim',
+    version = vim.version.range '*',
+  },
+  {
+    src = 'https://github.com/chipsenkbeil/org-roam.nvim',
+    version = vim.version.range '*',
+  },
 }
 
 -- ── Completion ───────────────────────────────────────────────────────
 -- https://github.com/saghen/blink.cmp
 -- LSP capabilities are registered by blink's plugin/blink-cmp.lua.
 require('blink.cmp').setup {
-  keymap = { preset = 'default' }, -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+  keymap = {
+    preset = 'default', -- <C-y> accepts; <Tab>/<S-Tab> jump snippet fields
+    -- <C-Space> is the tmux prefix, so it never reaches Neovim inside tmux.
+    ['<C-space>'] = false,
+    ['<C-l>'] = { 'show', 'show_documentation', 'hide_documentation' },
+  },
+  cmdline = {
+    keymap = {
+      preset = 'cmdline',
+      ['<C-space>'] = false,
+      ['<C-l>'] = { 'show', 'fallback' },
+    },
+  },
   completion = { documentation = { auto_show = true } },
   signature = { enabled = true },
 }
@@ -181,6 +210,9 @@ miniclue.setup {
     { mode = 'n', keys = '<Leader>b', desc = '+Buffers' },
     { mode = 'n', keys = '<Leader>c', desc = '+Code' },
     { mode = 'n', keys = '<Leader>cc', desc = '+Calls' },
+    { mode = 'n', keys = '<Leader>o', desc = '+Orgmode' },
+    { mode = 'n', keys = '<Leader>oR', desc = '+OrgRoam' },
+    { mode = 'n', keys = '<Leader>oRd', desc = '+Dailies' },
     { mode = 'n', keys = '<Leader>p', desc = '+Pack' },
     { mode = 'n', keys = '<Leader>q', desc = '+Quit' },
     { mode = 'n', keys = '<Leader>s', desc = '+Search' },
@@ -821,5 +853,8 @@ require('colorizer').setup {
     names = false, -- don't highlight CSS color names ('red', 'blue', etc.)
   },
 }
+
+-- nvim-orgmode
+require 'org'
 
 -- vim: set ts=2 sts=2 sw=2 wrap et :

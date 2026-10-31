@@ -1,5 +1,6 @@
 {
   ".claude/skills/graphify": ["bandit", "codacy", "codeql", "ruff"],
+  ".claude/worktrees": ["bandit"],
   ".mise/locks": ["yamllint"],
   ".mypy_cache": ["yamllint"],
   "Brewfile.lock.json": ["yamllint"],
@@ -8,6 +9,8 @@
   "config/cheat/cheatsheets/community": ["codacy", "codeql", "megalinter", "yamllint"],
   "config/cheat/cheatsheets/tldr": ["codacy", "codeql", "megalinter", "yamllint"],
   "config/copilot/Library": ["bandit"],
+  "config/copilot/plugins": ["bandit"],
+  "config/copilot/skills": ["bandit", "codacy", "codeql", "ruff"],
   "config/fish/functions/__bass.py": ["bandit", "codacy", "codeql"],
   "config/fish/functions/__z_add.fish": ["codacy", "codeql"],
   "config/fish/functions/__z_clean.fish": ["codacy", "codeql"],
@@ -48,7 +51,6 @@
   "config/zsh": ["megalinter", "yamllint"],
   "config/zsh/completions.d": ["codacy", "codeql"],
   "graphify-out": ["bandit", "codacy", "codeql"],
-  "lazy-lock.json": ["yamllint"],
   "local/bin/antigen.zsh": ["yamllint"],
   "local/bin/asdf": ["yamllint"],
   "node_modules": ["bandit", "codacy", "codeql", "grype", "megalinter", "yamllint"],

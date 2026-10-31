@@ -51,7 +51,6 @@ config/gnupg/s
 config/iterm2/AppSupport
 config/karabiner/automatic_backups
 config/npm/npmrc
-config/nvim/lazy-lock.json
 config/nvim/spell/*
 config/op/plugins/gh.json
 config/op/plugins/used_items/gh.json
@@ -64,7 +63,6 @@ config/zed/settings.json
 config/zsh/.zcompdump
 dependency-check-report.html
 iTermServer-*
-lazy-lock.json
 local/bin/asdf/plugins/*
 local/share/fonts/*
 lock
@@ -131,6 +129,9 @@ graphify-out/
 !.claude/**
 .claude/**/*.log
 .claude/settings.local.json
+# Claude Code's git worktrees: whole checkouts nested in this one, which the
+# linters would otherwise walk with this checkout's root-relative ignores.
+.claude/worktrees/
 # Latest user prompt, written by .claude/hooks/prompt-record.sh for the
 # BASH_OK check in pre-bash-route.sh. Prompts can carry anything.
 .claude/.last-prompt

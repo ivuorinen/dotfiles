@@ -7,6 +7,60 @@
   "statusLine": {
     "command": "deja-hook statusline",
     "refreshInterval": 1,
-    "type": "command"
-  }
+    "type": "command",
+    "padding": 1
+  },
+  "bannerStyle": "mona",
+  "contextManagementTools": true,
+  "copyOnCodeBlockClick": true,
+  "defaultMode": "autopilot",
+  "defaultPermissionMode": "assisted",
+  "enableAllGithubMcpTools": false,
+  "inlineImages": true,
+  "keepAlive": "busy",
+  "memory": true,
+  "mergeStrategy": "rebase",
+  "notifications": true,
+  "pinnedPrompts": true,
+  "planContextTier": "long_context",
+  "planEffortLevel": "max",
+  "remoteExport": false,
+  "respectGitignore": true,
+  "terminalNotifications": true,
+  "terminalProgress": true,
+  "transcriptView": "concise",
+  "updateTerminalTitle": true,
+  "footer": {
+    "showAgent": true,
+    "showAiUsed": true,
+    "showBranch": true,
+    "showCiStatus": true,
+    "showCodeChanges": true,
+    "showContextWindow": true,
+    "showCustom": true,
+    "showDirectory": true,
+    "showModelEffort": true,
+    "showPullRequest": true,
+    "showQuota": true,
+    "showSandbox": true,
+    "showSchedules": true,
+    "showYolo": true
+  },
+  "permissions": {
+    "disableBypassPermissionsMode": "disable"
+  },
+  "sandbox": {
+    "allowBypass": false,
+    "auth": {
+      "gh": false
+    },
+    "sandboxLspServers": true
+  },
+  "sidebar": {
+    "showCloseButton": true
+  },
+  "subagents": {
+    "contextManagementTools": true
+  },
+  "model": "gpt-6.1-sol"
 }
