@@ -30,7 +30,6 @@ decide()
 @test "pre-edit-block: blocks vendored files" {
   run -2 decide "$REPO/config/fish/functions/bass.fish"
   [[ "$output" == *"do not edit it in place"* ]]
-  run -2 decide "$REPO/.claude/skills/graphify/SKILL.md"
 }
 
 # fzf is no longer vendored: its shell integration comes from the mise binary,
@@ -42,11 +41,6 @@ decide()
 
 @test "pre-edit-block: a generated man page is still writable" {
   run -0 decide "$REPO/local/man/man1/dfm.1"
-}
-
-@test "pre-edit-block: blocks the vendored graphify skill" {
-  run -2 decide "$REPO/.claude/skills/graphify/SKILL.md"
-  [[ "$output" == *"vendored-files.md"* ]]
 }
 
 # A vendored group added after an audit found these five editable
@@ -108,7 +102,7 @@ decide()
 # Deliberate asymmetry: vendored files are read-only, not read-blocked. A Read
 # of a vendored file is legitimate; only Edit/Write is refused.
 @test "pre-edit-block: reading a vendored file is allowed" {
-  run -0 decide "$REPO/.claude/skills/graphify/SKILL.md" Read
+  run -0 decide "$REPO/config/fish/functions/bass.fish" Read
   run -0 decide "$REPO/config/fish/functions/fisher.fish" Read
 }
 
@@ -157,7 +151,7 @@ search()
   run -0 search Glob "$REPO" "**/*.md"
   run -0 search Grep "$REPO/config/fish/functions/bass.fish"
   run -0 bash -c 'jq -cn "{tool_name: \"Grep\", tool_input: {pattern: \"secrets.d\"}}" | bash "$1"' _ "$HOOK"
-  run -2 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/.claude/skills/graphify/x.ipynb"
+  run -2 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/tools/dotbot/x.ipynb"
   run -0 bash -c 'jq -cn --arg p "$2" "{tool_name: \"NotebookEdit\", tool_input: {notebook_path: \$p}}" | bash "$1"' _ "$HOOK" "$REPO/notes/x.ipynb"
 }
 

@@ -66,10 +66,13 @@ jobs:
       # reload-recursion and 5 s budget guards, and the palette parse checks.
       # age: the a/ad/ae real-age round-trip tests skip without it, and they
       # are the only tests that prove an encrypted file decrypts.
+      # jq: every .claude/hooks script parses its JSON input with it, so the
+      # hook suites need it, as do the herdr, theme and gh helper tests. The
+      # runner image happens to ship one; this pins it.
       - name: Install pinned tools
         uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
         with:
-          install_args: python shfmt uv age bats tmux yamllint
+          install_args: python shfmt uv age bats tmux yamllint jq
 
       - name: Run test suite
         # scripts/bats-run.sh is the same runner as the pre-commit hook:

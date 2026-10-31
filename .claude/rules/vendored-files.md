@@ -1,7 +1,6 @@
 ---
 description: "Vendored third-party files must never be modified — refresh from upstream instead."
 paths:
-  - ".claude/skills/graphify/**"
   - "config/fish/functions/fisher.fish"
   - "config/fish/functions/bass.fish"
   - "config/fish/functions/__bass.py"
@@ -11,22 +10,19 @@ paths:
 
 # Vendored files
 
-Never modify vendored files. Two groups are vendored in-tree rather
-than carried as submodules; each is refreshed from upstream, never
-edited in place.
+Never modify vendored files. One group, the fish plugin functions below,
+is vendored in-tree rather than carried as a submodule; it is refreshed
+from upstream, never edited in place.
 
 fzf is not vendored: the mise-installed binary generates its own shell
 integration (`fzf --bash`/`--zsh`), which `config/fzf/fzf.{bash,zsh}` cache
 through `lib::init_cached`. Those loaders are project code.
 
-## graphify skill
-
-`.claude/skills/graphify/` is the graphify skill, copied in from the
-plugin cache rather than authored here. `.pre-commit-config.yaml`
-excludes the whole tree from every hook, so edits to it are never
-linted. Refresh by re-copying the skill from the plugin cache; never
-hand-edit a file under it, because the next refresh discards the
-change with no submodule sync to recover from.
+Neither is the graphify skill: `graphify install --platform claude` writes it
+as a personal skill (`.claude/rules/graphify-first.md`). An in-tree copy
+existed until 2026-10 and was removed because Claude Code runs a personal
+skill over a project skill of the same name, so the copy was shadowed and
+drifted from the CLI version.
 
 ## fish plugin functions
 
