@@ -18,8 +18,7 @@ fi
 # "<owner/repo> <pin>" — each extension is third-party code that gh runs, so
 # every entry is pinned: a release tag for binary extensions, a full commit
 # SHA for script extensions (gh clones those). `gh extension list` shows the
-# installed versions. gh leaves an installed extension alone, so a changed pin
-# takes effect only after `gh extension remove <name>`.
+# installed versions; install_extensions reinstalls any that differ.
 extensions=(
   # Report on repository dependencies
   "andyfeller/gh-dependency-report v0.5.0"
@@ -37,12 +36,26 @@ extensions=(
   "rsese/gh-actions-status v1.3.1"
 )
 
-# Install each extension at its pinned version
+# Install each extension at its pinned version. `gh extension install` exits 0
+# for an extension that is already installed without applying --pin, so an
+# installed one at another version is removed first. `gh extension list` prints
+# "gh <name>\t<owner/repo>\t<version>", the version being the release tag or
+# the first 8 characters of the commit for a script extension.
 install_extensions()
 {
-  local entry repo pin
+  local entry repo pin installed version
+  installed="$(gh extension list 2> /dev/null || true)"
   for entry in "${extensions[@]}"; do
     read -r repo pin <<< "$entry"
+    version="$(awk -F '\t' -v repo="$repo" '$2 == repo { print $3 }' <<< "$installed")"
+    if [[ "$version" == "$pin" || "$version" == "${pin:0:8}" ]]; then
+      msgr nested "$repo already at $version"
+      continue
+    fi
+    if [[ -n "$version" ]]; then
+      msgr nested "Replacing $repo $version with $pin"
+      gh extension remove "${repo#*/gh-}"
+    fi
     msgr nested "Installing $repo@$pin"
     gh extension install "$repo" --pin "$pin"
     echo ""
