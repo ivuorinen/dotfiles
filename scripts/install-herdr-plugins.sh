@@ -21,6 +21,12 @@ if ! command -v herdr &> /dev/null; then
   exit 0
 fi
 
+# jq reads each installed plugin's ref out of `herdr plugin list --json`.
+if ! command -v jq &> /dev/null; then
+  msgr warn "jq not found, skipping herdr plugins"
+  exit 0
+fi
+
 # "<plugin-id> <owner/repo> <ref>" — the id is what herdr registers, which is
 # not always derivable from the repo name (kryptamine/herdr-auto-title
 # registers as herdr.auto-title). Each plugin is built from source and run,
@@ -34,23 +40,36 @@ plugins=(
   "herdr.auto-title kryptamine/herdr-auto-title 636286baf931fa71966083d1e8294fc4a38f11fb"
 )
 
+# Install each plugin at its ref. An installed plugin is skipped only when its
+# requested ref, or the commit herdr resolved, equals the configured ref: a
+# check on the plugin id alone kept a plugin at its old ref after the pin
+# changed. Reinstalling replaces the managed checkout and re-runs the build,
+# which for these Rust plugins is minutes of cargo, so a match is left alone.
 install_plugins()
 {
-  local installed entry id repo ref
+  local installed entry id repo ref refs
 
-  # Reinstalling replaces the managed checkout and re-runs the build, which for
-  # these Rust plugins is minutes of cargo. Ask once, then skip what is there.
-  installed="$(herdr plugin list --json 2> /dev/null || echo '[]')"
+  installed="$(herdr plugin list --json 2> /dev/null || echo '{}')"
 
   for entry in "${plugins[@]}"; do
     read -r id repo ref <<< "$entry"
+    # "<requested_ref> <resolved_commit>" of the installed plugin; empty when
+    # it is not installed. requested_ref is null for a plugin installed
+    # without --ref.
+    refs="$(jq -r --arg id "$id" '[.. | objects | select(.plugin_id? == $id)
+      | .source | (.requested_ref // ""), (.resolved_commit // "")] | join(" ")' \
+      <<< "$installed")"
 
-    if grep -q "\"plugin_id\"[[:space:]]*:[[:space:]]*\"${id}\"" <<< "$installed"; then
-      msgr nested "$id already installed, skipping"
+    if [[ " $refs " == *" $ref "* ]]; then
+      msgr nested "$id already at $ref, skipping"
       continue
     fi
 
-    msgr nested "Installing $repo"
+    if [[ -n "${refs// /}" ]]; then
+      msgr nested "Reinstalling $id at $ref"
+    else
+      msgr nested "Installing $repo"
+    fi
     herdr plugin install "$repo" ${ref:+--ref "$ref"} --yes
     echo ""
   done
