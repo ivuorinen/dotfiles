@@ -3,7 +3,6 @@
 #USAGE   cmd "all" help="Install everything in the correct order"
 #USAGE   cmd "apt-packages" help="Install apt packages (Debian/Ubuntu)"
 #USAGE   cmd "cheat-databases" help="Install cheat external cheatsheet databases"
-#USAGE   cmd "composer" help="Install PHP Package Manager Composer"
 #USAGE   cmd "dnf-packages" help="Install dnf packages (Fedora/RHEL)"
 #USAGE   cmd "fonts" help="Install programming fonts"
 #USAGE   cmd "gh" help="Install GitHub CLI Extensions"
@@ -14,7 +13,6 @@
 #USAGE     flag "--dry-run" help="Show what would be removed without removing"
 #USAGE   }
 #USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
-#USAGE   cmd "z" help="Install z directory jumper"
 #USAGE }
 #
 # @description Install tools, packages, and configurations (dfm install)
@@ -93,7 +91,6 @@ dfm_install()
     "all:Installs everything in the correct order"
     "apt-packages:Install apt packages (Debian/Ubuntu)"
     "cheat-databases:Install cheat external cheatsheet databases"
-    "composer:Install composer"
     "dnf-packages:Install dnf packages (Fedora/RHEL)"
     "fonts:Install programming fonts"
     "gh:Install GitHub CLI Extensions"
@@ -102,7 +99,6 @@ dfm_install()
     "mise:Install tools via mise (runtimes + CLI tools)"
     "mise-cleanup:Remove old version manager installations (--dry-run supported)"
     "xcode-cli-tools:Install Xcode CLI tools (macOS)"
-    "z:Install z"
   )
 
   case "$1" in
@@ -129,7 +125,6 @@ dfm_install()
       # Python libraries are not a step: mise installs them into every python
       # it installs, from config/mise/default-python-packages.
       run_step "mise" dfm_install mise
-      run_step "composer" dfm_install composer
       # macOS defaults come after the mise step: they set the login shell to
       # fish, which that step's brew bootstrap installs.
       [[ "$(uname)" == "Darwin" ]] && run_step "macos defaults" dfm_install macos
@@ -140,10 +135,7 @@ dfm_install()
       run_step "cheat databases" dfm_install cheat-databases
       require_bin "gh extensions" gh && run_step "gh extensions" dfm_install gh
 
-      # Tier 4: Independent utilities
-      run_step "z" dfm_install z
-
-      # Tier 5: Generate completions, docs, and manpages from usage specs
+      # Tier 4: Generate completions, docs, and manpages from usage specs
       msgr run "Generating completions and docs from usage specs..."
       if bash "$DOTFILES/scripts/install-completions.sh"; then
         msgr run_done "Completions and docs generated!"
@@ -175,12 +167,6 @@ dfm_install()
         bash "$database" \
           && msgr run_done "Cheat: $database run"
       done
-      ;;
-
-    composer)
-      msgr run "Installing composer..."
-      bash "$DOTFILES/scripts/install-composer.sh" \
-        && msgr run_done "composer installed!"
       ;;
 
     fonts)
@@ -311,12 +297,6 @@ dfm_install()
       msgr run "Installing Xcode CLI tools..."
       bash "$DOTFILES/scripts/install-xcode-cli-tools.sh" \
         && msgr yay "Xcode CLI tools installed!"
-      ;;
-
-    z)
-      msgr run "Installing z..."
-      bash "$DOTFILES/scripts/install-z.sh" \
-        && msgr yay "z has been installed!"
       ;;
 
     *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;

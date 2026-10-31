@@ -39,7 +39,6 @@ setup()
   [[ "$output" == *"all"* ]]
   [[ "$output" == *"apt-packages"* ]]
   [[ "$output" == *"cheat-databases"* ]]
-  [[ "$output" == *"composer"* ]]
   [[ "$output" == *"dnf-packages"* ]]
   [[ "$output" == *"fonts"* ]]
   [[ "$output" == *"gh"* ]]
@@ -48,7 +47,6 @@ setup()
   [[ "$output" == *"mise"* ]]
   [[ "$output" == *"mise-cleanup"* ]]
   [[ "$output" == *"xcode-cli-tools"* ]]
-  [[ "$output" == *"z"* ]]
 }
 
 @test "dfm install with invalid subcommand shows menu" {
@@ -156,7 +154,7 @@ setup()
   run bash local/bin/dfm scripts
   [ "$status" -eq 0 ]
   [[ "$output" == *"fonts"* ]]
-  [[ "$output" == *"z"* ]]
+  [[ "$output" == *"gh-extensions"* ]]
 }
 
 @test "dfm tests menu shows entries" {
