@@ -69,16 +69,19 @@ require_bin()
 # `install all` the apt/dnf steps run before the mise step, so each of them
 # calls this first rather than assuming the mise step has run. No binary is
 # the one fatal case: the caller records the failure and later steps that
-# need mise skip.
+# need mise skip. MISE_INSTALL_PATH puts the binary in the directory added to
+# PATH: mise.run defaults to ~/.local/bin/mise whatever XDG_BIN_HOME says, so
+# a custom XDG_BIN_HOME left mise installed but not found.
 ensure_mise()
 {
   command -v mise &> /dev/null && return 0
+  local bin_dir="${XDG_BIN_HOME:-$HOME/.local/bin}"
   msgr nested "Installing mise..."
-  curl -fsSL https://mise.run | sh || {
+  curl -fsSL https://mise.run | MISE_INSTALL_PATH="$bin_dir/mise" sh || {
     msgr err "Failed to install mise"
     return 1
   }
-  export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
+  export PATH="$bin_dir:$PATH"
   return 0
 }
 
