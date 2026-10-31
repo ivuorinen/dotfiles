@@ -7,7 +7,7 @@
     "cc-safety-net": "^2.6.15",
     "context-mode": "^1.0.169",
     "pi-goal-x": "^0.32.3",
-    "pi-powerline-footer": "^0.20.1",
+    "pi-powerline-footer": "^0.21.0",
     "pi-simplify": "^0.2.3"
   },
   "allowScripts": {
