@@ -130,6 +130,12 @@
     ~/.local/bin:
       glob: true
       path: local/bin/*
+      # dotbot globs ignore .gitignore, and py_compile/compileall write
+      # local/bin/__pycache__ even with PYTHONDONTWRITEBYTECODE=1; without this
+      # the bytecode cache is linked onto PATH. Replaces the default excludes,
+      # which only match at the repo root and never matched local/bin/*.
+      exclude:
+        - local/bin/__pycache__
     # Manuals
     ~/.local/man:
       glob: true
