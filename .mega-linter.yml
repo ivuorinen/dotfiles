@@ -34,8 +34,9 @@ DISABLE_LINTERS:
   - PYTHON_ISORT # using ruff (I rules)
   - PHP_PHPCSFIXER # no composer.json; false positives on non-PHP files
   - PHP_PSALM # no psalm.xml baseline; type annotations not maintained
-  # The repo has no lockfile, manifest or SBOM for osv-scanner to read (it
-  # warns "no package sources found" on every run); mise pins the tools.
+  # uv.lock lists no packages (pyproject.toml declares no dependencies), so
+  # osv-scanner warns "no package sources found" on every run; mise pins the
+  # tools.
   - REPOSITORY_OSV_SCANNER
 YAML_YAMLLINT_CONFIG_FILE: .yamllint.yml
 REPOSITORY_GIT_DIFF_DISABLE_ERRORS: true
