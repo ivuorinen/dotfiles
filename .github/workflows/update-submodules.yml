@@ -8,8 +8,10 @@ on:
     - cron: "0 4 * * 1,4"
   workflow_dispatch:
 
+# One group for every run: each one rebuilds the same branch from main,
+# whatever ref dispatched it, so two must never overlap.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 permissions: {}

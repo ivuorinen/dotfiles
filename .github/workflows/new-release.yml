@@ -7,8 +7,10 @@ on:
   schedule:
     - cron: "0 21 * * *" # 00:00 EEST (summer, UTC+3) / 23:00 EET (winter, UTC+2)
 
+# One group for every run: each one tags main's HEAD, whatever ref
+# dispatched it, so two must never overlap.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 permissions:
