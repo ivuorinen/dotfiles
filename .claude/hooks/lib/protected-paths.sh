@@ -20,7 +20,6 @@ PROTECTED_PATHS=(
   config/fish/functions/__bass.py
   config/fish/functions/__z_add.fish
   config/fish/functions/__z_clean.fish
-  .claude/skills/graphify
   # Not vendored, but a write to either switches off the hook chain without
   # any flag the bypass scan can see: removing .git/hooks/commit-msg, or a
   # hooksPath line appended to .git/config (agent-loopholes-63eb3265).

@@ -46,7 +46,7 @@ batch()
 
 @test "pre-ctx-write-guard: blocks writes aimed at vendored files" {
   run -2 code 'echo broken > config/fish/functions/bass.fish'
-  run -2 code 'truncate -s0 .claude/skills/graphify/SKILL.md'
+  run -2 code 'truncate -s0 config/fish/functions/fisher.fish'
   run -2 code 'tee config/fish/functions/bass.fish < /tmp/x'
   run -2 code 'chmod 777 config/fish/functions/__z_add.fish'
 }
@@ -63,7 +63,7 @@ batch()
 }
 
 @test "pre-ctx-write-guard: blocks writes to the other vendored trees" {
-  run -2 code 'rm .claude/skills/graphify/SKILL.md'
+  run -2 code 'rm config/cheat/cheatsheets/community/README.md'
   run -2 code 'echo x > config/cheat/cheatsheets/tldr/README.md'
   run -2 code 'rm tools/antidote/functions/antidote'
 }
@@ -129,7 +129,7 @@ batch()
 # ctx_execute_file only reads its path, so analysing a vendored file with code
 # that happens to call open() is not a write to it.
 @test "pre-ctx-write-guard: reading a protected file via ctx_execute_file is allowed" {
-  run -0 code 'print(open("/tmp/other").read())' '.claude/skills/graphify/SKILL.md'
+  run -0 code 'print(open("/tmp/other").read())' 'config/fish/functions/fisher.fish'
 }
 
 # The path and the write used to have to share a line, so a variable split
@@ -137,7 +137,7 @@ batch()
 @test "pre-ctx-write-guard: a protected path in a variable is still caught" {
   run -2 code "p='config/fish/functions/fisher.fish'
 require('fs').writeFileSync(p,'x')"
-  run -2 code 'f=.claude/skills/graphify/SKILL.md
+  run -2 code 'f=tools/dotbot/README.md
 printf x > "$f"'
 }
 

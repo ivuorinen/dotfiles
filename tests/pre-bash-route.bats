@@ -353,7 +353,7 @@ with_prompt()
   [ "$(decision 'pnpm add x')" = "deny" ]
 }
 
-# mise-packages.md; the vendored graphify skill runs these (agent-loopholes-c31d880a).
+# mise-packages.md; the graphify skill's setup step runs these (agent-loopholes-c31d880a).
 @test "pre-bash-route: hand-run Python package installs are denied" {
   [ "$(decision 'pip install graphifyy')" = "deny" ]
   [ "$(decision 'python3 -m pip install graphifyy -q --break-system-packages')" = "deny" ]
@@ -369,7 +369,7 @@ with_prompt()
 # vendored-files.md through Bash (agent-loopholes-cef01270).
 @test "pre-bash-route: writes to protected paths are denied" {
   [ "$(decision 'echo x > config/fish/functions/__bass.py')" = "deny" ]
-  [ "$(decision 'cp /tmp/x .claude/skills/graphify/SKILL.md')" = "deny" ]
+  [ "$(decision 'cp /tmp/x tools/antidote/README.md')" = "deny" ]
   [ "$(decision 'rm config/fish/functions/fisher.fish')" = "deny" ]
   [ "$(decision 'git checkout HEAD~5 -- config/fish/functions/bass.fish')" = "deny" ]
   [ "$(decision 'rm -rf tools/dotbot')" = "deny" ]

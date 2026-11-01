@@ -112,8 +112,8 @@ symlinks them into `~/.config/` automatically.
   eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
   `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
   `bash -n`.
-- **Vendored files**: `.claude/skills/graphify/` and five fish plugin functions
-  under `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
+- **Vendored files**: five fish plugin functions under
+  `config/fish/functions/` (`fisher.fish`, `bass.fish`, `__bass.py`,
   `__z_add.fish`, `__z_clean.fish`).
   Edit policy: `.claude/rules/vendored-files.md`.
   Third-party licenses: `NOTICE`.
@@ -149,7 +149,7 @@ back into this file.
 
 This project has a knowledge graph at `graphify-out/` with god nodes,
 community structure, and cross-file relationships. It is built by the
-`graphify` skill (`.claude/skills/graphify/SKILL.md`) and holds a wiki
+`graphify` skill (a personal skill, installed by `graphify install`) and holds a wiki
 (`wiki/index.md`), a full report (`GRAPH_REPORT.md`), and the graph itself
 (`graph.json`).
 

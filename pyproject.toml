@@ -12,7 +12,6 @@ line-length = 120
 extend-exclude = [
   "config/cheat/cheatsheets",
   "tools",
-  ".claude/skills/graphify",
   "config/copilot/skills",
   "config/pi/agent/tmp",
   "config/pi/agent/npm",
@@ -46,7 +45,6 @@ quote-style = "double"
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
-  "./.claude/skills/graphify",
   "./config/copilot/skills",
   "./node_modules",
   "./graphify-out",

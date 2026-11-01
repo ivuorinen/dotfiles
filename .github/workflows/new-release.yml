@@ -7,9 +7,14 @@ on:
   schedule:
     - cron: "0 21 * * *" # 00:00 EEST (summer, UTC+3) / 23:00 EET (winter, UTC+2)
 
+# One group for every run: each one tags main's HEAD, whatever ref
+# dispatched it, so two must never overlap. A new run waits instead of
+# cancelling the running one: a run cancelled after pushing its tag but
+# before creating the release leaves a tag no later run releases, since
+# each later run finds HEAD already tagged.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -30,8 +35,11 @@ jobs:
       # persist-credentials MUST stay true: fregante/daily-version-action
       # pushes the new tag using the checkout's git credentials (it has no
       # token input), so disabling this breaks the daily release entirely.
+      # ref: main, because daily-version-action tags HEAD: a workflow_dispatch
+      # from another branch would otherwise release that branch's commit.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: Create tag if necessary

@@ -16,6 +16,12 @@ Removing or renaming a command, alias or config a user invokes is a
 breaking change whatever the type: add `!` after the scope and a
 `BREAKING CHANGE: <what was removed>` footer.
 
+The type picks the release-notes section (`.github/tag-changelog-config.js`
+files `fix` under Bugfixes and `docs` under Documentation Changes), so it
+follows what the commit changes at runtime. A commit that changes behaviour
+is not `docs` because it also edits prose: split the behaviour change into
+its own `fix`/`feat` commit, or type the whole commit by it.
+
 Header length: target 72 characters (matches `git log --oneline`
 width). The actual hard limit from `@ivuorinen/commitlint-config`
 (which extends `@commitlint/config-conventional`) is 100 characters

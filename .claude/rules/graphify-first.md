@@ -31,8 +31,11 @@ its own extractors, which have no `.bats` support, so it drops the test
 subgraph every time. `scripts/graphify-tests.md` explains why the suite needs
 a repo-owned extractor rather than a graphify extension.
 
-When the user types `/graphify`, invoke the graphify skill
-(`.claude/skills/graphify/SKILL.md`) before anything else.
+When the user types `/graphify`, invoke the graphify skill before anything
+else. It is a personal skill, not part of this repo: `graphify install
+--platform claude` writes it to `$CLAUDE_CONFIG_DIR/skills/graphify/` (or
+`~/.claude/skills/graphify/`). Rerun that after upgrading graphifyy so the
+skill's instructions match the CLI.
 
 A `PreToolUse` hook on `Read` and `Bash` prints a one-line reminder per call
 (`.claude/hooks/pre-graphify-nudge.sh`). It is a nudge, not a copy of this
