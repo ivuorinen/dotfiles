@@ -19,10 +19,10 @@ integration (`fzf --bash`/`--zsh`), which `config/fzf/fzf.{bash,zsh}` cache
 through `lib::init_cached`. Those loaders are project code.
 
 Neither is the graphify skill: `graphify install --platform claude` writes it
-as a personal skill (`.claude/rules/graphify-first.md`). An in-tree copy
-existed until 2026-10 and was removed because Claude Code runs a personal
-skill over a project skill of the same name, so the copy was shadowed and
-drifted from the CLI version.
+as a personal skill outside the repo, at the path named in
+`.claude/rules/graphify-first.md`. An in-tree copy existed until 2026-10 and
+was removed because Claude Code runs a personal skill over a project skill of
+the same name, so the copy was shadowed and drifted from the CLI version.
 
 ## fish plugin functions
 
