@@ -59,9 +59,11 @@ jobs:
       #
       # Changes go to a PR from $BRANCH, not straight to main: main requires
       # status checks, and a GITHUB_TOKEN push cannot bypass branch
-      # protection. A PR opened with GITHUB_TOKEN triggers no workflows, so its
-      # checks never report and an admin merges it. The branch is rebuilt from
-      # main on every run, so the force push refreshes a PR left open.
+      # protection. When GITHUB_TOKEN opens or updates a PR, GitHub creates its
+      # pull_request runs in an approval-required state: a user with write
+      # access selects "Approve workflows to run" on the PR, and merges it once
+      # those checks pass. The branch is rebuilt from main on every run, so the
+      # force push refreshes a PR left open.
       # Every tagged submodule follows its default branch's newest tag, major
       # bumps included and with no per-submodule exceptions: a tag is the
       # upstream's own release point, so the pin is always a release. A pin
@@ -106,5 +108,5 @@ jobs:
           if [ -z "$open_pr" ]; then
             gh pr create --base main --head "$BRANCH" \
               --title "chore(git): Update submodules (automated)" \
-              --body "Moves each tagged submodule to its newest tag. Opened with GITHUB_TOKEN, so no checks run on it; merge it as an admin."
+              --body "Moves each tagged submodule to its newest tag. GITHUB_TOKEN opened it, so a user with write access must select Approve workflows to run; merge once the checks pass."
           fi
