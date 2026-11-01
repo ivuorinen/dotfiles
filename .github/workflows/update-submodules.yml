@@ -109,7 +109,7 @@ jobs:
           git commit -m "chore(git): Update submodules (automated)"
           git show --raw
           git push --force origin "$BRANCH"
-          open_pr="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+          open_pr="$(gh pr list --base main --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
           if [ -z "$open_pr" ]; then
             gh pr create --base main --head "$BRANCH" \
               --title "chore(git): Update submodules (automated)" \
