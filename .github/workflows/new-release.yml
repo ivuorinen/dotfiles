@@ -30,8 +30,11 @@ jobs:
       # persist-credentials MUST stay true: fregante/daily-version-action
       # pushes the new tag using the checkout's git credentials (it has no
       # token input), so disabling this breaks the daily release entirely.
+      # ref: main, because daily-version-action tags HEAD: a workflow_dispatch
+      # from another branch would otherwise release that branch's commit.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: Create tag if necessary

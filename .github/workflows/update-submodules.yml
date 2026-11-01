@@ -27,9 +27,12 @@ jobs:
       # persist-credentials MUST stay true: "Update submodules" ends in a raw
       # `git push`, which needs the token persisted in git's config. The
       # token: input only authenticates the initial clone, not later pushes.
+      # ref: main, because a workflow_dispatch from another branch would
+      # otherwise check that branch out and base $BRANCH on it.
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           submodules: true
           fetch-depth: 2
           token: ${{ secrets.GITHUB_TOKEN }}
