@@ -175,7 +175,7 @@ trufflehog = "3.99.7"
 "github:anchore/grype" = "0.121.0"
 trivy = "0.76.1"
 "github:anchore/syft" = "1.55.0"
-opengrep = "1.33.0"
+opengrep = "1.33.1"
 osv-scanner = "2.7.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
