@@ -365,6 +365,9 @@ if [ ! -d "$HOME/.claude" ] || [ -d "$XDG_STATE_HOME/claude" ]; then
   export CLAUDE_CONFIG_DIR="$XDG_STATE_HOME/claude"
 fi
 
+# context-mode session and content store; must be an absolute path.
+export CONTEXT_MODE_DIR="$XDG_STATE_HOME/context-mode"
+
 # pi.dev
 msg "Setting up pi.dev configuration"
 # The agent dir itself: pi appends /agent only to its ~/.pi default.

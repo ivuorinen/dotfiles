@@ -83,6 +83,9 @@ if not test -d "$HOME/.claude"; or test -d "$XDG_STATE_HOME/claude"
     set -q CLAUDE_CONFIG_DIR; or set -x CLAUDE_CONFIG_DIR "$XDG_STATE_HOME/claude"
 end
 
+# context-mode session and content store; must be an absolute path.
+set -q CONTEXT_MODE_DIR; or set -x CONTEXT_MODE_DIR "$XDG_STATE_HOME/context-mode"
+
 # pi.dev environment
 # The agent dir itself: pi appends /agent only to its ~/.pi default.
 set -q PI_CODING_AGENT_DIR; or set -x PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi/agent"
