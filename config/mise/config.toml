@@ -181,7 +181,7 @@ osv-scanner = "2.7.0"
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
 "pipx:bandit[toml]" = "1.9.4"
-checkov = "3.3.30"
+checkov = "3.4.0"
 pinact = "5.0.2"
 zizmor = "1.31.1"
 # Go vulnerability scanner. Neither the registry nor the github backend knows
