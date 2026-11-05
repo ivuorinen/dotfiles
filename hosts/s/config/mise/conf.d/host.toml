@@ -1,0 +1,5 @@
+# mise tools only this host needs. dotbot links this onto the gitignored
+# config/mise/conf.d/host.toml through the ~/.config/mise symlink.
+[tools]
+"github:ville6000/7pace-cli" = "0.3.1"
+"npm:@villev/estorm" = "0.16.0"

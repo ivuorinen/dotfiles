@@ -177,3 +177,6 @@ mise.lock
 codeql-*.sarif
 /_codeql_detected_source_root
 config/mise/locks
+# Host-only mise tools: hosts/<host>/config/mise/conf.d/host.toml links here
+# through the ~/.config/mise symlink (hosts/README.md).
+config/mise/conf.d/host.toml

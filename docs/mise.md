@@ -57,6 +57,9 @@ a system or Homebrew path.
 3. If a shell completion or alias is needed, wire it in `config/alias`
    or `config/fish/`.
 
+A tool only one machine needs goes in `hosts/<host>/config/mise/conf.d/host.toml`
+instead; `./install --links` links it into place.
+
 ## Homebrew formulae via mise (bootstrap packages)
 
 Plain `homebrew/core` CLI formulae are installed by mise's experimental
