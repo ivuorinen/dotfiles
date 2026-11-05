@@ -6,7 +6,7 @@
     "@moyai/pi-session-hoarder": "^0.2.0",
     "cc-safety-net": "^2.6.15",
     "context-mode": "^1.0.169",
-    "pi-goal-x": "^0.32.3",
+    "pi-goal-x": "^0.34.0",
     "pi-powerline-footer": "^0.20.1",
     "pi-simplify": "^0.2.3"
   },
