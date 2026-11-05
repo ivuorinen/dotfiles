@@ -1,4 +1,8 @@
 #:schema https://mise.jdx.dev/schema/mise.json
+# Releases before 2026.11.0 read a bare `go X.Y` line in go.mod as a version
+# request. Warn on them rather than stop: a hard floor in the global config
+# would break every shell on a host that has not upgraded yet.
+min_version = { soft = "2026.11.0" }
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pypi.uvx = true
