@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gpg-tui configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "general": {
+      "type": "object",
+      "properties": {
+        "splash": {
+          "type": "boolean"
+        },
+        "tick_rate": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "color": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string"
+        },
+        "file_explorer": {
+          "type": "string"
+        },
+        "detail_level": {
+          "type": "string"
+        }
+      }
+    },
+    "gpg": {
+      "type": "object",
+      "properties": {
+        "armor": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

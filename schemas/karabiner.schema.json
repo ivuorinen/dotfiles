@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Karabiner-Elements configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "complex_modifications": {
+            "type": "object",
+            "properties": {
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "manipulators": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["type"],
+                        "if": {
+                          "required": ["type"],
+                          "properties": { "type": { "const": "basic" } }
+                        },
+                        "then": { "required": ["from"] },
+                        "properties": {
+                          "from": {
+                            "type": "object",
+                            "properties": {
+                              "key_code": {
+                                "type": "string"
+                              },
+                              "modifiers": {
+                                "type": "object",
+                                "properties": {
+                                  "mandatory": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "optional": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "to": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key_code": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "identifiers": {
+                  "type": "object",
+                  "properties": {
+                    "is_keyboard": {
+                      "type": "boolean"
+                    },
+                    "product_id": {
+                      "type": "integer"
+                    },
+                    "vendor_id": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "ignore": {
+                  "type": "boolean"
+                },
+                "fn_function_keys": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "object",
+                        "properties": {
+                          "key_code": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "to": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key_code": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "selected": {
+            "type": "boolean"
+          },
+          "simple_modifications": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "object",
+                  "properties": {
+                    "key_code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "to": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key_code": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "virtual_hid_keyboard": {
+            "type": "object",
+            "properties": {
+              "keyboard_type_v2": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

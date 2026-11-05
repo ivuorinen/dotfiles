@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gh-changelog configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "check_for_updates": {
+      "type": "boolean"
+    },
+    "excluded_labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "logger": {
+      "type": "string"
+    },
+    "no_color": {
+      "type": "boolean"
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "show_unreleased": {
+      "type": "boolean"
+    },
+    "skip_entries_without_label": {
+      "type": "boolean"
+    }
+  }
+}

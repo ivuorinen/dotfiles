@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "television configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "history_size": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "global_history": {
+      "type": "boolean"
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "preview_panel": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            "scrollbar": {
+              "type": "boolean"
+            },
+            "border_type": {
+              "type": "string"
+            },
+            "hidden": {
+              "type": "boolean"
+            }
+          }
+        },
+        "results_panel": {
+          "type": "object",
+          "properties": {
+            "border_type": {
+              "type": "string"
+            }
+          }
+        },
+        "theme": {
+          "type": "string"
+        }
+      }
+    },
+    "keybindings": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "string" },
+          { "type": "array", "items": { "type": "string" } }
+        ]
+      }
+    },
+    "shell_integration": {
+      "type": "object",
+      "properties": {
+        "fallback_channel": {
+          "type": "string"
+        },
+        "keybindings": {
+          "type": "object",
+          "properties": {
+            "smart_autocomplete": {
+              "type": "string"
+            },
+            "command_history": {
+              "type": "string"
+            }
+          }
+        },
+        "channel_triggers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

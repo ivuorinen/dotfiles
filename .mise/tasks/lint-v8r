@@ -2,7 +2,19 @@
 #MISE description="JSON Schema validation of schema-backed configs"
 set -euo pipefail
 
+# Schema mappings live in .v8rrc.yml. schemas/ holds the catalog's own
+# schemas and is not an input: ajv checks each against its meta-schema when
+# a mapped file uses it. --ignore-errors passes that compile failure like a
+# missing schema, which would silently stop validating every file mapped to
+# the broken schema, so the run fails on ajv's "schema is invalid" instead.
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
 local/bin/git-ls-existing -z --cached --others --exclude-standard \
   '*.yml' '*.yaml' '*.json' '*.toml' \
-  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/)' \
-  | xargs -0 v8r --ignore-errors
+  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|schemas/)' \
+  | xargs -0 v8r --ignore-errors 2>&1 \
+  | tee "$log"
+if grep -q 'schema is invalid' "$log"; then
+  echo "lint-v8r: a schema under schemas/ fails its meta-schema (see above)" >&2
+  exit 1
+fi

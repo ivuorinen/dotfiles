@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "gh-dash theme fragment",
+  "description": "A palette file holds only the theme key of a gh-dash config. gh-dash.dev/schema.json cannot be used whole: its relative $refs resolve against the working directory under v8r, so this wraps its theme part.",
+  "type": "object",
+  "properties": {
+    "theme": { "$ref": "https://gh-dash.dev/schema/theme.json" }
+  },
+  "required": ["theme"]
+}

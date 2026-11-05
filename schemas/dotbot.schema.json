@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dotbot configuration",
+  "description": "Repo-local schema: no upstream schema exists. Directive options follow the README and plugin sources of the pinned tools/dotbot; directives from plugins are allowed.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "minProperties": 1,
+    "maxProperties": 1,
+    "properties": {
+      "defaults": {
+        "type": "object",
+        "properties": {
+          "link": { "$ref": "#/definitions/link" },
+          "create": { "$ref": "#/definitions/createOptions" },
+          "clean": { "$ref": "#/definitions/cleanOptions" },
+          "shell": { "$ref": "#/definitions/shellDefaults" }
+        },
+        "additionalProperties": { "type": "object" }
+      },
+      "link": {
+        "type": "object",
+        "additionalProperties": {
+          "anyOf": [{ "type": ["string", "null"] }, { "$ref": "#/definitions/link" }]
+        }
+      },
+      "create": {
+        "anyOf": [
+          { "type": "array", "items": { "type": "string" } },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/createOptions" }]
+            }
+          }
+        ]
+      },
+      "shell": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1,
+              "maxItems": 2
+            },
+            { "$ref": "#/definitions/shell" }
+          ]
+        }
+      },
+      "clean": {
+        "anyOf": [
+          { "type": "array", "items": { "type": "string" } },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/cleanOptions" }]
+            }
+          }
+        ]
+      },
+      "plugins": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "definitions": {
+    "link": {
+      "type": "object",
+      "properties": {
+        "path": { "type": ["string", "null"] },
+        "type": { "enum": ["symlink", "hardlink"] },
+        "create": { "type": "boolean" },
+        "relink": { "type": "boolean" },
+        "force": { "type": "boolean" },
+        "backup": { "type": "boolean" },
+        "relative": { "type": "boolean" },
+        "canonicalize": { "type": "boolean" },
+        "canonicalize-path": { "type": "boolean" },
+        "if": { "type": "string" },
+        "ignore-missing": { "type": "boolean" },
+        "glob": { "type": "boolean" },
+        "exclude": { "type": "array", "items": { "type": "string" } },
+        "prefix": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "createOptions": {
+      "type": "object",
+      "properties": { "mode": { "type": "integer" } },
+      "additionalProperties": false
+    },
+    "cleanOptions": {
+      "type": "object",
+      "properties": {
+        "force": { "type": "boolean" },
+        "recursive": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "shellDefaults": {
+      "type": "object",
+      "properties": {
+        "quiet": { "type": "boolean" },
+        "stdin": { "type": "boolean" },
+        "stdout": { "type": "boolean" },
+        "stderr": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "shell": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "quiet": { "type": "boolean" },
+        "stdin": { "type": "boolean" },
+        "stdout": { "type": "boolean" },
+        "stderr": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

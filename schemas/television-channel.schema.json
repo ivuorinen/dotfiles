@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "television cable channel",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "required": ["metadata", "source"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": ["name", "run"],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "run": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "output": {
+          "type": "string"
+        },
+        "no_sort": {
+          "type": "boolean"
+        },
+        "frecency": {
+          "type": "boolean"
+        },
+        "display": {
+          "type": "string"
+        },
+        "ansi": {
+          "type": "boolean"
+        }
+      }
+    },
+    "preview": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "shell": {
+          "type": "string"
+        },
+        "env": {
+          "type": "object",
+          "properties": {
+            "BAT_THEME": {
+              "type": "string"
+            },
+            "MANWIDTH": {
+              "type": "string"
+            }
+          }
+        },
+        "header": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "string"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "preview_panel": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            "header": {
+              "type": "string"
+            },
+            "border_type": {
+              "type": "string"
+            },
+            "padding": {
+              "type": "object",
+              "properties": {
+                "left": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "right": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                }
+              }
+            }
+          }
+        },
+        "layout": {
+          "type": "string"
+        },
+        "input_header": {
+          "type": "string"
+        },
+        "input_prompt": {
+          "type": "string"
+        },
+        "results_panel": {
+          "type": "object",
+          "properties": {
+            "border_type": {
+              "type": "string"
+            },
+            "padding": {
+              "type": "object",
+              "properties": {
+                "left": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "right": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "keybindings": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "actions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["command"],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "shell": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

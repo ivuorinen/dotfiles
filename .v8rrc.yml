@@ -1,0 +1,117 @@
+---
+# Schemas for the files SchemaStore cannot place: no catalog match, a match
+# that misses a nested path (mise conf.d/*/), or several candidate versions
+# (renovate, prettierrc). v8r searches this catalog before SchemaStore and
+# ignores in-file $schema / #:schema lines, so every mapping lives here.
+#
+# Upstream schemas come first. Files whose tool publishes none use a
+# repo-local schema under schemas/, typed from the keys this repo sets with
+# other keys allowed, so a new upstream option never fails the gate.
+customCatalog:
+  schemas:
+    # --- upstream ---
+    - name: Renovate
+      description: Same URL as the file's own $schema; SchemaStore lists five versions
+      fileMatch: [.github/renovate.json]
+      location: https://docs.renovatebot.com/renovate-schema.json
+    - name: Prettier
+      description: Same URL as the file's own $schema; SchemaStore lists three versions
+      fileMatch: [.prettierrc.json]
+      location: https://json.schemastore.org/prettierrc
+    - name: mise conf.d fragments
+      description: SchemaStore matches conf.d/*.toml only, not one directory deeper
+      fileMatch: ["config/mise/conf.d/*/*.toml"]
+      location: https://mise.jdx.dev/schema/mise.json
+    - name: miserc
+      description: mise.jdx.dev does not serve it, so read it from the repo
+      fileMatch: [config/mise/miserc.toml]
+      location: https://raw.githubusercontent.com/jdx/mise/main/schema/miserc.json
+    - name: CodeQL config
+      fileMatch: [.github/codeql/codeql-config.yml]
+      location: https://raw.githubusercontent.com/github/codeql-action/main/src/db-config-schema.json
+    - name: Glamour style
+      fileMatch: [config/glow/terminal.json]
+      location: https://www.schemastore.org/glamour-style.json
+    - name: sesh
+      fileMatch: [config/sesh/sesh.toml]
+      location: https://raw.githubusercontent.com/joshmedeski/sesh/main/sesh.schema.json
+    - name: pi settings
+      fileMatch: [config/pi/agent/settings.json]
+      location: https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/schemas/settings.schema.json
+    - name: gh-dash theme fragment
+      fileMatch: ["config/theme/palettes.d/*/*/gh-dash.theme.yml"]
+      location: schemas/gh-dash-theme.schema.json
+
+    # --- repo-local ---
+    - name: Codacy
+      fileMatch: [.codacy.yml]
+      location: schemas/codacy.schema.json
+    - name: Exclusion baseline
+      fileMatch: [.exclusion-baseline.json]
+      location: schemas/exclusion-baseline.schema.json
+    - name: grype
+      fileMatch: [.grype.yaml]
+      location: schemas/grype.schema.json
+    - name: SonarLint connected mode
+      fileMatch: [.sonarlint/connectedMode.json]
+      location: schemas/sonarlint-connected-mode.schema.json
+    - name: MCP servers
+      fileMatch: [config/copilot/mcp-config.json, config/pi/agent/mcp.json]
+      location: schemas/mcp-servers.schema.json
+    - name: Copilot CLI settings
+      fileMatch: [config/copilot/settings.json]
+      location: schemas/copilot-settings.schema.json
+    - name: gh-changelog
+      fileMatch: [config/gh-changelog/config.yaml]
+      location: schemas/gh-changelog.schema.json
+    - name: glow
+      fileMatch: [config/glow/glow.yml]
+      location: schemas/glow.schema.json
+    - name: gpg-tui
+      fileMatch: [config/gpg-tui/gpg-tui.toml]
+      location: schemas/gpg-tui.schema.json
+    - name: herdr
+      fileMatch: [config/herdr/config.toml]
+      location: schemas/herdr.schema.json
+    - name: herdr-navigator
+      fileMatch: [config/herdr/plugins/config/herdr-navigator/config.toml]
+      location: schemas/herdr-navigator.schema.json
+    - name: herdr sessionizer
+      fileMatch: [config/herdr/plugins/config/sessionizer/config.toml]
+      location: schemas/herdr-sessionizer.schema.json
+    - name: Homebrew trust list
+      fileMatch: [config/homebrew/trust.json]
+      location: schemas/homebrew-trust.schema.json
+    - name: Karabiner-Elements
+      fileMatch: [config/karabiner/karabiner.json]
+      location: schemas/karabiner.schema.json
+    - name: vim.pack lockfile
+      fileMatch: [config/nvim/nvim-pack-lock.json]
+      location: schemas/nvim-pack-lock.schema.json
+    - name: pi open-tui
+      fileMatch: [config/pi/agent/open-tui.json]
+      location: schemas/pi-open-tui.schema.json
+    - name: pi zentui
+      fileMatch: [config/pi/agent/zentui.json]
+      location: schemas/pi-zentui.schema.json
+    - name: television config
+      description: base.toml and the palette fragments appended to it
+      fileMatch:
+        - config/television/base.toml
+        - "config/theme/palettes.d/*/*/television.toml"
+      location: schemas/television-config.schema.json
+    - name: television channel
+      fileMatch: ["config/television/cable/*.toml"]
+      location: schemas/television-channel.schema.json
+    - name: television theme
+      fileMatch: ["config/television/themes/*.toml"]
+      location: schemas/television-theme.schema.json
+    - name: eza theme
+      fileMatch: ["config/theme/palettes.d/*/*/eza.yml"]
+      location: schemas/eza-theme.schema.json
+    - name: Dotbot
+      fileMatch:
+        - dotbot-links.yaml
+        - install.conf.yaml
+        - "hosts/*/install.conf.yaml"
+      location: schemas/dotbot.schema.json
