@@ -146,7 +146,6 @@
     # SSH Configuration
     ~/.ssh/:
       glob: true
-      mode: 0600
       path: ssh/*
     # mise → asdf compatibility (tools expecting ~/.asdf find mise data)
     ~/.asdf:
