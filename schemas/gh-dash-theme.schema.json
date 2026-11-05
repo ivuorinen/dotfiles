@@ -5,5 +5,6 @@
   "type": "object",
   "properties": {
     "theme": { "$ref": "https://gh-dash.dev/schema/theme.json" }
-  }
+  },
+  "required": ["theme"]
 }

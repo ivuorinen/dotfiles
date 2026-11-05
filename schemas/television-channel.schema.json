@@ -3,9 +3,11 @@
   "title": "television cable channel",
   "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
   "type": "object",
+  "required": ["metadata", "source"],
   "properties": {
     "metadata": {
       "type": "object",
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string"
@@ -23,6 +25,7 @@
     },
     "source": {
       "type": "object",
+      "required": ["command"],
       "properties": {
         "command": {
           "anyOf": [
@@ -35,6 +38,7 @@
                 "anyOf": [
                   {
                     "type": "object",
+                    "required": ["name", "run"],
                     "properties": {
                       "name": {
                         "type": "string"
@@ -71,6 +75,7 @@
     },
     "preview": {
       "type": "object",
+      "required": ["command"],
       "properties": {
         "command": {
           "anyOf": [
@@ -114,7 +119,9 @@
           "type": "object",
           "properties": {
             "size": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
             },
             "header": {
               "type": "string"
@@ -126,10 +133,14 @@
               "type": "object",
               "properties": {
                 "left": {
-                  "type": "integer"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
                 },
                 "right": {
-                  "type": "integer"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
                 }
               }
             }
@@ -154,10 +165,14 @@
               "type": "object",
               "properties": {
                 "left": {
-                  "type": "integer"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
                 },
                 "right": {
-                  "type": "integer"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
                 }
               }
             }
@@ -185,6 +200,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
+        "required": ["command"],
         "properties": {
           "description": {
             "type": "string"

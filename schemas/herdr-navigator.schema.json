@@ -117,12 +117,14 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["path"],
         "properties": {
           "path": {
             "type": "string"
           },
           "max_depth": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0
           }
         }
       }

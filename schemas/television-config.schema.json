@@ -5,7 +5,8 @@
   "type": "object",
   "properties": {
     "history_size": {
-      "type": "integer"
+      "type": "integer",
+      "minimum": 0
     },
     "global_history": {
       "type": "boolean"
@@ -17,7 +18,9 @@
           "type": "object",
           "properties": {
             "size": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
             },
             "scrollbar": {
               "type": "boolean"
@@ -46,7 +49,10 @@
     "keybindings": {
       "type": "object",
       "additionalProperties": {
-        "type": "string"
+        "anyOf": [
+          { "type": "string" },
+          { "type": "array", "items": { "type": "string" } }
+        ]
       }
     },
     "shell_integration": {

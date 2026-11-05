@@ -446,10 +446,12 @@
               }
             },
             "builtinRendererOverrides": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": { "type": "boolean" }
             },
             "customToolOverrides": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": { "type": ["boolean", "object"] }
             },
             "readOutputMode": {
               "type": "string"

@@ -17,7 +17,8 @@
           "type": "boolean"
         },
         "depth": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         }
       }
     },
@@ -80,7 +81,9 @@
                   "type": "string"
                 },
                 "ratio": {
-                  "type": "number"
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "exclusiveMaximum": 1
                 }
               }
             }

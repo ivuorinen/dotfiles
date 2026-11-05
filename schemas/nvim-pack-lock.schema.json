@@ -8,6 +8,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
+        "required": ["rev"],
         "properties": {
           "rev": {
             "type": "string"
