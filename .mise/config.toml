@@ -1,7 +1,9 @@
 [tools]
 # The interpreter the pypi-backed yamllint installs into in CI, and the one
-# ruff and SonarCloud target (.sonarcloud.properties).
-python = "3.14"
+# ruff and SonarCloud target (.sonarcloud.properties). Inside the repo this
+# entry shadows the global one, so it repeats that postinstall: ./install runs
+# `mise install` from here. CI has no linked file and skips it.
+python = { version = "3.14", postinstall = 'f="$HOME/.config/mise/default-python-packages"; [ ! -f "$f" ] || python -m pip install -r "$f"' }
 # The runtime the npm-backed lint tools below run on. A CI runner happens to
 # ship one; a fresh clone following .github/CONTRIBUTING.md may not.
 node = "lts"

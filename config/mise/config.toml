@@ -6,10 +6,6 @@ min_version = { soft = "2026.11.0" }
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pypi.uvx = true
-# Python libraries to install into every python mise installs. Kept in this
-# directory rather than the default ~/.default-python-packages so it lives
-# with the rest of the mise config and is version-controlled.
-python.default_packages_file = "~/.config/mise/default-python-packages"
 trusted_config_paths = [
   "~/Code/ivuorinen",
   "~/Code/s",
@@ -59,7 +55,9 @@ minimum_release_age_excludes = ["pypi:*"]
 # Language runtimes & build toolchains
 node = "lts"
 bun = "1.4.4"
-python = "3.14"
+# postinstall pip-installs default-python-packages into each python mise
+# installs; it replaces python.default_packages_file, deprecated in 2026.11.0.
+python = { version = "3.14", postinstall = 'python -m pip install -r "$HOME/.config/mise/default-python-packages"' }
 go = "1.27.3"
 rust = "1.99.1"
 uv = "0.13.6"

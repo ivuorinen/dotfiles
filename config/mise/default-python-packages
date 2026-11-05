@@ -1,14 +1,15 @@
 # Python libraries installed into every Python that mise installs.
 #
-# mise reads this after each `mise install python@...`, so a version bump no
-# longer orphans these the way `uv pip install --system` did.
+# The python entry's postinstall in config.toml pip-installs this after each
+# `mise install python@...`, so a version bump no longer orphans these the
+# way `uv pip install --system` did.
 #
 # A standalone script declares its own dependencies inline instead (PEP 723,
 # run by `uv run --script`), so it works under any python3 on PATH —
 # local/bin/x-compare-versions.py does this for `packaging`.
 #
-# One package per line. Comments and blank lines are ignored.
-# Location is set by python.default_packages_file in config.toml.
+# A pip requirements file (`pip install -r`): one package per line, comments
+# and blank lines ignored.
 #
 # Tools (executables) do NOT belong here — those are mise tools in
 # config.toml. This file is only for libraries something needs to *import*.
