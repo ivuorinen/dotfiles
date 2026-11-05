@@ -1,0 +1,522 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "pi zentui extension settings",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "components": {
+      "type": "object",
+      "properties": {
+        "editor": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "style": {
+              "type": "string"
+            },
+            "codexQuota": {
+              "type": "boolean"
+            },
+            "colorSource": {
+              "type": "string"
+            },
+            "borderColorMode": {
+              "type": "string"
+            },
+            "modelLabel": {
+              "type": "string"
+            },
+            "viewportIndicators": {
+              "type": "boolean"
+            },
+            "styles": {
+              "type": "object",
+              "properties": {
+                "opencode": {
+                  "type": "object",
+                  "properties": {
+                    "metadataFormat": {
+                      "type": "string"
+                    },
+                    "completionMenu": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "opencode-copy-friendly": {
+                  "type": "object",
+                  "properties": {
+                    "metadataFormat": {
+                      "type": "string"
+                    },
+                    "completionMenu": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "accent-rail": {
+                  "type": "object",
+                  "properties": {
+                    "rail": {
+                      "type": "string"
+                    },
+                    "asciiRail": {
+                      "type": "string"
+                    },
+                    "transparent": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "minimalist": {
+                  "type": "object",
+                  "properties": {
+                    "formats": {
+                      "type": "object",
+                      "properties": {
+                        "bottomLeft": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "pathDisplay": {
+                      "type": "string"
+                    },
+                    "contextFormat": {
+                      "type": "string"
+                    },
+                    "contextGauge": {
+                      "type": "boolean"
+                    },
+                    "showSessionName": {
+                      "type": "boolean"
+                    },
+                    "showTimer": {
+                      "type": "boolean"
+                    },
+                    "showCost": {
+                      "type": "boolean"
+                    },
+                    "showCacheHit": {
+                      "type": "boolean"
+                    },
+                    "showGit": {
+                      "type": "boolean"
+                    },
+                    "contextThresholds": {
+                      "type": "object",
+                      "properties": {
+                        "warning": {
+                          "type": "integer"
+                        },
+                        "error": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "separator": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "footer": {
+          "type": "object",
+          "properties": {
+            "style": {
+              "type": "string"
+            },
+            "codexQuota": {
+              "type": "boolean"
+            },
+            "colorSource": {
+              "type": "string"
+            },
+            "modelLabel": {
+              "type": "string"
+            },
+            "styles": {
+              "type": "object",
+              "properties": {
+                "starship": {
+                  "type": "object",
+                  "properties": {
+                    "format": {
+                      "type": "string"
+                    },
+                    "responsive": {
+                      "type": "boolean"
+                    },
+                    "compactFormat": {
+                      "type": "string"
+                    },
+                    "compactMaxLines": {
+                      "type": "integer"
+                    },
+                    "separator": {
+                      "type": "string"
+                    },
+                    "contextStyle": {
+                      "type": "string"
+                    },
+                    "contextThresholds": {
+                      "type": "object",
+                      "properties": {
+                        "warning": {
+                          "type": "integer"
+                        },
+                        "error": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "pathDisplay": {
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "type": "string"
+                        },
+                        "depth": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "segments": {
+                      "type": "object",
+                      "properties": {
+                        "cwd": {
+                          "type": "boolean"
+                        },
+                        "sessionName": {
+                          "type": "boolean"
+                        },
+                        "gitBranch": {
+                          "type": "boolean"
+                        },
+                        "gitStatus": {
+                          "type": "boolean"
+                        },
+                        "gitCounts": {
+                          "type": "boolean"
+                        },
+                        "gitCommit": {
+                          "type": "boolean"
+                        },
+                        "gitMetrics": {
+                          "type": "boolean"
+                        },
+                        "runtime": {
+                          "type": "boolean"
+                        },
+                        "modelInfo": {
+                          "type": "boolean"
+                        },
+                        "context": {
+                          "type": "boolean"
+                        },
+                        "tokens": {
+                          "type": "boolean"
+                        },
+                        "cost": {
+                          "type": "boolean"
+                        },
+                        "sessionDuration": {
+                          "type": "boolean"
+                        },
+                        "username": {
+                          "type": "boolean"
+                        },
+                        "time": {
+                          "type": "boolean"
+                        },
+                        "os": {
+                          "type": "boolean"
+                        },
+                        "packageVersion": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "gitBranch": {
+                      "type": "object",
+                      "properties": {
+                        "maxLength": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "gitCommit": {
+                      "type": "object",
+                      "properties": {
+                        "hashLength": {
+                          "type": "integer"
+                        },
+                        "onlyDetached": {
+                          "type": "boolean"
+                        },
+                        "showTag": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "gitMetrics": {
+                      "type": "object",
+                      "properties": {
+                        "onlyNonzero": {
+                          "type": "boolean"
+                        },
+                        "ignoreSubmodules": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "extensionStatuses": {
+                      "type": "object",
+                      "properties": {
+                        "defaultPlacement": {
+                          "type": "string"
+                        },
+                        "placements": {
+                          "type": "object",
+                          "properties": {
+                            "pi-lens-lsp": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "colorModes": {
+                          "type": "object",
+                          "properties": {
+                            "pi-lens-lsp": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "userMessages": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "style": {
+              "type": "string"
+            }
+          }
+        },
+        "selectorBorders": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "style": {
+              "type": "string"
+            },
+            "colorSource": {
+              "type": "string"
+            }
+          }
+        },
+        "thinkingSteps": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "mode": {
+              "type": "string"
+            }
+          }
+        },
+        "workingLine": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "turnSummary": {
+              "type": "boolean"
+            },
+            "turnSummaryFormat": {
+              "type": "string"
+            },
+            "spinner": {
+              "type": "string"
+            },
+            "spinnerIntervalMs": {
+              "type": "integer"
+            },
+            "animateSpinnerColor": {
+              "type": "boolean"
+            },
+            "textIntervalMs": {
+              "type": "integer"
+            },
+            "textAnimation": {
+              "type": "string"
+            },
+            "placement": {
+              "type": "string"
+            },
+            "colorSource": {
+              "type": "string"
+            },
+            "messages": {
+              "type": "object",
+              "properties": {
+                "custom": {
+                  "type": "boolean"
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "segments": {
+              "type": "object",
+              "properties": {
+                "tokenRate": {
+                  "type": "boolean"
+                },
+                "tool": {
+                  "type": "boolean"
+                },
+                "elapsed": {
+                  "type": "boolean"
+                },
+                "thought": {
+                  "type": "boolean"
+                },
+                "tokens": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "toolDisplay": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "style": {
+              "type": "string"
+            },
+            "registerToolOverrides": {
+              "type": "object",
+              "properties": {
+                "read": {
+                  "type": "boolean"
+                },
+                "write": {
+                  "type": "boolean"
+                },
+                "edit": {
+                  "type": "boolean"
+                },
+                "bash": {
+                  "type": "boolean"
+                },
+                "grep": {
+                  "type": "boolean"
+                },
+                "find": {
+                  "type": "boolean"
+                },
+                "ls": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "builtinRendererOverrides": {
+              "type": "object"
+            },
+            "customToolOverrides": {
+              "type": "object"
+            },
+            "readOutputMode": {
+              "type": "string"
+            },
+            "searchOutputMode": {
+              "type": "string"
+            },
+            "mcpOutputMode": {
+              "type": "string"
+            },
+            "bashOutputMode": {
+              "type": "string"
+            },
+            "previewLines": {
+              "type": "integer"
+            },
+            "expandedPreviewMaxLines": {
+              "type": "integer"
+            },
+            "bashCollapsedLines": {
+              "type": "integer"
+            },
+            "diffViewMode": {
+              "type": "string"
+            },
+            "diffIndicatorMode": {
+              "type": "string"
+            },
+            "diffSplitMinWidth": {
+              "type": "integer"
+            },
+            "diffCollapsedLines": {
+              "type": "integer"
+            },
+            "diffWordWrap": {
+              "type": "boolean"
+            },
+            "showTruncationHints": {
+              "type": "boolean"
+            }
+          }
+        },
+        "extensionStatuses": {
+          "type": "object",
+          "properties": {
+            "visibility": {
+              "type": "object",
+              "properties": {
+                "pi-lens-lsp": {
+                  "type": "string"
+                }
+              }
+            },
+            "defaultVisibility": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "icons": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

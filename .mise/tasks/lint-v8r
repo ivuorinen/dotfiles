@@ -2,7 +2,9 @@
 #MISE description="JSON Schema validation of schema-backed configs"
 set -euo pipefail
 
+# Schema mappings live in .v8rrc.yml. schemas/ holds the catalog's own
+# schemas; ajv checks each against its meta-schema when it is used.
 local/bin/git-ls-existing -z --cached --others --exclude-standard \
   '*.yml' '*.yaml' '*.json' '*.toml' \
-  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/)' \
+  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|schemas/)' \
   | xargs -0 v8r --ignore-errors

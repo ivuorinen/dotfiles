@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "herdr sessionizer plugin configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "projects": {
+      "type": "object",
+      "properties": {
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "git_only": {
+          "type": "boolean"
+        },
+        "depth": {
+          "type": "integer"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "placement": {
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        },
+        "height": {
+          "type": "string"
+        }
+      }
+    },
+    "worktree": {
+      "type": "object",
+      "properties": {
+        "github_prs": {
+          "type": "boolean"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "focus": {
+          "type": "string"
+        }
+      }
+    },
+    "tabs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "panes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "command": {
+                  "type": "string"
+                },
+                "from": {
+                  "type": "string"
+                },
+                "split": {
+                  "type": "string"
+                },
+                "ratio": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

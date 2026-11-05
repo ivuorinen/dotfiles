@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "herdr-navigator plugin configuration",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "picker": {
+      "type": "object",
+      "properties": {
+        "reuse_existing": {
+          "type": "boolean"
+        },
+        "create_missing": {
+          "type": "boolean"
+        },
+        "prefix_workspace_labels": {
+          "type": "boolean"
+        },
+        "engine": {
+          "type": "string"
+        },
+        "source_order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_priority_boost": {
+          "type": "integer"
+        },
+        "agent_sort": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "detailed_rows": {
+          "type": "boolean"
+        },
+        "check_updates": {
+          "type": "boolean"
+        },
+        "vim_mode": {
+          "type": "boolean"
+        },
+        "vim_filter_search": {
+          "type": "boolean"
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "audio": {
+          "type": "boolean"
+        },
+        "sound": {
+          "type": "string"
+        },
+        "custom_sound": {
+          "type": "string"
+        }
+      }
+    },
+    "jump_back": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "pin_previous": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "open_workspaces": {
+          "type": "boolean"
+        },
+        "herdr_plus_projects": {
+          "type": "boolean"
+        },
+        "zoxide": {
+          "type": "boolean"
+        },
+        "roots": {
+          "type": "boolean"
+        },
+        "agents": {
+          "type": "boolean"
+        },
+        "servers": {
+          "type": "boolean"
+        },
+        "sessions": {
+          "type": "boolean"
+        },
+        "herdr_plus_quick_actions": {
+          "type": "boolean"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "inherit_herdr": {
+          "type": "boolean"
+        }
+      }
+    },
+    "roots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "max_depth": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "sessions": {
+      "type": "object",
+      "properties": {
+        "local": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

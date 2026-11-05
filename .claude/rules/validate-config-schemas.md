@@ -27,10 +27,10 @@ The repeat failure mode this rule prevents:
 
 ## How to validate
 
-`mise exec -- v8r <file>` is the universal entry point — it auto-detects
-the schema from `schemastore.org` for most well-known formats. Run
-it after any edit to a file with a known schema and before
-committing.
+`mise exec -- v8r <file>` is the universal entry point — it looks the
+file up in the `.v8rrc.yml` catalog first, then auto-detects the schema
+from `schemastore.org` by filename. Run it after any edit to a
+structured config file and before committing.
 
 | File pattern                  | Tool                                       | Checks                   |
 |-------------------------------|--------------------------------------------|--------------------------|
@@ -59,7 +59,20 @@ Which values need evidence and which are freeform is defined once, in
 tracks or does not ignore, so a new file counts before it is staged),
 excluding submodules, cheat sheets, `config/gh/` (rewritten by
 `gh config set`), `config/gh-dash/` (its schema's relative `$ref`s never
-resolve), `graphify-out/` and `docs/audit/`. A file with a schema-store match that
+resolve), `graphify-out/`, `docs/audit/` and `schemas/`. A file that
 fails validation fails both gates. A file with no match, or with several
-candidate schemas (`.github/renovate.json`, `.prettierrc.json`), passes
-unchecked — for those, `no-schema-guessing.md` is the only safety net.
+candidate schemas, still passes unchecked, so give every new config file
+an entry in `.v8rrc.yml` — v8r ignores in-file `$schema` / `#:schema`
+lines, so the catalog is the only mapping it reads.
+
+## The catalog
+
+`.v8rrc.yml` maps a file to an upstream schema when its tool publishes
+one, and otherwise to a repo-local schema under `schemas/`. Most
+repo-local schemas are typed from the keys this repo already sets and
+allow any other key, so they catch a wrong type or broken structure but
+never an invented key name — `no-schema-guessing.md` still governs those
+files. `dotbot.schema.json` is the exception: its directive options come
+from the pinned `tools/dotbot` README and reject unknown ones. The
+`schemas/` files are skipped as inputs because ajv checks each against
+its meta-schema whenever it validates a file with it.

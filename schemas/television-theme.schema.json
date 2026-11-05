@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "television theme",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "background": {
+      "type": "string"
+    },
+    "border_fg": {
+      "type": "string"
+    },
+    "text_fg": {
+      "type": "string"
+    },
+    "dimmed_text_fg": {
+      "type": "string"
+    },
+    "input_text_fg": {
+      "type": "string"
+    },
+    "result_count_fg": {
+      "type": "string"
+    },
+    "result_name_fg": {
+      "type": "string"
+    },
+    "result_line_number_fg": {
+      "type": "string"
+    },
+    "result_value_fg": {
+      "type": "string"
+    },
+    "selection_fg": {
+      "type": "string"
+    },
+    "selection_bg": {
+      "type": "string"
+    },
+    "match_fg": {
+      "type": "string"
+    },
+    "preview_title_fg": {
+      "type": "string"
+    },
+    "channel_mode_fg": {
+      "type": "string"
+    },
+    "channel_mode_bg": {
+      "type": "string"
+    },
+    "remote_control_mode_fg": {
+      "type": "string"
+    },
+    "remote_control_mode_bg": {
+      "type": "string"
+    }
+  }
+}

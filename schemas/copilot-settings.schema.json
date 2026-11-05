@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GitHub Copilot CLI settings",
+  "description": "Repo-local schema: no upstream schema exists. Types follow the keys this repo sets; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "enabledPlugins": {
+      "type": "object"
+    },
+    "allowedUrls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "theme": {
+      "type": "string"
+    },
+    "statusLine": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "refreshInterval": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        },
+        "padding": {
+          "type": "integer"
+        }
+      }
+    },
+    "bannerStyle": {
+      "type": "string"
+    },
+    "contextManagementTools": {
+      "type": "boolean"
+    },
+    "copyOnCodeBlockClick": {
+      "type": "boolean"
+    },
+    "defaultMode": {
+      "type": "string"
+    },
+    "defaultPermissionMode": {
+      "type": "string"
+    },
+    "enableAllGithubMcpTools": {
+      "type": "boolean"
+    },
+    "inlineImages": {
+      "type": "boolean"
+    },
+    "keepAlive": {
+      "type": "string"
+    },
+    "memory": {
+      "type": "boolean"
+    },
+    "mergeStrategy": {
+      "type": "string"
+    },
+    "notifications": {
+      "type": "boolean"
+    },
+    "pinnedPrompts": {
+      "type": "boolean"
+    },
+    "planContextTier": {
+      "type": "string"
+    },
+    "planEffortLevel": {
+      "type": "string"
+    },
+    "remoteExport": {
+      "type": "boolean"
+    },
+    "respectGitignore": {
+      "type": "boolean"
+    },
+    "terminalNotifications": {
+      "type": "boolean"
+    },
+    "terminalProgress": {
+      "type": "boolean"
+    },
+    "transcriptView": {
+      "type": "string"
+    },
+    "updateTerminalTitle": {
+      "type": "boolean"
+    },
+    "footer": {
+      "type": "object",
+      "properties": {
+        "showAgent": {
+          "type": "boolean"
+        },
+        "showAiUsed": {
+          "type": "boolean"
+        },
+        "showBranch": {
+          "type": "boolean"
+        },
+        "showCiStatus": {
+          "type": "boolean"
+        },
+        "showCodeChanges": {
+          "type": "boolean"
+        },
+        "showContextWindow": {
+          "type": "boolean"
+        },
+        "showCustom": {
+          "type": "boolean"
+        },
+        "showDirectory": {
+          "type": "boolean"
+        },
+        "showModelEffort": {
+          "type": "boolean"
+        },
+        "showPullRequest": {
+          "type": "boolean"
+        },
+        "showQuota": {
+          "type": "boolean"
+        },
+        "showSandbox": {
+          "type": "boolean"
+        },
+        "showSchedules": {
+          "type": "boolean"
+        },
+        "showYolo": {
+          "type": "boolean"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "disableBypassPermissionsMode": {
+          "type": "string"
+        }
+      }
+    },
+    "sandbox": {
+      "type": "object",
+      "properties": {
+        "allowBypass": {
+          "type": "boolean"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "gh": {
+              "type": "boolean"
+            }
+          }
+        },
+        "sandboxLspServers": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sidebar": {
+      "type": "object",
+      "properties": {
+        "showCloseButton": {
+          "type": "boolean"
+        }
+      }
+    },
+    "subagents": {
+      "type": "object",
+      "properties": {
+        "contextManagementTools": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model": {
+      "type": "string"
+    }
+  }
+}
