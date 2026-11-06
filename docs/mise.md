@@ -57,6 +57,11 @@ a system or Homebrew path.
 3. If a shell completion or alias is needed, wire it in `config/alias`
    or `config/fish/`.
 
+A tool only one machine needs goes in `hosts/<host>/config/mise/conf.d/host.toml`
+instead; `./install --links` links it into place. A full install's mise step runs
+before host overlays, so that host's `install.conf.yaml` runs `dfm install mise`
+again after the link.
+
 ## Homebrew formulae via mise (bootstrap packages)
 
 Plain `homebrew/core` CLI formulae are installed by mise's experimental
@@ -131,8 +136,5 @@ terminal running mise, because Safari is sandboxed.
 
 - `experimental = true` is set — some commands (`deps`, `oci`, `mcp`) are
   marked experimental and may change.
-- The `pipx`/`uvx` combination is partly disabled in the config because
-  the mise pipx backend cannot find `uvx` when `uv` is mise-managed
-  (see the inline comment and upstream discussion link in the config).
 - Prefer mise versions over hardcoded Homebrew paths anywhere in this
   repo — the migration to mise is intentional and complete.

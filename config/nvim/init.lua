@@ -18,10 +18,9 @@ _path_prepend(vim.env.HOME .. '/.local/share/mise/shims')
 
 -- ── Python 3 provider ───────────────────────────────────────────────
 -- Pin the interpreter instead of letting nvim search the environment on
--- every start. The shim (not an installs/<version>/ path) keeps this valid
--- across python upgrades; pynvim is kept in that interpreter by
--- config/mise/default-python-packages.
-vim.g.python3_host_prog = vim.env.HOME .. '/.local/share/mise/shims/python3'
+-- every start. pynvim-python (pipx:pynvim in mise) runs pynvim's own virtualenv,
+-- so a project's python version cannot take the provider away.
+vim.g.python3_host_prog = vim.env.HOME .. '/.local/share/mise/shims/pynvim-python'
 
 -- nvim 0.12+ niceness (private API — pcall so a future rename doesn't break startup)
 -- cmdheight = 0 (options.lua): messages go to ui2's float, which hides after 4 s

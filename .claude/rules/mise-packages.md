@@ -1,5 +1,5 @@
 ---
-description: "Python packages come from mise's default-packages file; run mise install after adding a tool."
+description: "Python tools are pipx: entries in mise's config; run mise install after adding a tool."
 paths:
   - "config/mise/**"
   - ".mise/config.toml"
@@ -8,9 +8,12 @@ paths:
 # mise-managed tools and Python packages
 
 Never `pip install`, `python3 -m pip install`, `uv tool install`, or
-`uv pip install` by hand. Add a Python library to
-`config/mise/default-python-packages`; mise installs it into every
-Python it builds, so a version bump never orphans it.
+`uv pip install` by hand. Add a Python tool to `config/mise/config.toml` as
+`"pipx:<package>" = "<version>"`; each gets its own virtualenv, so neither a
+Python version bump nor a project's own Python can orphan it. A package with no
+executables cannot be a mise tool: a standalone script declares such a library
+inline instead (PEP 723, run by `uv run --script`), as
+`local/bin/x-compare-versions.py` does for `packaging`.
 
 Run `mise install` after adding a tool to `config/mise/config.toml`.
 

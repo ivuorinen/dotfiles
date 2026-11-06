@@ -6,10 +6,6 @@ min_version = { soft = "2026.11.0" }
 [settings]
 # Use uvx (from uv) instead of requiring pipx to be installed separately
 pypi.uvx = true
-# Python libraries to install into every python mise installs. Kept in this
-# directory rather than the default ~/.default-python-packages so it lives
-# with the rest of the mise config and is version-controlled.
-python.default_packages_file = "~/.config/mise/default-python-packages"
 trusted_config_paths = [
   "~/Code/ivuorinen",
   "~/Code/s",
@@ -104,6 +100,7 @@ difftastic = "0.72.0"
 neovim = "0.12.6"
 tree-sitter = "0.27.1"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
+"pipx:pynvim" = "0.6.0"  # Python client; its pynvim-python is g:python3_host_prog
 "npm:fish-lsp" = "1.1.5"
 
 # Task runners & caching
@@ -192,6 +189,7 @@ prek = "0.5.9"
 "npm:corepack" = "0.36.0"
 
 # System monitoring & misc utilities
+"pipx:graphifyy" = "0.9.102"  # graphify, the code knowledge graph (.claude/rules/graphify-first.md)
 bottom = "0.15.0"
 cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.36.0"
@@ -203,12 +201,12 @@ codeql = "2.27.4"
 copilot = "1.0.105"
 herdr = "0.9.5"
 pi = "1.4.0"
-"npm:context-mode" = "1.0.169"
+"npm:context-mode" = "2.1.0"
 "npm:@tobilu/qmd" = "2.8.3"
 "aqua:SonarSource/sonarqube-cli" = "1.11.0.16877"
 "npm:@vshulcz/deja-vu" = "0.23.5"
 lefthook = "2.2.2"
-"github:ivuorinen/git-dirty" = "2026.10.0"
+"github:ivuorinen/git-dirty" = "v0.2.0"
 poppler = "latest"
 
 # Homebrew formulae for mise's brew bootstrap ([bootstrap.packages]) live in

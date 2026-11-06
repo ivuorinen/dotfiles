@@ -79,8 +79,7 @@ list live in `local/bin/CLAUDE.md`, which loads when working there.
 
 `config/mise/config.toml` pins the language runtimes and CLI tools.
 Activated via `eval "$(mise activate bash)"` in `config/exports`.
-Python libraries come from `config/mise/default-python-packages`
-(`python.default_packages_file` points at it). Install mandates:
+Python tools are `pipx:` entries in that file. Install mandates:
 `.claude/rules/mise-packages.md`.
 
 ### Host-specific Configs
@@ -108,8 +107,8 @@ symlinks them into `~/.config/` automatically.
 ## Gotchas
 
 - **POSIX scripts** (validation rule in `.claude/rules/posix-scripts.md`,
-  which holds the authoritative list): nine scripts are `sh`, not bash —
-  eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
+  which holds the authoritative list): eight scripts are `sh`, not bash —
+  seven `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
   `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
   `bash -n`.
 - **Vendored files**: five fish plugin functions under
