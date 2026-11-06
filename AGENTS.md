@@ -107,8 +107,8 @@ symlinks them into `~/.config/` automatically.
 ## Gotchas
 
 - **POSIX scripts** (validation rule in `.claude/rules/posix-scripts.md`,
-  which holds the authoritative list): nine scripts are `sh`, not bash —
-  eight `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
+  which holds the authoritative list): eight scripts are `sh`, not bash —
+  seven `#!/bin/sh` under `local/bin/`, plus `local/bin/pushover` on
   `#!/usr/bin/env sh`. Validate them with `sh -n` or `dash -n`, never
   `bash -n`.
 - **Vendored files**: five fish plugin functions under

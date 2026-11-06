@@ -8,7 +8,6 @@ paths:
   - "local/bin/x-ssl-expiry-date"
   - "local/bin/x-list-open-prs"
   - "local/bin/x-quota-usage"
-  - "local/bin/mise-python-arch"
   - "local/bin/pushover"
 ---
 
@@ -28,7 +27,6 @@ bashism slips through:
 - `local/bin/x-ssl-expiry-date`
 - `local/bin/x-list-open-prs`
 - `local/bin/x-quota-usage`
-- `local/bin/mise-python-arch`
 
 One more declares `#!/usr/bin/env sh` rather than `#!/bin/sh`, and is POSIX
 all the same:

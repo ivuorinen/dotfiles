@@ -122,19 +122,6 @@ set -q OP_CACHE; or set -x OP_CACHE "$XDG_STATE_HOME/1password"
 # config/mise/miserc.toml sets the same outside these shells.
 set -gx MISE_AUTO_ENV true
 
-# Set precompiled Python arch+OS so mise downloads the right binary
-# Each output line from mise-python-arch has the format: export KEY="value"
-if command -v mise-python-arch >/dev/null 2>&1
-    for _line in (mise-python-arch 2>/dev/null)
-        set -l _kv (string replace -r '^export ' '' -- $_line)
-        set -l _key (string split -m1 '=' $_kv)[1]
-        set -l _val (string replace -r '^[^=]+="|"$' '' -- $_kv | string replace -ra '"' '')
-        if test -n "$_key"
-            set -gx $_key $_val
-        end
-    end
-end
-
 # Rust / cargo configuration
 set -q CARGO_HOME; or set -x CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -q CARGO_BIN_HOME; or set -x CARGO_BIN_HOME "$XDG_BIN_HOME"
