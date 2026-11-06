@@ -177,7 +177,7 @@ osv-scanner = "2.7.0"
 "pipx:bandit[toml]" = "1.9.4"
 checkov = "3.4.0"
 pinact = "5.0.2"
-zizmor = "1.31.1"
+zizmor = "1.32.0"
 # Go vulnerability scanner. Neither the registry nor the github backend knows
 # golang/vuln, so the go backend is the only route — same case as gocyclo above.
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
