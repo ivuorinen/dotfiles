@@ -58,7 +58,9 @@ a system or Homebrew path.
    or `config/fish/`.
 
 A tool only one machine needs goes in `hosts/<host>/config/mise/conf.d/host.toml`
-instead; `./install --links` links it into place.
+instead; `./install --links` links it into place. A full install's mise step runs
+before host overlays, so that host's `install.conf.yaml` runs `dfm install mise`
+again after the link.
 
 ## Homebrew formulae via mise (bootstrap packages)
 

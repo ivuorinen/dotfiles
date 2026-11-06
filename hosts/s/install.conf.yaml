@@ -12,3 +12,7 @@
       glob: true
       force: true
       path: hosts/s/config/**
+- shell:
+    # A full install's mise step runs before this overlay, so it never saw the
+    # host.toml linked above. ./install --links skips shell steps.
+    - bash local/bin/dfm install mise
