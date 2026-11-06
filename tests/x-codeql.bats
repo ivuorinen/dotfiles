@@ -20,9 +20,12 @@ setup()
   mkdir -p "$TMP/bin" "$TMP/src" "$TMP/out" "$TMP/cache"
   CALLS="$TMP/calls"
   : > "$CALLS"
-  for tool in sh bash env date mkdir find awk grep rm cat mktemp head jq git; do
+  for tool in sh bash env date mkdir find awk grep rm cat mktemp head jq; do
     src="$(command -v "$tool")" && ln -sf "$src" "$TMP/bin/$tool"
   done
+  # Outside a project that pins git, its mise shim falls back to the next git on
+  # PATH, and this PATH has none. Link the real one.
+  ln -sf "$(type -aP git | grep -v '/mise/shims/' | head -1)" "$TMP/bin/git"
 
   cat > "$TMP/bin/codeql" << STUB
 #!/usr/bin/env bash

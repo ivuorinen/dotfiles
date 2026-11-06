@@ -23,9 +23,12 @@ setup()
   CALLS="$TMP/calls"
   CLIP="$TMP/clipboard"
   : > "$CALLS"
-  for tool in bash env jq git date stat sed awk sort cat mktemp mkdir rm mv printf head tr wc dirname basename; do
+  for tool in bash env jq date stat sed awk sort cat mktemp mkdir rm mv printf head tr wc dirname basename; do
     src="$(command -v "$tool")" && ln -sf "$src" "$TMP/bin/$tool"
   done
+  # Outside a project that pins git, its mise shim falls back to the next git on
+  # PATH, and this PATH has none. Link the real one.
+  ln -sf "$(type -aP git | grep -v '/mise/shims/' | head -1)" "$TMP/bin/git"
 
   cat > "$TMP/bin/gh" << STUB
 #!/usr/bin/env bash
