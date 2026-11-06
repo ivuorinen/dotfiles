@@ -135,8 +135,8 @@ dfm_install()
       # mise is the lynchpin: a failed *tool* (e.g. a host-unsupported dotnet
       # tool) no longer aborts the run — the mise step stays usable and the
       # steps below simply skip themselves if mise is genuinely absent.
-      # Python libraries are not a step: mise installs them into every python
-      # it installs, from config/mise/default-python-packages.
+      # Python tools are not a step: they are pipx: entries in config.toml, which
+      # this step installs like any other tool.
       run_step "mise" dfm_install mise
       # macOS defaults come after the mise step: they set the login shell to
       # fish, which that step's brew bootstrap installs.

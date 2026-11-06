@@ -55,9 +55,7 @@ minimum_release_age_excludes = ["pypi:*"]
 # Language runtimes & build toolchains
 node = "lts"
 bun = "1.4.4"
-# postinstall pip-installs default-python-packages into each python mise
-# installs; it replaces python.default_packages_file, deprecated in 2026.11.0.
-python = { version = "3.14", postinstall = 'python -m pip install -r "$HOME/.config/mise/default-python-packages"' }
+python = "3.14"
 go = "1.27.3"
 rust = "1.99.1"
 uv = "0.13.6"
@@ -102,6 +100,7 @@ difftastic = "0.72.0"
 neovim = "0.12.6"
 tree-sitter = "0.27.1"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
+"pipx:pynvim" = "0.6.0"  # Python client; its pynvim-python is g:python3_host_prog
 "npm:fish-lsp" = "1.1.5"
 
 # Task runners & caching
@@ -190,6 +189,7 @@ prek = "0.5.9"
 "npm:corepack" = "0.36.0"
 
 # System monitoring & misc utilities
+"pipx:graphifyy" = "0.9.102"  # graphify, the code knowledge graph (.claude/rules/graphify-first.md)
 bottom = "0.15.0"
 cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.36.0"

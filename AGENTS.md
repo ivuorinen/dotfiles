@@ -79,8 +79,7 @@ list live in `local/bin/CLAUDE.md`, which loads when working there.
 
 `config/mise/config.toml` pins the language runtimes and CLI tools.
 Activated via `eval "$(mise activate bash)"` in `config/exports`.
-Python libraries come from `config/mise/default-python-packages`
-(the `python` entry's `postinstall` installs it). Install mandates:
+Python tools are `pipx:` entries in that file. Install mandates:
 `.claude/rules/mise-packages.md`.
 
 ### Host-specific Configs

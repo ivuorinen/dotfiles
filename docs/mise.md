@@ -134,8 +134,5 @@ terminal running mise, because Safari is sandboxed.
 
 - `experimental = true` is set — some commands (`deps`, `oci`, `mcp`) are
   marked experimental and may change.
-- The `pipx`/`uvx` combination is partly disabled in the config because
-  the mise pipx backend cannot find `uvx` when `uv` is mise-managed
-  (see the inline comment and upstream discussion link in the config).
 - Prefer mise versions over hardcoded Homebrew paths anywhere in this
   repo — the migration to mise is intentional and complete.
