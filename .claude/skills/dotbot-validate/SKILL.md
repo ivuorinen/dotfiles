@@ -17,11 +17,7 @@ denies them.
 yamllint -d relaxed <file>
 ```
 
-If yamllint is not available, fall back to:
-
-```bash
-python3 -c "import yaml; yaml.safe_load(open('<file>'))"
-```
+If yamllint is not available, report `yamllint not available — <file> not validated`.
 
 ## 2. Link target verification
 
