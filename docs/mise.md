@@ -84,7 +84,7 @@ and exported as `MISE_AUTO_ENV=true` by `config/exports` and
 
 > **Do not run `mise bootstrap packages prune --manager brew` here.** prune
 > removes every formula mise config does not declare, including the Brewfile
-> stack (imagemagick, ffmpeg, coreutils, antidot, dark-notify) and phpenv's
+> stack (imagemagick, ffmpeg, coreutils, antidot) and phpenv's
 > PHP and its extensions. Use `dfm cleanup brew` (brew cleanup + autoremove)
 > instead.
 
