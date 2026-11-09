@@ -69,7 +69,7 @@ usage = "7.1.4"
 "github:jrmoulton/tmux-sessionizer" = "0.6.1"
 
 # File navigation, search & viewing
-fd = "10.5.0"
+fd = "10.5.1"
 ripgrep = "15.2.0"
 "cargo:eza" = "0.23.5"
 zoxide = "0.10.0"
