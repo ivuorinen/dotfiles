@@ -5,7 +5,7 @@
 #
 # What stays here on native brew, on purpose:
 #   - casks (mise brew-cask cannot import, and its prune skips Homebrew-installed casks)
-#   - imagemagick, ffmpeg, coreutils (GNU), and the two tap formulae
+#   - imagemagick, ffmpeg, coreutils (GNU), and the antidot tap formula
 #   - gnupg and fontconfig, whose commands (gpg-agent, fc-list, fc-cache) this
 #     repo calls directly
 # Only leaves are listed: brew resolves each one's dependency closure, and a
@@ -16,7 +16,6 @@
 # formulae here — mise resolves their dependency closure automatically.
 # Never run `mise bootstrap packages prune --manager brew`: it removes every
 # formula mise config does not declare, this file's and phpenv's included.
-tap "cormacrelf/tap"
 tap "doron-cohen/tap"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
@@ -28,8 +27,6 @@ brew "fontconfig"
 brew "gnupg"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-# Watcher for macOS 10.14+ light/dark mode changes
-brew "cormacrelf/tap/dark-notify"
 # Cleans up your $HOME from those pesky dotfiles
 brew "doron-cohen/tap/antidot"
 # Command-line interface for 1Password

@@ -18,11 +18,7 @@ Run yamllint on the file:
 yamllint <file>
 ```
 
-If yamllint is not available, fall back to:
-
-```bash
-python3 -c "import yaml; yaml.safe_load(open('<file>'))"
-```
+If yamllint is not available, report `yamllint not available — <file> not validated`.
 
 ## 2. GitHub Actions workflows
 

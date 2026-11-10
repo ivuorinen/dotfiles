@@ -12,7 +12,6 @@
     "shivammathur/php/php"
   ],
   "trustedtaps": [
-    "cormacrelf/tap",
     "doron-cohen/tap"
   ]
 }
