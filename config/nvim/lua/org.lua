@@ -5,8 +5,19 @@
 -- https://github.com/nvim-orgmode/orgmode
 -- https://nvim-orgmode.github.io
 require('orgmode').setup {
-  org_agenda_files = '~/orgfiles/**/*',
+  -- Agenda files are also refile targets, so list them instead of globbing:
+  -- beorg overwrites calendar.org and reminders.org.
+  org_agenda_files = {
+    '~/orgfiles/tasks.org',
+    '~/orgfiles/refile.org',
+    '~/orgfiles/learn-orgmode.org',
+    '~/orgfiles/MyHabits.org',
+    '~/orgfiles/roam/**/*',
+  },
   org_default_notes_file = '~/orgfiles/refile.org',
+  org_todo_keywords = { 'TODO', 'NEXT', 'IN-PROGRESS', 'WAITING', '|', 'DONE' },
+  org_tags_column = -77,
+  org_adapt_indentation = false,
   mappings = {
     -- <leader>oa opens org-super-agenda below. orgmode sets its global maps on
     -- a deferred timer, so leaving org_agenda on <prefix>a would overwrite
