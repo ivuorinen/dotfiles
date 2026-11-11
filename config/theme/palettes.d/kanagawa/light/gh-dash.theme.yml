@@ -8,7 +8,7 @@ theme:
       secondary: "#624c83"
       inverted: "#dcd5ac"
       faint: "#43436c"
-      # AA-darkened Lotus yellow/green (4.5:1 on #f2ecbc); see light/starship.toml
+      # AA-darkened Lotus yellow/green (4.5:1 on #f2ecbc); see ../ROLES.md
       warning: "#716b3c"
       success: "#5b7040"
       error: "#c0374a"

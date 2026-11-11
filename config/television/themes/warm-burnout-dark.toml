@@ -1,5 +1,5 @@
 # Warm Burnout Dark — derived from catppuccin-mocha-mauve.toml by the colour-role map
-# in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# in config/theme/palettes.d/warm-burnout/ROLES.md.
 # general
 background = '#1a1510'
 border_fg = '#2e3a41'

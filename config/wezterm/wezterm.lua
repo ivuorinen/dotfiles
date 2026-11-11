@@ -62,7 +62,7 @@ config.scrollback_lines = 3000
 
 -- Catppuccin Latte with the ANSI accents darkened to reach WCAG AA
 -- (4.5:1) on base #eff1f5. Hue and saturation are unchanged; the mapping
--- is in config/theme/palettes.d/catppuccin/light/starship.toml. Black and white use
+-- is in config/theme/palettes.d/catppuccin/ROLES.md. Black and white use
 -- the Catppuccin style guide's Latte mapping (black = subtext1/subtext0,
 -- white = surface2/surface1). The builtin uses surface1 for black (1.61:1),
 -- which leaves text printed in "black" unreadable. White has the same flaw
@@ -144,7 +144,7 @@ local kanagawa_wave = {
 -- Kanagawa Lotus AA: upstream extras/foot/kanagawa-lotus.ini with every
 -- accent darkened (hue and saturation unchanged) to WCAG AA 4.5:1 on
 -- #f2ecbc; bright black is the muted overlay0 (3:1). Mapping in
--- config/theme/palettes.d/kanagawa/light/starship.toml.
+-- config/theme/palettes.d/kanagawa/ROLES.md.
 local kanagawa_lotus_aa = {
   foreground = '#545464',
   background = '#f2ecbc',

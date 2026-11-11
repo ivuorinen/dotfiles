@@ -1,0 +1,45 @@
+# Oasis colour roles
+
+Oasis Abyss Light 3, derived from `../catppuccin/ROLES.md` by the colour-role
+map below.
+
+Palette source: <https://github.com/uhs-robert/oasis.nvim> (Oasis Abyss Light 3),
+`extras/lua-theme/themes/light/3/oasis_abyss.lua` at upstream a3ef178f.
+
+Two upstream keys miss WCAG AA 4.5:1 on `#d8d8d8` and are darkened in HSL
+lightness only: theme_accent `#31732b` -> `#2e6b28` (4.07 -> 4.53) and
+syntax_comment `#625f54` -> `#615e54` (4.49 -> 4.55).
+
+Each Catppuccin role takes one Oasis key, in the Oasis tmux palettes and in
+vim and COSMIC (nvim takes the two darkened values; wezterm uses upstream's
+own colours); `tests/theme-contrast.bats` recomputes the ratios. Role, key,
+light value:
+
+```text
+rosewater syntax_func          #5b3b28
+flamingo  syntax_regex         #ba141a
+pink      theme_accent         #2e6b28
+mauve     magenta              #691fbe
+red       red                  #9e1010
+maroon    syntax_string        #870f13
+peach     bright_yellow        #744211
+yellow    yellow               #554f1c
+green     green                #31572e
+teal      bright_cyan          #2f564a
+sky       bright_blue          #1e546a
+sapphire  theme_primary        #750202
+blue      blue                 #11508d
+lavender  syntax_builtin_const #5049c1
+text      fg_core              #181811
+subtext1  syntax_bracket       #3d4047
+subtext0  syntax_comment       #615e54
+overlay2  fg_inlay             #647276
+overlay1  fg_dim               #7c7a74
+overlay0  fg_muted             #615f57
+surface2  hint_bg              #97cebe
+surface1  bg_surface           #b9b9b9
+surface0  bg_mantle            #cdcdcd
+base      bg_core              #d8d8d8
+mantle    bg_crust             #d4d4d4
+crust     bg_shadow            #d0d0d0
+```

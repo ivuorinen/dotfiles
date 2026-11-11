@@ -1,6 +1,6 @@
 " oasis_abyss_dark — Oasis Abyss Dark (https://github.com/uhs-robert/oasis.nvim),
 " derived from catppuccin_mocha.vim by the colour-role map in
-" config/theme/palettes.d/oasis/light/starship.toml.
+" config/theme/palettes.d/oasis/ROLES.md.
 " =============================================================================
 " Filename: autoload/airline/themes/oasis_abyss_dark.vim
 " Author: tilmaneggers

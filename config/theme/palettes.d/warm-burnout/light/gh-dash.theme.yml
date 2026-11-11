@@ -1,5 +1,5 @@
 # Warm Burnout Light — derived from ../../catppuccin/light/gh-dash.theme.yml by the
-# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# colour-role map in config/theme/palettes.d/warm-burnout/ROLES.md.
 ---
 theme:
   colors:
@@ -8,7 +8,7 @@ theme:
       secondary: "#7e4060"
       inverted: "#ede6da"
       faint: "#5c5750"
-      # Warm Burnout yellow/green (4.5:1 on #f5ede0); see light/starship.toml
+      # Warm Burnout yellow/green (4.5:1 on #f5ede0); see ../ROLES.md
       warning: "#855700"
       success: "#4d5c1a"
       error: "#b03434"

@@ -10,7 +10,7 @@
 
 " Theme colors. Accents darkened from upstream Latte (same HSL hue and
 " saturation) to reach WCAG AA 4.5:1 on base #F2ECBC; mapping in
-" config/theme/palettes.d/kanagawa/light/starship.toml.
+" config/theme/palettes.d/kanagawa/ROLES.md.
 let s:rosewater = "#9A5B00"
 let s:flamingo = "#C92C30"
 let s:pink = "#A54C6B"
