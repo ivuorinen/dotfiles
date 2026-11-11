@@ -1,7 +1,8 @@
 {
   "enabledPlugins": {},
   "allowedUrls": [
-    "http://localhost:4200"
+    "http://localhost:4200",
+    "https://raw.githubusercontent.com"
   ],
   "theme": "default",
   "statusLine": {
