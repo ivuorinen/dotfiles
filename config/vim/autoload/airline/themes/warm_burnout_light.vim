@@ -1,6 +1,6 @@
 " warm_burnout_light — Warm Burnout Light (https://github.com/felipefdl/warm-burnout),
 " derived from catppuccin_latte.vim by the colour-role map in
-" config/theme/palettes.d/warm-burnout/light/starship.toml.
+" config/theme/palettes.d/warm-burnout/ROLES.md.
 " =============================================================================
 " Filename: autoload/airline/themes/warm_burnout_light.vim
 " Author: tilmaneggers

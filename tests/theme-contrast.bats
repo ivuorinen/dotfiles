@@ -6,22 +6,22 @@
 # upstream (bat .tmTheme, eza, catppuccin/tmux, catppuccin/fish). A
 # refresh silently restores the unreadable values, so each
 # check fails naming the file that regressed. The mapping lives in
-# config/theme/palettes.d/catppuccin/light/starship.toml.
+# config/theme/palettes.d/catppuccin/ROLES.md.
 #
 # Kanagawa: contrast is computed, not pattern-matched. Every colour a Lotus
 # file uses outside its background set must reach 4.5:1 on #f2ecbc, and
 # every Wave colour 4.5:1 on #1f1f28. The muted comment/overlay greys are a
 # deliberate exception held to 3:1, below WCAG 1.4.3's 4.5:1 for text. The
-# mapping lives in config/theme/palettes.d/kanagawa/light/starship.toml.
+# mapping lives in config/theme/palettes.d/kanagawa/ROLES.md.
 #
 # Oasis: computed the same way, Abyss Light 3 on #d8d8d8 and Abyss Dark on
 # #000000. Upstream targets AA already; the checks keep a refresh honest.
-# The role map lives in config/theme/palettes.d/oasis/light/starship.toml.
+# The role map lives in config/theme/palettes.d/oasis/ROLES.md.
 #
 # Warm Burnout: computed the same way, Light on #f5ede0 and Dark on #1a1510.
 # Upstream's accent and three light ANSI brights miss AA and are adjusted in
 # lightness only; the map and the fixes are in
-# config/theme/palettes.d/warm-burnout/light/starship.toml.
+# config/theme/palettes.d/warm-burnout/ROLES.md.
 
 setup()
 {

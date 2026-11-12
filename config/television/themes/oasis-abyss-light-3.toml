@@ -1,5 +1,5 @@
 # Oasis Abyss Light 3 — derived from catppuccin-latte-mauve.toml by the colour-role map
-# in config/theme/palettes.d/oasis/light/starship.toml.
+# in config/theme/palettes.d/oasis/ROLES.md.
 # general
 background = '#d8d8d8'
 border_fg = '#b9b9b9'
@@ -10,7 +10,7 @@ input_text_fg = '#691fbe'
 result_count_fg = '#691fbe'
 # results
 # accents reach WCAG AA 4.5:1 on #d8d8d8; mapping in
-# config/theme/palettes.d/oasis/light/starship.toml
+# config/theme/palettes.d/oasis/ROLES.md
 result_name_fg = '#11508d'
 result_line_number_fg = '#554f1c'
 result_value_fg = '#5049c1'

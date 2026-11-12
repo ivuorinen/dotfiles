@@ -172,7 +172,7 @@ Oasis theme assets -- MIT
   The Oasis palettes under config/theme/palettes.d/oasis/, oasis-aa.theme,
   the vim, television and COSMIC themes are derived from upstream's
   extras/lua-theme values through a Catppuccin-role map; the map is in
-  config/theme/palettes.d/oasis/light/starship.toml.
+  config/theme/palettes.d/oasis/ROLES.md.
 
 Warm Burnout theme assets -- MIT
   warm-burnout: Copyright (c) 2026 Felipe Lima
@@ -222,7 +222,7 @@ Warm Burnout theme assets -- MIT
   The Warm Burnout palettes under config/theme/palettes.d/warm-burnout/,
   warm-burnout-aa.theme, the airline, television and COSMIC themes are
   derived from upstream's palette through a Catppuccin-role map; the map
-  is in config/theme/palettes.d/warm-burnout/light/starship.toml.
+  is in config/theme/palettes.d/warm-burnout/ROLES.md.
 
 
 Submodules are not vendored into this tree: each is a git submodule pinned at

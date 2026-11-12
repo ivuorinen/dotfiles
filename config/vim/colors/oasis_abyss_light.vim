@@ -1,6 +1,6 @@
 " oasis_abyss_light — Oasis Abyss Light 3 (https://github.com/uhs-robert/oasis.nvim),
 " derived from catppuccin_latte.vim by the colour-role map in
-" config/theme/palettes.d/oasis/light/starship.toml.
+" config/theme/palettes.d/oasis/ROLES.md.
 " Name: oasis_abyss_light.vim
 
 set background=light

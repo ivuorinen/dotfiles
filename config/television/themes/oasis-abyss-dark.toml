@@ -1,5 +1,5 @@
 # Oasis Abyss Dark — derived from catppuccin-mocha-mauve.toml by the colour-role map
-# in config/theme/palettes.d/oasis/light/starship.toml.
+# in config/theme/palettes.d/oasis/ROLES.md.
 # general
 background = '#000000'
 border_fg = '#1c1c1c'

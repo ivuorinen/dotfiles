@@ -1,5 +1,5 @@
 # Oasis Abyss Dark — derived from ../../catppuccin/dark/gh-dash.theme.yml by the
-# colour-role map in config/theme/palettes.d/oasis/light/starship.toml.
+# colour-role map in config/theme/palettes.d/oasis/ROLES.md.
 ---
 theme:
   colors:

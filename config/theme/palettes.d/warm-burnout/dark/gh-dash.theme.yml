@@ -1,5 +1,5 @@
 # Warm Burnout Dark — derived from ../../catppuccin/dark/gh-dash.theme.yml by the
-# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# colour-role map in config/theme/palettes.d/warm-burnout/ROLES.md.
 ---
 theme:
   colors:

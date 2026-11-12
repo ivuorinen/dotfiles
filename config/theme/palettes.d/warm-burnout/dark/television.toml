@@ -1,5 +1,5 @@
 # Warm Burnout Dark — derived from ../../catppuccin/dark/television.toml by the
-# colour-role map in config/theme/palettes.d/warm-burnout/light/starship.toml.
+# colour-role map in config/theme/palettes.d/warm-burnout/ROLES.md.
 # television dark palette — Warm Burnout Dark (keyword accent). The theme
 # file is vendored under config/television/themes/ and linked into
 # ~/.config/television/themes/; television resolves `[ui] theme` by

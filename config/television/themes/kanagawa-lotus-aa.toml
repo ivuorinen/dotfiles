@@ -10,7 +10,7 @@ input_text_fg = '#624c83'
 result_count_fg = '#624c83'
 # results
 # accents AA-darkened (4.5:1 on #f2ecbc); mapping in
-# config/theme/palettes.d/kanagawa/light/starship.toml
+# config/theme/palettes.d/kanagawa/ROLES.md
 result_name_fg = '#4d699b'
 result_line_number_fg = '#716b3c'
 result_value_fg = '#5d57a3'

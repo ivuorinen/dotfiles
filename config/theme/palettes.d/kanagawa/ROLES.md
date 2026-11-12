@@ -1,0 +1,58 @@
+# Kanagawa colour roles
+
+Kanagawa Lotus AA, derived from `../catppuccin/ROLES.md` by the colour-role
+map in `docs/plans/2026-09-30-kanagawa-theme-families.md`.
+
+Palette source: <https://github.com/rebelot/kanagawa.nvim> (Kanagawa Lotus).
+
+Accents deviate from upstream Lotus: each keeps its HSL hue and saturation
+with lightness lowered until it reaches WCAG AA (4.5:1) on base `#f2ecbc`
+(overlay0: 3:1). Upstream's rosewater-slot `#e98a00` was 2.16:1. The same
+darkened set is used in the Kanagawa tmux palette and in nvim, vim, wezterm
+and COSMIC; `tests/theme-contrast.bats` recomputes the ratios. Upstream to AA:
+
+```text
+red       #c84053 -> #c0374a
+maroon    #d7474b -> #c92c30
+peach     #cc6d00 -> #a15600
+yellow    #77713f -> #716b3c
+green     #6f894e -> #5b7040
+teal      #597b75 -> #51706b
+sky       #4e8ca2 -> #3e7082
+sapphire  #5a7785 -> #536e7b
+pink      #b35b79 -> #a54c6b
+rosewater #e98a00 -> #9a5b00
+subtext0  #716e61 -> #6d6a5e
+overlay0  #8a8980 -> #88877e
+```
+
+Role and light value:
+
+```text
+rosewater #9a5b00
+flamingo  #c92c30
+pink      #a54c6b
+mauve     #624c83
+red       #c0374a
+maroon    #c92c30
+peach     #a15600
+yellow    #716b3c
+green     #5b7040
+teal      #51706b
+sky       #3e7082
+sapphire  #536e7b
+blue      #4d699b
+lavender  #5d57a3
+text      #545464
+subtext1  #43436c
+subtext0  #6d6a5e
+overlay2  #766b90
+overlay1  #716e61
+overlay0  #88877e
+surface2  #a09cac
+surface1  #d5cea3
+surface0  #e7dba0
+base      #f2ecbc
+mantle    #e5ddb0
+crust     #dcd5ac
+```

@@ -40,7 +40,7 @@ two stay structurally identical.
 Upstream [oasis.nvim](https://github.com/uhs-robert/oasis.nvim) ships no
 COSMIC themes either. These are derived the same way, from the same
 Catppuccin sources, through the colour-role map in
-`config/theme/palettes.d/oasis/light/starship.toml` (Abyss Dark /
+`config/theme/palettes.d/oasis/ROLES.md` (Abyss Dark /
 Abyss Light 3). The accent is Oasis's `theme_primary`, not blue.
 
 - `themes/cosmic-term/oasis-abyss-dark.ron`, `oasis-abyss-light-3.ron`
@@ -55,7 +55,7 @@ the Oasis backgrounds.
 Upstream [warm-burnout](https://github.com/felipefdl/warm-burnout) ships no
 COSMIC themes either. These are derived the same way, from the same
 Catppuccin sources, through the colour-role map in
-`config/theme/palettes.d/warm-burnout/light/starship.toml` (Dark / Light).
+`config/theme/palettes.d/warm-burnout/ROLES.md` (Dark / Light).
 The accent and window hint are Warm Burnout's keyword orange, not blue.
 
 - `themes/cosmic-term/warm-burnout-dark.ron`, `warm-burnout-light.ron`

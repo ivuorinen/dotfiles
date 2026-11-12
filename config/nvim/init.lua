@@ -682,7 +682,7 @@ end
 -- Wave for dark, Lotus for light. Upstream Lotus accents fall to 2.0–4.3:1
 -- on lotusWhite3 #f2ecbc; same hue and saturation, lightness lowered to
 -- reach WCAG AA 4.5:1 (lotusGray3 to 3:1 as the muted comment colour);
--- mapping in config/theme/palettes.d/kanagawa/light/starship.toml.
+-- mapping in config/theme/palettes.d/kanagawa/ROLES.md.
 require('kanagawa').setup {
   dimInactive = true,
   background = { dark = 'wave', light = 'lotus' },
@@ -763,7 +763,7 @@ require('catppuccin').setup {
   },
   -- Upstream Latte accents fall to 2.3–3.5:1 on base (sky is 2.47:1).
   -- Same hue and saturation, lightness lowered to reach WCAG AA 4.5:1;
-  -- mapping in config/theme/palettes.d/catppuccin/light/starship.toml.
+  -- mapping in config/theme/palettes.d/catppuccin/ROLES.md.
   color_overrides = {
     latte = {
       rosewater = '#bb4930',
