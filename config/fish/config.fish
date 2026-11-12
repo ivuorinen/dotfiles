@@ -160,5 +160,9 @@ end
 set -gx FZF_DEFAULT_OPTS '--color=16,bg+:-1'
 set -e FZF_DEFAULT_OPTS_FILE
 
+# bat, ls and eza: an inherited BAT_THEME or LS_COLORS names the old
+# per-family colours; config/exports explains why both are dropped.
+set -e BAT_THEME LS_COLORS
+
 # Added by get-aspire-cli.sh
 fish_add_path $HOME/.aspire/bin

@@ -502,6 +502,12 @@ unset _theme_interactive
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1'
 unset FZF_DEFAULT_OPTS_FILE
 
+# bat, ls and eza draw in the terminal's ANSI colours too. A BAT_THEME or
+# LS_COLORS inherited from an older shell or the tmux server names the old
+# per-family colours, and bat lets BAT_THEME override its config file, so both
+# are dropped.
+unset BAT_THEME LS_COLORS
+
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks
 # with no install.conf exclude. For gh-dash it is an overlay merged on top
