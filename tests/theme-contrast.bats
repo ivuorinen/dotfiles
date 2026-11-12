@@ -3,7 +3,7 @@
 #
 # Catppuccin: the AA-darkened Latte (4.5:1 on #eff1f5). Upstream Latte
 # accents sit at 2.3-3.5:1 on base, and several of these files originate
-# upstream (bat .tmTheme, eza, catppuccin/tmux, catppuccin/fish). A
+# upstream (catppuccin/tmux, catppuccin/fish). A
 # refresh silently restores the unreadable values, so each
 # check fails naming the file that regressed. The mapping lives in
 # config/theme/palettes.d/catppuccin/ROLES.md.
@@ -31,7 +31,6 @@ setup()
   # Upstream Latte accents below 4.5:1 on base. Mauve and red already pass
   # and are kept as upstream, so they are not listed.
   UPSTREAM_HEX='(dc8a78|dd7878|ea76cb|e64553|fe640b|df8e1d|40a02b|179299|04a5e5|209fb5|1e66f5|7287fd)'
-  UPSTREAM_RGB='(220;138;120|221;120;120|234;118;203|230;69;83|254;100;11|223;142;29|64;160;43|23;146;153|4;165;229|32;159;181|30;102;245|114;135;253)'
 }
 
 # check_contrast <bg> <min> <muted-hexes> <bg-hexes> <label=path[@start@end]>...
@@ -91,14 +90,8 @@ PY
 
 @test "light palettes carry no upstream low-contrast Latte accents" {
   local files=(
-    "$CP/light/starship.toml"
-    "$CP/light/eza.yml"
-    "$CP/light/gitui.ron"
-    "$CP/light/fzf"
     "$CP/light/gh-dash.theme.yml"
     "$CP/light/tmux.thm.conf"
-    "config/bat/themes/Catppuccin Latte.tmTheme"
-    "config/fish/themes/catppuccin-aa.theme"
     "config/television/themes/catppuccin-latte-mauve.toml"
     "config/cosmic-desktop/themes/cosmic-term/catppuccin-latte.ron"
     "config/vim/colors/catppuccin_latte.vim"
@@ -120,11 +113,6 @@ PY
   done
 }
 
-@test "dircolors light carries no upstream Latte RGB triplets" {
-  run grep -En "38;2;$UPSTREAM_RGB([;[:space:]]|$)" "$ROOT/$CP/light/dircolors"
-  [ "$status" -eq 1 ]
-}
-
 @test "AA overrides stay wired into each app" {
   grep -q 'color_overrides' "$ROOT/config/nvim/init.lua"
   grep -q "light = 'Catppuccin Latte AA'" "$ROOT/config/wezterm/wezterm.lua"
@@ -136,19 +124,11 @@ PY
   grep -q "lotusYellow3 = '#8d6100'" "$ROOT/config/nvim/init.lua"
   grep -q "light = 'Kanagawa Lotus AA'" "$ROOT/config/wezterm/wezterm.lua"
   grep -q "'kanagawa_lotus'" "$ROOT/config/vim/vimrc"
-  # Oasis: upstream's dark diff foregrounds are background shades; the
-  # "changed" one equals surface1, which the computed check treats as a
-  # fill, so pin the replacement here.
-  grep -A8 '<string>Diff changed</string>' "$ROOT/config/bat/themes/Oasis Abyss Dark.tmTheme" | grep -q '#81C0FF'
   grep -q "'oasis_abyss_light'" "$ROOT/config/vim/vimrc"
   # nvim takes its colours from the plugin, not these files, so the two
   # Abyss Light 3 values darkened for AA are pinned in its overrides.
   grep -q "accent = '#2e6b28'" "$ROOT/config/nvim/init.lua"
   grep -q "comment = '#615e54'" "$ROOT/config/nvim/init.lua"
-  # The fish theme name is resolved per family, never hardcoded.
-  grep -q '__dotfiles_theme_name' "$ROOT/config/fish/conf.d/theme-switch.fish"
-  grep -q '__dotfiles_theme_name' "$ROOT/config/fish/config.fish"
-  grep -q 'theme="${family}-aa"' "$ROOT/config/theme/handlers.d/fish"
 }
 
 # Lotus background inks (surfaces, selection, diff/search fills).
@@ -163,14 +143,11 @@ LOTUS_MUTED='#88877e #716e61 #766b90'
   local targets=()
   local f
   for f in "$ROOT/$KP"/light/*; do
-    [[ "$(basename "$f")" == bat.theme ]] && continue
     targets+=("${f#"$ROOT/"}")
   done
   targets+=(
-    "config/fish/themes/kanagawa-aa.theme@"$'\n'"[light]"$'\n'"@"$'\n'"[dark]"$'\n'
     "config/vim/colors/kanagawa_lotus.vim"
     "config/vim/autoload/airline/themes/kanagawa_lotus.vim"
-    "config/bat/themes/Kanagawa Lotus AA.tmTheme"
     "config/television/themes/kanagawa-lotus-aa.toml"
     "config/cosmic-desktop/themes/cosmic-term/kanagawa-lotus-aa.ron"
     "config/wezterm/wezterm.lua@local kanagawa_lotus_aa = {@"$'\n}\n'
@@ -203,14 +180,11 @@ WAVE_MUTED='#727169 #717c7c #6a6780'
   local targets=()
   local f
   for f in "$ROOT/$KP"/dark/*; do
-    [[ "$(basename "$f")" == bat.theme ]] && continue
     targets+=("${f#"$ROOT/"}")
   done
   targets+=(
-    "config/fish/themes/kanagawa-aa.theme@"$'\n'"[dark]"$'\n'"@"$'\n'"[unknown]"$'\n'
     "config/vim/colors/kanagawa_wave.vim"
     "config/vim/autoload/airline/themes/kanagawa_wave.vim"
-    "config/bat/themes/Kanagawa Wave.tmTheme"
     "config/television/themes/kanagawa-wave.toml"
     "config/cosmic-desktop/themes/cosmic-term/kanagawa-wave.ron"
     "config/wezterm/wezterm.lua@local kanagawa_wave = {@local kanagawa_lotus_aa"
@@ -236,14 +210,12 @@ OASIS_LIGHT_BG='#d4d4d4 #d0d0d0 #cdcdcd #b9b9b9 #97cebe #e1c99d #b9d17a'
 # Abyss Light 3 overlays (fg_inlay, fg_dim, fg_muted): muted, 3:1.
 OASIS_LIGHT_MUTED='#647276 #7c7a74 #615f57'
 
-# oasis_palette_targets <mode> — the family's palettes.d files for one mode
-# (bat.theme holds a name, not colours).
+# oasis_palette_targets <mode> — the family's palettes.d files for one mode.
 oasis_palette_targets()
 {
   local f
   targets=()
   for f in "$ROOT/config/theme/palettes.d/oasis/$1"/*; do
-    [[ "$(basename "$f")" == bat.theme ]] && continue
     targets+=("${f#"$ROOT/"}")
   done
 }
@@ -253,10 +225,8 @@ oasis_palette_targets()
   local targets=()
   oasis_palette_targets light
   targets+=(
-    "config/fish/themes/oasis-aa.theme@"$'\n'"[light]"$'\n'"@"$'\n'"[dark]"$'\n'
     "config/vim/colors/oasis_abyss_light.vim"
     "config/vim/autoload/airline/themes/oasis_abyss_light.vim"
-    "config/bat/themes/Oasis Abyss Light 3.tmTheme"
     "config/television/themes/oasis-abyss-light-3.toml"
     "config/cosmic-desktop/themes/cosmic-term/oasis-abyss-light-3.ron"
     "config/wezterm/wezterm.lua@local oasis_abyss_light_3 = {@"$'\n}\n'
@@ -287,10 +257,8 @@ OASIS_DARK_MUTED='#607d85 #7b786d #605c4d #5a5a5a'
   local targets=()
   oasis_palette_targets dark
   targets+=(
-    "config/fish/themes/oasis-aa.theme@"$'\n'"[dark]"$'\n'"@"$'\n'"[unknown]"$'\n'
     "config/vim/colors/oasis_abyss_dark.vim"
     "config/vim/autoload/airline/themes/oasis_abyss_dark.vim"
-    "config/bat/themes/Oasis Abyss Dark.tmTheme"
     "config/television/themes/oasis-abyss-dark.toml"
     "config/cosmic-desktop/themes/cosmic-term/oasis-abyss-dark.ron"
     "config/wezterm/wezterm.lua@local oasis_abyss_dark = {@"$'\n}\n'
@@ -317,14 +285,12 @@ WB_LIGHT_BG='#ede6da #f0e8dc #ece4d6 #e2ecd8 #dce4ec #f0d4d4 #cfdae2 #ddd6ca #c4
 # Warm Burnout Light overlays (fg_gutter, the AA-darkened LineNr grey): muted, 3:1.
 WB_LIGHT_MUTED='#8a8070 #938871'
 
-# wb_palette_targets <mode> — the family's palettes.d files for one mode
-# (bat.theme holds a name, not colours).
+# wb_palette_targets <mode> — the family's palettes.d files for one mode.
 wb_palette_targets()
 {
   local f
   targets=()
   for f in "$ROOT/config/theme/palettes.d/warm-burnout/$1"/*; do
-    [[ "$(basename "$f")" == bat.theme ]] && continue
     targets+=("${f#"$ROOT/"}")
   done
 }
@@ -334,10 +300,8 @@ wb_palette_targets()
   local targets=()
   wb_palette_targets light
   targets+=(
-    "config/fish/themes/warm-burnout-aa.theme@"$'\n'"[light]"$'\n'"@"$'\n'"[dark]"$'\n'
     "config/vim/colors/warm_burnout_light.vim"
     "config/vim/autoload/airline/themes/warm_burnout_light.vim"
-    "config/bat/themes/Warm Burnout Light.tmTheme"
     "config/television/themes/warm-burnout-light.toml"
     "config/cosmic-desktop/themes/cosmic-term/warm-burnout-light.ron"
     "config/wezterm/wezterm.lua@local warm_burnout_light = {@"$'\n}\n'
@@ -359,10 +323,8 @@ WB_DARK_MUTED='#746f67 #6b6860 #686868 #65635c'
   local targets=()
   wb_palette_targets dark
   targets+=(
-    "config/fish/themes/warm-burnout-aa.theme@"$'\n'"[dark]"$'\n'"@"$'\n'"[unknown]"$'\n'
     "config/vim/colors/warm_burnout_dark.vim"
     "config/vim/autoload/airline/themes/warm_burnout_dark.vim"
-    "config/bat/themes/Warm Burnout Dark.tmTheme"
     "config/television/themes/warm-burnout-dark.toml"
     "config/cosmic-desktop/themes/cosmic-term/warm-burnout-dark.ron"
     "config/wezterm/wezterm.lua@local warm_burnout_dark = {@"$'\n}\n'
@@ -507,64 +469,4 @@ VIM
   [[ "$output" == *"ANSI 0 #3a3630 on 7 #736b5f is 2.28:1"* ]]
   ROOT="$BATS_TEST_TMPDIR" run check_terminal "#f5ede0!|p/planted.vim"
   [ "$status" -eq 0 ]
-}
-
-# --- file colours -----------------------------------------------------------
-# eza's columns come from Catppuccin's upstream file through each family's
-# role map, which hands some of them the surface roles. They are dimmed names
-# and metadata, so 3:1 (WCAG 1.4.11) is the floor, not 4.5:1.
-
-# check_file_colours <palette-dir>... — eza.yml foregrounds against the dir's
-# starship.toml base.
-check_file_colours()
-{
-  python3 - "$ROOT" "$@" << 'PY'
-import pathlib, re, sys
-
-root, *dirs = sys.argv[1:]
-EZA = re.compile(r'foreground:\s*"(#[0-9a-fA-F]{6})"')
-
-
-def lum(h):
-    c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
-    c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
-
-
-def ratio(a, b):
-    la, lb = sorted([lum(a), lum(b)], reverse=True)
-    return (la + 0.05) / (lb + 0.05)
-
-
-bad = []
-for d in dirs:
-    base = pathlib.Path(root, d)
-    bg = re.search(r'^base\s*=\s*"(#[0-9a-fA-F]{6})"', (base / "starship.toml").read_text(), re.M).group(1).lower()
-    for n, line in enumerate((base / "eza.yml").read_text().splitlines(), 1):
-        m = EZA.search(line)
-        if m and ratio(m.group(1).lower(), bg) < 3.0:
-            bad.append(f"{d}/eza.yml:{n}: {m.group(1).lower()} is {ratio(m.group(1).lower(), bg):.2f}:1 on {bg}")
-print("\n".join(bad))
-sys.exit(1 if bad else 0)
-PY
-}
-
-@test "file colours: eza columns reach 3:1 in every palette" {
-  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
-  local P=config/theme/palettes.d
-  run check_file_colours \
-    "$P/catppuccin/light" "$P/catppuccin/dark" "$P/kanagawa/light" "$P/kanagawa/dark" \
-    "$P/oasis/light" "$P/oasis/dark" "$P/warm-burnout/light" "$P/warm-burnout/dark"
-  echo "$output"
-  [ "$status" -eq 0 ]
-}
-
-@test "file colours: the check catches a column drawn in the background colour" {
-  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
-  mkdir -p "$BATS_TEST_TMPDIR/p"
-  printf '[palettes.p]\nbase = "#f5ede0"\n' > "$BATS_TEST_TMPDIR/p/starship.toml"
-  printf 'date:\n  foreground: "#f5ede0"\n' > "$BATS_TEST_TMPDIR/p/eza.yml"
-  ROOT="$BATS_TEST_TMPDIR" run check_file_colours p
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"p/eza.yml:2: #f5ede0 is 1.00:1"* ]]
 }

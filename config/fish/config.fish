@@ -4,14 +4,16 @@
 
 set -g fish_greeting
 
-# The active theme family (DOTFILES_THEME_FAMILY, else the saved choice,
-# else config/theme/family; __dotfiles_theme_name resolves it) controls
-# fish syntax and completion colours; the prompt itself is rendered by
-# starship (see
-# below). The repo-owned <family>-aa theme (e.g. kanagawa-aa) holds both
-# [light] (AA-darkened) and [dark] palettes; conf.d/theme-switch.fish
-# re-saves it on a dark/light flip so syntax colours follow the OS.
-set -l __theme (__dotfiles_theme_name); and fish_config theme choose $__theme
+# fish's built-in `default` theme draws syntax and completions in the
+# terminal's ANSI colours, so the terminal's scheme (one per theme family and
+# mode) recolours them with no theme handler. Chosen on every start, so
+# universal colours saved by the old per-family themes never win. Its
+# selection and search highlights are white on bright black, which no family
+# can read, so they reverse the text instead of filling it.
+fish_config theme choose default
+set -g fish_color_selection --reverse
+set -g fish_color_search_match --reverse
+set -g fish_pager_color_progress --reverse
 
 test -e "$HOME/.config/fish/alias.fish" &&
     source "$HOME/.config/fish/alias.fish"
@@ -44,8 +46,8 @@ if status is-interactive
     # a raw install path — see `which -a gh`.
     type -q mise; and fish_add_path --move --prepend --path "$XDG_DATA_HOME/mise/shims"
 
-    # Starship prompt — ~/.config/starship.toml is composed per family and
-    # mode by the theme orchestrator (handlers.d/starship).
+    # Starship prompt — ~/.config/starship.toml links
+    # config/starship/starship.toml, drawn in the terminal's ANSI colours.
     # `enable_transience` collapses prior prompts to just the character
     # symbol so scrollback stays clean (matches tide --transient=Yes).
     if type -q starship
@@ -147,20 +149,16 @@ if status is-interactive
         test "$m" = dark -o "$m" = light; or set m (theme-mode 2>/dev/null)
         test "$m" = dark -o "$m" = light; or set m dark
     end
-    # Bootstrap mode so the prompt + LS_COLORS are right on first prompt.
+    # Bootstrap mode so the prompt is right on first prompt.
     set -l apply "$DOTFILES/config/theme/apply"
     if test -x $apply
         $apply $m >/dev/null 2>&1
     end
 end
 
-# fzf: colours come from the theme orchestrator's state file
-# (config/theme/handlers.d/fzf); config/exports explains the guards, the
-# erase and why this follows the apply above.
-set -e FZF_DEFAULT_OPTS
-test -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
-and set -x FZF_DEFAULT_OPTS_FILE "$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
-test -e "$FZF_DEFAULT_OPTS_FILE"; or set -e FZF_DEFAULT_OPTS_FILE
+# fzf: the terminal's 16 ANSI colours; config/exports explains the options.
+set -gx FZF_DEFAULT_OPTS '--color=16,bg+:-1'
+set -e FZF_DEFAULT_OPTS_FILE
 
 # Added by get-aspire-cli.sh
 fish_add_path $HOME/.aspire/bin

@@ -1,12 +1,9 @@
 # Starship prompt — port of config/omp/own.toml (the previous oh-my-posh
 # theme), shared by every theme family.
 #
-# Colours are palette roles. config/theme/handlers.d/starship appends the
-# active family's palette for the mode
-# (config/theme/palettes.d/<family>/<mode>/starship.toml, one
-# [palettes.active] table) to this file and links the result at
-# ~/.config/starship.toml. Starship reads its config on every prompt, so a
-# flip shows on the next one; an edit here shows after `dfm theme reapply`.
+# Colours are the terminal's ANSI names, so the terminal's scheme (one per
+# theme family and mode) recolours the prompt on a flip, with no theme
+# handler. dotbot-links.yaml links this file at ~/.config/starship.toml.
 #
 # Layout: line 1 = OS icon · user@host (SSH only) · path
 #                 · git · node · dotnet · go · php · ruby · python
@@ -14,8 +11,8 @@
 # Transient prompt collapses prior prompts to just `➜ ` (wired by
 # `enable_transience` in config/fish/config.fish and base/zshrc).
 #
-# Username is peach, hostname is lavender (your "differentiated colours"
-# request); both still hidden outside SSH per starship defaults.
+# Username is bright yellow, hostname is bright blue (your "differentiated
+# colours" request); both still hidden outside SSH per starship defaults.
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
@@ -37,11 +34,9 @@ $python\
 $line_break\
 $character"""
 
-palette = "active"
-
 [os]
 disabled = false
-style = "sky"
+style = "cyan"
 format = "[$symbol]($style) "
 
 # Nerd Font glyphs via \uXXXX escapes — the Write/Edit pipeline strips
@@ -63,27 +58,27 @@ Manjaro = "\uF312"
 Pop = "\uF32A"
 
 # Username — only shown over SSH (or as root) per starship defaults.
-# Differentiated from hostname via peach. The "@" separator lives in
+# Differentiated from hostname via bright yellow. The "@" separator lives in
 # the hostname format below so it only appears when hostname renders
 # (avoids a dangling "root@" when running as root locally without SSH).
 [username]
-style_user = "peach"
+style_user = "bright-yellow"
 style_root = "red bold"
 format = "[$user]($style)"
 
-# Hostname — SSH-only by default; lavender so it contrasts with peach user.
+# Hostname — SSH-only by default; bright blue so it contrasts with the user.
 # trim_at = "." matches tide_context_hostname_parts = 1 (drop domain).
-# The "@" separator is part of this format (subtext0) so it only renders
+# The "@" separator is part of this format (bright black) so it only renders
 # when hostname renders.
 [hostname]
 ssh_only = true
 trim_at = "."
-style = "lavender"
-format = "[@](subtext0)[$hostname]($style) "
+style = "bright-blue"
+format = "[@](bright-black)[$hostname]($style) "
 
-# Path — sky (Catppuccin's cyan) matches omp's cyan path colour.
+# Path — cyan matches omp's cyan path colour.
 [directory]
-style = "sky"
+style = "cyan"
 truncation_length = 3
 truncation_symbol = "…/"
 format = "[$path]($style)[$read_only]($read_only_style) "
@@ -119,7 +114,7 @@ up_to_date = ""
 style = "yellow"
 format = '\([$state( $progress_current/$progress_total)]($style)\) '
 
-# Languages — colours match omp foregrounds, mapped to Catppuccin equivalents.
+# Languages — colours match omp foregrounds, mapped to ANSI equivalents.
 
 [nodejs]
 symbol = "\uE718 "
@@ -129,19 +124,19 @@ format = "[$symbol$version]($style) "
 
 [dotnet]
 symbol = "\uE77F "
-style = "mauve"
+style = "purple"
 version_format = "${major}"
 format = "[$symbol$version]($style) "
 
 [golang]
 symbol = "\uE626 "
-style = "teal"
+style = "bright-cyan"
 version_format = "${major}.${minor}.${patch}"
 format = "[$symbol$version]($style) "
 
 [php]
 symbol = "\uE73D "
-style = "lavender"
+style = "bright-blue"
 format = "[$symbol$version]($style) "
 
 [ruby]

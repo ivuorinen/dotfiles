@@ -103,8 +103,8 @@ base/zshrc  ──┘                     └──▶ config/alias    (shell al
 
 Zsh additionally loads **antidote** (plugin manager, in `tools/antidote/`).
 All three shells (bash, zsh, fish) render their prompt with **starship**;
-the `~/.config/starship.toml` symlink is managed by the theme orchestrator
-(`config/theme/handlers.d/starship`).
+`~/.config/starship.toml` links `config/starship/starship.toml`, whose
+colours are the terminal's ANSI names.
 
 ### Key Scripts
 

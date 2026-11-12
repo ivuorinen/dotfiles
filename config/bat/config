@@ -1,0 +1,3 @@
+# bat draws syntax in the terminal's own ANSI colours, so the terminal's
+# scheme (one per theme family and mode) recolours it; no theme handler.
+--theme="ansi"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
-# The theme family is resolved outside config/theme/_lib.sh in four
-# runtimes: fish (__dotfiles_theme_name), nvim (theme_family in init.lua),
-# vim (s:Schemes in vimrc) and wezterm (theme_family in wezterm.lua). Each
+# The theme family is resolved outside config/theme/_lib.sh in three
+# runtimes: nvim (theme_family in init.lua), vim (s:Schemes in vimrc) and
+# wezterm (theme_family in wezterm.lua). Each
 # re-implements the same contract — DOTFILES_THEME_FAMILY, then the saved
 # choice in $XDG_STATE_HOME/dotfiles-theme/choice, then config/theme/family;
 # an unknown family never leaves the app unthemed — so each is exercised
@@ -27,61 +27,6 @@ save_choice()
 teardown()
 {
   rm -rf "$TMPDIR_TEST"
-}
-
-# --- fish -------------------------------------------------------------
-
-fish_theme_name()
-{
-  fish --no-config -c "source '$ROOT/config/fish/functions/__dotfiles_theme_name.fish'; __dotfiles_theme_name"
-}
-
-@test "fish: resolves the tracked family to its -aa theme" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  run fish_theme_name
-  [ "$status" -eq 0 ]
-  [ "$output" = "$(cat "$ROOT/config/theme/family")-aa" ]
-}
-
-@test "fish: the env override wins" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  DOTFILES_THEME_FAMILY=catppuccin run fish_theme_name
-  [ "$status" -eq 0 ]
-  [ "$output" = "catppuccin-aa" ]
-}
-
-@test "fish: warm-burnout resolves to its -aa theme" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  DOTFILES_THEME_FAMILY=warm-burnout run fish_theme_name
-  [ "$status" -eq 0 ]
-  [ "$output" = "warm-burnout-aa" ]
-}
-
-@test "fish: a non-slug or themeless family prints nothing and fails" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  for bad in '../catppuccin' 'Kanagawa' 'nosuchfamily'; do
-    DOTFILES_THEME_FAMILY="$bad" run fish_theme_name
-    [ "$status" -eq 1 ]
-    [ -z "$output" ]
-  done
-}
-
-@test "fish: the saved choice wins over the tracked family" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  save_choice kanagawa
-  run fish_theme_name
-  [ "$status" -eq 0 ]
-  [ "$output" = "kanagawa-aa" ]
-}
-
-@test "fish: an invalid saved choice falls back to the tracked family" {
-  command -v fish > /dev/null 2>&1 || skip "fish not installed"
-  for bad in 'nope' '../kanagawa' ''; do
-    save_choice "$bad"
-    run fish_theme_name
-    [ "$status" -eq 0 ]
-    [ "$output" = "$(cat "$ROOT/config/theme/family")-aa" ]
-  done
 }
 
 # --- vim --------------------------------------------------------------
@@ -398,17 +343,12 @@ LUA
   [[ "$output" == *"pair=Oasis Abyss Dark|Oasis Abyss Light 3"* ]]
 }
 
-@test "wezterm and fish: an empty XDG_STATE_HOME counts as unset" {
+@test "wezterm: an empty XDG_STATE_HOME counts as unset" {
   # _lib.sh reads ${XDG_STATE_HOME:-$HOME/.local/state}; an empty value
   # must not turn the choice path into /dotfiles-theme/choice.
   local home="$TMPDIR_TEST/home"
   mkdir -p "$home/.local/state/dotfiles-theme"
   echo kanagawa > "$home/.local/state/dotfiles-theme/choice"
-  if command -v fish > /dev/null 2>&1; then
-    run env HOME="$home" XDG_STATE_HOME= fish --no-config -c \
-      "source '$ROOT/config/fish/functions/__dotfiles_theme_name.fish'; __dotfiles_theme_name"
-    [ "$output" = "kanagawa-aa" ]
-  fi
   command -v nvim > /dev/null 2>&1 || skip "nvim (used as the Lua host) not installed"
   cat > "$TMPDIR_TEST/stub.lua" << 'LUA'
 local function any() return setmetatable({}, { __index = function() return function() return {} end end }) end

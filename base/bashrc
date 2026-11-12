@@ -54,11 +54,6 @@ if command -v gpgconf > /dev/null 2>&1; then
   unset _gpg_ssh_sock
 fi
 
-# Reload the theme colour caches at the next prompt after a theme switch
-# (config/theme/shell-env.sh, sourced through config/exports). Installed
-# before starship's init so starship_precmd still runs first.
-command -v _theme_prompt_hook_install > /dev/null && _theme_prompt_hook_install
-
 # These three go through lib::init_cached (config/lib.sh): by this point
 # PATH leads with the mise shims, and each shim call re-enters mise to
 # resolve a version — `starship init bash` costs ~200ms through the shim
@@ -67,8 +62,8 @@ x-have antidot && lib::init_cached antidot antidot init --shell bash
 
 PROMPT_DIRTRIM=3
 
-# Starship prompt — ~/.config/starship.toml is composed per family and mode
-# by the theme orchestrator (config/theme/handlers.d/starship).
+# Starship prompt — ~/.config/starship.toml links config/starship/starship.toml,
+# drawn in the terminal's ANSI colours.
 command -v starship > /dev/null 2>&1 && lib::init_cached starship starship init bash
 
 if command -v wt > /dev/null 2>&1; then

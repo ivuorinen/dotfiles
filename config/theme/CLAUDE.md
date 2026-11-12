@@ -25,12 +25,24 @@ Dark/light theming is owned by a stand-alone orchestrator:
   racing it, and racing family switches settle on the last saved choice.
   A retry that finds the lock held exits 0; a flip that cannot get it
   within 10 s logs a WARN and exits 1 without applying. After every
-  handler run it rewrites `generation`, the stamp open shells compare at
-  each prompt before reloading the colour caches.
-- `config/theme/handlers.d/<app>` — per-app flip executables; a failure
-  must exit non-zero with a stderr line (apply logs it). A missing tool
-  is a skip: stderr note, exit 0. Add new apps by dropping a file here
-  (`theme-handler-scaffold` skill).
+  handler run it rewrites `generation`, a stamp a reader can compare to
+  notice that a flip finished.
+- The terminal owns the palette. An app that draws in the terminal's 16
+  ANSI colours, with no ANSI colour as a fill under text, is recoloured by
+  the terminal's scheme (one per family and mode) at draw time, running
+  processes included, so it gets one static config and no handler: bat
+  (`config/bat/config`), eza and ls (their built-in defaults), fzf
+  (`FZF_DEFAULT_OPTS`), gitui (`config/gitui/theme.ron`), starship
+  (`config/starship/starship.toml`) and fish (its built-in `default` theme,
+  chosen in `config/fish/config.fish`). No ANSI colour reads as a fill in
+  every family (the light schemes tune all 16 as text), so these configs
+  drop the fills: no current-line background, reversed selections.
+- `config/theme/handlers.d/<app>` — per-app flip executables, only for apps
+  that cannot draw that way: tmux (status-bar surface shades), gh-dash and
+  television (selection fills their configs cannot drop) and claude (the
+  mode word). A failure must exit non-zero with a stderr line (apply logs
+  it). A missing tool is a skip: stderr note, exit 0. Add new apps by
+  dropping a file here (`theme-handler-scaffold` skill).
 - The active theme family (`_theme_family` in `_lib.sh`):
   `DOTFILES_THEME_FAMILY` (test seam; an invalid value fails closed),
   else the per-machine saved choice in `$XDG_STATE_HOME/dotfiles-theme/choice`
@@ -40,15 +52,12 @@ Dark/light theming is owned by a stand-alone orchestrator:
   `local/bin/theme` lists the families and marks the active one, switches
   (`theme <family>`) and resets (`theme --reset`): it writes or removes the
   saved choice, then runs apply at the current mode.
-- `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — theme
-  assets, one tree per family (`catppuccin`, `kanagawa`, `oasis`,
-  `warm-burnout`). A handler
-  whose active family ships no file removes its stale link instead of
-  keeping another family's palette. Shared app config stays out of the
-  tree: `handlers.d/starship` appends the family's `[palettes.active]`
-  table to `config/starship/starship.toml` (named so v8r's catalog
-  validates it), so an edit to that file shows after
-  `dfm theme reapply`.
+- `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — the
+  assets of the apps that keep a handler, one tree per family
+  (`catppuccin`, `kanagawa`, `oasis`, `warm-burnout`), plus each family's
+  colour-role map in `palettes.d/<family>/ROLES.md`. A handler whose active
+  family ships no file drops or rebuilds its artifact without it instead of
+  keeping another family's palette.
 - `config/theme/tmux-palette <mode>` — loads the catppuccin/tmux status
   engine with `config/tmux/catppuccin.conf` and the active family's
   `tmux.thm.conf` (a family without one keeps the flavour's upstream
@@ -60,16 +69,10 @@ Dark/light theming is owned by a stand-alone orchestrator:
 - Fallback: `config/theme/probe-osc11` — OSC 11 query for SSH and
   no-OS-source environments.
 
-Open shells react to flips at their next prompt: bash and zsh through the
-hook in `config/theme/shell-env.sh`, fish through
-`config/fish/conf.d/theme-switch.fish` (which also re-saves its theme).
-Both watch the `generation` stamp and reload LS_COLORS and BAT_THEME. fzf
-needs no reload: both shells export `FZF_DEFAULT_OPTS_FILE` pointing at the
-link `handlers.d/fzf` rewrites, and fzf reads it at every start. fish
-(`__dotfiles_theme_name`), nvim,
-vim and wezterm each resolve the family themselves, in `_theme_family`'s
-order, and fall back to `oasis` (fish to no theme change) when nothing
-resolves. nvim and vim follow the OS appearance;
+Open shells need nothing on a flip: the ANSI-drawn apps take their colours
+from the terminal when they draw. nvim, vim and wezterm each resolve the
+family themselves, in `_theme_family`'s order, and fall back to `oasis` when
+nothing resolves. nvim and vim follow the OS appearance;
 wezterm follows the mode file (on its reload watch list), falling back to
 the OS appearance when there is none. After a family switch, running vim
 and nvim sessions update within 3 s, and wezterm reloads when apply
@@ -79,4 +82,11 @@ Claude Code follows the mode, not the family. `handlers.d/claude` sets
 `theme` to `custom:dotfiles` once and, on each flip, rewrites
 `${CLAUDE_CONFIG_DIR:-~/.claude}/themes/dotfiles.json` with `base` set to
 the mode. Running sessions reload that file live. They do not re-apply
-`theme` from `settings.json`, and `"auto"` misses flips.
+`theme` from `settings.json`, and `"auto"` misses flips. Its `*-ansi` bases
+would follow the family, but paint diffs as ANSI fills.
+
+Copilot CLI needs no handler: `config/copilot/settings.json` sets `theme`
+to `default` ("Base-16 terminal colors"), which builds every colour from
+the terminal's OSC 10/11/4 replies and falls back to ANSI names without
+them. Keep it off `github`, the shipped default: it hard-codes `#ffffff` /
+`#0D1117` and writes the terminal background itself.

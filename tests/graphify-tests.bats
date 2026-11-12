@@ -46,8 +46,8 @@ print(m.node_id(sys.argv[1]))
 
 @test "graphify-tests: node_id keeps every directory level" {
   # Using only the basename would collide same-named files in different dirs.
-  run node_id "config/theme/handlers.d/bat"
-  [ "$output" = "config_theme_handlers_d_bat" ]
+  run node_id "config/theme/handlers.d/tmux"
+  [ "$output" = "config_theme_handlers_d_tmux" ]
 }
 
 @test "graphify-tests: --check writes nothing" {
