@@ -63,6 +63,11 @@ directory; `local/bin/theme-mode` is the public read API, and
 `local/bin/theme` lists and switches theme families (the choice is saved
 per machine under `$XDG_STATE_HOME`, never in the repo).
 
+Terminal apps take their colours from the terminal: WezTerm ships one ANSI
+scheme per theme family and mode. Configure an app with the 16 ANSI colour
+names, never hex, and with no ANSI colour as a background fill. Only an app
+that can't do that gets a theme handler (`config/theme/CLAUDE.md`).
+
 ### msgr — Messaging Helper
 
 `local/bin/msgr` provides colored output functions (`msgr msg`,
