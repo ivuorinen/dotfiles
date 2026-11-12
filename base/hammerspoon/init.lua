@@ -22,18 +22,22 @@
 -- F18 is now the new meh key, or something like that.
 --
 --  Misc binds:
---    F18 + v =   write clipboard contents (skips paste protection)
+--    F18 + v         = write clipboard contents (skips paste protection)
 --
 --  Window size & position:
---    F18 + u       = 1/3
---    F18 + i       = 2/3
---    F18 + o       = 3/3
---    F18 + y       = 2/3 from left
---    F18 + p       = 2/3 from right
---    F18 + left    = 1/2 from left
---    F18 + right   = 1/2 from right
---    F18 + j/up    = maximize
---    F18 + k/down  = center to window (dynamic sizing)
+--    F18 + u         = 1/3
+--    F18 + i         = 2/3
+--    F18 + o         = 3/3
+--    F18 + Shift + u = 1/4 (4-column layout)
+--    F18 + Shift + i = 2-3/4 (middle two columns)
+--    F18 + Shift + o = 4/4
+--    (Shift works pressed before or after F18)
+--    F18 + y         = 2/3 from left
+--    F18 + p         = 2/3 from right
+--    F18 + left      = 1/2 from left
+--    F18 + right     = 1/2 from right
+--    F18 + j/up      = maximize
+--    F18 + k/down    = center to window (dynamic sizing)
 --
 --  Cycling through windows:
 --    F18 + h         = cycle backwards
@@ -45,12 +49,15 @@
 --
 local f18 = hs.hotkey.modal.new()
 
--- Capture F18 key press/release
-hs.hotkey.bind({}, 'F18', function()
-  f18:enter()
-end, function()
-  f18:exit()
-end)
+-- Capture F18 key press/release. Hotkeys match modifiers exactly, so a second
+-- binding with Shift lets Shift go down before F18 and still enter the mode.
+for _, mods in ipairs { {}, { 'shift' } } do
+  hs.hotkey.bind(mods, 'F18', function()
+    f18:enter()
+  end, function()
+    f18:exit()
+  end)
+end
 
 -- Keycodes resolved from the CURRENT keyboard layout. Binding by keycode (a
 -- number) instead of a character string keeps every key in use visible in one
@@ -93,9 +100,9 @@ end
 
 -- Bind a Meh key to an action that needs the focused window. The "is anything
 -- focused?" guard lives here once instead of in every handler; fn receives the
--- window and only runs when one exists.
-local function bind(key, fn)
-  f18:bind({}, key, function()
+-- window and only runs when one exists. mods defaults to none (plain F18 + key).
+local function bind(key, fn, mods)
+  f18:bind(mods or {}, key, function()
     local w = hs.window.focusedWindow()
     if w then
       fn(w)
@@ -105,10 +112,10 @@ end
 
 -- Place the focused window into a unit-rect region: x/y/w/h are fractions
 -- (0..1) of the screen, so { 0, 0, 1/3, 1 } is the full-height left third.
-local function place(key, x, y, w, h)
+local function place(key, x, y, w, h, mods)
   bind(key, function(win)
     win:moveToUnit({ x = x, y = y, w = w, h = h }, 0)
-  end)
+  end, mods)
 end
 
 -- Center the focused window at wFrac x hFrac of its screen's usable frame.
@@ -133,6 +140,9 @@ end)
 place(KEY.u, 0, 0, 1 / 3, 1) -- left third
 place(KEY.i, 1 / 3, 0, 1 / 3, 1) -- center third
 place(KEY.o, 2 / 3, 0, 1 / 3, 1) -- right third
+place(KEY.u, 0, 0, 1 / 4, 1, { 'shift' }) -- column 1 of 4
+place(KEY.i, 1 / 4, 0, 1 / 2, 1, { 'shift' }) -- columns 2-3 of 4
+place(KEY.o, 3 / 4, 0, 1 / 4, 1, { 'shift' }) -- column 4 of 4
 place(KEY.y, 0, 0, 2 / 3, 1) -- left two-thirds
 place(KEY.p, 1 / 3, 0, 2 / 3, 1) -- right two-thirds
 place(KEY.left, 0, 0, 0.5, 1) -- left half
