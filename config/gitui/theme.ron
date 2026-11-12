@@ -1,0 +1,15 @@
+// gitui's default theme draws in the terminal's ANSI colours, so the
+// terminal's scheme (one per theme family and mode) recolours it. Only the
+// fills are overridden: no ANSI colour reads as a background under text in
+// every family, so the selection and the command bar get none, and the
+// selected line is marked by its text colour instead: Blue, which gitui
+// uses for no text of its own. selection_fg recolours selected files,
+// commits and diff lines; selected folder and tag rows take command_fg,
+// which also colours the command bar.
+(
+    selection_bg: Some("Reset"),
+    selection_fg: Some("Blue"),
+    cmdbar_bg: Some("Reset"),
+    cmdbar_extra_lines_bg: Some("Reset"),
+    command_fg: Some("Blue"),
+)

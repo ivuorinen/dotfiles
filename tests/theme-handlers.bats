@@ -137,103 +137,17 @@ STUB
   [[ "$output" == *"catppuccin/tmux is not installed"* ]]
 }
 
-@test "handlers: an invalid family exits 1 and leaves the link untouched" {
+@test "handlers: an invalid family exits 1" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
   mkdir -p "$HOME/.config"
-  ln -s /somewhere "$HOME/.config/starship.toml"
-  for h in starship eza gitui fzf dircolors gh-dash television bat fish; do
+  for h in gh-dash television; do
     DOTFILES_THEME_FAMILY=../catppuccin run "$HD/$h" dark
     [ "$status" -eq 1 ] || {
       echo "$h exited $status"
       return 1
     }
   done
-  [ "$(readlink "$HOME/.config/starship.toml")" = "/somewhere" ]
-}
-
-@test "symlink handlers: a family without the palette removes the stale link" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
-  "$HD/starship" dark
-  "$HD/eza" dark
-  "$HD/gitui" dark
-  [ -L "$HOME/.config/starship.toml" ]
-  bare_family
-  for h in starship eza gitui; do
-    run "$HD/$h" dark
-    [ "$status" -eq 0 ]
-  done
-  [ ! -e "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
-  [ ! -L "$HOME/.config/eza/theme.yml" ]
-  [ ! -L "$HOME/.config/gitui/theme.ron" ]
-}
-
-@test "symlink handlers: a family without the palette keeps a regular file" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config"
-  echo "user content" > "$HOME/.config/starship.toml"
-  bare_family
-  run "$HD/starship" dark
-  [ "$status" -eq 0 ]
-  [ "$(cat "$HOME/.config/starship.toml")" = "user content" ]
-}
-
-@test "state handlers: a family without palettes clears the stale state" {
-  "$HD/bat" dark
-  [ -f "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
-  bare_family
-  run "$HD/bat" dark
-  [ "$status" -eq 0 ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/bat-theme" ]
-}
-
-@test "fzf handler: links the colours; a family without them leaves an empty file" {
-  local f="$TMPDIR_TEST/dotfiles-theme/fzf-colors"
-  run "$HD/fzf" dark
-  [ "$status" -eq 0 ]
-  [[ "$(readlink "$f")" == *"/catppuccin/dark/fzf" ]]
-  # FZF_DEFAULT_OPTS_FILE stays exported, and fzf exits 2 on a missing file.
-  bare_family
-  run "$HD/fzf" dark
-  [ "$status" -eq 0 ]
-  [ -f "$f" ] && [ ! -L "$f" ]
-  [ -z "$(tr -d '[:space:]' < "$f")" ]
-  # The next family with colours replaces that file with a link again.
-  DOTFILES="$BATS_TEST_DIRNAME/.." DOTFILES_THEME_FAMILY=kanagawa run "$HD/fzf" light
-  [ "$status" -eq 0 ]
-  [[ "$(readlink "$f")" == *"/kanagawa/light/fzf" ]]
-}
-
-@test "fzf handler: rejects invalid mode" {
-  run "$HD/fzf" purple
-  [ "$status" -eq 2 ]
-}
-
-# after <file> <first> <then> — <then> sits on a later line than <first>.
-after()
-{
-  awk -v a="$2" -v b="$3" 'index($0, a) && !x { x = NR } index($0, b) { y = NR }
-    END { exit !(x && y > x) }' "$1"
-}
-
-@test "fzf: both shells export the colours file only after their first apply" {
-  # The export waits for the file to exist, and a machine's first apply is
-  # what writes it: a check above the apply leaves that shell uncoloured.
-  after "$DOTFILES/config/exports" 'config/theme/apply" "$m"' 'export FZF_DEFAULT_OPTS_FILE='
-  after "$DOTFILES/config/fish/config.fish" '$apply $m' 'set -x FZF_DEFAULT_OPTS_FILE'
-}
-
-@test "dircolors handler: a family without a palette removes the cache" {
-  mkdir -p "$TMPDIR_TEST/dotfiles-theme"
-  echo "LS_COLORS=stale" > "$TMPDIR_TEST/dotfiles-theme/ls-colors"
-  bare_family
-  run "$HD/dircolors" dark
-  [ "$status" -eq 0 ]
-  [ ! -e "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
 }
 
 @test "composed handlers: a family without palettes writes no theme" {
@@ -251,279 +165,40 @@ after()
 @test "handlers: kanagawa resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
+  mkdir -p "$HOME/.config"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=kanagawa
-  for h in starship eza gitui fzf gh-dash television bat; do
+  for h in gh-dash television; do
     run "$HD/$h" light
     [ "$status" -eq 0 ]
   done
-  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
-  grep -qxF 'base = "#f2ecbc"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Kanagawa Lotus AA" ]
   grep -q "kanagawa-lotus-aa.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
 @test "handlers: oasis resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
+  mkdir -p "$HOME/.config"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=oasis
-  for h in starship eza gitui fzf gh-dash television bat; do
+  for h in gh-dash television; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
-  grep -qxF 'base = "#000000"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Oasis Abyss Dark" ]
   grep -q "oasis-abyss-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
 }
 
 @test "handlers: warm-burnout resolves every palette" {
   # shellcheck disable=SC2030,SC2031
   export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza" "$HOME/.config/gitui"
+  mkdir -p "$HOME/.config"
   # shellcheck disable=SC2030,SC2031
   export DOTFILES_THEME_FAMILY=warm-burnout
-  for h in starship eza gitui fzf gh-dash television bat; do
+  for h in gh-dash television; do
     run "$HD/$h" dark
     [ "$status" -eq 0 ]
   done
-  [ "$(readlink "$HOME/.config/starship.toml")" = "$TMPDIR_TEST/dotfiles-theme/starship.toml" ]
-  grep -qxF 'base = "#1a1510"' "$TMPDIR_TEST/dotfiles-theme/starship.toml"
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Warm Burnout Dark" ]
   grep -q "warm-burnout-dark.toml" "$TMPDIR_TEST/dotfiles-theme/television/config.toml"
-}
-
-@test "starship handler: composes the prompt with the family palette and links it" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config"
-  local out="$TMPDIR_TEST/dotfiles-theme/starship.toml"
-  run "$HD/starship" light
-  [ "$status" -eq 0 ]
-  [ "$(readlink "$HOME/.config/starship.toml")" = "$out" ]
-  # The shared prompt, then this family's palette for the mode.
-  [ "$(head -n 1 "$out")" = "$(head -n 1 "$DOTFILES/config/starship/starship.toml")" ]
-  grep -qxF 'palette = "active"' "$out"
-  grep -qxF 'base = "#eff1f5"' "$out"
-  run "$HD/starship" dark
-  [ "$status" -eq 0 ]
-  grep -qxF 'base = "#1e1e2e"' "$out"
-}
-
-@test "starship handler: refuses to clobber a regular file" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config"
-  echo "user content" > "$HOME/.config/starship.toml"
-  run "$HD/starship" dark
-  [ "$status" -eq 0 ]
-  [ ! -L "$HOME/.config/starship.toml" ]
-  [ "$(cat "$HOME/.config/starship.toml")" = "user content" ]
-}
-
-@test "eza handler: swaps ~/.config/eza/theme.yml symlink" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza"
-  run "$HD/eza" light
-  [ "$status" -eq 0 ]
-  [ -L "$HOME/.config/eza/theme.yml" ]
-  target="$(readlink "$HOME/.config/eza/theme.yml")"
-  [[ "$target" == *"/catppuccin/light/eza.yml" ]]
-}
-
-@test "eza handler: refuses to clobber a regular file" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config/eza"
-  echo "user content" > "$HOME/.config/eza/theme.yml"
-  run "$HD/eza" dark
-  [ "$status" -eq 0 ]
-  [ ! -L "$HOME/.config/eza/theme.yml" ]
-  [ "$(cat "$HOME/.config/eza/theme.yml")" = "user content" ]
-}
-
-@test "eza handler: rejects invalid mode" {
-  run "$HD/eza" purple
-  [ "$status" -eq 2 ]
-}
-
-@test "dircolors handler: writes ls-colors cache atomically" {
-  if ! command -v dircolors > /dev/null 2>&1 \
-    && ! command -v gdircolors > /dev/null 2>&1; then
-    skip "neither dircolors nor gdircolors installed"
-  fi
-  run "$HD/dircolors" dark
-  [ "$status" -eq 0 ]
-  [ -f "$TMPDIR_TEST/dotfiles-theme/ls-colors" ]
-  grep -q "LS_COLORS=" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
-  grep -q "export LS_COLORS" "$TMPDIR_TEST/dotfiles-theme/ls-colors"
-}
-
-@test "fish handler: saves the mode's section of the theme headlessly" {
-  if ! command -v fish > /dev/null 2>&1; then
-    skip "fish not installed"
-  fi
-  # Private fish config dir: the save writes universal variables, which
-  # must never land in the developer's real fish_variables.
-  export XDG_CONFIG_HOME="$TMPDIR_TEST/cfg"
-  mkdir -p "$XDG_CONFIG_HOME/fish/themes"
-  cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$XDG_CONFIG_HOME/fish/themes/"
-  run "$HD/fish" dark
-  [ "$status" -eq 0 ]
-  local dark light
-  dark="$(fish -c 'echo $fish_color_command')"
-  run "$HD/fish" light
-  [ "$status" -eq 0 ]
-  light="$(fish -c 'echo $fish_color_command')"
-  [ -n "$dark" ]
-  # fish 3.x has no --color-theme and ignores the theme's sections, so
-  # only fish 4 can save a different palette per mode.
-  # shellcheck disable=SC2016
-  if ! fish -c 'functions fish_config' 2> /dev/null | grep -q -- 'color-theme='; then
-    skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
-  fi
-  [ "$dark" != "$light" ]
-}
-
-@test "fish theme-switch: an in-session flip saves the mode file's section" {
-  if ! command -v fish > /dev/null 2>&1; then
-    skip "fish not installed"
-  fi
-  # shellcheck disable=SC2016
-  if ! fish -c 'functions fish_config' 2> /dev/null | grep -q -- 'color-theme='; then
-    skip "fish_config has no --color-theme (fish $(fish -c 'echo $version'))"
-  fi
-  # The terminal's OSC 11 answer can lag a flip (WezTerm keeps the old
-  # background in panes open across it), and here there is no terminal at
-  # all: only the mode file can pick the section.
-  local cfg="$TMPDIR_TEST/cfg" expected
-  mkdir -p "$cfg/fish/themes" "$TMPDIR_TEST/dotfiles-theme"
-  cp "$DOTFILES/config/fish/themes/catppuccin-aa.theme" "$cfg/fish/themes/"
-  echo dark > "$TMPDIR_TEST/dotfiles-theme/mode"
-  # apply's generation stamp is what the watcher reacts to; clearing the
-  # tracker below makes the next prompt see it as new.
-  echo g1 > "$TMPDIR_TEST/dotfiles-theme/generation"
-  expected="$(awk '/^\[/ { s = $0 } s == "[dark]" && $1 == "fish_color_command" { print $2 }' \
-    "$DOTFILES/config/fish/themes/catppuccin-aa.theme")"
-  XDG_CONFIG_HOME="$cfg" run fish --no-config -i -c "
-    source '$DOTFILES/config/fish/functions/__dotfiles_theme_name.fish'
-    source '$DOTFILES/config/fish/conf.d/theme-switch.fish'
-    set -e __theme_switch_last_generation
-    emit fish_prompt
-    echo \$fish_color_command"
-  [ "$status" -eq 0 ]
-  [ -n "$expected" ]
-  # Read in-session: --no-config keeps universal variables off disk.
-  [ "$output" = "$expected" ]
-}
-
-# Fake fish: answers the fish_config source probe as fish 4 (with
-# --color-theme) or fish 3 (without), and records every other -c command.
-stub_fish()
-{
-  mkdir -p "$TMPDIR_TEST/bin"
-  cat > "$TMPDIR_TEST/bin/fish" << EOF
-#!/usr/bin/env bash
-if [[ "\$2" == "functions fish_config" ]]; then
-  if [[ "$1" == 4 ]]; then
-    echo '    argparse h/help color-theme= no-override -- \$argv'
-  else
-    echo '    argparse h/help -- \$argv'
-  fi
-  exit 0
-fi
-printf '%s\n' "\$2" >> "$TMPDIR_TEST/fish.log"
-EOF
-  chmod +x "$TMPDIR_TEST/bin/fish"
-}
-
-@test "fish handler: fish 4 saves with --color-theme=<mode>" {
-  stub_fish 4
-  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" light
-  [ "$status" -eq 0 ]
-  [ "$(cat "$TMPDIR_TEST/fish.log")" = "fish_config theme save --color-theme=light catppuccin-aa" ]
-}
-
-@test "fish handler: fish 3 saves without --color-theme" {
-  stub_fish 3
-  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" dark
-  [ "$status" -eq 0 ]
-  [ "$(cat "$TMPDIR_TEST/fish.log")" = "fish_config theme save catppuccin-aa" ]
-}
-
-@test "fish handler: fish not in PATH is a skip, not a failure" {
-  mkdir -p "$TMPDIR_TEST/bin"
-  ln -s "$(command -v bash)" "$TMPDIR_TEST/bin/bash"
-  ln -s "$(command -v dirname)" "$TMPDIR_TEST/bin/dirname"
-  PATH="$TMPDIR_TEST/bin" run "$HD/fish" dark
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"fish not in PATH; skipping"* ]]
-}
-
-@test "fish handler: a failed theme save exits 1 with a message" {
-  mkdir -p "$TMPDIR_TEST/bin"
-  printf '#!/usr/bin/env bash\nexit 1\n' > "$TMPDIR_TEST/bin/fish"
-  chmod +x "$TMPDIR_TEST/bin/fish"
-  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/fish" dark
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"fish handler: fish_config theme save catppuccin-aa failed"* ]]
-}
-
-@test "fish handler: rejects invalid mode" {
-  run "$HD/fish" purple
-  [ "$status" -eq 2 ]
-}
-
-@test "bat handler: publishes theme name to the state dir, not ~/.config" {
-  # shellcheck disable=SC2030,SC2031
-  export HOME="$TMPDIR_TEST/home"
-  mkdir -p "$HOME/.config"
-  run "$HD/bat" dark
-  [ "$status" -eq 0 ]
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Catppuccin Mocha" ]
-  run "$HD/bat" light
-  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/bat-theme")" = "Catppuccin Latte" ]
-  # The reorg invariant: nothing is written under ~/.config.
-  [ ! -e "$HOME/.config/bat/config" ]
-  [ -z "$(find "$HOME/.config" -type f 2> /dev/null)" ]
-}
-
-@test "bat handler: a failed cache build exits 1 with a message" {
-  # Fake bat: an empty cache dir (so the build is due) and a failing build.
-  mkdir -p "$TMPDIR_TEST/bin" "$TMPDIR_TEST/batcache"
-  cat > "$TMPDIR_TEST/bin/bat" << STUB
-#!/usr/bin/env bash
-case "\$1" in
-  --cache-dir) echo "$TMPDIR_TEST/batcache" ;;
-  --config-dir) echo "$TMPDIR_TEST/batconfig" ;;
-  cache) exit 1 ;;
-esac
-STUB
-  chmod +x "$TMPDIR_TEST/bin/bat"
-  PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/bat" dark
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"bat handler: bat cache --build failed"* ]]
-}
-
-@test "bat handler: an unwritable state dir exits 1 with a message" {
-  # Fake bat with no cache dir, so the build block is skipped and the
-  # exit status can only come from the state write.
-  mkdir -p "$TMPDIR_TEST/bin"
-  printf '#!/usr/bin/env bash\n' > "$TMPDIR_TEST/bin/bat"
-  chmod +x "$TMPDIR_TEST/bin/bat"
-  : > "$TMPDIR_TEST/file"
-  XDG_STATE_HOME="$TMPDIR_TEST/file" PATH="$TMPDIR_TEST/bin:$PATH" run "$HD/bat" dark
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"bat handler: cannot write"* ]]
-}
-
-@test "bat handler: rejects invalid mode" {
-  run "$HD/bat" purple
-  [ "$status" -eq 2 ]
 }
 
 @test "gh-dash handler: writes the theme overlay into the state dir, not ~/.config" {

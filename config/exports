@@ -429,8 +429,7 @@ theme_mode()
 }
 
 # theme-reapply — re-fire all theme handlers for the current mode (or
-# $1), bypassing apply's idempotency guard. Reloads the colour caches into
-# the current shell (_theme_refresh_env). Use after editing a palette to
+# $1), bypassing apply's idempotency guard. Use after editing a palette to
 # see the result without restarting the shell.
 theme-reapply()
 {
@@ -454,7 +453,6 @@ theme-reapply()
       "$h" "$mode" || rc=1
     fi
   done
-  _theme_refresh_env
   echo "theme-reapply: applied $mode"
   return $rc
 }
@@ -497,26 +495,12 @@ if [ "$_theme_interactive" = 1 ] \
 fi
 unset _theme_interactive
 
-# Load the colour caches the theme handlers publish — LS_COLORS (dircolors)
-# and BAT_THEME (bat, so bat-driven previews follow the mode without any file
-# under ~/.config/bat) — and note their generation. The prompt hook that
-# base/bashrc and base/zshrc install reloads them after a theme switch.
-# shellcheck source=config/theme/shell-env.sh
-. "${DOTFILES:-$HOME/.dotfiles}/config/theme/shell-env.sh"
-_theme_refresh_env
-
-# fzf: colours come from the theme orchestrator's state file
-# (config/theme/handlers.d/fzf), which fzf reads at every start. Exported only
-# when it exists, since fzf exits 2 when FZF_DEFAULT_OPTS_FILE names a missing
-# file, and only after the apply above, which writes it on a machine's first
-# shell. For the same reason an inherited FZF_DEFAULT_OPTS_FILE that names a
-# missing file is dropped. An FZF_DEFAULT_OPTS inherited from an older shell
-# or the tmux server would override the file, so it is cleared.
-unset FZF_DEFAULT_OPTS
-if [ -e "$XDG_STATE_HOME/dotfiles-theme/fzf-colors" ]; then
-  export FZF_DEFAULT_OPTS_FILE="$XDG_STATE_HOME/dotfiles-theme/fzf-colors"
-fi
-[ -e "${FZF_DEFAULT_OPTS_FILE:-}" ] || unset FZF_DEFAULT_OPTS_FILE
+# fzf: the terminal's 16 ANSI colours, so the terminal's scheme recolours it.
+# The current line gets no fill (bg+:-1): no ANSI colour reads as a fill under
+# text in every family. An FZF_DEFAULT_OPTS_FILE inherited from an older shell
+# or the tmux server names the old per-family colours, so it is dropped.
+export FZF_DEFAULT_OPTS='--color=16,bg+:-1'
+unset FZF_DEFAULT_OPTS_FILE
 
 # gh-dash and television read their themed config from the theme state
 # dir, so config/gh-dash and config/television stay plain dotbot symlinks

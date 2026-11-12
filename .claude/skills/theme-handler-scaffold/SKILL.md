@@ -8,6 +8,12 @@ user-invocable: true
 allowed-tools: Bash, Read, Write, Edit
 ---
 
+First check the app needs one. An app that can draw in the terminal's 16
+ANSI colours, with no ANSI colour as a fill under text (a selection or
+badge background), gets one static config in `config/<app>/` and no
+handler: the terminal's scheme recolours it (`config/theme/CLAUDE.md`). If
+so, stop and write that config instead.
+
 Scaffolds a new entry in the theme orchestrator's handler chain. Per
 `docs/audit/arch-profile.md` rules 1 and 2, each app gets:
 
@@ -59,13 +65,21 @@ dst="$HOME/.config/<app>/theme.<ext>"
 
 # Apply theme: replace this with the app-specific flip. The default
 # links the palette, or removes a stale link from another family when
-# the active one ships none. For a composed or state-dir artifact,
-# rebuild it without the palette (or delete it) in the empty-src case.
+# the active one ships none (never a regular file: that is user data).
+# For a composed or state-dir artifact, rebuild it without the palette
+# (or delete it) in the empty-src case.
 mkdir -p -- "$(dirname -- "$dst")"
-_link_palette "$src" "$dst" || {
-  echo "<app> handler: cannot link $dst" >&2
-  exit 1
-}
+if [[ -n "$src" ]]; then
+  _idempotent_ln_sf "$src" "$dst" || {
+    echo "<app> handler: cannot link $dst" >&2
+    exit 1
+  }
+elif [[ -L "$dst" ]]; then
+  rm -f -- "$dst" || {
+    echo "<app> handler: cannot remove $dst" >&2
+    exit 1
+  }
+fi
 ```
 
 3. `chmod +x config/theme/handlers.d/<app>`.
@@ -87,8 +101,8 @@ Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
 5. Print:
 
     - Paths created
-    - The reminder: "Update the handler body — the `_link_palette`
-      line is a placeholder. Most apps need their own reload
+    - The reminder: "Update the handler body — the link block is a
+      placeholder. Most apps need their own reload
       command (e.g. `tmux source-file`, `kitty @ load-config`).
       The orchestrator forks every handler in parallel under a 5 s
       timeout and retries the ones that exit non-zero, so keep the
@@ -101,7 +115,7 @@ Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
 
 ## Conventions enforced
 
-- Source `_lib.sh` for shared helpers (`_palette`, `_link_palette`,
+- Source `_lib.sh` for shared helpers (`_palette`, `_idempotent_ln_sf`,
   `_atomic_write`, etc.).
 - Validate `$mode` is `dark` or `light`; exit 2 on garbage input.
 - Exit 1 without touching anything when `_theme_family` fails.
@@ -123,5 +137,5 @@ Add `<app>.<ext>` to `REQUIRED` in `tests/theme-palettes.bats`.
 2. Run `config/theme/apply light`; check the flip back works.
 3. `bats tests/theme-handlers.bats` to confirm the orchestrator
     integration tests still pass.
-4. Update the layout comments in any consumer files (e.g. tmux's
-    theme-switch sourcing) to mention the new app.
+4. Update the layout comments in any consumer files (e.g.
+    `config/theme/CLAUDE.md`'s handler list) to mention the new app.

@@ -106,9 +106,6 @@ customCatalog:
     - name: television theme
       fileMatch: ["config/television/themes/*.toml"]
       location: schemas/television-theme.schema.json
-    - name: eza theme
-      fileMatch: ["config/theme/palettes.d/*/*/eza.yml"]
-      location: schemas/eza-theme.schema.json
     - name: Dotbot
       fileMatch:
         - dotbot-links.yaml

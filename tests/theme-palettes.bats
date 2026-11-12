@@ -9,8 +9,7 @@ setup()
   ROOT="$BATS_TEST_DIRNAME/.."
   PD="$ROOT/config/theme/palettes.d"
   # tmux.thm.conf is optional: only families that override @thm_* ship it.
-  REQUIRED=(starship.toml eza.yml gitui.ron fzf
-    gh-dash.theme.yml television.toml dircolors bat.theme)
+  REQUIRED=(gh-dash.theme.yml television.toml)
 }
 
 families()
@@ -50,10 +49,10 @@ check_complete()
 
 @test "palettes: the completeness check fails when a file is missing" {
   cp -R "$PD" "$BATS_TEST_TMPDIR/pd"
-  rm "$BATS_TEST_TMPDIR/pd/kanagawa/light/gitui.ron"
+  rm "$BATS_TEST_TMPDIR/pd/kanagawa/light/television.toml"
   run check_complete "$BATS_TEST_TMPDIR/pd"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"kanagawa/light/gitui.ron"* ]]
+  [[ "$output" == *"kanagawa/light/television.toml"* ]]
 }
 
 @test "palettes: the tracked family file names an existing family" {
@@ -78,18 +77,16 @@ PY
   [ "$status" -eq 0 ]
 }
 
-@test "palettes: every starship palette defines the colours the shared prompt uses" {
-  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
-  # handlers.d/starship appends one [palettes.active] table to
-  # config/starship/starship.toml. Starship renders a missing role or a
-  # malformed colour uncoloured, without a warning, and its schema types
-  # palette entries as plain strings, so neither v8r nor starship catches
-  # either; this does.
-  run python3 - "$ROOT" << 'PY'
-import pathlib, re, sys, tomllib
+# starship_colours <file> — every colour word the prompt's styles use, minus
+# modifiers. Starship renders an unknown colour uncoloured, without a
+# warning, and its schema types styles as plain strings, so neither v8r nor
+# starship catches a stray palette role; this does.
+starship_colours()
+{
+  python3 - "$1" << 'PY'
+import re, sys, tomllib
 
-root = pathlib.Path(sys.argv[1])
-base = tomllib.loads((root / "config/starship/starship.toml").read_text())
+base = tomllib.loads(open(sys.argv[1]).read())
 MODS = {"bold", "italic", "underline", "dimmed", "inverted", "blink", "hidden",
         "strikethrough", "none", "prev_fg", "prev_bg"}
 
@@ -107,37 +104,30 @@ def styles(v, key=""):
         yield from re.findall(r"\]\(([^)$]+)\)", v)
 
 
-used = {w.split(":", 1)[-1] for s in styles(base) for w in s.split()} - MODS
-bad, checked = [], 0
-for p in sorted((root / "config/theme/palettes.d").glob("*/*/starship.toml")):
-    palette = tomllib.loads(p.read_text())["palettes"]["active"]
-    missing = used - set(palette)
-    if missing:
-        bad.append(f"{p}: missing {sorted(missing)}")
-    for role, value in palette.items():
-        checked += 1
-        if not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
-            bad.append(f"{p}: {role} = {value!r} is not #rrggbb")
-print("\n".join(bad) if bad else f"roles used: {sorted(used)}; colours checked: {checked}")
-sys.exit(1 if bad else 0)
+print("\n".join(sorted({w.split(":", 1)[-1] for s in styles(base) for w in s.split()} - MODS)))
 PY
-  echo "$output"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"sky"* ]]
-  # Every family and mode was read: 8 palettes of 26 roles.
-  [[ "$output" == *"colours checked: 208"* ]]
 }
 
-@test "palettes: every fzf palette loads as fzf's options file" {
-  command -v fzf > /dev/null 2>&1 || skip "fzf not installed"
-  local f
-  for f in "$PD"/*/*/fzf; do
-    # A bad option makes fzf exit 2; a clean load filters "x" and exits 0.
-    printf 'x\n' | FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE="$f" fzf --filter x > /dev/null || {
-      echo "fzf rejects $f"
-      return 1
-    }
-  done
+# The 8 standard names starship documents, plain and with bright-.
+ANSI_NAMES='^(bright-)?(black|red|green|blue|yellow|purple|cyan|white)$'
+
+@test "palettes: the starship prompt uses only ANSI colour names" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  run starship_colours "$ROOT/config/starship/starship.toml"
+  [ "$status" -eq 0 ]
+  echo "$output"
+  [[ "$output" == *"cyan"* ]]
+  run grep -Ev "$ANSI_NAMES" <<< "$output"
+  [ "$status" -eq 1 ]
+}
+
+@test "palettes: the starship check catches a palette role" {
+  command -v python3 > /dev/null 2>&1 || skip "python3 not installed"
+  printf '[directory]\nstyle = "sky"\n' > "$BATS_TEST_TMPDIR/s.toml"
+  run starship_colours "$BATS_TEST_TMPDIR/s.toml"
+  run grep -Ev "$ANSI_NAMES" <<< "$output"
+  [ "$status" -eq 0 ]
+  [ "$output" = "sky" ]
 }
 
 @test "palettes: every YAML palette parses" {
@@ -200,15 +190,4 @@ teardown()
   [ "$once" -eq "$thrice" ]
   run grep -nE '^set(-option)? +-[a-z]*a[a-z]* +terminal-features' "$ROOT/config/tmux/tmux.conf"
   [ "$status" -eq 1 ]
-}
-
-@test "palettes: every bat.theme names a vendored tmTheme" {
-  local f name
-  for f in "$PD"/*/*/bat.theme; do
-    read -r name < "$f"
-    [ -f "$ROOT/config/bat/themes/$name.tmTheme" ] || {
-      echo "$f names missing tmTheme: $name"
-      return 1
-    }
-  done
 }

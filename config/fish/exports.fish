@@ -97,8 +97,7 @@ set -q PI_LENS_CONFIG_PATH; or set -x PI_LENS_CONFIG_PATH "$XDG_CONFIG_HOME/pi/p
 # so config/gh-dash and config/television stay plain symlinks with no
 # install.conf exclude; for gh-dash it is an overlay merged on top of
 # config/gh-dash/config.yml. Paths are stable; the theme handlers rewrite the
-# files behind them on every flip. (BAT_THEME is mode-driven and lives in
-# conf.d/theme-switch.fish alongside LS_COLORS.)
+# files behind them on every flip.
 set -gx GH_DASH_CONFIG "$XDG_STATE_HOME/dotfiles-theme/gh-dash-config.yml"
 set -gx TELEVISION_CONFIG "$XDG_STATE_HOME/dotfiles-theme/television"
 

@@ -105,25 +105,6 @@ _palette()
   printf '%s\n' "$path"
 }
 
-# Link a palette into place, or — when the active family ships none
-# (empty src) — remove a stale link left by another family so palettes
-# never mix. Only a symlink is ever removed; a regular file is user data
-# and stays (same guard as _idempotent_ln_sf). -L, not -e: a link left
-# dangling by a moved palette must still be cleaned up.
-_link_palette()
-{
-  local src=$1 dst=$2
-  if [[ -n "$src" ]]; then
-    _idempotent_ln_sf "$src" "$dst"
-    return
-  fi
-  if [[ -L "$dst" ]]; then
-    rm -f -- "$dst"
-    printf 'theme: active family ships no palette for %s; removed stale link\n' "$dst" >&2
-  fi
-  return 0
-}
-
 # Non-blocking exclusive lock on $1, held on fd 9 of the calling shell until
 # that process exits. It is a kernel flock(2) lock, taken with flock(1)
 # (util-linux on Linux) or else lockf(1) (macOS base system), so the kernel

@@ -34,8 +34,8 @@ state_file="$state_dir/mode"
 # apply's own record of the family it last applied. The user's saved choice
 # is "$state_dir/choice" (local/bin/theme), which apply only reads.
 applied_family_file="$state_dir/applied-family"
-# Rewritten after every handler run so open shells know to reload the
-# colour caches the handlers just wrote (config/exports, theme-switch.fish).
+# Rewritten after every handler run: a stamp a reader can compare to notice
+# that a flip finished.
 generation_file="$state_dir/generation"
 retry_file="$state_dir/retry"
 RETRY_MINUTES=10

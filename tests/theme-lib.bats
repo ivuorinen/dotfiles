@@ -312,28 +312,3 @@ save_choice()
   [ "$status" -eq 1 ]
   [ -z "$output" ]
 }
-
-@test "_link_palette: links a palette idempotently" {
-  source "$THEME_LIB"
-  echo x > "$TMPDIR_TEST/src"
-  _link_palette "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
-  _link_palette "$TMPDIR_TEST/src" "$TMPDIR_TEST/dst"
-  [ "$(readlink "$TMPDIR_TEST/dst")" = "$TMPDIR_TEST/src" ]
-}
-
-@test "_link_palette: empty src removes a stale (even dangling) link" {
-  source "$THEME_LIB"
-  ln -s "$TMPDIR_TEST/gone" "$TMPDIR_TEST/dst"
-  run _link_palette "" "$TMPDIR_TEST/dst"
-  [ "$status" -eq 0 ]
-  [ ! -L "$TMPDIR_TEST/dst" ]
-  [[ "$output" == *"removed stale link"* ]]
-}
-
-@test "_link_palette: empty src never removes a regular file" {
-  source "$THEME_LIB"
-  echo "user content" > "$TMPDIR_TEST/dst"
-  run _link_palette "" "$TMPDIR_TEST/dst"
-  [ "$status" -eq 0 ]
-  [ "$(cat "$TMPDIR_TEST/dst")" = "user content" ]
-}

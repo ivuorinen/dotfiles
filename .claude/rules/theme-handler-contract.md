@@ -6,6 +6,10 @@ paths:
 
 # Theme handler contract
 
+- Never add a handler for an app that can draw in the terminal's 16 ANSI
+  colours with no ANSI colour as a fill under text: give it one static
+  config instead, and the terminal's scheme recolours it
+  (`config/theme/CLAUDE.md`).
 - Never special-case an app in `config/theme/apply` or
   `config/theme/watcher`. Add an executable
   `config/theme/handlers.d/<app>` instead (the
@@ -17,10 +21,10 @@ paths:
   `config/theme/family` (`DOTFILES_THEME_FAMILY` overrides both in tests).
 - Resolve palettes with `_palette <mode> <file>` from `_lib.sh`, never
   by building the path by hand. When the active family ships no file,
-  the handler must leave nothing from another family in place:
-  `_link_palette "" <dst>` removes a stale symlink (never a regular
-  file), and state/composed handlers drop or rebuild their artifact
-  without the palette. Palettes never mix across families.
+  the handler must leave nothing from another family in place: a link
+  handler removes its stale symlink (never a regular file), and
+  state/composed handlers drop or rebuild their artifact without the
+  palette. Palettes never mix across families.
   `tests/theme-handlers.bats` fails on any `palettes.d` literal in a code
   line of a handler or `tmux-palette`.
 - A new family must ship the same file set as the others, in both

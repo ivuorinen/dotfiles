@@ -74,7 +74,7 @@
       path: config/*
       # Themed apps are NOT excluded: every theme handler writes into
       # $XDG_STATE_HOME/dotfiles-theme/ and the app is pointed there via an
-      # env var (BAT_THEME, GH_DASH_CONFIG, TELEVISION_CONFIG, …), so their
+      # env var (GH_DASH_CONFIG, TELEVISION_CONFIG, …), so their
       # config dirs are plain symlinks. The remaining excludes are 1Password's
       # split sub-paths (below) and cosmic-desktop's runtime-written state.
       # herdr is excluded because a whole-directory symlink puts its state in
@@ -88,6 +88,7 @@
         - config/mise
         - config/herdr
         - config/gnupg
+        - config/gitui
     # mise: it creates a real ~/.config/mise dir on first run, which blocks a
     # plain glob relink (relink only replaces symlinks, not real dirs). Force
     # here so config.toml — and thus the toolset/shims — always links in.
@@ -109,6 +110,19 @@
     ~/.config/herdr/plugins/config/sessionizer/config.toml:
       force: true
       path: config/herdr/plugins/config/sessionizer/config.toml
+    # gitui: its one static theme.ron, linked as a file so ~/.config/gitui
+    # stays the real directory gitui owns (key bindings); config/gitui is
+    # excluded from the config/* glob above. relink replaces the per-family
+    # link the old theme handler left; a regular file is left alone.
+    ~/.config/gitui/theme.ron:
+      relink: true
+      path: config/gitui/theme.ron
+    # starship reads ~/.config/starship.toml, not the config/starship dir the
+    # glob links. relink replaces the composed-per-family link the old theme
+    # handler left; a regular file is left alone.
+    ~/.config/starship.toml:
+      relink: true
+      path: config/starship/starship.toml
     # GnuPG reads its config only from GNUPGHOME ($XDG_DATA_HOME/gnupg, set in
     # config/exports and config/fish/exports.fish), never from ~/.config/gnupg,
     # so the two files link into the keyring dir; config/gnupg is excluded

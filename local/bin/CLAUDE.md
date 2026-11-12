@@ -63,4 +63,4 @@ every section. Key commands:
 - `dfm tests` — test visualization helpers
 - `dfm theme family [name]` / `reset` / `mode` / `reapply [mode]` — the
   `theme` family switcher, `theme-mode`, and the `theme-reapply` shell
-  function (whose env refresh reaches only dfm's own process)
+  function (which re-runs every theme handler)
