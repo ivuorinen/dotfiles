@@ -2,7 +2,9 @@
   "enabledPlugins": {},
   "allowedUrls": [
     "http://localhost:4200",
-    "https://raw.githubusercontent.com"
+    "https://raw.githubusercontent.com",
+    "https://marketplace.visualstudio.com",
+    "https://learn.microsoft.com"
   ],
   "theme": "default",
   "statusLine": {
@@ -14,7 +16,7 @@
   "bannerStyle": "mona",
   "contextManagementTools": true,
   "copyOnCodeBlockClick": true,
-  "defaultMode": "autopilot",
+  "defaultMode": "interactive",
   "defaultPermissionMode": "assisted",
   "enableAllGithubMcpTools": false,
   "inlineImages": true,
@@ -29,7 +31,6 @@
   "respectGitignore": true,
   "terminalNotifications": true,
   "terminalProgress": true,
-  "transcriptView": "concise",
   "updateTerminalTitle": true,
   "footer": {
     "showAgent": true,
@@ -42,10 +43,11 @@
     "showDirectory": true,
     "showModelEffort": true,
     "showPullRequest": true,
-    "showQuota": true,
+    "showQuota": false,
     "showSandbox": true,
     "showSchedules": true,
-    "showYolo": true
+    "showYolo": true,
+    "showUsername": false
   },
   "permissions": {
     "disableBypassPermissionsMode": "disable"
@@ -54,14 +56,20 @@
     "allowBypass": false,
     "auth": {
       "gh": false
-    },
-    "sandboxLspServers": true
+    }
   },
   "sidebar": {
-    "showCloseButton": true
+    "showCloseButton": true,
+    "enabled": false
   },
   "subagents": {
     "contextManagementTools": true
   },
-  "model": "gpt-6.1-sol"
+  "model": "gpt-6.1-sol",
+  "askUser": true,
+  "assistedApprovalInstructions": "Nitpicker files and actions auto-approval: Always automatically approve Nitpicker-related tool execution and file actions: reads and writes of installed Nitpicker skill files, bundled Python scripts, context packs, findings-store operations, and audit/fix/test actions in the audited repository or temporary audit fixtures. Running a Nitpicker action through python, python3, or a wrapper does not itself require confirmation. These are tool-execution approvals, not a waiver of the skill's explicit user-decision gates for fixes, migrations, or commits. Do not approve unrelated commands, unrelated filesystem access, or security/permission bypasses. Explicit deny rules still apply.",
+  "voice": {
+    "enabled": false
+  },
+  "effortLevel": "xhigh"
 }
