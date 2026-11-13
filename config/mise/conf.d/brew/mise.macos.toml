@@ -1,7 +1,141 @@
 #:schema https://mise.jdx.dev/schema/mise.json
-# macOS-only formulae: Homebrew lists a `macos` requirement for both, so they
-# have no Linux bottle. This file loads only in the `macos` platform
-# environment, which `auto_env = true` in ../../miserc.toml turns on.
+# Homebrew formulae and casks installed by mise's bootstrap packages, without
+# the `brew` CLI. mise pours formulae into the canonical Homebrew prefix
+# (/opt/homebrew) and installs casks from Homebrew's API, so paths match a
+# native install, and anything Homebrew already installed counts as installed.
+# Applied by `mise bootstrap` (`dfm install all`) and `dfm packages apply`.
+#
+# macOS only: this file loads in the `macos` platform environment, which
+# `auto_env = true` in ../../miserc.toml turns on. Linux hosts take their
+# packages from apt/dnf (../system-packages/), never from a Linuxbrew prefix.
+# mise skips the `brew:` formulae on Intel Macs, where its brew manager is
+# unavailable; the casks still install there.
+#
+# Fonts are casks too, macOS only: on Linux mise's brew-cask installs fonts
+# only after creating a Linuxbrew prefix with sudo, so Linux hosts keep
+# scripts/install-fonts.sh (`dfm install fonts`, run by `dfm install all`).
+#
+# Formulae: only on-request LEAVES — mise resolves each formula's dependency
+# closure, so transitive deps are intentionally omitted. gnupg and fontconfig
+# provide commands this repo calls directly (gpg-agent, fc-list, fc-cache).
+# PHP is managed by phpenv.fish, not here. Anything already in [tools] in
+# ../../config.toml is not re-introduced: jq, imagemagick, and the codeql CLI
+# (so no codeql cask).
+#
+# Every entry is "latest" by necessity: Homebrew installs only the current
+# revision of a formula or cask, so there is no version to pin.
+#
+# Never run `mise bootstrap packages prune`: it uninstalls every formula and
+# cask no mise config declares, phpenv's PHP versions included.
+#
+# Why the formulae stay brew packages rather than [tools] entries — the 49 that
+# moved here first were all checked, and none can move:
+#
+#   * 48 of 49 have no mise registry entry. The one that does,
+#     dependency-check, is a Java application: mise installs it, but it dies
+#     with "JAVA_HOME is not defined correctly" because brew resolves its JRE
+#     dependency and mise does not.
+#   * 26 are GitHub-hosted, but only 5 publish prebuilt binaries rather than
+#     source tarballs — the rest (chafa, htop, irssi, flock, …) ship a .tar.gz
+#     that the github backend cannot use, and git-extras, kcov, testssl.sh,
+#     luarocks and tree publish no release assets at all.
+#   * Of those 5: Mole has no Linux asset and fails outright,
+#     terminal-notifier unpacks a macOS .app that is inert on Linux, and
+#     gpg-tui installs but cannot run — "libgpgme.so.11: cannot open shared
+#     object file", again a dependency brew supplies and mise does not.
+#
+#   * fish installs and runs, and was moved here briefly before being put
+#     back: its release tarball contains the `fish` binary ALONE. No
+#     fish_indent. This repo gates on `fish_indent --check` in both
+#     .pre-commit-config.yaml and the Tests workflow, so pinning fish at 4.8.1
+#     would have left the formatter floating at whatever apt or brew supplies
+#     (3.7.0 here) — a formatter decoupled from its shell, across a major
+#     version, guarding 38 tracked files.
+#
+# The pattern is the point: brew resolves a dependency closure, mise installs a
+# single self-contained artifact. A formula that needs system libraries, a
+# runtime, or sibling binaries belongs here, not in [tools]. config.toml has no
+# platform conditionals either, so a macOS-only tool moved to [tools] would
+# break `mise install` on Linux.
 [bootstrap.packages]
+"brew:autoconf-archive" = "latest"
+"brew:autogen" = "latest"
+"brew:automake" = "latest"
+"brew:bash" = "latest"
+"brew:bison" = "latest"
+"brew:bzip2" = "latest"
+"brew:certifi" = "latest"
+"brew:chafa" = "latest"
+"brew:coreutils" = "latest" # GNU file, shell and text utilities
+"brew:cryptography" = "latest"
+"brew:dependency-check" = "latest"
+"brew:dnsmasq" = "latest"
+"brew:enchant" = "latest"
+"brew:exiftool" = "latest"
+"brew:ffmpeg" = "latest" # audio and video codecs
+"brew:figlet" = "latest"
+"brew:fish" = "latest"
+"brew:flock" = "latest"
+"brew:fontconfig" = "latest" # fc-list, fc-cache
+"brew:ghostscript" = "latest"
+"brew:git" = "latest"
+"brew:git-extras" = "latest"
+"brew:gnu-sed" = "latest"
+"brew:gnupg" = "latest" # gpg, gpg-agent
+"brew:gpg-tui" = "latest"
+"brew:graphviz" = "latest"
+"brew:grep" = "latest"
+"brew:gzip" = "latest"
+"brew:htop" = "latest"
+"brew:hwloc" = "latest"
+"brew:irssi" = "latest"
+"brew:jpeg" = "latest"
+"brew:json-c" = "latest"
+"brew:kcov" = "latest"
+"brew:libedit" = "latest"
+"brew:libressl" = "latest"
+"brew:libuv" = "latest"
+"brew:libxml2" = "latest"
+"brew:libyaml" = "latest"
+"brew:luarocks" = "latest"
+"brew:lzip" = "latest"
 "brew:mole" = "latest"
+"brew:moreutils" = "latest"
+"brew:ossp-uuid" = "latest"
+"brew:re2c" = "latest"
 "brew:terminal-notifier" = "latest"
+"brew:testssl" = "latest"
+"brew:tree" = "latest"
+"brew:watch" = "latest"
+"brew:wget" = "latest"
+"brew:zlib" = "latest"
+"brew-cask:1password-cli" = "latest" # 1Password command-line interface
+"brew-cask:claude" = "latest" # Claude desktop app
+"brew-cask:font-jetbrains-mono" = "latest"
+"brew-cask:font-jetbrains-mono-nerd-font" = "latest"
+"brew-cask:font-monaspace" = "latest"
+"brew-cask:font-monaspace-nf" = "latest"
+"brew-cask:font-open-sans" = "latest"
+"brew-cask:fork" = "latest" # git client
+"brew-cask:hammerspoon" = "latest" # desktop automation
+"brew-cask:jetbrains-toolbox" = "latest" # JetBrains tools manager
+"brew-cask:karabiner-elements" = "latest" # keyboard customiser
+"brew-cask:keybase" = "latest" # end-to-end encryption
+"brew-cask:notunes" = "latest" # keeps iTunes/Music from launching
+"brew-cask:obsidian" = "latest" # Markdown knowledge base
+"brew-cask:orbstack" = "latest" # Docker Desktop replacement
+"brew-cask:qlmarkdown" = "latest" # Quick Look for Markdown
+"brew-cask:qlstephen" = "latest" # Quick Look for extensionless text
+"brew-cask:quicklook-json" = "latest" # Quick Look for JSON
+"brew-cask:quicklookase" = "latest" # Quick Look for Adobe Swatch Exchange
+"brew-cask:quitter" = "latest" # hides or quits idle apps
+"brew-cask:raycast" = "latest" # launcher
+"brew-cask:setapp" = "latest" # app subscription
+"brew-cask:slack" = "latest" # team chat
+"brew-cask:soundsource" = "latest" # sound controller
+"brew-cask:syntax-highlight" = "latest" # Quick Look for source files
+"brew-cask:uhk-agent" = "latest" # Ultimate Hacking Keyboard configurator
+"brew-cask:vlc" = "latest" # media player
+"brew-cask:wezterm" = "latest" # terminal emulator
+"brew-cask:yubico-authenticator" = "latest" # YubiKey companion app
+"brew-cask:zed" = "latest" # code editor

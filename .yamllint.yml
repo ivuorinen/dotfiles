@@ -4,7 +4,6 @@ extends: default
 ignore: |
   .mise/locks
   .mypy_cache
-  Brewfile.lock.json
   config/cheat/cheatsheets/community
   config/cheat/cheatsheets/tldr
   config/mise/locks

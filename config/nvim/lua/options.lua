@@ -12,9 +12,10 @@ local o = vim.opt
 g.mapleader = ' ' -- Space as the leader key
 g.maplocalleader = ' ' -- Space as the local leader key
 
--- Nerd Font is installed (Brewfile / fonts) — used by mini.icons
--- and the diagnostic-sign branch in lua/autogroups.lua. Set explicitly so
--- the nil-fallback paths don't silently disable nerd-font glyphs.
+-- Nerd Font is installed (mise font casks on macOS, install-fonts.sh on
+-- Linux) — used by mini.icons and the diagnostic-sign branch in
+-- lua/autogroups.lua. Set explicitly so the nil-fallback paths don't silently
+-- disable nerd-font glyphs.
 g.have_nerd_font = true
 
 g.loaded_perl_provider = 0 -- Disable perl provider

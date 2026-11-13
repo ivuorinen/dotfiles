@@ -54,13 +54,12 @@ if command -v gpgconf > /dev/null 2>&1; then
   unset _gpg_ssh_sock
 fi
 
-# These three go through lib::init_cached (config/lib.sh): by this point
-# PATH leads with the mise shims, and each shim call re-enters mise to
+PROMPT_DIRTRIM=3
+
+# starship and wt below go through lib::init_cached (config/lib.sh): by this
+# point PATH leads with the mise shims, and each shim call re-enters mise to
 # resolve a version — `starship init bash` costs ~200ms through the shim
 # against ~8ms to source its cached output.
-x-have antidot && lib::init_cached antidot antidot init --shell bash
-
-PROMPT_DIRTRIM=3
 
 # Starship prompt — ~/.config/starship.toml links config/starship/starship.toml,
 # drawn in the terminal's ANSI colours.

@@ -45,7 +45,7 @@ must route through the sandbox.
   → One `ctx_execute_file` call with the slice logic built in.
 - `Read` a 200-line YAML to "see what's defined".
   → `ctx_execute_file` with a YAML parser, print the keys.
-- `Read` a Brewfile to identify tool candidates.
+- `Read` a package list to identify tool candidates.
   → `ctx_execute_file` with a regex extractor, print only matches.
 - `Read offset=N limit=M` to truncate a large file's window into
   context. The truncation is a tell that the file is too big to read
@@ -53,14 +53,14 @@ must route through the sandbox.
 
 ## Practical patterns
 
-Identify CLI tools (vs libraries) in a Brewfile:
+List the Homebrew formulae mise installs on macOS:
 
 ```python
 import re
 
-with open("config/homebrew/Brewfile") as f:
+with open("config/mise/conf.d/brew/mise.macos.toml") as f:
     for line in f:
-        m = re.match(r'brew "([^"]+)"', line)
+        m = re.match(r'"brew:([^"]+)"', line)
         if m:
             print(m.group(1))
 ```

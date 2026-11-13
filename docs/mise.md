@@ -62,38 +62,39 @@ instead; `./install --links` links it into place. A full install's mise step run
 before host overlays, so that host's `install.conf.yaml` runs `dfm install mise`
 again after the link.
 
-## Homebrew formulae via mise (bootstrap packages)
+## Homebrew formulae and casks via mise (bootstrap packages)
 
-Plain `homebrew/core` CLI formulae are installed by mise's experimental
-brew bootstrap instead of the `brew` CLI. They live under
-`[bootstrap.packages]` in the `config/mise/conf.d/brew/` folder fragment as
-`"brew:<formula>" = "latest"`, and mise pours them into the canonical
-Homebrew prefix (`/opt/homebrew`), so paths match a native
-`brew install`. `mise.toml` there holds the formulae every platform gets;
-`mise.macos.toml` holds the macOS-only ones and loads through the
-`auto_env = true` platform environment set in `config/mise/miserc.toml`
-and exported as `MISE_AUTO_ENV=true` by `config/exports` and
-`config/fish/exports.fish`.
+On macOS, mise installs the Homebrew formulae and casks without the `brew`
+CLI. They live under `[bootstrap.packages]` in
+`config/mise/conf.d/brew/mise.macos.toml` as `"brew:<formula>" = "latest"`
+and `"brew-cask:<cask>" = "latest"`. That file loads only in the macOS
+platform environment: `auto_env = true` in `config/mise/miserc.toml`,
+exported as `MISE_AUTO_ENV=true` by `config/exports` and
+`config/fish/exports.fish`. mise pours formulae into the canonical Homebrew
+prefix (`/opt/homebrew`), so paths match a native `brew install`, and
+anything Homebrew already installed counts as installed. On Intel Macs mise
+skips the formulae (its brew manager is Apple-silicon only) and still
+installs the casks.
 
-| Command                                       | Does                                     |
-|-----------------------------------------------|------------------------------------------|
-| `mise bootstrap packages status` (alias `ls`) | Show configured formulae + install state |
-| `mise bootstrap packages apply -m brew -y`    | Install any missing formulae             |
-| `mise bootstrap packages upgrade -m brew`     | Upgrade installed bootstrap formulae     |
-| `mise bootstrap packages import -m brew`      | Snapshot on-request formulae into config |
+| Command                                  | Does                                                |
+|------------------------------------------|-----------------------------------------------------|
+| `dfm packages status`                    | List the declared packages; exit 1 if one differs   |
+| `dfm packages apply`                     | Install what is missing (apt and dnf through sudo)  |
+| `dfm packages upgrade`                   | Upgrade the declared packages that are installed    |
+| `mise bootstrap packages import -m brew` | Record installed formulae in `[bootstrap.packages]` |
 
-> **Do not run `mise bootstrap packages prune --manager brew` here.** prune
-> removes every formula mise config does not declare, including the Brewfile
-> stack (imagemagick, ffmpeg, coreutils, antidot) and phpenv's
-> PHP and its extensions. Use `dfm cleanup brew` (brew cleanup + autoremove)
-> instead.
+> **Do not run `mise bootstrap packages prune`.** It removes every formula
+> and cask no mise config declares, phpenv's PHP versions and extensions
+> included. dfm has no brew cleanup step for a related reason: mise and the
+> brew CLI share `/opt/homebrew`, and `brew cleanup` / `brew autoremove` can
+> remove or relink kegs mise poured.
 
-`dfm install mise` runs `apply` automatically (macOS only). Only
-on-request **leaves** are listed — mise resolves each formula's
-dependency closure, so transitive deps must not be added. Casks and the
-imagemagick/ffmpeg/coreutils stack stay on native brew
-in `config/homebrew/Brewfile` (see its header). PHP is managed by
-`phpenv.fish` (homebrew provider), not brew or mise.
+`dfm install all` applies them through `mise bootstrap`. Only on-request
+**leaves** are listed — mise resolves each formula's dependency closure, so
+transitive deps must not be added. Fonts are casks too, on macOS only: on
+Linux mise installs font casks only after creating a Linuxbrew prefix with
+sudo, so Linux keeps `scripts/install-fonts.sh`. PHP is managed by
+`phpenv.fish` (homebrew provider), not by mise.
 
 ## Linux distribution packages
 
