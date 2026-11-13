@@ -3,16 +3,41 @@
 # dfm ssh is the second section tests/dfm.bats never reaches, and the one the
 # repo documented nowhere until this session.
 #
-# Only the menu and dispatch surface is covered. Every action reads the user's
-# real ~/.ssh, appends to allowed_signers, or fetches github.com/<user>.keys,
-# and dfm cannot be isolated with a stubbed PATH — it sources config/exports
-# during bootstrap, which rebuilds PATH and drops the stub directory. Calling
-# an action here would touch real SSH configuration.
+# Mostly the menu and dispatch surface. The actions read the user's real
+# ~/.ssh and append to allowed_signers, so only the GitHub fetch is exercised:
+# dfm-ssh skips the shell environment (dfm_bootstrap_min), so a curl stub first
+# on PATH stays the curl it runs, and `github` stops at a failed fetch before
+# it reads any local key.
 
 setup()
 {
   REPO="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
   DFM="$REPO/local/bin/dfm"
+}
+
+@test "dfm ssh github: the fetch is bounded and a failure is reported" {
+  local stubs="$BATS_TEST_TMPDIR/stubs"
+  mkdir -p "$stubs"
+  printf '#!/bin/sh\necho "$*" > "%s/curl-args"\nexit 28\n' "$BATS_TEST_TMPDIR" > "$stubs/curl"
+  chmod +x "$stubs/curl"
+  run env PATH="$stubs:$PATH" DOTFILES="$REPO" "$DFM" ssh github someone
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"No keys fetched for 'someone'"* ]]
+  [[ "$(cat "$BATS_TEST_TMPDIR/curl-args")" == *"--connect-timeout 10 --max-time 30"* ]]
+  [[ "$(cat "$BATS_TEST_TMPDIR/curl-args")" == *"https://github.com/someone.keys"* ]]
+}
+
+@test "dfm ssh github: a missing curl is named instead of a network error" {
+  # A PATH with only what the dispatcher needs to start, and no curl.
+  local bin="$BATS_TEST_TMPDIR/bin" tool
+  mkdir -p "$bin"
+  for tool in bash dirname readlink; do
+    ln -s "$(command -v "$tool")" "$bin/$tool"
+  done
+  run env PATH="$bin" DOTFILES="$REPO" "$DFM" ssh github someone
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"curl not found"* ]]
+  [[ "$output" != *"No keys fetched"* ]]
 }
 
 @test "dfm ssh: bare invocation lists every subcommand" {
@@ -31,12 +56,13 @@ setup()
 
 @test "dfm ssh: the menu documents the github user argument" {
   run env DOTFILES="$REPO" "$DFM" ssh
-  [[ "$output" == *"github <user>"* ]]
+  # Optional: the default comes from git's github.user.
+  [[ "$output" == *"github [user]"* ]]
 }
 
 @test "dfm ssh: an unknown subcommand shows the menu instead of acting" {
   run env DOTFILES="$REPO" "$DFM" ssh definitely-not-a-subcommand
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 2 ]
   [[ "$output" == *"signers"* ]]
 }
 
