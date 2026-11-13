@@ -9,8 +9,11 @@ set -g fish_greeting
 # mode) recolours them with no theme handler. Chosen on every start, so
 # universal colours saved by the old per-family themes never win. Its
 # selection and search highlights are white on bright black, which no family
-# can read, so they reverse the text instead of filling it.
-fish_config theme choose default
+# can read, so they reverse the text instead of filling it. fish 4 names it
+# `default`; fish 3 (the distro fish on Linux) names it `fish default`, and
+# printed "No such theme: default" on every start.
+fish_config theme choose default 2>/dev/null
+or fish_config theme choose "fish default"
 set -g fish_color_selection --reverse
 set -g fish_color_search_match --reverse
 set -g fish_pager_color_progress --reverse
