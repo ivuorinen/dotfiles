@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #USAGE cmd "cleanup" help="Remove old installs, caches, and unused packages" {
-#USAGE   cmd "all" help="Run old-vms, brew, mise, and caches cleanup in sequence"
-#USAGE   cmd "brew" help="brew cleanup --prune=all and autoremove unused deps"
+#USAGE   cmd "all" help="Run old-vms, mise, and caches cleanup in sequence"
 #USAGE   cmd "caches" help="Clear mise and uv caches"
 #USAGE   cmd "docker" help="Remove stopped containers and dangling images"
 #USAGE   cmd "mise" help="Prune unused tool versions and clear mise download cache"
-#USAGE   cmd "old-vms" help="Remove old version manager directories replaced by mise"
+#USAGE   cmd "old-vms" help="Remove old version manager directories replaced by mise" {
+#USAGE     flag "--dry-run" help="Show what would be removed without removing"
+#USAGE   }
 #USAGE }
 #
 # @description Remove old installs, caches, and unused packages (dfm cleanup)
@@ -29,7 +30,6 @@ dfm_cleanup()
       local rc=0
       msgr msg "Running all cleanup tasks..."
       dfm_cleanup old-vms || rc=1
-      dfm_cleanup brew || rc=1
       dfm_cleanup mise || rc=1
       dfm_cleanup caches || rc=1
       if [[ $rc -eq 0 ]]; then
@@ -40,37 +40,28 @@ dfm_cleanup()
       return "$rc"
       ;;
 
-    brew)
-      if ! command -v brew > /dev/null 2>&1; then
-        msgr warn "brew not found — skipping"
-        return 0
-      fi
-      # Collect both statuses: the branch used to end on msgr, so a failed
-      # cleanup still printed success and `dfm cleanup all` never saw it.
-      local brew_rc=0
-      msgr run "Running brew cleanup..."
-      brew cleanup --prune=all || brew_rc=1
-      msgr run "Running brew autoremove..."
-      brew autoremove || brew_rc=1
-      if ((brew_rc == 0)); then
-        msgr yay "Homebrew cleanup complete"
-      else
-        msgr err "Homebrew cleanup failed"
-      fi
-      return "$brew_rc"
-      ;;
-
+    # No brew step: mise's brew manager shares /opt/homebrew with the brew
+    # CLI, and `brew cleanup`/`brew autoremove` can remove or relink kegs mise
+    # poured.
     caches)
+      # Each tool's status counts, so `cleanup all` sees a failure and the
+      # success line is printed only when everything worked.
+      local cache_rc=0
       msgr run "Clearing caches..."
       if command -v mise > /dev/null 2>&1; then
         msgr nested "mise cache..."
-        mise cache clean
+        mise cache clean || cache_rc=1
       fi
       if command -v uv > /dev/null 2>&1; then
         msgr nested "uv cache..."
-        uv cache clean
+        uv cache clean || cache_rc=1
       fi
-      msgr yay "Cache cleanup complete"
+      if ((cache_rc == 0)); then
+        msgr yay "Cache cleanup complete"
+      else
+        msgr err "Cache cleanup failed"
+      fi
+      return "$cache_rc"
       ;;
 
     docker)
@@ -79,7 +70,10 @@ dfm_cleanup()
         return 0
       fi
       msgr run "Running docker system prune..."
-      docker system prune -f
+      if ! docker system prune -f; then
+        msgr err "docker system prune failed"
+        return 1
+      fi
       msgr yay "Docker cleanup complete"
       ;;
 
@@ -88,11 +82,17 @@ dfm_cleanup()
         msgr warn "mise not found — skipping"
         return 0
       fi
+      local mise_rc=0
       msgr run "Pruning unused mise tool versions..."
-      mise prune --yes
+      mise prune --yes || mise_rc=1
       msgr run "Clearing mise download cache..."
-      mise cache clean
-      msgr yay "mise cleanup complete"
+      mise cache clean || mise_rc=1
+      if ((mise_rc == 0)); then
+        msgr yay "mise cleanup complete"
+      else
+        msgr err "mise cleanup failed"
+      fi
+      return "$mise_rc"
       ;;
 
     old-vms)
@@ -102,10 +102,11 @@ dfm_cleanup()
         return 1
       fi
       msgr run "Removing old version manager installs..."
-      bash "$script"
+      # Arguments pass through: the script takes --dry-run.
+      bash "$script" "${@:2}"
       ;;
 
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

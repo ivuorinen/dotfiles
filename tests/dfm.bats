@@ -157,7 +157,9 @@ setup()
   [ "$status" -eq 0 ]
   [[ "$output" == *"fmt"* ]]
   [[ "$output" == *"shfmt"* ]]
-  [[ "$output" == *"yamlfmt"* ]]
+  [[ "$output" == *"reset-nvim"* ]]
+  [[ "$output" != *"yamlfmt"* ]]
+  [[ "$output" != *"reset_all"* ]]
 }
 
 @test "dfm check menu shows entries" {

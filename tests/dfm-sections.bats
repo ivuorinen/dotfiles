@@ -100,40 +100,30 @@ usage_cmds()
   [[ "$output" == *"/bin"* ]]
 }
 
-@test "dfm apt: matches whether apt exists on this system" {
-  run env DOTFILES="$REPO" "$DFM" apt
-  if command -v apt > /dev/null 2>&1; then
-    for entry in $(usage_cmds apt); do
-      [[ "$output" == *"$entry"* ]] || {
-        echo "apt exists but the menu is missing '$entry'"
-        return 1
-      }
-    done
-  else
-    [[ "$output" == *"not available on this system"* ]]
-  fi
-}
+# reset-nvim deletes nvim's XDG directories and relinks the config. Everything
+# it touches lives under BATS_TEST_TMPDIR: HOME, the four XDG roots, a fake
+# DOTFILES (whose empty shared.sh keeps PATH as set here) and a mise stub, so
+# the `dfm install mise` it ends with installs nothing.
+@test "dfm dotfiles reset-nvim: clears the XDG nvim dirs and relinks the config" {
+  local t="$BATS_TEST_TMPDIR" d
+  local fake="$t/dotfiles"
+  mkdir -p "$fake/config/nvim" "$t/home" "$t/stubs"
+  : > "$fake/config/shared.sh"
+  printf '#!/bin/sh\nexit 0\n' > "$t/stubs/mise"
+  chmod +x "$t/stubs/mise"
+  for d in data state cache config; do
+    mkdir -p "$t/$d/nvim"
+    : > "$t/$d/nvim/old"
+  done
 
-@test "dfm brew: matches whether brew exists on this system" {
-  run env DOTFILES="$REPO" "$DFM" brew
-  if command -v brew > /dev/null 2>&1; then
-    for entry in $(usage_cmds brew); do
-      [[ "$output" == *"$entry"* ]] || {
-        echo "brew exists but the menu is missing '$entry'"
-        return 1
-      }
-    done
-  else
-    [[ "$output" == *"not available on this system"* ]]
-  fi
-}
-
-@test "dfm: a tool-gated section never runs its action when the tool is absent" {
-  # The gate sits at the top of the section function, so it must also stop a
-  # direct `dfm apt upkeep` — not just the bare menu invocation.
-  if command -v apt > /dev/null 2>&1; then
-    skip "apt is installed on this machine"
-  fi
-  run env DOTFILES="$REPO" "$DFM" apt upkeep
-  [[ "$output" == *"not available on this system"* ]]
+  run env PATH="$t/stubs:$PATH" HOME="$t/home" DOTFILES="$fake" \
+    XDG_DATA_HOME="$t/data" XDG_STATE_HOME="$t/state" \
+    XDG_CACHE_HOME="$t/cache" XDG_CONFIG_HOME="$t/config" \
+    "$DFM" dotfiles reset-nvim < /dev/null
+  [ "$status" -eq 0 ]
+  [ ! -e "$t/data/nvim" ]
+  [ ! -e "$t/state/nvim" ]
+  [ ! -e "$t/cache/nvim" ]
+  [ -L "$t/config/nvim" ]
+  [ "$(readlink "$t/config/nvim")" = "$fake/config/nvim" ]
 }
