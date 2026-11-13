@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #USAGE cmd "helpers" help="Display system information and generate documentation" {
-#USAGE   cmd "aliases" help="Show live shell aliases" {
+#USAGE   cmd "aliases" help="Show live shell aliases for bash, zsh or fish" {
 #USAGE     arg "<shell>" help="Shell to show aliases for (bash, zsh, fish)"
 #USAGE   }
 #USAGE   cmd "colors" help="Show terminal color palette"
@@ -20,34 +20,17 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
+}
 dfm_bootstrap_for "$@"
 
 # Handle helper utility commands
 dfm_helpers()
 {
-  USAGE_PREFIX="$SCRIPT helpers <command>"
-  MENU=(
-    "aliases:<shell> (bash, zsh, fish) Show live shell aliases"
-    "colors:Show colors"
-    "env:Show environment variables"
-    "functions:Show functions"
-    'path:Show $PATH dir by dir'
-    "docs-aliases:Generate docs/aliases.md"
-    "docs-nvim:Generate nvim keybindings documentation"
-    "docs-tmux:Generate tmux keybindings documentation"
-    "docs-wezterm:Generate wezterm keybindings documentation"
-    "docs-all:Generate all documentation"
-  )
-
   CMD="${1:-}"
   [[ $# -gt 0 ]] && shift
   SECTION="${1:-}"
@@ -71,33 +54,20 @@ dfm_helpers()
           fish -ic "alias" | sed "s|$HOME|~|"
           ;;
         *)
-          echo "$SCRIPT helpers aliases <shell> (bash, zsh, fish)"
+          msgr err "Usage: $SCRIPT helpers aliases <bash|zsh|fish>"
+          return 2
           ;;
       esac
       ;;
 
     "colors")
-      max=255
-      start=0
-
-      while [ "$start" -le "$max" ]; do
-        for i in $(seq "$start" $((start + 9))); do
-          if [ "$i" -le "$max" ]; then
-            # Outputs colored number
-            # printf " \e[38;5;%sm%4s\e[0m" "$i" "$i"
-
-            # Outputs colored block with number inside
-            # printf " \e[48;5;%sm\e[38;5;15m%5s \e[0m" "$i" "$i"
-
-            # Outputs colored block and color number
-            # printf " \e[48;5;%sm   \e[0m %3d" "$i" "$i"
-
-            # Outputs color number and colored block
-            printf "%3d \e[48;5;%sm   \e[0m " "$i" "$i"
-          fi
-        done
-        printf "\n"
-        start=$((start + 10))
+      # The 256-colour palette, ten per row: each number and a block in it.
+      local i
+      for ((i = 0; i <= 255; i++)); do
+        printf "%3d \e[48;5;%sm   \e[0m " "$i" "$i"
+        if ((i % 10 == 9 || i == 255)); then
+          printf "\n"
+        fi
       done
       ;;
 
@@ -117,7 +87,7 @@ dfm_helpers()
       return "$rc"
       ;;
 
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "$CMD" ;;
   esac
 }
 

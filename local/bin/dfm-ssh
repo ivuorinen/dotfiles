@@ -189,12 +189,6 @@ dfm_ssh_github()
 
 dfm_ssh()
 {
-  USAGE_PREFIX="$SCRIPT ssh <command>"
-  MENU=(
-    "signers:Append local public keys missing from allowed_signers, then compare with GitHub"
-    "check:Dry run — show what would be appended and the GitHub overlap, write nothing"
-    "github <user>:Compare local public keys against github.com/<user>.keys"
-  )
   case "${1:-}" in
     s | signers)
       dfm_ssh_signers
@@ -210,7 +204,7 @@ dfm_ssh()
       shift
       dfm_ssh_github "${1:-}"
       ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

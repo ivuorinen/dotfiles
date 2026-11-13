@@ -14,31 +14,17 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
+}
 dfm_bootstrap_for "$@"
 
 dfm_cleanup()
 {
-  USAGE_PREFIX="$SCRIPT cleanup <command>"
-
-  MENU=(
-    "all:Run old-vms, brew, mise, and caches cleanup in sequence"
-    "brew:brew cleanup --prune=all and autoremove unused deps"
-    "caches:Clear mise and uv caches"
-    "docker:Remove stopped containers and dangling images (docker system prune)"
-    "mise:Prune unused tool versions and clear mise download cache"
-    "old-vms:Remove old version manager directories replaced by mise"
-  )
-
-  case "$1" in
+  case "${1:-}" in
     all)
       local rc=0
       msgr msg "Running all cleanup tasks..."

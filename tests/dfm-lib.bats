@@ -56,27 +56,97 @@ setup()
   done
 }
 
-# The bash-4 guard runs on stock macOS bash 3.2. Reached without a terminal
-# (a test run, CI), it must refuse instead of installing anything. brew and
-# mise stubs first on PATH record any call, so an install attempt fails the
-# test rather than touching the machine.
-@test "dfm_bootstrap: bash 3.2 without a terminal refuses and installs nothing" {
+# dfm must run on stock macOS bash 3.2 — it is what `dfm install all` uses to
+# install a newer bash — so it carries no version guard. CI has no bash 3.2,
+# so bash-4-only syntax is rejected statically: associative and nameref
+# declarations, mapfile/readarray, case-modifying expansions, `|&`, `&>>` and
+# `;;&`. Comment lines are skipped.
+bash4_syntax()
+{
+  grep -nE '(^|[^[:alnum:]_])(local|declare|typeset) +-[a-zA-Z]*[An]|(^|[^[:alnum:]_])(mapfile|readarray)([^[:alnum:]_]|$)|\$\{[A-Za-z_][A-Za-z0-9_]*(,,?|\^\^?)\}|\|&|&>>|;;&' "$@" \
+    | grep -vE '^([^:]+:)?[0-9]+:[[:space:]]*#'
+}
+
+@test "bash-4 syntax check: finds a planted associative array" {
+  # Known-positive control: an empty result below means nothing only while
+  # this still fires.
+  printf 'f()\n{\n  local -A x\n  mapfile -t y < z\n}\n' > "$BATS_TEST_TMPDIR/planted"
+  run bash4_syntax "$BATS_TEST_TMPDIR/planted"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"local -A x"* ]]
+  [[ "$output" == *"mapfile -t y"* ]]
+}
+
+@test "dfm files use no bash-4-only syntax" {
+  run bash4_syntax "$DOTFILES/local/bin/dfm" "$DOTFILES"/local/bin/dfm-*
+  [ "$status" -eq 1 ] || {
+    echo "bash-4-only syntax found:"
+    echo "$output"
+    return 1
+  }
+}
+
+@test "dfm runs actions under /bin/bash 3.2" {
   /bin/bash -c '((BASH_VERSINFO[0] < 4))' || skip "/bin/bash is 4+"
-  local stubs="$BATS_TEST_TMPDIR/stubs"
-  mkdir -p "$stubs"
-  for tool in brew mise; do
-    printf '#!/bin/sh\necho "%s $*" >> "%s/calls"\n' "$tool" "$stubs" > "$stubs/$tool"
-    chmod +x "$stubs/$tool"
-  done
-  run env PATH="$stubs:/usr/bin:/bin" /bin/bash -c 'source "$0"; dfm_bootstrap' "$DFM_LIB" < /dev/null
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"dfm requires bash 4.0+"* ]]
-  [[ "$output" == *"mise bootstrap packages apply brew:bash"* ]]
-  [ ! -e "$stubs/calls" ]
+  run env DOTFILES="$DOTFILES" /bin/bash "$DOTFILES/local/bin/dfm-helpers" path
+  [ "$status" -eq 0 ]
+  [ -n "$output" ]
+
+  local fake="$BATS_TEST_TMPDIR/dotfiles"
+  mkdir -p "$fake/config/secrets.d" "$fake/config/fish/secrets.d"
+  : > "$fake/config/shared.sh"
+  printf "export A_TOKEN='x'\n" > "$fake/config/secrets.d/a.sh"
+  printf "set -x A_TOKEN 'x'\n" > "$fake/config/fish/secrets.d/a.fish"
+  run env DOTFILES="$fake" /bin/bash "$DOTFILES/local/bin/dfm-secrets" list
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"A_TOKEN"* ]]
 }
 
 @test "dfm-lib: exports DFM so subcommands can re-dispatch" {
   run bash -c 'source "$0"; echo "${DFM:-UNSET}"' "$DFM_LIB"
   [ "$status" -eq 0 ]
   [ "$output" != "UNSET" ]
+}
+
+# dfm_menu renders a section's menu from its #USAGE header, the same spec the
+# completions are generated from.
+@test "dfm_menu: lists each subcommand with its args and help" {
+  local spec="$BATS_TEST_TMPDIR/dfm-demo"
+  cat > "$spec" << 'EOF'
+#!/usr/bin/env bash
+#USAGE cmd "demo" help="Demo section" {
+#USAGE   cmd "plain" help="No arguments"
+#USAGE   cmd "takes" help="Takes things: an arg and a flag" {
+#USAGE     alias "t"
+#USAGE     arg "<thing>" help="The thing"
+#USAGE     flag "--force" help="Force it"
+#USAGE   }
+#USAGE }
+#
+#USAGE   cmd "after" help="Past the header, never read"
+EOF
+  run bash -c 'source "$0"; dfm_bootstrap_min; dfm_menu "$1"' "$DFM_LIB" "$spec"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"  dfm demo <command>"* ]]
+  # The name column widens to the longest entry (23 characters here); flags
+  # are shown as optional.
+  [[ "$output" == *"  plain                   No arguments"* ]]
+  [[ "$output" == *"  takes <thing> [--force] Takes things: an arg and a flag"* ]]
+  [[ "$output" != *"after"* ]]
+  [[ "$output" != *"alias"* ]]
+}
+
+@test "dfm_menu: a section without subcommands is titled with its args" {
+  local spec="$BATS_TEST_TMPDIR/dfm-solo"
+  cat > "$spec" << 'EOF'
+#!/usr/bin/env bash
+#USAGE cmd "solo" help="Show one thing" {
+#USAGE   arg "[name]" help="Name of the thing"
+#USAGE }
+EOF
+  run bash -c 'source "$0"; dfm_bootstrap_min; dfm_menu "$1"' "$DFM_LIB" "$spec"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"  dfm solo [name]"* ]]
+  [[ "$output" == *"  Show one thing"* ]]
+  [[ "$output" != *"<command>"* ]]
 }

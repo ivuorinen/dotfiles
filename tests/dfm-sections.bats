@@ -23,31 +23,39 @@ usage_cmds()
     | sed 's/.*"\(.*\)"/\1/'
 }
 
-@test "dfm sections: every USAGE-declared subcommand appears in its menu" {
-  for section in check dotfiles helpers secrets tests theme; do
-    run env DOTFILES="$REPO" "$DFM" "$section"
-    [ "$status" -eq 0 ] || {
-      echo "dfm $section exited $status"
-      return 1
-    }
-    for entry in $(usage_cmds "$section"); do
-      [[ "$output" == *"$entry"* ]] || {
-        echo "dfm-$section: USAGE declares '$entry' but the menu does not list it"
-        return 1
-      }
-    done
-  done
-}
-
-@test "dfm sections: an unknown subcommand shows the menu instead of acting" {
+@test "dfm sections: an unknown subcommand exits 2 with the menu instead of acting" {
   for section in check dotfiles helpers secrets tests theme; do
     run env DOTFILES="$REPO" "$DFM" "$section" definitely-not-a-subcommand
+    [ "$status" -eq 2 ] || {
+      echo "dfm $section with a bogus argument exited $status, not 2"
+      return 1
+    }
+    [[ "$output" == *"unknown command: dfm $section definitely-not-a-subcommand"* ]] || {
+      echo "dfm $section did not name the unknown command"
+      return 1
+    }
     first=$(usage_cmds "$section" | head -1)
     [[ "$output" == *"$first"* ]] || {
       echo "dfm $section with a bogus argument did not fall back to the menu"
       return 1
     }
   done
+}
+
+@test "dfm sections: a help flag shows the menu with exit 0" {
+  for flag in help -h --help; do
+    run env DOTFILES="$REPO" "$DFM" check "$flag"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"dfm check <command>"* ]]
+  done
+}
+
+@test "dfm helpers aliases: a missing or unknown shell exits 2" {
+  run env DOTFILES="$REPO" "$DFM" helpers aliases
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Usage: dfm helpers aliases"* ]]
+  run env DOTFILES="$REPO" "$DFM" helpers aliases tcsh
+  [ "$status" -eq 2 ]
 }
 
 @test "dfm scripts: lists the install scripts it can run" {

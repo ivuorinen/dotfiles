@@ -21,15 +21,12 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
+}
 dfm_bootstrap_for "$@"
 
 # Collected outcomes for the `install all` closing summary.
@@ -98,22 +95,6 @@ ensure_mise()
 # Handle install section commands
 dfm_install()
 {
-  USAGE_PREFIX="$SCRIPT install <command>"
-
-  MENU=(
-    "all:Installs everything in the correct order"
-    "apt-packages:Install apt packages (Debian/Ubuntu)"
-    "cheat-databases:Install cheat external cheatsheet databases"
-    "dnf-packages:Install dnf packages (Fedora/RHEL)"
-    "fonts:Install programming fonts"
-    "gh:Install GitHub CLI Extensions"
-    "imagick:Install ImageMagick CLI"
-    "macos:Apply macOS defaults and the login shell"
-    "mise:Install tools via mise (runtimes + CLI tools)"
-    "mise-cleanup:Remove old version manager installations (--dry-run supported)"
-    "xcode-cli-tools:Install Xcode CLI tools (macOS)"
-  )
-
   case "$1" in
     all)
       msgr msg "Starting to install all and reloading configurations..."
@@ -312,7 +293,7 @@ dfm_install()
         && msgr yay "Xcode CLI tools installed!"
       ;;
 
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

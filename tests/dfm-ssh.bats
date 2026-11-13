@@ -53,14 +53,3 @@ setup()
   [ "$status" -eq 0 ]
   [[ "$output" == *"ssh"* ]]
 }
-
-@test "dfm ssh: the menu entries match the USAGE spec" {
-  run env DOTFILES="$REPO" "$DFM" ssh
-  spec=$(grep -oE '^#USAGE   cmd "[a-z-]+"' "$REPO/local/bin/dfm-ssh" | sed 's/.*"\(.*\)"/\1/' | sort -u)
-  for entry in $spec; do
-    [[ "$output" == *"$entry"* ]] || {
-      echo "USAGE declares '$entry' but the menu does not list it"
-      return 1
-    }
-  done
-}

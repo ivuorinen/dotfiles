@@ -34,10 +34,14 @@ export DFM
 # before ./install has linked anything.
 command -v msgr > /dev/null 2>&1 || PATH="$_dfm_libdir:$PATH"
 
-# Shared variable setup used by every bootstrap path. Kept sourcing-free
-# and separate so the full path can control the shared.sh / msgr order
-# (see dfm_bootstrap).
-dfm_bootstrap_vars()
+# Minimal bootstrap for menu/help paths: the shared variables and nothing
+# else. It deliberately SKIPS config/shared.sh, which pulls in
+# config/exports — `mise activate`, `brew shellenv` and the rest of the
+# export chain, together far more than a static menu needs (each of those
+# two alone forks a ~20-30 ms subprocess). Action paths use dfm_bootstrap
+# (full) instead. Call once near the top of a subcommand via
+# dfm_bootstrap_for, after sourcing this file.
+dfm_bootstrap_min()
 {
   # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
   : "${VERBOSE:=0}"
@@ -47,73 +51,26 @@ dfm_bootstrap_vars()
   export DOTFILES BREWFILE HOSTFILES
 
   # Every dfm-* binary presents itself under the public "dfm" name, so
-  # help/usage text reads "dfm brew <command>" no matter which binary is
+  # help/usage text reads "dfm install <command>" no matter which binary is
   # actually executing.
   SCRIPT="dfm"
 }
 
-# Minimal bootstrap for menu/help paths. Sets the shared variables and
-# sources msgr (cheap — just colour-function definitions) but
-# deliberately SKIPS config/shared.sh. shared.sh pulls in config/exports,
-# which runs `mise activate`, `brew shellenv` and the rest of the export
-# chain; together they cost far more than a static menu needs (each of those
-# two alone forks a ~20-30 ms subprocess). Rendering a static menu needs none
-# of that, so the listing path stays fast. Action paths use dfm_bootstrap
-# (full) instead. Call once near the top of a subcommand via
-# dfm_bootstrap_for, after sourcing this file. msgr's bare msg() prints
-# unconditionally, but this path never sources config/exports, so there
-# are no `msg "Setting up …"` calls to leak.
-dfm_bootstrap_min()
-{
-  dfm_bootstrap_vars
-
-  # shellcheck disable=SC1090
-  source "${DOTFILES}/local/bin/msgr"
-}
-
-# Full bootstrap for action paths: the variable setup plus the bash-4
-# guard and the (expensive) shared shell environment.
+# Full bootstrap for action paths: the variable setup plus the (expensive)
+# shared shell environment. dfm runs on bash 3.2 (stock macOS) — it is what
+# `dfm install all` uses to install a newer bash — so it needs no version
+# guard; tests/dfm-lib.bats rejects bash-4-only syntax in the dfm files.
 dfm_bootstrap()
 {
-  dfm_bootstrap_vars
+  dfm_bootstrap_min
 
-  # Require bash 4.0+ for associative arrays and mapfile. Stock macOS ships
-  # bash 3.2, so the guard offers an install, but only to a person at a
-  # terminal: a test run or CI job that reaches an action path must never
-  # install packages. mise's brew bootstrap installs brew:bash (declared in
-  # config/mise/conf.d/brew/) without Homebrew; the guard no longer pipes
-  # Homebrew's unpinned HEAD installer into bash, and says "Done" only when
-  # the install succeeded.
-  if ((BASH_VERSINFO[0] < 4)); then
-    echo "dfm requires bash 4.0+, found ${BASH_VERSION}"
-    if [[ "$(uname)" != "Darwin" ]]; then
-      echo "Install bash 4.0+ and try again."
-    elif [[ ! -t 0 ]]; then
-      echo "Install bash 4.0+ (mise bootstrap packages apply brew:bash) and try again."
-    elif command -v mise &> /dev/null; then
-      echo "Installing modern bash via mise (brew:bash)..."
-      mise bootstrap packages apply --yes brew:bash \
-        && echo "Done. Restart your shell and run dfm again."
-    elif command -v brew &> /dev/null; then
-      echo "Installing modern bash via Homebrew..."
-      brew install bash && echo "Done. Restart your shell and run dfm again."
-    else
-      echo "Install mise (https://mise.jdx.dev), then run: mise bootstrap packages apply brew:bash"
-    fi
-    exit 1
-  fi
-
-  # Order matters: shared.sh MUST be sourced before msgr. shared.sh
-  # defines a VERBOSE-guarded msg() and then sources config/exports, which
-  # calls `msg "Setting up …"` for many tools. msgr also defines a bare
-  # msg() that prints unconditionally; if msgr were sourced first those
-  # setup messages would bleed onto stdout (e.g. `dfm helpers tmux`).
-  # Sourcing shared.sh first keeps the guarded msg() active while exports
-  # runs; msgr then loads its colour helpers for the action code.
+  # shared.sh defines VERBOSE-guarded msg()/msg_* helpers and then sources
+  # config/exports, whose `msg "Setting up …"` lines stay quiet unless
+  # VERBOSE=1. The sections print through the external `msgr` command, so
+  # nothing here sources msgr's functions — doing so would replace the
+  # guarded msg() with msgr's unconditional one.
   # shellcheck disable=SC1091
   source "$DOTFILES/config/shared.sh"
-  # shellcheck disable=SC1090
-  source "${DOTFILES}/local/bin/msgr"
 }
 
 # Bootstrap appropriately for the subcommand's ARGS. A menu/help
@@ -133,307 +90,103 @@ dfm_bootstrap_for()
   esac
 }
 
-# Get description from a script file's @description tag
-get_script_description()
-{
-  local file="$1"
-  local desc
-  desc=$(sed -n '/@description/s/.*@description *\(.*\)/\1/p' "$file" | head -1)
-  echo "${desc:-No description available}"
-}
-
-# Menu builder
+# Print a framed menu: TITLE, then one "name:description" entry per further
+# argument. The name column is as wide as the longest name, at least 20.
 menu_builder()
 {
   local title=$1
   local commands=("${@:2}")
-  local width=60
+  local width=60 rule cmd name desc col=20
 
-  printf "\n%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
-  printf "%-${width}s\n" "  $title"
-  printf "%s\n" "$(printf '%.s─' $(seq 1 "$width"))"
+  # The rule line, built without a subshell or seq.
+  printf -v rule '%*s' "$width" ''
+  rule=${rule// /─}
 
   for cmd in "${commands[@]}"; do
-    local name=${cmd%%:*}
-    local desc=${cmd#*:}
-    printf "  %-20s %s\n" "$name" "$desc"
+    name=${cmd%%:*}
+    ((${#name} > col)) && col=${#name}
+  done
+
+  printf "\n%s\n" "$rule"
+  printf "%-${width}s\n" "  $title"
+  printf "%s\n" "$rule"
+
+  for cmd in "${commands[@]}"; do
+    name=${cmd%%:*}
+    desc=${cmd#*:}
+    printf "  %-${col}s %s\n" "$name" "$desc"
   done
 }
 
-# Derive a secrets filename from an env var name.
-# Lowercases the name, then strips a trailing credential-type suffix.
-# GITHUB_TOKEN -> github, SONAR_TOKEN -> sonar, FOO_API_KEY -> foo.
-# Callers can override the result by passing an explicit filename to
-# secrets_create (e.g. SONAR_TOKEN is stored as sonarcloud).
-secrets_filename_from_env()
+# Print the menu of the dfm-* section FILE from its leading usage-spec block
+# (the comment lines marked USAGE) — the spec the completions, markdown and
+# manpages are generated from, so the menu cannot drift from them. Each
+# depth-1 `cmd` is an entry, its nested `arg`/`flag` names appended to the
+# entry name. A section without subcommands is titled with its own args and
+# shows its help line instead. Only the header is read: the loop stops at the
+# first line after the shebang that is not a spec line. Bash 3.2 compatible
+# and fork-free.
+#
+# The marker is written `[#]USAGE` in the patterns below: .mise/tasks/lint-usage
+# lints every local/bin file that contains the marker spelled out, and this
+# sourced library is not a spec.
+dfm_menu()
 {
-  local name
-  name=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
-  case "$name" in
-    *_api_key) name=${name%_api_key} ;;
-    *_token) name=${name%_token} ;;
-    *_secret) name=${name%_secret} ;;
-    *_password) name=${name%_password} ;;
-    *_key) name=${name%_key} ;;
-    *_pat) name=${name%_pat} ;;
-  esac
-  printf '%s' "$name"
+  local file=$1 line section="" section_help="" args=""
+  local name="" entry_args="" help="" items=()
+  local re_section='^[#]USAGE cmd "([^"]+)"( help="([^"]*)")?'
+  local re_cmd='^[#]USAGE   cmd "([^"]+)"( help="([^"]*)")?'
+  local re_cmd_arg='^[#]USAGE     (arg|flag) "([^"]+)"'
+  local re_section_arg='^[#]USAGE   (arg|flag) "([^"]+)"'
+
+  while IFS= read -r line || [[ -n $line ]]; do
+    case $line in
+      "#!"*) continue ;;
+      [#]USAGE*) ;;
+      *) break ;;
+    esac
+    if [[ $line =~ $re_cmd ]]; then
+      [[ -n $name ]] && items+=("$name$entry_args:$help")
+      name=${BASH_REMATCH[1]}
+      help=${BASH_REMATCH[3]}
+      entry_args=""
+    elif [[ $line =~ $re_cmd_arg ]]; then
+      # Flags are optional by nature; args carry their own <> or [].
+      if [[ ${BASH_REMATCH[1]} == flag ]]; then
+        entry_args+=" [${BASH_REMATCH[2]}]"
+      else
+        entry_args+=" ${BASH_REMATCH[2]}"
+      fi
+    elif [[ $line =~ $re_section_arg ]]; then
+      args+=" ${BASH_REMATCH[2]}"
+    elif [[ $line =~ $re_section ]]; then
+      section=${BASH_REMATCH[1]}
+      section_help=${BASH_REMATCH[3]}
+    fi
+  done < "$file"
+  [[ -n $name ]] && items+=("$name$entry_args:$help")
+
+  if ((${#items[@]} == 0)); then
+    menu_builder "$SCRIPT $section${args}"
+    printf "  %s\n" "$section_help"
+  else
+    menu_builder "$SCRIPT $section${args:- <command>}" "${items[@]}"
+  fi
 }
 
-# True when NAME is a safe secrets filename. It must start with an
-# alphanumeric and contain only letters, digits, '.', '_' or '-'. This
-# rejects empty names, '.'/'..', leading-dot names (which would create a
-# hidden file the listing glob skips) and anything with a path separator.
-secrets_valid_name()
+# The `*)` branch of every section with fixed subcommands. No argument or a
+# help flag shows the menu. Anything else is an error: the message and the
+# menu go to stderr and the script exits 2, so a renamed or removed command
+# in a script or an install config fails instead of passing silently.
+dfm_fallback()
 {
-  [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]
-}
-
-# Create fish + bash/zsh secrets files for an environment variable.
-# Usage: secrets_create <ENV_NAME> [filename]
-# The value is read from a hidden prompt so it never reaches the
-# terminal, shell history, or the process table. Files are written with
-# a 077 umask so only the owner can read them.
-secrets_create()
-{
-  local env_name="$1"
-  local filename="$2"
-
-  if [[ -z "$env_name" ]]; then
-    msgr err "Usage: $SCRIPT secrets create <ENV_NAME> [filename]"
-    return 1
-  fi
-
-  # Reject anything that is not a valid POSIX shell identifier; otherwise
-  # the generated set/export lines would be syntactically broken.
-  if [[ ! "$env_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
-    msgr err "Invalid environment variable name: $env_name"
-    msgr nested "Expected a shell identifier, e.g. GITHUB_TOKEN"
-    return 1
-  fi
-
-  [[ -z "$filename" ]] && filename=$(secrets_filename_from_env "$env_name")
-
-  # Stripping a suffix can leave nothing (e.g. env name "_TOKEN").
-  if [[ -z "$filename" ]]; then
-    msgr err "Could not derive a filename from '$env_name' — pass one explicitly"
-    return 1
-  fi
-
-  # Guard the filename so the secret can only land inside the two
-  # secrets.d directories, never as a traversal path or hidden file.
-  if ! secrets_valid_name "$filename"; then
-    msgr err "Invalid secrets filename: $filename"
-    msgr nested "Use letters, digits, '.', '_', '-'; must start alphanumeric"
-    return 1
-  fi
-
-  local fish_secret="$DOTFILES/config/fish/secrets.d/$filename.fish"
-  local sh_secret="$DOTFILES/config/secrets.d/$filename.sh"
-
-  if [[ -f "$fish_secret" ]] || [[ -f "$sh_secret" ]]; then
-    msgr warn "Secrets files already exist — they will be overwritten"
-  fi
-
-  # IFS= preserves leading/trailing whitespace and -r preserves
-  # backslashes, so the secret is captured exactly as typed.
-  local secret
-  IFS= read -rsp "Enter $env_name (input hidden): " secret
-  echo
-
-  if [[ -z "$secret" ]]; then
-    msgr err "No value provided"
-    return 1
-  fi
-
-  # Store the value single-quoted so secrets containing $, ", \, or
-  # backticks are written verbatim instead of being expanded or
-  # breaking the file. Each shell has different single-quote rules:
-  #   POSIX sh — fully literal; only ' must be escaped as '\''.
-  #   fish     — literal except \ and ', each escaped with a backslash.
-  local sh_value fish_value
-  sh_value=${secret//\'/\'\\\'\'}
-  fish_value=${secret//\\/\\\\}
-  fish_value=${fish_value//\'/\\\'}
-
-  # Create the directories and files under a 077 umask so newly created
-  # paths are owner-only from the start. Every write is checked so a
-  # failure (e.g. full disk) is a hard error, never a silent success.
-  local old_umask
-  old_umask=$(umask)
-  umask 077
-  if ! mkdir -p "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
-    || ! printf "# %s\nset -x %s '%s'\n" "$env_name" "$env_name" "$fish_value" > "$fish_secret" \
-    || ! printf "# %s\nexport %s='%s'\n" "$env_name" "$env_name" "$sh_value" > "$sh_secret"; then
-    umask "$old_umask"
-    msgr err "Failed to write secret files"
-    return 1
-  fi
-
-  # umask only governs newly created paths; re-tighten explicitly so a
-  # pre-existing dir/file with broader perms (e.g. 0755/0644) is fixed.
-  if ! chmod 700 "$(dirname "$fish_secret")" "$(dirname "$sh_secret")" \
-    || ! chmod 600 "$fish_secret" "$sh_secret"; then
-    umask "$old_umask"
-    msgr err "Failed to set secret file permissions"
-    return 1
-  fi
-  umask "$old_umask"
-
-  msgr yay "$env_name secrets created"
-  msgr nested "fish:     $fish_secret"
-  msgr nested "bash/zsh: $sh_secret"
-}
-
-# Print the environment variable name(s) defined across the given secret
-# files, comma-separated and de-duplicated, WITHOUT revealing any values.
-secrets_env_names()
-{
-  local file line name out=""
-  for file in "$@"; do
-    [[ -f "$file" ]] || continue
-    while IFS= read -r line; do
-      name=""
-      case "$line" in
-        "set -x "*)
-          name=${line#set -x }
-          name=${name%% *}
-          ;;
-        "export "*)
-          name=${line#export }
-          name=${name%%=*}
-          ;;
-        *) continue ;;
-      esac
-      [[ -z "$name" ]] && continue
-      case ",$out," in
-        *",$name,"*) ;;
-        *) out="${out:+$out,}$name" ;;
-      esac
-    done < "$file"
-  done
-  printf '%s' "$out"
-}
-
-# List configured secrets: one row per name with the env var(s) it defines
-# and which shells have a file. Values are never printed.
-secrets_list()
-{
-  local fish_dir="$DOTFILES/config/fish/secrets.d"
-  local sh_dir="$DOTFILES/config/secrets.d"
-
-  local -A names=()
-  local f base
-  for f in "$fish_dir"/*.fish; do
-    [[ -e "$f" ]] || continue
-    base=$(basename "$f" .fish)
-    names["$base"]=1
-  done
-  for f in "$sh_dir"/*.sh; do
-    [[ -e "$f" ]] || continue
-    base=$(basename "$f" .sh)
-    names["$base"]=1
-  done
-
-  if [[ ${#names[@]} -eq 0 ]]; then
-    msgr msg "No secrets configured"
-    return 0
-  fi
-
-  local -a sorted
-  mapfile -t sorted < <(printf '%s\n' "${!names[@]}" | sort)
-
-  msgr msg "Configured secrets:"
-  local name fish_file sh_file shells env_names
-  for name in "${sorted[@]}"; do
-    fish_file="$fish_dir/$name.fish"
-    sh_file="$sh_dir/$name.sh"
-    shells=""
-    [[ -f "$fish_file" ]] && shells="fish"
-    [[ -f "$sh_file" ]] && shells="${shells:+$shells,}sh"
-    env_names=$(secrets_env_names "$fish_file" "$sh_file")
-    msgr nested "$(printf '%-20s %-24s [%s]' "$name" "${env_names:-?}" "$shells")"
-  done
-}
-
-# Show the contents of a secret's files. This intentionally reveals the
-# stored value — it is the user inspecting their own secret.
-secrets_show()
-{
-  local name="$1"
-
-  if [[ -z "$name" ]]; then
-    msgr err "Usage: $SCRIPT secrets show <name>"
-    return 1
-  fi
-
-  if ! secrets_valid_name "$name"; then
-    msgr err "Invalid secrets name: $name"
-    return 1
-  fi
-
-  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
-  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
-
-  if [[ ! -f "$fish_file" ]] && [[ ! -f "$sh_file" ]]; then
-    msgr err "No secret named '$name'"
-    msgr nested "Run '$SCRIPT secrets list' to see configured secrets"
-    return 1
-  fi
-
-  local f line
-  for f in "$fish_file" "$sh_file"; do
-    [[ -f "$f" ]] || continue
-    msgr msg "$f"
-    while IFS= read -r line; do
-      msgr nested "$line"
-    done < "$f"
-  done
-}
-
-# Remove a secret's fish + bash/zsh files after confirmation.
-secrets_remove()
-{
-  local name="$1"
-
-  if [[ -z "$name" ]]; then
-    msgr err "Usage: $SCRIPT secrets remove <name>"
-    return 1
-  fi
-
-  if ! secrets_valid_name "$name"; then
-    msgr err "Invalid secrets name: $name"
-    return 1
-  fi
-
-  local fish_file="$DOTFILES/config/fish/secrets.d/$name.fish"
-  local sh_file="$DOTFILES/config/secrets.d/$name.sh"
-
-  local -a targets=()
-  [[ -f "$fish_file" ]] && targets+=("$fish_file")
-  [[ -f "$sh_file" ]] && targets+=("$sh_file")
-
-  if [[ ${#targets[@]} -eq 0 ]]; then
-    msgr err "No secret named '$name'"
-    return 1
-  fi
-
-  msgr warn "About to remove:"
-  local t
-  for t in "${targets[@]}"; do
-    msgr nested "$t"
-  done
-
-  local answer
-  read -rp "Remove these files? [y/N] " answer
-  case "$answer" in
-    [yY] | [yY][eE][sS])
-      rm -f "${targets[@]}"
-      msgr yay "Removed secret '$name'"
-      ;;
+  case "${1:-}" in
+    "" | help | -h | --help) dfm_menu "$0" ;;
     *)
-      msgr msg "Aborted — nothing removed"
-      return 0
+      local section=${0##*/}
+      msgr err "unknown command: $SCRIPT ${section#dfm-} $1"
+      dfm_menu "$0" >&2
+      exit 2
       ;;
   esac
 }

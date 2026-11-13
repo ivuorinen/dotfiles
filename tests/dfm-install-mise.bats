@@ -16,8 +16,8 @@ setup()
     "$TMP/home" "$TMP/xdgbin"
   : > "$TMP/dotfiles/config/shared.sh"
   ln -s "$REPO/local/bin/msgr" "$TMP/dotfiles/local/bin/msgr"
-  # dfm-install runs under `env bash`; keep this bash (4+) ahead of a system
-  # bash 3.2, which dfm-lib's guard would refuse.
+  # dfm-install runs under `env bash`; keep the bash running this test first
+  # on the trimmed PATH.
   ln -s "$BASH" "$TMP/bin/bash"
 
   # The installer goes to -o FILE, or to stdout without it. CURL_FAIL fails

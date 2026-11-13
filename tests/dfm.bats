@@ -25,9 +25,10 @@ setup()
   [[ "$output" == *"dfm scripts"* ]]
 }
 
-@test "dfm with invalid section shows usage" {
+@test "dfm with invalid section fails with exit 2 and shows usage" {
   run bash local/bin/dfm nonexistent
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown section: dfm nonexistent"* ]]
   [[ "$output" == *"Usage: dfm"* ]]
 }
 
@@ -89,8 +90,24 @@ setup()
 
 @test "dfm docs rejects unknown doc" {
   run bash local/bin/dfm docs no-such-doc
-  [ "$status" -eq 1 ]
+  [ "$status" -eq 2 ]
   [[ "$output" == *"Documentation not found"* ]]
+}
+
+@test "dfm docs and dfm scripts show their menu for a help flag" {
+  run bash local/bin/dfm docs help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Shell Aliases"* ]]
+  run bash local/bin/dfm scripts --help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dfm scripts"* ]]
+  [[ "$output" != *"Script not found"* ]]
+}
+
+@test "dfm scripts with an unknown script fails with exit 2" {
+  run bash local/bin/dfm scripts no-such-script
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Script not found: no-such-script"* ]]
 }
 
 @test "dfm theme menu shows entries" {
