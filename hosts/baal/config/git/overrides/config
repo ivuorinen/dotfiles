@@ -1,0 +1,12 @@
+# vim: ft=gitconfig ai noexpandtab
+[include]
+	path = ~/.dotfiles/config/git/shared
+
+[gpg]
+	format = ssh
+
+[user]
+	signingkey = ~/.ssh/id_ed25519
+
+[commit]
+	gpgsign = true

@@ -5,6 +5,7 @@ Host folders contain machine specific overrides and an `install.conf.yaml` file 
 Current hosts:
 
 - **air** – personal computer
+- **baal** – Linux server
 - **lakka** – remote server
 - **s** – work laptop
 - **tunkki** – local server

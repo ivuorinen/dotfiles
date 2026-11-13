@@ -1,0 +1,9 @@
+---
+# ./install runs tools/dotbot-defaults.yaml ahead of this file.
+- shell:
+    - echo "Configuring baal"
+- link:
+    ~/.config/:
+      glob: true
+      force: true
+      path: hosts/baal/config/**
