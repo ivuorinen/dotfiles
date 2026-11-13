@@ -73,3 +73,45 @@ setup()
   run -0 --separate-stderr bash "$BASE/install" --links
   [[ "$stderr" != *"git-credentials"* ]]
 }
+
+# A failed task in the main run (a `dfm install all` step that exits non-zero)
+# used to stop ./install under `set -e`, skipping the host overlay and the
+# after.d hooks that run on every install. Both must still run, and install
+# must still report the failure.
+@test "install: a failing main run still applies the host overlay and after.d hooks" {
+  cat > "$BASE/tools/dotbot/bin/dotbot" << 'EOF'
+#!/usr/bin/env bash
+echo "$*" >> "$LOG"
+case " $* " in
+  *" install.conf.yaml "*) exit 1 ;;
+esac
+EOF
+  mkdir -p "$BASE/hosts/testhost/after.d"
+  printf '#!/usr/bin/env bash\ntouch "%s"\n' "$BATS_TEST_TMPDIR/after-ran" \
+    > "$BASE/hosts/testhost/after.d/10-marker"
+  chmod +x "$BASE/hosts/testhost/after.d/10-marker"
+
+  run bash "$BASE/install"
+  [ "$status" -eq 1 ]
+  [ -e "$BATS_TEST_TMPDIR/after-ran" ]
+  run -0 cat "$LOG"
+  [[ "${lines[1]}" == *"$BASE/hosts/testhost/install.conf.yaml"* ]]
+}
+
+@test "install: a failing host overlay is reported after the after.d hooks" {
+  cat > "$BASE/tools/dotbot/bin/dotbot" << 'EOF'
+#!/usr/bin/env bash
+echo "$*" >> "$LOG"
+case "$*" in
+  */hosts/testhost/install.conf.yaml*) exit 3 ;;
+esac
+EOF
+  mkdir -p "$BASE/hosts/testhost/after.d"
+  printf '#!/usr/bin/env bash\ntouch "%s"\n' "$BATS_TEST_TMPDIR/after-ran" \
+    > "$BASE/hosts/testhost/after.d/10-marker"
+  chmod +x "$BASE/hosts/testhost/after.d/10-marker"
+
+  run bash "$BASE/install"
+  [ "$status" -eq 3 ]
+  [ -e "$BATS_TEST_TMPDIR/after-ran" ]
+}
