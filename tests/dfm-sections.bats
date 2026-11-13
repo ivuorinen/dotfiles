@@ -127,3 +127,29 @@ usage_cmds()
   [ -L "$t/config/nvim" ]
   [ "$(readlink "$t/config/nvim")" = "$fake/config/nvim" ]
 }
+
+# A read-only parent makes rm fail. The command stops there instead of
+# reporting the delete and relinking over a config it could not remove.
+@test "dfm dotfiles reset-nvim: a failed delete stops before relinking" {
+  [ "$(id -u)" -ne 0 ] || skip "root ignores the read-only directory"
+  local t="$BATS_TEST_TMPDIR" d
+  local fake="$t/dotfiles"
+  mkdir -p "$fake/config/nvim" "$t/home" "$t/stubs"
+  : > "$fake/config/shared.sh"
+  printf '#!/bin/sh\nexit 0\n' > "$t/stubs/mise"
+  chmod +x "$t/stubs/mise"
+  for d in data state cache config; do
+    mkdir -p "$t/$d/nvim"
+  done
+  chmod 555 "$t/state"
+
+  run env PATH="$t/stubs:$PATH" HOME="$t/home" DOTFILES="$fake" \
+    XDG_DATA_HOME="$t/data" XDG_STATE_HOME="$t/state" \
+    XDG_CACHE_HOME="$t/cache" XDG_CONFIG_HOME="$t/config" \
+    "$DFM" dotfiles reset-nvim < /dev/null
+  chmod 755 "$t/state"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to delete nvim's data, state, cache or config"* ]]
+  [[ "$output" != *"Deleted nvim's data"* ]]
+  [ ! -L "$t/config/nvim" ]
+}

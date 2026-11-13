@@ -76,8 +76,11 @@ dfm_dotfiles()
         esac
       fi
       msgr run "Cleaning nvim data, state, cache and config"
-      rm -rf "$data" "$state" "$cache" "$config" \
-        && msgr ok "Deleted nvim's data, state, cache and config"
+      if ! rm -rf "$data" "$state" "$cache" "$config"; then
+        msgr err "Failed to delete nvim's data, state, cache or config"
+        return 1
+      fi
+      msgr ok "Deleted nvim's data, state, cache and config"
       if ! mkdir -p "${config%/*}" || ! ln -s "$DOTFILES/config/nvim" "$config"; then
         msgr err "Failed to link $config to $DOTFILES/config/nvim"
         return 1
