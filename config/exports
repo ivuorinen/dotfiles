@@ -407,7 +407,7 @@ export PATH="$HOME/.lando/bin${PATH+:$PATH}" #landopath
 # theme_mode — shared bash/zsh read API (uses `local`, not strict POSIX).
 # The cheap path: reads the state file only and defaults to dark. Unlike
 # local/bin/theme-mode it does NOT run the OSC 11 probe, so it is safe on
-# hot paths (prompts, theme-reapply) with no per-call tty I/O. Detection
+# hot paths (prompts) with no per-call tty I/O. Detection
 # (the probe) lives in the shell bootstrap below and local/bin/theme-mode.
 theme_mode()
 {
@@ -426,34 +426,8 @@ theme_mode()
   printf 'dark\n'
 }
 
-# theme-reapply — re-fire all theme handlers for the current mode (or
-# $1), bypassing apply's idempotency guard. Use after editing a palette to
-# see the result without restarting the shell.
-theme-reapply()
-{
-  local mode="${1:-$(theme_mode)}"
-  case "$mode" in
-    dark | light) ;;
-    *)
-      echo "theme-reapply: mode must be 'dark' or 'light' (got '$mode')" >&2
-      return 2
-      ;;
-  esac
-  local dotfiles="${DOTFILES:-$HOME/.dotfiles}"
-  local handlers_dir="$dotfiles/config/theme/handlers.d"
-  if [ ! -d "$handlers_dir" ]; then
-    echo "theme-reapply: missing $handlers_dir" >&2
-    return 1
-  fi
-  local rc=0 h
-  for h in "$handlers_dir"/*; do
-    if [ -x "$h" ]; then
-      "$h" "$mode" || rc=1
-    fi
-  done
-  echo "theme-reapply: applied $mode"
-  return $rc
-}
+# Re-running every theme handler after a palette edit is `dfm theme reapply`
+# (config/theme/apply --force), one command for bash, zsh and fish.
 
 # Theme orchestrator: bootstrap state + spawn watcher.
 # Skip the watcher fork in SSH sessions — the remote OS is the wrong

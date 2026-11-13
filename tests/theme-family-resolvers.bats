@@ -18,7 +18,7 @@ setup()
   export XDG_STATE_HOME="$TMPDIR_TEST"
 }
 
-# save_choice <family> — what local/bin/theme writes.
+# save_choice <family> — what `dfm theme family` writes.
 save_choice()
 {
   printf '%s\n' "$1" > "$TMPDIR_TEST/dotfiles-theme/choice"

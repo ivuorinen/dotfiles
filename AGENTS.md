@@ -60,8 +60,9 @@ constants; the mandate is `.claude/rules/lib-sh-side-effects.md`.
 Dark/light theming is owned by a stand-alone orchestrator. The details
 live in `config/theme/CLAUDE.md`, which loads when you work in that
 directory; `local/bin/theme-mode` is the public read API, and
-`local/bin/theme` lists and switches theme families (the choice is saved
-per machine under `$XDG_STATE_HOME`, never in the repo).
+`dfm theme` lists and switches theme families (the choice is saved per
+machine under `$XDG_STATE_HOME`, never in the repo), re-runs the handlers
+and shows the orchestrator's state.
 
 Terminal apps take their colours from the terminal: WezTerm ships one ANSI
 scheme per theme family and mode. Configure an app with the 16 ANSI colour

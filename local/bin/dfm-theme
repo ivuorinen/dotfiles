@@ -8,57 +8,220 @@
 #USAGE   cmd "reapply" help="Re-run every theme handler" {
 #USAGE     arg "[mode]" help="dark or light (default: the current mode)"
 #USAGE   }
+#USAGE   cmd "status" help="Show the mode, the family and its source, the watcher and pending retries"
 #USAGE }
 #
 # @description List and switch theme families (dfm theme)
-# dfm theme — the theme family switcher, mode and reapply in one place.
+# dfm theme — switch theme families, print the mode, re-run the handlers.
+#
+# The family choice is saved per machine in
+# $XDG_STATE_HOME/dotfiles-theme/choice, outside the repo, and
+# config/theme/apply re-themes everything running. The tracked
+# config/theme/family is the default wherever no choice was saved. The engine
+# (watcher, apply, handlers) stays in config/theme/; config/theme/CLAUDE.md
+# describes it.
 #
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
-dfm_bootstrap_for "$@"
+}
+# No command needs the shell environment: they read and write the theme state
+# and run config/theme/apply and theme-mode directly.
+dfm_bootstrap_min
+
+# Load the theme library (_theme_family, _theme_valid_family,
+# _theme_choice_file, _atomic_write) for the commands that need it.
+theme_lib()
+{
+  # shellcheck source=config/theme/_lib.sh
+  source "$DOTFILES/config/theme/_lib.sh" || {
+    msgr err "cannot load $DOTFILES/config/theme/_lib.sh"
+    exit 1
+  }
+}
+
+# Every family a switch accepts, one per line, in glob (sorted) order.
+theme_families()
+{
+  local d f
+  for d in "$DOTFILES/config/theme/palettes.d"/*/; do
+    d="${d%/}"
+    f="${d##*/}"
+    if _theme_valid_family "$f"; then printf '%s\n' "$f"; fi
+  done
+}
+
+theme_warn_override()
+{
+  if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
+    msgr warn "DOTFILES_THEME_FAMILY=$DOTFILES_THEME_FAMILY overrides the saved choice while it is set"
+  fi
+}
+
+# Re-theme everything running, under apply's lock. With --force every handler
+# runs even when the mode and family are unchanged.
+theme_apply()
+{
+  "$DOTFILES/config/theme/apply" "$@"
+}
+
+theme_list()
+{
+  local active choice saved="" f
+  active="$(_theme_family 2> /dev/null)" || active=""
+  choice="$(_theme_choice_file)"
+  # Any choice file that _theme_family would skip is worth a word: empty,
+  # whitespace, or a family that has since been removed.
+  if [[ -r "$choice" ]]; then
+    read -r saved < "$choice" || true
+    if ! _theme_valid_family "$saved"; then
+      msgr warn "ignoring the saved choice '$saved' in $choice: not a theme family; using the default"
+    fi
+  fi
+  theme_warn_override
+  while IFS= read -r f; do
+    if [[ "$f" != "$active" ]]; then
+      printf '  %s\n' "$f"
+    elif [[ -t 1 ]]; then
+      printf '\033[1m→ %s\033[0m\n' "$f"
+    else
+      printf '* %s\n' "$f"
+    fi
+  done < <(theme_families)
+}
+
+# Save the choice even when the family is already active: saving is what pins
+# it, so a later change to the tracked default leaves it alone.
+theme_switch()
+{
+  local family="$1" active
+  if ! _theme_valid_family "$family"; then
+    msgr err "unknown theme family '$family'; choose one of: $(theme_families | paste -sd ' ' -)"
+    exit 2
+  fi
+  theme_warn_override
+  active="$(_theme_family 2> /dev/null)" || active=""
+  if ! _atomic_write "$(_theme_choice_file)" "$family"; then
+    msgr err "cannot save the theme choice to $(_theme_choice_file)"
+    exit 1
+  fi
+  theme_apply "$("$_dfm_dir/theme-mode")"
+  if [[ "$family" == "$active" ]]; then
+    msgr ok "$family is already the active theme family; saved it as the choice"
+  else
+    msgr ok "switched to the $family theme family"
+  fi
+}
+
+# One line per field, read-only, from the state config/theme/apply and
+# config/theme/watcher keep in $XDG_STATE_HOME/dotfiles-theme.
+theme_status()
+{
+  local dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
+  local mode="" applied="" saved="" active source pid="" watcher retry="" gen="" when
+  [[ -r "$dir/mode" ]] && read -r mode < "$dir/mode"
+  [[ -r "$dir/applied-family" ]] && read -r applied < "$dir/applied-family"
+  [[ -r "$dir/choice" ]] && read -r saved < "$dir/choice"
+
+  # Where the family comes from, in _theme_family's order.
+  active="$(_theme_family 2> /dev/null)" || active=""
+  if [[ -n "${DOTFILES_THEME_FAMILY:-}" ]]; then
+    source="DOTFILES_THEME_FAMILY"
+  elif [[ -n "$saved" ]] && _theme_valid_family "$saved"; then
+    source="saved choice"
+  else
+    source="default, config/theme/family"
+  fi
+
+  # daemon.pid holds the watcher's pid while it runs and is emptied when it
+  # exits. The flock on it is the real lock; probing that could make a
+  # watcher starting at this moment give up, so only the pid is checked, and
+  # its command line must name config/theme/watcher (a reused pid will not).
+  [[ -r "$dir/daemon.pid" ]] && read -r pid < "$dir/daemon.pid"
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2> /dev/null \
+    && [[ "$(ps -p "$pid" -o args= 2> /dev/null)" == *theme/watcher* ]]; then
+    watcher="running (pid $pid)"
+  elif [[ -n "${SSH_CONNECTION:-}" ]]; then
+    watcher="not running (shells do not start it in SSH sessions)"
+  else
+    watcher="not running (the next interactive shell starts it)"
+  fi
+
+  [[ -s "$dir/retry" ]] && retry="$(paste -sd ' ' - < "$dir/retry")"
+  [[ -r "$dir/generation" ]] && read -r gen < "$dir/generation"
+  when=""
+  if [[ -n "$gen" ]]; then
+    # generation is "<epoch>-<pid>". BSD date takes -r EPOCH, GNU -d @EPOCH.
+    when="$(date -r "${gen%%-*}" '+%F %T' 2> /dev/null \
+      || date -d "@${gen%%-*}" '+%F %T' 2> /dev/null)"
+  fi
+
+  printf '%-9s %s\n' \
+    "mode:" "${mode:-not set (no apply has run)}" \
+    "family:" "${active:-unresolvable} ($source)" \
+    "applied:" "${applied:-none yet}" \
+    "watcher:" "$watcher" \
+    "retry:" "${retry:-none}" \
+    "updated:" "${when:-never}" \
+    "log:" "$dir/log"
+}
 
 dfm_theme()
 {
-  USAGE_PREFIX="$SCRIPT theme <command>"
-
-  MENU=(
-    "family:List theme families, or switch to one"
-    "reset:Return to the default theme family"
-    "mode:Print the current dark/light mode"
-    "reapply:Re-run every theme handler"
-  )
-
-  # theme and theme-mode are siblings of this script, so a checkout works
-  # before ./install links them. theme-reapply is the shell function the
-  # full bootstrap defines by sourcing config/exports.
-  # reset and mode take no arguments: `dfm theme reset kanagawa` is a
-  # mistake, and acting on it would drop the saved choice.
-  if [[ "${1:-}" == reset || "${1:-}" == mode ]] && (($# > 1)); then
+  # reset, mode and status take no arguments: `dfm theme reset kanagawa` is
+  # a mistake, and acting on it would drop the saved choice.
+  if [[ "${1:-}" == reset || "${1:-}" == mode || "${1:-}" == status ]] && (($# > 1)); then
     msgr err "Usage: $SCRIPT theme $1 (takes no arguments)"
     exit 2
   fi
   case "${1:-}" in
     family)
       shift
-      "$_dfm_dir/theme" "$@"
+      theme_lib
+      if (($# == 0)); then
+        theme_list
+      elif (($# > 1)) || [[ $1 == -* ]]; then
+        msgr err "Usage: $SCRIPT theme family [name]"
+        exit 2
+      else
+        theme_switch "$1"
+      fi
       ;;
-    reset) "$_dfm_dir/theme" --reset ;;
+    reset)
+      theme_lib
+      rm -f -- "$(_theme_choice_file)"
+      theme_apply "$("$_dfm_dir/theme-mode")"
+      msgr ok "back to the default theme family ($(_theme_family 2> /dev/null || echo none))"
+      ;;
     mode) "$_dfm_dir/theme-mode" ;;
-    reapply)
-      shift
-      theme-reapply "$@"
+    status)
+      theme_lib
+      theme_status
       ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    reapply)
+      # After editing a palette: run every handler at the given or current
+      # mode, which a plain apply skips when nothing changed.
+      local mode="${2:-}"
+      [[ -n "$mode" ]] || mode="$("$_dfm_dir/theme-mode")"
+      case "$mode" in
+        dark | light) ;;
+        *)
+          msgr err "Usage: $SCRIPT theme reapply [dark|light] (got '$mode')"
+          exit 2
+          ;;
+      esac
+      if theme_apply --force "$mode"; then
+        msgr ok "re-applied the $mode theme"
+      else
+        return 1
+      fi
+      ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

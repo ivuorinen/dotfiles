@@ -49,9 +49,12 @@ Dark/light theming is owned by a stand-alone orchestrator:
   (skipped when missing, empty or invalid), else the tracked default
   `config/theme/family` (`oasis`). apply only reads the saved choice, and
   deletes the `family` file older applies kept their record in.
-  `local/bin/theme` lists the families and marks the active one, switches
-  (`theme <family>`) and resets (`theme --reset`): it writes or removes the
-  saved choice, then runs apply at the current mode.
+  `dfm theme family` lists the families and marks the active one, switches
+  (`dfm theme family <name>`) and resets (`dfm theme reset`): it writes or
+  removes the saved choice, then runs apply at the current mode.
+  `dfm theme reapply [mode]` runs `apply --force`, which runs every handler
+  even when nothing changed (after a palette edit), and `dfm theme status`
+  shows the mode, the family and its source, the watcher and pending retries.
 - `config/theme/palettes.d/<family>/<dark|light>/<app>[.<ext>]` — the
   assets of the apps that keep a handler, one tree per family
   (`catppuccin`, `kanagawa`, `oasis`, `warm-burnout`), plus each family's
@@ -65,7 +68,8 @@ Dark/light theming is owned by a stand-alone orchestrator:
   `handlers.d/tmux` re-sources the whole `tmux.conf` (so the bootstrap
   must never call that handler back — it would recurse).
 - `local/bin/theme-mode` (and bash/fish functions) — public read API for
-  the mode; `local/bin/theme` — the public family switcher.
+  the mode; `local/bin/dfm-theme` (`dfm theme`) — the user-facing commands.
+  The engine stays here; dfm only calls it.
 - Fallback: `config/theme/probe-osc11` — OSC 11 query for SSH and
   no-OS-source environments.
 

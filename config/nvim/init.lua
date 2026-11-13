@@ -810,7 +810,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 })
 
 -- Applied at startup and re-checked every 3 s, so a family switch
--- (local/bin/theme) reaches running sessions the way vim's timer does. It acts
+-- (dfm theme family) reaches running sessions the way vim's timer does. It acts
 -- only when the family's scheme changes, so a manual :colorscheme stays until
 -- the next switch; 'background' stays with auto-dark-mode below.
 local family_schemes = {
