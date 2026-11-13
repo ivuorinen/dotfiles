@@ -125,9 +125,6 @@
 "brew-cask:obsidian" = "latest" # Markdown knowledge base
 "brew-cask:orbstack" = "latest" # Docker Desktop replacement
 "brew-cask:qlmarkdown" = "latest" # Quick Look for Markdown
-"brew-cask:qlstephen" = "latest" # Quick Look for extensionless text
-"brew-cask:quicklook-json" = "latest" # Quick Look for JSON
-"brew-cask:quicklookase" = "latest" # Quick Look for Adobe Swatch Exchange
 "brew-cask:quitter" = "latest" # hides or quits idle apps
 "brew-cask:raycast" = "latest" # launcher
 "brew-cask:setapp" = "latest" # app subscription
