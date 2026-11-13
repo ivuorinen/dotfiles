@@ -9,7 +9,6 @@ Some problematic code has been fixed per `shellcheck` suggestions.
 - git-dirty (based on git-extra-tools)
 - git-fsck-dirs
 - git-update-dirs
-- php-switcher
 - x-backup-folder
 - x-backup-mysql-with-prefix
 - x-check-git-attributes
