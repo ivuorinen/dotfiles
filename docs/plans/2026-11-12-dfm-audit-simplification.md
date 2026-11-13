@@ -496,9 +496,10 @@ mise trying to provide PHP alongside phpenv's own `PATH` switch.
     - The token prompt uses `read -s` and is unreachable under dotbot (stdin is `/dev/null`).
     - Moving the secrets code is a move; `dfm.bats` 424 re-checks that `list` prints names, not values.
 - **errors / leaks** — Every new failure path ends in a non-zero status and a visible line: install steps
-    including `mise bootstrap`, `./install` (rc carried through), `dfm packages` (missing mise, no sudo), cleanup
+    including `mise bootstrap`, `./install` (rc carried through), `dfm packages` without mise, cleanup
     branches, cheat databases, ssh `curl` timeouts, `reset-nvim` link failure, `dfm theme reapply` with a bad
-    mode. No new resources: the parser reads through a redirect; `ensure_mise` keeps its `mktemp`+`trap`.
+    mode. A user without sudo rights is not a failure: `dfm packages apply|upgrade` warns, skips and exits 0.
+    No new resources: the parser reads through a redirect; `ensure_mise` keeps its `mktemp`+`trap`.
 - **migrations** — The Brewfile-to-mise move is a config migration and is ordered for it: Commit 7 adds the mise
     entries while the Brewfile still exists, the macOS check runs, and only then Commit 8 deletes the Brewfile.
     Already-installed apps and formulae stay installed throughout. Commit 3 (`./install` keeps going) lands
