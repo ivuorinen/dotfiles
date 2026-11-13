@@ -548,6 +548,25 @@ fake_dotfiles()
   rm -rf "$tmp"
 }
 
+@test "dfm secrets create tightens an existing file before writing to it" {
+  local tmp fperms
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  mkdir -p "$tmp/config/secrets.d" "$tmp/config/fish/secrets.d/github.fish"
+  printf 'old\n' > "$tmp/config/secrets.d/github.sh"
+  chmod 644 "$tmp/config/secrets.d/github.sh"
+  # A directory where the fish file belongs makes the first write fail. The
+  # sh file is 0600 by then, because the modes are set before any write.
+  run bash -c "printf 'newtok\n' | DOTFILES='$tmp' bash local/bin/dfm secrets create GITHUB_TOKEN"
+  chmod 700 "$tmp/config/fish/secrets.d/github.fish"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to write secret files"* ]]
+  fperms="$(stat -c '%a' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d/github.sh")"
+  [ "$fperms" = "600" ]
+  rm -rf "$tmp"
+}
+
 @test "dfm secrets remove deletes a secret present in only one shell" {
   local tmp
   tmp="$(mktemp -d)"
