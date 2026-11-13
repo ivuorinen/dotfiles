@@ -9,7 +9,6 @@ Current hosts:
 - **s** – work laptop
 - **tunkki** – local server
 - **twonky** – Electron flags and wallpaper overlay
-- **v** – work desktop
 
 ## Overlay layout
 
