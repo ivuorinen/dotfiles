@@ -191,13 +191,13 @@ Configured in `lua/org.lua`, which `init.lua` requires last. Org files live in
 `~/orgfiles`; its keys sit under the leader `o` prefix, which orgmode itself also
 maps (see `CLAUDE.md`). `lua/org.lua` adds visual-mode emphasis keys in org buffers.
 
-| Plugin                     | Role                                                |
-|----------------------------|-----------------------------------------------------|
-| orgmode                    | Org-mode core: agenda, capture, LSP (`org`)         |
-| org-bullets.nvim           | Unicode heading bullets                             |
-| org-virtual-clocktime.nvim | Logbook clock totals as virtual text                |
-| org-super-agenda.nvim      | Grouped agenda with custom views                    |
-| org-roam.nvim              | Linked-notes knowledge base under `~/orgfiles/roam` |
+| Plugin                     | Role                                           |
+|----------------------------|------------------------------------------------|
+| orgmode                    | Org-mode core: agenda, capture, LSP (`org`)    |
+| org-bullets.nvim           | Unicode heading bullets                        |
+| org-virtual-clocktime.nvim | Logbook clock totals as virtual text           |
+| org-super-agenda.nvim      | Grouped agenda with custom views               |
+| org-roam.nvim              | Linked-notes knowledge base under `~/orgfiles` |
 
 URLs: `github.com/nvim-orgmode/orgmode` · `github.com/nvim-orgmode/org-bullets.nvim` ·
 `github.com/hugginsio/org-virtual-clocktime.nvim` · `github.com/hamidi-dev/org-super-agenda.nvim` ·

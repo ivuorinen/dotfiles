@@ -4,4 +4,4 @@
 set -euo pipefail
 
 cd "$HOME/orgfiles"
-exec nvim tasks.org +'Org agenda'
+exec nvim next-actions.org +'Org agenda'

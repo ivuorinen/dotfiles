@@ -44,7 +44,6 @@
 | ` oW`        | OrgSuperAgenda: Work This Week                                                             | `<Lua callback>`                                           |
 | ` oa`        | orgmode super agenda                                                                       | `<Cmd>OrgSuperAgenda<CR>`                                  |
 | ` oc`        | org capture                                                                                | `<Cmd>lua require("orgmode").action("capture.prompt")<CR>` |
-| ` op`        | OrgSuperAgenda: Personal                                                                   | `<Lua callback>`                                           |
 | ` pp`        | Open plugin manager                                                                        | `<Cmd>Pack<CR>`                                            |
 | ` qQ`        | Force quit without saving                                                                  | `<Lua callback>`                                           |
 | ` qf`        | Quicker close split                                                                        | `<Cmd>q<CR>`                                               |
@@ -602,4 +601,4 @@ Buffer-local maps an org buffer adds to those above.
 | `ir` | Select inner subtree (orgmode)                      | `:normal vir<CR>` |
 | `i~` | Select inside code markers (orgmode)                | `:normal vi~<CR>` |
 
-- Generated on 2026-10-30
+- Generated on 2026-11-13

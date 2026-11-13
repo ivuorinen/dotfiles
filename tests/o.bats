@@ -18,10 +18,10 @@ teardown()
   rm -rf "$TMPDIR_TEST"
 }
 
-@test "o: opens tasks.org in \$HOME/orgfiles with the org agenda" {
+@test "o: opens next-actions.org in \$HOME/orgfiles with the org agenda" {
   HOME="$TMPDIR_TEST" run bash local/bin/o
   [ "$status" -eq 0 ]
-  [ "$output" = "$(cd "$TMPDIR_TEST/orgfiles" && pwd) nvim tasks.org +Org agenda" ]
+  [ "$output" = "$(cd "$TMPDIR_TEST/orgfiles" && pwd) nvim next-actions.org +Org agenda" ]
 }
 
 @test "o: passes nvim's exit status through" {
