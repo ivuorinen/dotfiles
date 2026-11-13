@@ -477,6 +477,22 @@ fake_dotfiles()
   rm -rf "$tmp"
 }
 
+@test "dfm secrets remove reports a file it could not delete" {
+  [ "$(id -u)" -ne 0 ] || skip "root ignores the read-only directory"
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  chmod 500 "$tmp/config/secrets.d"
+  run bash -c "printf 'y\n' | DOTFILES='$tmp' bash local/bin/dfm secrets remove github"
+  chmod 700 "$tmp/config/secrets.d"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to remove secret 'github'"* ]]
+  [[ "$output" != *"Removed secret"* ]]
+  [ -f "$tmp/config/secrets.d/github.sh" ]
+  rm -rf "$tmp"
+}
+
 @test "dfm secrets remove errors for an unknown secret" {
   run bash local/bin/dfm secrets remove nope
   [ "$status" -eq 1 ]
