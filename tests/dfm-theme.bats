@@ -37,6 +37,21 @@ expected_list()
   done
 }
 
+# Point DOTFILES at a tree whose config/theme/apply fails the way a lock
+# timeout does; every other theme file is linked from the repo.
+failing_apply()
+{
+  local fake="$TMPDIR_TEST/dotfiles" e
+  mkdir -p "$fake/config/theme"
+  for e in "$DOTFILES/config/theme"/*; do
+    ln -s "$e" "$fake/config/theme/${e##*/}"
+  done
+  rm "$fake/config/theme/apply"
+  printf '#!/bin/sh\necho "apply: lock still held" >&2\nexit 1\n' > "$fake/config/theme/apply"
+  chmod +x "$fake/config/theme/apply"
+  export DOTFILES="$fake"
+}
+
 @test "dfm theme: a help flag shows the menu" {
   run "$DFM" theme --help
   [ "$status" -eq 0 ]
@@ -90,6 +105,38 @@ expected_list()
   [ "$status" -eq 0 ]
   [ ! -e "$STATE/choice" ]
   [ "$(cat "$STATE/applied-family")" = "$DEFAULT" ]
+}
+
+@test "dfm theme family: a failed apply is an error, not a switch" {
+  failing_apply
+  run "$DFM" theme family kanagawa
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"apply: lock still held"* ]]
+  [[ "$output" == *"saved kanagawa as the theme family, but applying it failed"* ]]
+  [[ "$output" != *"switched to"* ]]
+  [ "$(cat "$STATE/choice")" = "kanagawa" ]
+}
+
+@test "dfm theme reset: a failed apply is an error" {
+  echo kanagawa > "$STATE/choice"
+  failing_apply
+  run "$DFM" theme reset
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"applying the default theme family failed"* ]]
+  [[ "$output" != *"back to the default"* ]]
+  [ ! -e "$STATE/choice" ]
+}
+
+@test "dfm theme reset: a choice it cannot remove stops before applying" {
+  [ "$(id -u)" -ne 0 ] || skip "root ignores the read-only directory"
+  echo kanagawa > "$STATE/choice"
+  chmod 500 "$STATE"
+  run "$DFM" theme reset
+  chmod 700 "$STATE"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"cannot remove the saved theme choice"* ]]
+  [[ "$output" != *"back to the default"* ]]
+  [ "$(cat "$STATE/choice")" = "kanagawa" ]
 }
 
 @test "dfm theme family: a stale saved choice is reported and the default is marked" {

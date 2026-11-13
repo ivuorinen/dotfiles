@@ -110,7 +110,10 @@ theme_switch()
     msgr err "cannot save the theme choice to $(_theme_choice_file)"
     exit 1
   fi
-  theme_apply "$("$_dfm_dir/theme-mode")"
+  if ! theme_apply "$("$_dfm_dir/theme-mode")"; then
+    msgr err "saved $family as the theme family, but applying it failed"
+    exit 1
+  fi
   if [[ "$family" == "$active" ]]; then
     msgr ok "$family is already the active theme family; saved it as the choice"
   else
@@ -194,8 +197,14 @@ dfm_theme()
       ;;
     reset)
       theme_lib
-      rm -f -- "$(_theme_choice_file)"
-      theme_apply "$("$_dfm_dir/theme-mode")"
+      if ! rm -f -- "$(_theme_choice_file)"; then
+        msgr err "cannot remove the saved theme choice $(_theme_choice_file)"
+        exit 1
+      fi
+      if ! theme_apply "$("$_dfm_dir/theme-mode")"; then
+        msgr err "removed the saved choice, but applying the default theme family failed"
+        exit 1
+      fi
       msgr ok "back to the default theme family ($(_theme_family 2> /dev/null || echo none))"
       ;;
     mode) "$_dfm_dir/theme-mode" ;;
