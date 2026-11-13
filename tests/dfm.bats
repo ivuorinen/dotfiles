@@ -336,7 +336,8 @@ fake_dotfiles()
 
   # fish: sourcing must yield the original value unchanged.
   if command -v fish > /dev/null 2>&1; then
-    run fish -c 'source $argv[1]; printf "%s" $MY_SECRET' "$tmp/config/fish/secrets.d/my.fish"
+    # --no-config: only the secret file is sourced, not the developer's config.
+    run fish --no-config -c 'source $argv[1]; printf "%s" $MY_SECRET' "$tmp/config/fish/secrets.d/my.fish"
     [ "$output" = "$value" ]
   fi
   rm -rf "$tmp"

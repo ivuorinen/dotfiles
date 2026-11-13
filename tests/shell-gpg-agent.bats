@@ -40,7 +40,8 @@ setup()
   fish_block="$(sed -n '/if set -l gpg_tty (tty/,/^    end$/p' \
     "$DOTFILES_REPO/config/fish/config.fish")"
   [[ "$fish_block" == *GPG_TTY* ]]
-  run fish -c "set -gx GPG_TTY stale"$'\n'"$fish_block"$'\n''set -q GPG_TTY; and echo "[$GPG_TTY]"; or echo unset' \
+  # --no-config: only the extracted block runs, not the developer's config.
+  run fish --no-config -c "set -gx GPG_TTY stale"$'\n'"$fish_block"$'\n''set -q GPG_TTY; and echo "[$GPG_TTY]"; or echo unset' \
     < /dev/null
   [ "$status" -eq 0 ]
   [ "$output" = "unset" ]
