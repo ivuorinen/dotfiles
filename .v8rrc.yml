@@ -111,4 +111,5 @@ customCatalog:
         - dotbot-links.yaml
         - install.conf.yaml
         - "hosts/*/install.conf.yaml"
+        - tools/dotbot-defaults.yaml
       location: schemas/dotbot.schema.json

@@ -122,10 +122,12 @@ repos:
         # never validate.
         # schemas/ holds the catalog's own schemas; ajv checks each against
         # its meta-schema when a file is validated with it.
+        # Of tools/, only the submodules are skipped; tools/dotbot-defaults.yaml
+        # is this repo's own file and has a catalog entry.
         entry: mise exec -- v8r --ignore-errors
         language: system
         files: \.(ya?ml|json|toml)$
-        exclude: ^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/|schemas/)
+        exclude: ^(tools/(antidote|dotbot)/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|config/pi/agent/(tmp|npm)/|node_modules/|graphify-out/|docs/audit/|schemas/)
       - id: shellcheck
         name: shellcheck
         entry: mise exec -- shellcheck
