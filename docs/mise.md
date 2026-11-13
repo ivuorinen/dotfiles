@@ -106,10 +106,9 @@ platform environment, and mise skips the entries whose manager is not on
 `PATH`, so one list serves both distros. Tools already pinned in
 `[tools]` are not repeated there.
 
-`dfm install apt-packages` and `dfm install dnf-packages` run
-`mise bootstrap packages apply --manager apt|dnf --yes` (sudo), skipping
-when the user has no sudo rights. They install the mise binary first when
-it is missing, because `dfm install all` runs them before the mise step.
+`dfm packages apply` (and `mise bootstrap` in `dfm install all`) installs
+them through sudo; a user without sudo rights gets a warning instead of a
+prompt that cannot succeed.
 
 ## macOS defaults
 

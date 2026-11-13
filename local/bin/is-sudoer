@@ -3,7 +3,7 @@
 #USAGE about "Test whether a user has sudo privileges (exit 0 if yes, 1 if no)"
 
 # Silent predicate: the exit code is the contract, so it composes cleanly in
-# gates like `is-sudoer && dfm install apt-packages`. Never prompts — every
+# gates like `is-sudoer && dfm packages apply`. Never prompts — every
 # sudo probe uses -n, so an unattended install can branch on it without
 # hanging. Deliberately does not source msgr (kept fast and side-effect-free
 # for use in loops/gates); errors go straight to stderr like x-git-root.

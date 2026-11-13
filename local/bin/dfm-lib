@@ -46,9 +46,8 @@ dfm_bootstrap_min()
   # Helper variables, override with ENVs like `VERBOSE=1 dfm help`
   : "${VERBOSE:=0}"
   : "${DOTFILES:=$HOME/.dotfiles}"
-  : "${BREWFILE:=$DOTFILES/config/homebrew/Brewfile}"
   : "${HOSTFILES:=$DOTFILES/hosts}"
-  export DOTFILES BREWFILE HOSTFILES
+  export DOTFILES HOSTFILES
 
   # Every dfm-* binary presents itself under the public "dfm" name, so
   # help/usage text reads "dfm install <command>" no matter which binary is

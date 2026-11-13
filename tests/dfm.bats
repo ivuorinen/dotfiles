@@ -183,62 +183,21 @@ setup()
   [[ "$output" == *"params"* ]]
 }
 
-# A tool-gated section (apt, brew) only makes sense when its tool exists.
-# `dfm <section>` shows the menu when the tool is present, or ONLY a
-# not-available notice when it is absent. The bare `dfm` listing omits
-# such a section entirely when its tool is missing, and never prints a
-# notice — absent sections are skipped, not run. These assertions branch
-# on the host so they hold on both Debian (apt present) and macOS (absent).
-@test "dfm apt shows menu when apt present, notice-only when absent" {
-  run bash local/bin/dfm apt
-  [ "$status" -eq 0 ]
-  if command -v apt > /dev/null 2>&1; then
-    [[ "$output" == *"upkeep"* ]]
-    [[ "$output" != *"not available"* ]]
-  else
-    [[ "$output" == *"apt not available"* ]]
-    [[ "$output" != *"upkeep"* ]]
-  fi
-}
-
-@test "dfm brew shows menu when brew present, notice-only when absent" {
-  run bash local/bin/dfm brew
-  [ "$status" -eq 0 ]
-  if command -v brew > /dev/null 2>&1; then
-    [[ "$output" == *"untracked"* ]]
-    [[ "$output" != *"not available"* ]]
-  else
-    [[ "$output" == *"brew not available"* ]]
-    [[ "$output" != *"untracked"* ]]
-  fi
-}
-
-# `brew autoupdate` is an external tap command the Brewfile never taps, so the
-# old branch failed with "Unknown command". It is a deprecation notice now and
-# must not reach brew at all.
-@test "dfm brew autoupdate prints the deprecation notice and exits 0" {
-  command -v brew > /dev/null 2>&1 || skip "brew not installed"
-  run bash local/bin/dfm brew autoupdate
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"dfm brew autoupdate is deprecated"* ]]
-  [[ "$output" != *"Unknown command"* ]]
-}
-
-@test "bare dfm omits tool-gated sections whose tool is absent" {
+# Package management is one section, `dfm packages`, over mise's bootstrap
+# packages; the apt and brew sections are gone.
+@test "bare dfm lists the packages section and no apt or brew section" {
   run bash local/bin/dfm
   [ "$status" -eq 0 ]
-  # Absent sections are skipped, not run, so no notice ever leaks here.
-  [[ "$output" != *"not available"* ]]
-  if command -v apt > /dev/null 2>&1; then
-    [[ "$output" == *"dfm apt"* ]]
-  else
-    [[ "$output" != *"dfm apt"* ]]
-  fi
-  if command -v brew > /dev/null 2>&1; then
-    [[ "$output" == *"dfm brew"* ]]
-  else
-    [[ "$output" != *"dfm brew"* ]]
-  fi
+  [[ "$output" == *"dfm packages <command>"* ]]
+  [[ "$output" != *"dfm apt "* ]]
+  [[ "$output" != *"dfm brew "* ]]
+}
+
+@test "dfm apt and dfm brew are unknown sections" {
+  run bash local/bin/dfm apt
+  [ "$status" -eq 2 ]
+  run bash local/bin/dfm brew install
+  [ "$status" -eq 2 ]
 }
 
 # config/exports emits `msg "Setting up …"` for many tools, guarded by

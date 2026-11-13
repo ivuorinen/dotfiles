@@ -12,15 +12,15 @@
 #USAGE     alias "hostname"
 #USAGE     arg "[hostname]" help="Hostname to check against"
 #USAGE   }
-#USAGE   cmd "all" help="Run brew, mise, tools, perms, updates, and disk checks"
-#USAGE   cmd "brew" help="Verify Brewfile and mise bootstrap packages are installed"
-#USAGE   cmd "disk" help="Show disk usage for mise installs and brew cache"
+#USAGE   cmd "all" help="Run packages, mise, tools, perms, updates, and disk checks"
+#USAGE   cmd "disk" help="Show disk usage for mise installs and the uv cache"
 #USAGE   cmd "mise" help="Run mise doctor to check mise health"
+#USAGE   cmd "packages" help="Verify the packages mise declares for this host are installed"
 #USAGE   cmd "perms" help="Verify declared directory and secret-file modes" {
 #USAGE     flag "--fix" help="Repair drift instead of only reporting it"
 #USAGE   }
 #USAGE   cmd "tools" help="Verify essential CLI tools are available in PATH"
-#USAGE   cmd "updates" help="Show available updates for mise tools and brew packages"
+#USAGE   cmd "updates" help="Show available updates for mise tools"
 #USAGE }
 #
 # @description System information and health checks (dfm check)
@@ -73,7 +73,7 @@ dfm_check()
 
     all)
       local rc=0
-      dfm_check brew || rc=1
+      dfm_check packages || rc=1
       dfm_check mise || rc=1
       dfm_check tools || rc=1
       dfm_check perms || rc=1
@@ -268,35 +268,16 @@ dfm_check()
       return "$rc"
       ;;
 
-    brew)
-      local rc=0
-      # Only the Brewfile half needs the brew CLI: mise installs its
-      # [bootstrap.packages] formulae without it, so a brew-less Mac must
-      # still get the mise check instead of an early "skipping" return.
-      if command -v brew > /dev/null 2>&1; then
-        local brewfile="$DOTFILES/config/homebrew/Brewfile"
-        msgr run "Checking Brewfile..."
-        if brew bundle check --file="$brewfile" --no-upgrade; then
-          msgr yay "All Brewfile packages installed"
-        else
-          msgr err "Some Brewfile packages missing — run 'dfm brew install' to sync"
-          rc=1
-        fi
+    packages)
+      # Every package mise declares for this host: apt or dnf on Linux,
+      # Homebrew formulae and casks on macOS (dfm packages).
+      msgr run "Checking the declared packages..."
+      if "$DFM" packages status > /dev/null; then
+        msgr yay "All declared packages installed"
       else
-        msgr warn "brew not found — skipping the Brewfile check"
+        msgr err "Some declared packages differ — see '$SCRIPT packages status', then run '$SCRIPT packages apply'"
+        return 1
       fi
-      # The homebrew/core formulae mise installs (config/mise/conf.d/brew/).
-      # `dfm install mise` applies them on macOS only, so only check there.
-      if [[ "$(uname -s)" == "Darwin" ]] && command -v mise > /dev/null 2>&1; then
-        msgr run "Checking mise bootstrap packages..."
-        if mise bootstrap packages status --missing > /dev/null; then
-          msgr yay "All mise bootstrap packages installed"
-        else
-          msgr err "Some mise bootstrap packages missing — see 'mise bootstrap packages status', then run 'dfm install mise'"
-          rc=1
-        fi
-      fi
-      return "$rc"
       ;;
 
     disk)
@@ -304,9 +285,6 @@ dfm_check()
       msgr msg "Disk usage for tool stores:"
       if [[ -d "$mise_installs" ]]; then
         msgr nested "mise installs: $(du -sh "$mise_installs" 2> /dev/null | cut -f1)"
-      fi
-      if command -v brew > /dev/null 2>&1; then
-        msgr nested "brew cache:    $(du -sh "$(brew --cache)" 2> /dev/null | cut -f1)"
       fi
       if command -v uv > /dev/null 2>&1; then
         local uv_cache
@@ -341,10 +319,6 @@ dfm_check()
       if command -v mise > /dev/null 2>&1; then
         msgr msg "mise outdated:"
         mise outdated || true
-      fi
-      if command -v brew > /dev/null 2>&1; then
-        msgr msg "brew outdated:"
-        brew outdated || true
       fi
       ;;
 

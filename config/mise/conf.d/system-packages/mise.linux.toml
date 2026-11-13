@@ -4,8 +4,8 @@
 # backend provides. mise reads this file only in the `linux` platform
 # environment (`auto_env = true` in ../../miserc.toml), and on each distro it
 # skips the entries whose manager is not on PATH, so one list serves both.
-# Applied by `dfm install apt-packages` / `dfm install dnf-packages`
-# (`mise bootstrap packages apply --manager apt|dnf`), which use sudo.
+# Applied by `dfm packages apply` and by `mise bootstrap` in `dfm install all`,
+# both through sudo; hosts where the user has no sudo rights skip them.
 #
 # Tools pinned in [tools] in ../../config.toml (cmake, jq, shellcheck, tmux)
 # are not repeated here: a distro copy runs instead of the pinned one whenever
