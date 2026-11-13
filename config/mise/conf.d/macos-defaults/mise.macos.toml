@@ -16,8 +16,8 @@
 
 [bootstrap.user]
 # mise resolves the name on PATH and in the Homebrew prefix, adds it to
-# /etc/shells and runs chsh. fish comes from conf.d/brew/, so `dfm install
-# all` applies this after the mise step.
+# /etc/shells and runs chsh. fish comes from conf.d/brew/; `mise bootstrap`
+# (run by `dfm install all`) applies the login shell after the packages.
 login_shell = "fish"
 
 [bootstrap.macos.defaults.NSGlobalDomain]

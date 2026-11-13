@@ -128,7 +128,8 @@ the run instead of being skipped silently.
 | `mise bootstrap macos defaults status`           | Show which preferences differ               |
 | `mise bootstrap --only macos-defaults --dry-run` | Preview the writes and the hook             |
 
-`dfm install all` applies it after the mise step, which installs fish.
+`dfm install all` applies it through `mise bootstrap`, which sets the login
+shell after the packages that install fish.
 Writing the `com.apple.Safari` domain needs Full Disk Access for the
 terminal running mise, because Safari is sandboxed.
 

@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 #USAGE cmd "install" help="Install tools, packages, and configurations" {
 #USAGE   cmd "all" help="Install everything in the correct order"
-#USAGE   cmd "apt-packages" help="Install apt packages (Debian/Ubuntu)"
 #USAGE   cmd "cheat-databases" help="Install cheat external cheatsheet databases"
-#USAGE   cmd "dnf-packages" help="Install dnf packages (Fedora/RHEL)"
 #USAGE   cmd "fonts" help="Install programming fonts"
 #USAGE   cmd "gh" help="Install GitHub CLI Extensions"
-#USAGE   cmd "imagick" help="Install ImageMagick CLI"
 #USAGE   cmd "macos" help="Apply macOS defaults and the login shell"
 #USAGE   cmd "mise" help="Install tools via mise (runtimes + CLI tools)"
-#USAGE   cmd "mise-cleanup" help="Remove old version manager installations" {
-#USAGE     flag "--dry-run" help="Show what would be removed without removing"
-#USAGE   }
 #USAGE   cmd "xcode-cli-tools" help="Install Xcode CLI tools (macOS)"
 #USAGE }
 #
@@ -61,12 +55,11 @@ require_bin()
   return 1
 }
 
-# Install the mise binary when it is missing. The apt, dnf and macos steps
-# apply mise config ([bootstrap.*] under config/mise/conf.d/), and in
-# `install all` the apt/dnf steps run before the mise step, so each of them
-# calls this first rather than assuming the mise step has run. No binary is
-# the one fatal case: the caller records the failure and later steps that
-# need mise skip. MISE_INSTALL_PATH puts the binary in the directory added to
+# Install the mise binary when it is missing. `install all`, `install mise`
+# and `install macos` all apply mise config, so each calls this first rather
+# than assuming another step ran. No binary is the one fatal case: the caller
+# records the failure and the steps that need mise skip.
+# MISE_INSTALL_PATH puts the binary in the directory added to
 # PATH: mise.run defaults to ~/.local/bin/mise whatever XDG_BIN_HOME says, so
 # a custom XDG_BIN_HOME left mise installed but not found. The installer is
 # downloaded to a temporary file and run only after the download completes:
@@ -92,44 +85,80 @@ ensure_mise()
   return 0
 }
 
+# Offer to create GITHUB_TOKEN secrets when the token is missing: mise queries
+# the GitHub API for every github: tool, and unauthenticated requests are
+# limited to 60 an hour. Asks once per run, and only a person at a terminal.
+_install_token_asked=0
+install_github_token()
+{
+  [[ -n "${GITHUB_TOKEN:-}" ]] && return 0
+  ((_install_token_asked == 0)) || return 0
+  _install_token_asked=1
+  msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
+  msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
+  if [[ ! -t 0 ]]; then
+    msgr nested "Non-interactive shell; skipping token prompt"
+    return 0
+  fi
+  local answer
+  read -rp "Create GITHUB_TOKEN secrets now? [y/N] " answer
+  if [[ "${answer:-N}" =~ ^[Yy]$ ]]; then
+    "$DFM" secrets github
+    # shellcheck disable=SC1090
+    [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
+      && source "$DOTFILES/config/secrets.d/github.sh"
+  fi
+}
+
+# Apply what `mise bootstrap` owns, in its own order: the declared packages
+# (apt/dnf; Homebrew formulae and casks on macOS), macOS defaults, the login
+# shell, and their hooks. Tools are left to the `install mise` step, which
+# tolerates a host-unsupported tool; a user without sudo rights also skips the
+# packages part, which needs sudo.
+install_bootstrap()
+{
+  local skip=tools
+  if ! "$DOTFILES/local/bin/is-sudoer"; then
+    msgr warn "Skipping system packages: $(id -un) has no sudo rights"
+    _install_skips+=("system packages (no sudo rights)")
+    skip=tools,packages
+  fi
+  msgr run "Applying mise bootstrap (all but tools)..."
+  mise bootstrap --yes --skip "$skip"
+}
+
 # Handle install section commands
 dfm_install()
 {
   case "$1" in
     all)
-      msgr msg "Starting to install all and reloading configurations..."
+      msgr msg "Installing everything..."
       _install_failures=()
       _install_skips=()
 
-      # Tier 0: Platform foundations (build tools, OS packages). The apt and
-      # dnf lists are mise [bootstrap.packages], so those steps install the
-      # mise binary first when it is missing.
-      [[ "$(uname)" == "Darwin" ]] && run_step "xcode cli tools" dfm_install xcode-cli-tools
-      command -v apt &> /dev/null && run_step "apt packages" dfm_install apt-packages
-      command -v dnf &> /dev/null && run_step "dnf packages" dfm_install dnf-packages
+      # Xcode CLI tools first on macOS: git and the compilers the rest needs.
+      [[ $OSTYPE == darwin* ]] && run_step "xcode cli tools" dfm_install xcode-cli-tools
 
-      # Tier 1: Fonts. Homebrew is not a step: `dfm brew install` would put
-      # back every Brewfile formula removed since, so it runs only by hand.
-      run_step "fonts" dfm_install fonts
+      # mise sets up the machine in its own order (`mise bootstrap --help`):
+      # packages, macOS defaults, the login shell (fish, from the packages),
+      # then the tools — including the pipx: Python tools, ntfy and shellspec
+      # pinned in config/mise/config.toml. Nothing here keeps that order.
+      if ensure_mise; then
+        install_github_token
+        run_step "mise bootstrap" install_bootstrap
+        run_step "mise tools" dfm_install mise
+      else
+        _install_failures+=("mise (not installed)")
+      fi
 
-      # Tier 2: Runtimes and CLI tools via mise, then remaining installers.
-      # mise is the lynchpin: a failed *tool* (e.g. a host-unsupported dotnet
-      # tool) no longer aborts the run — the mise step stays usable and the
-      # steps below simply skip themselves if mise is genuinely absent.
-      # Python tools are not a step: they are pipx: entries in config.toml, which
-      # this step installs like any other tool.
-      run_step "mise" dfm_install mise
-      # macOS defaults come after the mise step: they set the login shell to
-      # fish, which that step's brew bootstrap installs.
-      [[ "$(uname)" == "Darwin" ]] && run_step "macos defaults" dfm_install macos
+      # Fonts on Linux. macOS gets them as casks in the bootstrap above; on
+      # Linux mise would need a Linuxbrew prefix created with sudo for them.
+      [[ $OSTYPE == darwin* ]] || run_step "fonts" dfm_install fonts
 
-      # Tier 3: Tool-dependent installers
-      # ntfy and shellspec are not steps: they are pinned in
-      # config/mise/config.toml, so the mise step above already installs them.
       run_step "cheat databases" dfm_install cheat-databases
       require_bin "gh extensions" gh && run_step "gh extensions" dfm_install gh
 
-      # Tier 4: Generate completions, docs, and manpages from usage specs
+      # Completions, docs and manpages from the usage specs.
       msgr run "Generating completions and docs from usage specs..."
       if bash "$DOTFILES/scripts/install-completions.sh"; then
         msgr run_done "Completions and docs generated!"
@@ -137,12 +166,9 @@ dfm_install()
         msgr warn "Some completions/docs failed to generate (non-fatal)"
       fi
 
-      msgr msg "Reloading configurations again..."
-      # shellcheck disable=SC1091
-      source "$DOTFILES/config/shared.sh"
-
       # Closing summary: surface skips and failures so a partial install is
-      # visible instead of silently incomplete.
+      # visible instead of silently incomplete, and exit 1 after a failed
+      # step so ./install (and anything else calling this) sees it.
       if [[ ${#_install_skips[@]} -gt 0 ]]; then
         msgr warn "Skipped ${#_install_skips[@]} step(s):"
         for _s in "${_install_skips[@]}"; do msgr nested "$_s"; done
@@ -150,17 +176,26 @@ dfm_install()
       if [[ ${#_install_failures[@]} -gt 0 ]]; then
         msgr err "Completed with ${#_install_failures[@]} failed step(s):"
         for _f in "${_install_failures[@]}"; do msgr nested "$_f"; done
-      else
-        msgr yay "All done!"
+        return 1
       fi
+      msgr yay "All done!"
       ;;
 
     cheat-databases)
+      # Every script runs; any failure is named and fails the step, instead
+      # of the status of whichever script happened to run last.
       msgr run "Installing cheat databases..."
+      local database cheat_rc=0
       for database in "$DOTFILES"/scripts/install-cheat-*.sh; do
-        bash "$database" \
-          && msgr run_done "Cheat: $database run"
+        [[ -f "$database" ]] || continue
+        if bash "$database"; then
+          msgr run_done "Cheat: ${database##*/} run"
+        else
+          msgr err "Cheat: ${database##*/} failed"
+          cheat_rc=1
+        fi
       done
+      return "$cheat_rc"
       ;;
 
     fonts)
@@ -175,37 +210,12 @@ dfm_install()
         && msgr yay "github cli extensions installed!"
       ;;
 
-    imagick)
-      msgr run "Downloading and installing ImageMagick CLI..."
-      # Download beside the target and move into place only on success:
-      # redirecting straight to magick truncated a working binary, and without
-      # -f an HTTP error page was saved, made executable and reported done.
-      # The subshell owns its traps, so Ctrl-C or TERM mid-download removes
-      # the partial file without replacing any trap the caller has set.
-      if (
-        magick_tmp="$(mktemp "$XDG_BIN_HOME/.magick.XXXXXX")" || exit 1
-        # shellcheck disable=SC2064 # expand now: the path is fixed
-        trap "rm -f -- $(printf '%q' "$magick_tmp")" EXIT
-        trap 'exit 130' INT
-        trap 'exit 143' TERM
-        curl -fsSL --connect-timeout 15 -o "$magick_tmp" \
-          https://imagemagick.org/archive/binaries/magick \
-          && chmod +x "$magick_tmp" \
-          && mv "$magick_tmp" "$XDG_BIN_HOME/magick"
-      ); then
-        msgr yay "imagick downloaded and installed!"
-      else
-        msgr err "imagick download failed"
-        return 1
-      fi
-      ;;
-
     macos)
       # The preferences, the login shell and the post-defaults hook live in
       # config/mise/conf.d/macos-defaults/mise.macos.toml, which mise loads
       # only on macOS. --only runs those two parts of `mise bootstrap`
       # together with their hooks.
-      if [[ "$(uname -s)" != "Darwin" ]]; then
+      if [[ $OSTYPE != darwin* ]]; then
         msgr warn "Not a macOS system, skipping macOS defaults"
         return 0
       fi
@@ -216,74 +226,29 @@ dfm_install()
       ;;
 
     mise)
+      # The [tools] only. Packages are `dfm packages apply` (and `mise
+      # bootstrap` in `install all`).
       msgr run "Installing tools via mise..."
       ensure_mise || return 1
-      if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-        msgr warn "GITHUB_TOKEN is not set — mise queries GitHub API for each github: tool"
-        msgr nested "Unauthenticated requests are rate-limited to 60/hr; installs may fail mid-run"
-        if [[ -t 0 ]]; then
-          read -rp "Create GITHUB_TOKEN secrets now? [y/N] " _answer
-          if [[ "${_answer:-N}" =~ ^[Yy]$ ]]; then
-            "$DFM" secrets github
-            # shellcheck disable=SC1090
-            [[ -f "$DOTFILES/config/secrets.d/github.sh" ]] \
-              && source "$DOTFILES/config/secrets.d/github.sh"
-          fi
-          unset _answer
-        else
-          msgr nested "Non-interactive shell; skipping token prompt"
-        fi
-      fi
+      install_github_token
       # A single host-unsupported tool (e.g. a dotnet tool that will not build
       # on this box) makes `mise install` exit non-zero even though every other
-      # tool installed. Do not abort on that — warn and still reshim so the
-      # tools that DID install get their shims.
-      mise install --yes \
-        || msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
-      mise reshim \
-        || msgr warn "mise reshim failed (non-fatal)"
-      # Apply [bootstrap.packages] (config/mise/conf.d/brew/) — Homebrew
-      # formulae mise installs into the canonical prefix (/opt/homebrew) without
-      # the brew CLI. The macOS-only ones sit in mise.macos.toml, which auto_env
-      # loads on macOS alone; the gate stays because Linux hosts get their
-      # packages from apt/dnf, not a linuxbrew prefix. Scoped to the brew
-      # manager and kept non-fatal because the feature is experimental.
-      if [[ "$(uname -s)" == "Darwin" ]]; then
-        msgr nested "Applying mise bootstrap brew packages..."
-        mise bootstrap packages apply --manager brew --yes \
-          || msgr warn "mise bootstrap packages apply failed (non-fatal)"
+      # tool installed. Do not fail on that — warn and still reshim so the
+      # tools that DID install get their shims, and say so at the end instead
+      # of claiming success.
+      local mise_warnings=0
+      if ! mise install --yes; then
+        msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
+        mise_warnings=1
       fi
-      msgr yay "mise tools installed!"
-      ;;
-
-    mise-cleanup)
-      msgr run "Cleaning up old version manager installations..."
-      bash "$DOTFILES/scripts/cleanup-old-version-managers.sh" "${@:2}"
-      ;;
-
-    apt-packages)
-      # System packages need sudo; auto-skip on hosts where this user has no
-      # sudo rights (e.g. shared servers) rather than failing mid-install.
-      # Both package lists are [bootstrap.packages] in
-      # config/mise/conf.d/system-packages/mise.linux.toml.
-      if "$DOTFILES/local/bin/is-sudoer"; then
-        msgr run "Installing apt packages..."
-        ensure_mise || return 1
-        mise bootstrap packages apply --manager apt --yes \
-          && msgr yay "apt packages installed!"
-      else
-        msgr warn "Skipping apt packages: $(id -un) has no sudo privileges"
+      if ! mise reshim; then
+        msgr warn "mise reshim failed"
+        mise_warnings=1
       fi
-      ;;
-
-    dnf-packages)
-      if "$DOTFILES/local/bin/is-sudoer"; then
-        msgr run "Installing dnf packages..."
-        ensure_mise || return 1
-        mise bootstrap packages apply --manager dnf --yes \
-          && msgr yay "dnf packages installed!"
+      if ((mise_warnings == 0)); then
+        msgr yay "mise tools installed!"
       else
-        msgr warn "Skipping dnf packages: $(id -un) has no sudo privileges"
+        msgr warn "mise tools installed with warnings (see above)"
       fi
       ;;
 

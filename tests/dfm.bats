@@ -38,21 +38,21 @@ setup()
   run bash local/bin/dfm install
   [ "$status" -eq 0 ]
   [[ "$output" == *"all"* ]]
-  [[ "$output" == *"apt-packages"* ]]
   [[ "$output" == *"cheat-databases"* ]]
-  [[ "$output" == *"dnf-packages"* ]]
   [[ "$output" == *"fonts"* ]]
   [[ "$output" == *"gh"* ]]
-  [[ "$output" == *"imagick"* ]]
   [[ "$output" == *"macos"* ]]
   [[ "$output" == *"mise"* ]]
-  [[ "$output" == *"mise-cleanup"* ]]
   [[ "$output" == *"xcode-cli-tools"* ]]
+  # imagemagick is a mise tool; old version managers are `dfm cleanup old-vms`.
+  [[ "$output" != *"imagick"* ]]
+  [[ "$output" != *"mise-cleanup"* ]]
 }
 
-@test "dfm install with invalid subcommand shows menu" {
+@test "dfm install with invalid subcommand fails with exit 2 and shows the menu" {
   run bash local/bin/dfm install nonexistent
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown command: dfm install nonexistent"* ]]
   [[ "$output" == *"dfm install"* ]]
 }
 
