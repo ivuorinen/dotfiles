@@ -28,6 +28,11 @@ idiomatic_version_file_enable_tools = [
   "deno",
   "dotnet",
 ]
+# PHP versions belong to phpenv.fish (config/fish/fish_plugins), which reads
+# .php-version, .tool-versions and composer.json itself. Without this, a `php`
+# line in a project's .tool-versions would have mise build PHP from source
+# (auto_install below) and manage PATH beside phpenv.
+disable_tools = ["php"]
 
 # Generate mise.lock for reproducible installs
 lockfile = true
