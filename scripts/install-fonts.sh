@@ -12,11 +12,16 @@ source "${DOTFILES}/config/shared.sh"
 # ── Font Registry ──────────────────────────────────────────────
 # Format: display_name|check_pattern|github_repo|version|asset_pattern
 # Add new fonts by appending a line to this array.
+#
+# The same set as the font casks in config/mise/conf.d/brew/mise.macos.toml,
+# less two this script cannot fetch: plain JetBrains Mono is vendored in
+# local/share/fonts, and Open Sans has no GitHub release. The check glob must
+# not match those vendored files — JetBrainsMonoNL* did, and the Nerd Font
+# was never installed. The asset glob must match one asset: monaspace-*.zip
+# matched all five Monaspace builds and took the first listed.
 FONTS=(
-  "JetBrainsMono NF|JetBrainsMonoNL*|ryanoasis/nerd-fonts|latest|JetBrainsMono.zip"
-  "OpenDyslexic NF|OpenDyslexic*|ryanoasis/nerd-fonts|latest|OpenDyslexic.zip"
-  "Monaspace|Monaspace*|githubnext/monaspace|latest|monaspace-*.zip"
-  "FiraCode|FiraCode*|tonsky/FiraCode|latest|Fira_Code_*.zip"
+  "JetBrainsMono NF|JetBrainsMonoNerdFont*|ryanoasis/nerd-fonts|latest|JetBrainsMono.zip"
+  "Monaspace|Monaspace*|githubnext/monaspace|latest|monaspace-static-*.zip"
 )
 
 # ── Configuration ──────────────────────────────────────────────
