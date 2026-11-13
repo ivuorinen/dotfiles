@@ -85,7 +85,7 @@ usage_cmds()
   # Read-only, so it is safe to run for real.
   run env DOTFILES="$REPO" "$DFM" check arch
   [ "$status" -eq 0 ]
-  [ -n "$output" ]
+  [ "$output" = "$(uname -m)" ]
 }
 
 @test "dfm check host: reports the hostname" {

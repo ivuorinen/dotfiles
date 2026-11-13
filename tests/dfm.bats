@@ -258,21 +258,35 @@ setup()
 
 # ── Group 4: Check commands ───────────────────────────────────
 
-@test "dfm check arch returns current arch" {
+@test "dfm check arch returns the CPU architecture" {
   run bash local/bin/dfm check arch
   [ "$status" -eq 0 ]
-  [ -n "$output" ]
+  [ "$output" = "$(uname -m)" ]
 }
 
 @test "dfm check arch with matching value exits 0" {
-  local current_arch
-  current_arch="$(uname)"
-  run bash local/bin/dfm check arch "$current_arch"
+  run bash local/bin/dfm check arch "$(uname -m)"
   [ "$status" -eq 0 ]
 }
 
 @test "dfm check arch with non-matching value exits 1" {
   run bash local/bin/dfm check arch FakeArch
+  [ "$status" -eq 1 ]
+  # The OS name is not an architecture.
+  run bash local/bin/dfm check arch "$(uname -s)"
+  [ "$status" -eq 1 ]
+}
+
+@test "dfm check os returns the OS kernel name" {
+  run bash local/bin/dfm check os
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(uname -s)" ]
+}
+
+@test "dfm check os compares against the OS kernel name" {
+  run bash local/bin/dfm check os "$(uname -s)"
+  [ "$status" -eq 0 ]
+  run bash local/bin/dfm check os FakeOS
   [ "$status" -eq 1 ]
 }
 
