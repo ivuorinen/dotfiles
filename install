@@ -97,11 +97,20 @@ fi
 
 run_host_hooks before
 
+# A failed dotbot task (for example a `dfm install all` step) must not stop
+# the host overlay and the after.d hooks from running: under `set -e` a bare
+# failing call would exit here. Keep the first non-zero status and report it
+# once everything has run.
+rc=0
 "${DOTBOT_BIN_PATH}" \
   -d "${BASEDIR}" \
   -c "${DEFAULTS_CONFIG}" "${LINKS_CONFIG}" "${CONFIG}" \
-  "${DOTBOT_ARGS[@]}"
+  "${DOTBOT_ARGS[@]}" || rc=$?
 
-run_host_config
+host_rc=0
+run_host_config || host_rc=$?
+[ "$rc" -ne 0 ] || rc=$host_rc
 
 run_host_hooks after
+
+exit "$rc"

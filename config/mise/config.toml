@@ -28,6 +28,11 @@ idiomatic_version_file_enable_tools = [
   "deno",
   "dotnet",
 ]
+# PHP versions belong to phpenv.fish (config/fish/fish_plugins), which reads
+# .php-version, .tool-versions and composer.json itself. Without this, a `php`
+# line in a project's .tool-versions would have mise build PHP from source
+# (auto_install below) and manage PATH beside phpenv.
+disable_tools = ["php"]
 
 # Generate mise.lock for reproducible installs
 lockfile = true
@@ -83,6 +88,10 @@ jq = "1.8.2"
 yq = "4.54.1"
 choose = "1.3.7"
 "github:jgm/pandoc" = "3.13"
+# The registry resolves this to conda:imagemagick, a build that carries its own
+# delegates (jpeg, png, webp, heic, rsvg, …) on Linux and macOS alike, so both
+# get `magick` (x-thumbgen) without Homebrew or a downloaded binary.
+imagemagick = "7.1.2_31"
 
 # Git & version control
 github-cli = "2.103.3"
@@ -210,5 +219,5 @@ lefthook = "2.2.2"
 poppler = "latest"
 "github:ville6000/tfs" = "0.13.0"
 
-# Homebrew formulae for mise's brew bootstrap ([bootstrap.packages]) live in
-# the conf.d/brew/ folder fragment, split by platform.
+# Homebrew formulae and casks for mise's brew bootstrap ([bootstrap.packages])
+# live in conf.d/brew/mise.macos.toml, which loads on macOS only.

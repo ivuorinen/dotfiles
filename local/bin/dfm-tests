@@ -10,28 +10,19 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
-dfm_bootstrap_for "$@"
+}
+# Visual helpers only: no shell environment needed.
+dfm_bootstrap_min
 
 # Secret menu for visual tests
 dfm_tests()
 {
-  USAGE_PREFIX="$SCRIPT tests <command>"
-
-  MENU=(
-    "msgr:List all available msgr message types"
-    "params:List all parameters"
-  )
-
-  case "$1" in
+  case "${1:-}" in
     params)
       echo "All parameters:"
       for i in "$@"; do
@@ -54,7 +45,7 @@ dfm_tests()
       msgr yay "msgr yay"
       msgr yay_done "msgr yay_done"
       ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

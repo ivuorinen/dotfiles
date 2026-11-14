@@ -24,7 +24,7 @@ STUB
   run "$APPLY" dark
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/applied-family")" = "catppuccin" ]
-  # The choice file belongs to the user (local/bin/theme); apply never writes it.
+  # The choice file belongs to the user (`dfm theme family`); apply never writes it.
   [ ! -e "$TMPDIR_TEST/dotfiles-theme/choice" ]
 }
 
@@ -352,4 +352,37 @@ STUB
   run "$APPLY" dark
   [ "$status" -eq 0 ]
   [ "$(cat "$TMPDIR_TEST/dotfiles-theme/generation")" = "$first" ]
+}
+
+# --force (dfm theme reapply) re-runs every handler at an unchanged mode and
+# family, the case the plain apply skips.
+@test "apply --force: re-runs every handler when nothing changed" {
+  counting_handler
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  TMPDIR_TEST="$TMPDIR_TEST" "$APPLY" dark
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 1 ]
+  first="$(cat "$TMPDIR_TEST/dotfiles-theme/generation")"
+  sleep 1
+  TMPDIR_TEST="$TMPDIR_TEST" run "$APPLY" --force dark
+  [ "$status" -eq 0 ]
+  [ "$(wc -l < "$TMPDIR_TEST/handler-runs")" -eq 2 ]
+  [ "$(cat "$TMPDIR_TEST/dotfiles-theme/generation")" != "$first" ]
+}
+
+@test "apply --force: exits 1 and names a failed handler" {
+  printf '#!/usr/bin/env bash\necho broken >&2\nexit 3\n' > "$THEME_HANDLERS_DIR/broken"
+  chmod +x "$THEME_HANDLERS_DIR/broken"
+  run "$APPLY" --force dark
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"handlers failed: broken"* ]]
+  # The plain apply keeps its contract: a handler failure is logged, exit 0.
+  run "$APPLY" light
+  [ "$status" -eq 0 ]
+}
+
+@test "apply --force: rejects a missing or unknown mode" {
+  run "$APPLY" --force
+  [ "$status" -eq 2 ]
+  run "$APPLY" --force dusk
+  [ "$status" -eq 2 ]
 }

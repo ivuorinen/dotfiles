@@ -295,9 +295,11 @@ if [[ -f "$DOTFILES/local/bin/dfm" ]]; then
     # `|| true`: under `set -e` a grep with no match exits 1 and would abort
     # the whole generator. A dfm-* with no #USAGE simply contributes nothing.
     grep '^#USAGE' "$DOTFILES/local/bin/dfm" || true
-    for section in install brew apt check dotfiles helpers docs scripts tests secrets ssh cleanup; do
-      sub="$DOTFILES/local/bin/dfm-$section"
-      [[ -f "$sub" ]] || continue
+    # Every executable dfm-* is a section; the non-executable dfm-lib and
+    # the dfm.md doc are not. A glob, not a list, so a new section cannot be
+    # left out (a hand-kept list once missed `theme`).
+    for sub in "$DOTFILES"/local/bin/dfm-*; do
+      [[ -f "$sub" && -x "$sub" ]] || continue
       grep '^#USAGE' "$sub" || true
     done
   } > "$dfm_spec"

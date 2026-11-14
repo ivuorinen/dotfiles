@@ -25,9 +25,10 @@ setup()
   [[ "$output" == *"dfm scripts"* ]]
 }
 
-@test "dfm with invalid section shows usage" {
+@test "dfm with invalid section fails with exit 2 and shows usage" {
   run bash local/bin/dfm nonexistent
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown section: dfm nonexistent"* ]]
   [[ "$output" == *"Usage: dfm"* ]]
 }
 
@@ -37,21 +38,21 @@ setup()
   run bash local/bin/dfm install
   [ "$status" -eq 0 ]
   [[ "$output" == *"all"* ]]
-  [[ "$output" == *"apt-packages"* ]]
   [[ "$output" == *"cheat-databases"* ]]
-  [[ "$output" == *"dnf-packages"* ]]
   [[ "$output" == *"fonts"* ]]
   [[ "$output" == *"gh"* ]]
-  [[ "$output" == *"imagick"* ]]
   [[ "$output" == *"macos"* ]]
   [[ "$output" == *"mise"* ]]
-  [[ "$output" == *"mise-cleanup"* ]]
   [[ "$output" == *"xcode-cli-tools"* ]]
+  # imagemagick is a mise tool; old version managers are `dfm cleanup old-vms`.
+  [[ "$output" != *"imagick"* ]]
+  [[ "$output" != *"mise-cleanup"* ]]
 }
 
-@test "dfm install with invalid subcommand shows menu" {
+@test "dfm install with invalid subcommand fails with exit 2 and shows the menu" {
   run bash local/bin/dfm install nonexistent
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown command: dfm install nonexistent"* ]]
   [[ "$output" == *"dfm install"* ]]
 }
 
@@ -89,8 +90,24 @@ setup()
 
 @test "dfm docs rejects unknown doc" {
   run bash local/bin/dfm docs no-such-doc
-  [ "$status" -eq 1 ]
+  [ "$status" -eq 2 ]
   [[ "$output" == *"Documentation not found"* ]]
+}
+
+@test "dfm docs and dfm scripts show their menu for a help flag" {
+  run bash local/bin/dfm docs help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Shell Aliases"* ]]
+  run bash local/bin/dfm scripts --help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dfm scripts"* ]]
+  [[ "$output" != *"Script not found"* ]]
+}
+
+@test "dfm scripts with an unknown script fails with exit 2" {
+  run bash local/bin/dfm scripts no-such-script
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Script not found: no-such-script"* ]]
 }
 
 @test "dfm theme menu shows entries" {
@@ -140,7 +157,9 @@ setup()
   [ "$status" -eq 0 ]
   [[ "$output" == *"fmt"* ]]
   [[ "$output" == *"shfmt"* ]]
-  [[ "$output" == *"yamlfmt"* ]]
+  [[ "$output" == *"reset-nvim"* ]]
+  [[ "$output" != *"yamlfmt"* ]]
+  [[ "$output" != *"reset_all"* ]]
 }
 
 @test "dfm check menu shows entries" {
@@ -164,62 +183,21 @@ setup()
   [[ "$output" == *"params"* ]]
 }
 
-# A tool-gated section (apt, brew) only makes sense when its tool exists.
-# `dfm <section>` shows the menu when the tool is present, or ONLY a
-# not-available notice when it is absent. The bare `dfm` listing omits
-# such a section entirely when its tool is missing, and never prints a
-# notice — absent sections are skipped, not run. These assertions branch
-# on the host so they hold on both Debian (apt present) and macOS (absent).
-@test "dfm apt shows menu when apt present, notice-only when absent" {
-  run bash local/bin/dfm apt
-  [ "$status" -eq 0 ]
-  if command -v apt > /dev/null 2>&1; then
-    [[ "$output" == *"upkeep"* ]]
-    [[ "$output" != *"not available"* ]]
-  else
-    [[ "$output" == *"apt not available"* ]]
-    [[ "$output" != *"upkeep"* ]]
-  fi
-}
-
-@test "dfm brew shows menu when brew present, notice-only when absent" {
-  run bash local/bin/dfm brew
-  [ "$status" -eq 0 ]
-  if command -v brew > /dev/null 2>&1; then
-    [[ "$output" == *"untracked"* ]]
-    [[ "$output" != *"not available"* ]]
-  else
-    [[ "$output" == *"brew not available"* ]]
-    [[ "$output" != *"untracked"* ]]
-  fi
-}
-
-# `brew autoupdate` is an external tap command the Brewfile never taps, so the
-# old branch failed with "Unknown command". It is a deprecation notice now and
-# must not reach brew at all.
-@test "dfm brew autoupdate prints the deprecation notice and exits 0" {
-  command -v brew > /dev/null 2>&1 || skip "brew not installed"
-  run bash local/bin/dfm brew autoupdate
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"dfm brew autoupdate is deprecated"* ]]
-  [[ "$output" != *"Unknown command"* ]]
-}
-
-@test "bare dfm omits tool-gated sections whose tool is absent" {
+# Package management is one section, `dfm packages`, over mise's bootstrap
+# packages; the apt and brew sections are gone.
+@test "bare dfm lists the packages section and no apt or brew section" {
   run bash local/bin/dfm
   [ "$status" -eq 0 ]
-  # Absent sections are skipped, not run, so no notice ever leaks here.
-  [[ "$output" != *"not available"* ]]
-  if command -v apt > /dev/null 2>&1; then
-    [[ "$output" == *"dfm apt"* ]]
-  else
-    [[ "$output" != *"dfm apt"* ]]
-  fi
-  if command -v brew > /dev/null 2>&1; then
-    [[ "$output" == *"dfm brew"* ]]
-  else
-    [[ "$output" != *"dfm brew"* ]]
-  fi
+  [[ "$output" == *"dfm packages <command>"* ]]
+  [[ "$output" != *"dfm apt "* ]]
+  [[ "$output" != *"dfm brew "* ]]
+}
+
+@test "dfm apt and dfm brew are unknown sections" {
+  run bash local/bin/dfm apt
+  [ "$status" -eq 2 ]
+  run bash local/bin/dfm brew install
+  [ "$status" -eq 2 ]
 }
 
 # config/exports emits `msg "Setting up …"` for many tools, guarded by
@@ -241,21 +219,35 @@ setup()
 
 # ── Group 4: Check commands ───────────────────────────────────
 
-@test "dfm check arch returns current arch" {
+@test "dfm check arch returns the CPU architecture" {
   run bash local/bin/dfm check arch
   [ "$status" -eq 0 ]
-  [ -n "$output" ]
+  [ "$output" = "$(uname -m)" ]
 }
 
 @test "dfm check arch with matching value exits 0" {
-  local current_arch
-  current_arch="$(uname)"
-  run bash local/bin/dfm check arch "$current_arch"
+  run bash local/bin/dfm check arch "$(uname -m)"
   [ "$status" -eq 0 ]
 }
 
 @test "dfm check arch with non-matching value exits 1" {
   run bash local/bin/dfm check arch FakeArch
+  [ "$status" -eq 1 ]
+  # The OS name is not an architecture.
+  run bash local/bin/dfm check arch "$(uname -s)"
+  [ "$status" -eq 1 ]
+}
+
+@test "dfm check os returns the OS kernel name" {
+  run bash local/bin/dfm check os
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(uname -s)" ]
+}
+
+@test "dfm check os compares against the OS kernel name" {
+  run bash local/bin/dfm check os "$(uname -s)"
+  [ "$status" -eq 0 ]
+  run bash local/bin/dfm check os FakeOS
   [ "$status" -eq 1 ]
 }
 
@@ -344,7 +336,8 @@ fake_dotfiles()
 
   # fish: sourcing must yield the original value unchanged.
   if command -v fish > /dev/null 2>&1; then
-    run fish -c 'source $argv[1]; printf "%s" $MY_SECRET' "$tmp/config/fish/secrets.d/my.fish"
+    # --no-config: only the secret file is sourced, not the developer's config.
+    run fish --no-config -c 'source $argv[1]; printf "%s" $MY_SECRET' "$tmp/config/fish/secrets.d/my.fish"
     [ "$output" = "$value" ]
   fi
   rm -rf "$tmp"
@@ -484,6 +477,22 @@ fake_dotfiles()
   rm -rf "$tmp"
 }
 
+@test "dfm secrets remove reports a file it could not delete" {
+  [ "$(id -u)" -ne 0 ] || skip "root ignores the read-only directory"
+  local tmp
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  printf 'tok\n' | DOTFILES="$tmp" bash local/bin/dfm secrets create GITHUB_TOKEN
+  chmod 500 "$tmp/config/secrets.d"
+  run bash -c "printf 'y\n' | DOTFILES='$tmp' bash local/bin/dfm secrets remove github"
+  chmod 700 "$tmp/config/secrets.d"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to remove secret 'github'"* ]]
+  [[ "$output" != *"Removed secret"* ]]
+  [ -f "$tmp/config/secrets.d/github.sh" ]
+  rm -rf "$tmp"
+}
+
 @test "dfm secrets remove errors for an unknown secret" {
   run bash local/bin/dfm secrets remove nope
   [ "$status" -eq 1 ]
@@ -552,6 +561,25 @@ fake_dotfiles()
     || stat -f '%Lp' "$tmp/config/secrets.d")"
   [ "$fperms" = "600" ]
   [ "$dperms" = "700" ]
+  rm -rf "$tmp"
+}
+
+@test "dfm secrets create tightens an existing file before writing to it" {
+  local tmp fperms
+  tmp="$(mktemp -d)"
+  fake_dotfiles "$tmp"
+  mkdir -p "$tmp/config/secrets.d" "$tmp/config/fish/secrets.d/github.fish"
+  printf 'old\n' > "$tmp/config/secrets.d/github.sh"
+  chmod 644 "$tmp/config/secrets.d/github.sh"
+  # A directory where the fish file belongs makes the first write fail. The
+  # sh file is 0600 by then, because the modes are set before any write.
+  run bash -c "printf 'newtok\n' | DOTFILES='$tmp' bash local/bin/dfm secrets create GITHUB_TOKEN"
+  chmod 700 "$tmp/config/fish/secrets.d/github.fish"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to write secret files"* ]]
+  fperms="$(stat -c '%a' "$tmp/config/secrets.d/github.sh" 2> /dev/null \
+    || stat -f '%Lp' "$tmp/config/secrets.d/github.sh")"
+  [ "$fperms" = "600" ]
   rm -rf "$tmp"
 }
 

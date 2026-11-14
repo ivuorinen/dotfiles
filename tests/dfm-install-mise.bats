@@ -8,6 +8,8 @@
 # MISE_INSTALL_PATH (or mise.run's default), DOTFILES is a scratch tree whose
 # shared.sh is empty, and PATH keeps no directory that holds a real mise.
 
+bats_require_minimum_version 1.5.0
+
 setup()
 {
   REPO="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
@@ -16,8 +18,8 @@ setup()
     "$TMP/home" "$TMP/xdgbin"
   : > "$TMP/dotfiles/config/shared.sh"
   ln -s "$REPO/local/bin/msgr" "$TMP/dotfiles/local/bin/msgr"
-  # dfm-install runs under `env bash`; keep this bash (4+) ahead of a system
-  # bash 3.2, which dfm-lib's guard would refuse.
+  # dfm-install runs under `env bash`; keep the bash running this test first
+  # on the trimmed PATH.
   ln -s "$BASH" "$TMP/bin/bash"
 
   # The installer goes to -o FILE, or to stdout without it. CURL_FAIL fails
@@ -92,4 +94,19 @@ install_mise()
     DOTFILES="$TMP/dotfiles" GITHUB_TOKEN=test "$REPO/local/bin/dfm-install" mise
   [ "$status" -eq 0 ]
   [ -x "$TMP/home/.local/bin/mise" ]
+}
+
+# A host-unsupported tool makes `mise install` fail while the rest installed:
+# the step still succeeds, but says so instead of claiming success.
+@test "dfm install mise: a failed tool install ends with a warning, not success" {
+  printf '#!/bin/sh\necho "mise $*" >> "%s"\n[ "$1" = install ] && exit 1\nexit 0\n' \
+    "$TMP/calls" > "$TMP/bin/mise"
+  chmod +x "$TMP/bin/mise"
+  install_mise
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"installed with warnings"* ]]
+  [[ "$output" != *"mise tools installed!"* ]]
+  grep -qx 'mise reshim' "$TMP/calls"
+  # Packages are not this step's job any more.
+  run ! grep -q 'bootstrap' "$TMP/calls"
 }

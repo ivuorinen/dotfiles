@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#USAGE cmd "packages" help="Install, check and upgrade the packages mise declares" {
+#USAGE   cmd "apply" help="Install every declared package this host's managers support"
+#USAGE   cmd "status" help="List the declared packages; exit 1 when one differs from the config"
+#USAGE   cmd "upgrade" help="Upgrade the declared packages that are installed"
+#USAGE }
+#
+# @description Install, check and upgrade declared packages via mise (dfm packages)
+# dfm packages — `mise bootstrap packages` for every package manager the host
+# has: apt and dnf (config/mise/conf.d/system-packages/), and Homebrew formulae
+# and casks on macOS (config/mise/conf.d/brew/mise.macos.toml), installed by
+# mise without the brew CLI. mise skips a manager the host lacks.
+#
+# `prune` is deliberately not offered: it uninstalls every formula and cask no
+# mise config declares, which includes phpenv's PHP versions.
+#
+# vim: ft=bash ts=2 sw=2 et
+# shellcheck source-path=$HOME/.dotfiles/local/bin
+
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+# shellcheck source=local/bin/dfm-lib
+source "$_dfm_dir/dfm-lib" || {
+  echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
+  exit 1
+}
+dfm_bootstrap_for "$@"
+
+# apt and dnf install through sudo. A user without sudo rights (a shared
+# server) gets a warning instead of a prompt that cannot succeed. is-sudoer
+# never prompts, so this is safe under dotbot, where stdin is /dev/null.
+packages_can_install()
+{
+  "$DOTFILES/local/bin/is-sudoer" && return 0
+  msgr warn "Skipping: $(id -un) has no sudo rights, which the system package managers need"
+  return 1
+}
+
+dfm_packages()
+{
+  case "${1:-}" in
+    apply | status | upgrade)
+      if ! command -v mise > /dev/null 2>&1; then
+        msgr err "mise not found; run '$SCRIPT install mise' first"
+        return 1
+      fi
+      ;;
+  esac
+
+  case "${1:-}" in
+    apply)
+      packages_can_install || return 0
+      mise bootstrap packages apply --yes
+      ;;
+    status)
+      # --missing lists every package and exits 1 when any differs.
+      mise bootstrap packages status --missing
+      ;;
+    upgrade)
+      packages_can_install || return 0
+      mise bootstrap packages upgrade --yes
+      ;;
+    *) dfm_fallback "${1:-}" ;;
+  esac
+}
+
+dfm_packages "$@"

@@ -25,25 +25,33 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
-dfm_bootstrap_for "$@"
+}
+# No command here needs the shell environment: ssh-add, jq, git and curl come
+# from the caller's PATH, and each missing one is reported or skipped.
+dfm_bootstrap_min
 
 # Config — override via env.
 : "${DFM_SSH_PUBDIR:=$HOME/.ssh}"
 : "${DFM_SSH_SIGNERS:=$DOTFILES/ssh/allowed_signers}"
-: "${DFM_SSH_GITHUB_USER:=$(git config --global --get github.user 2> /dev/null || echo ivuorinen)}"
+# DFM_SSH_GITHUB_USER (default: git's github.user, else ivuorinen) is resolved
+# in dfm_ssh_github, not here: `git` can be a mise shim that costs ~200 ms per
+# call, and every invocation — the menu and the `dfm` listing included —
+# would pay it.
 # 1Password's SSH agent socket — used as a fallback when the ambient
 # SSH_AUTH_SOCK is unset/empty (non-login shells, cron) so the signing key
-# managed by 1Password is still discovered. macOS default; override per host.
-: "${DFM_SSH_AGENT_SOCK:=$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock}"
+# managed by 1Password is still discovered. The default is 1Password's own
+# path for the OS (its SSH agent docs: the Group Containers socket on macOS,
+# ~/.1password/agent.sock on Linux); override per host.
+if [[ $OSTYPE == darwin* ]]; then
+  : "${DFM_SSH_AGENT_SOCK:=$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock}"
+else
+  : "${DFM_SSH_AGENT_SOCK:=$HOME/.1password/agent.sock}"
+fi
 # git-profile config (dotzero/git-profile) — the source of every email you
 # commit under. Its user.email values become the combined principal list on
 # each appended allowed_signers line, so one key verifies commits made under
@@ -103,9 +111,10 @@ _ssh_local_blobs()
 {
   _ssh_local | awk '{print $1" "$2}' | sort -u
 }
+# Bounded, so an unreachable network fails in seconds instead of hanging.
 _ssh_github_blobs()
 {
-  curl -fsSL "https://github.com/${1}.keys" 2> /dev/null \
+  curl -fsSL --connect-timeout 10 --max-time 30 "https://github.com/${1}.keys" 2> /dev/null \
     | awk 'NF>=2 {print $1" "$2}' | sort -u
 }
 
@@ -150,8 +159,14 @@ dfm_ssh_signers()
 # Compare local public keys against github.com/<user>.keys.
 dfm_ssh_github()
 {
-  local user="${1:-$DFM_SSH_GITHUB_USER}"
+  local user="${1:-${DFM_SSH_GITHUB_USER:-}}"
+  [[ -z "$user" ]] && user=$(git config --global --get github.user 2> /dev/null)
+  [[ -z "$user" ]] && user=ivuorinen
   msgr run "Comparing local keys with https://github.com/${user}.keys"
+  if ! command -v curl > /dev/null 2>&1; then
+    msgr err "curl not found; cannot fetch https://github.com/${user}.keys"
+    return 1
+  fi
   local gh local_blobs
   gh=$(_ssh_github_blobs "$user")
   if [[ -z "$gh" ]]; then
@@ -189,12 +204,6 @@ dfm_ssh_github()
 
 dfm_ssh()
 {
-  USAGE_PREFIX="$SCRIPT ssh <command>"
-  MENU=(
-    "signers:Append local public keys missing from allowed_signers, then compare with GitHub"
-    "check:Dry run — show what would be appended and the GitHub overlap, write nothing"
-    "github <user>:Compare local public keys against github.com/<user>.keys"
-  )
   case "${1:-}" in
     s | signers)
       dfm_ssh_signers
@@ -210,7 +219,7 @@ dfm_ssh()
       shift
       dfm_ssh_github "${1:-}"
       ;;
-    *) menu_builder "$USAGE_PREFIX" "${MENU[@]}" ;;
+    *) dfm_fallback "${1:-}" ;;
   esac
 }
 

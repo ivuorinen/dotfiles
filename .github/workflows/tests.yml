@@ -34,7 +34,7 @@ jobs:
       - name: Install fish and zsh (Linux)
         if: runner.os == 'Linux'
         # fish stays a distro package: the mise fish tarball ships no
-        # fish_indent (config/mise/conf.d/brew/mise.toml).
+        # fish_indent (config/mise/conf.d/brew/mise.macos.toml).
         # zsh: zsh-antidote.bats runs zshrc and antidote.zsh under zsh itself.
         # macOS ships it; the Ubuntu image does not.
         run: |

@@ -13,9 +13,12 @@ dfm install fonts                  # Via dotfiles manager
 ## Fonts Installed
 
 - JetBrainsMono Nerd Font (ryanoasis/nerd-fonts)
-- OpenDyslexic Nerd Font (ryanoasis/nerd-fonts)
-- Monaspace (githubnext/monaspace)
-- FiraCode (tonsky/FiraCode)
+- Monaspace, static build (githubnext/monaspace)
+
+`dfm install all` runs this on Linux only. macOS installs its fonts as
+Homebrew casks (`config/mise/conf.d/brew/mise.macos.toml`). Plain JetBrains
+Mono is not in this list because it is vendored in `local/share/fonts`, which
+`~/.local/share/fonts` links to.
 
 ## Adding Fonts
 

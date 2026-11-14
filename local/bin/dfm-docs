@@ -9,16 +9,15 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
-dfm_bootstrap_for "$@"
+}
+# Reading a doc needs no shell environment: glow/bat come from the caller's
+# PATH, and cat is the fallback.
+dfm_bootstrap_min
 
 # Show a documentation file from docs/. The menu is built by scanning
 # docs/*.md (top level only — docs/audit/ is never listed) and using
@@ -28,13 +27,20 @@ dfm_docs()
   USAGE_PREFIX="$SCRIPT docs <file>"
   local docs_dir="$DOTFILES/docs"
 
-  if [[ -z ${1:-} ]]; then
-    local MENU=() f name desc
+  if [[ -z ${1:-} || $1 == help || $1 == -h || $1 == --help ]]; then
+    local MENU=() f name desc line
     for f in "$docs_dir"/*.md; do
       [[ -f $f ]] || continue
       name=${f##*/}
       name=${name%.md}
-      desc=$(awk '/^# /{ sub(/^# /, ""); print; exit }' "$f")
+      # Read up to the first "# " header; no subprocess per doc.
+      desc=""
+      while IFS= read -r line || [[ -n $line ]]; do
+        if [[ $line == "# "* ]]; then
+          desc=${line#"# "}
+          break
+        fi
+      done < "$f"
       MENU+=("$name:${desc:-$name}")
     done
     menu_builder "$USAGE_PREFIX" "${MENU[@]}"
@@ -44,8 +50,9 @@ dfm_docs()
   local name=${1##*/}
   local path="$docs_dir/${name%.md}.md"
   if [[ ! -f $path ]]; then
-    echo "Documentation not found: $path" >&2
-    return 1
+    msgr err "Documentation not found: $path"
+    msgr nested "Run '$SCRIPT docs' to list the docs" >&2
+    return 2
   fi
 
   # Plain text when stdout is not a terminal: `dfm docs x | grep`, a hook or

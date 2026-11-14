@@ -111,15 +111,15 @@ colours are the terminal's ANSI names.
 - **`local/bin/msgr`** — colored output helper (`msgr msg|run|yay|err|warn`).
   Sourced by `dfm` and most scripts in `local/bin/`.
 - **`local/bin/dfm`** — the main dotfiles manager script. Key sub-commands:
-  - `dfm install all` — install everything in tiered stages
-  - `dfm brew install` / `dfm brew update` — Homebrew management
-  - `dfm apt upkeep` — APT maintenance (Debian/Ubuntu)
-  - `dfm dotfiles fmt` / `dfm dotfiles shfmt` — format configs/scripts
+  - `dfm install all` — Xcode CLI tools, `mise bootstrap`, the mise tools, fonts (Linux), cheat DBs, gh extensions
+  - `dfm packages apply` / `status` / `upgrade` — apt, dnf and macOS Homebrew packages through mise
+  - `dfm dotfiles fmt` / `dfm dotfiles shfmt` — run `mise run fix` and the prek `shfmt` hook / the hook alone
+  - `dfm dotfiles reset-nvim` — delete nvim's XDG data, state, cache and config, relink it
   - `dfm helpers docs-all` — regenerate generated docs under `docs/`
   - `dfm docs [name]` — list/show `docs/*.md`
   - `dfm scripts` — run `install-*.sh` scripts from `scripts/` (menu labels from `@description`)
   - `dfm helpers <name>` — inspect aliases, colors, env, functions, path
-  - `dfm check arch` / `dfm check host` — system info
+  - `dfm check arch` / `dfm check os` / `dfm check host` — CPU (`uname -m`), OS (`uname -s`), hostname
 
 ### mise — Unified Tool Manager
 

@@ -8,3 +8,8 @@
       exclude: ["*.md", "*renovate*", "LICENSE"]
     shell:
       stdout: true
+      # dotbot connects a shell step's stderr to /dev/null by default
+      # (tools/dotbot/README.md, `stderr`). The install steps report warnings
+      # and failures on stderr (msgr warn/err), so without this a partial
+      # install printed nothing about what failed.
+      stderr: true

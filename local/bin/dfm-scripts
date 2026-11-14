@@ -9,15 +9,12 @@
 # vim: ft=bash ts=2 sw=2 et
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
-_dfm_dir=$(
-  unset CDPATH
-  cd -- "$(dirname -- "$0")" && pwd
-)
+_dfm_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 # shellcheck source=local/bin/dfm-lib
-if ! source "$_dfm_dir/dfm-lib"; then
+source "$_dfm_dir/dfm-lib" || {
   echo "${0##*/}: cannot load dfm-lib (broken install?)" >&2
   exit 1
-fi
+}
 dfm_bootstrap_for "$@"
 
 # Handle install script execution
@@ -25,18 +22,25 @@ dfm_scripts()
 {
   USAGE_PREFIX="$SCRIPT scripts <command>"
 
-  # Collect scripts and their descriptions
-  local menu_items=()
-  for script in "$DOTFILES/scripts/install-"*.sh; do
-    if [ -f "$script" ]; then
-      name=$(basename "$script" .sh | sed 's/install-//')
-      desc=$(get_script_description "$script")
-      menu_items+=("$name:$desc")
-    fi
-  done
-
-  case "$1" in
-    "")
+  case "${1:-}" in
+    "" | help | -h | --help)
+      # Name from the file name, label from the first line carrying an
+      # @description tag; built only here, never when running a script.
+      local menu_items=() script name desc line
+      for script in "$DOTFILES/scripts/install-"*.sh; do
+        [[ -f "$script" ]] || continue
+        name=${script##*/install-}
+        name=${name%.sh}
+        desc=""
+        while IFS= read -r line || [[ -n $line ]]; do
+          if [[ $line == *@description* ]]; then
+            desc=${line##*@description}
+            desc=${desc#"${desc%%[! ]*}"}
+            break
+          fi
+        done < "$script"
+        menu_items+=("$name:${desc:-No description available}")
+      done
       menu_builder "$USAGE_PREFIX" "${menu_items[@]}"
       ;;
     *)
@@ -46,6 +50,8 @@ dfm_scripts()
         bash "$script_path"
       else
         msgr err "Script not found: $1"
+        msgr nested "Run '$SCRIPT scripts' to list them" >&2
+        return 2
       fi
       ;;
   esac

@@ -6,6 +6,11 @@
 # $state_dir/retry; a later apply at the same mode and family re-runs only
 # those, at most once per RETRY_MINUTES.
 #
+# --force runs every handler even when the mode and family are unchanged
+# (after editing a palette: `dfm theme reapply`). It waits for the lock as a
+# flip does, and exits 1 naming the handlers that failed, since a person is
+# waiting on the result.
+#
 # Env overrides (test seams):
 #   THEME_HANDLERS_DIR     defaults to $DOTFILES/config/theme/handlers.d
 #   XDG_STATE_HOME         defaults to $HOME/.local/state
@@ -15,8 +20,13 @@ set -uo pipefail
 # shellcheck disable=SC1091
 source "$(dirname -- "$0")/_lib.sh"
 
+force=0
+if [[ ${1:-} == --force ]]; then
+  force=1
+  shift
+fi
 if [[ $# -ne 1 ]]; then
-  echo "apply: usage: apply <dark|light>" >&2
+  echo "apply: usage: apply [--force] <dark|light>" >&2
   exit 2
 fi
 
@@ -32,7 +42,7 @@ esac
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-theme"
 state_file="$state_dir/mode"
 # apply's own record of the family it last applied. The user's saved choice
-# is "$state_dir/choice" (local/bin/theme), which apply only reads.
+# is "$state_dir/choice" (`dfm theme family`), which apply only reads.
 applied_family_file="$state_dir/applied-family"
 # Rewritten after every handler run: a stamp a reader can compare to notice
 # that a flip finished.
@@ -66,6 +76,8 @@ resolve_family
 state_unchanged()
 {
   local current="" current_family=""
+  # A forced run treats every state as changed: it runs every handler.
+  ((force == 0)) || return 1
   [[ -r "$state_file" ]] || return 1
   read -r current < "$state_file" || true
   [[ -r "$applied_family_file" ]] && {
@@ -113,7 +125,7 @@ else
   done
 fi
 
-# Resolve again now the lock is held: a `theme` run that saved a newer
+# Resolve again now the lock is held: a `dfm theme family` run that saved a newer
 # choice while this apply waited must win over the value read above.
 resolve_family
 
@@ -217,4 +229,8 @@ fi
 # final: a new stamp tells open shells to reload them at their next prompt.
 _atomic_write "$generation_file" "$(date +%s)-$$"
 
+if ((force == 1 && ${#failed_names[@]} > 0)); then
+  echo "apply: handlers failed: ${failed_names[*]} (details in the theme log)" >&2
+  exit 1
+fi
 exit 0

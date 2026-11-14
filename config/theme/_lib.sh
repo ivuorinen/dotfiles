@@ -48,7 +48,7 @@ _idempotent_ln_sf()
   return 0
 }
 
-# The user's saved family choice, written by local/bin/theme. Per machine
+# The user's saved family choice, written by `dfm theme family`. Per machine
 # and outside the repo, so switching never leaves a tracked change.
 _theme_choice_file()
 {

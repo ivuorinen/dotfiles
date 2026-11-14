@@ -117,6 +117,11 @@ fi
 # mise pipx backend installs to a different location.
 # We leave XDG_BIN_HOME alone and let mise take precedence via PATH.
 
+# --- Homebrew Bundle ---
+# `mise bootstrap packages` installs the Homebrew packages now. The Brewfile
+# is gone; `brew bundle` wrote this lock file next to it.
+remove_file "$XDG_CONFIG_HOME/homebrew/Brewfile.lock.json" "Homebrew Bundle lock file"
+
 # --- Homebrew-installed version managers ---
 # Uninstall the Homebrew copies of tools mise now manages.
 if command -v brew &> /dev/null; then

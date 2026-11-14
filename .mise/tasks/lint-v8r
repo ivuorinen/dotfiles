@@ -7,11 +7,13 @@ set -euo pipefail
 # a mapped file uses it. --ignore-errors passes that compile failure like a
 # missing schema, which would silently stop validating every file mapped to
 # the broken schema, so the run fails on ajv's "schema is invalid" instead.
+# Only the submodules under tools/ are skipped: tools/dotbot-defaults.yaml is
+# this repo's own file and has a catalog entry.
 log=$(mktemp)
 trap 'rm -f "$log"' EXIT
 local/bin/git-ls-existing -z --cached --others --exclude-standard \
   '*.yml' '*.yaml' '*.json' '*.toml' \
-  | grep -zvE '^(tools/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|schemas/)' \
+  | grep -zvE '^(tools/(antidote|dotbot)/|config/cheat/cheatsheets/|config/gh/|config/gh-dash/|node_modules/|graphify-out/|docs/audit/|schemas/)' \
   | xargs -0 v8r --ignore-errors 2>&1 \
   | tee "$log"
 if grep -q 'schema is invalid' "$log"; then

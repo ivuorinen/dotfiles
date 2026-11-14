@@ -59,11 +59,10 @@ source_fzf_config()
 }
 
 source_fzf_config
-# Cached via lib::init_cached for the same reason as in base/bashrc: these
-# resolve through mise shims, and a shim call costs ~80ms against ~2ms for
-# the real binary. zprof does not show this — it profiles functions, not
-# top-level evals.
-x-have antidot && lib::init_cached antidot antidot init --shell zsh
+# starship and wt below are cached via lib::init_cached for the same reason as
+# in base/bashrc: they resolve through mise shims, and a shim call costs ~80ms
+# against ~2ms for the real binary. zprof does not show this — it profiles
+# functions, not top-level evals.
 
 # Add usage-generated completions to fpath
 # shellcheck disable=SC2206 # zsh: unquoted $fpath expands the array unsplit

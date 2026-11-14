@@ -20,14 +20,16 @@ setup()
   : > "$CALLS"
 
   # One release JSON serves every font: an asset for each registry glob
-  # plus a decoy that no glob may select.
+  # plus decoys that no glob may select. The Monaspace builds are listed in
+  # the order githubnext/monaspace publishes them, static not first.
   cat > "$TMP/release.json" << 'JSON'
 {"assets": [
   {"browser_download_url": "https://example.test/dl/Decoy.tar.xz"},
   {"browser_download_url": "https://example.test/dl/JetBrainsMono.zip"},
-  {"browser_download_url": "https://example.test/dl/OpenDyslexic.zip"},
-  {"browser_download_url": "https://example.test/dl/monaspace-v1.200.zip"},
-  {"browser_download_url": "https://example.test/dl/Fira_Code_v6.2.zip"}
+  {"browser_download_url": "https://example.test/dl/monaspace-frozen-v1.400.zip"},
+  {"browser_download_url": "https://example.test/dl/monaspace-nerdfonts-v1.400.zip"},
+  {"browser_download_url": "https://example.test/dl/monaspace-static-v1.400.zip"},
+  {"browser_download_url": "https://example.test/dl/monaspace-variable-v1.400.zip"}
 ]}
 JSON
 
@@ -84,10 +86,8 @@ run_fonts()
 install_all_fonts()
 {
   mkdir -p "$FONT_DIR"
-  : > "$FONT_DIR/JetBrainsMonoNL-Regular.ttf"
-  : > "$FONT_DIR/OpenDyslexic-Regular.otf"
+  : > "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf"
   : > "$FONT_DIR/MonaspaceNeon-Regular.otf"
-  : > "$FONT_DIR/FiraCode-Regular.ttf"
 }
 
 @test "install-fonts: an unauthenticated gh falls back to curl" {
@@ -109,18 +109,28 @@ install_all_fonts()
   run_fonts
   [ "$status" -eq 0 ]
   grep -q 'https://example.test/dl/JetBrainsMono.zip' "$CALLS"
-  grep -q 'https://example.test/dl/OpenDyslexic.zip' "$CALLS"
-  grep -q 'https://example.test/dl/monaspace-v1.200.zip' "$CALLS"
-  grep -q 'https://example.test/dl/Fira_Code_v6.2.zip' "$CALLS"
+  grep -q 'https://example.test/dl/monaspace-static-v1.400.zip' "$CALLS"
   run ! grep -q 'Decoy' "$CALLS"
+  run ! grep -qE 'monaspace-(frozen|nerdfonts|variable)' "$CALLS"
+}
+
+@test "install-fonts: the vendored JetBrains Mono does not count as the Nerd Font" {
+  # local/share/fonts ships plain JetBrains Mono, and ~/.local/share/fonts
+  # links to it on Linux.
+  mkdir -p "$FONT_DIR"
+  : > "$FONT_DIR/JetBrainsMono-Regular.ttf"
+  : > "$FONT_DIR/JetBrainsMonoNL-Regular.ttf"
+  run_fonts
+  [ "$status" -eq 0 ]
+  grep -q 'https://example.test/dl/JetBrainsMono.zip' "$CALLS"
 }
 
 @test "install-fonts: downloads refuse a redirect off https" {
   run_fonts
   [ "$status" -eq 0 ]
   downloads=$(grep -c '^curl .* -o ' "$CALLS")
-  [ "$downloads" -eq 4 ]
-  [ "$(grep '^curl .* -o ' "$CALLS" | grep -c -- "--proto-redir =https")" -eq 4 ]
+  [ "$downloads" -eq 2 ]
+  [ "$(grep '^curl .* -o ' "$CALLS" | grep -c -- "--proto-redir =https")" -eq 2 ]
 }
 
 @test "install-fonts: installed fonts are skipped without a network call" {
@@ -134,7 +144,7 @@ install_all_fonts()
   install_all_fonts
   run_fonts --force
   [ "$status" -eq 0 ]
-  [ "$(grep -c '^curl .* -o ' "$CALLS")" -eq 4 ]
+  [ "$(grep -c '^curl .* -o ' "$CALLS")" -eq 2 ]
 }
 
 @test "install-fonts: an unknown option exits 1" {

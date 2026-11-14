@@ -255,7 +255,7 @@ in markdown and mise TOML buffers.
 | auto-dark-mode.nvim | Polls OS every 1 s; syncs `background` with system dark/light state        |
 | nvim-colorizer.lua  | Highlights hex color codes in-buffer; named colors disabled                |
 
-The colorscheme follows the active theme family — the choice saved by `theme`,
+The colorscheme follows the active theme family — the choice saved by `dfm theme family`,
 else `config/theme/family` — (`oasis`, `kanagawa`, `catppuccin` or `warm-burnout`);
 each switches variant with `background`. Running sessions pick up a family switch
 within 3 s. A family whose plugin is not installed falls back to oasis.
