@@ -177,7 +177,7 @@ trufflehog = "3.99.8"
 # without a config change.
 "github:anchore/grype" = "0.121.2"
 trivy = "0.76.1"
-"github:anchore/syft" = "1.55.0"
+"github:anchore/syft" = "1.57.1"
 opengrep = "1.33.1"
 osv-scanner = "2.7.0"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
