@@ -198,7 +198,7 @@ prek = "0.5.10"
 "npm:corepack" = "0.36.0"
 
 # System monitoring & misc utilities
-"pipx:graphifyy" = "0.9.102"  # graphify, the code knowledge graph (.claude/rules/graphify-first.md)
+"pipx:graphifyy" = "0.9.106"  # graphify, the code knowledge graph (.claude/rules/graphify-first.md)
 bottom = "0.15.0"
 cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.37.2"
