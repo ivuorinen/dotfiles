@@ -107,7 +107,7 @@ difftastic = "0.72.0"
 
 # Editors & language servers
 neovim = "0.12.6"
-tree-sitter = "0.27.1"
+tree-sitter = "0.27.2"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
 "pipx:pynvim" = "0.6.0"  # Python client; its pynvim-python is g:python3_host_prog
 "npm:fish-lsp" = "1.1.5"
