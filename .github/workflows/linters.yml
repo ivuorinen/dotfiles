@@ -33,4 +33,4 @@ jobs:
           persist-credentials: false
 
       - name: Run PR Lint
-        uses: ivuorinen/actions/pr-lint@65ac82193fdc3eff00e971c4d0a9f95b07fea5c6 # v2026.11.12
+        uses: ivuorinen/actions/pr-lint@95bfd957bf148f5bce9b7506f74579ecf7452a51 # v2026.11.14
