@@ -140,10 +140,6 @@ IncludeDevelopMenu = true
 WebKitDeveloperExtrasEnabledPreferenceKey = true
 "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true
 
-[bootstrap.macos.defaults."com.googlecode.iterm2"]
-# No confirmation prompt when quitting iTerm2
-PromptOnQuit = false
-
 [bootstrap.macos.defaults."com.apple.TimeMachine"]
 # Don't offer new disks as Time Machine backup volumes
 DoNotOfferNewDisksForBackup = true
@@ -179,11 +175,15 @@ value = false
 
 # Runs after the preferences above, in three parts:
 #   1. preferences whose value holds $HOME, which the hook's shell expands;
-#   2. the restarts mise leaves to the user: Dock, Finder and the menu bar
-#      read most preferences only at launch;
+#   2. the restarts mise leaves to the user: Activity Monitor, Messages and
+#      Safari, whose preferences this file sets; Dock, Finder and the menu
+#      bar, which read most preferences only at launch; and cfprefsd, which
+#      caches them;
 #   3. settings `defaults` cannot write as the user (boot chime in NVRAM,
 #      power management, system timezone, the login window's system-wide
-#      preference), with sudo prompting once.
+#      preference), with sudo prompting once. StartupMute is the Apple
+#      silicon chime switch, the one "Play sound on startup" in Sound
+#      settings changes.
 # mise runs hooks under `sh -o errexit`, so a failing command stops the hook
 # and fails the run. The root commands come last so that such a failure can no
 # longer cost the preferences or the restarts, and is reported instead of
@@ -194,13 +194,12 @@ run = '''
 defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/"
 mkdir -p "$HOME/Documents/Screenshots"
 defaults write com.apple.screencapture location -string "$HOME/Documents/Screenshots"
-for app in "Activity Monitor" "Address Book" Calendar Contacts cfprefsd \
-  Dock Finder Mail Messages Safari SizeUp SystemUIServer; do
+for app in "Activity Monitor" Messages Safari Dock Finder SystemUIServer \
+  cfprefsd; do
   killall "$app" > /dev/null 2>&1 || true
 done
-sudo nvram SystemAudioVolume=" "
+sudo nvram StartupMute=%01
 sudo pmset -a hibernatemode 0
-sudo pmset -a sms 0
 sudo systemsetup -settimezone "Europe/Helsinki" > /dev/null
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 '''
