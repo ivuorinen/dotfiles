@@ -109,7 +109,12 @@ difftastic = "0.72.0"
 neovim = "0.12.6"
 tree-sitter = "0.27.1"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
-"pipx:pynvim" = "0.6.0"  # Python client; its pynvim-python is g:python3_host_prog
+# An exact pin on a pipx tool is never found (still in mise 2026.11.8): mise
+# installs it as <version>~uv~<hash> but looks for <version>, so the tool
+# counts as missing, stays off PATH, and is reinstalled whenever one of its
+# dependencies moves. "latest" resolves through the install's latest link.
+# Pin exactly again once mise finds those installs.
+"pipx:pynvim" = "latest"  # Python client; its pynvim-python is g:python3_host_prog
 "npm:fish-lsp" = "1.1.5"
 
 # Task runners & caching
@@ -198,7 +203,9 @@ prek = "0.5.10"
 "npm:corepack" = "0.36.0"
 
 # System monitoring & misc utilities
-"pipx:graphifyy" = "0.9.102"  # graphify, the code knowledge graph (.claude/rules/graphify-first.md)
+# "latest" for the reason at pipx:pynvim. After an upgrade, rerun
+# `graphify install --platform claude` (.claude/rules/graphify-first.md).
+"pipx:graphifyy" = "latest"  # graphify, the code knowledge graph
 bottom = "0.15.0"
 cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.37.2"
