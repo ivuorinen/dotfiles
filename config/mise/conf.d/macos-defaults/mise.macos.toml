@@ -183,7 +183,9 @@ value = false
 #      power management, system timezone, the login window's system-wide
 #      preference), with sudo prompting once. StartupMute is the Apple
 #      silicon chime switch, the one "Play sound on startup" in Sound
-#      settings changes.
+#      settings changes. systemsetup prints "### Error:-99" even when it
+#      sets the timezone, so it runs only when /etc/localtime points at
+#      another zone.
 # mise runs hooks under `sh -o errexit`, so a failing command stops the hook
 # and fails the run. The root commands come last so that such a failure can no
 # longer cost the preferences or the restarts, and is reported instead of
@@ -200,6 +202,9 @@ for app in "Activity Monitor" Messages Safari Dock Finder SystemUIServer \
 done
 sudo nvram StartupMute=%01
 sudo pmset -a hibernatemode 0
-sudo systemsetup -settimezone "Europe/Helsinki" > /dev/null
+case "$(readlink /etc/localtime)" in
+  */zoneinfo/Europe/Helsinki) ;;
+  *) sudo systemsetup -settimezone "Europe/Helsinki" > /dev/null ;;
+esac
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 '''
