@@ -107,7 +107,7 @@ difftastic = "0.72.0"
 
 # Editors & language servers
 neovim = "0.12.6"
-tree-sitter = "0.27.1"
+tree-sitter = "0.27.2"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
 # An exact pin on a pipx tool is never found (still in mise 2026.11.8): mise
 # installs it as <version>~uv~<hash> but looks for <version>, so the tool
