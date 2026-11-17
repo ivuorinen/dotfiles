@@ -89,15 +89,15 @@ jobs:
     name: Lint (mise run lint)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      patched: ${{ steps.patch.outputs.patched }}
     steps:
-      # The branch itself, not the PR merge ref, so a fix commit can land on
-      # it. No credentials persist: only the push step below sees a token,
-      # after every tool the branch controls has finished running.
+      # The default ref: on a PR, its merge with main, so lint covers the
+      # merged result. push-fixes applies the patch to the branch head; if
+      # main changed the same lines, the apply fails and nothing is pushed.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-          ref: ${{ github.head_ref || github.ref_name }}
           persist-credentials: false
 
       # linters.yml only runs on pull_request, so without this job a commit
@@ -108,34 +108,90 @@ jobs:
       - name: Run autofixers
         run: mise run fix
 
-      # fiximus pushes with its own token because a push made with
-      # GITHUB_TOKEN starts no workflow run, and the fixed commit needs one.
-      # On main it is on the ruleset's bypass list. Fork PRs get
-      # no secrets, and a run fiximus started must not push again (a fixer
-      # that is not idempotent would loop), so both fail with the diff.
-      - name: Commit fixes as fiximus
+      # The fixes leave this job as a patch: this runner has run tools the
+      # branch controls, so it never holds FIXIMUS_TOKEN. Fork PRs could not
+      # push, and a run fiximus started must not push again (a fixer that is
+      # not idempotent would loop), so both fail here with the diff.
+      - name: Save fixes as a patch
+        id: patch
         env:
-          FIXIMUS_TOKEN: ${{ secrets.FIXIMUS_TOKEN }}
-          REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-          REF: ${{ github.head_ref || github.ref_name }}
+          CAN_PUSH: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           if git diff --quiet; then
             exit 0
           fi
-          if [ -z "$FIXIMUS_TOKEN" ] || [ "$GITHUB_ACTOR" = fiximus ]; then
-            git diff --stat
+          git diff --stat
+          if [ "$CAN_PUSH" != true ] || [ "$GITHUB_ACTOR" = fiximus ]; then
             echo "::error::mise run fix changed files that this run cannot push; run it locally"
             exit 1
           fi
-          git config user.name fiximus
-          git config user.email 189535814+fiximus@users.noreply.github.com
-          git commit --all --message "style: apply autofixers (automated)"
-          git push "https://x-access-token:${FIXIMUS_TOKEN}@github.com/${REPO}.git" "HEAD:${REF}"
+          git diff --binary > "$RUNNER_TEMP/autofix.patch"
+          echo patched=true >> "$GITHUB_OUTPUT"
+
+      - name: Upload the patch
+        if: steps.patch.outputs.patched == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: autofix-patch
+          path: ${{ runner.temp }}/autofix.patch
+          retention-days: 1
 
       # Catches what no fixer can: editorconfig, schemas, usage, bandit and
       # exclusion drift.
       - name: Run lint
         run: mise run lint
+
+      # The lint above saw the fixed tree, not this commit, so the required
+      # check stays red here; the fixed commit gets a run of its own. If the
+      # push never lands, this commit stays blocked rather than passing.
+      - name: Fail until the fixed commit is checked
+        if: steps.patch.outputs.patched == 'true'
+        run: |
+          echo "::error::mise run fix changed files; fiximus pushes them as a new commit"
+          exit 1
+
+  # A fresh runner that runs nothing from the branch: git applies the patch
+  # and pushes it, so no branch-controlled tool or hook sees the token.
+  # fiximus pushes with its own token because a push made with GITHUB_TOKEN
+  # starts no workflow run, and the fixed commit needs one. On main it is on
+  # the ruleset's bypass list.
+  push-fixes:
+    name: Push autofixes as fiximus
+    needs: lint
+    if: ${{ !cancelled() && needs.lint.outputs.patched == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Download the patch
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: autofix-patch
+          path: ${{ runner.temp }}
+
+      # .github/ stays out: a compromised fixer must not get its edits pushed
+      # with a token that bypasses the main ruleset.
+      - name: Commit the patch
+        run: |
+          if git apply --numstat "$RUNNER_TEMP/autofix.patch" | cut -f3 | grep -q '^\.github/'; then
+            echo "::error::the autofixes touch .github/; run mise run fix locally"
+            exit 1
+          fi
+          git apply --index "$RUNNER_TEMP/autofix.patch"
+          git config user.name fiximus
+          git config user.email 189535814+fiximus@users.noreply.github.com
+          git commit --message "style: apply autofixers (automated)"
+
+      - name: Push as fiximus
+        env:
+          FIXIMUS_TOKEN: ${{ secrets.FIXIMUS_TOKEN }}
+          REF: ${{ github.head_ref || github.ref_name }}
+        run: git push "https://x-access-token:${FIXIMUS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${REF}"
 
   fish-lint:
     name: Fish syntax and formatting
