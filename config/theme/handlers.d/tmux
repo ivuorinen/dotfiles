@@ -39,8 +39,16 @@ if ! err="$(tmux source-file "$conf" 2>&1)"; then
   tmux display-message "${msg//#/##}"
   exit 1
 fi
-# Repaint every attached client now instead of on the next status-interval.
-while IFS= read -r client; do
-  [[ -n "$client" ]] && tmux refresh-client -S -t "$client"
-done < <(tmux list-clients -F '#{client_name}' 2> /dev/null)
+# Repaint every attached client now instead of on the next status-interval,
+# and make it re-read the terminal's colours. WezTerm sends no mode-2031
+# theme reports, so tmux keeps answering OSC 10/11 from the colours it
+# cached at attach. A SIGWINCH makes the client re-query them (at most once
+# per 30 s, tmux's TTY_REQUEST_LIMIT), and tmux then tells the panes that
+# subscribed to 2031 (Copilot CLI, fish) to re-read theirs. This runs after
+# the reload, by which time WezTerm has switched its scheme.
+while read -r client pid; do
+  [[ -n "$client" ]] || continue
+  tmux refresh-client -S -t "$client"
+  [[ "$pid" =~ ^[0-9]+$ ]] && kill -WINCH "$pid" 2> /dev/null
+done < <(tmux list-clients -F '#{client_name} #{client_pid}' 2> /dev/null)
 exit 0

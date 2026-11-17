@@ -93,4 +93,9 @@ Copilot CLI needs no handler: `config/copilot/settings.json` sets `theme`
 to `default` ("Base-16 terminal colors"), which builds every colour from
 the terminal's OSC 10/11/4 replies and falls back to ANSI names without
 them. Keep it off `github`, the shipped default: it hard-codes `#ffffff` /
-`#0D1117` and writes the terminal background itself.
+`#0D1117` and writes the terminal background itself. Inside tmux those
+replies come from colours tmux cached at attach, and WezTerm sends no
+mode-2031 report to refresh them, so after the reload `handlers.d/tmux`
+sends each client `SIGWINCH`. tmux then re-queries WezTerm and signals
+Copilot (and fish) to re-read. Without it a running Copilot keeps the old
+mode's surfaces under the new mode's text.

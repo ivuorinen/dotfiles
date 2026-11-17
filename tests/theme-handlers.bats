@@ -90,6 +90,35 @@ STUB
   ((SECONDS - start < 3))
 }
 
+@test "tmux handler: a flip makes every client re-query the terminal colours" {
+  # A detached test server has no clients, so a stub tmux lists a fake
+  # client whose pid is a listener that records SIGWINCH, plus a client
+  # with a non-numeric pid that must be skipped.
+  mkdir -p "$TMPDIR_TEST/bin"
+  local ready="$TMPDIR_TEST/ready" got="$TMPDIR_TEST/winch"
+  bash -c 'trap "touch \"$2\"; exit" WINCH; touch "$1"; for _ in $(seq 50); do sleep 0.1; done' \
+    _ "$ready" "$got" &
+  local listener=$!
+  cat > "$TMPDIR_TEST/bin/tmux" << STUB
+#!/usr/bin/env bash
+[[ "\$1" == list-clients ]] && printf '%s\n' '/dev/ttys999 $listener' '/dev/ttys998 nope'
+exit 0
+STUB
+  chmod +x "$TMPDIR_TEST/bin/tmux"
+  : > "$TMPDIR_TEST/tmux.conf"
+  for _ in $(seq 1 50); do
+    [[ -e "$ready" ]] && break
+    sleep 0.1
+  done
+  PATH="$TMPDIR_TEST/bin:$PATH" THEME_TMUX_CONF="$TMPDIR_TEST/tmux.conf" run "$HD/tmux" dark --now
+  [ "$status" -eq 0 ]
+  for _ in $(seq 1 20); do
+    [[ -e "$got" ]] && break
+    sleep 0.1
+  done
+  [ -e "$got" ]
+}
+
 @test "tmux handler: a missing config fails loudly" {
   command -v tmux > /dev/null 2>&1 || skip "tmux not installed"
   test_server
