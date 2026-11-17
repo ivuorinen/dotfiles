@@ -84,13 +84,20 @@ jobs:
         run: scripts/bats-run.sh tests/
 
   lint:
+    # The name is the main ruleset's required status check: renaming the job
+    # blocks every PR until the ruleset is changed to match.
     name: Lint (mise run lint)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # The branch itself, not the PR merge ref, so a fix commit can land on
+      # it. No credentials persist: only the push step below sees a token,
+      # after every tool the branch controls has finished running.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref_name }}
           persist-credentials: false
 
       # linters.yml only runs on pull_request, so without this job a commit
@@ -98,6 +105,35 @@ jobs:
       - name: Install the mise toolchain
         uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
 
+      - name: Run autofixers
+        run: mise run fix
+
+      # fiximus pushes with its own token because a push made with
+      # GITHUB_TOKEN starts no workflow run, and the fixed commit needs one.
+      # On main it is on the ruleset's bypass list. Fork PRs get
+      # no secrets, and a run fiximus started must not push again (a fixer
+      # that is not idempotent would loop), so both fail with the diff.
+      - name: Commit fixes as fiximus
+        env:
+          FIXIMUS_TOKEN: ${{ secrets.FIXIMUS_TOKEN }}
+          REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          if [ -z "$FIXIMUS_TOKEN" ] || [ "$GITHUB_ACTOR" = fiximus ]; then
+            git diff --stat
+            echo "::error::mise run fix changed files that this run cannot push; run it locally"
+            exit 1
+          fi
+          git config user.name fiximus
+          git config user.email 189535814+fiximus@users.noreply.github.com
+          git commit --all --message "style: apply autofixers (automated)"
+          git push "https://x-access-token:${FIXIMUS_TOKEN}@github.com/${REPO}.git" "HEAD:${REF}"
+
+      # Catches what no fixer can: editorconfig, schemas, usage, bandit and
+      # exclusion drift.
       - name: Run lint
         run: mise run lint
 
