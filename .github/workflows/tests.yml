@@ -175,14 +175,16 @@ jobs:
           path: ${{ runner.temp }}
 
       # .github/ stays out: a compromised fixer must not get its edits pushed
-      # with a token that bypasses the main ruleset.
+      # with a token that bypasses the main ruleset. The check reads the
+      # staged result through a pathspec, which no file name can escape;
+      # parsing patch output misses names git prints quoted.
       - name: Commit the patch
         run: |
-          if git apply --numstat "$RUNNER_TEMP/autofix.patch" | cut -f3 | grep -q '^\.github/'; then
+          git apply --index "$RUNNER_TEMP/autofix.patch"
+          if ! git diff --cached --quiet -- .github/; then
             echo "::error::the autofixes touch .github/; run mise run fix locally"
             exit 1
           fi
-          git apply --index "$RUNNER_TEMP/autofix.patch"
           git config user.name fiximus
           git config user.email 189535814+fiximus@users.noreply.github.com
           git commit --message "style: apply autofixers (automated)"
