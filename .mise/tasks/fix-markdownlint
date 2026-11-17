@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Autofix markdownlint issues (honors .markdownlintignore)"
+exec markdownlint --fix --ignore-path .markdownlintignore '**/*.md'
