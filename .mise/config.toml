@@ -16,7 +16,7 @@ editorconfig-checker = "4.0.2"
 usage = { version = "7.1.4", workflow = "publish-cli.yml" }
 "npm:prettier" = "3.9.10"
 "npm:markdownlint-cli" = "0.50.0"
-"npm:markdown-table-formatter" = "1.7.0"
+"npm:markdown-table-formatter" = "2.1.0"
 "npm:v8r" = "6.1.0"
 # `lint-bandit` is part of the `lint` chain, so the CI gate needs bandit even
 # though no other job uses Python. The [toml] extra is required: without it

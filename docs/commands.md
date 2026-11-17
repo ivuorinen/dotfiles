@@ -23,7 +23,8 @@ mise run lint-v8r          # JSON Schema validation of schema-backed configs
 mise run lint-usage        # usage lint for scripts/ and local/bin/
 mise run lint-bandit       # Python SAST (config in [tool.bandit], pyproject.toml)
 mise run lint-exclusions   # Third-party exclusion lists agree across gates (scripts/check-exclusion-drift.py)
-mise run fix               # Autofix everything (biome + prettier + md-table)
+mise run fix               # Autofix everything (biome + prettier + markdownlint + md-table); alias: lint-fix
+mise run fix-markdownlint  # Auto-fix markdownlint issues (honors .markdownlintignore)
 mise run fix-md-table      # Auto-fix markdown tables
 ```
 

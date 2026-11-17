@@ -144,7 +144,7 @@
 | `]t`         | :tnext                                                                                     | `<Lua callback>`                                           |
 | `g%`         | Reverse matching bracket (matchit)                                                         | `<Plug>(MatchitNormalBackward)`                            |
 | `g=`         | Evaluate                                                                                   | `v:lua.MiniOperators.evaluate()`                           |
-| `g=​=`       | Evaluate line                                                                              | `g=_`                                                      |
+| `g=​=`        | Evaluate line                                                                              | `g=_`                                                      |
 | `gH`         | Reset hunks                                                                                | `<Lua callback>`                                           |
 | `gO`         | vim.lsp.buf.document_symbol()                                                              | `<Lua callback>`                                           |
 | `gR`         | Replace                                                                                    | `v:lua.MiniOperators.replace()`                            |
@@ -168,8 +168,8 @@
 | `gss`        | Sort line                                                                                  | `^gsg_`                                                    |
 | `gx`         | Exchange                                                                                   | `v:lua.MiniOperators.exchange()`                           |
 | `gxx`        | Exchange line                                                                              | `gx_`                                                      |
-| `j`          | Move down                                                                                  | `v:count =​= 0 ? 'gj' : 'j'`                               |
-| `k`          | Move up                                                                                    | `v:count =​= 0 ? 'gk' : 'k'`                               |
+| `j`          | Move down                                                                                  | `v:count =​= 0 ? 'gj' : 'j'`                                |
+| `k`          | Move up                                                                                    | `v:count =​= 0 ? 'gk' : 'k'`                                |
 | `s`          | Surround (mini.surround)                                                                   | `<Lua callback>`                                           |
 | `sF`         | Find left surrounding                                                                      | `<Lua callback>`                                           |
 | `sFl`        | Find previous left surrounding                                                             | `<Lua callback>`                                           |
@@ -215,8 +215,8 @@
 | `<Tab>`   | vim.snippet.jump if active, otherwise &lt;Tab&gt;                                          | `<Lua callback>`                                                                     |
 | `<`       | Indent Left                                                                                | `<gv`                                                                                |
 | `>`       | Indent Right                                                                               | `>gv`                                                                                |
-| `@`       | :help v_@-default                                                                          | `mode() =​=# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'`                           |
-| `Q`       | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                   |
+| `@`       | :help v_@-default                                                                          | `mode() =​=# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'`                            |
+| `Q`       | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                    |
 | `[%`      | Previous unmatched group (matchit)                                                         | `<Plug>(MatchitVisualMultiBackward)`                                                 |
 | `[H`      | First hunk                                                                                 | `<Cmd>lua MiniDiff.goto_hunk('first')<CR>`                                           |
 | `[N`      | Select previous sibling node                                                               | `<Lua callback>`                                                                     |
@@ -275,8 +275,8 @@
 | `<C-K>` | Move Block Up                                                                              | `<Cmd>m '<-2<CR>gv=gv`                                                               |
 | `<`     | Indent Left                                                                                | `<gv`                                                                                |
 | `>`     | Indent Right                                                                               | `>gv`                                                                                |
-| `@`     | :help v_@-default                                                                          | `mode() =​=# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'`                           |
-| `Q`     | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                   |
+| `@`     | :help v_@-default                                                                          | `mode() =​=# 'V' ? ':normal! @'.getcharstr().'<CR>' : '@'`                            |
+| `Q`     | :help v_Q-default                                                                          | `mode() =​=# 'V' ? ':normal! @<C-R>=reg_recorded()<CR><CR>' : 'Q'`                    |
 | `[%`    | Previous unmatched group (matchit)                                                         | `<Plug>(MatchitVisualMultiBackward)`                                                 |
 | `[H`    | First hunk                                                                                 | `<Cmd>lua MiniDiff.goto_hunk('first')<CR>`                                           |
 | `[N`    | Select previous sibling node                                                               | `<Lua callback>`                                                                     |

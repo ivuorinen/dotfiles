@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 #MISE description="Run every autofixer, in order"
+#MISE alias="lint-fix"
 #
 # Steps run one at a time and the chain stops at the first failure, like `lint`.
+# md-table runs last so table alignment is final after markdownlint's fixes.
 set -euo pipefail
 
-for task in fix-biome fix-prettier fix-md-table; do
+for task in fix-biome fix-prettier fix-markdownlint fix-md-table; do
   mise run "$task"
 done
