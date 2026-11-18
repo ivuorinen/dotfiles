@@ -4,7 +4,9 @@
     "http://localhost:4200",
     "https://raw.githubusercontent.com",
     "https://marketplace.visualstudio.com",
-    "https://learn.microsoft.com"
+    "https://learn.microsoft.com",
+    "https://github.com",
+    "https://developer.chrome.com"
   ],
   "theme": "default",
   "statusLine": {
@@ -19,7 +21,7 @@
   "defaultMode": "interactive",
   "defaultPermissionMode": "assisted",
   "enableAllGithubMcpTools": false,
-  "inlineImages": true,
+  "inlineImages": false,
   "keepAlive": "busy",
   "memory": true,
   "mergeStrategy": "rebase",
@@ -71,5 +73,7 @@
   "voice": {
     "enabled": false
   },
-  "effortLevel": "xhigh"
+  "effortLevel": "xhigh",
+  "disableAllHooks": false,
+  "showReasoning": false
 }
