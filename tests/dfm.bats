@@ -13,6 +13,15 @@ setup()
   [[ "$output" == *"Usage: dfm"* ]]
 }
 
+@test "bash dfm found on PATH loads dfm-lib from its own folder" {
+  # `bash dfm` searches PATH but leaves $0 as the bare name, which names a
+  # file in the current directory, not the dfm that runs.
+  cd "$BATS_TEST_TMPDIR"
+  PATH="$DOTFILES/local/bin:$PATH" run bash dfm help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Usage: dfm"* ]]
+}
+
 @test "dfm with no args shows full usage with all sections" {
   run bash local/bin/dfm
   [ "$status" -eq 0 ]

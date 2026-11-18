@@ -8,7 +8,8 @@ with files under `local/bin/`.
 `local/bin/dfm` is a thin **git-style dispatcher**: `dfm <section>
 <args>` resolves and execs `dfm-<section>` (sibling of the dispatcher
 first, then `$PATH`), mirroring how git finds `git-<command>`. The
-dispatcher resolves `$0` through any symlinks first, so "the folder it
+dispatcher resolves its own path (`BASH_SOURCE`, which `bash dfm` sets to
+the file it found on `$PATH` while `$0` stays bare) through any symlinks first, so "the folder it
 is in" is the script's real location (the repo's `local/bin`) even when
 invoked via a `~/.local/bin/dfm` symlink — dropping a new `dfm-<sub>`
 into `local/bin/` works immediately, before `./install` links it. No

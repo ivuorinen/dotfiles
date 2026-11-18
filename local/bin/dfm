@@ -17,15 +17,17 @@
 # shellcheck source-path=$HOME/.dotfiles/local/bin
 
 # Directory where the dfm scripts REALLY live — also the home of dfm-lib and
-# every dfm-* subcommand. We resolve $0 through any symlinks first: when dfm is
-# invoked via a ~/.local/bin/dfm symlink (a prior install), a plain
-# dirname "$0" would yield ~/.local/bin, which need not contain newly added
+# every dfm-* subcommand. The path comes from BASH_SOURCE, not $0: `bash dfm`
+# finds dfm on PATH but leaves $0 as the bare name, which would resolve
+# against the current directory. We resolve that path through any symlinks
+# first: when dfm is invoked via a ~/.local/bin/dfm symlink (a prior install),
+# a plain dirname would yield ~/.local/bin, which need not contain newly added
 # dfm-* siblings (or even dfm-lib) before `./install` links them. Following the
 # symlink chain to the repo's local/bin makes `dfm <new-sub>` work the moment
 # the file is dropped in — no re-link needed — and resolving here (before $PATH)
 # keeps the script's own folder authoritative. readlink is used without -f for
 # macOS/BSD portability.
-_dfm_src="$0"
+_dfm_src="${BASH_SOURCE[0]}"
 while [ -h "$_dfm_src" ]; do
   _dfm_link_dir=$(
     unset CDPATH
