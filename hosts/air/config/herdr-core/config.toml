@@ -1,0 +1,7 @@
+# Herdr.app starts the core through launchd, which sets no XDG_RUNTIME_DIR, so
+# the core listens under ~/.local/state. Shells get XDG_RUNTIME_DIR from
+# config/exports and would look in ~/.local/run. Naming the socket here gives
+# the app and every shell one path, which the HC_SOCKET hint would only do per
+# shell. It lives in this host overlay because the path must be absolute: hc
+# does not expand ~, and a /Users path would be wrong on the Linux hosts.
+socket = "/Users/ivuorinen/.local/state/herdr-core/default/default.sock"

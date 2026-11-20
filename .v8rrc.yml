@@ -79,6 +79,9 @@ customCatalog:
     - name: herdr sessionizer
       fileMatch: [config/herdr/plugins/config/sessionizer/config.toml]
       location: schemas/herdr-sessionizer.schema.json
+    - name: herdr-core
+      fileMatch: ["hosts/*/config/herdr-core/config.toml"]
+      location: schemas/herdr-core.schema.json
     - name: Homebrew trust list
       fileMatch: [config/homebrew/trust.json]
       location: schemas/homebrew-trust.schema.json
