@@ -92,6 +92,22 @@ choose = "1.3.7"
 # delegates (jpeg, png, webp, heic, rsvg, …) on Linux and macOS alike, so both
 # get `magick` (x-thumbgen) without Homebrew or a downloaded binary.
 imagemagick = "7.1.2_31"
+"pypi:visidata" = { version = "latest", with = [
+  "openpyxl",     # XLSX
+  "xlrd",         # XLS
+  "pyarrow",      # Parquet, Arrow
+  "duckdb",       # DuckDB
+  "lxml",         # XML, HTML
+  "PyYAML",       # YAML
+  "h5py",         # HDF5
+  "pandas",       # Pandas data formats
+  "numpy",        # NumPy
+  "pdfminer.six", # PDF
+  "odfpy",        # ODS
+  "dpkt",         # PCAP
+  "dnslib",       # PCAP DNS decoding
+  "s3fs",         # S3 storage
+] }
 
 # Git & version control
 github-cli = "2.103.3"
