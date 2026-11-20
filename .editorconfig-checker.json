@@ -5,6 +5,7 @@
   "SpacesAfterTabs": false,
   "NoColor": false,
   "Exclude": [
+    "\\.claude/settings\\.json$",
     "base/plan",
     "config/bash/completions.d/.*",
     "config/copilot/skills/.*",
