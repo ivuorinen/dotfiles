@@ -41,7 +41,9 @@ quote-style = "double"
 # CLI's gitignored caches of marketplace plugins, Python scripts included, and
 # config/copilot/skills holds its installed skills. .claude/worktrees holds Claude
 # Code's gitignored worktrees, whole nested checkouts whose vendored files the
-# root-relative entries here do not match.
+# root-relative entries here do not match. .tmp is the gitignored scratch area
+# (`.tmp/*` in .gitignore), which `bandit -r .` scans all the same: a kit
+# unpacked there fails the local gate while CI never sees it.
 exclude_dirs = [
   "./config/cheat/cheatsheets",
   "./tools",
@@ -52,6 +54,7 @@ exclude_dirs = [
   "./config/copilot/Library",
   "./config/copilot/plugins",
   "./.claude/worktrees",
+  "./.tmp",
   "./config/pi/agent/tmp",
   "./config/pi/agent/npm",
   "./config/mise/locks",

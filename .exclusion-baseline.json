@@ -2,6 +2,7 @@
   ".claude/worktrees": ["bandit"],
   ".mise/locks": ["yamllint"],
   ".mypy_cache": ["yamllint"],
+  ".tmp": ["bandit"],
   "config/bash/completions.d": ["codacy", "codeql"],
   "config/cheat/cheatsheets": ["bandit", "grype", "ruff"],
   "config/cheat/cheatsheets/community": ["codacy", "codeql", "megalinter", "yamllint"],
