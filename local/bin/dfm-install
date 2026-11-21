@@ -241,6 +241,25 @@ dfm_install()
         msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
         mise_warnings=1
       fi
+      # lockfile = true creates project lockfiles, but the global one only
+      # through `mise lock --global`. Without it an exact-pinned pypi:/pipx:
+      # tool installs into a <version>~uv~<hash> dir that mise never finds,
+      # so it stays "missing" after every install. The lock runs after the
+      # install so uv is there to record the dependency graphs. It can record
+      # a newer graph than the install resolved, which names another dir, so
+      # install again; that is a no-op when nothing moved. From then on
+      # `mise install` keeps the lockfile current. ~/.config/mise links to
+      # config/mise, so the global lockfile lands there (gitignored).
+      if [[ ! -e "$DOTFILES/config/mise/mise.lock" ]]; then
+        msgr run "Creating the global mise lockfile..."
+        if ! mise lock --global; then
+          msgr warn "mise lock --global failed"
+          mise_warnings=1
+        elif ! mise install --yes; then
+          msgr warn "Some mise tools failed to install (host-unsupported?); continuing"
+          mise_warnings=1
+        fi
+      fi
       if ! mise reshim; then
         msgr warn "mise reshim failed"
         mise_warnings=1

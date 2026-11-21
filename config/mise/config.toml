@@ -34,7 +34,9 @@ idiomatic_version_file_enable_tools = [
 # (auto_install below) and manage PATH beside phpenv.
 disable_tools = ["php"]
 
-# Generate mise.lock for reproducible installs
+# Generate mise.lock for reproducible installs. This creates project
+# lockfiles only: the global one (config/mise/mise.lock, gitignored) comes
+# from `mise lock --global`, which `dfm install mise` runs when it is absent.
 lockfile = true
 
 # Save disk space — don't keep downloaded archives or failed installs
@@ -126,11 +128,12 @@ difftastic = "0.72.0"
 neovim = "0.12.6"
 tree-sitter = "0.27.2"
 "npm:neovim" = "5.5.0"   # Node.js client for Neovim's RPC API (required by plugins)
-# An exact pin on a pipx tool is never found (still in mise 2026.11.8): mise
-# installs it as <version>~uv~<hash> but looks for <version>, so the tool
-# counts as missing, stays off PATH, and is reinstalled whenever one of its
-# dependencies moves. "latest" resolves through the install's latest link.
-# Pin exactly again once mise finds those installs.
+# mise installs a pipx tool as <version>~uv~<hash>, and finds an exact pin
+# there only through the dependency graph the global lockfile records.
+# Without that lockfile it looks for <version>, so the tool counts as
+# missing, stays off PATH, and every `mise install` adds another ~uv~ dir.
+# "latest" resolves through the install's latest link. Pin exactly again
+# once every machine has the global lockfile (see lockfile above).
 "pipx:pynvim" = "latest"  # Python client; its pynvim-python is g:python3_host_prog
 "npm:fish-lsp" = "1.1.5"
 

@@ -62,7 +62,7 @@ run_all()
   grep -qx 'install-gh-extensions' "$CALLS"
   grep -qx 'install-completions' "$CALLS"
   # The bootstrap (packages, macOS defaults, login shell) runs before the tools.
-  [ "$(grep -n 'mise bootstrap' "$CALLS" | cut -d: -f1)" -lt "$(grep -n 'mise install' "$CALLS" | cut -d: -f1)" ]
+  [ "$(grep -n -m1 'mise bootstrap' "$CALLS" | cut -d: -f1)" -lt "$(grep -n -m1 'mise install' "$CALLS" | cut -d: -f1)" ]
 }
 
 @test "dfm install all: fonts come from install-fonts.sh on Linux only" {

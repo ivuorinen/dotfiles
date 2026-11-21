@@ -110,3 +110,41 @@ install_mise()
   # Packages are not this step's job any more.
   run ! grep -q 'bootstrap' "$TMP/calls"
 }
+
+# mise creates the global lockfile only through `mise lock --global`. Without
+# it an exact-pinned pypi:/pipx: tool installs into a <version>~uv~<hash> dir
+# that mise never finds, so it stays "missing" after every install. The lock
+# can record a newer graph than the install resolved, which names another
+# dir, so the tools are installed again after it.
+@test "dfm install mise: creates the global lockfile between two installs" {
+  printf '#!/bin/sh\necho "mise $*" >> "%s"\nexit 0\n' "$TMP/calls" > "$TMP/bin/mise"
+  chmod +x "$TMP/bin/mise"
+  install_mise
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"mise tools installed!"* ]]
+  [ "$(grep -v reshim "$TMP/calls" | tr '\n' '|')" = \
+    'mise install --yes|mise lock --global|mise install --yes|' ]
+}
+
+# Once the lockfile exists `mise install` keeps it current, and a full
+# `mise lock --global` resolves every tool on every platform, which is slow.
+@test "dfm install mise: an existing global lockfile is not locked again" {
+  printf '#!/bin/sh\necho "mise $*" >> "%s"\nexit 0\n' "$TMP/calls" > "$TMP/bin/mise"
+  chmod +x "$TMP/bin/mise"
+  mkdir -p "$TMP/dotfiles/config/mise"
+  : > "$TMP/dotfiles/config/mise/mise.lock"
+  install_mise
+  [ "$status" -eq 0 ]
+  grep -qx 'mise install --yes' "$TMP/calls"
+  run ! grep -q 'mise lock' "$TMP/calls"
+}
+
+@test "dfm install mise: a failed global lock ends with a warning, not success" {
+  printf '#!/bin/sh\necho "mise $*" >> "%s"\n[ "$1" = lock ] && exit 1\nexit 0\n' \
+    "$TMP/calls" > "$TMP/bin/mise"
+  chmod +x "$TMP/bin/mise"
+  install_mise
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"installed with warnings"* ]]
+  [[ "$output" != *"mise tools installed!"* ]]
+}

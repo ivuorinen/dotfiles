@@ -24,7 +24,11 @@ a system or Homebrew path.
   `npm:prettier`, `dotnet:csharpier`, `github:owner/repo`, `pipx:…`,
   `aqua:owner/repo`.
 - **Reproducibility**: `lockfile = true` writes `mise.lock` with
-  checksums. `idiomatic_version_file = true` makes mise respect
+  checksums for project configs. The global config's lockfile
+  (`config/mise/mise.lock`, untracked) comes only from `mise lock --global`,
+  which `dfm install mise` runs when the file is absent. Without it, an
+  exact-pinned `pipx:`/`pypi:` tool is reported missing after every install.
+  `idiomatic_version_file = true` makes mise respect
   `.nvmrc`, `.python-version`, `.go-version`, etc. in other projects.
 - **npm/dotnet tools live in mise, not `package.json`**, so hook scripts
   and interactive shells get them on PATH without relying on a package
