@@ -204,7 +204,7 @@ trufflehog = "3.99.8"
 trivy = "0.76.1"
 "github:anchore/syft" = "1.57.1"
 opengrep = "1.33.1"
-osv-scanner = "2.7.0"
+osv-scanner = "2.7.1"
 # Python SAST. Not in mise's registry, so it comes through the pipx backend.
 # The [toml] extra is required: without it bandit cannot read its config out
 # of pyproject.toml and silently falls back to defaults.
