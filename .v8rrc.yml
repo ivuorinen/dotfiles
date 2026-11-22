@@ -35,9 +35,6 @@ customCatalog:
     - name: sesh
       fileMatch: [config/sesh/sesh.toml]
       location: https://raw.githubusercontent.com/joshmedeski/sesh/main/sesh.schema.json
-    - name: pi settings
-      fileMatch: [config/pi/agent/settings.json]
-      location: https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/schemas/settings.schema.json
     - name: gh-dash theme fragment
       fileMatch: ["config/theme/palettes.d/*/*/gh-dash.theme.yml"]
       location: schemas/gh-dash-theme.schema.json
@@ -91,12 +88,6 @@ customCatalog:
     - name: vim.pack lockfile
       fileMatch: [config/nvim/nvim-pack-lock.json]
       location: schemas/nvim-pack-lock.schema.json
-    - name: pi open-tui
-      fileMatch: [config/pi/agent/open-tui.json]
-      location: schemas/pi-open-tui.schema.json
-    - name: pi zentui
-      fileMatch: [config/pi/agent/zentui.json]
-      location: schemas/pi-zentui.schema.json
     - name: television config
       description: base.toml and the palette fragments appended to it
       fileMatch:

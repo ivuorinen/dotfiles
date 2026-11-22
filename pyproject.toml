@@ -13,8 +13,6 @@ extend-exclude = [
   "config/cheat/cheatsheets",
   "tools",
   "config/copilot/skills",
-  "config/pi/agent/tmp",
-  "config/pi/agent/npm",
   "config/mise/locks",
 ]
 
@@ -55,8 +53,6 @@ exclude_dirs = [
   "./config/copilot/plugins",
   "./.claude/worktrees",
   "./.tmp",
-  "./config/pi/agent/tmp",
-  "./config/pi/agent/npm",
   "./config/mise/locks",
   "./config/fish/functions/__bass.py",
   "./config/fish/functions/fisher.fish",

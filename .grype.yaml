@@ -6,8 +6,6 @@
 exclude:
   - "./config/cheat/cheatsheets/**"
   - "./config/mise/locks/**"
-  - "./config/pi/agent/npm/**"
-  - "./config/pi/agent/tmp/**"
   - "./config/vim/extra/**"
   - "./config/vim/plugged/**"
   - "./node_modules/**"

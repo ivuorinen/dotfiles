@@ -157,14 +157,14 @@ extends: default
 ignore: |
   node_modules
   tools/*
-  config/pi/agent/tmp
+  config/mise/locks
 
 rules:
   line-length: disable
 EOF
   run "$CHECK"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"NEW      config/pi/agent/tmp"* ]]
+  [[ "$output" == *"NEW      config/mise/locks"* ]]
   [[ "$output" == *"covered by: yamllint"* ]]
 }
 

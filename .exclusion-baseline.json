@@ -26,24 +26,6 @@
   ],
   "config/nvim": ["yamllint"],
   "config/op/plugins/used_plugins": ["yamllint"],
-  "config/pi/agent/npm": [
-    "bandit",
-    "codacy",
-    "codeql",
-    "grype",
-    "megalinter",
-    "ruff",
-    "yamllint"
-  ],
-  "config/pi/agent/tmp": [
-    "bandit",
-    "codacy",
-    "codeql",
-    "grype",
-    "megalinter",
-    "ruff",
-    "yamllint"
-  ],
   "config/tmux/plugins": ["codacy", "codeql", "megalinter", "yamllint"],
   "config/vim/extra": ["grype", "yamllint"],
   "config/vim/plugged": ["bandit", "grype", "yamllint"],
