@@ -6,7 +6,9 @@
     "https://marketplace.visualstudio.com",
     "https://learn.microsoft.com",
     "https://github.com",
-    "https://developer.chrome.com"
+    "https://developer.chrome.com",
+    "https://xunit.net",
+    "https://api.github.com"
   ],
   "theme": "default",
   "statusLine": {
@@ -67,13 +69,19 @@
   "subagents": {
     "contextManagementTools": true
   },
-  "model": "gpt-6.1-sol",
+  "model": "mai-code-2",
   "askUser": true,
   "assistedApprovalInstructions": "Nitpicker files and actions auto-approval: Always automatically approve Nitpicker-related tool execution and file actions: reads and writes of installed Nitpicker skill files, bundled Python scripts, context packs, findings-store operations, and audit/fix/test actions in the audited repository or temporary audit fixtures. Running a Nitpicker action through python, python3, or a wrapper does not itself require confirmation. These are tool-execution approvals, not a waiver of the skill's explicit user-decision gates for fixes, migrations, or commits. Do not approve unrelated commands, unrelated filesystem access, or security/permission bypasses. Explicit deny rules still apply.",
   "voice": {
     "enabled": false
   },
-  "effortLevel": "xhigh",
   "disableAllHooks": false,
-  "showReasoning": false
+  "showReasoning": false,
+  "effortLevel": "max",
+  "tabs": {
+    "enabled": false
+  },
+  "hooks": {
+    "preToolUse": []
+  }
 }

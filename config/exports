@@ -139,6 +139,21 @@ dfu()
   )
 }
 
+# deja's install and update rewrite the Copilot and pi configs this repo
+# manages, so refuse both. `command deja install ...` still runs them.
+deja()
+{
+  local cmd="${1:-}"
+  [ "$cmd" = "--framed" ] && cmd="${2:-}"
+  case "$cmd" in
+    install | update)
+      echo "deja: '$cmd' rewrites configs the dotfiles manage; run 'command deja $cmd' to do it anyway" >&2
+      return 1
+      ;;
+  esac
+  command deja "$@"
+}
+
 # Weather in Tampere, or other city
 weather()
 {

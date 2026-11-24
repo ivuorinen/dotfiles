@@ -72,7 +72,7 @@ a lens; none is valid:
 If a lens truly cannot be run, that is not a quiet note in a summary — stop, say which lens and
 why, and ask.
 
-## 4. Read through context-mode, always
+## 4. Read through context-mode, always, when the tools are available
 
 Whenever the context-mode MCP tools are available, they are the required interface for
 reading and inspecting: file contents, directory listings, `grep`, `git log`/`diff`/
