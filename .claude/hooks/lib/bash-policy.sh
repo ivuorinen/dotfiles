@@ -185,7 +185,7 @@ BP_HOOKCFG_RE+='|[Cc][Oo][Mm][Mm][Ii][Tt]\.[Gg][Pp][Gg][Ss][Ii][Gg][Nn][[:space:
 # for `--config-env=alias.x=VAR`.
 BP_ALIASCFG_RE='(^|=)[Aa][Ll][Ii][Aa][Ss]\.'
 
-BP_R_NET="Network fetchers are banned in shell commands (.claude/rules/context-mode.md). Use ctx_fetch_and_index(url, source), or ctx_execute(language: \"javascript\") with fetch()."
+BP_R_NET="Network fetchers are banned in shell commands (.claude/rules/context-mode.md). Use ctx_index(url, source), or ctx_execute(language: \"javascript\") with fetch()."
 BP_R_NPM="Node CLIs come from mise, never npm/npx/pnpm (.claude/rules/no-npm.md). Pin the tool as \"npm:<package>\" in .mise/config.toml and run it with mise exec -- <tool>."
 BP_R_PIP="Python tools are pipx: entries in config/mise/config.toml, never pip or uv installs by hand (.claude/rules/mise-packages.md)."
 BP_R_BYPASS="The command bypasses the project's hook chain (.claude/rules/no-hook-bypass.md). Fix the failing hook instead."

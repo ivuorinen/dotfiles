@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pre-tool guard: route output-producing Bash commands to ctx_batch_execute,
+# Pre-tool guard: route output-producing Bash commands to ctx_batch,
 # and enforce the project rules that have a Bash-shaped bypass.
 #
 # Reads Claude Code PreToolUse JSON on stdin, inspects tool_input.command,
@@ -181,7 +181,7 @@ if [[ "$bash_ok" -eq 1 ]]; then
     }'
     exit 0
   fi
-  deny_policy "BASH_OK requires the user to name \`${ok_fw:-the command}\` in their latest message (.claude/rules/bash-routing.md case 4). Route it through ctx_batch_execute instead."
+  deny_policy "BASH_OK requires the user to name \`${ok_fw:-the command}\` in their latest message (.claude/rules/bash-routing.md case 4). Route it through ctx_batch instead."
 fi
 
 deny_reason=""
@@ -291,11 +291,11 @@ if [[ -n "$deny_reason" ]]; then
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
       permissionDecisionReason: (
-        "Routed to ctx_batch_execute per .claude/rules/bash-routing.md (\($why)).\n\n" +
+        "Routed to ctx_batch per .claude/rules/bash-routing.md (\($why)).\n\n" +
         "Bash is reserved for state mutations (git-hunk commit, git mv/rm/push, mkdir, chmod, mv, rm, touch), " +
         "in-place formatters (shfmt -w, fish_indent --write), and package installs (brew install, mise install).\n\n" +
         "Output-producing commands belong in:\n" +
-        "  - mcp__plugin_context-mode_context-mode__ctx_batch_execute  (multi-command sweeps with queries)\n" +
+        "  - mcp__plugin_context-mode_context-mode__ctx_batch(commands: [...], queries: [...])  (multi-command sweeps with queries)\n" +
         "  - mcp__plugin_context-mode_context-mode__ctx_execute(language: \"shell\", code: ...)  (single command, print only what you need)\n\n" +
         "Original command: \($cmd)\n\n" +
         "BASH_OK overrides this only for a command the user named in their latest message."

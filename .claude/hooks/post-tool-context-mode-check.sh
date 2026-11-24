@@ -14,7 +14,7 @@ set -uo pipefail
 input=$(cat)
 
 # Only inspect responses from context-mode tools. Any other tool (e.g.
-# ctx_execute_file returning a file whose content mentions these patterns)
+# Read returning a file whose content mentions these patterns)
 # would false-positive. The upgrade/doctor/stats/purge tools are also
 # excluded — they ARE the remediation and their output naturally contains
 # the banner that would otherwise deadlock the check.

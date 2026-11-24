@@ -24,7 +24,7 @@ except in a lookup that never executes it (`which curl`, `rg -n curl docs/`,
 (`GIT_PAGER=curl`, `git -c core.editor='curl x'`).
 Use instead:
 
-- `ctx_fetch_and_index(url, source)` — fetch and index web pages
+- `ctx_index(url, source)` — fetch and index web pages
 - `ctx_execute(language: "javascript", code: "const r = await fetch(...)")`
   — run HTTP calls in sandbox
 
@@ -39,7 +39,7 @@ only stdout enters context.
 ### WebFetch
 
 WebFetch is denied entirely. The hook extracts the URL and tells you
-to use `ctx_fetch_and_index` instead. Then `ctx_search(queries)` to
+to use `ctx_index(url, source)` instead. Then `ctx_search(queries)` to
 query the indexed content.
 
 ## REDIRECTED tools — use sandbox equivalents
@@ -55,19 +55,18 @@ query the indexed content.
 
 ## Tool selection hierarchy
 
-1. **GATHER**: `ctx_batch_execute(commands, queries)` — primary tool.
-    Runs all commands, auto-indexes output, returns search results.
-    ONE call replaces 30+ individual calls.
+1. **GATHER**: `ctx_batch(commands, queries)` — primary tool. `commands`
+    is a list of shell command strings; runs all of them, auto-indexes
+    output, returns search results. ONE call replaces 30+ individual calls.
 2. **FOLLOW-UP**: `ctx_search(queries: ["q1", "q2", ...])` — query
     indexed content. Pass ALL questions as one array in ONE call.
-3. **PROCESSING**: `ctx_execute(language, code)` /
-    `ctx_execute_file(path, language, code)` — sandbox execution. Only
-    stdout enters context.
-4. **WEB**: `ctx_fetch_and_index(url, source)` then
-    `ctx_search(queries)` — fetch, chunk, index, query. Raw HTML never
-    enters context.
-5. **INDEX**: `ctx_index(content, source)` — store content in FTS5
-    knowledge base for later search.
+3. **PROCESSING**: `ctx_execute(language, code)` — sandbox execution in
+    the project directory. Add `file` to hand the code one file's path in
+    `$CTX_FILE`. Only stdout enters context.
+4. **WEB**: `ctx_index(url, source)` then `ctx_search(queries)` — fetch,
+    chunk, index, query. Raw HTML never enters context.
+5. **INDEX**: `ctx_index(path | content, source)` — store a file, folder
+    or text in the FTS5 knowledge base for later search.
 
 ## Subagent routing
 

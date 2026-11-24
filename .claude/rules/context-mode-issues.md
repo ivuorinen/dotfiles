@@ -7,7 +7,7 @@ description: "Halt and notify the user on context-mode errors or missing MCP too
 context-mode is load-bearing for this repo's routing rules
 (`.claude/rules/context-mode.md`, `.claude/rules/bash-routing.md`).
 A stale or broken install silently degrades the rule chain — falling
-back to direct `Bash` instead of `ctx_batch_execute`, or losing FTS5
+back to direct `Bash` instead of `ctx_batch`, or losing FTS5
 indexing entirely.
 
 If a context-mode MCP tool response carries any of the following
@@ -64,7 +64,7 @@ A distinct failure mode from the error signals above: the routing
 hooks (`pre-bash-route.sh`, the context-mode PreToolUse guard) are
 active and denying `Bash`, but the `mcp__plugin_context-mode_*` tools
 they redirect you to are **not in your toolset** — a `ToolSearch` for
-`ctx_execute` / `ctx_batch_execute` returns nothing, or the
+`ctx_execute` / `ctx_batch` returns nothing, or the
 deferred-tool list never offered them. This happens when the
 context-mode MCP server failed to connect for the session (the hooks
 are file-based and load regardless; the MCP tools are not).

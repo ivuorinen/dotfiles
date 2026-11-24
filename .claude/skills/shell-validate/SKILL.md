@@ -5,12 +5,12 @@ description: >-
   Apply when writing or modifying any shell script
   in local/bin/ or scripts/.
 user-invocable: false
-allowed-tools: Read, Grep, mcp__plugin_context-mode_context-mode__ctx_batch_execute
+allowed-tools: Read, Grep, mcp__plugin_context-mode_context-mode__ctx_batch
 ---
 
 After editing any shell script in `local/bin/`, `scripts/`, or `config/`
 (files with a `#!` shebang or `# shellcheck shell=` directive),
-validate it. Run every command below through `ctx_batch_execute`
+validate it. Run every command below through `ctx_batch`
 (`.claude/rules/bash-routing.md`); `Bash` denies them.
 
 ## 1. Determine the shell

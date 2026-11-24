@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 #
 # Coverage for .claude/hooks/pre-bash-route.sh — the PreToolUse guard that
-# routes output-producing Bash commands to ctx_batch_execute.
+# routes output-producing Bash commands to ctx_batch.
 #
 # The hook was the repo's only untested script for a long time, and it drifted:
 # `git status` was denied for months against both .claude/rules/bash-routing.md

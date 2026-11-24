@@ -79,8 +79,8 @@ reading and inspecting: file contents, directory listings, `grep`, `git log`/`di
 `status`, test and build output, URL fetches, and any command whose output you intend
 to filter, count, parse, or summarise.
 
-- `ctx_execute` / `ctx_execute_file` for one command or one file, `ctx_batch_execute`
-  for several, `ctx_search` for recall, `ctx_fetch_and_index` for URLs.
+- `ctx_execute` for one command or one file (its `file` parameter), `ctx_batch`
+  for several, `ctx_search` for recall, `ctx_index` with a `url` for URLs.
 - Do not reach for `cat`/`head`/`sed -n`/`grep` under plain Bash, and do not append
   ` # ctx-ok` to route around the guard. The guard is the rule, not an obstacle.
 - Plain Bash stays correct only for state mutations (git writes, `mkdir`/`rm`/`mv`,

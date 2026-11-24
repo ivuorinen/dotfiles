@@ -33,7 +33,7 @@ not a guess; it needs no evidence beyond the user's request.
 Before writing any key or value in a schema-less file, at least one of the
 following must be true:
 
-1. **Docs fetched in this session**: call `ctx_fetch_and_index` on the
+1. **Docs fetched in this session**: call `ctx_index(url, source)` on the
     tool's official reference page and quote the exact key from the returned
     content. A previous session's fetch does not count — fetch again.
 2. **Tool's schema dump or man page**: run `<tool> schema`, `<tool>
@@ -68,7 +68,7 @@ recalled `globs:` (used by the context-mode superpowers plugin) and it was
 applied to seven Claude Code rule files. The Claude Code docs use `paths:`.
 All seven files required correction; an Invalid finding was filed.
 
-Correct procedure: call `ctx_fetch_and_index` on `code.claude.com/docs/en/memory`,
+Correct procedure: call `ctx_index` on `code.claude.com/docs/en/memory`,
 search for "path-specific rules", quote `paths:` from the returned text.
 
 ## Relationship to validate-config-schemas.md

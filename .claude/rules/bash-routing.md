@@ -1,17 +1,17 @@
 ---
-description: "Shell command routing — ctx_batch_execute is the default tool for all commands producing output."
+description: "Shell command routing — ctx_batch is the default tool for all commands producing output."
 ---
 
-# Bash routing — ctx_batch_execute is the default
+# Bash routing — ctx_batch is the default
 
-ALWAYS use `mcp__plugin_context-mode_context-mode__ctx_batch_execute` for shell
+ALWAYS use `mcp__plugin_context-mode_context-mode__ctx_batch` for shell
 commands. The default tool for ANY shell invocation in this repo is
-`ctx_batch_execute` — `Bash` is the exception, not the rule.
+`ctx_batch` — `Bash` is the exception, not the rule.
 
 ## The default rule
 
 If a shell command produces output you intend to read, use
-`ctx_batch_execute`. This includes:
+`ctx_batch`. This includes:
 
 - `rg`, `fd`, `grep`, `find` — every search.
 - `shellcheck`, `shfmt --diff`, `fish_indent --check` — every lint/format check.
@@ -43,7 +43,7 @@ If a shell command produces output you intend to read, use
   command inside an allowed one.
 
 Even when output is short, batch related commands together: one
-`ctx_batch_execute` call with five commands costs less than five `Bash`
+`ctx_batch` call with five commands costs less than five `Bash`
 calls.
 
 ## When Bash is acceptable
@@ -70,13 +70,13 @@ Only these narrow cases:
     twenty lines.** A user instruction does not waive the routing
     rule for unbounded output. If the named command can emit more
     than ~twenty lines (`find /`, `rg` without `--max-count`,
-    `git log` without `-n`), route it through `ctx_batch_execute`
+    `git log` without `-n`), route it through `ctx_batch`
     even when the user asked for it explicitly. Authorisation does
     not carry over from earlier in the session or from another
     conversation.
 
 If you pipe through `head`, `tail`, or `grep` to truncate output, route
-the command through `ctx_batch_execute` instead. The truncation is a
+the command through `ctx_batch` instead. The truncation is a
 tell that the raw output is bigger than you want in chat context.
 
 ## Programmatic enforcement
@@ -120,25 +120,23 @@ patterns from earlier sessions are still routed through context-mode.
 
 ## Forbidden patterns
 
-- `Bash` with `rg -n ... | head -20` — use `ctx_batch_execute` with a
+- `Bash` with `rg -n ... | head -20` — use `ctx_batch` with a
   focused `queries:` array instead.
-- Chaining many small `ctx_execute` calls — one `ctx_batch_execute` with
+- Chaining many small `ctx_execute` calls — one `ctx_batch` with
   multiple `commands` and `queries` is the right shape.
-- `ctx_execute` / `ctx_execute_file` to write files — use `Write` / `Edit`.
-- `WebFetch` for documentation — use `ctx_fetch_and_index`.
+- `ctx_execute` to write files — use `Write` / `Edit`.
+- `WebFetch` for documentation — use `ctx_index(url, source)`.
 
 ## Practical patterns
 
-Investigation pass — one `ctx_batch_execute`, many queries:
+Investigation pass — one `ctx_batch`, many queries. `commands` is a
+list of plain command strings:
 
 ```yaml
 commands:
-  - label: "shellcheck on changed scripts"
-    command: "shellcheck local/bin/dfm local/bin/msgr"
-  - label: "shfmt diff"
-    command: "shfmt --diff local/bin/dfm"
-  - label: "yamllint on install config"
-    command: "yamllint install.conf.yaml"
+  - "shellcheck local/bin/dfm local/bin/msgr"
+  - "shfmt --diff local/bin/dfm"
+  - "yamllint install.conf.yaml"
 queries:
   - "shellcheck errors"
   - "shfmt formatting differences"
@@ -149,8 +147,7 @@ Lint pass — batch the full quality gate:
 
 ```yaml
 commands:
-  - label: "mise run lint"
-    command: "mise run lint"
+  - "mise run lint"
 queries:
   - "lint errors"
   - "editorconfig violations"
@@ -160,10 +157,8 @@ Search pass — rg with follow-up:
 
 ```yaml
 commands:
-  - label: "functions referencing theme apply"
-    command: "rg -n 'theme apply' config/fish/"
-  - label: "handlers list"
-    command: "ls config/theme/handlers.d/"
+  - "rg -n 'theme apply' config/fish/"
+  - "ls config/theme/handlers.d/"
 queries:
   - "theme apply callers"
   - "handler names"

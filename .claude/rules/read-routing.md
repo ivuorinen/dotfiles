@@ -1,13 +1,14 @@
 ---
-description: "Read routing — ctx_execute_file is the default for any read whose purpose is analysis."
+description: "Read routing — ctx_execute with `file` is the default for any read whose purpose is analysis."
 ---
 
-# Read routing — ctx_execute_file is the default for analysis
+# Read routing — ctx_execute with `file` is the default for analysis
 
 Every byte `Read` returns enters the conversation and stays there for
-the rest of the session. `ctx_execute_file` runs code in the sandbox
-and only what you `print()` enters context. Default to the sandbox
-for any read whose purpose is anything other than a follow-up `Edit`.
+the rest of the session. `ctx_execute` with `file` runs code in the
+sandbox, hands it the file's path in `$CTX_FILE`, and only what you
+`print()` enters context. Default to the sandbox for any read whose
+purpose is anything other than a follow-up `Edit`.
 
 This rule is the Read-side companion to `bash-routing.md`. Same
 discipline, different tool.
@@ -16,7 +17,7 @@ discipline, different tool.
 
 If a file read produces output you intend to **analyze, summarise,
 extract from, count, search within, parse, or reason about the
-structure of**, use `ctx_execute_file(path, language, code)`. Only
+structure of**, use `ctx_execute(language, code, file)`. Only
 your printed answer enters context.
 
 `Read` is correct in exactly these cases:
@@ -28,7 +29,7 @@ your printed answer enters context.
     response.** Below that threshold the sandbox round-trip costs as
     much as the bytes themselves; above it the bytes dominate.
 3. **You must quote the file verbatim to the user.** Even then, use
-    `ctx_execute_file` + `print()` of the slice; only fall back to
+    `ctx_execute` + `print()` of the slice; only fall back to
     `Read` when the full bytes are essential to the response.
 
 If none of those three apply, you are in default-rule territory and
@@ -37,16 +38,16 @@ must route through the sandbox.
 ## Forbidden patterns
 
 - `Read` a config file → describe what's in it.
-  → `ctx_execute_file` with a parser.
+  → `ctx_execute` with a parser.
 - `Read` a script → summarise what it does.
-  → `ctx_execute_file` with a line-by-line scan that prints only the
+  → `ctx_execute` with a line-by-line scan that prints only the
     sections you'll discuss.
 - `Read` a file, then `Read` it again to find a specific section.
-  → One `ctx_execute_file` call with the slice logic built in.
+  → One `ctx_execute` call with the slice logic built in.
 - `Read` a 200-line YAML to "see what's defined".
-  → `ctx_execute_file` with a YAML parser, print the keys.
+  → `ctx_execute` with a YAML parser, print the keys.
 - `Read` a package list to identify tool candidates.
-  → `ctx_execute_file` with a regex extractor, print only matches.
+  → `ctx_execute` with a regex extractor, print only matches.
 - `Read offset=N limit=M` to truncate a large file's window into
   context. The truncation is a tell that the file is too big to read
   whole — route the analysis through the sandbox instead.
@@ -102,7 +103,7 @@ will catch the failure mode for you.
 ## Cost model
 
 A 400-line `Read` consumes ~5 KB of cache plus the same in input
-tokens. A `ctx_execute_file` returning ten lines of summary consumes
+tokens. A `ctx_execute` returning ten lines of summary consumes
 ~150 bytes. Multiply across a session and the cheap path keeps the
 conversation focused; the expensive path forces earlier compaction
 and degrades recall of the work that actually mattered.

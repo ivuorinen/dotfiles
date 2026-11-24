@@ -34,5 +34,5 @@ end
 ## 3. Validate
 
 Run the `fish-validate` skill on the new file. It owns the check
-commands and routes them through `ctx_batch_execute`, which
+commands and routes them through `ctx_batch`, which
 `.claude/rules/bash-routing.md` requires.

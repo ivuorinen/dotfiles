@@ -10,7 +10,7 @@ where something lives — run `graphify query "<question>"` first whenever
 relationships and `graphify explain "<concept>"` for a focused concept.
 These return a scoped subgraph, far smaller than `GRAPH_REPORT.md` or raw
 grep output. They print output, so run them through `ctx_execute` /
-`ctx_batch_execute`; `pre-bash-route.sh` denies them on `Bash`.
+`ctx_batch`; `pre-bash-route.sh` denies them on `Bash`.
 
 Use `graphify-out/wiki/index.md` for broad navigation when it exists, never
 raw source browsing.
