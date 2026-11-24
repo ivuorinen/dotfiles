@@ -81,8 +81,10 @@ if not test -d "$HOME/.claude"; or test -d "$XDG_STATE_HOME/claude"
     set -q CLAUDE_CONFIG_DIR; or set -x CLAUDE_CONFIG_DIR "$XDG_STATE_HOME/claude"
 end
 
-# context-mode session and content store; must be an absolute path.
-set -q CONTEXT_MODE_DIR; or set -x CONTEXT_MODE_DIR "$XDG_STATE_HOME/context-mode"
+# context-mode data root (per-project index and session stores); must be an absolute
+# path. context-mode 2.x reads CONTEXT_MODE_DATA_DIR: the CONTEXT_MODE_DIR this used
+# to set is ignored, which left its data in ~/.context-mode.
+set -q CONTEXT_MODE_DATA_DIR; or set -x CONTEXT_MODE_DATA_DIR "$XDG_STATE_HOME/context-mode"
 
 # pi.dev environment
 # The agent dir itself: pi appends /agent only to its ~/.pi default.
