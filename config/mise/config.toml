@@ -236,7 +236,6 @@ adr-tools = "3.0.0"
 codeql = "2.27.4"
 copilot = "1.0.114"
 herdr = "0.9.5"
-pi = "1.5.2"
 "npm:context-mode" = "2.1.5"
 "npm:@tobilu/qmd" = "2.8.3"
 "aqua:SonarSource/sonarqube-cli" = "1.12.0.17622"
@@ -247,6 +246,7 @@ poppler = "latest"
 "github:ville6000/tfs" = "0.13.0"
 cargo-binstall = "latest"
 "cargo:forgejo-cli" = "latest"
+"github:can1357/oh-my-pi" = "latest"
 
 # Homebrew formulae and casks for mise's brew bootstrap ([bootstrap.packages])
 # live in conf.d/brew/mise.macos.toml, which loads on macOS only.

@@ -82,7 +82,7 @@ config/copilot/skills/*
 config/copilot/skills/deja-history/*
 !config/copilot/skills/deja-history/SKILL.md
 
-# pi.dev coding harness
+# omp coding harness (PI_CONFIG_DIR points its config root at config/pi)
 config/pi/*
 !config/pi/agent/
 config/pi/agent/*

@@ -368,13 +368,12 @@ fi
 # to set is ignored, which left its data in ~/.context-mode.
 export CONTEXT_MODE_DATA_DIR="$XDG_STATE_HOME/context-mode"
 
-# pi.dev
-msg "Setting up pi.dev configuration"
-# The agent dir itself: pi appends /agent only to its ~/.pi default.
-export PI_CODING_AGENT_DIR="$XDG_CONFIG_HOME/pi/agent"
+# omp (oh-my-pi)
+msg "Setting up omp configuration"
+# PI_CONFIG_DIR is a dirname under $HOME (default .omp), not a path, so strip the
+# $HOME/ prefix; XDG_CONFIG_HOME must live under $HOME for this to resolve.
+export PI_CONFIG_DIR="${XDG_CONFIG_HOME#"$HOME"/}/pi"
 export PI_CODING_AGENT_SESSION_DIR="$XDG_STATE_HOME/pi/sessions"
-export PI_LENS_HOME="$XDG_STATE_HOME/pi/pi-lens"
-export PI_LENS_CONFIG_PATH="$XDG_CONFIG_HOME/pi/pi-lens/config.json"
 
 # Yarn
 msg "Setting up Yarn configuration"

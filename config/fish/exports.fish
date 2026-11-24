@@ -86,12 +86,11 @@ end
 # to set is ignored, which left its data in ~/.context-mode.
 set -q CONTEXT_MODE_DATA_DIR; or set -x CONTEXT_MODE_DATA_DIR "$XDG_STATE_HOME/context-mode"
 
-# pi.dev environment
-# The agent dir itself: pi appends /agent only to its ~/.pi default.
-set -q PI_CODING_AGENT_DIR; or set -x PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi/agent"
+# omp (oh-my-pi) environment
+# PI_CONFIG_DIR is a dirname under $HOME (default .omp), not a path, so strip the
+# $HOME/ prefix; XDG_CONFIG_HOME must live under $HOME for this to resolve.
+set -q PI_CONFIG_DIR; or set -x PI_CONFIG_DIR (string replace -- "$HOME/" "" "$XDG_CONFIG_HOME")/pi
 set -q PI_CODING_AGENT_SESSION_DIR; or set -x PI_CODING_AGENT_SESSION_DIR "$XDG_STATE_HOME/pi/sessions"
-set -q PI_LENS_HOME; or set -x PI_LENS_HOME "$XDG_STATE_HOME/pi/pi-lens"
-set -q PI_LENS_CONFIG_PATH; or set -x PI_LENS_CONFIG_PATH "$XDG_CONFIG_HOME/pi/pi-lens/config.json"
 
 # gh-dash / television — read their themed config from the theme state dir
 # so config/gh-dash and config/television stay plain symlinks with no

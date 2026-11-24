@@ -2,7 +2,7 @@
 #USAGE about "Run deja for agent hooks; exit 0 when deja is not installed"
 #USAGE arg "[args]" help="Arguments passed through to deja" var=#true
 
-# Dotfiles-managed wrapper for Pi's deja extension.
+# Dotfiles-managed wrapper for omp's deja extension.
 # Resolve the real deja binary at runtime so updates can move it without
 # rewriting tracked config, and so the extension can call a stable PATH name.
 

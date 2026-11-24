@@ -7,8 +7,10 @@ config/op/plugins/used_plugins/*
 # Copilot CLI runtime state (plugins, caches, its vendored graphify skill copy).
 config/copilot/*
 !config/copilot/copilot-instructions.md
-config/pi/agent/tmp/*
-config/pi/agent/npm/*
+# omp files: PI_CONFIG_DIR roots omp here, and its cache, data and state land
+# beside the tracked files on a machine missing the ~/.cache/omp,
+# ~/.local/share/omp or ~/.local/state/omp directories (dotbot-links.yaml).
+config/pi/*
 config/vim/*
 docs/*
 # graphify generated report/wiki — machine-generated, regenerable.

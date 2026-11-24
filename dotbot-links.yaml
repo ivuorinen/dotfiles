@@ -15,6 +15,11 @@
 - create:
     ~/.cache:
     ~/.cache/git:
+    # omp sends its cache, data and state categories to $XDG_CACHE_HOME/omp,
+    # $XDG_DATA_HOME/omp and $XDG_STATE_HOME/omp only when each directory
+    # already exists. A missing one lands under PI_CONFIG_DIR, config/pi in
+    # this repo, which for the data category puts agent.db (logins) there.
+    ~/.cache/omp:
     ~/.config:
     # Credential stores the apps create for themselves: 1Password CLI config,
     # and DOCKER_CONFIG (config/exports points it here), which holds registry
@@ -41,9 +46,13 @@
     ~/.local/share/tmux/plugins:
     ~/.local/share/gnupg:
       mode: 0700
+    ~/.local/share/omp:
+      mode: 0700
     # XDG_STATE_HOME. Holds zsh history, the 1Password cache dir and the theme
     # daemon's pidfile — none of which should be readable by other local users.
     ~/.local/state:
+      mode: 0700
+    ~/.local/state/omp:
       mode: 0700
     ~/.local/state/tmux:
       mode: 0700
