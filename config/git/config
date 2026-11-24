@@ -65,6 +65,11 @@
 	whitespace = red reverse
 [coderabbit]
 	machineId = cli/2d3277ec1da346c4b30b26d0fb373d8c
+[credential]
+	helper =
+	helper = !~/.local/share/mise/shims/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
 [credential "https://github.com"]
 	helper =
 	helper = !~/.local/share/mise/shims/gh auth git-credential

@@ -246,6 +246,7 @@ poppler = "latest"
 "github:ville6000/tfs" = "0.13.0"
 cargo-binstall = "latest"
 "cargo:forgejo-cli" = "latest"
+"github:git-ecosystem/git-credential-manager" = "3.0.2"
 "github:can1357/oh-my-pi" = "latest"
 
 # Homebrew formulae and casks for mise's brew bootstrap ([bootstrap.packages])
