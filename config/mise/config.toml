@@ -247,6 +247,7 @@ poppler = "latest"
 cargo-binstall = "latest"
 "cargo:forgejo-cli" = "latest"
 "github:git-ecosystem/git-credential-manager" = "3.0.2"
+rclone = "1.76.0"
 "github:can1357/oh-my-pi" = "latest"
 
 # Homebrew formulae and casks for mise's brew bootstrap ([bootstrap.packages])
