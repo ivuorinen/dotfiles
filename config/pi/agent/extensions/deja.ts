@@ -1,7 +1,11 @@
-// repo-managed adaptation of `deja install pi-auto`.
-// Runs the `deja-hook` launcher that ./install links into ~/.local/bin, by its
-// absolute path so no PATH lookup decides what runs. The launcher resolves
-// $DEJA_HOOK_BIN itself, so a stale override still falls back to deja.
+// repo-managed adaptation of `deja install omp-auto` (deja-vu 0.24.2).
+// omp-auto writes ~/.omp/agent/extensions/deja/index.js, which ignores PI_CONFIG_DIR
+// and hardcodes an absolute launcher path, so it would recreate ~/.omp and carry one
+// machine's paths into the repo. This runs the `deja-hook` launcher that ./install
+// links into ~/.local/bin instead, by its absolute path so no PATH lookup decides
+// what runs. The launcher resolves $DEJA_HOOK_BIN itself, so a stale override still
+// falls back to deja. The handlers follow the generated file: on a deja bump, diff
+// against a fresh `deja install omp-auto` run in a throwaway HOME.
 import { execFileSync } from 'node:child_process'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -16,6 +20,7 @@ interface SessionManager {
 }
 
 interface ExtensionContext {
+  cwd?: string
   sessionManager?: SessionManager
   ui: {
     setStatus: (name: string, status: string) => void
@@ -28,8 +33,18 @@ interface PiApi {
   registerCommand: (...args: unknown[]) => void
 }
 
-interface BeforeAgentStartEvent {
-  prompt?: string
+interface TextPart {
+  type?: string
+  text?: string
+}
+
+interface Message {
+  role?: string
+  content?: TextPart[]
+}
+
+interface ContextEvent {
+  messages?: Message[]
 }
 
 interface HookResponse {
@@ -39,28 +54,19 @@ interface HookResponse {
   }
 }
 
-interface ToolTextPart {
-  type: 'text'
-  text: string
-}
-
 interface ToolResultEvent {
   toolName?: string
+  toolCallId?: string
+  isError?: boolean
   input?: {
     path?: string
     file_path?: string
+    input?: string
   }
-  content?: unknown[]
-  toolCallId?: string
-  isError?: boolean
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-function isTextPart(value: unknown): value is ToolTextPart {
-  return isRecord(value) && value.type === 'text' && typeof value.text === 'string'
+  content?: TextPart[]
+  details?: {
+    exitCode?: number
+  }
 }
 
 function run(args: string[], input: string, timeout = 10000): string {
@@ -73,20 +79,29 @@ function run(args: string[], input: string, timeout = 10000): string {
       stdio: ['pipe', 'pipe', 'ignore'],
     }).trim()
   } catch {
+    // Memory is optional: an extension that throws here takes the session with
+    // it, because extensions run in-process with no isolation.
     return ''
   }
 }
 
+function userText(message: Message | undefined): string {
+  if (message?.role !== 'user' || !Array.isArray(message.content)) return ''
+  return message.content
+    .filter((part) => part?.type === 'text' && typeof part.text === 'string')
+    .map((part) => part.text)
+    .join('\n')
+    .trim()
+}
+
 export default function (pi: PiApi) {
-  // Once per session, not once per process: /new, a resume and a fork keep the
-  // process and switch the session, and a flag set on the first one left every
-  // later session with no digest. A session joins once its context lookup is
-  // done, whether or not that lookup found anything.
-  const contextDone = new Set<string>()
-  let toldBuilding = false
-  // The tool and compaction events carry no session id, and recall dedupes per
-  // session: without one it repeats itself and forgets nothing. pi keeps the id
-  // on the session manager, which every handler gets through ctx.
+  // The same prompt reaches the context event more than once in a turn, once per
+  // provider request, so the answer is cached rather than asked again.
+  let asked = ''
+  let recalled = ''
+  // No event carries a session id; the session manager does, and every handler
+  // reaches it through ctx. Recall skips what it already showed a session, so
+  // without the id the same block goes out on every message.
   let session = ''
   let sessionFile = ''
   const remember = (ctx: ExtensionContext) => {
@@ -104,44 +119,45 @@ export default function (pi: PiApi) {
   }
   const sessionID = () => session
 
-  // pi keeps a footer status line: while the first index builds, that is
-  // where the user can see it happening instead of wondering why recall is
-  // quiet. Cleared as soon as the build finishes.
-  const showBuild = (ctx: ExtensionContext) => {
-    const status = run(['warmup-status'], '')
-    if (status) {
-      ctx.ui.setStatus('deja', status)
-      return true
-    }
-    ctx.ui.setStatus('deja', '')
-    return false
-  }
+  // The footer line deja keeps: sessions, hits and what is still being indexed.
+  const statusline = () =>
+    run(
+      ['statusline'],
+      JSON.stringify({
+        session_id: sessionID(),
+        transcript_path: sessionFile,
+        cwd: process.cwd(),
+      }),
+    )
+      .split(' · ')
+      .slice(0, 3)
+      .map((part, i) => (i === 2 ? part.replace(/^(\d+\s+earlier)\b.*/, '$1') : part))
+      .join(' · ')
 
-  pi.on('session_start', (_event: unknown, ctx: ExtensionContext) => {
+  pi.on('session_start', async (_event: unknown, ctx: ExtensionContext) => {
     try {
       remember(ctx)
-      showBuild(ctx)
+      // omp keeps a footer line, so a first index that is still building is
+      // visible instead of looking like memory that does not work.
+      ctx.ui.setStatus('deja', run(['warmup-status'], '') || statusline())
     } catch {
       // memory is optional: never break the session over it
     }
   })
 
-  // pi surfaces registered commands in the prompt box, which is how someone
-  // who never read the docs finds this at all.
+  // Registered commands show up in omp's prompt box, which is how someone who
+  // never read the docs finds this at all.
   pi.registerCommand('deja', {
     description: 'Search your own past coding sessions',
-    handler: (args: string, ctx: ExtensionContext) => {
+    handler: async (args: string, ctx: ExtensionContext) => {
       const query = (args || '').trim()
       if (!query) {
-        ctx.ui.notify('Usage: /deja followed by what you are looking for', 'info')
+        ctx.ui.notify('Usage: /deja <what you are looking for>', 'info')
         return
       }
-      // The user is waiting on this one, so it may outlive the hook budget:
-      // a first search can rebuild the index.
-      //
-      // "--" when the query names one of deja's own flags: searching for
-      // "--json" or "--all-matches" otherwise dies in flag parsing and comes
-      // back as an empty history.
+      // The user is waiting on this one, so it gets a longer budget than a
+      // hook: a first search can rebuild the index. "--" keeps a query that
+      // starts with a dash out of deja's own flag parsing.
       const commandArgs = query.startsWith('-')
         ? ['search', '--', query]
         : ['search', query]
@@ -150,148 +166,157 @@ export default function (pi: PiApi) {
     },
   })
 
-  pi.on('before_agent_start', (event: BeforeAgentStartEvent, ctx: ExtensionContext) => {
+  // Once per session, before the first answer: what this project's recent
+  // sessions were about. omp stores what a before_agent_start handler returns as
+  // a message of its own, so the digest is in the conversation rather than
+  // stapled onto the user's first prompt.
+  //
+  // Once per session, not once per process: /new, a resume and a fork keep the
+  // process and switch the session, and a flag set on the first one left every
+  // later session with no digest. The set is keyed by the session manager's id,
+  // read fresh on each turn.
+  const injected = new Set<string>()
+  pi.on('before_agent_start', async (_event: unknown, ctx: ExtensionContext) => {
     try {
       remember(ctx)
-      if (!contextDone.has(sessionID())) {
-        // The session goes with it: hook-context marks the one starting as
-        // live, which keeps it out of its own MCP recall on this first turn
-        // (#4394, as #4246 and #4273 did for Hermes and opencode). pi has no
-        // MCP of its own, so the lead names the shell command, not the tool
-        // (#4584).
-        const raw = run(
-          ['hook-context'],
-          JSON.stringify({
-            session_id: sessionID(),
-            cwd: process.cwd(),
-            deja_shell: true,
-          }),
-        )
-        let digest = ''
-        let receipt = ''
-        try {
-          const parsed = JSON.parse(raw) as HookResponse
-          digest = parsed.hookSpecificOutput?.additionalContext ?? ''
-          receipt = parsed.systemMessage ?? ''
-        } catch {
-          digest = raw
-        }
-        if (digest) {
-          contextDone.add(sessionID())
-          ctx.ui.setStatus('deja', '')
-          // The receipt is what tells the user memory arrived; without it the
-          // recall is invisible and reads as the model guessing.
-          if (receipt) ctx.ui.notify(receipt, 'info')
-          // pi keeps the footer until it is cleared, so the session carries a
-          // quiet reminder that memory is on rather than a one-off toast.
-          const stats = run(['statusline'], '')
-          if (stats) ctx.ui.setStatus('deja', stats)
-          return {
-            message: {
-              customType: 'deja-recall',
-              content: digest,
-              display: false,
-            },
-          }
-        }
-        // Nothing to recall: either there is no history yet, or the first
-        // index is still building. A build is worth retrying, since its digest
-        // comes on a later turn, and worth saying, once.
-        if (showBuild(ctx)) {
-          if (!toldBuilding) {
-            toldBuilding = true
-            ctx.ui.notify(run(['warmup-status'], ''), 'info')
-          }
-          return
-        }
-        // With no build running the lookup is done, and this prompt goes on to
-        // prompt recall like every later one.
-        contextDone.add(sessionID())
-      }
+      const key = sessionID()
+      if (injected.has(key)) return
+      injected.add(key)
+      // The session goes with it: hook-context marks the one starting as live,
+      // which keeps it out of its own MCP recall on this first turn (#4394, as
+      // #4246 and #4273 did for Hermes and opencode).
       const raw = run(
-        ['hook-prompt'],
-        JSON.stringify({ prompt: event.prompt ?? '', session_id: sessionID() }),
+        ['hook-context'],
+        JSON.stringify({ session_id: sessionID(), cwd: process.cwd() }),
       )
       if (!raw) return
-      const resp = JSON.parse(raw) as HookResponse
-      if (resp.systemMessage) ctx.ui.notify(resp.systemMessage, 'info')
-      const extra = resp.hookSpecificOutput?.additionalContext
-      if (!extra) return
-      return {
-        message: { customType: 'deja-recall', content: extra, display: false },
+      let digest = raw
+      let receipt = ''
+      try {
+        const parsed = JSON.parse(raw) as HookResponse
+        digest = parsed?.hookSpecificOutput?.additionalContext || ''
+        receipt = parsed?.systemMessage || ''
+      } catch {
+        // not JSON: the raw text is the digest
       }
+      if (!digest) return
+      // Without the receipt the recall is invisible and reads as the model
+      // guessing; with it the user knows where the answer came from.
+      if (receipt) ctx.ui.notify(receipt, 'info')
+      const stats = statusline()
+      if (stats) ctx.ui.setStatus('deja', stats)
+      return { message: { customType: 'deja-recall', content: digest, display: false } }
     } catch {
       // memory is optional: never break the session over it
     }
   })
 
-  // The other half of the point of action: a command has just failed, and this
-  // machine has fixed that same error before. pi hands tool_result the content
-  // the model is about to read and uses what the handler returns, so the repair
-  // goes in beside the error in the same turn. tool_execution_start and
-  // tool_execution_end are observe-only — their return reaches nothing — which
-  // is why this is the one that carries it.
-  const repaired = new Map<string, string>()
-  pi.on('tool_result', (event: ToolResultEvent) => {
+  pi.on('context', async (event: ContextEvent, ctx: ExtensionContext) => {
+    remember(ctx)
+    const messages = Array.isArray(event?.messages) ? event.messages : null
+    if (!messages || messages.length === 0) return
+    let at = -1
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i]?.role === 'user') {
+        at = i
+        break
+      }
+    }
+    if (at < 0) return
+    const target = messages[at]
+    const prompt = userText(target)
+    if (!prompt) return
+    if (prompt !== asked) {
+      asked = prompt
+      recalled = run(
+        ['hook-prompt', '--plain'],
+        JSON.stringify({
+          prompt,
+          session_id: sessionID(),
+          cwd: ctx?.cwd || process.cwd(),
+        }),
+      )
+    }
+    // Silence is the common case: the hook speaks only when this machine's
+    // history actually answers the question.
+    if (!recalled) return
+    const out = messages.slice()
+    out[at] = {
+      ...target,
+      content: [{ type: 'text', text: recalled }, ...(target.content ?? [])],
+    }
+    return { messages: out }
+  })
+
+  // The point of action: a command just failed, and this machine has fixed that
+  // same error before. tool_result hands over the content the model is about to
+  // read and takes a replacement back, so the repair arrives beside the error in
+  // the same turn instead of a turn later.
+  const repaired: Record<string, string> = {}
+  pi.on('tool_result', async (event: ToolResultEvent) => {
     try {
+      if (!event) return
       // A file the agent just opened is the step before it changes that file,
-      // and pi has no handler that runs earlier whose return the model reads.
-      // So the file's own history goes out here: what was decided about it,
-      // from the sessions that decided it. deja answers once per session per
-      // fact, so re-reading the same file stays quiet. An edit or a write
-      // without a read before it gets the same line, for the edits after it.
+      // and omp has no handler that runs earlier whose return the model reads.
+      // So the file's own history goes out here: what past sessions decided about
+      // it. deja answers once per session per fact, so re-reading the same file
+      // stays quiet. An edit or a write without a read before it gets the same
+      // line, for the edits after it.
       if (
         event.toolName === 'read' ||
         event.toolName === 'edit' ||
         event.toolName === 'write'
       ) {
-        const path = String(event.input?.path ?? event.input?.file_path ?? '')
+        // omp's edit names its file only in the anchor its input opens with,
+        // "[path#HASH]".
+        const anchor = /^\s*\[([^\]#]+)#/.exec(String(event.input?.input ?? ''))
+        const path = String(
+          event.input?.path || event.input?.file_path || anchor?.[1] || '',
+        )
         if (!path) return
         const parts = Array.isArray(event.content) ? event.content : []
         const id = `file:${String(event.toolCallId ?? '')}`
-        if (!repaired.has(id)) {
-          repaired.set(
-            id,
-            run(
-              ['hook-tool', '--plain'],
-              JSON.stringify({
-                tool_name: event.toolName,
-                tool_input: { file_path: path },
-                session_id: sessionID(),
-                cwd: process.cwd(),
-              }),
-            ),
+        if (!(id in repaired)) {
+          repaired[id] = run(
+            ['hook-tool', '--plain'],
+            JSON.stringify({
+              tool_name: event.toolName,
+              tool_input: { file_path: path },
+              session_id: sessionID(),
+              cwd: process.cwd(),
+            }),
           )
         }
-        const note = repaired.get(id)
+        const note = repaired[id]
         if (!note) return
         return { content: parts.concat([{ type: 'text', text: note }]) }
       }
-      if (!event.isError) return
-      // Senpi and Kimchi's pi have a powershell tool beside bash (#4523).
-      if (event.toolName !== 'bash' && event.toolName !== 'powershell') return
+      if (event.toolName !== 'bash') return
+      // omp's bash tool reports a non-zero exit in details.exitCode and leaves
+      // isError false: gating on isError alone stays silent on every failed build.
+      const failed =
+        event.isError === true ||
+        (typeof event.details?.exitCode === 'number' && event.details.exitCode !== 0)
+      if (!failed) return
       const parts = Array.isArray(event.content) ? event.content : []
       const output = parts
-        .filter(isTextPart)
+        .filter((part) => part?.type === 'text' && typeof part.text === 'string')
         .map((part) => part.text)
         .join('\n')
       if (!output.trim()) return
       const id = String(event.toolCallId ?? '')
-      if (!repaired.has(id)) {
-        repaired.set(
-          id,
-          run(
-            ['hook-tool-after', '--plain'],
-            JSON.stringify({
-              tool_name: event.toolName,
-              tool_response: output,
-              session_id: sessionID(),
-              cwd: process.cwd(),
-            }),
-          ),
+      if (!(id in repaired)) {
+        repaired[id] = run(
+          ['hook-tool-after', '--plain'],
+          JSON.stringify({
+            tool_name: 'bash',
+            tool_response: output,
+            session_id: sessionID(),
+            cwd: process.cwd(),
+          }),
         )
       }
-      const line = repaired.get(id)
+      const line = repaired[id]
       if (!line) return
       return { content: parts.concat([{ type: 'text', text: line }]) }
     } catch {
@@ -300,12 +325,10 @@ export default function (pi: PiApi) {
   })
 
   // Compaction throws away the blocks this session was shown, and the list that
-  // stops them repeating outlives them. session_compact fires once the summary
-  // has replaced the history, which is exactly when the session should be
-  // allowed to see those blocks again. The session file keeps the turns the
-  // summary replaced, so deja reads them from it and the next prompt carries
-  // what the agent was in the middle of.
-  pi.on('session_compact', (_event: unknown, ctx: ExtensionContext) => {
+  // stops them repeating outlives them. The session file still holds the turns
+  // the summary replaced: deja reads them from it, and the next prompt's recall
+  // carries what the agent was in the middle of.
+  pi.on('session_compact', async (_event: unknown, ctx: ExtensionContext) => {
     try {
       remember(ctx)
       run(
@@ -314,6 +337,7 @@ export default function (pi: PiApi) {
           session_id: sessionID(),
           transcript_path: sessionFile,
           cwd: process.cwd(),
+          harness: 'omp',
         }),
       )
     } catch {
@@ -321,14 +345,30 @@ export default function (pi: PiApi) {
     }
   })
 
-  // The session is over: quit, /new, /resume, /fork or a reload. Its live
-  // stamp goes with it, so the next session's MCP recall can answer with it
-  // now rather than twenty minutes from now (#4210). The id is the one this
-  // extension saw last; on a switch ctx may already name the next session.
-  pi.on('session_shutdown', () => {
+  // A session is over when omp exits or switches to another one (/new, /resume,
+  // a fork). Its live stamp goes with it, so the next session's MCP recall can
+  // answer with it now rather than twenty minutes from now (#4210). On a switch
+  // the id remembered so far is the session left behind.
+  const endSession = () => {
+    const id = sessionID()
+    if (id)
+      run(
+        ['hook-session-end'],
+        JSON.stringify({ session_id: id, cwd: process.cwd() }),
+        2000,
+      )
+  }
+  pi.on('session_switch', async (_event: unknown, ctx: ExtensionContext) => {
     try {
-      const id = sessionID()
-      if (id) run(['hook-session-end'], JSON.stringify({ session_id: id }), 2000)
+      endSession()
+      remember(ctx)
+    } catch {
+      // memory is optional: never break the session over it
+    }
+  })
+  pi.on('session_shutdown', async () => {
+    try {
+      endSession()
     } catch {
       // memory is optional: never break the session over it
     }
