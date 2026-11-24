@@ -4,5 +4,6 @@
       "args": ["mcp"],
       "command": "deja"
     }
-  }
+  },
+  "disabledServers": ["context-mode:context-mode"]
 }
