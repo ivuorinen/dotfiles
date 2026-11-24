@@ -85,6 +85,10 @@ end
 # path. context-mode 2.x reads CONTEXT_MODE_DATA_DIR: the CONTEXT_MODE_DIR this used
 # to set is ignored, which left its data in ~/.context-mode.
 set -q CONTEXT_MODE_DATA_DIR; or set -x CONTEXT_MODE_DATA_DIR "$XDG_STATE_HOME/context-mode"
+# Tool results over this many bytes are indexed and replaced by an excerpt and a
+# ctx_search pointer (default 4096). 16384 matches the cap context-mode puts on
+# its own tool output, so a mid-sized file or command result arrives whole.
+set -q CTX_REPLACE_TRIGGER_BYTES; or set -x CTX_REPLACE_TRIGGER_BYTES 16384
 
 # omp (oh-my-pi) environment
 # PI_CONFIG_DIR is a dirname under $HOME (default .omp), not a path, so strip the

@@ -367,6 +367,10 @@ fi
 # path. context-mode 2.x reads CONTEXT_MODE_DATA_DIR: the CONTEXT_MODE_DIR this used
 # to set is ignored, which left its data in ~/.context-mode.
 export CONTEXT_MODE_DATA_DIR="$XDG_STATE_HOME/context-mode"
+# Tool results over this many bytes are indexed and replaced by an excerpt and a
+# ctx_search pointer (default 4096). 16384 matches the cap context-mode puts on
+# its own tool output, so a mid-sized file or command result arrives whole.
+export CTX_REPLACE_TRIGGER_BYTES=16384
 
 # omp (oh-my-pi)
 msg "Setting up omp configuration"
