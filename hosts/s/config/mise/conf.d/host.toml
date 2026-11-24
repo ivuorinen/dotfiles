@@ -3,3 +3,4 @@
 [tools]
 "github:ville6000/7pace-cli" = "0.3.1"
 "npm:@villev/estorm" = "0.16.0"
+"github:ville6000/tfs" = "0.13.0"
