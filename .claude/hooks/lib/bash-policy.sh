@@ -403,10 +403,7 @@ _bp_redir()
   return 0
 }
 
-# _bp_protected WORD... — succeed when a word names a protected path, read as
-# given or, when the caller set BP_CWD (the ctx tools' `cwd`), relative to it:
-# `echo x > setup.py` run in tools/dotbot names no protected text of its own
-# (audit-80f9f36c). Absolute and home paths ignore the cwd.
+# _bp_protected WORD... — succeed when a word names a protected path.
 _bp_protected()
 {
   local a
@@ -417,11 +414,6 @@ _bp_protected()
     if [[ $a == *[{}]* ]] && protected_referenced "${a//[\{\}]/ }"; then
       return 0
     fi
-    [[ -n ${BP_CWD:-} ]] || continue
-    case $a in
-      /* | '~'* | -*) ;;
-      *) protected_referenced "$BP_CWD/$a" && return 0 ;;
-    esac
   done
   return 1
 }

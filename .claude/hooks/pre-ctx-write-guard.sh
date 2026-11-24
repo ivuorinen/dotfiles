@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse on context-mode execute tools (ctx_execute, ctx_execute_file,
-# ctx_batch_execute, ctx_index): the sandbox has raw filesystem access, so code
+# PreToolUse on the context-mode tools that reach files (ctx_execute, ctx_batch,
+# ctx_index): the sandbox has raw filesystem access, so code
 # that targets hook-protected paths must be denied here — pre-edit-block.sh
 # only sees Edit/Write/Read tool calls (finding audit-5f0966e7). The same
 # sandbox runs arbitrary shell, so the Bash policy tier (lib/bash-policy.sh)
@@ -26,17 +26,20 @@ command -v jq > /dev/null 2>&1 \
 source "$(dirname "${BASH_SOURCE[0]}")/lib/bash-policy.sh"
 
 input=$(cat)
-# `commands` (ctx_batch_execute) are shell. `code` is shell when `language`
-# says so or is absent; any other language goes to the string-literal pass.
-# `path` (ctx_execute_file, ctx_index) is only read, so it gets the secrets
-# check alone.
+# `commands` (ctx_batch, a list of strings) are shell. `code` (ctx_execute) is
+# shell when `language` says so or is absent; any other language goes to the
+# string-literal pass. `file` (ctx_execute) and `path` (ctx_index) name a file
+# to read, so they get the secrets check. ctx_execute's code receives `file` in
+# $CTX_FILE and can write it, so a protected `file` counts as named by the code.
 unreadable="unparseable hook payload; pre-ctx-write-guard.sh fails closed."
 # One unit per batch command, newlines carried as \x1e so each stays one line.
 # Every batch command runs in a shell of its own, so each is judged on its own:
 # joined, a protected path in one (`git submodule status`) and a write-shaped
 # token in another (a JavaScript `=>`) read as one write.
+# A command that is not a string is not a shape ctx_batch sends: fail closed
+# rather than let it through unjudged.
 shell_units=$(printf '%s' "$input" | jq -r '
-  ((.tool_input.commands // [])[] | .command // empty),
+  ((.tool_input.commands // [])[] | if type == "string" then . else error("command is not a string") end),
   (if (.tool_input.language // "shell") == "shell" then (.tool_input.code // empty) else empty end)
   | gsub("\n"; "\u001e")
 ' 2> /dev/null) || block "$unreadable"
@@ -47,19 +50,11 @@ done <<< "$shell_units"
 foreign_code=$(printf '%s' "$input" | jq -r '
   if (.tool_input.language // "shell") == "shell" then empty else (.tool_input.code // empty) end
 ' 2> /dev/null) || block "$unreadable"
-path=$(printf '%s' "$input" | jq -r '.tool_input.path // empty' 2> /dev/null) || block "$unreadable"
-# Both execute tools take a `cwd`. Inside a secrets or protected tree a bare
-# relative name (`cat github.fish`) carries no path text for the predicates to
-# see (audit-80f9f36c), so the directory itself is judged.
-cwd=$(printf '%s' "$input" | jq -r '.tool_input.cwd // empty' 2> /dev/null) || block "$unreadable"
+path=$(printf '%s' "$input" | jq -r '.tool_input.file // .tool_input.path // empty' 2> /dev/null) || block "$unreadable"
 # A regex test, not ${code//[[:space:]]/}: bash 3.2's pattern substitution is
 # quadratic and cost seconds on a long batch.
 [[ "$foreign_code" =~ [^[:space:]] ]] || foreign_code=""
 [[ ${#units[@]} -gt 0 || -n "$foreign_code" || -n "$path" ]] || exit 0
-
-if [[ -n "$cwd" ]] && secrets_referenced "$cwd"; then
-  block "the working directory is inside a secrets.d tree — its files contain credentials. Ask the user instead."
-fi
 
 # ponytail: per-unit co-occurrence heuristic — a protected path anywhere in a
 # unit (one batch command, or the code) plus a write-shaped token anywhere in
@@ -71,19 +66,21 @@ fi
 # writes it cannot parse.
 writeish='>>|>|sed [^|;&]*-i|tee |rm |mv |cp |chmod |truncate |open\(|writeFile|appendFile'
 
-# co_occurs UNIT FOREIGN — refuse UNIT when it names a protected path and
-# carries a write-shaped token. For non-shell code (FOREIGN=1) a protected cwd
-# counts as the path being named, since every relative write lands inside it;
-# shell gets the precise cwd-aware check in the policy tier (BP_CWD below), so
-# `echo x > /tmp/y` there still passes.
+file_protected=0
+if [[ -n "$path" ]] && protected_referenced "$path"; then
+  file_protected=1
+fi
+
+# co_occurs UNIT — refuse UNIT when it names a protected path and carries a
+# write-shaped token. A protected `file` counts as named: the code reaches it
+# through $CTX_FILE without spelling the path.
 co_occurs()
 {
-  local unit=$1 foreign=$2 cleaned hit=0
+  local unit=$1 cleaned hit=$file_protected
   # Strip stderr/stdout-to-null redirects so `2> /dev/null` does not read as
   # a write.
   cleaned=$(printf '%s' "$unit" | sed -E 's/[0-9]*>>?[[:space:]]*(\&[0-9]+|\/dev\/null)//g')
-  protected_referenced "$cleaned" && hit=1
-  if [[ "$hit" -eq 0 && "$foreign" -eq 1 && -n "$cwd" ]] && protected_referenced "$cwd/"; then
+  if [[ "$hit" -eq 0 ]] && protected_referenced "$cleaned"; then
     hit=1
   fi
   if [[ "$hit" -eq 1 ]] && printf '%s\n' "$cleaned" | grep -qE "$writeish"; then
@@ -95,9 +92,9 @@ co_occurs()
 }
 
 for unit in ${units[@]+"${units[@]}"}; do
-  co_occurs "$unit" 0
+  co_occurs "$unit"
 done
-[[ -z "$foreign_code" ]] || co_occurs "$foreign_code" 1
+[[ -z "$foreign_code" ]] || co_occurs "$foreign_code"
 
 # Real secrets.d files, fish or bash/zsh: reading is as forbidden as writing.
 if [[ -n "$path" ]] && secrets_referenced "$path"; then
@@ -112,9 +109,6 @@ fi
 # -A")` is still read. Each unit is checked alone for the reason the units
 # exist: its "code names a policy tool" test would otherwise read one
 # command's unparseable shape against another command's tool name.
-# BP_CWD lets its write checks resolve relative targets against `cwd`.
-# shellcheck disable=SC2034 # read by lib/bash-policy.sh
-BP_CWD=$cwd
 for unit in ${units[@]+"${units[@]}"}; do
   if bash_policy_check "$unit" shell; then
     block "$BP_REASON"

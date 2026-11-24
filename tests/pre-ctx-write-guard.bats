@@ -22,19 +22,24 @@ setup()
   export HOOK
 }
 
-# ctx_execute / ctx_execute_file shape: the code (and optional path) field.
+# ctx_execute shape: the code and an optional file it receives in $CTX_FILE.
 code()
 {
-  jq -cn --arg c "$1" --arg p "${2:-}" \
-    '{tool_input: {code: $c, path: $p}}' | bash "$HOOK"
+  jq -cn --arg c "$1" --arg f "${2:-}" \
+    '{tool_input: {code: $c, file: $f}}' | bash "$HOOK"
 }
 
-# ctx_batch_execute shape: a commands array. The guard judges every .command,
+# ctx_batch shape: a list of command strings. The guard judges every command,
 # so a denied command hidden at index 3 is still seen.
 batch()
 {
-  jq -cn --args '{tool_input: {commands: ($ARGS.positional | map({command: .}))}}' "$@" \
-    | bash "$HOOK"
+  jq -cn --args '{tool_input: {commands: $ARGS.positional}}' "$@" | bash "$HOOK"
+}
+
+# ctx_index shape: a path to read.
+index()
+{
+  jq -cn --arg p "$1" '{tool_input: {path: $p}}' | bash "$HOOK"
 }
 
 @test "pre-ctx-write-guard: blocks writes aimed at submodule trees" {
@@ -124,12 +129,23 @@ batch()
   run -2 code 'ls config/fish/secrets.d/'
   run -2 code 'cat config/secrets.d/tfs.sh'
   run -2 code '' 'config/secrets.d/sonar.sh'
+  run -2 index 'config/secrets.d/sonar.sh'
 }
 
-# ctx_execute_file only reads its path, so analysing a vendored file with code
-# that happens to call open() is not a write to it.
-@test "pre-ctx-write-guard: reading a protected file via ctx_execute_file is allowed" {
-  run -0 code 'print(open("/tmp/other").read())' 'config/fish/functions/fisher.fish'
+# ctx_execute hands its code the `file` in $CTX_FILE, so the code can write a
+# protected file without spelling its path. Read-only code on it still passes.
+@test "pre-ctx-write-guard: a protected file is guarded through CTX_FILE" {
+  run -2 code 'echo x > "$CTX_FILE"' 'config/fish/functions/fisher.fish'
+  [[ "$output" == *"hook-protected path"* ]]
+  run -2 code 'require("fs").writeFileSync(process.env.CTX_FILE, "x")' 'tools/dotbot/README.md'
+  run -0 code 'wc -l "$CTX_FILE"' 'config/fish/functions/fisher.fish'
+}
+
+# ctx_batch sends plain strings. Any other shape fails closed rather than
+# going through unjudged.
+@test "pre-ctx-write-guard: a batch command that is not a string fails closed" {
+  run -2 bash -c 'jq -cn "{tool_input: {commands: [{command: \"rm tools/dotbot/x\"}]}}" | bash "$1"' _ "$HOOK"
+  [[ "$output" == *"fails closed"* ]]
 }
 
 # The path and the write used to have to share a line, so a variable split
@@ -245,42 +261,6 @@ subprocess.run(["git", "status"])'
   run -0 code "$script"
   end=$(date +%s)
   [ $((end - start)) -lt 2 ]
-}
-
-# ctx_execute with a cwd: code_in DIR CODE [LANGUAGE].
-code_in()
-{
-  jq -cn --arg d "$1" --arg c "$2" --arg l "${3:-shell}" \
-    '{tool_input: {cwd: $d, language: $l, code: $c}}' | bash "$HOOK"
-}
-
-# ctx_batch_execute with a cwd: batch_in DIR COMMAND...
-batch_in()
-{
-  local d=$1
-  shift
-  jq -cn --arg d "$d" --args '{tool_input: {cwd: $d, commands: ($ARGS.positional | map({command: .}))}}' "$@" \
-    | bash "$HOOK"
-}
-
-# A relative name inside a secrets or protected cwd carried no path text for
-# the predicates (audit-80f9f36c). Synthetic payloads only: nothing is run.
-@test "pre-ctx-write-guard: a secrets.d cwd is refused" {
-  run -2 batch_in config/fish/secrets.d 'cat github.fish'
-  [[ "$output" == *"secrets.d"* ]]
-  run -2 code_in config/fish/secrets.d 'cat *'
-  run -2 code_in "$PWD/config/secrets.d" 'ls'
-  run -0 code_in config/fish 'ls functions'
-}
-
-@test "pre-ctx-write-guard: writes resolved against a protected cwd are refused" {
-  run -2 code_in tools/dotbot 'echo x > setup.py'
-  run -2 code_in tools/dotbot 'perl -pi -e s/a/b/ setup.py'
-  run -2 batch_in .git 'rm hooks/pre-commit'
-  run -2 code_in tools/dotbot 'require("fs").writeFileSync("setup.py", "x")' javascript
-  run -0 code_in tools/dotbot 'ls; cat README.md'
-  run -0 code_in tools/dotbot 'echo x > /tmp/out'
-  run -0 code_in local/bin 'echo x > scratch.txt'
 }
 
 # The wrapper, config-file, alias and update-index gaps on the sandbox path
