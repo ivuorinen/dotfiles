@@ -1,0 +1,79 @@
+images:
+  blockImages: true
+hideThinkingBlock: true
+showHardwareCursor: false
+doubleEscapeAction: tree
+treeFilterMode: all
+theme:
+  dark: dark-gruvbox
+  light: light-gruvbox
+autocompleteMaxVisible: 10
+steeringMode: all
+followUpMode: all
+startup:
+  changelogMode: summary
+modelRoles:
+  default: anthropic/claude-opus-5-5:xhigh
+symbolPreset: nerd
+composer:
+  shape: rule
+update:
+  auto: true
+setupVersion: 3
+tui:
+  mouse: false
+  tight: false
+defaultThinkingLevel: xhigh
+personality: default
+retry:
+  waitForUsageReset: true
+advisor:
+  enabled: true
+btw:
+  inject: true
+branchSummary:
+  enabled: true
+compaction:
+  handoffSaveToDisk: true
+memory:
+  backend: mnemopi
+autolearn:
+  enabled: true
+lsp:
+  formatOnWrite: true
+bash:
+  gitGuard: true
+bashInterceptor:
+  enabled: true
+astGrep:
+  enabled: true
+checkpoint:
+  enabled: true
+github:
+  enabled: true
+security:
+  enabled: true
+todo:
+  eager: always
+tasks:
+  todoClearDelay: 900
+plan:
+  autosave: true
+task:
+  eager: default
+  steps: true
+  structured: true
+  isolation:
+    commits: generic
+commands:
+  enableClaudeUser: true
+claudeResets:
+  autoRedeem5h: "yes"
+  autoRedeemWeekly: "yes"
+  autoRedeemFable: "yes"
+secrets:
+  enabled: true
+statusLine:
+  transparent: true
+tools:
+  approvalMode: yolo

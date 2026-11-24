@@ -1,0 +1,302 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "omp settings (config.yml)",
+  "description": "Repo-local schema: omp publishes none. Types follow the keys this repo sets, as `omp config list --json` reports them; other keys are allowed.",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "object",
+      "properties": {
+        "blockImages": {
+          "type": "boolean"
+        }
+      }
+    },
+    "hideThinkingBlock": {
+      "type": "boolean"
+    },
+    "showHardwareCursor": {
+      "type": "boolean"
+    },
+    "doubleEscapeAction": {
+      "type": "string"
+    },
+    "treeFilterMode": {
+      "type": "string"
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "dark": {
+          "type": "string"
+        },
+        "light": {
+          "type": "string"
+        }
+      }
+    },
+    "autocompleteMaxVisible": {
+      "type": "number"
+    },
+    "steeringMode": {
+      "type": "string"
+    },
+    "followUpMode": {
+      "type": "string"
+    },
+    "startup": {
+      "type": "object",
+      "properties": {
+        "changelogMode": {
+          "type": "string"
+        }
+      }
+    },
+    "modelRoles": {
+      "type": "object"
+    },
+    "symbolPreset": {
+      "type": "string"
+    },
+    "composer": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "type": "string"
+        }
+      }
+    },
+    "update": {
+      "type": "object",
+      "properties": {
+        "auto": {
+          "type": "boolean"
+        }
+      }
+    },
+    "setupVersion": {
+      "type": "number"
+    },
+    "tui": {
+      "type": "object",
+      "properties": {
+        "mouse": {
+          "type": "boolean"
+        },
+        "tight": {
+          "type": "boolean"
+        }
+      }
+    },
+    "defaultThinkingLevel": {
+      "type": "string"
+    },
+    "personality": {
+      "type": "string"
+    },
+    "retry": {
+      "type": "object",
+      "properties": {
+        "waitForUsageReset": {
+          "type": "boolean"
+        }
+      }
+    },
+    "advisor": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "btw": {
+      "type": "object",
+      "properties": {
+        "inject": {
+          "type": "boolean"
+        }
+      }
+    },
+    "branchSummary": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "compaction": {
+      "type": "object",
+      "properties": {
+        "handoffSaveToDisk": {
+          "type": "boolean"
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "backend": {
+          "type": "string"
+        }
+      }
+    },
+    "autolearn": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "lsp": {
+      "type": "object",
+      "properties": {
+        "formatOnWrite": {
+          "type": "boolean"
+        }
+      }
+    },
+    "bash": {
+      "type": "object",
+      "properties": {
+        "gitGuard": {
+          "type": "boolean"
+        }
+      }
+    },
+    "bashInterceptor": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "astGrep": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "github": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "todo": {
+      "type": "object",
+      "properties": {
+        "eager": {
+          "type": "string"
+        }
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "properties": {
+        "todoClearDelay": {
+          "type": "number"
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "autosave": {
+          "type": "boolean"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "properties": {
+        "eager": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "boolean"
+        },
+        "structured": {
+          "type": "boolean"
+        },
+        "isolation": {
+          "type": "object",
+          "properties": {
+            "commits": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "enableClaudeUser": {
+          "type": "boolean"
+        }
+      }
+    },
+    "claudeResets": {
+      "type": "object",
+      "properties": {
+        "autoRedeem5h": {
+          "type": "string"
+        },
+        "autoRedeemWeekly": {
+          "type": "string"
+        },
+        "autoRedeemFable": {
+          "type": "string"
+        }
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "statusLine": {
+      "type": "object",
+      "properties": {
+        "transparent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "properties": {
+        "approvalMode": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

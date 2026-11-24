@@ -86,6 +86,12 @@ config/copilot/skills/deja-history/*
 config/pi/*
 !config/pi/agent/
 config/pi/agent/*
+# config.yml is omp's settings file, and omp writes every setting change into
+# it. Never leave a literal credential here (auth.broker.token, live.apiKey,
+# mnemopi.*ApiKey, searxng.token, ...): point the setting at an environment
+# variable the way omp's settings docs allow for that key, or leave it unset
+# where omp falls back to an environment variable.
+!config/pi/agent/config.yml
 !config/pi/agent/mcp.json
 !config/pi/agent/extensions/
 config/pi/agent/extensions/*

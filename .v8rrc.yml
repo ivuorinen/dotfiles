@@ -58,6 +58,9 @@ customCatalog:
     - name: Copilot CLI settings
       fileMatch: [config/copilot/settings.json]
       location: schemas/copilot-settings.schema.json
+    - name: omp settings
+      fileMatch: [config/pi/agent/config.yml]
+      location: schemas/omp-config.schema.json
     - name: gh-changelog
       fileMatch: [config/gh-changelog/config.yaml]
       location: schemas/gh-changelog.schema.json
