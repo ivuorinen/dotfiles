@@ -73,6 +73,8 @@ cr.md
 
 # copilot coding harness
 config/copilot/*
+# copilot-instructions.md is mirrored for omp in config/pi/agent/AGENTS.md and
+# RULES.md; change both when a shared rule changes.
 !config/copilot/copilot-instructions.md
 !config/copilot/mcp-config.json
 !config/copilot/settings.json
@@ -93,6 +95,12 @@ config/pi/agent/*
 # where omp falls back to an environment variable.
 !config/pi/agent/config.yml
 !config/pi/agent/mcp.json
+# AGENTS.md and RULES.md are omp's global instructions, adapted from
+# config/copilot/copilot-instructions.md plus what ~/.local/state/claude/CLAUDE.md
+# adds. omp keeps one user-level context file, so AGENTS.md hides that
+# CLAUDE.md; RULES.md also reaches subagents, which never receive an AGENTS.md.
+!config/pi/agent/AGENTS.md
+!config/pi/agent/RULES.md
 !config/pi/agent/extensions/
 config/pi/agent/extensions/*
 !config/pi/agent/extensions/deja.ts

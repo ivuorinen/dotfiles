@@ -11,6 +11,10 @@ config/copilot/*
 # beside the tracked files on a machine missing the ~/.cache/omp,
 # ~/.local/share/omp or ~/.local/state/omp directories (dotbot-links.yaml).
 config/pi/*
+!config/pi/agent/
+config/pi/agent/*
+!config/pi/agent/AGENTS.md
+!config/pi/agent/RULES.md
 config/vim/*
 docs/*
 # graphify generated report/wiki — machine-generated, regenerable.
