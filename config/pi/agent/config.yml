@@ -35,12 +35,15 @@ branchSummary:
   enabled: true
 compaction:
   handoffSaveToDisk: true
+  idleEnabled: true
 memory:
   backend: mnemopi
 autolearn:
   enabled: true
+  autoContinue: true
 lsp:
   formatOnWrite: true
+  diagnosticsOnEdit: true
 bash:
   gitGuard: true
 bashInterceptor:
@@ -55,6 +58,7 @@ security:
   enabled: true
 todo:
   eager: always
+  backend: native
 tasks:
   todoClearDelay: 900
 plan:
@@ -65,6 +69,11 @@ task:
   structured: true
   isolation:
     commits: generic
+  enableEffort: true
+  enableLsp: true
+  crossInstance: true
+  maxRecursionDepth: 0
+  prewalk: true
 commands:
   enableClaudeUser: true
 claudeResets:
@@ -77,3 +86,22 @@ statusLine:
   transparent: true
 tools:
   approvalMode: yolo
+terminal:
+  showProgress: true
+display:
+  cacheMissMarker: true
+error:
+  notify: "on"
+marketplace:
+  autoUpdate: auto
+features:
+  unexpectedStopDetection: smart
+contextPromotion:
+  enabled: true
+mnemopi:
+  recallRelevance: auto
+  polyphonicRecall: true
+  enhancedRecall: true
+  proactiveLinking: true
+mcp:
+  notifications: true
