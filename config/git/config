@@ -80,3 +80,5 @@
 	cleanup = !git-cleanup-squashed
 [gpg "ssh"]
 	allowedSignersFile = ~/.ssh/allowed_signers
+[credential "https://git.esle.fi"]
+	provider = generic
