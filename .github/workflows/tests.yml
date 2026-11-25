@@ -69,10 +69,13 @@ jobs:
       # jq: every .claude/hooks script parses its JSON input with it, so the
       # hook suites need it, as do the herdr, theme and gh helper tests. The
       # runner image happens to ship one; this pins it.
+      # node: tests/pi-git-policy.bats loads the omp git-policy extension with
+      # Node's TypeScript type stripping (22.18+) and skips without it; this
+      # pins a Node that has it instead of relying on the runner image's.
       - name: Install pinned tools
         uses: jdx/mise-action@90f833d396d0cc3674b631d2d225e306476c303a # v5.2.10
         with:
-          install_args: python shfmt uv age bats tmux yamllint jq
+          install_args: python shfmt uv age bats tmux yamllint jq node
 
       - name: Run test suite
         # scripts/bats-run.sh is the same runner as the pre-commit hook:
