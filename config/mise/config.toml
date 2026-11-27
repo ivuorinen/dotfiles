@@ -248,7 +248,7 @@ pinact = "5.0.2"
 "github:anchore/syft" = "1.57.1"
 trivy = "0.76.1"
 trufflehog = "3.99.8"
-zizmor = "1.31.1"
+zizmor = "1.33.1"
 
 # System monitoring & misc utilities
 bottom = "0.15.0"
