@@ -150,7 +150,7 @@ tree-sitter = "0.27.2"
 
 # AI & coding agents
 "npm:ccusage" = "20.0.51"
-copilot = "1.0.114"
+copilot = "1.0.115"
 "npm:@vshulcz/deja-vu" = "0.24.2"
 # "latest" for the reason at pipx:pynvim. After an upgrade, rerun
 # `graphify install --platform claude` (.claude/rules/graphify-first.md).
