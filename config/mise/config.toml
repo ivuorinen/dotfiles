@@ -255,6 +255,7 @@ bottom = "0.15.0"
 cheat = "5.1.0"
 "github:binwiederhier/ntfy" = "2.37.2"
 rclone = "1.76.0"
+jactionlint = "latest"
 
 # Homebrew formulae and casks for mise's brew bootstrap ([bootstrap.packages])
 # live in conf.d/brew/mise.macos.toml, which loads on macOS only.
