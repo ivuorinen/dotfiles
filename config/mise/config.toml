@@ -62,7 +62,7 @@ minimum_release_age_excludes = ["pypi:*"]
 # devDependencies stay reserved for build-time tooling pinned per-project.
 
 # Language runtimes & build toolchains
-bun = "1.4.4"
+bun = "1.4.5"
 cargo-binstall = "latest"
 cmake = "4.4.5"
 "npm:corepack" = "0.36.0"
