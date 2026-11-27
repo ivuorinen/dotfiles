@@ -247,7 +247,7 @@ osv-scanner = "2.7.1"
 pinact = "5.0.2"
 "github:anchore/syft" = "1.57.1"
 trivy = "0.76.1"
-trufflehog = "3.99.8"
+trufflehog = "3.100.1"
 zizmor = "1.31.1"
 
 # System monitoring & misc utilities
